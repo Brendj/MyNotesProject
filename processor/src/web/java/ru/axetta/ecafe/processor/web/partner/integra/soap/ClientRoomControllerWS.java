@@ -1733,7 +1733,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setMobilePhone(client.getMobile());
         clientSummaryExt.setEmail(client.getEmail());
         clientSummaryExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(client.getOrg().getIdOfOrg(),
-                typesForSummary).getDate()));
+                typesForSummary)));
         Contragent defaultMerchant = client.getOrg().getDefaultSupplier();
         if (defaultMerchant != null) {
             clientSummaryExt.setDefaultMerchantId(defaultMerchant.getIdOfContragent());
@@ -1898,7 +1898,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             purchaseExt.setSum(order.getRSum());
             purchaseExt.setByCash(order.getSumByCash());
             purchaseExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(order.getOrg().getIdOfOrg(),
-                    SectionType.PAYMENT_REGISTRY).getDate()));
+                    SectionType.PAYMENT_REGISTRY)));
             if (order.getCard() == null) {
                 purchaseExt.setIdOfCard(null);
             } else {
@@ -1979,7 +1979,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseWithDetailsExt.setSum(order.getRSum());
                 purchaseWithDetailsExt.setByCash(order.getSumByCash());
                 purchaseWithDetailsExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(order.getOrg().getIdOfOrg(),
-                        SectionType.PAYMENT_REGISTRY).getDate()));
+                        SectionType.PAYMENT_REGISTRY)));
                 if (order.getCard() == null) {
                     purchaseWithDetailsExt.setIdOfCard(null);
                 } else {
@@ -1999,7 +1999,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     purchaseWithDetailsElementExt.setSum(od.getRPrice());
                     purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
                     purchaseWithDetailsElementExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(order.getOrg().getIdOfOrg(),
-                            SectionType.PAYMENT_REGISTRY).getDate()));
+                            SectionType.PAYMENT_REGISTRY)));
                     if (od.isComplex()) {
                         purchaseWithDetailsElementExt.setType(1);
                     } else if (od.isComplexItem()) {
@@ -3178,7 +3178,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventWithRepItem.setDirection(enterEvent.getPassDirection());
             enterEventWithRepItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             enterEventWithRepItem.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(enterEvent.getOrg().getIdOfOrg(),
-                    SectionType.ENTER_EVENTS).getDate()));
+                    SectionType.ENTER_EVENTS)));
 
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
@@ -3242,7 +3242,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setDirection(enterEvent.getPassDirection());
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             enterEventItem.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(enterEvent.getOrg().getIdOfOrg(),
-                    SectionType.ENTER_EVENTS).getDate()));
+                    SectionType.ENTER_EVENTS)));
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
                 //Client guardian = DAOUtils.findClient(session, guardianId);                                                session
@@ -3264,7 +3264,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setDirection(EnterEvent.CHECKED_BY_TEACHER_EXT);
             enterEventItem.setTemporaryCard(0);
             enterEventItem.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(manualEvent.getIdOfOrg(),
-                    SectionType.ENTER_EVENTS).getDate()));
+                    SectionType.ENTER_EVENTS)));
             enterEventList.getE().add(enterEventItem);
         }
         data.setEnterEventList(enterEventList);
@@ -3293,7 +3293,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setPassWithGuardian(enterEvent.getGuardianId());
             enterEventItem.setLastUpdateDate(toXmlDateTime(
                     OrgRepository.getInstance().getLastProcessSectionsDate(enterEvent.getOrg().getIdOfOrg(),
-                    SectionType.ENTER_EVENTS).getDate()));
+                    SectionType.ENTER_EVENTS)));
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
                 enterEventItem.setGuardianSan(ClientDao.getInstance().extractSanFromClient(guardianId));

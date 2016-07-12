@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -131,29 +132,33 @@ public class OrgRepository extends AbstractJpaDao<Org> {
     }
 
     @Transactional(readOnly = true)
-    public LastProcessSectionsDates getLastProcessSectionsDate( Long idOfOrg, SectionType sectionType)  {
+    public Date getLastProcessSectionsDate(Long idOfOrg, SectionType sectionType)  {
         List<SectionType> sectionTypes = new ArrayList<SectionType>();
         sectionTypes.add(sectionType);
         return getLastProcessSectionsDate(idOfOrg, sectionTypes);
     }
 
     @Transactional(readOnly = true)
-    public LastProcessSectionsDates getLastProcessSectionsDate(Long idOfOrg, List<SectionType> sectionTypes) {
+    public Date getLastProcessSectionsDate(Long idOfOrg, List<SectionType> sectionTypes) {
         List<Integer> types = new ArrayList<Integer>();
         for(SectionType sectionType : sectionTypes){
             types.add(sectionType.getType());
         }
-        Org org = findOrgWithFriendlyOrgs(idOfOrg);
-        List<Org> orgs = new ArrayList<Org>();
-        orgs.add(org);
-        orgs.addAll(org.getFriendlyOrg());
+        //Org org = findOrgWithFriendlyOrgs(idOfOrg);
+        //List<Org> orgs = new ArrayList<Org>();
+        //orgs.add(org);
+        //orgs.addAll(org.getFriendlyOrg());
         Query query = entityManager.createQuery(
-                "select l from LastProcessSectionsDates l where l.org in :orgs "
+                "select l from LastProcessSectionsDates l where l.compositeIdOfLastProcessSectionsDates.idOfOrg = :idOfOrg "
                         + "and l.compositeIdOfLastProcessSectionsDates.type in :types order by date desc ",
                 LastProcessSectionsDates.class);
         query.setMaxResults(1);
-        query.setParameter("orgs", orgs);
+        query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("types", types);
-        return (LastProcessSectionsDates) query.getSingleResult();
+        LastProcessSectionsDates result = null;
+        try{
+            result = (LastProcessSectionsDates) query.getSingleResult();
+        } catch (Exception ignore){}
+        return result != null ? result.getDate() : null;
     }
 }
