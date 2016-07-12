@@ -148,8 +148,8 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         orgs.add(org);
         orgs.addAll(org.getFriendlyOrg());
         Query query = entityManager.createQuery(
-                "from LastProcessSectionsDates where org in :orgs "
-                        + "and LastProcessSectionsDates.compositeIdOfLastProcessSectionsDates.type in :types order by date desc ",
+                "select l from LastProcessSectionsDates l where l.org in :orgs "
+                        + "and l.compositeIdOfLastProcessSectionsDates.type in :types order by date desc ",
                 LastProcessSectionsDates.class);
         query.setMaxResults(1);
         query.setParameter("orgs", orgs);
