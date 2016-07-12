@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.Sub
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
@@ -319,6 +320,11 @@ public class DAOUtils {
 
     public static SpecialDate findSpecialDate(Session persistenceSession, CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
         return (SpecialDate) persistenceSession.get(SpecialDate.class, compositeIdOfSpecialDate);
+    }
+
+    public static LastProcessSectionsDates findLastProcessSectionsDate(Session persistenceSession,
+            CompositeIdOfLastProcessSectionsDates compositeIdOfLastProcessSectionsDates) throws Exception {
+        return (LastProcessSectionsDates) persistenceSession.get(LastProcessSectionsDates.class, compositeIdOfLastProcessSectionsDates);
     }
 
     public static OrderDetail findOrderDetail(Session persistenceSession,
@@ -2211,6 +2217,26 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static LastProcessSectionsDates getLastProcessSectionsDate(Session session, Long idOfOrg, SectionType sectionType) throws Exception {
+        List<SectionType> sectionTypes = new ArrayList<SectionType>();
+        sectionTypes.add(sectionType);
+        return getLastProcessSectionsDate(session, idOfOrg, sectionTypes);
+    }
+
+    public static LastProcessSectionsDates getLastProcessSectionsDate(Session session, Long idOfOrg, List<SectionType> sectionTypes) throws Exception {
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        List<Integer> types = new ArrayList<Integer>();
+        for(SectionType sectionType : sectionTypes){
+            types.add(sectionType.getType());
+        }
+        Criteria criteria = session.createCriteria(LastProcessSectionsDates.class);
+        criteria.add(Restrictions.in("org", orgs));
+        if(!types.isEmpty()){
+            criteria.add(Restrictions.in("type", types));
+        }
+        criteria.addOrder(org.hibernate.criterion.Order.desc("date"));
+        return (LastProcessSectionsDates) criteria.list().get(0);
+    }
 
     public static List<Accessory> getAccessories(Session session, Long idOfSourceOrg) {
         String q = "from Accessory a where a.idOfSourceOrg=:idOfSourceOrg";

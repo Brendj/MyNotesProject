@@ -23,3 +23,14 @@ CREATE TABLE cf_groupnames_to_orgs
   constraint cf_groupnames_to_orgs_fk foreign key (idoforg)
     references cf_orgs (idoforg)
 );
+
+--Дата последней обработки секций синхронизации
+CREATE TABLE cf_lastprocesssectionsdates
+(
+  idoforg BIGINT NOT NULL,
+  type INTEGER NOT NULL,
+  date BIGINT NOT NULL,
+  CONSTRAINT cf_lastprocesssectionsdates_pk PRIMARY KEY (idoforg, type),
+  CONSTRAINT cf_lastprocesssectionsdates_idoforg_fk FOREIGN KEY (idoforg)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
