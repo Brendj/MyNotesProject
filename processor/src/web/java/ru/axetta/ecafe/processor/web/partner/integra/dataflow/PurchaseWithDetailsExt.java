@@ -61,6 +61,10 @@ public class PurchaseWithDetailsExt {
     @XmlAttribute(name = "s")
     protected Integer state;
 
+    @XmlAttribute(name = "LastUpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar lastUpdateDate;
+
     /**
      * Gets the value of the e property.
      * <p/>
@@ -254,5 +258,13 @@ public class PurchaseWithDetailsExt {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public XMLGregorianCalendar getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

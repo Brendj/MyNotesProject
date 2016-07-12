@@ -1,9 +1,10 @@
 package ru.axetta.ecafe.processor.core.persistence.dao.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.LastProcessSectionsDates;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.dao.AbstractJpaDao;
+import ru.axetta.ecafe.processor.core.sync.SectionType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,5 +128,32 @@ public class OrgRepository extends AbstractJpaDao<Org> {
             return ((BigInteger) r.getResultList().get(0)).longValue();
         }
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public LastProcessSectionsDates getLastProcessSectionsDate( Long idOfOrg, SectionType sectionType)  {
+        List<SectionType> sectionTypes = new ArrayList<SectionType>();
+        sectionTypes.add(sectionType);
+        return getLastProcessSectionsDate(idOfOrg, sectionTypes);
+    }
+
+    @Transactional(readOnly = true)
+    public LastProcessSectionsDates getLastProcessSectionsDate(Long idOfOrg, List<SectionType> sectionTypes) {
+        List<Integer> types = new ArrayList<Integer>();
+        for(SectionType sectionType : sectionTypes){
+            types.add(sectionType.getType());
+        }
+        Org org = findOrgWithFriendlyOrgs(idOfOrg);
+        List<Org> orgs = new ArrayList<Org>();
+        orgs.add(org);
+        orgs.addAll(org.getFriendlyOrg());
+        Query query = entityManager.createQuery(
+                "from LastProcessSectionsDates where org in :orgs "
+                        + "and LastProcessSectionsDates.compositeIdOfLastProcessSectionsDates.type in :types order by date desc ",
+                LastProcessSectionsDates.class);
+        query.setMaxResults(1);
+        query.setParameter("orgs", orgs);
+        query.setParameter("types", types);
+        return (LastProcessSectionsDates) query.getSingleResult();
     }
 }

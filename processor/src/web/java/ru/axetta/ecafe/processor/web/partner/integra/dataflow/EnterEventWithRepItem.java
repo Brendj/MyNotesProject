@@ -50,6 +50,10 @@ public class EnterEventWithRepItem {
     @XmlAttribute(name = "ChildPassCheckerContractId")
     protected Long childPassCheckerContractId;
 
+    @XmlAttribute(name = "LastUpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar lastUpdateDate;
+
     /**
      * Gets the value of the dateTime property.
      *
@@ -208,5 +212,13 @@ public class EnterEventWithRepItem {
 
     public void setChildPassCheckerContractId(Long childPassCheckerContractId) {
         this.childPassCheckerContractId = childPassCheckerContractId;
+    }
+
+    public XMLGregorianCalendar getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

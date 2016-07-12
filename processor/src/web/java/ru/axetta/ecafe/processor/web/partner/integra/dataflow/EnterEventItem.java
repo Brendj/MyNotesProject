@@ -54,6 +54,10 @@ public class EnterEventItem {
     @XmlAttribute(name = "VisitorFullName")
     protected String VisitorFullName;
 
+    @XmlAttribute(name = "LastUpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar lastUpdateDate;
+
     /**
      * Gets the value of the dateTime property.
      * 
@@ -220,5 +224,13 @@ public class EnterEventItem {
 
     public void setPassWithGuardian(Long passWithGuardian) {
         this.passWithGuardian = passWithGuardian;
+    }
+
+    public XMLGregorianCalendar getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

@@ -113,6 +113,10 @@ public class ClientSummaryExt {
     protected Integer discountMode;
     @XmlAttribute(name = "Limit")
     protected Long limit;
+
+    @XmlAttribute(name = "LastUpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar lastUpdateDate;
     /**
      *
      * Gets the value of the contractId property.
@@ -664,6 +668,14 @@ public class ClientSummaryExt {
 
     public void setLimit(Long limit) {
         this.limit = limit;
+    }
+
+    public XMLGregorianCalendar getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 
     public String getFullName() {

@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * <p>Java class for PurchaseWithDetailsElementExt complex type.
@@ -77,6 +75,10 @@ public class PurchaseWithDetailsElementExt {
     protected Double minMg;
     @XmlAttribute(name = "MinFe")
     protected Double minFe;
+
+    @XmlAttribute(name = "LastUpdateDate")
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar lastUpdateDate;
 
     public Long getIdOfOrderDetail() {
         return idOfOrderDetail;
@@ -364,5 +366,13 @@ public class PurchaseWithDetailsElementExt {
      */
     public void setCarbohydrates(Double carbohydrates) {
         this.carbohydrates = carbohydrates;
+    }
+
+    public XMLGregorianCalendar getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }
