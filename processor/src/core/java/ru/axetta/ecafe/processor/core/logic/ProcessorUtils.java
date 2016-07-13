@@ -63,10 +63,12 @@ public class ProcessorUtils {
             if (lastProcessSectionsDate == null){
                 lastProcessSectionsDate = new LastProcessSectionsDates(new CompositeIdOfLastProcessSectionsDates(idOfOrg,
                         sectionType.getType()), new Date());
+                session.save(lastProcessSectionsDate);
             } else {
                 lastProcessSectionsDate.setDate(new Date());
+                session.update(lastProcessSectionsDate);
             }
-            session.save(lastProcessSectionsDate);
+            session.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {

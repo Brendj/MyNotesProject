@@ -1486,6 +1486,7 @@ public class Processor implements SyncProcessor {
             List<AbstractToElement> responseSections, Boolean error, Long idOfPacket, List<Long> errorClientIds) {
         try {
             if (request.getPaymentRegistry() != null) {
+                ProcessorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
                 if (request.getPaymentRegistry().getPayments() != null) {
                     if (request.getPaymentRegistry().getPayments().hasNext()) {
                         if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {

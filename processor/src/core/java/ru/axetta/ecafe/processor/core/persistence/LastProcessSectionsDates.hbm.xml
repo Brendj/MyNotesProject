@@ -15,7 +15,7 @@
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
                      not-null="true" insert="false" update="false"/>
         <property name="date" column="Date" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true" update="false"/>
+                  not-null="true"/>
     </class>
 </hibernate-mapping>
 
