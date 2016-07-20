@@ -128,4 +128,11 @@ ALTER TABLE cf_checksums ADD COLUMN checkSumOnSettings CHARACTER VARYING(32);
 
 CREATE INDEX cf_cards_lastupdate_idx ON cf_cards USING btree (lastupdate);
 
+ALTER TABLE cf_discountchangehistory
+  ADD COLUMN idoforg BIGINT,
+  ADD COLUMN comment CHARACTER VARYING(128) NOT NULL DEFAULT '',
+  ADD CONSTRAINT cf_discountchangehistory_idoforg_fk FOREIGN KEY (idoforg)
+REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+
 --! ФИНАЛИЗИРОВАН (Семенов, 270616) НЕ МЕНЯТЬ
