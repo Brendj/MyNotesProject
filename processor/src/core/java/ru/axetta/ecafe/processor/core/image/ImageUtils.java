@@ -27,7 +27,7 @@ public class ImageUtils {
 
     private static final String IMAGE_DIRECTORY = RuntimeContext.getInstance().getConfigProperties()
             .getProperty(RuntimeContext.IMAGE_DIRECTORY, "/image");
-    private static final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static final String AB = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static SecureRandom rnd = new SecureRandom();
     private static final String DELIMITER = "/";
     private static final String JPG = ".jpg";
