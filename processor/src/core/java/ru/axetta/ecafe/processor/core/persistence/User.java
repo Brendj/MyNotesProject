@@ -356,6 +356,10 @@ public class User {
         return idOfRole.equals(DefaultRole.ADMIN.ordinal());
     }
 
+    public boolean isSupplier() {
+        return idOfRole.equals(DefaultRole.SUPPLIER.ordinal());
+    }
+
     public String getRegion() {
         return region;
     }

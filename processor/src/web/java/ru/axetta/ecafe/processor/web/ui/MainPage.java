@@ -400,6 +400,7 @@ public class MainPage implements Serializable {
     private final LatePaymentDetailedReportPage latePaymentDetailedReportPage = new LatePaymentDetailedReportPage();
     private final AdjustmentPaymentReportPage adjustmentPaymentReportPage = new AdjustmentPaymentReportPage();
     private final SalesReportGroupPage salesReportGroupPage = new SalesReportGroupPage();
+    private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -6128,6 +6129,20 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showTaloonApprovalVerificationPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = taloonApprovalVerificationPage;
+            currentWorkspacePage.show();
+        } catch (Exception e) {
+            logger.error("Failed to set taloon approval verification page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы сверки реестров талонов: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showDeliveredServicesElectronicCollationReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -8523,6 +8538,10 @@ public class MainPage implements Serializable {
         return getCurrentUser().isAdmin();
     }
 
+    public boolean isSupplier() throws Exception {
+        return getCurrentUser().isSupplier();
+    }
+
     public boolean isEligibleToEditUsers() throws Exception {
         return getCurrentUser().isSecurityAdmin();
         //return getCurrentUser().hasFunction(Function.FUNC_USER_EDIT);
@@ -9069,6 +9088,10 @@ public class MainPage implements Serializable {
 
     public JournalReportsReportPage getJournalReportsReportPage() {
         return journalReportsReportPage;
+    }
+
+    public TaloonApprovalVerificationPage getTaloonApprovalVerificationPage() {
+        return taloonApprovalVerificationPage;
     }
 
     /*public BasicBasketReportPage getBasicBasketReportPage() {
