@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
+import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
@@ -19,6 +20,7 @@ import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
@@ -86,12 +88,16 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.MTOM;
+import java.awt.*;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -103,6 +109,7 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOf
  * To change this template use File | Settings | File Templates.
  */
 
+@MTOM
 @WebService()
 public class ClientRoomControllerWS extends HttpServlet implements ClientRoomController {
 
@@ -138,6 +145,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN = 380L;
     private static final Long RC_ORG_HOLDER_NOT_FOUND = 390L;
     private static final Long RC_CLIENT_GUID_NOT_FOUND = 400L;
+    private static final Long RC_CLIENT_DOES_NOT_HAVE_PHOTO = 500L;
+    private static final Long RC_IMAGE_SIZE_NOT_FOUND = 510L;
+    private static final Long RC_IMAGE_NOT_VALIDATED = 520L;
+    private static final Long RC_IMAGE_NOT_SAVED = 530L;
+    private static final Long RC_IMAGE_NOT_DELETED = 540L;
+    private static final Long RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO = 550L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -163,6 +176,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_IS_NOT_WARD_OF_GUARDIAN_DESC = "Клиент не найден или не является опекаемым для данного опекуна";
     private static final String RC_ORG_HOLDER_NOT_FOUND_DESC = "Не найдена организация - держатель экземпляра";
     private static final String RC_CLIENT_GUID_NOT_FOUND_DESC = "GUID клиента не найден";
+    private static final String RC_IMAGE_NOT_SAVED_DESC = "Не удалось сохранить фото";
+    private static final String RC_IMAGE_NOT_DELETED_DESC = "Не удалось удалить фото";
+    private static final String RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO_DESC = "У клиента нет неподтвержденного фото";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -1794,6 +1810,127 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setOrgType(client.getOrg().getType());
 
         data.setClientSummaryExt(clientSummaryExt);
+    }
+
+    @Override
+    public PhotoURLResult getPhotoURL(Long contractId, int size) {
+        PhotoURLResult result = new PhotoURLResult();
+        Client client = DAOService.getInstance().getClientByContractId(contractId);
+        if(client == null){
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+            return result;
+        }
+        getPhotoUrl(size, result, client);
+        return result;
+    }
+
+    private void getPhotoUrl(int size, PhotoURLResult result, Client client) {
+        try {
+            result.URL = ImageUtils.getPhotoURL(client, size);
+            result.isNew = client.getPhoto().getIsNew();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (ImageUtils.NoPhotoException e){
+            result.URL = ImageUtils.getDefaultImageURL();
+            result.resultCode = RC_CLIENT_DOES_NOT_HAVE_PHOTO;
+            result.description = e.getMessage();
+        } catch (ImageUtils.NoSuchImageSizeException e){
+            result.resultCode = RC_IMAGE_SIZE_NOT_FOUND;
+            result.description = e.getMessage();
+        }
+    }
+
+    @Override
+    public PhotoURLResult uploadPhoto(Long contractId, Image photo, int size) {
+        PhotoURLResult result = new PhotoURLResult();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    return result;
+                }
+                ClientPhoto clientPhoto;
+                if (client.getPhoto() != null) {
+                    clientPhoto = client.getPhoto();
+                    ImageUtils.saveImage(client.getContractId(), photo, true, client.getPhoto().getName());
+                } else {
+                    String imageName = ImageUtils.saveImage(client.getContractId(), photo, true);
+                    clientPhoto = new ClientPhoto(client, imageName, true);
+                }
+                session.save(clientPhoto);
+                transaction.commit();
+                transaction = null;
+                getPhotoUrl(size, result, client);
+            } catch (IOException e){
+                result.resultCode = RC_IMAGE_NOT_SAVED;
+                result.description = RC_IMAGE_NOT_SAVED_DESC + ": " + e.getMessage();
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (ImageUtils.ImageUtilsException e){
+            result.resultCode = RC_IMAGE_NOT_VALIDATED;
+            result.description = e.getMessage();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
+    public Result deleteNewPhoto(Long contractId) {
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    return result;
+                }
+                if (client.getPhoto() != null && client.getPhoto().getIsNew()) {
+                    boolean deleted = ImageUtils.deleteImage(client.getContractId(), client.getPhoto().getName(), true);
+                    if(!deleted){
+                        result.resultCode = RC_IMAGE_NOT_DELETED;
+                        result.description = RC_IMAGE_NOT_DELETED_DESC;
+                    } else {
+                        result.resultCode = RC_OK;
+                        result.description = RC_OK_DESC;
+                        boolean exists = ImageUtils.checkImageExists(client.getContractId(), client.getPhoto().getName(), false);
+                        if(exists){
+                            client.getPhoto().setIsNew(false);
+                            session.save(client.getPhoto());
+                        } else {
+                            session.delete(client.getPhoto());
+                        }
+                    }
+                } else {
+                    result.resultCode = RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO;
+                    result.description = RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO_DESC;
+                }
+                transaction.commit();
+                transaction = null;
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
     }
 
     @Override

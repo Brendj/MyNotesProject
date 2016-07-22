@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsS
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import java.awt.*;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,15 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getSummaryByTypedId")
     ClientSummaryResult getSummaryByTypedId(@WebParam(name = "id") String id, @WebParam(name = "idType") int idType);
+
+    @WebMethod(operationName = "getPhotoURL")
+    PhotoURLResult getPhotoURL(@WebParam(name = "contractId") Long contractId, @WebParam(name = "size") int size);
+
+    @WebMethod(operationName = "uploadPhoto")
+    PhotoURLResult uploadPhoto(@WebParam(name = "contractId") Long contractId, @WebParam(name = "image") Image photo, @WebParam(name = "size") int size);
+
+    @WebMethod(operationName = "deleteNewPhoto")
+    Result deleteNewPhoto(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "getPurchaseList")
     PurchaseListResult getPurchaseList(@WebParam(name = "contractId") Long contractId,
