@@ -141,6 +141,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private static final String INSTANCE_NAME = PROCESSOR_PARAM_BASE + ".instance";
     private static final String NODE_INFO_FILE = PROCESSOR_PARAM_BASE + ".nodeInfoFile";
     public static final String ISTK_WEBSERVICE = PROCESSOR_PARAM_BASE + ".istk.webservice";
+    public static final String IMAGE_CONFIG = PROCESSOR_PARAM_BASE + ".image";
+    public static final String IMAGE_DIRECTORY = IMAGE_CONFIG + ".path";
+    public static final String IMAGE_VALIDATION = IMAGE_CONFIG + ".validation";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger

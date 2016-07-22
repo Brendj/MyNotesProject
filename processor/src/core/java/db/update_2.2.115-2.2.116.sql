@@ -27,3 +27,15 @@ CREATE TABLE cf_lastprocesssectionsdates
   CONSTRAINT cf_lastprocesssectionsdates_idoforg_fk FOREIGN KEY (idoforg)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Хранение хэш-наименований фото клиентов
+CREATE TABLE cf_clientphoto
+(
+  idofclient BIGINT NOT NULL,
+  name CHARACTER VARYING(16) NOT NULL DEFAULT '',
+  isnew INTEGER NOT NULL,
+  CONSTRAINT cf_clientphoto_pk PRIMARY KEY (idofclient),
+  CONSTRAINT cf_clientphoto_idofclient_fk FOREIGN KEY (idofclient)
+  REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+CREATE INDEX cf_clientphoto_client_idx ON cf_clientphoto USING BTREE (idofclient);

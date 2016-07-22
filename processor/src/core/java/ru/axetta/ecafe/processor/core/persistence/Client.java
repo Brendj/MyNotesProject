@@ -121,6 +121,8 @@ public class Client {
     private Date birthDate;
     private String benefitOnAdmission;
 
+    private ClientPhoto photo;
+
     protected Client() {
         // For Hibernate only
     }
@@ -940,6 +942,14 @@ public class Client {
 
     public void setBenefitOnAdmission(String benefitOnAdmission) {
         this.benefitOnAdmission = benefitOnAdmission;
+    }
+
+    public ClientPhoto getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(ClientPhoto clientPhoto) {
+        this.photo = clientPhoto;
     }
 
     @Override
