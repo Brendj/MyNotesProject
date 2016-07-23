@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
@@ -460,15 +461,15 @@ public class FrontController extends HttpServlet {
 
     /* Метод возвращает номер, напечатанный на новой карте, по номеру чипа карты */
     @WebMethod(operationName = "getCardPrintedNoByCardNo")
-    public Long getCardPrintedNoByCardNo(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo)
+    public CardPrintedNoItem getCardPrintedNoByCardNo(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo)
             throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         try {
-            Long cardPrintedNo = RuntimeContext.getInstance().getCardManager().getNewCardPrintedNo(cardNo);
-            if (cardPrintedNo == null){
+            CardManager.NewCardItem newCardItem = RuntimeContext.getInstance().getCardManager().getNewCardPrintedNo(cardNo);
+            if (newCardItem.getCardPrintedNo() == null){
                 throw new Exception("Номер карты не найден.");
             }
-            return cardPrintedNo;
+            return new CardPrintedNoItem(newCardItem.getCardPrintedNo(), Card.TYPE_NAMES[newCardItem.getCardType()]);
         } catch (Exception e) {
             logger.error("Ошибка при запросе номера на карте по номеру чипа", e);
             throw new FrontControllerException(
