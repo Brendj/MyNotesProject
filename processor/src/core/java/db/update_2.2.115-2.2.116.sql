@@ -39,3 +39,7 @@ CREATE TABLE cf_clientphoto
   REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 CREATE INDEX cf_clientphoto_client_idx ON cf_clientphoto USING BTREE (idofclient);
+
+--Тип карт
+ALTER TABLE cf_newcards
+  ADD COLUMN cardtype integer;

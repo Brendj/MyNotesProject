@@ -31,12 +31,38 @@ public interface CardManager {
 
     void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;
 
-    Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo) throws Exception;
+    Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo, Integer cardType) throws Exception;
 
-    Long createNewCard(long cardNo, Long cardPrintedNo) throws Exception;
+    Long createNewCard(long cardNo, Long cardPrintedNo, Integer cardType) throws Exception;
 
-    Long getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception;
+    NewCardItem getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception;
 
-    Long getNewCardPrintedNo(long cardNo) throws Exception;
+    NewCardItem getNewCardPrintedNo(long cardNo) throws Exception;
+
+    class NewCardItem{
+        private Long cardPrintedNo;
+        private Integer cardType;
+
+        public NewCardItem(Long cardPrintedNo, Integer cardType) {
+            this.cardPrintedNo = cardPrintedNo;
+            this.cardType = cardType;
+        }
+
+        public Long getCardPrintedNo() {
+            return cardPrintedNo;
+        }
+
+        public void setCardPrintedNo(Long cardPrintedNo) {
+            this.cardPrintedNo = cardPrintedNo;
+        }
+
+        public Integer getCardType() {
+            return cardType;
+        }
+
+        public void setCardType(Integer cardType) {
+            this.cardType = cardType;
+        }
+    }
 
 }

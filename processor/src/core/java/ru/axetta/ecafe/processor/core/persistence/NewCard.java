@@ -15,13 +15,15 @@ public class NewCard {
     private Date createTime;
     private Long cardNo;
     private Long cardPrintedNo;
+    private Integer cardType;
 
     public NewCard() {
     }
 
-    public NewCard(Long cardNo, Long cardPrintedNo) {
+    public NewCard(Long cardNo, Long cardPrintedNo, Integer cardType) {
         this.cardNo = cardNo;
         this.cardPrintedNo = cardPrintedNo;
+        this.cardType = cardType;
         this.createTime = new Date();
     }
 
@@ -55,6 +57,14 @@ public class NewCard {
 
     public void setCardPrintedNo(Long cardPrintedNo) {
         this.cardPrintedNo = cardPrintedNo;
+    }
+
+    public Integer getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
     }
 
     @Override

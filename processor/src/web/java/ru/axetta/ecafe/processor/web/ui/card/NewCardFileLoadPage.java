@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -151,10 +152,19 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
                 return new LineResult(lineNo, 10, "Карта с данным нанесенным номером уже существует.", null);
             }
         }
+        Integer cardType = null;
+        String cardTypeString = StringUtils.isEmpty(tokens[2]) ? null : tokens[2];
+        if(cardTypeString != null && !cardTypeString.equals(Card.UNKNOWN_TYPE_NAME)){
+            try {
+                 cardType = Card.parseCardType(cardTypeString);
+            } catch (Exception e){
+                return new LineResult(lineNo, 12, "Неверный тип карты.", null);
+            }
+        }
 
         try {
             Long idOfCard = cardManager
-                    .createNewCard(cardNo, cardPrintedNo);
+                    .createNewCard(cardNo, cardPrintedNo, cardType);
             return new LineResult(lineNo, 0, "Карта внесена в базу.", idOfCard);
         } catch (Exception e) {
             logger.debug("Failed to create card", e);

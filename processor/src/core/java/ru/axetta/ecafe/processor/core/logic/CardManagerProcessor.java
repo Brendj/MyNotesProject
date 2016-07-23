@@ -329,7 +329,7 @@ public class CardManagerProcessor implements CardManager {
 
     @Override
     public Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo,
-            Long cardPrintedNo) throws Exception {
+            Long cardPrintedNo, Integer cardType) throws Exception {
 
         logger.debug("check exist card");
         Card c = findCardByCardNo(persistenceSession, cardNo);
@@ -363,21 +363,21 @@ public class CardManagerProcessor implements CardManager {
         }
 
         logger.debug("create card");
-        NewCard card = new NewCard(cardNo, cardPrintedNo);
+        NewCard card = new NewCard(cardNo, cardPrintedNo, cardType);
         persistenceSession.save(card);
 
         return card.getIdOfNewCard();
     }
 
     @Override
-    public Long createNewCard(long cardNo, Long cardPrintedNo) throws Exception {
+    public Long createNewCard(long cardNo, Long cardPrintedNo, Integer cardType) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Long idOfCard = createNewCard(persistenceSession, persistenceTransaction, cardNo, cardPrintedNo);
+            Long idOfCard = createNewCard(persistenceSession, persistenceTransaction, cardNo, cardPrintedNo, cardType);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -390,39 +390,39 @@ public class CardManagerProcessor implements CardManager {
     }
 
     @Override
-    public Long getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception {
+    public NewCardItem getNewCardPrintedNo(Session persistenceSession, Transaction persistenceTransaction, long cardNo) throws Exception {
         logger.debug("check exist card");
         Card c = findCardByCardNo(persistenceSession, cardNo);
         if (c != null) {
-            return c.getCardPrintedNo();
+            return new NewCardItem(c.getCardPrintedNo(), c.getCardType());
         }
         logger.debug("check exist temp card");
         CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
         if (ct != null) {
-            return Long.parseLong(ct.getCardPrintedNo());
+            return new NewCardItem(Long.parseLong(ct.getCardPrintedNo()), null);
         }
         logger.debug("check exist newcard");
         NewCard uCard = findNewCardByCardNo(persistenceSession, cardNo);
         if (uCard != null) {
-            return  uCard.getCardPrintedNo();
+            return new NewCardItem(uCard.getCardPrintedNo(), uCard.getCardType());
         }
         return null;
     }
 
     @Override
-    public Long getNewCardPrintedNo(long cardNo) throws Exception {
+    public NewCardItem getNewCardPrintedNo(long cardNo) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Long cardPrintedNo = getNewCardPrintedNo(persistenceSession, persistenceTransaction, cardNo);
+            NewCardItem result = getNewCardPrintedNo(persistenceSession, persistenceTransaction, cardNo);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return cardPrintedNo;
+            return result;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
