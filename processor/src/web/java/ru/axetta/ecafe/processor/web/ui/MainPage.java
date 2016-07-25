@@ -8539,7 +8539,7 @@ public class MainPage implements Serializable {
     }
 
     public boolean isSupplier() throws Exception {
-        return getCurrentUser().isSupplier();
+        return getCurrentUser().isSupplier() || getCurrentUser().hasFunction(Function.FUNC_SUPPLIER);
     }
 
     public boolean isEligibleToEditUsers() throws Exception {
