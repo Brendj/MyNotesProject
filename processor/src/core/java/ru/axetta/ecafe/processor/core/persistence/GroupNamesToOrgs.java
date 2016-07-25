@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 /**
  * Created with IntelliJ IDEA.
- * User: T800
+ * User: anvarov
  * Date: 08.07.16
  * Time: 14:04
  * To change this template use File | Settings | File Templates.
