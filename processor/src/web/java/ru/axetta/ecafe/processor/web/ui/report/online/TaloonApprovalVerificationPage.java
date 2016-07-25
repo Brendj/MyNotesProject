@@ -109,8 +109,6 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
                         detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                     }
                     if (currentState.equals(TaloonApprovalVerificationItem.MAKE_CONFIRM)) {
-                        //detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-                        //detail.setShippedQty(detail.getSoldedQty());
                         detail.performConfirm();
                     }
                     break;
@@ -120,10 +118,20 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
     }
 
     public void confirmPpStateAllDay() {
+        changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    }
+
+    public void deselectPpStateAllDay() {
+        changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+    }
+
+    public void changePpStateAllDay(TaloonPPStatesEnum state) {
         for (TaloonApprovalVerificationItem item : items) {
             if (item.equals(currentTaloonApprovalVerificationItem)) {
                 for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
-                    detail.performConfirm();
+                    if (detail.getPpState() != null) {
+                        detail.setPpState(state);
+                    }
                 }
                 break;
             }

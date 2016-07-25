@@ -74,7 +74,7 @@
                     <h:outputText escape="true" value="Оплата ИС ПП" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Отгрузка ИС ПП" />
+                    <h:outputText escape="true" value="Отгрузка ПП" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Цена ИС ПП" />
@@ -93,7 +93,8 @@
                 </rich:column>
             </rich:columnGroup>
         </f:facet>
-        <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey">
+        <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey"
+                       columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
             <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}">
                 <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" />
             </rich:column>
@@ -129,40 +130,52 @@
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
             <rich:column headerClass="column-header">
-                <h:graphicImage value="/images/tips/applied.png" rendered="#{detail.isppStateConfirmed}" />
+                <h:graphicImage value="/images/taloons/applied.png" rendered="#{detail.isppStateConfirmed}" />
             </rich:column>
             <rich:column headerClass="column-header">
-                <h:graphicImage value="/images/tips/applied.png" rendered="#{detail.ppStateConfirmed}" />
-                <a4j:commandLink reRender="taloonApprovalVerificationTable" value="#{detail.ppStateToTurnOnFirst}" rendered="#{detail.ppStateNotSelected || detail.ppStateCanceled}"
+                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateNotSelected || detail.ppStateCanceled}"
                                  action="#{mainPage.taloonApprovalVerificationPage.switchPpState()}" style="color:lightgray;">
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                    <h:graphicImage value="/images/taloons/applied-gray.png" />
                 </a4j:commandLink>
-                <a4j:commandLink reRender="taloonApprovalVerificationTable" value="x" style="align: right" rendered="#{detail.ppStateConfirmed}"
-                                 action="#{mainPage.taloonApprovalVerificationPage.resetPpState()}" >
+                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateConfirmed}"
+                                 action="#{mainPage.taloonApprovalVerificationPage.resetPpState()}"
+                                 onclick="if (#{!detail.isOutOfPeriodEdit()}) { alert('Истек период, в который разрешено редактирование согласованной записи'); return false; }">
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                    <h:graphicImage value="/images/taloons/applied.png" />
                 </a4j:commandLink>
-                <h:outputText escape="false" value="<strong>" rendered="#{detail.ppStateNull}"/>
-                <a4j:commandLink reRender="taloonApprovalVerificationTable" value="#{detail.ppStateToTurnOnAllDay}" rendered="#{detail.ppStateNull}"
+
+
+                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateNull}"
                                  action="#{mainPage.taloonApprovalVerificationPage.confirmPpStateAllDay()}" style="color:lightgray;">
                     <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />
+                    <h:graphicImage value="/images/taloons/applied-big.png" />
                 </a4j:commandLink>
-                <h:outputText escape="false" value="</strong>" rendered="#{detail.ppStateNull}"/>
+                &nbsp;
+                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateNull}"
+                                 action="#{mainPage.taloonApprovalVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;">
+                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />
+                    <h:graphicImage value="/images/taloons/applied-big-gray.png" />
+                </a4j:commandLink>
+
             </rich:column>
             <rich:column headerClass="column-header">
-                <h:graphicImage value="/images/16x16/delete.png" rendered="#{detail.ppStateCanceled}" />
                 <a4j:commandLink oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"
-                                 reRender="taloonApprovalVerificationTable" value="#{detail.ppStateToTurnOnSecond}" rendered="#{detail.ppStateNotSelected || detail.ppStateConfirmed}"
+                                 reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateNotSelected || detail.ppStateConfirmed}"
                                  action="#{mainPage.taloonApprovalVerificationPage.switchPpState()}"
+                                 onclick="if (#{!detail.enableEditShippedQty()}) { alert('Не установлено подтверждение от ИС ПП либо истек период, в который разрешено редактирование'); return false; }"
                                  style="color:lightgray;" >
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                    <h:graphicImage value="/images/taloons/canceled-gray.png" />
                 </a4j:commandLink>
-                <a4j:commandLink reRender="taloonApprovalVerificationTable" value="x" style="align: right" rendered="#{detail.ppStateCanceled}"
+                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateCanceled}"
                                  action="#{mainPage.taloonApprovalVerificationPage.resetPpState()}" >
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
+                    <h:graphicImage value="/images/taloons/canceled.png" />
                 </a4j:commandLink>
             </rich:column>
         </rich:subTable>

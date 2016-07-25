@@ -23,7 +23,8 @@ public class TaloonApprovalVerificationItem {
 
     public static final String MAKE_CONFIRM = "Согласие";
     public static final String MAKE_CANCEL = "Отказ";
-    public static final String MAKE_CONFIRM_ENTIRE_DAY = "Подтвердить ";
+    public static final String MAKE_CLEAR = "Очистить";
+    //public static final String MAKE_CONFIRM_ENTIRE_DAY = "Подтвердить ";
     public static final String DAY_FORMAT = "dd.MM.yyyy";
 
     private Date taloonDate;
@@ -160,6 +161,17 @@ public class TaloonApprovalVerificationItem {
             return (shippedQty == null || shippedQty == 0);
         }
 
+        public Boolean isOutOfPeriodEdit() {
+            Date currentDate = new Date();
+            Calendar localCalendar = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+            localCalendar.setTime(taloonDate);
+            localCalendar.add(Calendar.MONTH, 1);
+            localCalendar.add(Calendar.SECOND, -1);
+            Date endMonthDate = localCalendar.getTime();
+            Date redDate = CalendarUtils.addDays(endMonthDate, 5);
+            return (currentDate.before(redDate));
+        }
+
         public Boolean enableEditShippedQty() {
             if (summaryDay) return false;
             Date currentDate = new Date();
@@ -181,7 +193,7 @@ public class TaloonApprovalVerificationItem {
         public void performConfirm() {
             if (this.ppState == null) return;
             this.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-            this.setShippedQty(this.getSoldedQty());
+            //this.setShippedQty(this.getSoldedQty());
         }
 
         public Boolean enableEditPpStatus() {
@@ -196,13 +208,17 @@ public class TaloonApprovalVerificationItem {
             return MAKE_CONFIRM;
         }
 
-        public String getPpStateToTurnOnAllDay() {
+        public String getPpStateForAllDay() {
             DateFormat df = new SimpleDateFormat(DAY_FORMAT);
-            return MAKE_CONFIRM_ENTIRE_DAY + df.format(taloonDate);
+            return df.format(taloonDate);
         }
 
         public String getPpStateToTurnOnSecond() {
             return MAKE_CANCEL;
+        }
+
+        public String getPpStateToClear() {
+            return MAKE_CLEAR;
         }
 
         public boolean taloonDateIsEmpty() {

@@ -60,9 +60,9 @@ public class TaloonApprovalVerification {
                                 taloon.getIsppState(),
                                 taloon.getPpState(), taloon.getCompositeIdOfTaloonApproval().getIdOfOrg(), d, false);
 
-                sdRequestedQty += taloon.getRequestedQty();
-                sdSoldedQty += taloon.getSoldedQty();
-                sdShippedQty += taloon.getShippedQty();
+                sdRequestedQty += taloon.getRequestedQty() == null ? 0 : taloon.getRequestedQty();
+                sdSoldedQty += taloon.getSoldedQty() == null ? 0 : taloon.getSoldedQty();
+                sdShippedQty += taloon.getShippedQty() == null ? 0 : taloon.getShippedQty();
                 sdSumma += (taloon.getPrice() == null || taloon.getSoldedQty() == null) ? 0 : taloon.getPrice() * taloon.getSoldedQty();
 
                 item.getDetails().add(detail);
