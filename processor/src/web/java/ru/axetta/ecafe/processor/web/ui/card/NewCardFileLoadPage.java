@@ -71,9 +71,9 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
     static {
         StringBuilder sb = new StringBuilder();
         sb.append("Возможные типы карт: ");
-        for(int i = 1; i <= Card.TYPE_NAMES.length; i++){
+        for(int i = 1; i < Card.TYPE_NAMES.length; i++){
             sb.append(String.format("%d - %s", i, Card.TYPE_NAMES[i]));
-            if(i != Card.TYPE_NAMES.length) {
+            if(i != (Card.TYPE_NAMES.length - 1)) {
                 sb.append(", ");
             }
         }
