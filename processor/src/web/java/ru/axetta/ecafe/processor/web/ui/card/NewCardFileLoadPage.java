@@ -67,9 +67,26 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
     private boolean checkCardPrintedNoUnique = true;
     private List<LineResult> lineResults = Collections.emptyList();
     private int successLineNumber;
+    private final static String cardTypeNames;
+    static {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Возможные типы карт: ");
+        for(int i = 1; i <= Card.TYPE_NAMES.length; i++){
+            sb.append(String.format("%d - %s", i, Card.TYPE_NAMES[i]));
+            if(i != Card.TYPE_NAMES.length) {
+                sb.append(", ");
+            }
+        }
+        sb.append(".");
+        cardTypeNames = sb.toString();
+    }
 
     public String getPageFilename() {
         return "card/load_new_cards";
+    }
+
+    public static String getCardTypeNames() {
+        return cardTypeNames;
     }
 
     public boolean isCheckCardPrintedNoUnique() {
@@ -152,14 +169,9 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
                 return new LineResult(lineNo, 10, "Карта с данным нанесенным номером уже существует.", null);
             }
         }
-        Integer cardType = null;
-        String cardTypeString = StringUtils.isEmpty(tokens[2]) ? null : tokens[2];
-        if(cardTypeString != null && !cardTypeString.equals(Card.UNKNOWN_TYPE_NAME)){
-            try {
-                 cardType = Card.parseCardType(cardTypeString);
-            } catch (Exception e){
-                return new LineResult(lineNo, 12, "Неверный тип карты.", null);
-            }
+        Integer cardType = StringUtils.isEmpty(tokens[2]) ? null : Integer.parseInt(tokens[2]);
+        if(cardType != null && !(cardType > 0 && cardType <= Card.TYPE_NAMES.length)){
+            return new LineResult(lineNo, 12, "Неверный тип карты.", null);
         }
 
         try {

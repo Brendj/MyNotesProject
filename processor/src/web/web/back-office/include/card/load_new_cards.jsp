@@ -23,6 +23,9 @@
         <h:selectBooleanCheckbox value="#{mainPage.newCardFileLoadPage.checkCardPrintedNoUnique}" styleClass="output-text">
             <a4j:support event="onclick" reRender="newCardFileLoaderPanel" ajaxSingle="true" />
         </h:selectBooleanCheckbox>
+
+        <h:outputText escape="true" value="#{mainPage.newCardFileLoadPage.cardTypeNames}"
+                      styleClass="output-text"/>
     </h:panelGrid>
 
     <rich:fileUpload id="newCardFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
