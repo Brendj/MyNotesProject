@@ -12,5 +12,5 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  */
 public class PhotoURLResult extends Result{
     public String URL;
-    public Boolean isNew;
+    public Integer status;
 }

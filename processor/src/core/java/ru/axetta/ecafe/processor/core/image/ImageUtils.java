@@ -48,19 +48,26 @@ public class ImageUtils {
                 generateFileName(contractId, isNew, hashFileName) + JPG;
     }
 
-    public static String getPhotoURL(Client client, int size) throws NoPhotoException, NoSuchImageSizeException {
+    public static String getPhotoURL(Client client, int size, boolean isNew) throws NoPhotoException, NoNewPhotoException, NoSuchImageSizeException {
         if(client.getPhoto() == null){
             throw new NoPhotoException("У клиента нет фото.");
+        }
+        if(!client.getPhoto().getIsNew() && isNew){
+            throw new NoNewPhotoException();
         }
         StringBuilder tmp = new StringBuilder();
         tmp.append(ImageSize.fromInteger(size));
         tmp.append(DELIMITER);
-        if(client.getPhoto().getIsNew()){
+        if(isNew){
             tmp.append(ISNEW);
         }
         tmp.append(client.getContractId().toString());
         tmp.append(client.getPhoto().getName());
         return tmp.toString();
+    }
+
+    public static int getPhotoStatus(Client client){
+        return client.getPhoto().getIsNew() ? 1 : 0;
     }
 
     public static String getDefaultImageURL(){
@@ -130,7 +137,7 @@ public class ImageUtils {
 
     public static BufferedImage resizeImage(BufferedImage image) {
         return resizeImage(image, (int) (image.getWidth() * ClientPhotoConfig.COMPRESSION),
-                (int) (image.getWidth() * ClientPhotoConfig.COMPRESSION));
+                (int) (image.getHeight() * ClientPhotoConfig.COMPRESSION));
     }
 
     public static void saveImage(String path, BufferedImage image) throws IOException {
@@ -149,6 +156,13 @@ public class ImageUtils {
         BufferedImage sbimage = resizeImage(bimage);
         saveImage(formImagePath(contractId, isNew, hashFileName, ImageSize.MEDIUM), bimage);
         saveImage(formImagePath(contractId, isNew, hashFileName, ImageSize.SMALL), sbimage);
+    }
+
+    public static void saveImage(Client client, Image image, boolean isNew) throws IOException, ImageUtilsException {
+        if(getPhotoStatus(client) == 2){
+
+        }
+        saveImage(client.getContractId(), image, isNew, client.getPhoto().getName());
     }
 
     public static boolean deleteImage(Long contractId, String hashFileName, boolean isNew) {
@@ -271,7 +285,7 @@ public class ImageUtils {
         }
     }
 
-    public static enum ImageSize {
+    public enum ImageSize {
 
         SMALL(0, "small"),
         MEDIUM(1, "medium");
@@ -345,6 +359,26 @@ public class ImageUtils {
         }
 
         public NoPhotoException(String message) {
+            super(message);
+        }
+    }
+
+    public static class NoNewPhotoException extends ImageUtilsException {
+
+        public NoNewPhotoException() {
+        }
+
+        public NoNewPhotoException(String message) {
+            super(message);
+        }
+    }
+
+    public static class PhotoUnderRegistryException extends ImageUtilsException {
+
+        public PhotoUnderRegistryException() {
+        }
+
+        public PhotoUnderRegistryException(String message) {
             super(message);
         }
     }

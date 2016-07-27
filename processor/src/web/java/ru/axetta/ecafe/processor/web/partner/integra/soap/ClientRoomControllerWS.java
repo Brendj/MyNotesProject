@@ -151,6 +151,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_IMAGE_NOT_SAVED = 530L;
     private static final Long RC_IMAGE_NOT_DELETED = 540L;
     private static final Long RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO = 550L;
+    private static final Long RC_CLIENT_PHOTO_UNDER_REGISTRY = 560L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -179,6 +180,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_IMAGE_NOT_SAVED_DESC = "Не удалось сохранить фото";
     private static final String RC_IMAGE_NOT_DELETED_DESC = "Не удалось удалить фото";
     private static final String RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO_DESC = "У клиента нет неподтвержденного фото";
+    private static final String RC_CLIENT_PHOTO_UNDER_REGISTRY_DESC = "Фото клиента в процессе сверки";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -1813,7 +1815,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PhotoURLResult getPhotoURL(Long contractId, int size) {
+    public PhotoURLResult getPhotoURL(Long contractId, int size, boolean isNew) {
         PhotoURLResult result = new PhotoURLResult();
         Client client = DAOService.getInstance().getClientByContractId(contractId);
         if(client == null){
@@ -1821,20 +1823,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_CLIENT_NOT_FOUND_DESC;
             return result;
         }
-        getPhotoUrl(size, result, client);
+        getPhotoUrl(size, result, client, isNew);
         return result;
     }
 
-    private void getPhotoUrl(int size, PhotoURLResult result, Client client) {
+    private void getPhotoUrl(int size, PhotoURLResult result, Client client, boolean isNew) {
         try {
-            result.URL = ImageUtils.getPhotoURL(client, size);
-            result.isNew = client.getPhoto().getIsNew();
+            result.URL = ImageUtils.getPhotoURL(client, size, isNew);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
-        } catch (ImageUtils.NoPhotoException e){
+            result.status = ImageUtils.getPhotoStatus(client);
+        } catch (ImageUtils.NoPhotoException e) {
             result.URL = ImageUtils.getDefaultImageURL();
             result.resultCode = RC_CLIENT_DOES_NOT_HAVE_PHOTO;
             result.description = e.getMessage();
+        } catch (ImageUtils.NoNewPhotoException e){
+            result.resultCode = RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO;
+            result.description = RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO_DESC;
         } catch (ImageUtils.NoSuchImageSizeException e){
             result.resultCode = RC_IMAGE_SIZE_NOT_FOUND;
             result.description = e.getMessage();
@@ -1857,15 +1862,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 ClientPhoto clientPhoto;
                 if (client.getPhoto() != null) {
                     clientPhoto = client.getPhoto();
-                    ImageUtils.saveImage(client.getContractId(), photo, true, client.getPhoto().getName());
+                    ImageUtils.saveImage(client, photo, true);
                 } else {
                     String imageName = ImageUtils.saveImage(client.getContractId(), photo, true);
                     clientPhoto = new ClientPhoto(client, imageName, true);
+                    client.setPhoto(clientPhoto);
                 }
                 session.save(clientPhoto);
                 transaction.commit();
                 transaction = null;
-                getPhotoUrl(size, result, client);
+                getPhotoUrl(size, result, client, true);
             } catch (IOException e){
                 result.resultCode = RC_IMAGE_NOT_SAVED;
                 result.description = RC_IMAGE_NOT_SAVED_DESC + ": " + e.getMessage();
