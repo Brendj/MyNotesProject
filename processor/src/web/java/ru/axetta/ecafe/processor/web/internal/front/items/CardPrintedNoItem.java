@@ -12,12 +12,12 @@ package ru.axetta.ecafe.processor.web.internal.front.items;
  */
 public class CardPrintedNoItem {
     private Long cardPrintedNo;
-    private String cardType;
+    private Integer cardType;
 
     public CardPrintedNoItem() {
     }
 
-    public CardPrintedNoItem(Long cardPrintedNo, String cardType) {
+    public CardPrintedNoItem(Long cardPrintedNo, Integer cardType) {
         this.cardPrintedNo = cardPrintedNo;
         this.cardType = cardType;
     }
@@ -30,11 +30,11 @@ public class CardPrintedNoItem {
         this.cardPrintedNo = cardPrintedNo;
     }
 
-    public String getCardType() {
+    public Integer getCardType() {
         return cardType;
     }
 
-    public void setCardType(String cardType) {
+    public void setCardType(Integer cardType) {
         this.cardType = cardType;
     }
 }

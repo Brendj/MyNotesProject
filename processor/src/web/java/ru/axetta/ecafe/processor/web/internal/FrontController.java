@@ -469,7 +469,7 @@ public class FrontController extends HttpServlet {
             if (newCardItem.getCardPrintedNo() == null){
                 throw new Exception("Номер карты не найден.");
             }
-            return new CardPrintedNoItem(newCardItem.getCardPrintedNo(), Card.TYPE_NAMES[newCardItem.getCardType()]);
+            return new CardPrintedNoItem(newCardItem.getCardPrintedNo(), newCardItem.getCardType());
         } catch (Exception e) {
             logger.error("Ошибка при запросе номера на карте по номеру чипа", e);
             throw new FrontControllerException(
