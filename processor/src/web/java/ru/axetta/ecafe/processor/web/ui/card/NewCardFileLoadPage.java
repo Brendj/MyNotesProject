@@ -67,8 +67,9 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
     private boolean checkCardPrintedNoUnique = true;
     private List<LineResult> lineResults = Collections.emptyList();
     private int successLineNumber;
-    private final static String cardTypeNames;
-    static {
+    private String cardTypeNames = formCardTypeNames();
+
+    public static String formCardTypeNames(){
         StringBuilder sb = new StringBuilder();
         sb.append("Возможные типы карт: ");
         for(int i = 1; i < Card.TYPE_NAMES.length; i++){
@@ -78,15 +79,19 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
             }
         }
         sb.append(".");
-        cardTypeNames = sb.toString();
+        return sb.toString();
+    }
+
+    public String getCardTypeNames(){
+        return cardTypeNames;
+    }
+
+    public void setCardTypeNames(String cardTypeNames) {
+        this.cardTypeNames = cardTypeNames;
     }
 
     public String getPageFilename() {
         return "card/load_new_cards";
-    }
-
-    public static String getCardTypeNames() {
-        return cardTypeNames;
     }
 
     public boolean isCheckCardPrintedNoUnique() {
