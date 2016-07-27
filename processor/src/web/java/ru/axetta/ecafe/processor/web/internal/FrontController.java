@@ -466,8 +466,11 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(idOfOrg);
         try {
             CardManager.NewCardItem newCardItem = RuntimeContext.getInstance().getCardManager().getNewCardPrintedNo(cardNo);
+            if (newCardItem == null) {
+                throw new Exception(String.format("Карта с номером чипа '%s' не найдена",cardNo));
+            }
             if (newCardItem.getCardPrintedNo() == null){
-                throw new Exception("Номер карты не найден.");
+                throw new Exception("Номер на карте не найден");
             }
             return new CardPrintedNoItem(newCardItem.getCardPrintedNo(), newCardItem.getCardType());
         } catch (Exception e) {
