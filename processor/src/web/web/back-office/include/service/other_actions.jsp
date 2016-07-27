@@ -65,6 +65,19 @@
                          styleClass="command-button" />
     </rich:panel>
 
+    <rich:panel>
+        <a4j:commandButton value="Генерировать представителей" action="#{otherActionsPage.runGenerateGuardians}"
+                         title="Принудительное создание представителя клиентам из не предопределенных групп."
+                         styleClass="command-button" /><br/>
+        <h:outputText value="Список ид. организаций:"/>
+        <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
+    </rich:panel>
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

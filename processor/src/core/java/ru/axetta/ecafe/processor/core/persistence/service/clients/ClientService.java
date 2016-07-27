@@ -4,6 +4,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.List;
 @Service
 public class ClientService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
     public static ClientService getInstance() {
         return RuntimeContext.getAppContext().getBean(ClientService.class);
     }
@@ -44,5 +47,16 @@ public class ClientService {
             }
         }
         return modifiedClientsIds;
+    }
+
+    public int generateGuardians(List<Long> orgs) throws Exception {
+        int result;
+        try {
+            result = clientDao.runGenerateGuardians(orgs);
+        } catch (Exception e) {
+            logger.error("Error in generate guardians", e);
+            throw e;
+        }
+        return result;
     }
 }

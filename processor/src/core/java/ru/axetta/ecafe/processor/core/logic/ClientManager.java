@@ -69,7 +69,8 @@ public class ClientManager {
         FAX,
         GENDER,
         BIRTH_DATE,
-        BENEFIT_ON_ADMISSION
+        BENEFIT_ON_ADMISSION,
+        SSOID
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -109,6 +110,7 @@ public class ClientManager {
             new FieldProcessor.Def(32, false, false, "Пол", null, FieldId.GENDER, true),
             new FieldProcessor.Def(33, false, false, "Дата рождения", null, FieldId.BIRTH_DATE, true),
             new FieldProcessor.Def(34, false, false, "Льгота при поступлении", null, FieldId.BENEFIT_ON_ADMISSION, true),
+            new FieldProcessor.Def(35, false, false, "SSOID", null, FieldId.SSOID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -735,6 +737,10 @@ public class ClientManager {
             //token[34])
             if (fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION) != null) {
                 client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
+            }
+
+            if (fieldConfig.getValue(FieldId.SSOID) != null) {
+                client.setSsoid(fieldConfig.getValue(FieldId.SSOID));
             }
 
             logger.debug("save client");

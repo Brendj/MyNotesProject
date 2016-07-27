@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import java.util.List;
 public class OtherActionsPage extends BasicWorkspacePage {
 
     private String passwordForSearch;
+    private String orgsForGenerateGuardians;
     private List<Long> clientsIds = null;
 
     private static void close(Closeable resource) {
@@ -182,6 +184,38 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void runGenerateGuardians() {
+        List<Long> orgs = getOrgs();
+
+        int count = 0;
+        try {
+            count = ClientService.getInstance().generateGuardians(orgs);
+        } catch (Exception e) {
+            printError(String.format("Операция завершилась с ошибкой %s", e.getMessage()));
+            return;
+        }
+
+        printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
+    }
+
+    private List<Long> getOrgs() {
+        if (orgsForGenerateGuardians.equals("ALL")) {
+            return null;
+        }
+        List orgs = new ArrayList();
+        try {
+            String[] sOrgs = orgsForGenerateGuardians.split(",");
+            for (String s : sOrgs) {
+                Long org = Long.parseLong(s.trim());
+                orgs.add(org);
+            }
+        } catch (Exception e) {
+            printError("Корректно задайте список идентификаторов организаций через запятую");
+            return null;
+        }
+        return orgs;
+    }
+
     public void download() throws IOException {
         if ((clientsIds == null) || (clientsIds.isEmpty())) {
             return;
@@ -231,5 +265,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public boolean isDownloadable() {
         return clientsIds != null && !clientsIds.isEmpty();
+    }
+
+    public String getOrgsForGenerateGuardians() {
+        return orgsForGenerateGuardians;
+    }
+
+    public void setOrgsForGenerateGuardians(String orgsForGenerateGuardians) {
+        this.orgsForGenerateGuardians = orgsForGenerateGuardians;
     }
 }
