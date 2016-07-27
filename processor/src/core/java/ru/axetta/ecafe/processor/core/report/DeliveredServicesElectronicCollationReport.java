@@ -124,6 +124,17 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                     getOtherRegions());
         }
 
+        public boolean ConfirmMessage(Session session, Date startTime, Date endTime,
+                Calendar calendar, Long orgId, Long contragent, Long contract, String region, Boolean otherRegions)
+                throws Exception {
+
+            boolean b = findNotConfirmedTaloons(session, startTime, endTime, contragent,
+                    contract);
+
+            return b;
+        }
+
+
         public DeliveredServicesElectronicCollationReport build(Session session, Date startTime, Date endTime,
                 Calendar calendar, Long orgId, Long contragent, Long contract, String region, Boolean otherRegions)
                 throws Exception {
@@ -292,7 +303,9 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 }
             }
 
-            //String typeCondition = " cf_orders.ordertype<>8 and ";
+            List<DeliveredServicesItem> result = new ArrayList<DeliveredServicesItem>();
+
+            /*//String typeCondition = " cf_orders.ordertype<>8 and ";
             String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10)) and "
                     + " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
             String sql = "select cf_orgs.shortnameinfoservice, split_part(cf_goods.fullname, '/', 1) as level1, "
@@ -318,7 +331,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
             query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
 
-            List<DeliveredServicesItem> result = new ArrayList<DeliveredServicesItem>();
+
             List res = query.list();
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
@@ -348,7 +361,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 item.setIdoforg(idoforg);
                 item.setOrderType(orderType);
                 result.add(item);
-            }
+            }*/
 
             //Дополнительная инфа из таблицы cf_taloon_approval
             String sqlTaloon = "SELECT cf_orgs.shortnameinfoservice, split_part(cft.taloonname, '/', 1) AS level1, "
@@ -398,6 +411,98 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             }
 
             return result;
+        }
+
+        //Для вывода предупреждения
+        public  boolean findNotConfirmedTaloons(Session session, Date start, Date end,
+                Long contragent, Long contract) {
+            boolean b = false;
+
+            String contragentCondition = "";
+            if (contragent != null) {
+                contragentCondition = "(cf_orgs.defaultsupplier=" + contragent + ") AND ";
+            }
+
+            String contractOrgsCondition = "";
+            if (contract != null) {
+                //  Вытаскиваем те оргии, которые привязаны к контракту и устанавливаем их как ограничения. !Будет заменено!
+                Query query = session
+                        .createSQLQuery("SELECT idoforg FROM cf_orgs WHERE idofcontract=:contract");//.createQuery(sql);
+                query.setParameter("contract", contract);
+                List res = query.list();
+                for (Object entry : res) {
+                    Long org = ((BigInteger) entry).longValue();
+                    if (contractOrgsCondition.length() > 0) {
+                        contractOrgsCondition = contractOrgsCondition.concat(", ");
+                    }
+                    contractOrgsCondition = contractOrgsCondition.concat("" + org);
+                }
+
+                //  Берем даты начала и окончания контракта, если они выходят за рамки выбранных пользователем дат, то
+                //  ограничиваем временные рамки
+                Criteria contractCriteria = session.createCriteria(Contract.class);
+                contractCriteria.add(Restrictions.eq("globalId", contract));
+                Contract c = (Contract) contractCriteria.uniqueResult();
+                if (c.getDateOfConclusion().getTime() > start.getTime()) {
+                    start.setTime(c.getDateOfConclusion().getTime());
+                }
+                if (c.getDateOfClosing().getTime() < end.getTime()) {
+                    end.setTime(c.getDateOfClosing().getTime());
+                }
+            }
+            if (contractOrgsCondition.length() > 0) {
+                contractOrgsCondition = " cf_orgs.idoforg in (" + contractOrgsCondition + ") and ";
+            }
+            String orgCondition = "";
+            String in_str = "";
+            if (orgShortItemList != null) {
+                if(!orgShortItemList.isEmpty()) {
+                    for (OrgShortItem orgShortItem : orgShortItemList) {
+                        Org o = (Org) session.load(Org.class, orgShortItem.getIdOfOrg());
+
+                        for (Org fo : o.getFriendlyOrg()) {
+                            in_str += fo.getIdOfOrg().toString() + ",";
+                        }
+                    }
+                    if (in_str.length() > 0) {
+                        in_str = in_str.substring(0, in_str.length() - 1);
+                        orgCondition = String.format(" cf_orgs.idoforg in (%s) and ", in_str);
+                    }
+                }
+            }
+
+            String districtCondition = "";
+            if ((region != null) && !region.isEmpty()) {
+                //если выбран регион - надо анализировать флаг otherRegions
+                if (otherRegions) {
+                    districtCondition = String
+                            .format(" cf_orgs.idoforg in (select distinct friendlyorg from cf_friendly_organization f "
+                                    + "join cf_orgs o on f.currentorg = o.idoforg where o.district = '%s') and ",
+                                    region);
+                } else {
+                    districtCondition = String
+                            .format(" cf_orgs.idoforg in (select distinct friendlyorg from cf_friendly_organization f "
+                                    + "join cf_orgs o on f.currentorg = o.idoforg where o.district = '%s') and cf_orgs.district = '%s' and ",
+                                    region, region);
+                }
+            }
+
+            String sqlTaloonError = "SELECT cft.ispp_state, cft.pp_state "
+                    + "FROM cf_taloon_approval cft JOIN cf_orgs ON cft.idoforg = cf_orgs.idoforg WHERE cft.deletedstate = FALSE  AND "
+                    + "(cft.ispp_state in (0) OR cft.pp_state in (0,2)) AND "
+                    + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
+                    + "cft.taloondate BETWEEN :start AND :end";
+            Query queryTaloonError = session.createSQLQuery(sqlTaloonError);
+            queryTaloonError.setParameter("start", start.getTime());
+            queryTaloonError.setParameter("end", end.getTime());
+
+            List resTaloonError = queryTaloonError.list();
+
+            if (!resTaloonError.isEmpty()) {
+                b = true;
+            }
+
+            return b;
         }
 
         public String getRegion() {

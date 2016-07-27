@@ -6200,6 +6200,12 @@ public class MainPage implements Serializable {
             deliveredServicesElectronicCollationReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+
+            if (deliveredServicesElectronicCollationReportPage.b == true) {
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Внимание! В выбранном периоде есть несогласованные даты", null));
+            }
+
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (JRException fnfe) {

@@ -57,6 +57,8 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
     private final String FILTER_INIT = "Не выбрано. Отчет будет построен по всем образовательным организациям города";
     private final String FILTER_SUPER = "Не выбрано";
 
+    public boolean b;
+
     public String getPageFilename() {
         return "report/online/delivered_services_electronic_collation_report";
     }
@@ -132,6 +134,12 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             }
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
+
+            b = builder.ConfirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
+                    contragentFilter.getContragent().getIdOfContragent(),
+                    contractFilter.getContract().getIdOfContract(), region, otherRegions);
+
+
             DeliveredServicesElectronicCollationReport deliveredServicesElectronicCollationReport = builder
                     .build(session, startDate, endDate, localCalendar, idOfOrg,
                             contragentFilter.getContragent().getIdOfContragent(),
@@ -172,6 +180,11 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
 
     public void buildReport(Session session) throws Exception {
         DeliveredServicesElectronicCollationReport.Builder reportBuilder = new DeliveredServicesElectronicCollationReport.Builder();
+
+        b = reportBuilder.ConfirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
+                contragentFilter.getContragent().getIdOfContragent(),
+                contractFilter.getContract().getIdOfContract(), region, otherRegions);
+
         if (idOfOrgList != null) {
             List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
             for(Long idOfOrg : idOfOrgList) {
