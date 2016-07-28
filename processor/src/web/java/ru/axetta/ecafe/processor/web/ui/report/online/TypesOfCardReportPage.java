@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -119,9 +118,9 @@ public class TypesOfCardReportPage extends OnlineReportPage {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 builder.setUserId(DAOUtils.findUser(persistenceSession,
                         FacesContext.getCurrentInstance().getExternalContext().getRemoteUser()).getIdOfUser());
+                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } catch (Exception e) {
