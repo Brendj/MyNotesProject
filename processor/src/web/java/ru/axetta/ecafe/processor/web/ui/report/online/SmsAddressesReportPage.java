@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.SmsAddressesReport;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
@@ -106,6 +107,10 @@ public class SmsAddressesReportPage extends OnlineReportPage implements ClientSe
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return null;
         Date generateTime = new Date();
+        if(CollectionUtils.isEmpty(clientList)){
+            printError("Выберите список клиентов");
+            return null;
+        }
         SmsAddressesReport.Builder builder = new SmsAddressesReport.Builder(templateFilename, getClients());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -156,6 +161,10 @@ public class SmsAddressesReportPage extends OnlineReportPage implements ClientSe
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return;
         Date generateTime = new Date();
+        if(CollectionUtils.isEmpty(clientList)){
+            printError("Выберите список клиентов");
+            return;
+        }
         SmsAddressesReport.Builder builder = new SmsAddressesReport.Builder(templateFilename, getClients());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

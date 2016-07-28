@@ -59,10 +59,18 @@ public class InteractiveCardDataReportPage extends OnlineReportPage {
     }
 
     public void doGenerate() {
+        if(idOfOrg == null){
+            printError("Выберите организацию");
+            return;
+        }
         RuntimeContext.getAppContext().getBean(InteractiveCardDataReportPage.class).generate();
     }
 
     public void doGenerateXLS(ActionEvent actionEvent) {
+        if(idOfOrg == null){
+            printError("Выберите организацию");
+            return;
+        }
         RuntimeContext.getAppContext().getBean(InteractiveCardDataReportPage.class).generateXLS();
     }
 

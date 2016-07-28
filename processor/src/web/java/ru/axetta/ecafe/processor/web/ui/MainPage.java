@@ -6621,11 +6621,9 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            salesReportPage.buildReport(persistenceSession);
+            salesReportPage.buildReport(persistenceSession, facesContext);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,

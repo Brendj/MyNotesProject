@@ -67,4 +67,6 @@
             </f:verbatim>
         </c:if>
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 </h:panelGrid>
