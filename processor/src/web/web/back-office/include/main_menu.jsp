@@ -902,7 +902,10 @@
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
         <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
         <rich:panelMenuItem id="registerStampReportMenuItem" binding="#{registerStampPage.mainMenuComponent}"
-                            label="Реестр талонов" action="#{registerStampPage.show}" reRender="workspaceForm" />
+                            label="Реестр талонов (предварительный)" action="#{registerStampPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="registerStampElectronicCollationPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampElectronicCollationPage"--%>
+        <rich:panelMenuItem id="registerStampElectronicCollationReportMenuItem" binding="#{registerStampElectronicCollationPage.mainMenuComponent}"
+                            label="Реестр талонов (электронная сверка)" action="#{registerStampElectronicCollationPage.show}" reRender="workspaceForm" />
 
         <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
