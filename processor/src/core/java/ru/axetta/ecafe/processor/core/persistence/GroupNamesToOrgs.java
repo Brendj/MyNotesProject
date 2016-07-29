@@ -14,22 +14,34 @@ package ru.axetta.ecafe.processor.core.persistence;
 public class GroupNamesToOrgs {
 
     private Long idOfGroupNameToOrg;
-    private Org idOfOrg;
     private Long idOfMainOrg;
+    private Long idOfOrg;
     private Integer mainBuilding;
     private String groupName;
+    private Long version;
 
     public GroupNamesToOrgs() {
     }
 
-    public GroupNamesToOrgs(Long idOfGroupNameToOrg, Org idOfOrg, Long idOfMainOrg, Integer mainBuilding,
-            String groupName) {
+    public GroupNamesToOrgs(Long idOfGroupNameToOrg, Long idOfOrg, Long idOfMainOrg, Integer mainBuilding,
+            String groupName,long version) {
         this.idOfGroupNameToOrg = idOfGroupNameToOrg;
         this.idOfOrg = idOfOrg;
         this.idOfMainOrg = idOfMainOrg;
         this.mainBuilding = mainBuilding;
         this.groupName = groupName;
+        this.version = version;
     }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+
 
     public Long getIdOfGroupNameToOrg() {
         return idOfGroupNameToOrg;
@@ -39,11 +51,11 @@ public class GroupNamesToOrgs {
         this.idOfGroupNameToOrg = idOfGroupNameToOrg;
     }
 
-    public Org getIdOfOrg() {
+    public Long getIdOfOrg() {
         return idOfOrg;
     }
 
-    public void setIdOfOrg(Org idOfOrg) {
+    public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
     }
 

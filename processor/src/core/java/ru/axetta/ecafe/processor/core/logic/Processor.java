@@ -30,6 +30,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.Clientg
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ResClientgroupManagers;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.groups.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataProcessor;
@@ -666,7 +667,8 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-
+        //process groups organization
+        fullProcessingGroupsOrganization(request,syncHistory,responseSections);
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
@@ -796,6 +798,9 @@ public class Processor implements SyncProcessor {
         //Process GroupManagers (классных руководителей)
         fullProcessingClientGroupManagers(request, syncHistory, responseSections);
 
+        //GroupsOrganization
+        fullProcessingGroupsOrganization(request, syncHistory, responseSections);
+
         // время окончания обработки
         Date syncEndTime = new Date();
 
@@ -810,6 +815,28 @@ public class Processor implements SyncProcessor {
                 responseSections);
     }
 
+    private void fullProcessingGroupsOrganization(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        GroupsOrganizationRequest requestSection = request.findSection(GroupsOrganizationRequest.class);
+        if (requestSection == null) return;
+        try {
+            ResProcessGroupsOrganization resGroupsOrganization = processResGroupsOrganization(requestSection);
+            addToResponseSections(resGroupsOrganization, responseSections);
+        } catch (Exception e) {
+            String message = String.format("Failed to process ResGroupsOrganization, %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            ProcessGroupsOrganizationData groupsOrganizationData = processGroupsOrganizationData(requestSection);
+            addToResponseSections(groupsOrganizationData, responseSections);
+        } catch (Exception e) {
+            String message = String.format("Failed to process GroupsOrganization, %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
 
     private void fullProcessingRO(SyncRequest request, SyncHistory syncHistory,
             List<AbstractToElement> responseSections) {
@@ -3193,9 +3220,6 @@ public class Processor implements SyncProcessor {
     }
 
 
-
-
-
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds) throws Exception {
         Session persistenceSession = null;
@@ -4027,6 +4051,45 @@ public class Processor implements SyncProcessor {
         }
         return organizationComplexesStructure;
     }
+
+    private ProcessGroupsOrganizationData processGroupsOrganizationData(GroupsOrganizationRequest sectionRequest)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ProcessGroupsOrganizationData result = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new GroupsOrganizationDataProcessor(persistenceSession, sectionRequest);
+            result = (ProcessGroupsOrganizationData) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    private ResProcessGroupsOrganization processResGroupsOrganization(GroupsOrganizationRequest sectionRequest)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResProcessGroupsOrganization result = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ResGroupsOrganizationProcessor(persistenceSession, sectionRequest);
+            result = (ResProcessGroupsOrganization) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
 
     private ProhibitionsMenu getProhibitionsMenuData(Org org, long version) throws Exception {
         ProhibitionsMenu prohibitionsMenu = new ProhibitionsMenu();

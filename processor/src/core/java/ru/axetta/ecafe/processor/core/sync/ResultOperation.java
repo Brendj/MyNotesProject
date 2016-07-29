@@ -12,12 +12,12 @@ package ru.axetta.ecafe.processor.core.sync;
  * To change this template use File | Settings | File Templates.
  */
 public class ResultOperation {
-
+    private static final int SUCCESS_CODE = 0;
     private Integer code;
     private String message;
 
     public ResultOperation() {
-        this(0, null);
+        this(SUCCESS_CODE, null);
     }
 
     public ResultOperation(Integer code, String resultMessage) {
@@ -27,6 +27,10 @@ public class ResultOperation {
 
     public Integer getCode() {
         return code;
+    }
+
+    public boolean isSuccess() {
+        return code == SUCCESS_CODE;
     }
 
     public String getMessage() {

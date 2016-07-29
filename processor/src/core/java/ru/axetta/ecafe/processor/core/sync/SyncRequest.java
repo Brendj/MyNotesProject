@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.Categor
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
@@ -2466,6 +2467,7 @@ public class SyncRequest {
             builders.add(new CorrectingNumbersOrdersRegistryRequest.Builder());
             builders.add(new DirectivesRequest.Builder());
             builders.add(new QuestionaryClientsRequest.Builder());
+            builders.add(new GroupsOrganizationRequest.Builder(idOfOrg));
             return builders;
         }
 

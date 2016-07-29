@@ -6,12 +6,13 @@
 
 CREATE TABLE cf_groupnames_to_orgs
   (
-  idofgroupnametoorg bigserial,
-  idoforg bigint,
-  idofmainorg bigint,
-  mainbuilding integer,
+  idofgroupnametoorg BIGSERIAL,
+  idoforg BIGINT,
+  idofmainorg BIGINT,
+  mainbuilding INTEGER,
+  version BIGINT,
   check (mainbuilding = 1),
-  groupname character varying(36),
+  groupname CHARACTER VARYING(256),
   constraint cf_groupnames_to_orgs_pk primary key (idofgroupnametoorg),
   constraint cf_groupnames_to_orgs_fk foreign key (idoforg)
     references cf_orgs (idoforg)

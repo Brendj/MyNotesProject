@@ -11,10 +11,10 @@
         <id name="idOfGroupNameToOrg" column="IdOfGroupNameToOrg" type="long">
             <generator class="identity"/>
         </id>
-        <many-to-one name="idOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
-                     not-null="true"/>
         <property name="idOfMainOrg" column="IdOfMainOrg" type="long"/>
+        <property name="idOfOrg" column="IdOfOrg" type="long"/>
         <property name="mainBuilding" column="MainBuilding" type="int"/>
         <property name="groupName" column="GroupName" type="string"/>
+        <property name="version" column="Version" type="long"/>
     </class>
 </hibernate-mapping>

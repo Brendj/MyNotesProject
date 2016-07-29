@@ -2150,6 +2150,17 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByGroupNameToOrg(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "SELECT g.version FROM cf_GroupNames_To_Orgs AS g ORDER BY g.version DESC LIMIT 1 FOR UPDATE");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
     public static long nextVersionBySpecialDate(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select sd.version from cf_specialdates as sd order by sd.version desc limit 1 for update");
@@ -2191,6 +2202,14 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("version", version));
         //criteria.add(Restrictions.eq("deletedState", false));
         return criteria.list();
+    }
+
+    public static List<GroupNamesToOrgs> getGroupNamesToOrgsForOrgSinceVersion(Session session,Long idOfOrg,long version) throws Exception {
+        Query query = session
+                .createQuery("select g from GroupNamesToOrgs g where g.idOfMainOrg=:orgId and g.version>:version");
+        query.setParameter("orgId", idOfOrg);
+        query.setParameter("version", version);
+        return query.list();
     }
 
     public static List<ZeroTransaction> getZeroTransactionsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
