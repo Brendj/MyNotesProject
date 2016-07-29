@@ -55,6 +55,11 @@ public class ImageUtils {
         if(!client.getPhoto().getIsNew() && isNew){
             throw new NoNewPhotoException();
         }
+        if(!isNew){
+            if(!new File(formImagePath(client.getContractId(), isNew, client.getPhoto().getName(), ImageSize.fromIntegerToEnum(size))).exists()){
+                throw new NoPhotoException("У клиента нет фото.");
+            }
+        }
         StringBuilder tmp = new StringBuilder();
         tmp.append(ImageSize.fromInteger(size));
         tmp.append(DELIMITER);
@@ -323,6 +328,20 @@ public class ImageUtils {
                 sb.append(String.format("%d - %s, ", imageSize.getValue(), imageSize.getDescription()));
             }
             return sb.toString().substring(0, sb.length() - 2);
+        }
+
+        public static ImageSize fromIntegerToEnum(int value) throws NoSuchImageSizeException {
+            ImageSize result = null;
+            for(ImageSize i : ImageSize.values()){
+                if(i.getValue() == value){
+                    result = i;
+                    break;
+                }
+            }
+            if(result == null){
+                throw new NoSuchImageSizeException("Допустимые значения: " + getFormatsString() + ".");
+            }
+            return result;
         }
 
         public static String fromInteger(int value) throws NoSuchImageSizeException {

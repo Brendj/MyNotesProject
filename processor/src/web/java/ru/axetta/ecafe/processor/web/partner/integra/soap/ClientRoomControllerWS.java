@@ -1863,6 +1863,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (client.getPhoto() != null) {
                     clientPhoto = client.getPhoto();
                     ImageUtils.saveImage(client, photo, true);
+                    clientPhoto.setIsNew(true);
                 } else {
                     String imageName = ImageUtils.saveImage(client.getContractId(), photo, true);
                     clientPhoto = new ClientPhoto(client, imageName, true);
