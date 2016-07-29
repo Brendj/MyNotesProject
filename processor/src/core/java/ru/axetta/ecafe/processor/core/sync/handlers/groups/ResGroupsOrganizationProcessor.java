@@ -36,7 +36,6 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
 
     @Override
     public ResProcessGroupsOrganization process() throws Exception {
-
         ResProcessGroupsOrganization result = new ResProcessGroupsOrganization();
         loadOrgFromRequest();
         if (!foundMainBuilding()) {
@@ -49,14 +48,23 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
             return null;
         }
         ArrayList<ResProcessGroupsOrganizationItem> resultItems = new ArrayList<ResProcessGroupsOrganizationItem>();
-        for (GroupOrganizationItem groupItem : sectionRequest.getItems()) {
-            ResultOperation resultOperation = processResultGroupOrganizationItem(groupItem,nextVersion);
-            ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(groupItem.getName(),
-                    nextVersion, resultOperation);
-            resultItems.add(item);
+        if (sectionRequest.getItems().size() > 0) {
+            List<GroupNamesToOrgs> groupsFromMainBuilding = loadGroupsFromMainBuilding();
+            for (GroupOrganizationItem groupItem : sectionRequest.getItems()) {
+                ResultOperation resultOperation = processResultGroupOrganizationItem(groupsFromMainBuilding, groupItem, nextVersion);
+                ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(groupItem.getName(),
+                        nextVersion, resultOperation);
+                resultItems.add(item);
+            }
         }
         result.setItems(resultItems);
         return result;
+    }
+
+    private List<GroupNamesToOrgs> loadGroupsFromMainBuilding() {
+        Query query = session.createQuery("select g from GroupNamesToOrgs g where g.idOfMainOrg=:orgId");
+        query.setParameter("orgId", mainOrg.getIdOfOrg());
+        return query.list();
     }
 
     private boolean foundMainBuilding() {
@@ -84,32 +92,32 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
         }
     }
 
-    private ResultOperation processResultGroupOrganizationItem(GroupOrganizationItem groupItem, Long nextVersion) {
+    private ResultOperation processResultGroupOrganizationItem(List<GroupNamesToOrgs> groupsFromCurrentMainBuilding,
+            GroupOrganizationItem groupItem, Long nextVersion) {
         ResultOperation resultOperation = new ResultOperation();
-        try {
-            // обработать запись
-            Query query = session
-                    .createQuery("select g from GroupNamesToOrgs g where g.idOfMainOrg=:orgId and g.groupName =:groupName");
-            query.setParameter("orgId", mainOrg.getIdOfOrg());
-            query.setParameter("groupName", groupItem.getName());
-            List result = query.list();
-            GroupNamesToOrgs groupNameToOrg;
-            if (result == null || result.size() == 0) {
-                groupNameToOrg = new GroupNamesToOrgs();
-                groupNameToOrg.setGroupName(groupItem.getName());
-                groupNameToOrg.setIdOfOrg(groupItem.getBindingToOrg());
-                groupNameToOrg.setIdOfMainOrg(mainOrg.getIdOfOrg());
-                groupNameToOrg.setMainBuilding(1);
-                groupNameToOrg.setVersion(nextVersion);
-            } else {
-                groupNameToOrg = (GroupNamesToOrgs) result.get(0);
-                groupNameToOrg.setGroupName(groupItem.getName());
-                groupNameToOrg.setIdOfOrg(groupItem.getBindingToOrg());
-                groupNameToOrg.setIdOfMainOrg(mainOrg.getIdOfOrg());
-                groupNameToOrg.setVersion(nextVersion);
-                groupNameToOrg.setMainBuilding(1);
+        GroupNamesToOrgs savedGroupNamesToOrgs = null;
+        for (GroupNamesToOrgs groupNamesToOrgs : groupsFromCurrentMainBuilding) {
+            if (groupNamesToOrgs.getGroupName().equals(groupItem.getName())) {
+                savedGroupNamesToOrgs = groupNamesToOrgs;
+                break;
             }
-            session.saveOrUpdate(groupNameToOrg);
+        }
+        try {
+            if (savedGroupNamesToOrgs == null) {
+                savedGroupNamesToOrgs = new GroupNamesToOrgs();
+                savedGroupNamesToOrgs.setGroupName(groupItem.getName());
+                savedGroupNamesToOrgs.setIdOfOrg(groupItem.getBindingToOrg());
+                savedGroupNamesToOrgs.setIdOfMainOrg(mainOrg.getIdOfOrg());
+                savedGroupNamesToOrgs.setMainBuilding(1);
+                savedGroupNamesToOrgs.setVersion(nextVersion);
+            } else {
+                savedGroupNamesToOrgs.setGroupName(groupItem.getName());
+                savedGroupNamesToOrgs.setIdOfOrg(groupItem.getBindingToOrg());
+                savedGroupNamesToOrgs.setIdOfMainOrg(mainOrg.getIdOfOrg());
+                savedGroupNamesToOrgs.setVersion(nextVersion);
+                savedGroupNamesToOrgs.setMainBuilding(1);
+            }
+            session.saveOrUpdate(savedGroupNamesToOrgs);
         } catch (Exception e) {
             resultOperation = new ResultOperation(500, e.getMessage());
         }
