@@ -186,6 +186,37 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
+    /* получаем список всех товаров для льготного питания */
+    @SuppressWarnings("unchecked")
+    public List<GoodItem> findAllGoodsElectronicCollation(Long idOfOrg, Date startTime, Date endTime, Set orderTypes){
+       /* String sql = "select distinct good.globalId as globalId, "
+                + "     good.parts as parts, "
+                + "     good.fullName as fullName, "
+                + "     case ord.orderType when 10 then 1 else 0 end as orderType "
+                + " from OrderDetail details "
+                + "     left join details.good good "
+                + "     left join details.order ord "
+                + "     left join ord.org o "
+                + " where ord.state=0 "
+                + "     and details.state=0 "
+                + "     and ord.orderType in :orderType "
+                + "     and details.good is not null "
+                + "     and o.idOfOrg=:idOfOrg "
+                + "     and ord.createTime between :startDate and :endDate "
+                + "     and details.menuType >= :mintype "
+                + "     and details.menuType <=:maxtype "
+                + " order by fullName";
+        Query query = getSession().createQuery(sql);
+        query.setParameterList("orderType",orderTypes);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));*/
+        return null; //(List<GoodItem>) query.list();
+    }
+
     public Set<OrderTypeEnumType> getReducedPaymentOrderTypesWithDailySample() {
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);

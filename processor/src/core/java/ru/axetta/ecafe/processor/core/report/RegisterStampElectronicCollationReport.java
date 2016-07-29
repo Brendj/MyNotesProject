@@ -103,10 +103,12 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
             }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-            List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
-            allGoods.addAll(service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+            //методы для выборки данных
+            List<GoodItem> allGoods = service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+            allGoods.addAll(service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
+
             List<RegisterStampElectronicCollationReportItem> result = new ArrayList<RegisterStampElectronicCollationReportItem>();
             calendar.setTime(startTime);
             GoodItem emptyGoodItem = new GoodItem();
