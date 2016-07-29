@@ -185,20 +185,21 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runGenerateGuardians() {
-        List<Long> orgs = getOrgs();
+        List<Long> orgs;
 
         int count = 0;
         try {
+            orgs = getOrgs();
             count = ClientService.getInstance().generateGuardians(orgs);
         } catch (Exception e) {
-            printError(String.format("Операция завершилась с ошибкой %s", e.getMessage()));
+            printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
             return;
         }
 
         printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
     }
 
-    private List<Long> getOrgs() {
+    private List<Long> getOrgs() throws Exception {
         if (orgsForGenerateGuardians.equals("ALL")) {
             return null;
         }
@@ -210,8 +211,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
                 orgs.add(org);
             }
         } catch (Exception e) {
-            printError("Корректно задайте список идентификаторов организаций через запятую");
-            return null;
+            throw new Exception("Корректно задайте список идентификаторов организаций через запятую");
         }
         return orgs;
     }
