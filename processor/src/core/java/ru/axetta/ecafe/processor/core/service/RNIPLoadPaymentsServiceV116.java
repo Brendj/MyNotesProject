@@ -516,14 +516,24 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter12.setDefaultValue("Оплата услуг питания в образовательном учреждении");
 
         DescriptionSimpleParameter descriptionSimpleParameter13 = catOf.createDescriptionSimpleParameter();
-        descriptionSimpleParameter11.setForPayment(false);
-        descriptionSimpleParameter11.setForSearch(false);
-        descriptionSimpleParameter11.setLabel("Признак дублирования в ГИС ГМП");
-        descriptionSimpleParameter11.setName("duplication");
-        descriptionSimpleParameter11.setReadonly(true);
-        descriptionSimpleParameter11.setRequired(false);
-        descriptionSimpleParameter11.setVisible(false);
-        descriptionSimpleParameter11.setDefaultValue("off");
+        descriptionSimpleParameter13.setForPayment(false);
+        descriptionSimpleParameter13.setForSearch(false);
+        descriptionSimpleParameter13.setLabel("Признак дублирования в ГИС ГМП");
+        descriptionSimpleParameter13.setName("duplication");
+        descriptionSimpleParameter13.setReadonly(true);
+        descriptionSimpleParameter13.setRequired(false);
+        descriptionSimpleParameter13.setVisible(false);
+        descriptionSimpleParameter13.setDefaultValue("off");
+
+        DescriptionSimpleParameter descriptionSimpleParameter14 = catOf.createDescriptionSimpleParameter();
+        descriptionSimpleParameter14.setForPayment(true);
+        descriptionSimpleParameter14.setForSearch(true);
+        descriptionSimpleParameter14.setLabel("СНИЛС");
+        descriptionSimpleParameter14.setName("AltPayerIdentifier");
+        descriptionSimpleParameter14.setReadonly(false);
+        descriptionSimpleParameter14.setRequired(true);
+        descriptionSimpleParameter14.setVisible(true);
+        descriptionSimpleParameter14.setRegexp("^14(0){9}\\d{11}643$");
 
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter1);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter2);
@@ -537,6 +547,8 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter10);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter11);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter12);
+        descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter13);
+        descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter14);
 
         serviceType.setPaymentParameters(descriptionParametersType);
 

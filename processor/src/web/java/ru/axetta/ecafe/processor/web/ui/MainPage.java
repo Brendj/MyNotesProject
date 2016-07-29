@@ -2264,7 +2264,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
-            String prevRNIPId = rnipLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
+            //String prevRNIPId = rnipLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             contragentEditPage.updateContragent(persistenceSession, selectedIdOfContragent);
             selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
@@ -2274,7 +2274,7 @@ public class MainPage implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
             String newRNIPId = rnipLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
             Boolean upd = contragentEditPage
-                    .updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
+                    .updateContragentRNIP(persistenceSession, selectedIdOfContragent, newRNIPId);
             if (upd != null && upd == true) {
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно загружены в РНИП",
