@@ -118,6 +118,9 @@
                      column="DefaultSupplier"
                      not-null="true"/>
 
+        <many-to-one name="coSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
+                     column="CoSupplier"/>
+
         <set name="clientsInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Client"/>

@@ -50,6 +50,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String plainSsoPasswordConfirmation;
     private String smsSender;
     private ContragentItem defaultSupplier = new ContragentItem();
+    private ContragentItem coSupplier = new ContragentItem();
     private String INN;
     private String OGRN;
     private String mailingListReportsOnNutrition;
@@ -79,6 +80,18 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     private Boolean payByCashier;
     private Boolean oneActiveCard;
+
+    public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
+    public static final String CO_SUPPLIER = "CoSupplier";
+    private String modeContragentSelect;
+
+    public String getDefaultSupplierMode() {
+        return DEFAULT_SUPPLIER;
+    }
+
+    public String getCoSupplierMode() {
+        return CO_SUPPLIER;
+    }
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
     private SelectItem[] securityLevels = readSecurityLevels();
@@ -143,7 +156,16 @@ public class OrgCreatePage extends BasicWorkspacePage
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            this.defaultSupplier = new ContragentItem(contragent);
+            if (modeContragentSelect.equals(DEFAULT_SUPPLIER)) {
+                this.defaultSupplier = new ContragentItem(contragent);
+            }
+            if (modeContragentSelect.equals(CO_SUPPLIER)) {
+                this.coSupplier = new ContragentItem(contragent);
+            }
+        } else {
+            if (modeContragentSelect.equals(CO_SUPPLIER)) {
+                this.coSupplier = null;
+            }
         }
     }
 
@@ -178,14 +200,35 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.securityLevel = securityLevel;
     }
 
+    public ContragentItem getCoSupplier() {
+        return coSupplier;
+    }
+
+    public void setCoSupplier(ContragentItem coSupplier) {
+        this.coSupplier = coSupplier;
+    }
+
+    public String getModeContragentSelect() {
+        return modeContragentSelect;
+    }
+
+    public void setModeContragentSelect(String modeContragentSelect) {
+        this.modeContragentSelect = modeContragentSelect;
+    }
+
     public static class ContragentItem {
 
         private final Long idOfContragent;
         private final String contragentName;
 
         public ContragentItem(Contragent contragent) {
-            this.idOfContragent = contragent.getIdOfContragent();
-            this.contragentName = contragent.getContragentName();
+            if (contragent != null) {
+                this.idOfContragent = contragent.getIdOfContragent();
+                this.contragentName = contragent.getContragentName();
+            } else {
+                this.idOfContragent = null;
+                this.contragentName = null;
+            }
         }
 
         public ContragentItem() {
@@ -494,6 +537,8 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setRefectoryType(refectoryType);
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
+        Contragent coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
+        org.setCoSupplier(coSupplier);
 
         org.setSecurityLevel(securityLevel);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));

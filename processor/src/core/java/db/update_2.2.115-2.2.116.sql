@@ -48,3 +48,9 @@ ALTER TABLE cf_newcards
 --Признак удаления опекунской связи
 ALTER TABLE cf_client_guardian ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
 ADD COLUMN deletedate bigint;
+
+--Поле Соисполнитель поставщика по умолчанию
+ALTER TABLE cf_orgs ADD COLUMN cosupplier BIGINT,
+  ADD CONSTRAINT cf_orgs_contragent_cosupplier_fk FOREIGN KEY (cosupplier)
+  REFERENCES cf_contragents (idofcontragent) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION;

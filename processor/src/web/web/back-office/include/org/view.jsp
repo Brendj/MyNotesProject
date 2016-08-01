@@ -49,6 +49,8 @@
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Поставщик по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.defaultSupplierName}" readonly="true" styleClass="input-text" />
+    <h:outputText escape="true" value="Соисполнитель поставщика по умолчанию" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgViewPage.coSupplierName}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.organizationType}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />

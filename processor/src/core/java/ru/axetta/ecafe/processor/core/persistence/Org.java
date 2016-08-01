@@ -68,6 +68,7 @@ public class Org implements Serializable {
     private Long priceOfSms;
     private Long subscriptionPrice;
     private Contragent defaultSupplier;
+    private Contragent coSupplier;
     private Set<Client> clients = new HashSet<Client>();
     private Set<ClientGroup> clientGroups = new HashSet<ClientGroup>();
     private Set<SyncHistory> syncHistories = new HashSet<SyncHistory>();
@@ -972,5 +973,13 @@ public class Org implements Serializable {
 
     public void setSecurityLevel(OrganizationSecurityLevel securityLevel) {
         this.securityLevel = securityLevel;
+    }
+
+    public Contragent getCoSupplier() {
+        return coSupplier;
+    }
+
+    public void setCoSupplier(Contragent coSupplier) {
+        this.coSupplier = coSupplier;
     }
 }

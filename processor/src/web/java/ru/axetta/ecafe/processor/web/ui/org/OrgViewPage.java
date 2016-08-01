@@ -45,6 +45,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long subscriptionPrice;
     private String menuExchangeSourceOrgName;
     private String defaultSupplierName;
+    private String coSupplierName;
     private String INN;
     private String OGRN;
     private String mailingListReportsOnNutrition;
@@ -157,6 +158,9 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.priceOfSms = org.getPriceOfSms();
         this.subscriptionPrice = org.getSubscriptionPrice();
         this.defaultSupplierName = org.getDefaultSupplier().getContragentName();
+        if (org.getCoSupplier() != null) {
+            this.coSupplierName = org.getCoSupplier().getContragentName();
+        }
         this.INN=org.getINN();
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
@@ -575,5 +579,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public String getSecurityLevel() {
         return securityLevel;
+    }
+
+    public String getCoSupplierName() {
+        return coSupplierName;
+    }
+
+    public void setCoSupplierName(String coSupplierName) {
+        this.coSupplierName = coSupplierName;
     }
 }

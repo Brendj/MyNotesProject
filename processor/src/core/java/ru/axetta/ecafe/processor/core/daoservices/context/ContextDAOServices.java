@@ -26,6 +26,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -214,10 +215,22 @@ public class ContextDAOServices {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @SuppressWarnings("unchecked")
     public List<Long> findOrgOwnersByContragentSet(Long idOfUser) throws Exception {
-        Query query = entityManager.createQuery(
+        /*Query query = entityManager.createQuery(
                 "select distinct o.idOfOrg from Contragent c join c.orgsInternal o join c.usersInternal u where u.idOfUser = :idOfUser")
                 .setParameter("idOfUser", idOfUser);
-        return (List<Long>) query.getResultList();
+                return (List<Long>) query.getResultList();*/
+
+        List<Long> result = new ArrayList<Long>();
+        Query query = entityManager.createNativeQuery("SELECT idoforg FROM cf_orgs WHERE defaultsupplier IN "
+                + "(SELECT idofcontragent FROM cf_usercontragents WHERE idofuser = :idOfUser)"
+                + "OR cosupplier IN (SELECT idofcontragent FROM cf_usercontragents WHERE idofuser = :idOfUser)");
+        query.setParameter("idOfUser", idOfUser);
+        List list = query.getResultList();
+        for (Object entry : list) {
+            Long id = ((BigInteger)entry).longValue ();
+            result.add(id);
+        }
+        return result;
     }
 
     public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser) throws Exception {

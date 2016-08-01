@@ -60,6 +60,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Long menuExchangeSourceOrg;
     private String menuExchangeSourceOrgName;
     private ContragentItem defaultSupplier = new ContragentItem();
+    private ContragentItem coSupplier = new ContragentItem();
     private String INN;
     private String OGRN;
     private String mailingListReportsOnNutrition;
@@ -109,6 +110,18 @@ public class OrgEditPage extends BasicWorkspacePage
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
     private SelectItem[] securityLevels = readSecurityLevels();
 
+    public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
+    public static final String CO_SUPPLIER = "CoSupplier";
+    private String modeContragentSelect;
+
+    public String getDefaultSupplierMode() {
+        return DEFAULT_SUPPLIER;
+    }
+
+    public String getCoSupplierMode() {
+        return CO_SUPPLIER;
+    }
+
     private SelectItem[] readStatusDetailsComboMenuItems() {
         SelectItem[] items = new SelectItem[5];
         items[0] = new SelectItem(0, "");
@@ -152,6 +165,10 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void updateOrg(Session session, Long idOfOrg) throws Exception {
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class, this.defaultSupplier.getIdOfContragent());
+        Contragent coSupplier = null;
+        if (this.coSupplier != null) {
+            coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
+        }
         Org org = (Org) session.load(Org.class, idOfOrg);
         org.setRefectoryType(refectoryType);
         org.setShortName(shortName);
@@ -185,6 +202,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setSubscriptionPrice(this.subscriptionPrice);
 
         org.setDefaultSupplier(defaultSupplier);
+        org.setCoSupplier(coSupplier);
         org.setINN(INN);
         org.setOGRN(OGRN);
         org.setMailingListReportsOnNutrition(mailingListReportsOnNutrition);
@@ -343,6 +361,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.priceOfSms = org.getPriceOfSms();
         this.subscriptionPrice = org.getSubscriptionPrice();
         this.defaultSupplier = new ContragentItem(org.getDefaultSupplier());
+        this.coSupplier = new ContragentItem(org.getCoSupplier());
         this.OGRN=org.getOGRN();
         this.INN=org.getINN();
         this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
@@ -509,7 +528,16 @@ public class OrgEditPage extends BasicWorkspacePage
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlags, String classTypes) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            this.defaultSupplier = new ContragentItem(contragent);
+            if (modeContragentSelect.equals(DEFAULT_SUPPLIER)) {
+                this.defaultSupplier = new ContragentItem(contragent);
+            }
+            if (modeContragentSelect.equals(CO_SUPPLIER)) {
+                this.coSupplier = new ContragentItem(contragent);
+            }
+        } else {
+            if (modeContragentSelect.equals(CO_SUPPLIER)) {
+                this.coSupplier = null;
+            }
         }
     }
 
@@ -933,14 +961,35 @@ public class OrgEditPage extends BasicWorkspacePage
         this.securityLevel = securityLevel;
     }
 
+    public ContragentItem getCoSupplier() {
+        return coSupplier;
+    }
+
+    public void setCoSupplier(ContragentItem coSupplier) {
+        this.coSupplier = coSupplier;
+    }
+
+    public String getModeContragentSelect() {
+        return modeContragentSelect;
+    }
+
+    public void setModeContragentSelect(String modeContragentSelect) {
+        this.modeContragentSelect = modeContragentSelect;
+    }
+
     public static class ContragentItem {
         private final Long idOfContragent;
 
         private final String contragentName;
 
         public ContragentItem(Contragent contragent) {
-            this.idOfContragent = contragent.getIdOfContragent();
-            this.contragentName = contragent.getContragentName();
+            if (contragent != null) {
+                this.idOfContragent = contragent.getIdOfContragent();
+                this.contragentName = contragent.getContragentName();
+            } else {
+                this.idOfContragent = null;
+                this.contragentName = null;
+            }
         }
 
         public ContragentItem() {

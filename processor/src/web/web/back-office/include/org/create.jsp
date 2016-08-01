@@ -57,6 +57,21 @@
                                              target="#{mainPage.multiContrFlag}" />
                 <f:setPropertyActionListener value="2"
                                              target="#{mainPage.classTypes}" />
+            <f:setPropertyActionListener value="#{mainPage.orgCreatePage.defaultSupplierMode}" target="#{mainPage.orgCreatePage.modeContragentSelect}" />
+        </a4j:commandButton>
+    </h:panelGroup>
+    <h:outputText escape="true" value="Соисполнитель поставщика по умолчанию" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.orgCreatePage.coSupplier.contragentName}" readonly="true"
+                     styleClass="input-text" style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                           reRender="modalContragentSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                           rendered="#{mainPage.orgCreatePage.defaultSupplier != null}"
+                           styleClass="command-link" style="width: 25px;" >
+            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            <f:setPropertyActionListener value="#{mainPage.orgCreatePage.coSupplierMode}" target="#{mainPage.orgCreatePage.modeContragentSelect}" />
         </a4j:commandButton>
     </h:panelGroup>
     <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
