@@ -104,8 +104,8 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             //методы для выборки данных
-            List<GoodItem> allGoods = service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
-            allGoods.addAll(service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+            List<GoodItem> allGoods = service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime);
+            //allGoods.addAll(service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
 
