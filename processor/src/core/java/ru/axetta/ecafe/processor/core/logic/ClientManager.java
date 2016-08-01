@@ -986,6 +986,7 @@ public class ClientManager {
     public static List<ClientGuardianItem> loadGuardiansByClient(Session session, Long idOfClient) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
+        criteria.add(Restrictions.eq("deletedState", false));
         List results = criteria.list();
         List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
         for (Object o: results){
@@ -1001,6 +1002,7 @@ public class ClientManager {
     public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        criteria.add(Restrictions.eq("deletedState", false));
         List results = criteria.list();
         List<ClientGuardianItem> wardItems = new ArrayList<ClientGuardianItem>(results.size());
         for (Object o: results){
@@ -1082,19 +1084,29 @@ public class ClientManager {
 
     /* Удалить список опекунов клиента */
     public static void removeGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
+        Long version = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item: clientGuardians){
-            removeGuardianByClient(session, idOfClient, item.getIdOfClient());
+            removeGuardianByClient(session, idOfClient, item.getIdOfClient(), version);
+        }
+    }
+
+    /* Удалить список опекаемых клиента */
+    public static void removeWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards) {
+        Long version = generateNewClientGuardianVersion(session);
+        for (ClientGuardianItem item: clientWards){
+            removeGuardianByClient(session, item.getIdOfClient(), idOfClient, version);
         }
     }
 
     /* Удалить опекуна клиента */
-    public static void removeGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian) {
+    public static void removeGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         ClientGuardian clientGuardian = (ClientGuardian) criteria.uniqueResult();
-        if(clientGuardian!=null){
-            session.delete(clientGuardian);
+        if(clientGuardian!=null) {
+            clientGuardian.delete(version);
+            session.update(clientGuardian);
         }
     }
 
@@ -1116,11 +1128,13 @@ public class ClientManager {
             clientGuardian = new ClientGuardian(idOfChildren, idOfGuardian);
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
+            clientGuardian.setDeletedState(false);
             session.persist(clientGuardian);
         } else {
             if (!clientGuardian.isDisabled().equals(disabled)) {
                 clientGuardian.setVersion(version);
                 clientGuardian.setDisabled(disabled);
+                clientGuardian.setDeletedState(false);
                 session.saveOrUpdate(clientGuardian);
             }
         }

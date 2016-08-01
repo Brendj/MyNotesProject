@@ -17,5 +17,7 @@
         <property name="guardianType" column="GuardianType" type="integer"/>
         <property name="disabled" column="Disabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+        <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
+        <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
 </hibernate-mapping>

@@ -215,12 +215,12 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" rendered="#{mainPage.clientEditPage.existAddedGuardians()}">
+        <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientGuardianEditTable"
-                    action="#{mainPage.clientEditPage.removeClientGuardian}" rendered="#{clientGuardian.isNew}">
+                    action="#{mainPage.clientEditPage.removeClientGuardian}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{clientGuardian}" target="#{mainPage.clientEditPage.currentClientGuardian}" />
             </a4j:commandLink>
@@ -233,10 +233,6 @@
             </a4j:commandButton>
         </f:facet>
     </rich:dataTable>
-
-    <h:outputText escape="true" value="" styleClass="output-text"/>
-    <rich:messages id="messages" styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
 
     <h:outputText escape="true" value="Опекаемые" styleClass="output-text"/>
     <rich:dataTable id="clientWardEditTable" value="#{mainPage.clientEditPage.clientWardItems}" var="clientWard"
@@ -270,12 +266,12 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" rendered="#{mainPage.clientEditPage.existAddedWards()}">
+        <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientWardEditTable"
-                             action="#{mainPage.clientEditPage.removeClientWard}" rendered="#{clientWard.isNew}">
+                             action="#{mainPage.clientEditPage.removeClientWard}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{clientWard}" target="#{mainPage.clientEditPage.currentClientWard}" />
             </a4j:commandLink>

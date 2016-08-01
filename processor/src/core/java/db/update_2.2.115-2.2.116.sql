@@ -44,3 +44,7 @@ CREATE INDEX cf_clientphoto_client_idx ON cf_clientphoto USING BTREE (idofclient
 --Тип карт
 ALTER TABLE cf_newcards
   ADD COLUMN cardtype integer;
+
+--Признак удаления опекунской связи
+ALTER TABLE cf_client_guardian ADD COLUMN deletedstate boolean NOT NULL DEFAULT false,
+ADD COLUMN deletedate bigint;

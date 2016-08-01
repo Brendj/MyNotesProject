@@ -2799,10 +2799,14 @@ public class Processor implements SyncProcessor {
                     persistenceSession = persistenceSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
-                    criteria.add(Example.create(clientGuardian));
+                    criteria.add(Example.create(clientGuardian)
+                            .excludeProperty("disabled")
+                            .excludeProperty("version"));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if (dbClientGuardian != null) {
-                        persistenceSession.delete(dbClientGuardian);
+                        dbClientGuardian.delete(resultClientGuardianVersion);
+                        persistenceSession.update(dbClientGuardian);
+                        //persistenceSession.delete(dbClientGuardian);
                     }
                     persistenceTransaction.commit();
                     persistenceTransaction = null;

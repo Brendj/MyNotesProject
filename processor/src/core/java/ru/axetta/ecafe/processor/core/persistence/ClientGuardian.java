@@ -1,5 +1,9 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -15,6 +19,8 @@ public class ClientGuardian {
     private Long idOfGuardian;
     private Integer guardianType;
     private Boolean disabled;
+    private Boolean deletedState;
+    private Date deleteDate;
 
     protected ClientGuardian() {}
 
@@ -63,6 +69,12 @@ public class ClientGuardian {
         this.guardianType = guardianType;
     }
 
+    public void delete(Long version) {
+        this.setDeletedState(true);
+        this.setDeleteDate(RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime());
+        this.setVersion(version);
+    }
+
     public Boolean isDisabled() {
         if (disabled == null) {
             return false;
@@ -77,5 +89,21 @@ public class ClientGuardian {
         } else {
             this.disabled = disabled;
         }
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
+    }
+
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
     }
 }

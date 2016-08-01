@@ -29,6 +29,7 @@ public class ClientGuardianItem {
         this.idOfChildren = clientGuardian.getIdOfChildren();
         this.version = clientGuardian.getVersion();
         this.disabled = clientGuardian.isDisabled();
+        this.deleteState = clientGuardian.getDeletedState() ? 1 : 0;
         this.result = null;
     }
 

@@ -651,7 +651,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public Object removeClientGuardian() {
         if (currentClientGuardian != null && !clientGuardianItems.isEmpty()) {
             clientGuardianItems.remove(currentClientGuardian);
-            //removeListGuardianItems.add(currentClientGuardian);
+            removeListGuardianItems.add(currentClientGuardian);
         }
         return null;
     }
@@ -679,12 +679,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public Object removeClientWard() {
         if (currentClientWard != null && !clientWardItems.isEmpty()) {
             clientWardItems.remove(currentClientWard);
+            removeListWardItems.add(currentClientWard);
         }
         return null;
     }
 
     private List<ClientGuardianItem> clientGuardianItems;
     private List<ClientGuardianItem> removeListGuardianItems = new ArrayList<ClientGuardianItem>();
+    private List<ClientGuardianItem> removeListWardItems = new ArrayList<ClientGuardianItem>();
 
     public List<ClientGuardianItem> getClientGuardianItems() {
         return clientGuardianItems;
@@ -694,13 +696,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public List<ClientGuardianItem> getClientWardItems() {
         return clientWardItems;
-    }
-
-    public boolean existAddedGuardians() {
-        for (ClientGuardianItem item : clientGuardianItems) {
-            if (item.getIsNew()) return true;
-        }
-        return false;
     }
 
     public boolean existAddedWards() {
@@ -1028,6 +1023,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
         }
 
+        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
+        }
+
         resetNewFlags();
 
         if (clientWardItems != null && !clientWardItems.isEmpty()) {
@@ -1159,6 +1158,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
         this.benefitOnAdmission = client.getBenefitOnAdmission();
+        removeListGuardianItems.clear();
+        removeListWardItems.clear();
     }
 
     public String getIdOfCategoryListString() {
