@@ -15,7 +15,7 @@ import org.w3c.dom.Node;
 public class GroupOrganizationItem {
     private String name;
     private final long idOfOrg;
-    private long bindingToOrg;
+    private Long bindingToOrg;
 
     public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg) {
 
@@ -42,7 +42,7 @@ public class GroupOrganizationItem {
         return idOfOrg;
     }
 
-    public long getBindingToOrg() {
+    public Long getBindingToOrg() {
         return bindingToOrg;
     }
 }
