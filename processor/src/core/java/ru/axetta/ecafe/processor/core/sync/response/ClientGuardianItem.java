@@ -33,6 +33,11 @@ public class ClientGuardianItem {
         this.result = null;
     }
 
+    public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
+        this(clientGuardian);
+        this.result = new ResultOperation(resCode, resultMessage);
+    }
+
     public Integer getDeleteState() {
         return deleteState;
     }
@@ -49,13 +54,6 @@ public class ClientGuardianItem {
         return idOfChildren;
     }
 
-    public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
-        this.idOfGuardian = clientGuardian.getIdOfGuardian();
-        this.idOfChildren = clientGuardian.getIdOfChildren();
-        this.disabled = clientGuardian.isDisabled();
-        this.version = clientGuardian.getVersion();
-        this.result = new ResultOperation(resCode, resultMessage);
-    }
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
