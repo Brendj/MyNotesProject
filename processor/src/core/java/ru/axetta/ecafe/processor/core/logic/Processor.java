@@ -2761,6 +2761,7 @@ public class Processor implements SyncProcessor {
             ClientGuardian clientGuardian = new ClientGuardian(item.getIdOfChildren(), item.getIdOfGuardian());
             clientGuardian.setDisabled(item.getDisabled());
             clientGuardian.setVersion(resultClientGuardianVersion);
+            clientGuardian.setDeletedState(item.isDeleted());
             if (item.getDeleteState() == 0) {
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();

@@ -42,6 +42,10 @@ public class ClientGuardianItem {
         return deleteState;
     }
 
+    public Boolean isDeleted() {
+        return deleteState != null && deleteState > 0;
+    }
+
     public void setResult(ResultOperation result) {
         this.result = result;
     }
