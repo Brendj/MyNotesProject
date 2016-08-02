@@ -104,13 +104,34 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             //методы для выборки данных
-            List<GoodItem> allGoods = service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime);
-            //allGoods.addAll(service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+            //List<GoodItem> allGoods = service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime);
 
-            Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
+            //Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
 
-            List<RegisterStampElectronicCollationReportItem> result = new ArrayList<RegisterStampElectronicCollationReportItem>();
-            calendar.setTime(startTime);
+            List<RegisterStampElectronicCollationReportItem> result = service.findAllRegisterStampElectronicCollationItems(org.getIdOfOrg(), startTime, endTime);
+
+            List<Date> dateList = new ArrayList<Date>();
+
+            for (RegisterStampElectronicCollationReportItem reg: result) {
+                dateList.add(reg.getDateTime());
+            }
+
+            Date startTimeAdd = startTime;
+
+            while (endTime.getTime() > startTimeAdd.getTime()) {
+
+                for (Date date : dateList) {
+                    if (!date.equals(startTimeAdd)) {
+                        RegisterStampElectronicCollationReportItem reportItem = new RegisterStampElectronicCollationReportItem(
+                                0L, timeFormat.format(startTimeAdd), "", startTimeAdd, "", "", "", "");
+                        result.add(reportItem);
+                    }
+                }
+
+                startTimeAdd = CalendarUtils.addDays(startTimeAdd, 1);
+            }
+
+            /*calendar.setTime(startTime);
             GoodItem emptyGoodItem = new GoodItem();
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 Date time = calendar.getTime();
@@ -153,7 +174,7 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
                     result.add(allTotal);
                     result.add(dailySampleItem);
                 }
-            }
+            }*/
             return new JRBeanCollectionDataSource(result);
         }
     }

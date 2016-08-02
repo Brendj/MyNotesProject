@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampElectronicCollationReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
@@ -17,12 +18,15 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Re
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -207,6 +211,66 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             goodItem.setParts(str.split("/"));
 
             result.add(goodItem);
+        }
+
+        return result;
+    }
+
+    public List<RegisterStampElectronicCollationReportItem> findAllRegisterStampElectronicCollationItems(Long idOfOrg, Date startTime, Date endTime) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+        List<RegisterStampElectronicCollationReportItem> result = new ArrayList<RegisterStampElectronicCollationReportItem>();
+
+        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2, soldedQty, compositeIdOfTaloonApproval.taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) ORDER BY taloon_2";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("startDate", startTime);
+        query.setParameter("endDate", endTime);
+
+        List resList = query.list();
+
+        String [] parts;
+
+        String pathPart1 = "";
+        String pathPart2 = "";
+        String pathPart3 = "";
+        String pathPart4 = "";
+
+        Long qty = 0L;
+
+        String date;
+
+        String number;
+
+        Date dateTime;
+
+        RegisterStampElectronicCollationReportItem registerStampElectronicCollationReportItem;
+
+        for (Object obj: resList) {
+            Object [] objects = (Object[]) obj;
+
+            parts = objects[0].toString().split("/");
+
+            if(parts.length>0) pathPart1 = parts[0];
+            if(parts.length>1) pathPart2 = parts[1];
+            if(parts.length>2) pathPart3 = parts[2];
+            if(parts.length>3) pathPart4 = parts[3];
+
+            qty = ((Integer) objects[1]).longValue();
+
+            date = timeFormat.format(objects[2]);
+
+            if (objects.length > 3) {
+                number = objects[3] == null ? "" : String.valueOf(objects[3]);
+            } else {
+                number = "";
+            }
+
+            dateTime = (Date) objects[2];
+
+            registerStampElectronicCollationReportItem = new RegisterStampElectronicCollationReportItem(qty, date, number, dateTime, pathPart1, pathPart2, pathPart3, pathPart4);
+
+            result.add(registerStampElectronicCollationReportItem);
         }
 
         return result;

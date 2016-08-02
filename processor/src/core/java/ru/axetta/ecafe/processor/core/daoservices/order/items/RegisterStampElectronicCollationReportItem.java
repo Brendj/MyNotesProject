@@ -23,22 +23,20 @@ public class RegisterStampElectronicCollationReportItem {
     private String date;
     private String number;
     private Date dateTime;
-    private Integer orderType;
 
-    public RegisterStampElectronicCollationReportItem(GoodItem goodItem, Long qty, String date, Date dateTime) {
-        this(goodItem, qty, date, null, dateTime);
+    public RegisterStampElectronicCollationReportItem(Long qty, String date, Date dateTime, String level1, String level2, String level3, String level4) {
+        this(qty, date, null, dateTime, level1, level2, level3, level4);
     }
 
-    public RegisterStampElectronicCollationReportItem(GoodItem goodItem, Long qty, String date, String number, Date dateTime) {
-        this.level1 = goodItem.getPathPart1();
-        this.level2 = goodItem.getPathPart2();
-        this.level3 = goodItem.getPathPart3();
-        this.level4 = goodItem.getPathPart4();
+    public RegisterStampElectronicCollationReportItem(Long qty, String date, String number, Date dateTime, String level1, String level2, String level3, String level4) {
+        this.level1 = level1;
+        this.level2 = level2;
+        this.level3 = level3;
+        this.level4 = level4;
         this.qty = qty;
         this.date = date;
         this.number = number;
         this.dateTime = dateTime;
-        this.orderType = goodItem.getOrderType(); //.ordinal();
     }
 
     public String getLevel1() {
@@ -103,14 +101,6 @@ public class RegisterStampElectronicCollationReportItem {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
-    }
-
-    public Integer getOrderType() {
-        return orderType;
-    }
-
-    public void setOrderType(Integer orderType) {
-        this.orderType = orderType;
     }
 
     public String getCaption() {
