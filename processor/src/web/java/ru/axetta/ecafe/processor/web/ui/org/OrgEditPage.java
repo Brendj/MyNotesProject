@@ -166,7 +166,7 @@ public class OrgEditPage extends BasicWorkspacePage
     public void updateOrg(Session session, Long idOfOrg) throws Exception {
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class, this.defaultSupplier.getIdOfContragent());
         Contragent coSupplier = null;
-        if (this.coSupplier != null) {
+        if (this.coSupplier != null && this.coSupplier.getIdOfContragent() != null) {
             coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
         }
         Org org = (Org) session.load(Org.class, idOfOrg);

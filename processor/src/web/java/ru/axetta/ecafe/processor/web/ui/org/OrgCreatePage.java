@@ -537,8 +537,10 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setRefectoryType(refectoryType);
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
-        Contragent coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
-        org.setCoSupplier(coSupplier);
+        if (this.coSupplier != null && this.coSupplier.getIdOfContragent() != null) {
+            Contragent coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
+            org.setCoSupplier(coSupplier);
+        }
 
         org.setSecurityLevel(securityLevel);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
