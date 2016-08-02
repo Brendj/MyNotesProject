@@ -920,7 +920,7 @@
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesElectronicCollationReportMenuItem"
                             binding="#{mainPage.deliveredServicesElectronicCollationReportPage.mainMenuComponent}"
-                            label="Сводный отчет по услугам"
+                            label="Сводный отчет по услугам (электронная сверка)"
                             action="#{mainPage.showDeliveredServicesElectronicCollationReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                             label="Справки расходования средств" action="#{referReportPage.show}"
