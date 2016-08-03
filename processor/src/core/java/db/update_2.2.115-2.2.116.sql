@@ -54,3 +54,5 @@ ALTER TABLE cf_orgs ADD COLUMN cosupplier BIGINT,
   ADD CONSTRAINT cf_orgs_contragent_cosupplier_fk FOREIGN KEY (cosupplier)
   REFERENCES cf_contragents (idofcontragent) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 030816) НЕ МЕНЯТЬ
