@@ -2802,7 +2802,8 @@ public class Processor implements SyncProcessor {
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                     criteria.add(Example.create(clientGuardian)
                             .excludeProperty("disabled")
-                            .excludeProperty("version"));
+                            .excludeProperty("version")
+                            .excludeProperty("deletedState"));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if (dbClientGuardian != null) {
                         dbClientGuardian.delete(resultClientGuardianVersion);
