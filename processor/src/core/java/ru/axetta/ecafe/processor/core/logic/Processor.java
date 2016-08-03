@@ -1472,10 +1472,12 @@ public class Processor implements SyncProcessor {
     private void processMigrantsSections(SyncRequest request, SyncHistory syncHistory,
             List<AbstractToElement> responseSections, Boolean error) {
         try {
-            ResMigrants resMigrants = processMigrants(request.getMigrants());
-            MigrantsData migrantsData = processMigrantsData(request.getMigrants());
-            addToResponseSections(resMigrants, responseSections);
-            addToResponseSections(migrantsData, responseSections);
+            if (request.getMigrants() != null) {
+                ResMigrants resMigrants = processMigrants(request.getMigrants());
+                MigrantsData migrantsData = processMigrantsData(request.getMigrants());
+                addToResponseSections(resMigrants, responseSections);
+                addToResponseSections(migrantsData, responseSections);
+            }
         } catch (Exception e) {
             if(error != null){
                 error = true;
