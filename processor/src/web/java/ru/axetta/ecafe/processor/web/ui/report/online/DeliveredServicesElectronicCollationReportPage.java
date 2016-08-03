@@ -135,7 +135,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
 
-            b = builder.ConfirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
+            b = builder.confirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
                     contragentFilter.getContragent().getIdOfContragent(),
                     contractFilter.getContract().getIdOfContract(), region, otherRegions);
 
@@ -181,7 +181,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
     public void buildReport(Session session) throws Exception {
         DeliveredServicesElectronicCollationReport.Builder reportBuilder = new DeliveredServicesElectronicCollationReport.Builder();
 
-        b = reportBuilder.ConfirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
+        b = reportBuilder.confirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
                 contragentFilter.getContragent().getIdOfContragent(),
                 contractFilter.getContract().getIdOfContract(), region, otherRegions);
 

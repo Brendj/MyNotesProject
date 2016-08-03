@@ -62,6 +62,8 @@ public class RegisterStampElectronicCollationPage extends OnlineReportPage {
     private Boolean includeActDiscrepancies = true;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
 
+    private boolean b;
+
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
     }
@@ -157,6 +159,13 @@ public class RegisterStampElectronicCollationPage extends OnlineReportPage {
             builder.setOrg(
                     new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
             BasicReportJob report = builder.build(session, startDate, endDate, localCalendar);
+
+            b = builder.confirmMessage(session, startDate, endDate, org.getIdOfOrg());
+
+            if (b == true) {
+                printError(String.format("Внимание! В выбранном периоде есть несогласованные даты"));
+            }
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
             if (report != null) {

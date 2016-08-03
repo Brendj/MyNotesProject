@@ -124,7 +124,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                     getOtherRegions());
         }
 
-        public boolean ConfirmMessage(Session session, Date startTime, Date endTime,
+        public boolean confirmMessage(Session session, Date startTime, Date endTime,
                 Calendar calendar, Long orgId, Long contragent, Long contract, String region, Boolean otherRegions)
                 throws Exception {
 

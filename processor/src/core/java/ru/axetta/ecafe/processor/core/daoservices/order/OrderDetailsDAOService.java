@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
@@ -180,7 +181,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and details.menuType <=:maxtype "
                 + " order by fullName";
         Query query = getSession().createQuery(sql);
-        query.setParameterList("orderType",orderTypes);
+        query.setParameterList("orderType", orderTypes);
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
@@ -215,6 +216,28 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
         return result;
     }
+
+    // для вывода сообщ
+
+    public boolean findNotConfirmedTaloons(Session session, Date startDate, Date endDate, Long idOfOrg)  {
+
+        boolean b = false;
+
+        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) AND (isppState in (0) OR ppState in (0,2)) ORDER BY taloon_2";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+
+        List resTaloonError = query.list();
+
+        if (!resTaloonError.isEmpty()) {
+            b = true;
+        }
+
+        return b;
+    }
+
 
     public List<RegisterStampElectronicCollationReportItem> findAllRegisterStampElectronicCollationItems(Long idOfOrg, Date startTime, Date endTime) {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");

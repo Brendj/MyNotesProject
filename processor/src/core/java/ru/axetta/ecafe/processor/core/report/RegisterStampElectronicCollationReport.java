@@ -103,31 +103,62 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
             }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-            //методы для выборки данных
-            //List<GoodItem> allGoods = service.findAllGoodsElectronicCollation(org.getIdOfOrg(), startTime, endTime);
 
-            //Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
-
-            List<RegisterStampElectronicCollationReportItem> result = service.findAllRegisterStampElectronicCollationItems(org.getIdOfOrg(), startTime, endTime);
+            List<RegisterStampElectronicCollationReportItem> result = service.findAllRegisterStampElectronicCollationItems(
+                    org.getIdOfOrg(), startTime, endTime);
 
             List<Date> dateList = new ArrayList<Date>();
 
-            for (RegisterStampElectronicCollationReportItem reg: result) {
-                dateList.add(reg.getDateTime());
+            List<RegisterStampElectronicCollationReportItem> reportItems = new ArrayList<RegisterStampElectronicCollationReportItem>();
+
+            for (RegisterStampElectronicCollationReportItem reg : result) {
+
+                if (!dateList.contains(CalendarUtils.truncateToDayOfMonth(reg.getDateTime()))) {
+                    dateList.add(CalendarUtils.truncateToDayOfMonth(reg.getDateTime()));
+                }
+
+                RegisterStampElectronicCollationReportItem total = new RegisterStampElectronicCollationReportItem(
+                        reg.getQty(), "Итого", "", CalendarUtils.addDays(endTime, 1), reg.getLevel1(), reg.getLevel2(), reg.getLevel3(), reg.getLevel4());
+                RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(
+                        reg.getQty(), "Всего кол-во:", "", CalendarUtils.addDays(endTime, 3), reg.getLevel1(), reg.getLevel2(), reg.getLevel3(), reg.getLevel4());
+                reportItems.add(allTotal);
+                reportItems.add(total);
+            }
+
+            result.addAll(reportItems);
+
+            Date startTimeAddNew = startTime;
+
+            if (result.isEmpty()) {
+
+                while (endTime.getTime() > startTimeAddNew.getTime()) {
+
+                    RegisterStampElectronicCollationReportItem reportItem = new RegisterStampElectronicCollationReportItem(
+                            0L, timeFormat.format(startTimeAddNew), "", startTimeAddNew, "", "", "", "");
+
+                    RegisterStampElectronicCollationReportItem total = new RegisterStampElectronicCollationReportItem(
+                            0L, "Итого", "", CalendarUtils.addDays(endTime, 1), "", "", "", "");
+                    RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(
+                            0L, "Всего кол-во:", "", CalendarUtils.addDays(endTime, 3), "", "", "", "");
+
+                    result.add(reportItem);
+                    result.add(allTotal);
+                    result.add(total);
+
+                    startTimeAddNew = CalendarUtils.addDays(startTimeAddNew, 1);
+                }
             }
 
             Date startTimeAdd = startTime;
 
             while (endTime.getTime() > startTimeAdd.getTime()) {
 
-                for (Date date : dateList) {
-                    if (!date.equals(startTimeAdd)) {
-                        RegisterStampElectronicCollationReportItem reportItem = new RegisterStampElectronicCollationReportItem(
-                                0L, timeFormat.format(startTimeAdd), "", startTimeAdd, "", "", "", "");
-                        result.add(reportItem);
-                    }
-                }
+                if (!dateList.contains(startTimeAdd)) {
+                    RegisterStampElectronicCollationReportItem reportItem = new RegisterStampElectronicCollationReportItem(
+                            0L, timeFormat.format(startTimeAdd), "", startTimeAdd, "", "", "", "");
 
+                    result.add(reportItem);
+                }
                 startTimeAdd = CalendarUtils.addDays(startTimeAdd, 1);
             }
 
@@ -176,6 +207,14 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
                 }
             }*/
             return new JRBeanCollectionDataSource(result);
+        }
+
+        public boolean confirmMessage(Session session, Date startDate, Date endDate, Long idOfOrg) {
+
+            OrderDetailsDAOService service = new OrderDetailsDAOService();
+            service.setSession(session);
+            boolean b = service.findNotConfirmedTaloons(session, startDate, endDate, idOfOrg);
+            return b;
         }
     }
 
