@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report.taloonApproval;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -12,7 +11,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -161,26 +159,97 @@ public class TaloonApprovalVerificationItem {
             return (shippedQty == null || shippedQty == 0);
         }
 
-        public Boolean isOutOfPeriodEdit() {
+        public int getPeriod() {
             Date currentDate = new Date();
-            Calendar localCalendar = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
-            localCalendar.setTime(taloonDate);
-            localCalendar.add(Calendar.MONTH, 1);
-            localCalendar.add(Calendar.SECOND, -1);
-            Date endMonthDate = localCalendar.getTime();
-            Date redDate = CalendarUtils.addDays(endMonthDate, 5);
-            return (currentDate.before(redDate));
+            Date firstDayOfMonth = CalendarUtils.getFirstDayOfMonth(currentDate);
+            Date minDate = CalendarUtils.getFirstDayOfMonth(currentDate);
+            Date maxDate = CalendarUtils.addDays(CalendarUtils.getLastDayOfMonth(currentDate), 5);
+            int day = CalendarUtils.getDayOfMonth(currentDate);
+            if (day <= 5) {
+                minDate = CalendarUtils.addMonth(firstDayOfMonth, -1);
+            }
+            if (taloonDate.before(minDate)) {
+                return 1;
+            } else if (taloonDate.after(minDate) && taloonDate.before(maxDate)) {
+                return 2;
+            } else {
+                return 3;
+            }
+        }
+
+        public Boolean allowedSetFirstFlag() {
+            int period = getPeriod();
+            if (period == 1) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            if (period == 2 || period == 3) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        public Boolean allowedClearFirstFlag() {
+            int period = getPeriod();
+            if (period == 1) {
+                return false;
+            }
+            if (period == 2 || period == 3) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        public Boolean allowedSetSecondFlag() {
+            int period = getPeriod();
+            if (period == 1) {
+                return false;
+            }
+            if (period == 2 || period == 3) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        public Boolean allowedClearSecondFlag() {
+            int period = getPeriod();
+            if (period == 1) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            if (period == 2 || period == 3) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return true;
         }
 
         public Boolean enableEditShippedQty() {
             if (summaryDay) return false;
             Date currentDate = new Date();
-            Calendar localCalendar = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
-            localCalendar.setTime(taloonDate);
-            localCalendar.add(Calendar.MONTH, 1);
-            localCalendar.add(Calendar.SECOND, -1);
-            Date endMonthDate = localCalendar.getTime();
-            Date redDate = CalendarUtils.addDays(endMonthDate, 5);
+            Date firstMonthDate = CalendarUtils.getFirstDayOfNextMonth(taloonDate);
+            Date redDate = CalendarUtils.addDays(firstMonthDate, 5);
             if (currentDate.after(redDate)) return false;
 
             if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
@@ -193,15 +262,6 @@ public class TaloonApprovalVerificationItem {
         public void performConfirm() {
             if (this.ppState == null) return;
             this.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-            //this.setShippedQty(this.getSoldedQty());
-        }
-
-        public Boolean enableEditPpStatus() {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
-            } else {
-                return true;
-            }
         }
 
         public String getPpStateToTurnOnFirst() {

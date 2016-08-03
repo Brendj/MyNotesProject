@@ -145,7 +145,11 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
             if (item.equals(currentTaloonApprovalVerificationItem)) {
                 for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
                     if (detail.getPpState() != null) {
-                        detail.setPpState(state);
+                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag())
+                                ||
+                                ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED) && detail.allowedClearFirstFlag())) {
+                            detail.setPpState(state);
+                        }
                     }
                 }
                 break;
