@@ -9,11 +9,14 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.report.taloonApproval.TaloonApprovalVerification;
 import ru.axetta.ecafe.processor.core.report.taloonApproval.TaloonApprovalVerificationItem;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +42,8 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
     private TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail currentTaloonApprovalVerificationItemDetail;
     private TaloonApprovalVerificationItem currentTaloonApprovalVerificationItem;
     private String currentState;
+
+    private static final Logger logger = LoggerFactory.getLogger(TaloonApprovalVerificationPage.class);
 
     @Override
     public String getPageFilename() {
@@ -80,14 +85,24 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
     }
 
     public void apply() throws Exception {
-        Session session = RuntimeContext.getInstance().createPersistenceSession();
-        builder.applyChanges(session, items);
-        setItems(builder.getItems(session, startDate, endDate, idOfOrg));
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            builder.applyChanges(session, items);
+            setItems(builder.getItems(session, startDate, endDate, idOfOrg));
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public void reload() throws Exception {
-        Session session = RuntimeContext.getInstance().createPersistenceSession();
-        setItems(builder.getItems(session, startDate, endDate, idOfOrg));
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            setItems(builder.getItems(session, startDate, endDate, idOfOrg));
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public void resetPpState() {

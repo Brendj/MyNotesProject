@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CheckSums;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ public class CheckSumsDAOService {
     public List<ServiceCheckSumsPageItems> getCheckSums() {
         List<ServiceCheckSumsPageItems> sumsPageItemsList = new ArrayList<ServiceCheckSumsPageItems>();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession;
+        Session persistenceSession = null;
 
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
@@ -93,6 +94,8 @@ public class CheckSumsDAOService {
             }
         } catch (Exception e) {
             logger.warn("Failed to get CheckSums from persistence :" + e);
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
         }
 
         return sumsPageItemsList;
