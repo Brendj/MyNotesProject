@@ -72,7 +72,10 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
     public static String formCardTypeNames(){
         StringBuilder sb = new StringBuilder();
         sb.append("Возможные типы карт: ");
-        for(int i = 1; i < Card.TYPE_NAMES.length; i++){
+        for(int i = 0; i < Card.TYPE_NAMES.length; i++){
+            if(Card.TYPE_NAMES[i].equals(Card.UNKNOWN_TYPE_NAME)){
+                continue;
+            }
             sb.append(String.format("%d - %s", i, Card.TYPE_NAMES[i]));
             if(i != (Card.TYPE_NAMES.length - 1)) {
                 sb.append(", ");
@@ -174,7 +177,10 @@ public class NewCardFileLoadPage extends BasicWorkspacePage {
                 return new LineResult(lineNo, 10, "Карта с данным нанесенным номером уже существует.", null);
             }
         }
-        Integer cardType = StringUtils.isEmpty(tokens[2]) ? null : Integer.parseInt(tokens[2]);
+        Integer cardType = null;
+        if(tokens.length > 2){
+            cardType = StringUtils.isEmpty(tokens[2]) ? null : Integer.parseInt(tokens[2]);
+        }
         if(cardType != null && !(cardType > 0 && cardType <= Card.TYPE_NAMES.length)){
             return new LineResult(lineNo, 12, "Неверный тип карты.", null);
         }
