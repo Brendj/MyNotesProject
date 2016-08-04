@@ -525,7 +525,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter13.setVisible(false);
         descriptionSimpleParameter13.setDefaultValue("off");
 
-        DescriptionSimpleParameter descriptionSimpleParameter14 = catOf.createDescriptionSimpleParameter();
+        /*DescriptionSimpleParameter descriptionSimpleParameter14 = catOf.createDescriptionSimpleParameter();
         descriptionSimpleParameter14.setForPayment(true);
         descriptionSimpleParameter14.setForSearch(true);
         descriptionSimpleParameter14.setLabel("СНИЛС");
@@ -533,7 +533,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter14.setReadonly(false);
         descriptionSimpleParameter14.setRequired(true);
         descriptionSimpleParameter14.setVisible(true);
-        descriptionSimpleParameter14.setRegexp("^14(0){9}\\d{11}643$");
+        descriptionSimpleParameter14.setRegexp("^14(0){9}\\d{11}643$");*/
 
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter1);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter2);
@@ -548,7 +548,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter11);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter12);
         descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter13);
-        descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter14);
+        //descriptionParametersType.getDescriptionSimpleParameterOrDescriptionComplexParameter().add(descriptionSimpleParameter14);
 
         serviceType.setPaymentParameters(descriptionParametersType);
 

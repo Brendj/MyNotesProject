@@ -103,13 +103,15 @@ public class CheckSumsDAOService {
 
     public void saveCheckSums(CheckSums checkSums) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession;
+        Session persistenceSession = null;
 
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceSession.save(checkSums);
         } catch (Exception e) {
             logger.warn("Failed to get CheckSums from persistence :" + e);
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
         }
     }
 
