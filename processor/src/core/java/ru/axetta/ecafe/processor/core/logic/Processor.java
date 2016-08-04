@@ -3492,7 +3492,7 @@ public class Processor implements SyncProcessor {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.debug(e.getMessage(), e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

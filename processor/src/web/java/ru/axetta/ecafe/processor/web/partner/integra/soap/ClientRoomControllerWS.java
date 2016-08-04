@@ -88,7 +88,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.MTOM;
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -109,7 +108,6 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOf
  * To change this template use File | Settings | File Templates.
  */
 
-@MTOM
 @WebService()
 public class ClientRoomControllerWS extends HttpServlet implements ClientRoomController {
 
