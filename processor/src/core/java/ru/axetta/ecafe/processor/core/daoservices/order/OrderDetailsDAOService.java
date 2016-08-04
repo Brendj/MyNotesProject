@@ -219,11 +219,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     // для вывода сообщ
 
-    public boolean findNotConfirmedTaloons(Session session, Date startDate, Date endDate, Long idOfOrg)  {
+    public boolean findNotConfirmedTaloons(Date startDate, Date endDate, Long idOfOrg)  {
 
         boolean b = false;
 
-        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) AND (isppState in (0) OR ppState in (0,2)) ORDER BY taloon_2";
+        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0  AND (isppState in (0) OR ppState in (0,2)) ORDER BY taloon_2";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate);
@@ -244,7 +244,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
         List<RegisterStampElectronicCollationReportItem> result = new ArrayList<RegisterStampElectronicCollationReportItem>();
 
-        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2, soldedQty, compositeIdOfTaloonApproval.taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) ORDER BY taloon_2";
+        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2, soldedQty, compositeIdOfTaloonApproval.taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0 ORDER BY taloon_2";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startTime);
@@ -259,7 +259,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         String pathPart3 = "";
         String pathPart4 = "";
 
-        Long qty = 0L;
+        Long qty;
 
         String date;
 

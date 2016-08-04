@@ -90,7 +90,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" positionType="Float" x="0" y="0" width="116" height="22"/>
+								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="116" height="22"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="11"/>
 								</textElement>

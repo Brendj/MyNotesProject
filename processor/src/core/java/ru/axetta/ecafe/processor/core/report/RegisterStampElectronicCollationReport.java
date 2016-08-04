@@ -10,7 +10,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampElectronicCollationReportItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -85,14 +84,13 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+                    createDataSource(session, org, startTime, endTime));
             Date generateEndTime = new Date();
-            return new RegisterStampReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+            return new RegisterStampElectronicCollationReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
-                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
 
@@ -119,9 +117,6 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
                 RegisterStampElectronicCollationReportItem total = new RegisterStampElectronicCollationReportItem(
                         reg.getQty(), "Итого", "", CalendarUtils.addDays(endTime, 1), reg.getLevel1(), reg.getLevel2(), reg.getLevel3(), reg.getLevel4());
-                RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(
-                        reg.getQty(), "Всего кол-во:", "", CalendarUtils.addDays(endTime, 3), reg.getLevel1(), reg.getLevel2(), reg.getLevel3(), reg.getLevel4());
-                reportItems.add(allTotal);
                 reportItems.add(total);
             }
 
@@ -138,11 +133,8 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
                     RegisterStampElectronicCollationReportItem total = new RegisterStampElectronicCollationReportItem(
                             0L, "Итого", "", CalendarUtils.addDays(endTime, 1), "", "", "", "");
-                    RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(
-                            0L, "Всего кол-во:", "", CalendarUtils.addDays(endTime, 3), "", "", "", "");
 
                     result.add(reportItem);
-                    result.add(allTotal);
                     result.add(total);
 
                     startTimeAddNew = CalendarUtils.addDays(startTimeAddNew, 1);
@@ -155,57 +147,13 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
                 if (!dateList.contains(startTimeAdd)) {
                     RegisterStampElectronicCollationReportItem reportItem = new RegisterStampElectronicCollationReportItem(
-                            0L, timeFormat.format(startTimeAdd), "", startTimeAdd, "", "", "", "");
+                            0L, timeFormat.format(startTimeAdd), "", startTimeAdd, result.get(0).getLevel1(), result.get(0).getLevel2(), result.get(0).getLevel3(), result.get(0).getLevel4());
 
                     result.add(reportItem);
                 }
                 startTimeAdd = CalendarUtils.addDays(startTimeAdd, 1);
             }
 
-            /*calendar.setTime(startTime);
-            GoodItem emptyGoodItem = new GoodItem();
-            while (endTime.getTime()>calendar.getTimeInMillis()){
-                Date time = calendar.getTime();
-                String date = timeFormat.format(time);
-                if(allGoods.isEmpty()){
-                    RegisterStampElectronicCollationReportItem item = new RegisterStampElectronicCollationReportItem(emptyGoodItem,0L,date, time);
-                    RegisterStampElectronicCollationReportItem total = new RegisterStampElectronicCollationReportItem(emptyGoodItem,0L,"Итого", CalendarUtils
-                            .addDays(endTime, 1));
-                    RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    result.add(allTotal);
-                    result.add(item);
-                    result.add(total);
-                } else {
-                    for (GoodItem goodItem: allGoods){
-                        String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
-                        Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
-                                goodItem.getFullName(), withOutActDiscrepancies);
-                        RegisterStampElectronicCollationReportItem item = new RegisterStampElectronicCollationReportItem(goodItem,val,date,number, time);
-                        RegisterStampElectronicCollationReportItem total = new RegisterStampElectronicCollationReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
-                        RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                        result.add(allTotal);
-                        result.add(item);
-                        result.add(total);
-                    }
-                }
-                calendar.add(Calendar.DATE,1);
-            }
-            if(allGoods.isEmpty()){
-                RegisterStampElectronicCollationReportItem dailySampleItem = new RegisterStampElectronicCollationReportItem(emptyGoodItem,0L,"Суточная проба", CalendarUtils
-                        .addDays(endTime, 2));
-                RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                result.add(allTotal);
-                result.add(dailySampleItem);
-            } else {
-                for (GoodItem goodItem: allGoods){
-                    Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
-                            goodItem.getFullName());
-                    RegisterStampElectronicCollationReportItem dailySampleItem = new RegisterStampElectronicCollationReportItem(goodItem,val,"Суточная проба", CalendarUtils.addDays(endTime, 2));
-                    RegisterStampElectronicCollationReportItem allTotal = new RegisterStampElectronicCollationReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    result.add(allTotal);
-                    result.add(dailySampleItem);
-                }
-            }*/
             return new JRBeanCollectionDataSource(result);
         }
 
@@ -213,7 +161,7 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
 
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
-            boolean b = service.findNotConfirmedTaloons(session, startDate, endDate, idOfOrg);
+            boolean b = service.findNotConfirmedTaloons(startDate, endDate, idOfOrg);
             return b;
         }
     }
@@ -223,8 +171,6 @@ public class RegisterStampElectronicCollationReport extends BasicReportForOrgJob
         super(generateTime, generateDuration, print, startTime, endTime,
                 idOfOrg);
     }
-
-    public RegisterStampElectronicCollationReport() {}
 
     @Override
     public BasicReportForOrgJob createInstance() {
