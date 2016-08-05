@@ -21,6 +21,7 @@ public class ClientGuardian {
     private Boolean disabled;
     private Boolean deletedState;
     private Date deleteDate;
+    private String relation;
 
     protected ClientGuardian() {}
 
@@ -105,5 +106,13 @@ public class ClientGuardian {
 
     public void setDeleteDate(Date deleteDate) {
         this.deleteDate = deleteDate;
+    }
+
+    public String getRelation() {
+        return relation;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
     }
 }

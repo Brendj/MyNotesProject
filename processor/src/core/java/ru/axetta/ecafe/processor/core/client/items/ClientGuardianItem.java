@@ -16,6 +16,7 @@ public class ClientGuardianItem {
     private Boolean disabled;
     private String mobile;
     private boolean isNew;
+    private String relation;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -26,12 +27,13 @@ public class ClientGuardianItem {
         isNew = true;
     }
 
-    public ClientGuardianItem(Client client, Boolean disabled) {
+    public ClientGuardianItem(Client client, Boolean disabled, String relation) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
+        this.relation = relation;
         isNew = false;
     }
 
@@ -73,5 +75,13 @@ public class ClientGuardianItem {
 
     public String getMobile() {
         return mobile;
+    }
+
+    public String getRelation() {
+        return relation;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
     }
 }

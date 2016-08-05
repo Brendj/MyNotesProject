@@ -185,6 +185,12 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{!clientGuardian.disabled}" disabled="true" readonly="true" styleClass="output-text" />
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Степень родства" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientGuardian.relation}" styleClass="output-text" />
+        </rich:column>
     </rich:dataTable>
 
     <h:outputText escape="true" value="Опекаемые" styleClass="output-text"/>
@@ -218,6 +224,12 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{!clientWard.disabled}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Кем приходится опекун" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientGuardian.relation}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
 

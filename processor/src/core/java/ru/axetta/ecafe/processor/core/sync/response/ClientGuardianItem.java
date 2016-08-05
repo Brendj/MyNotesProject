@@ -23,6 +23,7 @@ public class ClientGuardianItem {
     private Integer deleteState;
     private ResultOperation result;
     private Boolean disabled;
+    private String relation;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -30,6 +31,7 @@ public class ClientGuardianItem {
         this.version = clientGuardian.getVersion();
         this.disabled = clientGuardian.isDisabled();
         this.deleteState = clientGuardian.getDeletedState() ? 1 : 0;
+        this.relation = clientGuardian.getRelation();
         this.result = null;
     }
 
@@ -66,6 +68,7 @@ public class ClientGuardianItem {
         XMLUtils.setAttributeIfNotNull(element, "Disabled", disabled ? "1" : "0");
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "D", deleteState);
+        XMLUtils.setAttributeIfNotNull(element, "Relation", relation);
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
@@ -78,14 +81,16 @@ public class ClientGuardianItem {
         Long idOfChildren = XMLUtils.getLongAttributeValue(itemNode, "IdOfChildren");
         Boolean disabled = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "Disabled"));
         Integer delete = XMLUtils.getIntegerValueZeroSafe(itemNode, "D");
-        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete);
+        String relation = XMLUtils.getAttributeValue(itemNode, "Relation");
+        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete, relation);
     }
 
-    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate) {
+    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate, String relation) {
         this.idOfGuardian = idOfGuardian;
         this.idOfChildren = idOfChildren;
         this.disabled = disabled;
         this.deleteState = deleteSate;
+        this.relation = relation;
     }
 
 
@@ -95,5 +100,13 @@ public class ClientGuardianItem {
 
     public void setDisabled(Boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public String getRelation() {
+        return relation;
+    }
+
+    public void setRelation(String relation) {
+        this.relation = relation;
     }
 }

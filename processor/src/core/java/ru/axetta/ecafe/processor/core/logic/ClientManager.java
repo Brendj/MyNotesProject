@@ -993,7 +993,7 @@ public class ClientManager {
             ClientGuardian clientGuardian = (ClientGuardian) o;
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
-                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled()));
+                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation()));
             }
         }
         return guardianItems;
@@ -1009,7 +1009,7 @@ public class ClientManager {
             ClientGuardian clientWard = (ClientGuardian) o;
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
-                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled()));
+                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation()));
             }
         }
         return wardItems;
@@ -1114,12 +1114,12 @@ public class ClientManager {
     public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
-            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled());
+            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(), item.getRelation());
         }
     }
 
     /* Добавить опекуна клиенту */
-    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled) {
+    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled, String relation) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1129,12 +1129,14 @@ public class ClientManager {
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
+            clientGuardian.setRelation(relation);
             session.persist(clientGuardian);
         } else {
-            if (!clientGuardian.isDisabled().equals(disabled)) {
+            if (!clientGuardian.isDisabled().equals(disabled) || !relation.equals(clientGuardian.getRelation())) {
                 clientGuardian.setVersion(version);
                 clientGuardian.setDisabled(disabled);
                 clientGuardian.setDeletedState(false);
+                clientGuardian.setRelation(relation);
                 session.saveOrUpdate(clientGuardian);
             }
         }
@@ -1143,7 +1145,7 @@ public class ClientManager {
     public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
-            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled());
+            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(), item.getRelation());
         }
     }
 

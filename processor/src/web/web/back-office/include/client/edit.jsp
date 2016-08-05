@@ -217,6 +217,14 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Степень родства" />
+            </f:facet>
+            <h:inputText value="#{clientGuardian.relation}" styleClass="output-text">
+                <a4j:support event="onchange" />
+            </h:inputText>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientGuardianEditTable"
@@ -265,6 +273,14 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Кем приходится опекун" />
+            </f:facet>
+            <h:inputText value="#{clientWard.relation}" styleClass="output-text">
+                <a4j:support event="onchange" />
+            </h:inputText>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
