@@ -185,7 +185,7 @@ public class ClientDao extends WritableJpaDao {
         createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, clientInfo.getNotifyViaEmail());
         createConfig.setValue(ClientManager.FieldId.MOBILE_PHONE, clientInfo.getMobile());
         createConfig.setValue(ClientManager.FieldId.EMAIL, clientInfo.getEmail());
-        createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getNotifyViaPUSH());
+        createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
         Long id = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
                 (ClientManager.ClientFieldConfig) createConfig, false, session);
 
