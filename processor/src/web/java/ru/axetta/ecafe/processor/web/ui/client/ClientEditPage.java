@@ -1231,4 +1231,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 .setProjection(Projections.projectionList().add(Projections.countDistinct("idOfCategoryDiscount")));
         return (Long) criteria.uniqueResult() > 0;
     }
+
+    public SelectItem[] getRelations() {
+        SelectItem[] result = new SelectItem[ClientGuardianRelationType.values().length + 1];
+        result[0] = new SelectItem(-1, "");
+        for (int i = 0; i < ClientGuardianRelationType.values().length; i++) {
+            result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
+        }
+        return result;
+    }
 }

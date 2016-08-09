@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.client.items;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationType;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,7 +17,7 @@ public class ClientGuardianItem {
     private Boolean disabled;
     private String mobile;
     private boolean isNew;
-    private String relation;
+    private Integer relation;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -27,13 +28,13 @@ public class ClientGuardianItem {
         isNew = true;
     }
 
-    public ClientGuardianItem(Client client, Boolean disabled, String relation) {
+    public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
-        this.relation = relation;
+        this.relation = relation == null ? null : relation.ordinal();
         isNew = false;
     }
 
@@ -77,11 +78,15 @@ public class ClientGuardianItem {
         return mobile;
     }
 
-    public String getRelation() {
+    public Integer getRelation() {
         return relation;
     }
 
-    public void setRelation(String relation) {
+    public void setRelation(Integer relation) {
         this.relation = relation;
+    }
+
+    public String getRelationStr() {
+        return relation == null ? "" : ClientGuardianRelationType.fromInteger(relation).toString();
     }
 }

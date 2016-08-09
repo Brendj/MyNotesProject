@@ -5,5 +5,5 @@
 -- Пакет обновлений 2.2.116
 
 --Поле родственной связи между опекуном и ребенком текстом
-ALTER TABLE cf_client_guardian ADD COLUMN relation CHARACTER VARYING(128);
+ALTER TABLE cf_client_guardian ADD COLUMN relation integer;
 

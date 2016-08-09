@@ -2764,7 +2764,7 @@ public class Processor implements SyncProcessor {
             clientGuardian.setDisabled(item.getDisabled());
             clientGuardian.setVersion(resultClientGuardianVersion);
             clientGuardian.setDeletedState(item.isDeleted());
-            clientGuardian.setRelation(item.getRelation());
+            clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
             if (item.getDeleteState() == 0) {
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();
@@ -2773,7 +2773,9 @@ public class Processor implements SyncProcessor {
                     criteria.add(Example.create(clientGuardian)
                             .excludeProperty("disabled")
                             .excludeProperty("version")
-                            .excludeProperty("relation"));
+                            .excludeProperty("relation")
+                            .excludeProperty("deleteDate")
+                            .excludeProperty("deletedState"));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if (dbClientGuardian == null) {
                         clientGuardian = (ClientGuardian) persistenceSession.merge(clientGuardian);
@@ -2783,7 +2785,7 @@ public class Processor implements SyncProcessor {
                     } else {
                         dbClientGuardian.setDisabled(item.getDisabled());
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
-                        dbClientGuardian.setRelation(item.getRelation());
+                        dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
                         persistenceSession.saveOrUpdate(dbClientGuardian);
                         resultClientGuardian.addItem(dbClientGuardian, 0, null);
                     }

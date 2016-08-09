@@ -1114,12 +1114,12 @@ public class ClientManager {
     public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
-            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(), item.getRelation());
+            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(), ClientGuardianRelationType.fromInteger(item.getRelation()));
         }
     }
 
     /* Добавить опекуна клиенту */
-    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled, String relation) {
+    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled, ClientGuardianRelationType relation) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1132,20 +1132,18 @@ public class ClientManager {
             clientGuardian.setRelation(relation);
             session.persist(clientGuardian);
         } else {
-            if (!clientGuardian.isDisabled().equals(disabled) || !relation.equals(clientGuardian.getRelation())) {
-                clientGuardian.setVersion(version);
-                clientGuardian.setDisabled(disabled);
-                clientGuardian.setDeletedState(false);
-                clientGuardian.setRelation(relation);
-                session.saveOrUpdate(clientGuardian);
-            }
+            clientGuardian.setVersion(version);
+            clientGuardian.setDisabled(disabled);
+            clientGuardian.setDeletedState(false);
+            clientGuardian.setRelation(relation);
+            session.saveOrUpdate(clientGuardian);
         }
     }
 
     public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
-            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(), item.getRelation());
+            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(), ClientGuardianRelationType.fromInteger(item.getRelation()));
         }
     }
 
@@ -1160,7 +1158,7 @@ public class ClientManager {
                 version = currentMaxVersion + 1;
             }
         } catch (Exception ex) {
-            logger.error("Failed get max client guardians vesion, ", ex);
+            logger.error("Failed get max client guardians version, ", ex);
             version = 0L;
         }
         return version;

@@ -23,7 +23,7 @@ public class ClientGuardianItem {
     private Integer deleteState;
     private ResultOperation result;
     private Boolean disabled;
-    private String relation;
+    private Integer relation;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -31,7 +31,7 @@ public class ClientGuardianItem {
         this.version = clientGuardian.getVersion();
         this.disabled = clientGuardian.isDisabled();
         this.deleteState = clientGuardian.getDeletedState() ? 1 : 0;
-        this.relation = clientGuardian.getRelation();
+        this.relation = clientGuardian.getRelation() == null ? null : clientGuardian.getRelation().ordinal();
         this.result = null;
     }
 
@@ -81,11 +81,11 @@ public class ClientGuardianItem {
         Long idOfChildren = XMLUtils.getLongAttributeValue(itemNode, "IdOfChildren");
         Boolean disabled = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "Disabled"));
         Integer delete = XMLUtils.getIntegerValueZeroSafe(itemNode, "D");
-        String relation = XMLUtils.getAttributeValue(itemNode, "Relation");
+        Integer relation = XMLUtils.getIntegerAttributeValue(itemNode, "Relation");
         return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete, relation);
     }
 
-    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate, String relation) {
+    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate, Integer relation) {
         this.idOfGuardian = idOfGuardian;
         this.idOfChildren = idOfChildren;
         this.disabled = disabled;
@@ -102,11 +102,11 @@ public class ClientGuardianItem {
         this.disabled = disabled;
     }
 
-    public String getRelation() {
+    public Integer getRelation() {
         return relation;
     }
 
-    public void setRelation(String relation) {
+    public void setRelation(Integer relation) {
         this.relation = relation;
     }
 }

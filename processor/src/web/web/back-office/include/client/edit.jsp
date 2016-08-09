@@ -209,19 +209,19 @@
             </f:facet>
             <h:outputText escape="true" value="#{clientGuardian.mobile}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
                 <h:outputText escape="true" value="Степень родства" />
             </f:facet>
-            <h:inputText value="#{clientGuardian.relation}" styleClass="output-text">
-                <a4j:support event="onchange" />
-            </h:inputText>
+            <h:selectOneMenu value="#{clientGuardian.relation}" styleClass="input-text">
+                <f:selectItems value="#{mainPage.clientEditPage.relations}" />
+            </h:selectOneMenu>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -278,9 +278,9 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Кем приходится опекун" />
             </f:facet>
-            <h:inputText value="#{clientWard.relation}" styleClass="output-text">
-                <a4j:support event="onchange" />
-            </h:inputText>
+            <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
+                <f:selectItems value="#{mainPage.clientEditPage.relations}" />
+            </h:selectOneMenu>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
