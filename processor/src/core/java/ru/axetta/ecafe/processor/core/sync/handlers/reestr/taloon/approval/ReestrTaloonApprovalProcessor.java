@@ -53,12 +53,14 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     TaloonCreatedTypeEnum createdType = item.getCreatedType();
                     TaloonISPPStatesEnum isppState = item.getIsppState();
                     TaloonPPStatesEnum ppState = item.getPpState();
+                    String goodsName = item.getGoodsName();
+                    String goodsGuid = item.getGoodsGuid();
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
                     Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
-                        taloon = new TaloonApproval(compositeId, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState);
+                        taloon = new TaloonApproval(compositeId, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState,goodsName,goodsGuid);
                     }
                     taloon.setSoldedQty(soldedQty);
                     taloon.setRequestedQty(requestedQty);
@@ -81,6 +83,8 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     resItem.setOrgId(item.getOrgId());
                     resItem.setDate(item.getDate());
                     resItem.setName(item.getName());
+                    resItem.setGoodsName(item.getGoodsName());
+                    resItem.setGoodsGuid(item.getGoodsGuid());
                     resItem.setSoldedQty(item.getSoldedQty());
                     resItem.setRequestedQty(item.getRequestedQty());
                     resItem.setShippedQty(item.getShippedQty());

@@ -26,6 +26,8 @@ public class TaloonApproval {
     private Org orgOwner; //От какой организации создана запись.
     private Long version;
     private Boolean deletedState;
+    private String goodsName;
+    private String goodsGuid;
 
     public TaloonApproval() {
         //for Hibernate only
@@ -33,7 +35,7 @@ public class TaloonApproval {
 
     public TaloonApproval(CompositeIdOfTaloonApproval compositeIdOfTaloonApproval, Integer soldedQty, Long price,
             TaloonCreatedTypeEnum createdType, Integer requestedQty, Integer shippedQty,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState) {
+            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,String goodsName,String goodsGuid) {
         this.compositeIdOfTaloonApproval = compositeIdOfTaloonApproval;
         this.soldedQty = soldedQty;
         this.price = price;
@@ -42,6 +44,8 @@ public class TaloonApproval {
         this.shippedQty = shippedQty;
         this.isppState = isppState;
         this.ppState = ppState;
+        this.goodsName = goodsName;
+        this.goodsGuid = goodsGuid;
     }
 
     public CompositeIdOfTaloonApproval getCompositeIdOfTaloonApproval() {
@@ -50,6 +54,22 @@ public class TaloonApproval {
 
     public void setCompositeIdOfTaloonApproval(CompositeIdOfTaloonApproval compositeIdOfTaloonApproval) {
         this.compositeIdOfTaloonApproval = compositeIdOfTaloonApproval;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getGoodsGuid() {
+        return goodsGuid;
+    }
+
+    public void setGoodsGuid(String goodsGuid) {
+        this.goodsGuid = goodsGuid;
     }
 
     public Org getOrg() {

@@ -33,6 +33,8 @@ public class TaloonApprovalItem {
     private Long orgId;
     private Date date;
     private String name;
+    private String goodsName;
+    private String goodsGuid;
     private Integer soldedQty;
     private Integer requestedQty;
     private Integer shippedQty;
@@ -50,6 +52,8 @@ public class TaloonApprovalItem {
         Long orgId = null;
         Date date = null;
         String name = null;
+        String goodsName = null;
+        String goodsGuid = null;
         Integer soldedQty = null;
         Integer requestedQty = null;
         Integer shippedQty = null;
@@ -96,6 +100,9 @@ public class TaloonApprovalItem {
         if (StringUtils.isEmpty(name)) {
             errorMessage.append( "Attribute Name not found");
         }
+
+        goodsName = XMLUtils.getAttributeValue(itemNode,"GoodsName");
+        goodsGuid = XMLUtils.getAttributeValue(itemNode,"GoodsGuid");
 
         if (isOldQtyFormat(itemNode)){
             Integer qty = readIntegerValue(itemNode, "Qty", errorMessage);
@@ -184,7 +191,7 @@ public class TaloonApprovalItem {
             }
         }
 
-        return new TaloonApprovalItem(orgId, date, name, soldedQty, requestedQty, shippedQty, price,
+        return new TaloonApprovalItem(orgId, date, name,goodsName,goodsGuid, soldedQty, requestedQty, shippedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
                 taloonNumber, orgOwner, deletedState, errorMessage.toString());
     }
@@ -209,7 +216,7 @@ public class TaloonApprovalItem {
     }
 
 
-    private TaloonApprovalItem(Long orgId, Date date, String name, Integer soldedQty, Integer requestedQty, Integer shippedQty,
+    private TaloonApprovalItem(Long orgId, Date date, String name,String goodsName,String goodsGuid, Integer soldedQty, Integer requestedQty, Integer shippedQty,
             Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
             Long taloonNumber, Long orgOwnerId, Boolean deletedState, String errorMessage) {
         this.setOrgId(orgId);
@@ -223,8 +230,10 @@ public class TaloonApprovalItem {
         this.setIsppState(isppState);
         this.setPpState(ppState);
         this.setTaloonNumber(taloonNumber);
-        this.orgOwnerId = orgOwnerId;
-        this.deletedState = deletedState;
+        this.setOrgOwnerId(orgOwnerId);
+        this.setDeletedState(deletedState);
+        this.setGoodsName(goodsName);
+        this.setGoodsGuid(goodsGuid);
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
             this.setResCode(ERROR_CODE_ALL_OK);
@@ -347,6 +356,22 @@ public class TaloonApprovalItem {
 
     public TaloonPPStatesEnum getPpState() {
         return ppState;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getGoodsGuid() {
+        return goodsGuid;
+    }
+
+    public void setGoodsGuid(String goodsGuid) {
+        this.goodsGuid = goodsGuid;
     }
 
     public void setPpState(TaloonPPStatesEnum ppState) {

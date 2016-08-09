@@ -28,6 +28,8 @@ public class ResTaloonApprovalItem {
     private Long orgId;
     private Date date;
     private String name;
+    private String goodsName;
+    private String goodsGuid;
     private Integer soldedQty;
     private Integer requestedQty;
     private Integer shippedQty;
@@ -49,6 +51,8 @@ public class ResTaloonApprovalItem {
         this.orgId = taloon.getCompositeIdOfTaloonApproval().getIdOfOrg();
         this.date = taloon.getCompositeIdOfTaloonApproval().getTaloonDate();
         this.name = taloon.getCompositeIdOfTaloonApproval().getTaloonName();
+        this.goodsName = taloon.getGoodsName();
+        this.goodsGuid = taloon.getGoodsGuid();
         this.soldedQty = taloon.getSoldedQty();
         this.setRequestedQty(taloon.getRequestedQty());
         this.setShippedQty(taloon.getShippedQty());
@@ -79,6 +83,12 @@ public class ResTaloonApprovalItem {
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
+        if (this.goodsName != null) {
+            XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
+        }
+        if (this.goodsGuid != null) {
+            XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid);
+        }
         XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState == null ? TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal() : isppState.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState == null ? TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal() : ppState.ordinal());
         if (resultCode != null && resultCode != 0) {
@@ -87,6 +97,22 @@ public class ResTaloonApprovalItem {
         // для поддежки старых версий
         XMLUtils.setAttributeIfNotNull(element, "Qty", soldedQty);
         return element;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getGoodsGuid() {
+        return goodsGuid;
+    }
+
+    public void setGoodsGuid(String goodsGuid) {
+        this.goodsGuid = goodsGuid;
     }
 
     public Long getOrgId() {
