@@ -229,7 +229,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Кем приходится опекун" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientGuardian.relationStr}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientWard.relationStr}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
 
