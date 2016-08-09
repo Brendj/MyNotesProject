@@ -58,6 +58,13 @@ public class AccountsRegistryHandler {
         // Добавляем карты временных посетителей (мигрантов)
         clientList.addAll(Processor.getMigrants(idOfOrg));
 
+        // Добавляем карты перемещенных клиентов
+        clientList.addAll(clientDao.findAllAllocatedClients(idOfOrg));
+
+        for (Client client : clientList) {
+            accountsRegistry.getAccountItems().add(new AccountItem(client));
+        }
+
         for (Client client : clientList) {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }

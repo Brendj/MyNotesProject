@@ -5,10 +5,13 @@
 package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +68,13 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
                 .setParameter("lastAccRegistrySync", lastAccRegistrySync);
 
         return query.getResultList();
+    }
+
+
+    public List<Client> findAllAllocatedClients(Long idOfOrg) {
+        Session ses = entityManager.unwrap(Session.class);
+        Org org = (Org) ses.load(Org.class, idOfOrg);
+        return ClientManager.findAllAllocatedClients(ses, org);
     }
 
     public List<Client> findById(List<Long> idOfClients) {
