@@ -878,8 +878,8 @@ public class ClientManager {
             for (Org org : friendlyOrg) {
                 idOfOrgList.add(org.getIdOfOrg());
             }
-            List<Long> idOfClientGroups = findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
-            List<Client> clients = findClientsByInOrgAndInGroups(session, idOfOrgList, idOfClientGroups);
+            Map<Long, Long> idOfClientGroupsMap = findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
+            List<Client> clients = findClientsByInOrgAndInGroups(session, idOfClientGroupsMap);
             clientSet.addAll(clients);
         }
         return res;
@@ -921,32 +921,41 @@ public class ClientManager {
         return res;
     }
 
-    public static List<Long> findMatchedClientGroupsByRegExAndOrg(Session session, List<Long> idOfOrg, String regExp) {
-        String sql = "SELECT idofclientgroup FROM cf_clientgroups where groupname ~ '"+regExp+"' and idoforg in (:idoforg)";
+    public static Map<Long, Long> findMatchedClientGroupsByRegExAndOrg(Session session, List<Long> idOfOrg, String regExp) {
+        String sql = "SELECT idofclientgroup, idoforg FROM cf_clientgroups where groupname = '"+regExp+"' and idoforg in (:idoforg)";
         Query query = session.createSQLQuery(sql);
         query.setParameterList("idoforg", idOfOrg);
         List idOfClientGroupResult = query.list();
-        List<Long> idOfClientGroups = new ArrayList<Long>(idOfClientGroupResult.size());
+
+        Map<Long, Long> idOfClientGroupsMap = new HashMap<Long, Long>();
+
         for (Object obj : idOfClientGroupResult){
-            Long value = Long.valueOf(obj.toString());
-            idOfClientGroups.add(value);
+            Object[] resultItem = (Object[]) obj;
+
+            Long groupId = Long.valueOf(resultItem[0].toString());
+            Long idOfOrgN = Long.valueOf(resultItem[1].toString());
+
+            idOfClientGroupsMap.put(idOfOrgN, groupId);
         }
-        return idOfClientGroups;
+        return idOfClientGroupsMap;
     }
 
-    public static List<Client> findClientsByInOrgAndInGroups(Session session,
-                                                             List<Long> idOfOrgList,
-                                                             List<Long> idOfClientGroupList) {
+    public static List<Client> findClientsByInOrgAndInGroups(Session session, Map<Long, Long> idOfClientGroupMap) {
         List<Client> res = new ArrayList<Client>();
 
-        Criteria criteria = session.createCriteria(Client.class);
-        criteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
-        criteria.add(Restrictions.isNotNull("idOfClientGroup"));
-        criteria.add(Restrictions.in("idOfClientGroup", idOfClientGroupList));
-        List list = criteria.list();
-        for (Object obj : list) {
-            Client client = (Client) obj;
-            res.add(client);
+        Set<Long> idOfOrgSet = idOfClientGroupMap.keySet();
+
+        for (Long idOfOrg : idOfOrgSet) {
+
+            Criteria criteria = session.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+            criteria.add(Restrictions.isNotNull("idOfClientGroup"));
+            criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroupMap.get(idOfOrg)));
+            List list = criteria.list();
+            for (Object obj : list) {
+                Client client = (Client) obj;
+                res.add(client);
+            }
         }
         return res;
     }

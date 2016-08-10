@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -155,8 +156,8 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         for (Org o : friendlyOrg) {
             idOfOrgList.add(o.getIdOfOrg());
         }
-        List<Long> idOfClientGroups = ClientManager.findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
-        List<Client> friendlyClients = ClientManager.findClientsByInOrgAndInGroups(session, idOfOrgList, idOfClientGroups);
+        Map<Long, Long> idOfClientGroupsMap = ClientManager.findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
+        List<Client> friendlyClients = ClientManager.findClientsByInOrgAndInGroups(session, idOfClientGroupsMap);
         clients.addAll(friendlyClients);
         ClientManager.updateClientVersionTransactional(session, clients);
     }
