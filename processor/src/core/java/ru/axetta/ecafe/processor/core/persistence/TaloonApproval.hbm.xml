@@ -17,6 +17,8 @@
         <property name="requestedQty" column="RequestedQty" type="integer" not-null="false"/>
         <property name="shippedQty" column="ShippedQty" type="integer" not-null="false"/>
         <property name="price" column="Price" type="long" not-null="true"/>
+        <property name="goodsName" column="GoodsName" type="string"/>
+        <property name="goodsGuid" column="GoodsGuid" type="string"/>
 
         <property name="createdType" column="CreatedType">
             <type name="org.hibernate.type.EnumType">
