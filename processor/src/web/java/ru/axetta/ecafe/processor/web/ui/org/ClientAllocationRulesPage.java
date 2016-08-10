@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.daoservices.org.ClientAllocationRuleDao;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
@@ -83,34 +84,40 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
             ClientAllocationRuleItem item = rules.get(i);
             if (item.isEditable()) {
                 if (validateItem(item)) {
-                    try {
-                        session = RuntimeContext.getInstance().createPersistenceSession();
-                        boolean isNewRule = item.getId() == null;
-                        ClientAllocationRule rule = isNewRule ? new ClientAllocationRule() : dao.find(item.getId());
-                        if (!isNewRule) {
-                            if (!checkIsReallyEdited(item, rule)) {
-                                continue;
+                    if (validateGroupFilter(item)) {
+                        try {
+                            session = RuntimeContext.getInstance().createPersistenceSession();
+                            boolean isNewRule = item.getId() == null;
+                            ClientAllocationRule rule = isNewRule ? new ClientAllocationRule() : dao.find(item.getId());
+                            if (!isNewRule) {
+                                if (!checkIsReallyEdited(item, rule)) {
+                                    continue;
+                                }
                             }
+                            rule.setSourceOrg(DAOUtils.getOrgReference(session, item.getIdOfSourceOrg()));
+                            rule.setDestinationOrg(DAOUtils.getOrgReference(session, item.getIdOfDestOrg()));
+                            rule.setGroupFilter(item.getGroupFilter());
+                            rule.setTempClient(item.isTempClient());
+                            rule = dao.saveOrUpdate(rule);
+                            updateClientsVersion(rule, session);
+                        } catch (Exception ex) {
+                            if (ex.getCause() instanceof ConstraintViolationException) {
+                                this.printError(String.format(
+                                        "Строка №%s является дубликатом! Необходимо либо удалить ее, либо изменить ее параметры для дальнейшего сохранения.",
+                                        i + 1));
+                            } else {
+                                this.printError(ex.getMessage());
+                            }
+                            getLogger().error(ex.getMessage());
+                            return null;
+                        } finally {
+                            item.setEditable(false);
+                            HibernateUtils.close(session, getLogger());
                         }
-                        rule.setSourceOrg(DAOUtils.getOrgReference(session, item.getIdOfSourceOrg()));
-                        rule.setDestinationOrg(DAOUtils.getOrgReference(session, item.getIdOfDestOrg()));
-                        rule.setGroupFilter(item.getGroupFilter());
-                        rule.setTempClient(item.isTempClient());
-                        rule = dao.saveOrUpdate(rule);
-                        updateClientsVersion(rule, session);
-                    } catch (Exception ex) {
-                        if (ex.getCause() instanceof ConstraintViolationException) {
-                            this.printError(String.format(
-                                    "Строка №%s является дубликатом! Необходимо либо удалить ее, либо изменить ее параметры для дальнейшего сохранения.",
-                                    i + 1));
-                        } else {
-                            this.printError(ex.getMessage());
-                        }
-                        getLogger().error(ex.getMessage());
+                    } else {
+                        this.printError(
+                                String.format("У строки №%s в поле Фильтр Групп перечисление нужно задавать через запятую", i + 1));
                         return null;
-                    } finally {
-                        item.setEditable(false);
-                        HibernateUtils.close(session, getLogger());
                     }
                 } else {
                     this.printError(String.format("У строки №%s не все обязательные поля заполнены!", i + 1));
@@ -156,8 +163,8 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         for (Org o : friendlyOrg) {
             idOfOrgList.add(o.getIdOfOrg());
         }
-        Map<Long, Long> idOfClientGroupsMap = ClientManager.findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
-        List<Client> friendlyClients = ClientManager.findClientsByInOrgAndInGroups(session, idOfClientGroupsMap);
+        List<ClientGroupsByRegExAndOrgItem> idOfClientGroupsList = ClientManager.findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
+        List<Client> friendlyClients = ClientManager.findClientsByInOrgAndInGroups(session, idOfClientGroupsList);
         clients.addAll(friendlyClients);
         ClientManager.updateClientVersionTransactional(session, clients);
     }
@@ -203,6 +210,14 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
     private boolean validateItem(ClientAllocationRuleItem item) {
         return item.getIdOfSourceOrg() != null && item.getIdOfDestOrg() != null && StringUtils
                 .isNotEmpty(item.getGroupFilter());
+    }
+
+    private boolean validateGroupFilter(ClientAllocationRuleItem item) {
+        if (item.getGroupFilter().contains(",") && !item.getGroupFilter().contains(";")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

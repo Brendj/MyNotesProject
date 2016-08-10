@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
@@ -878,8 +879,8 @@ public class ClientManager {
             for (Org org : friendlyOrg) {
                 idOfOrgList.add(org.getIdOfOrg());
             }
-            Map<Long, Long> idOfClientGroupsMap = findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
-            List<Client> clients = findClientsByInOrgAndInGroups(session, idOfClientGroupsMap);
+            List<ClientGroupsByRegExAndOrgItem> idOfClientGroupsList = findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
+            List<Client> clients = findClientsByInOrgAndInGroups(session, idOfClientGroupsList);
             clientSet.addAll(clients);
         }
         return res;
@@ -921,13 +922,17 @@ public class ClientManager {
         return res;
     }
 
-    public static Map<Long, Long> findMatchedClientGroupsByRegExAndOrg(Session session, List<Long> idOfOrg, String regExp) {
-        String sql = "SELECT idofclientgroup, idoforg FROM cf_clientgroups where groupname = '"+regExp+"' and idoforg in (:idoforg)";
+    public static List<ClientGroupsByRegExAndOrgItem> findMatchedClientGroupsByRegExAndOrg(Session session, List<Long> idOfOrg, String regExp) {
+
+        List<String> regExpList = regExpParse(regExp);
+
+        String sql = "SELECT idofclientgroup, idoforg FROM cf_clientgroups where groupname in(:regExp) and idoforg in (:idoforg)";
         Query query = session.createSQLQuery(sql);
         query.setParameterList("idoforg", idOfOrg);
+        query.setParameterList("regExp", regExpList);
         List idOfClientGroupResult = query.list();
 
-        Map<Long, Long> idOfClientGroupsMap = new HashMap<Long, Long>();
+        List<ClientGroupsByRegExAndOrgItem> idOfClientGroupsList = new ArrayList<ClientGroupsByRegExAndOrgItem>();
 
         for (Object obj : idOfClientGroupResult){
             Object[] resultItem = (Object[]) obj;
@@ -935,22 +940,34 @@ public class ClientManager {
             Long groupId = Long.valueOf(resultItem[0].toString());
             Long idOfOrgN = Long.valueOf(resultItem[1].toString());
 
-            idOfClientGroupsMap.put(idOfOrgN, groupId);
+            ClientGroupsByRegExAndOrgItem clientGroupsByRegExAndOrgItem = new ClientGroupsByRegExAndOrgItem(idOfOrgN, groupId);
+
+            idOfClientGroupsList.add(clientGroupsByRegExAndOrgItem);
         }
-        return idOfClientGroupsMap;
+        return idOfClientGroupsList;
     }
 
-    public static List<Client> findClientsByInOrgAndInGroups(Session session, Map<Long, Long> idOfClientGroupMap) {
+    public static List<String> regExpParse(String regExp) {
+        String[] regExpList = regExp.split(",");
+
+        List<String> regexpListTrimed = new ArrayList<String>();
+
+        for (String str: regExpList) {
+            regexpListTrimed.add(str.trim());
+        }
+
+        return regexpListTrimed;
+    }
+
+    public static List<Client> findClientsByInOrgAndInGroups(Session session, List<ClientGroupsByRegExAndOrgItem> idOfClientGroupList) {
         List<Client> res = new ArrayList<Client>();
 
-        Set<Long> idOfOrgSet = idOfClientGroupMap.keySet();
-
-        for (Long idOfOrg : idOfOrgSet) {
+        for (ClientGroupsByRegExAndOrgItem clientGroupsByRegExAndOrgItem : idOfClientGroupList) {
 
             Criteria criteria = session.createCriteria(Client.class);
-            criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+            criteria.add(Restrictions.eq("org.idOfOrg", clientGroupsByRegExAndOrgItem.getIdOfOrg()));
             criteria.add(Restrictions.isNotNull("idOfClientGroup"));
-            criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroupMap.get(idOfOrg)));
+            criteria.add(Restrictions.eq("idOfClientGroup", clientGroupsByRegExAndOrgItem.getIdOfClientGroup()));
             List list = criteria.list();
             for (Object obj : list) {
                 Client client = (Client) obj;

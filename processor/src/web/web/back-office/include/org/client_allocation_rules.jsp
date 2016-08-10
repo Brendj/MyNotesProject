@@ -44,7 +44,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Фильтр групп (regexp)" />
+                <h:outputText escape="true" value="Фильтр групп" />
             </f:facet>
             <%--Отображается при выводе сохраненного правила распределения клиентов--%>
             <h:outputText rendered="#{not rule.editable}" escape="true" value="#{rule.groupFilter}"
