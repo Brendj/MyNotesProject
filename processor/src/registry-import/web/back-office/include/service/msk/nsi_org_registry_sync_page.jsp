@@ -184,6 +184,12 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
+                                <h:outputText value="Количество представителей" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.guardiansCount}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
                                 <h:outputText value="Применить" />
                             </f:facet>
                             <h:selectBooleanCheckbox value="#{e.selected}" styleClass="checkboxes"

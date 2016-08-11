@@ -40,6 +40,7 @@
         <property name="genderFrom" column="GenderFrom" type="int"/>
         <property name="birthDateFrom" column="BirthDateFrom" type="long"/>
         <property name="benefitOnAdmissionFrom" column="BenefitOnAdmissionFrom" type="string" length="3000"/>
+        <property name="guardiansCount" column="GuardiansCount" type="int"/>
     </class>
 </hibernate-mapping>
 

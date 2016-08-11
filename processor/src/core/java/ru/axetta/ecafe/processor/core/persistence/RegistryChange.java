@@ -41,6 +41,8 @@ public class RegistryChange {
     protected Long birthDateFrom;
     protected String benefitOnAdmissionFrom;
 
+    protected Integer guardiansCount;
+
     public static final int FULL_COMPARISON = 1;
     public static final int CHANGES_UPDATE = 2;
 
@@ -285,5 +287,13 @@ public class RegistryChange {
 
     public void setBenefitOnAdmissionFrom(String benefitOnAdmissionFrom) {
         this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
+    }
+
+    public Integer getGuardiansCount() {
+        return guardiansCount;
+    }
+
+    public void setGuardiansCount(Integer guardiansCount) {
+        this.guardiansCount = guardiansCount;
     }
 }
