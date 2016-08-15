@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
+import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -1253,5 +1255,123 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
         return listResult;
+    }
+
+    @WebMethod(operationName = "loadClientPhotoChanges")
+    public List<ClilentPhotoChangeItem> loadClientPhotoChanges(@WebParam(name = "idOfOrg") long idOfOrg)
+            throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        List<ClilentPhotoChangeItem> results = new ArrayList<ClilentPhotoChangeItem>();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+            List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, org);
+
+            for(ClientPhoto clientPhoto : clientPhotos){
+                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
+                        ImageUtils.ImageSize.SMALL.getValue(), true);
+                ClilentPhotoChangeItem item = new ClilentPhotoChangeItem(clientPhoto.getIdOfClient(), photoContent.getBytes(),
+                        photoContent.getHash(), clientPhoto.getLastProceedError(), clientPhoto.getGuardian().getPerson().getFullName());
+                results.add(item);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return results;
+        } catch (Exception e) {
+            logger.error("Ошибка при запросе фото для сверки", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @WebMethod(operationName = "proceedClientPhotoChanges")
+    public void proceedClientPhotoChanges(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "results") List<ClientPhotoChangeResult> results) throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            for(ClientPhotoChangeResult result : results){
+                Client client = (Client) persistenceSession.load(Client.class, result.getClientId());
+                int currentPhotoHash = ImageUtils.getPhotoHash(client, ImageUtils.ImageSize.SMALL.getValue(), true);
+                if(result.getState() == 1){
+                    if(result.getSrc() == currentPhotoHash){
+                        try {
+                            ImageUtils.moveImage(client);
+                            client.getPhoto().setIsNew(false);
+                            client.getPhoto().setIsCanceled(false);
+                            client.getPhoto().setIsApproved(true);
+                            client.getPhoto().setLastProceedError(null);
+                            persistenceSession.update(client.getPhoto());
+                        } catch (IOException e){
+                            logger.error(e.getMessage(), e);
+                            client.getPhoto().setLastProceedError(
+                                    ("Не удалось принять фото: " + e.getMessage()).substring(0, 256));
+                            persistenceSession.update(client.getPhoto());
+                        }
+                    } else {
+                        client.getPhoto().setLastProceedError("Фото-расхождение было изменено во время сверки");
+                        persistenceSession.update(client.getPhoto());
+                    }
+                }
+                if(result.getState() == 2){
+                    if(result.getSrc() == currentPhotoHash){
+                        boolean deleted = ImageUtils.deleteImage(client, true);
+                        if (!deleted) {
+                            client.getPhoto().setLastProceedError("Не удалось удалить фото-расхождение");
+                            persistenceSession.update(client.getPhoto());
+                        } else {
+                            client.getPhoto().setIsNew(false);
+                            client.getPhoto().setIsCanceled(true);
+                            client.getPhoto().setLastProceedError(null);
+                            persistenceSession.update(client.getPhoto());
+                        }
+                    }
+                }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при обработке результатов сверки фото", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @WebMethod(operationName = "getClientPhotoChangesCount")
+    public Long getClientPhotoChangesCount(@WebParam(name = "idOfOrg") long idOfOrg) throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+            List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, org);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return (long) clientPhotos.size();
+        } catch (Exception e) {
+            logger.error("Ошибка при запросе количества фото для сверки", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 }
