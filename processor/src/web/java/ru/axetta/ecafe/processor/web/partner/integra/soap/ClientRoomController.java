@@ -54,7 +54,8 @@ public interface ClientRoomController {
     PhotoURLResult getPhotoURL(@WebParam(name = "contractId") Long contractId, @WebParam(name = "size") int size, @WebParam(name = "isNew") boolean isNew);
 
     @WebMethod(operationName = "uploadPhoto")
-    PhotoURLResult uploadPhoto(@WebParam(name = "contractId") Long contractId, @WebParam(name = "image") Image photo, @WebParam(name = "size") int size);
+    PhotoURLResult uploadPhoto(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "guardianContractId") Long guardianContractId, @WebParam(name = "image") Image photo, @WebParam(name = "size") int size);
 
     @WebMethod(operationName = "deleteNewPhoto")
     Result deleteNewPhoto(@WebParam(name = "contractId") Long contractId);

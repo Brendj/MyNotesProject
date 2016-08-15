@@ -1815,13 +1815,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public PhotoURLResult getPhotoURL(Long contractId, int size, boolean isNew) {
         PhotoURLResult result = new PhotoURLResult();
-        Client client = DAOService.getInstance().getClientByContractId(contractId);
-        if(client == null){
-            result.resultCode = RC_CLIENT_NOT_FOUND;
-            result.description = RC_CLIENT_NOT_FOUND_DESC;
-            return result;
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Client client = findClient(session, contractId, null, result);
+                if (client == null) {
+                    return result;
+                }
+                getPhotoUrl(size, result, client, isNew);
+                transaction.commit();
+                transaction = null;
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
         }
-        getPhotoUrl(size, result, client, isNew);
         return result;
     }
 
@@ -1845,7 +1860,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PhotoURLResult uploadPhoto(Long contractId, Image photo, int size) {
+    public PhotoURLResult uploadPhoto(Long contractId, Long guardianContractId, Image photo, int size) {
         PhotoURLResult result = new PhotoURLResult();
         Session session = null;
         Transaction transaction = null;
@@ -1857,21 +1872,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (client == null) {
                     return result;
                 }
+                Client guardian = findClient(session, guardianContractId, null, result);
+                if (guardian == null) {
+                    return result;
+                }
                 ClientPhoto clientPhoto;
                 if (client.getPhoto() != null) {
                     clientPhoto = client.getPhoto();
                     ImageUtils.saveImage(client, photo, true);
                     clientPhoto.setIsNew(true);
+                    clientPhoto.setIsCanceled(false);
                 } else {
-                    String imageName = ImageUtils.saveImage(client.getContractId(), photo, true);
-                    clientPhoto = new ClientPhoto(client, imageName, true);
+                    String imageName = ImageUtils.saveImage(client.getContractId(), client.getIdOfClient(), photo, true);
+                    clientPhoto = new ClientPhoto(client, guardian, imageName, true);
                     client.setPhoto(clientPhoto);
                 }
-                session.save(clientPhoto);
+                session.saveOrUpdate(clientPhoto);
                 transaction.commit();
                 transaction = null;
                 getPhotoUrl(size, result, client, true);
             } catch (IOException e){
+                logger.error(RC_IMAGE_NOT_SAVED_DESC + ": " + e.getMessage(), e);
                 result.resultCode = RC_IMAGE_NOT_SAVED;
                 result.description = RC_IMAGE_NOT_SAVED_DESC + ": " + e.getMessage();
             } finally {
@@ -1905,20 +1926,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
                 if (client.getPhoto() != null && client.getPhoto().getIsNew()) {
-                    boolean deleted = ImageUtils.deleteImage(client.getContractId(), client.getPhoto().getName(), true);
+                    boolean deleted = ImageUtils.deleteImage(client.getContractId(), client.getIdOfClient(),
+                            client.getPhoto().getName(), true);
                     if(!deleted){
                         result.resultCode = RC_IMAGE_NOT_DELETED;
                         result.description = RC_IMAGE_NOT_DELETED_DESC;
                     } else {
                         result.resultCode = RC_OK;
                         result.description = RC_OK_DESC;
-                        boolean exists = ImageUtils.checkImageExists(client.getContractId(), client.getPhoto().getName(), false);
-                        if(exists){
-                            client.getPhoto().setIsNew(false);
-                            session.save(client.getPhoto());
-                        } else {
-                            session.delete(client.getPhoto());
-                        }
+                        client.getPhoto().setIsNew(false);
+                        session.update(client.getPhoto());
                     }
                 } else {
                     result.resultCode = RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO;
