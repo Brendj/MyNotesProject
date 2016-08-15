@@ -11,6 +11,9 @@
 <%-- Панель просмотра клиента --%>
 <h:panelGrid id="clientViewGrid" styleClass="borderless-grid" columns="2"
              binding="#{mainPage.clientViewPage.pageComponent}">
+    <h:outputText escape="true" value="Фотография" styleClass="output-text" />
+    <h:graphicImage value="#{request.requestURL.substring(0, request.requestURL.length() - request.requestURI.length())}/processor/image/#{mainPage.clientViewPage.photoURL}"
+                    width="150"/>
     <h:outputText escape="true" value="Организация" styleClass="output-text" />
     <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
                    action="#{mainPage.showOrgViewPage}">

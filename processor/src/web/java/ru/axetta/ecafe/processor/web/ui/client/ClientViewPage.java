@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
+import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -122,6 +123,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Integer gender;
     private Date birthDate;
     private String benefitOnAdmission;
+    private String photoURL;
 
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
@@ -345,6 +347,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.gender = gender;
     }
 
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
+
     @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
@@ -424,6 +434,13 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
 
         this.clientWardItems = loadWardsByClient(session, idOfClient);
+
+        try {
+            this.photoURL = ImageUtils.getPhotoURL(client, ImageUtils.ImageSize.MEDIUM.getValue(), false);
+        } catch (Exception e){
+            this.photoURL = ImageUtils.getDefaultImageURL();
+        }
+
 
         // Категории скидок старое не используется
         // TODO: переписать использутеся кривая логика с return! По этому не рекомендуется писать ниже код
