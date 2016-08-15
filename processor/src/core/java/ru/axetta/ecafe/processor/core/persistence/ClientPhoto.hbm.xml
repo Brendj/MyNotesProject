@@ -15,6 +15,10 @@
         <one-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" constrained="true"/>
         <property name="name" column="name" type="string" not-null="true"/>
         <property name="isNew" column="isnew" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="isCanceled" column="iscanceled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="isApproved" column="isapproved" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <many-to-one name="guardian" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclientguardian"/>
+        <property name="lastProceedError" column="lastproceederror" type="string"/>
     </class>
 </hibernate-mapping>
 

@@ -15,6 +15,10 @@ public class ClientPhoto {
     private Client client;
     private String name;
     private boolean isNew;
+    private boolean isCanceled;
+    private boolean isApproved;
+    private Client guardian;
+    private String lastProceedError;
 
     public ClientPhoto() {
     }
@@ -24,8 +28,9 @@ public class ClientPhoto {
         this.name = name;
     }
 
-    public ClientPhoto(Client client, String name, boolean isNew) {
+    public ClientPhoto(Client client, Client guardian, String name, boolean isNew) {
         this.client = client;
+        this.guardian = guardian;
         this.name = name;
         this.isNew = isNew;
     }
@@ -60,5 +65,37 @@ public class ClientPhoto {
 
     public void setIsNew(boolean isNew) {
         this.isNew = isNew;
+    }
+
+    public boolean getIsCanceled() {
+        return isCanceled;
+    }
+
+    public void setIsCanceled(boolean isCanceled) {
+        this.isCanceled = isCanceled;
+    }
+
+    public boolean getIsApproved() {
+        return isApproved;
+    }
+
+    public void setIsApproved(boolean approved) {
+        isApproved = approved;
+    }
+
+    public Client getGuardian() {
+        return guardian;
+    }
+
+    public void setGuardian(Client guardian) {
+        this.guardian = guardian;
+    }
+
+    public String getLastProceedError() {
+        return lastProceedError;
+    }
+
+    public void setLastProceedError(String lastProceedError) {
+        this.lastProceedError = lastProceedError;
     }
 }

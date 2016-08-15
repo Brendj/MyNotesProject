@@ -35,6 +35,10 @@ public class ImageServlet extends HttpServlet {
             fin = new FileInputStream(ImageUtils.getNotFoundImagePath());
         }
 
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
         BufferedImage bi = ImageIO.read(fin);
         ImageIO.write(bi, "jpg", out);
         fin.close();
