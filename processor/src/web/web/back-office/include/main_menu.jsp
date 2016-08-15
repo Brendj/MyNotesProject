@@ -726,7 +726,7 @@
                         action="#{otherActionsPage.show}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceAdmin}" />
 
-    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Реестры"
+    <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Сверка"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" action="#{mainPage.showNSIGroupPage}" reRender="workspaceForm" />
 
@@ -741,6 +741,11 @@
                                 reRender="workspaceForm" />
             <rich:panelMenuItem id="nsiOrgRegistrySyncOverview" binding="#{NSIOrgRegistrySynchOverviewPage.mainMenuComponent}"
                                 label="Статистика сверки" action="#{NSIOrgRegistrySynchOverviewPage.show}"
+                                reRender="workspaceForm" />
+
+            <%--@elvariable id="photoRegistryPage" type="ru.axetta.ecafe.processor.web.ui.service.PhotoRegistryPage"--%>
+            <rich:panelMenuItem id="photoRegistryItem" binding="#{photoRegistryPage.mainMenuComponent}"
+                                label="Сверка фотографий клиентов" action="#{photoRegistryPage.show}"
                                 reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
