@@ -273,7 +273,14 @@ public class ImageUtils {
     }
 
     private static void moveImage(String src, String target) throws IOException {
-        Files.move(new File(src), new File(target));
+        File srcF = new File(src);
+        File targetF = new File(target);
+        try {
+            Files.move(srcF, targetF);
+        } catch (FileNotFoundException e) {
+            targetF.getParentFile().mkdir();
+            Files.move(srcF, targetF);
+        }
     }
 
     public static boolean deleteImage(Client client, boolean isNew) {
