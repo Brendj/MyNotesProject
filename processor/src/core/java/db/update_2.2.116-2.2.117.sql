@@ -13,3 +13,5 @@ ALTER TABLE cf_taloon_approval ADD COLUMN goodsname CHARACTER VARYING(512);
 ALTER TABLE cf_taloon_approval ADD COLUMN goodsguid CHARACTER VARYING(36);
 
 ALTER TABLE CF_RegistryChange ADD COLUMN guardiansCount integer;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 150816) НЕ МЕНЯТЬ
