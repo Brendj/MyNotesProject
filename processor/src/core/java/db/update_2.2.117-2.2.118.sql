@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.117
+-- Пакет обновлений 2.2.118
 
 ALTER TABLE CF_RegistryChange ADD COLUMN guardiansCount integer;
 
@@ -50,3 +50,9 @@ insert into cf_client_guardian_notificationsettings(idofclientguardian, notifyty
 --После импорта данных создаем индексы на таблицу флагов оповещений
 CREATE INDEX cf_client_guardian_notificationsettings_idofclientguardian_idx
 ON cf_client_guardian_notificationsettings USING btree (idofclientguardian);
+
+ALTER TABLE cf_clientphoto
+  ADD COLUMN iscanceled INTEGER NOT NULL DEFAULT FALSE,
+  ADD COLUMN isapproved INTEGER NOT NULL DEFAULT FALSE,
+  ADD COLUMN idofclientguardian BIGINT,
+  ADD COLUMN lastproceederror CHARACTER VARYING(256);

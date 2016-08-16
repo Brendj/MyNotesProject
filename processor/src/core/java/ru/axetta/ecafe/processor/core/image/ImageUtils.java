@@ -386,10 +386,10 @@ public class ImageUtils {
         }
     }
 
-    public static List<ClientPhoto> getNewClientPhotos(Session session, Org org){
+    public static List<ClientPhoto> getNewClientPhotos(Session session, List<Org> orgs){
         Criteria criteria = session.createCriteria(ClientPhoto.class);
         criteria.createAlias("client", "client", JoinType.LEFT_OUTER_JOIN);
-        criteria.add(Restrictions.eq("client.org", org));
+        criteria.add(Restrictions.in("client.org", orgs));
         criteria.add(Restrictions.eq("isNew", true));
         return criteria.list();
     }

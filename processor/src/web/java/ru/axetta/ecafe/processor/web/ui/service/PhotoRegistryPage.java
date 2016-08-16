@@ -121,7 +121,10 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
     }
 
     private void getClientPhotoItems(Session persistenceSession) {
-        List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, org);
+        Org org1 = (Org) persistenceSession.load(Org.class, org.getIdOfOrg());
+        List<Org> orgs = new ArrayList<Org>();
+        orgs.addAll(org1.getFriendlyOrg());
+        List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, orgs);
 
         items = new ArrayList<PhotoRegistryItem>();
         for(ClientPhoto clientPhoto : clientPhotos){
@@ -260,6 +263,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
         private Long idOfClient;
         private Client client;
         private String fullName;
+        private String guardianName;
         private String photoContentBase64;
         private int photoHash;
         private String newPhotoContentBase64;
@@ -273,6 +277,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
             this.idOfClient = clientPhoto.getClient().getIdOfClient();
             this.client = clientPhoto.getClient();
             this.fullName = clientPhoto.getClient().getPerson().getFullName();
+            this.guardianName = clientPhoto.getGuardian().getPerson().getFullName();
             try {
                 ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
                         ImageUtils.ImageSize.SMALL.getValue(), false);
@@ -343,6 +348,14 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
 
         public void setFullName(String fullName) {
             this.fullName = fullName;
+        }
+
+        public String getGuardianName() {
+            return guardianName;
+        }
+
+        public void setGuardianName(String guardianName) {
+            this.guardianName = guardianName;
         }
 
         public String getPhotoContentBase64() {

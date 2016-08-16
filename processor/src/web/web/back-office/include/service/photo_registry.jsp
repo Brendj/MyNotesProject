@@ -66,9 +66,15 @@
                 </rich:column>
                 <rich:column>
                     <f:facet name="header">
-                        <h:outputText value="ФИО" />
+                        <h:outputText value="ФИО обучающегося" />
                     </f:facet>
                     <h:outputText styleClass="output-text" value="#{e.fullName}" />
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="ФИО представителя" />
+                    </f:facet>
+                    <h:outputText styleClass="output-text" value="#{e.guardianName}" />
                 </rich:column>
                 <rich:column>
                     <f:facet name="header">
