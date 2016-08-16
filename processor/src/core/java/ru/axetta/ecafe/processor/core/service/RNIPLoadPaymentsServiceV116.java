@@ -409,6 +409,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter2.setForSearch(true);
         descriptionSimpleParameter2.setLabel("Номер договора");
         descriptionSimpleParameter2.setName("PAYMENT_TO");
+        descriptionSimpleParameter2.setIsId(BigInteger.valueOf(1));
         descriptionSimpleParameter2.setReadonly(false);
         descriptionSimpleParameter2.setRequired(true);
         descriptionSimpleParameter2.setVisible(true);
