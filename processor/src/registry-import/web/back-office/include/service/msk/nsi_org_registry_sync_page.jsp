@@ -182,12 +182,12 @@
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.benefitOnAdmissionFrom}" />
                         </rich:column>
-                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                        <%--<rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
                                 <h:outputText value="Количество представителей" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.guardiansCount}" />
-                        </rich:column>
+                        </rich:column>--%>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
                                 <h:outputText value="Применить" />
