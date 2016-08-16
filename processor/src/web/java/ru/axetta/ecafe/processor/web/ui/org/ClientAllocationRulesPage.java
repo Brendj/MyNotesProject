@@ -213,10 +213,18 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
     }
 
     private boolean validateGroupFilter(ClientAllocationRuleItem item) {
-        if (item.getGroupFilter().contains(",") && !item.getGroupFilter().contains(";")) {
-            return true;
+        if (item.getGroupFilter().contains(",")) {
+            if (item.getGroupFilter().contains(";")) {
+                return false;
+            } else {
+                return true;
+            }
         } else {
-            return false;
+            if (item.getGroupFilter().contains(";")) {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 
