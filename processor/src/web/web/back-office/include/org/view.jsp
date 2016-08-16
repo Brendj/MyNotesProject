@@ -164,6 +164,10 @@
 
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.securityLevel}" styleClass="input-text long-field" />
+
+    <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.photoRegistry}"  styleClass="input-text" disabled="true"  />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

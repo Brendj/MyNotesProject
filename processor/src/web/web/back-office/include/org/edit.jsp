@@ -239,6 +239,9 @@
         <f:converter converterId="organizationSecurityLevelConverter"/>
         <f:selectItems value="#{mainPage.orgEditPage.securityLevels}" />
     </h:selectOneMenu>
+
+    <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.photoRegistry}"  styleClass="input-text"  />
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateOrg}" reRender="mainMenu, workspaceTogglePanel"

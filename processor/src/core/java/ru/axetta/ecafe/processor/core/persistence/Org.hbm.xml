@@ -107,6 +107,12 @@
             </type>
         </property>
 
+        <property name="photoRegistryDirective" column="PhotoRegistryDirective">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PhotoRegistryDirective</param>
+            </type>
+        </property>
+
         <property name="statusDetailing" column="StatusDetailing" type="string" length="256"/>
         <property name="btiUnom" column="BtiUnom" type="long" length="8"/>
         <property name="btiUnad" column="BtiUnad" type="long" length="1"/>

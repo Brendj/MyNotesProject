@@ -70,6 +70,9 @@ public class DirectiveElement implements AbstractToElement{
         Integer securityModeFlag = org.getSecurityLevel().getCode();
         directiveItemList.add(new DirectiveItem("IS_SECURITY_MODE_FLAG", securityModeFlag.toString()));
 
+        Integer photoRegistryFlag = org.getPhotoRegistryDirective().getCode();
+        directiveItemList.add(new DirectiveItem("IS_ALLOWED_PHOTO_REGISTRY", photoRegistryFlag.toString()));
+
         Integer loginUniqControlPeriod = RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE);
         directiveItemList.add(new DirectiveItem("IS_LOGIN_UNIQ_CONTROL_PERIOD", loginUniqControlPeriod.toString()));

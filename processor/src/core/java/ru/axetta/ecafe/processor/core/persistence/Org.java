@@ -116,6 +116,7 @@ public class Org implements Serializable {
     private OrganizationType type;
     private OrganizationStatus status;
     private OrganizationSecurityLevel securityLevel;
+    private PhotoRegistryDirective photoRegistryDirective;
     private Long btiUnom;
     private Long btiUnad;
     private Long uniqueAddressId; //поле unique_address_id из сверки по реестрам
@@ -973,6 +974,14 @@ public class Org implements Serializable {
 
     public void setSecurityLevel(OrganizationSecurityLevel securityLevel) {
         this.securityLevel = securityLevel;
+    }
+
+    public PhotoRegistryDirective getPhotoRegistryDirective() {
+        return photoRegistryDirective;
+    }
+
+    public void setPhotoRegistryDirective(PhotoRegistryDirective photoRegistryDirective) {
+        this.photoRegistryDirective = photoRegistryDirective;
     }
 
     public Contragent getCoSupplier() {

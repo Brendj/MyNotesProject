@@ -77,6 +77,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long uniqueAddressId;
     private String statusDetailing;
     private String securityLevel;
+    private Boolean photoRegistry;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -245,6 +246,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.interdistrictCouncil = org.getInterdistrictCouncil();
         this.interdistrictCouncilChief = org.getInterdistrictCouncilChief();
         this.securityLevel = org.getSecurityLevel().toString();
+        this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
     }
 
     public String getFriendlyFilterOrgs() {
@@ -580,6 +582,12 @@ public class OrgViewPage extends BasicWorkspacePage {
     public String getSecurityLevel() {
         return securityLevel;
     }
+
+    public Boolean getPhotoRegistry() {
+        return photoRegistry;
+    }
+
+
 
     public String getCoSupplierName() {
         return coSupplierName;

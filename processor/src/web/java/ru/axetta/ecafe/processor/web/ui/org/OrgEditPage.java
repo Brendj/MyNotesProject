@@ -86,6 +86,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
     private OrganizationSecurityLevel securityLevel;
 
+    private Boolean photoRegistry;
+
     private Integer refectoryType;
     private List<SelectItem> refectoryTypeComboMenuItems;
 
@@ -323,6 +325,8 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
         org.setOrgStructureVersion(nextVersion);
+        PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
+        org.setPhotoRegistryDirective(photoD);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.update(org);
@@ -455,6 +459,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.payByCashier = org.getPayByCashier();
         this.oneActiveCard = org.getOneActiveCard();
         this.securityLevel = org.getSecurityLevel();
+        this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
 
     }
 
@@ -959,6 +964,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setSecurityLevel(OrganizationSecurityLevel securityLevel) {
         this.securityLevel = securityLevel;
+    }
+
+    public Boolean getPhotoRegistry() {
+        return photoRegistry;
+    }
+
+    public void setPhotoRegistry(Boolean photoRegistry) {
+        this.photoRegistry = photoRegistry;
     }
 
     public ContragentItem getCoSupplier() {

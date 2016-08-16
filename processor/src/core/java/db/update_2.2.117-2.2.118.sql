@@ -56,3 +56,6 @@ ALTER TABLE cf_clientphoto
   ADD COLUMN isapproved INTEGER NOT NULL DEFAULT FALSE,
   ADD COLUMN idofclientguardian BIGINT,
   ADD COLUMN lastproceederror CHARACTER VARYING(256);
+
+--Флаг "Сверка фотографий" у организации
+ALTER TABLE cf_orgs ADD COLUMN photoregistrydirective integer NOT NULL DEFAULT 0;
