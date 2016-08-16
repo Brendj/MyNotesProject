@@ -1269,7 +1269,9 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
-            List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, org);
+            List<Org> orgs = new ArrayList<Org>();
+            orgs.addAll(org.getFriendlyOrg());
+            List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, orgs);
 
             for(ClientPhoto clientPhoto : clientPhotos){
                 ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
@@ -1364,7 +1366,9 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
-            List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, org);
+            List<Org> orgs = new ArrayList<Org>();
+            orgs.addAll(org.getFriendlyOrg());
+            List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, orgs);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
