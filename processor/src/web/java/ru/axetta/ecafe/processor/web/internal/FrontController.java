@@ -1317,7 +1317,7 @@ public class FrontController extends HttpServlet {
                             persistenceSession.update(client.getPhoto());
                         } catch (IOException e){
                             logger.error(e.getMessage(), e);
-                            String error = "Не удалось принять фото: " + e.getMessage();
+                            String error = "Не удалось принять фото-расхождение: " + e.getMessage();
                             if(error.length() > 256){
                                 error = error.substring(0, 256);
                             }

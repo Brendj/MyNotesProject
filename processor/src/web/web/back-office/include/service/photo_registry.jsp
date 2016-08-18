@@ -28,12 +28,8 @@
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:form>
-                <a4j:commandButton value="Начать сверку"
-                                   onclick="#{rich:component('confirmation')}.show(); this.disabled = true;" oncomplete="this.disabled = false;"
-                                   reRender="synchTable,synchTableInfoPanel" styleClass="command-button" status="updateStatus"/>
-                <a4j:jsFunction name="submit" action="#{photoRegistryPage.doUpdate()}" reRender="synchTable,synchTableInfoPanel"/>
-            </h:form>
+            <a4j:commandButton value="Провести сверку" action="#{photoRegistryPage.doUpdate()}" reRender="synchTable,synchTableInfoPanel"
+                               status="updateStatus" onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
             <a4j:status id="updateStatus">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -108,6 +104,12 @@
                         <h:outputText escape="true" value="Отклонить" styleClass="output-text" />
                     </h:panelGrid>
                 </rich:column>
+                <rich:column width="150">
+                    <f:facet name="header">
+                        <h:outputText value="Сообщение" />
+                    </f:facet>
+                    <h:outputText styleClass="output-text" value="#{e.error}" rendered="#{not empty e.error}" />
+                </rich:column>
 
                 <f:facet name="footer">
                     <rich:datascroller for="table" renderIfSinglePage="false" maxPages="5" fastControls="hide"
@@ -128,7 +130,7 @@
                 </f:facet>
             </rich:dataTable>
             <a4j:commandButton value="Принять изменения" action="#{photoRegistryPage.doApply()}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
-                               onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
+                               onclick="this.disabled = true;" oncomplete="this.disabled = false;" disabled="#{photoRegistryPage.items.size() == 0}"/>
         </h:panelGroup>
     </h:panelGrid>
 

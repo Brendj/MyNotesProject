@@ -38,7 +38,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
             + " во избежание расхождений в данных. Для разблокировки нажмите кнопку \"Отменить сверку\"";
     private String confirm = CONFIRM_QUESTION;
 
-    private List<PhotoRegistryItem> items;
+    private List<PhotoRegistryItem> items = new ArrayList<PhotoRegistryItem>();
 
     private Org org;
     private String orgName;
@@ -140,18 +140,29 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
                 persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
+                int moved = 0;
+                int deleted = 0;
+
                 for(PhotoRegistryItem item : items){
                     if(item.selected){
-                        movePhoto(persistenceSession, item);
+                        if(movePhoto(persistenceSession, item)){
+                            moved++;
+                        }
                     } else if(item.denied) {
-                        deleteNewPhoto(persistenceSession, item);
+                        if(deleteNewPhoto(persistenceSession, item)){
+                            deleted++;
+                        }
                     }
                 }
+
+                String info = String.format("Изменения приняты. Всего расхождений - %s, из них принято %s, отклонено %s.",
+                        items.size(), moved, deleted);
 
                 getClientPhotoItems(persistenceSession);
 
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
+                infoMessages = info;
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -160,44 +171,65 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
             errorMessages = String.format("Не удалось провести сверку фотографий для Org id=%s: %s", org.getIdOfOrg(), e.getMessage());
             logger.error(errorMessages, e);
         }
-        infoMessages = String.format("Изменения приняты, обновление фотографий для организации ИД=%s разблокировано", org.getIdOfOrg());
     }
 
-    private void movePhoto(Session session, PhotoRegistryItem item){
+    private boolean movePhoto(Session session, PhotoRegistryItem item){
+        boolean result = false;
         try {
             int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), ImageUtils.ImageSize.SMALL.getValue(), true);
-            if(currentPhotoHash == item.getPhotoHash()) {
+            if(currentPhotoHash == item.getNewPhotoHash()) {
                 ImageUtils.moveImage(item.getClientPhoto().getClient());
                 item.getClientPhoto().setIsNew(false);
                 item.getClientPhoto().setIsCanceled(false);
                 item.getClientPhoto().setIsApproved(true);
                 item.getClientPhoto().setLastProceedError(null);
                 session.update(item.getClientPhoto());
+                result = true;
+            } else {
+                item.getClientPhoto().setLastProceedError("Фото-расхождение было изменено во время сверки");
+                session.update(item.getClientPhoto());
             }
         } catch (Exception e){
             logger.error(e.getMessage());
+            String error = "Не удалось принять фото-расхождение: " + e.getMessage();
+            if(error.length() > 256){
+                error = error.substring(0, 256);
+            }
+            item.getClientPhoto().setLastProceedError(error);
+            session.update(item.getClientPhoto());
         }
-
+        return result;
     }
 
-    private void deleteNewPhoto(Session session, PhotoRegistryItem item){
+    private boolean deleteNewPhoto(Session session, PhotoRegistryItem item){
+        boolean result = false;
         try {
             int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), ImageUtils.ImageSize.SMALL.getValue(), true);
-            if (currentPhotoHash == item.getPhotoHash()) {
+            if (currentPhotoHash == item.getNewPhotoHash()) {
                 boolean deleted = ImageUtils.deleteImage(item.getClientPhoto().getClient(), true);
                 if (!deleted) {
                     logger.error(String.format("Не удалось удалить фото-расхождение для клиента id=%s",
                             item.getClientPhoto().getClient().getIdOfClient()));
+                    item.getClientPhoto().setLastProceedError("Не удалось удалить фото-расхождение");
+                    session.update(item.getClientPhoto());
                 } else {
                     item.getClientPhoto().setIsNew(false);
                     item.getClientPhoto().setIsCanceled(true);
                     item.getClientPhoto().setLastProceedError(null);
                     session.update(item.getClientPhoto());
+                    result = true;
                 }
             }
         } catch (Exception e){
             logger.error(e.getMessage());
+            String error = "Не удалось удалить фото-расхождение: " + e.getMessage();
+            if(error.length() > 256){
+                error = error.substring(0, 256);
+            }
+            item.getClientPhoto().setLastProceedError(error);
+            session.update(item.getClientPhoto());
         }
+        return result;
     }
 
     public void doSelectAll() {
@@ -264,6 +296,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
         private Client client;
         private String fullName;
         private String guardianName;
+        private String error;
         private String photoContentBase64;
         private int photoHash;
         private String newPhotoContentBase64;
@@ -278,6 +311,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
             this.client = clientPhoto.getClient();
             this.fullName = clientPhoto.getClient().getPerson().getFullName();
             this.guardianName = clientPhoto.getGuardian().getPerson().getFullName();
+            this.error = clientPhoto.getLastProceedError();
             try {
                 ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
                         ImageUtils.ImageSize.SMALL.getValue(), false);
@@ -356,6 +390,14 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
 
         public void setGuardianName(String guardianName) {
             this.guardianName = guardianName;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
         }
 
         public String getPhotoContentBase64() {
