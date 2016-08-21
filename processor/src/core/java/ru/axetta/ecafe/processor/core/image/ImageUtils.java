@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.image;
 
 import com.google.common.io.Files;
+import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -115,6 +116,18 @@ public class ImageUtils {
         return getPhotoContent(path);
     }
 
+    public static String getPhotoString(Client client, int size, boolean isNew) throws IOException {
+        String path = "";
+        try {
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, client.getPhoto().getName(),
+                    ImageSize.fromIntegerToEnum(size));
+        } catch (NoSuchImageSizeException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return getPhotoString(path);
+    }
+
     public static int getPhotoHash(Client client, int size, boolean isNew) throws IOException {
         String path = "";
         try {
@@ -147,6 +160,25 @@ public class ImageUtils {
         return new PhotoContent(encoded, bytes, hash);
     }
 
+    public static String getPhotoString(String path) throws IOException {
+        File file;
+        FileInputStream fileInputStreamReader;
+        try {
+            file = new File(path);
+            fileInputStreamReader = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            file = new File(defaultImagePath());
+            fileInputStreamReader = new FileInputStream(file);
+        }
+        byte[] bytes = new byte[(int)file.length()];
+        fileInputStreamReader.read(bytes);
+        BASE64Encoder encoder = new BASE64Encoder();
+        String encoded = encoder.encode(bytes);
+        fileInputStreamReader.close();
+
+        return encoded;
+    }
+
     public static int getPhotoHash(String path) throws IOException {
         File file;
         FileInputStream fileInputStreamReader;
@@ -163,6 +195,16 @@ public class ImageUtils {
         fileInputStreamReader.close();
 
         return hash;
+    }
+
+    public static BufferedImage getImageFromString(String data) throws IOException {
+        BASE64Decoder decoder = new BASE64Decoder();
+        byte[] imageByte = decoder.decodeBuffer(data);
+        ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+        BufferedImage image = ImageIO.read(bis);
+        bis.close();
+
+        return image;
     }
 
     public static String generateHashFileName(int length){
@@ -253,6 +295,12 @@ public class ImageUtils {
         return hashFileName;
     }
 
+    public static String saveImage(Long contractId, Long idOfClient, BufferedImage image, boolean isNew) throws IOException, ImageUtilsException {
+        String hashFileName = generateHashFileName(16);
+        saveImage(contractId, idOfClient, image, isNew, hashFileName);
+        return hashFileName;
+    }
+
     public static void saveImage(Long contractId, Long idOfClient, Image image, boolean isNew, String hashFileName) throws IOException, ImageUtilsException {
         BufferedImage bimage = toBufferedImage(image);
         validateImage(bimage, contractId, hashFileName);
@@ -261,7 +309,18 @@ public class ImageUtils {
         saveImage(formImagePath(contractId, idOfClient, isNew, hashFileName, ImageSize.SMALL), sbimage);
     }
 
+    public static void saveImage(Long contractId, Long idOfClient, BufferedImage image, boolean isNew, String hashFileName) throws IOException, ImageUtilsException {
+        // validateImage(image, contractId, hashFileName);
+        BufferedImage sbimage = resizeImage(image);
+        saveImage(formImagePath(contractId, idOfClient, isNew, hashFileName, ImageSize.MEDIUM), image);
+        saveImage(formImagePath(contractId, idOfClient, isNew, hashFileName, ImageSize.SMALL), sbimage);
+    }
+
     public static void saveImage(Client client, Image image, boolean isNew) throws IOException, ImageUtilsException {
+        saveImage(client.getContractId(), client.getIdOfClient(), image, isNew, client.getPhoto().getName());
+    }
+
+    public static void saveImage(Client client, BufferedImage image, boolean isNew) throws IOException, ImageUtilsException {
         saveImage(client.getContractId(), client.getIdOfClient(), image, isNew, client.getPhoto().getName());
     }
 
@@ -318,7 +377,7 @@ public class ImageUtils {
         return file.exists();
     }
 
-    private static void validateImage(BufferedImage image, Long contractId, String hashFileName) throws IOException, ImageUtilsException {
+    public static void validateImage(BufferedImage image, Long contractId, String hashFileName) throws IOException, ImageUtilsException {
         validateSize(image);
         //compareImage неправильно работает
         //if(ClientPhotoConfig.CHECK_UNIQUE) {

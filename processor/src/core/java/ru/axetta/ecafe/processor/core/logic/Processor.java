@@ -28,6 +28,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientG
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientgroupManagerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientgroupManagersProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ResClientgroupManagers;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotos;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosData;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ResClientPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.*;
@@ -795,6 +799,9 @@ public class Processor implements SyncProcessor {
         // обработка SpecialDates
         fullProcessingSpecialDates(request, syncHistory, responseSections);
 
+        // обработка ClientPhotos
+        fullProcessingClientPhotos(request, syncHistory, responseSections);
+
         //Process GroupManagers (классных руководителей)
         fullProcessingClientGroupManagers(request, syncHistory, responseSections);
 
@@ -898,6 +905,24 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("processSpecialDates: %s", e.getMessage());
+            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingClientPhotos(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ClientPhotos clientPhotosRequest = request.getClientPhotos();
+            if (clientPhotosRequest != null) {
+                ClientPhotosData clientPhotosData = processClientPhotosData(clientPhotosRequest);
+                addToResponseSections(clientPhotosData, responseSections);
+
+                ResClientPhotos resClientPhotos = processClientPhotos(clientPhotosRequest);
+                addToResponseSections(resClientPhotos, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processClientPhotos: %s", e.getMessage());
             createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
@@ -2641,6 +2666,42 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
         return clients;
+    }
+
+    private ClientPhotosData processClientPhotosData(ClientPhotos clientPhotos) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ClientPhotosData clientPhotosData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ClientPhotosProcessor processor = new ClientPhotosProcessor(persistenceSession, clientPhotos);
+            clientPhotosData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return clientPhotosData;
+    }
+
+    private ResClientPhotos processClientPhotos(ClientPhotos clientPhotos) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResClientPhotos resClientPhotos = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ClientPhotosProcessor processor = new ClientPhotosProcessor(persistenceSession, clientPhotos);
+            resClientPhotos = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resClientPhotos;
     }
 
     //responce

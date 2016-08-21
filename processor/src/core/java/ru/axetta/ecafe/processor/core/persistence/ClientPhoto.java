@@ -19,6 +19,7 @@ public class ClientPhoto {
     private boolean isApproved;
     private Client guardian;
     private String lastProceedError;
+    private Long version;
 
     public ClientPhoto() {
     }
@@ -97,5 +98,13 @@ public class ClientPhoto {
 
     public void setLastProceedError(String lastProceedError) {
         this.lastProceedError = lastProceedError;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

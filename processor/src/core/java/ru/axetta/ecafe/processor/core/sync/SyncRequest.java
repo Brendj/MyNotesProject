@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.Categor
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotos;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
@@ -2459,6 +2461,7 @@ public class SyncRequest {
             builders.add(new ZeroTransactionsBuilder(idOfOrg));
             builders.add(new SpecialDatesBuilder(idOfOrg));
             builders.add(new MigrantsBuilder(idOfOrg));
+            builders.add(new ClientPhotosBuilder(idOfOrg));
             builders.add(new CardsOperationsRegistry.Builder(loadContext));
             builders.add(new InteractiveReportDataBuilder());
             builders.add(new GoodsBasicBasketRequest.Builder());
@@ -2687,6 +2690,10 @@ public class SyncRequest {
 
     public Migrants getMigrants() {
         return this.<Migrants>findSection(Migrants.class);
+    }
+
+    public ClientPhotos getClientPhotos() {
+        return this.<ClientPhotos>findSection(ClientPhotos.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

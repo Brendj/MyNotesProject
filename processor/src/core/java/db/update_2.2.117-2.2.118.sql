@@ -55,7 +55,9 @@ ALTER TABLE cf_clientphoto
   ADD COLUMN iscanceled INTEGER NOT NULL DEFAULT FALSE,
   ADD COLUMN isapproved INTEGER NOT NULL DEFAULT FALSE,
   ADD COLUMN idofclientguardian BIGINT,
-  ADD COLUMN lastproceederror CHARACTER VARYING(256);
+  ADD COLUMN lastproceederror CHARACTER VARYING(256),
+  ADD COLUMN version BIGINT NOT NULL DEFAULT 1;
+CREATE INDEX cf_clientphoto_version_idx ON cf_clientphoto USING BTREE (version);
 
 --Флаг "Сверка фотографий" у организации
 ALTER TABLE cf_orgs ADD COLUMN photoregistrydirective integer NOT NULL DEFAULT 0;

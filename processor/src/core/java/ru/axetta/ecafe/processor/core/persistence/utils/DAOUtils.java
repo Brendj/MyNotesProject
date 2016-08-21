@@ -2171,6 +2171,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByClientPhoto(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select cp.version from cf_clientphoto as cp order by cp.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByOrgStucture(Session session){
         long version = 0L;
         Query query = session.createSQLQuery(
@@ -2232,6 +2242,15 @@ public class DAOUtils {
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(SpecialDate.class);
         criteria.add(Restrictions.in("org", orgs));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<ClientPhoto> getClientPhotosForFriendlyOrgsSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        Criteria criteria = session.createCriteria(ClientPhoto.class);
+        criteria.createAlias("client", "client");
+        criteria.add(Restrictions.in("client.org", orgs));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
