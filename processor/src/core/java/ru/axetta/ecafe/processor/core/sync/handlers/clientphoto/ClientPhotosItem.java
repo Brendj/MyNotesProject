@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.sync.handlers.clientphoto;
 
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -14,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,9 +43,9 @@ public class ClientPhotosItem {
             if (client == null) {
                 emSetter.setCompositeErrorMessage(String.format("Клиент с ИД=%s не найден", idOfClient));
             } else {
-                Org org = DAOService.getInstance().findOrById(orgOwner);
-                if(!org.getFriendlyOrg().contains(client.getOrg())){
-                    emSetter.setCompositeErrorMessage(String.format("Клиент не принадлежит организации", idOfClient));
+                List<Long> orgsIds = DAOService.getInstance().findFriendlyOrgsIds(orgOwner);
+                if(!orgsIds.contains(client.getOrg().getIdOfOrg())){
+                    emSetter.setCompositeErrorMessage(String.format("Клиент с ИД=%s не принадлежит организации", idOfClient));
                 }
             }
 

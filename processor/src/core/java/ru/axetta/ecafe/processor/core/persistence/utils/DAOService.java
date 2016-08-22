@@ -455,6 +455,16 @@ public class DAOService {
         return entityManager.find(Org.class, idOfOrg);
     }
 
+    public List<Long> findFriendlyOrgsIds(long idOfOrg) {
+        List<Long> ids = new ArrayList<Long>();
+        Session session = entityManager.unwrap(Session.class);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        for(Org org1 : org.getFriendlyOrg()) {
+            ids.add(org1.getIdOfOrg());
+        }
+        return ids;
+    }
+
     public ReportInfo findReportInfoById(long idOfReportInfo) {
         return entityManager.find(ReportInfo.class, idOfReportInfo);
     }
