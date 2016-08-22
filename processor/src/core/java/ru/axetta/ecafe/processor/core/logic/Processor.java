@@ -862,11 +862,28 @@ public class Processor implements SyncProcessor {
 
     private void fullProcessingAccountsRegistry(SyncRequest request, List<AbstractToElement> responseSections) {
         try {
-            SectionRequest requestSection = request.findSection(AccountsRegistryRequest.class);
+            AccountsRegistryRequest requestSection = request.findSection(AccountsRegistryRequest.class);
             if (requestSection != null) {
-                ProcessorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNTS_REGISTRY);
-                AccountsRegistry accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class).handlerFull(request, request.getIdOfOrg());
-                addToResponseSections(accountsRegistry, responseSections);
+                AccountsRegistryHandler accountsRegistryHandler = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class);
+                AccountsRegistry result = null;
+                switch (requestSection.getContentType()) {
+                    case ForAll: {
+                        ProcessorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(),
+                                SectionType.ACCOUNTS_REGISTRY);
+                        result = accountsRegistryHandler.handlerFull(request, request.getIdOfOrg());
+                        break;
+                    }
+                    case ForCardsAndClients: {
+                        result = accountsRegistryHandler.accRegistryUpdateHandler(request);
+                        break;
+                    }
+                    case ForMigrants: {
+                        result = accountsRegistryHandler.handlerMigrants(request.getIdOfOrg());
+                    }
+                }
+                if (result != null) {
+                    addToResponseSections(result, responseSections);
+                }
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
