@@ -12,8 +12,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.Categor
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
@@ -2692,8 +2692,8 @@ public class SyncRequest {
         return this.<Migrants>findSection(Migrants.class);
     }
 
-    public ClientPhotos getClientPhotos() {
-        return this.<ClientPhotos>findSection(ClientPhotos.class);
+    public ClientsPhotos getClientPhotos() {
+        return this.<ClientsPhotos>findSection(ClientsPhotos.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

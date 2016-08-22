@@ -18,15 +18,15 @@ import java.util.List;
  * Date: 13.04.16
  * Time: 10:27
  */
-public class ClientPhotos implements SectionRequest {
-    public static final String SECTION_NAME = "ClientPhotos";
+public class ClientsPhotos implements SectionRequest {
+    public static final String SECTION_NAME = "ClientsPhotos";
 
     private final List<ClientPhotosItem> items;
     private final Long maxVersion;
     private final Long idOfOrgOwner;
     private final Integer syncPhotoCount;
 
-    public ClientPhotos(Node clientPhotoRequestNode, Long orgOwner) {
+    public ClientsPhotos(Node clientPhotoRequestNode, Long orgOwner) {
         maxVersion = XMLUtils.getLongAttributeValue(clientPhotoRequestNode, "V");
         syncPhotoCount = XMLUtils.getIntegerAttributeValue(clientPhotoRequestNode, "SyncPhotoCount");
         this.items = new ArrayList<ClientPhotosItem>();

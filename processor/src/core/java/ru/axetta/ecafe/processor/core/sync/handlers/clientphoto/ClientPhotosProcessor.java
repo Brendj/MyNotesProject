@@ -27,10 +27,10 @@ import java.util.List;
 
 public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
     private static final Logger logger = LoggerFactory.getLogger(ClientPhotosProcessor.class);
-    private final ClientPhotos clientPhotos;
+    private final ClientsPhotos clientPhotos;
     private final List<ResClientPhotosItem> resClientPhotosItems;
 
-    public ClientPhotosProcessor(Session persistenceSession, ClientPhotos clientPhotos) {
+    public ClientPhotosProcessor(Session persistenceSession, ClientsPhotos clientPhotos) {
         super(persistenceSession);
         this.clientPhotos = clientPhotos;
         resClientPhotosItems = new ArrayList<ResClientPhotosItem>();
@@ -42,8 +42,8 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
         List<ResClientPhotosItem> items = new ArrayList<ResClientPhotosItem>();
         try {
             ResClientPhotosItem resItem;
-            Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
             for(ClientPhotosItem item : clientPhotos.getItems()){
+                Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
                 if(item.getResCode().equals(ClientPhotosItem.ERROR_CODE_ALL_OK)){
                     Client client = (Client) session.load(Client.class, item.getIdOfClient());
                     ClientPhoto clientPhoto = client.getPhoto();

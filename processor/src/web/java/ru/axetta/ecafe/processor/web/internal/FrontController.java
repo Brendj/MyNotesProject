@@ -1314,6 +1314,8 @@ public class FrontController extends HttpServlet {
                             client.getPhoto().setIsCanceled(false);
                             client.getPhoto().setIsApproved(true);
                             client.getPhoto().setLastProceedError(null);
+                            Long nextVersion = DAOUtils.nextVersionByClientPhoto(persistenceSession);
+                            client.getPhoto().setVersion(nextVersion);
                             persistenceSession.update(client.getPhoto());
                         } catch (IOException e){
                             logger.error(e.getMessage(), e);
@@ -1343,6 +1345,7 @@ public class FrontController extends HttpServlet {
                         }
                     }
                 }
+                persistenceSession.flush();
             }
 
             persistenceTransaction.commit();

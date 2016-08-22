@@ -28,9 +28,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientG
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientgroupManagerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientgroupManagersProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ResClientgroupManagers;
-import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosData;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ResClientPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
@@ -913,7 +913,7 @@ public class Processor implements SyncProcessor {
     private void fullProcessingClientPhotos(SyncRequest request, SyncHistory syncHistory,
             List<AbstractToElement> responseSections) {
         try {
-            ClientPhotos clientPhotosRequest = request.getClientPhotos();
+            ClientsPhotos clientPhotosRequest = request.getClientPhotos();
             if (clientPhotosRequest != null) {
                 ClientPhotosData clientPhotosData = processClientPhotosData(clientPhotosRequest);
                 addToResponseSections(clientPhotosData, responseSections);
@@ -2668,7 +2668,7 @@ public class Processor implements SyncProcessor {
         return clients;
     }
 
-    private ClientPhotosData processClientPhotosData(ClientPhotos clientPhotos) throws Exception {
+    private ClientPhotosData processClientPhotosData(ClientsPhotos clientPhotos) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ClientPhotosData clientPhotosData = null;
@@ -2686,7 +2686,7 @@ public class Processor implements SyncProcessor {
         return clientPhotosData;
     }
 
-    private ResClientPhotos processClientPhotos(ClientPhotos clientPhotos) throws Exception {
+    private ResClientPhotos processClientPhotos(ClientsPhotos clientPhotos) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ResClientPhotos resClientPhotos = null;

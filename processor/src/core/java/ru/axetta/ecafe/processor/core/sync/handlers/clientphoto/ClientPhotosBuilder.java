@@ -23,16 +23,16 @@ public class ClientPhotosBuilder implements SectionRequestBuilder {
         this.idOfOrg = idOfOrg;
     }
 
-    public ClientPhotos build(Node envelopeNode) throws Exception {
+    public ClientsPhotos build(Node envelopeNode) throws Exception {
         SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
-        return sectionRequest != null ? (ClientPhotos) sectionRequest : null;
+        return sectionRequest != null ? (ClientsPhotos) sectionRequest : null;
     }
 
     @Override
     public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
-        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ClientPhotos.SECTION_NAME);
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ClientsPhotos.SECTION_NAME);
         if (sectionElement != null) {
-            return new ClientPhotos(sectionElement, idOfOrg);
+            return new ClientsPhotos(sectionElement, idOfOrg);
         } else
             return null;
     }

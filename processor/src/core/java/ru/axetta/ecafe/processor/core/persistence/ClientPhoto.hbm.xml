@@ -19,7 +19,7 @@
         <property name="isApproved" column="isapproved" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <many-to-one name="guardian" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idofclientguardian"/>
         <property name="lastProceedError" column="lastproceederror" type="string"/>
-        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="version" column="version" type="long"/>
     </class>
 </hibernate-mapping>
 

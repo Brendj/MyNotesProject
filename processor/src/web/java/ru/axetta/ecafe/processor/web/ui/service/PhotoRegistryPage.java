@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPhoto;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -178,13 +179,16 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
         try {
             int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), ImageUtils.ImageSize.SMALL.getValue(), true);
             if(currentPhotoHash == item.getNewPhotoHash()) {
+                Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
                 ImageUtils.moveImage(item.getClientPhoto().getClient());
                 item.getClientPhoto().setIsNew(false);
                 item.getClientPhoto().setIsCanceled(false);
                 item.getClientPhoto().setIsApproved(true);
                 item.getClientPhoto().setLastProceedError(null);
+                item.getClientPhoto().setVersion(nextVersion);
                 session.update(item.getClientPhoto());
                 result = true;
+                session.flush();
             } else {
                 item.getClientPhoto().setLastProceedError("Фото-расхождение было изменено во время сверки");
                 session.update(item.getClientPhoto());
