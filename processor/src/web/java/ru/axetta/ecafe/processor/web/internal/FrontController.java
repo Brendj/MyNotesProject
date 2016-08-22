@@ -1276,8 +1276,13 @@ public class FrontController extends HttpServlet {
             for(ClientPhoto clientPhoto : clientPhotos){
                 ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
                         ImageUtils.ImageSize.SMALL.getValue(), true);
+                Client guardian = clientPhoto.getGuardian();
+                String guardianName = null;
+                if(guardian != null){
+                    guardianName = guardian.getPerson().getFullName();
+                }
                 ClilentPhotoChangeItem item = new ClilentPhotoChangeItem(clientPhoto.getIdOfClient(), photoContent.getBytes(),
-                        photoContent.getHash(), clientPhoto.getLastProceedError(), clientPhoto.getGuardian().getPerson().getFullName());
+                        photoContent.getHash(), clientPhoto.getLastProceedError(),guardianName);
                 results.add(item);
             }
 
@@ -1319,7 +1324,7 @@ public class FrontController extends HttpServlet {
                             persistenceSession.update(client.getPhoto());
                         } catch (IOException e){
                             logger.error(e.getMessage(), e);
-                            String error = "Не удалось принять фото-расхождение: " + e.getMessage();
+                            String error = "Не удалось принять фото-расхождение. Обратитесь к администратору сервера: " + e.getMessage();
                             if(error.length() > 256){
                                 error = error.substring(0, 256);
                             }
@@ -1335,7 +1340,7 @@ public class FrontController extends HttpServlet {
                     if(result.getSrc() == currentPhotoHash){
                         boolean deleted = ImageUtils.deleteImage(client, true);
                         if (!deleted) {
-                            client.getPhoto().setLastProceedError("Не удалось удалить фото-расхождение");
+                            client.getPhoto().setLastProceedError("Не удалось удалить фото-расхождение. Обратитесь к администратору сервера.");
                             persistenceSession.update(client.getPhoto());
                         } else {
                             client.getPhoto().setIsNew(false);

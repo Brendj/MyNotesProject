@@ -314,7 +314,12 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
             this.idOfClient = clientPhoto.getClient().getIdOfClient();
             this.client = clientPhoto.getClient();
             this.fullName = clientPhoto.getClient().getPerson().getFullName();
-            this.guardianName = clientPhoto.getGuardian().getPerson().getFullName();
+            Client guardian = clientPhoto.getGuardian();
+            String guardianName = "";
+            if(guardian != null){
+                guardianName = guardian.getPerson().getFullName();
+            }
+            this.guardianName = guardianName;
             this.error = clientPhoto.getLastProceedError();
             try {
                 ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),

@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -89,8 +91,8 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
                     resItem.setErrorMessage(item.getErrorMessage());
                 }
                 items.add(resItem);
+                session.flush();
             }
-            session.flush();
         } catch (Exception e) {
             logger.error("Error saving ClientPhotos:", e);
             return null;
@@ -106,14 +108,21 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
         ResClientPhotosItem resItem;
         List<ClientPhoto> list = DAOUtils.getClientPhotosForFriendlyOrgsSinceVersion(session,
                 clientPhotos.getIdOfOrgOwner(), clientPhotos.getMaxVersion());
-        Long maxVersion = clientPhotos.getMaxVersion() + clientPhotos.getSyncPhotoCount();
+        Collections.sort(list, new Comparator<ClientPhoto>() {
+
+            public int compare(ClientPhoto cp1, ClientPhoto cp2) {
+                return cp1.getVersion().compareTo(cp2.getVersion());
+            }
+        });
+        int count = 1;
         for(ClientPhoto cp : list){
-            if(cp.getVersion() > maxVersion){
-                continue;
+            if(count > clientPhotos.getSyncPhotoCount()){
+                break;
             }
             resItem = new ResClientPhotosItem(cp);
             resItem.setImageData(ImageUtils.getPhotoString(cp.getClient(), ImageUtils.ImageSize.MEDIUM.getValue(), false));
             items.add(resItem);
+            count++;
         }
 
         result.setItems(items);
