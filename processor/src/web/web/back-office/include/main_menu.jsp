@@ -721,6 +721,9 @@
     <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
                         label="Переименование отчетов репозитория" action="#{repositoryReportsRenamePage.show}" reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="loadRegistryFromFileMenuItem" binding="#{mainPage.registryLoadPage.mainMenuComponent}"
+                        label="Обработать параметры клиентов из файлов" action="#{mainPage.showRegistryLoadPage}" reRender="workspaceForm" />
+
     <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
     <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
                         action="#{otherActionsPage.show}" reRender="workspaceForm"

@@ -236,6 +236,7 @@ public class MainPage implements Serializable {
     private final GroupControlBenefitsPage groupControlBenefitsPage = new GroupControlBenefitsPage();
     private final CancelCategoryBenefitsPage cancelCategoryBenefitsPage = new CancelCategoryBenefitsPage();
     private final SyncStatsPage syncStatsPage = new SyncStatsPage();
+    private final RegistryLoadPage registryLoadPage = new RegistryLoadPage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -3240,6 +3241,10 @@ public class MainPage implements Serializable {
         return "showNewCardLoadResultCSVList";
     }
 
+    public String showRegistryLoadResultCSVList() {
+        return "showRegistryLoadResultCSVList";
+    }
+
     public Long getSelectedIdOfCard() {
         return selectedIdOfCard;
     }
@@ -4251,6 +4256,37 @@ public class MainPage implements Serializable {
         } finally {
             close(inputStream);
         }
+    }
+
+    public RegistryLoadPage getRegistryLoadPage() {
+        return registryLoadPage;
+    }
+
+    public Object showRegistryLoadPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            registryLoadPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = registryLoadPage;
+        } catch (Exception e) {
+            logger.error("Failed to show registry file load page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы загрузки параметров клиентов из файла: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        updateSelectedMainMenu();
+        return null;
     }
 
     public BasicWorkspacePage getCcAccountGroupPage() {

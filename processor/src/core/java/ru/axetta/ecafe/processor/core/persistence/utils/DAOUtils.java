@@ -115,6 +115,14 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static Client findClientByGuid(Session persistenceSession, String guid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("clientGUID", guid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
     public static List<Client> findClientBySan(Session persistenceSession, String san) {
         Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
         clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));

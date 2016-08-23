@@ -166,7 +166,7 @@ public class ClientDao extends WritableJpaDao {
         return result;
     }
 
-    private List<ClientGuardian> getGuardians(Session session, Long idOfClient) {
+    public List<ClientGuardian> getGuardians(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
         //criteria.add(Restrictions.eq("disabled", false));
