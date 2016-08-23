@@ -297,20 +297,36 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                     }
 
                     if(client != null) {
-                        String firstName = parameters[8];
-                        String surname = parameters[9];
-                        String secondName = parameters[10];
+                        String surname = null;
+                        if(parameters.length > 8){
+                            surname = parameters[8];
+                        }
+                        String firstName = null;
+                        if(parameters.length > 9){
+                            firstName = parameters[9];
+                        }
+                        String secondName = null;
+                        if(parameters.length > 10){
+                            secondName = parameters[10];
+                        }
 
-                        String relation = parameters[11];
-                        String phone = Client.checkAndConvertMobile(parameters[12]);
-                        String email = "";
+                        String relation = null;
+                        if(parameters.length > 11){
+                            relation = parameters[11];
+                        }
+
+                        String phone = null;
+                        if(parameters.length > 12){
+                            phone = Client.checkAndConvertMobile(parameters[12]);
+                        }
+                        String email = null;
                         if(parameters.length > 13){
                             email = parameters[13];
                         }
 
                         boolean c = false;
                         if(guardians.size() > 0) {
-                            if (phone != null || !phone.isEmpty()) {
+                            if (phone != null && !phone.isEmpty()) {
                                 for (Client g : guardians) {
                                     if (phone.equals(g.getPhone())) {
                                         LineResult result = new LineResult(currentLineNo, 130, "Представитель найден по телефонному номеру",
@@ -321,7 +337,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                                     }
                                 }
                             }
-                            if (email != null || !email.isEmpty()) {
+                            if (email != null && !email.isEmpty()) {
                                 for (Client g : guardians) {
                                     if (email.equalsIgnoreCase(g.getEmail())) {
                                         LineResult result = new LineResult(currentLineNo, 140, "Представитель найден по электронной почте",
@@ -408,7 +424,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         boolean goodConId = false;
         long contractId = 0L;
         while (!goodConId) {
-            contractId = runtimeContext.getClientContractIdGenerator().generate(org.getIdOfOrg());
+            contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(org.getIdOfOrg(), persistenceSession);
             Client byConId = DAOUtils.findClientByContractId(persistenceSession, contractId);
             if(byConId == null){
                 goodConId = true;
