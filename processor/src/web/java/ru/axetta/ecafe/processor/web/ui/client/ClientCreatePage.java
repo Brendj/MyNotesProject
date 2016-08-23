@@ -523,7 +523,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
-            this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
+            this.contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(this.org.getIdOfOrg(), persistenceSession);
         }
 
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);

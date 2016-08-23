@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 /**
  * Created by IntelliJ IDEA.
@@ -64,23 +63,6 @@ public class ContractIdGenerator {
             newClientContractId = addLastDigitByLuhn(idOfOrg * 10000 + lastClientContractId);
         }
         return newClientContractId;
-    }
-
-    public long generate(long idOfOrg) throws Exception {
-        Transaction transaction = null;
-        Session session = sessionFactory.openSession();
-        try {
-            transaction = session.beginTransaction();
-
-            long newClientContractId =generateTransactionFree (idOfOrg, session);
-
-            transaction.commit();
-            transaction = null;
-            return newClientContractId;
-        } finally {
-            //HibernateUtils.rollback(transaction, logger);
-            //HibernateUtils.close(session, logger);
-        }
     }
 
     public static long addLastDigitByLuhn(long value) {
