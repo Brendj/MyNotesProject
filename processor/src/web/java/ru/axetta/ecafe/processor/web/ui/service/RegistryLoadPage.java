@@ -20,10 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -154,28 +151,45 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             printError("В названии файлов допускаются только числа");
             return;
         }
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
+
         List<LineResult> lineResults = new ArrayList<LineResult>();
 
-        try {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
+        if(parameter == 1) {
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
 
-            if(parameter == 1) {
+            try {
+                RuntimeContext runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
                 processClients(persistenceSession, path, lastFile, firstFile, lineResults);
-            }
-            if(parameter == 2) {
-                processGuardians(persistenceSession, path, lastFile, firstFile, lineResults);
-            }
 
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
         }
+
+        if(parameter == 2) {
+
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+
+            try {
+                RuntimeContext runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+
+                processGuardians(persistenceSession, persistenceTransaction, path, lastFile, firstFile, lineResults);
+
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+
         this.lineResults = lineResults;
         printMessage("Обработка параметров завершена");
     }
@@ -264,7 +278,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         }
     }
 
-    private void processGuardians(Session persistenceSession, String path, Long lastFile, Long firstFile,
+    private void processGuardians(Session persistenceSession, Transaction persistenceTransaction, String path, Long lastFile, Long firstFile,
             List<LineResult> lineResults) {
         BufferedReader br = null;
         String line;
@@ -374,7 +388,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                         }
 
                         try {
-                            Long idOfGuardian = createGuardian(persistenceSession, client, firstName, surname,
+                            Long idOfGuardian = createGuardian(persistenceSession, persistenceTransaction, client, firstName, surname,
                                     secondName, phone, email, relation);
                             LineResult result = new LineResult(currentLineNo, 100, "Создан новый представитель ИД=" + idOfGuardian,
                                     client.getIdOfClient());
@@ -391,7 +405,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                                 + " не найден", null);
                         lineResults.add(result);
                     }
-                    if(lineNo % 100 == 0){
+                    if(lineNo % 30 == 0){
                         this.lineResultsSize = lineResults.size();
                     }
                 }
@@ -421,8 +435,12 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         return result;
     }
 
-    private Long createGuardian(Session persistenceSession, Client client, String firstName, String surname,
+    private Long createGuardian(Session persistenceSession, Transaction persistenceTransaction,
+            Client client, String firstName, String surname,
             String secondName, String phone, String email, String relation) throws Exception{
+
+        persistenceTransaction = persistenceSession.beginTransaction();
+
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
         Org org = client.getOrg();
         boolean goodConId = false;
@@ -451,14 +469,19 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
         Date date = new Date();
 
-        Client guardian = new Client(org, person, contractPerson, 0, false, false, false,
-                contractId, date, 0, "" + contractId, 0,
+        Client guardian = new Client(org, person, contractPerson, 0, client.isNotifyViaEmail(), client.isNotifyViaSMS(),
+                client.isNotifyViaPUSH(), contractId, date, 0, "" + contractId, 0,
                 clientRegistryVersion, limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 
         guardian.setMobile(phone);
         guardian.setAddress("");
         guardian.setEmail(email);
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
+        Set<ClientNotificationSetting> set = new HashSet<ClientNotificationSetting>();
+        for(ClientNotificationSetting setting : client.getNotificationSettings()){
+            set.add(new ClientNotificationSetting(guardian, setting.getNotifyType()));
+        }
+        guardian.setNotificationSettings(set);
         persistenceSession.persist(guardian);
 
         ClientMigration clientMigration = new ClientMigration(guardian, org, date);
@@ -477,6 +500,9 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
         persistenceSession.persist(clientGuardian);
+
+        persistenceTransaction.commit();
+        persistenceTransaction = null;
 
         return guardian.getIdOfClient();
     }
