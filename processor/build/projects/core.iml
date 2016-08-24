@@ -143,6 +143,7 @@
     <orderEntry type="library" scope="PROVIDED" name="guava" level="project" />
     <orderEntry type="library" name="infinispan-core-5.1.2.FINAL" level="project" />
     <orderEntry type="library" name="xades" level="project" />
+    <orderEntry type="library" name="jboss-vfs-3.1.0.Final1" level="project" />
   </component>
 </module>
 
