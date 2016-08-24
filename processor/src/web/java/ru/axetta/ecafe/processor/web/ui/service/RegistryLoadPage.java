@@ -20,7 +20,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -333,9 +336,21 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                             relation = parameters[11];
                         }
 
-                        String phone = null;
+                        String[] phones = null;
                         if(parameters.length > 12){
-                            phone = Client.checkAndConvertMobile(parameters[12]);
+                            phones = parameters[12].split(",");
+                            for(int j = 0; j < phones.length; j++){
+                                String s = Client.checkAndConvertMobile(phones[j]);
+                                if(s != null && !s.isEmpty()) {
+                                    if (s.charAt(1) == '9') {
+                                        phones[j] = s;
+                                    } else {
+                                        phones[j] = null;
+                                    }
+                                } else {
+                                    phones[j] = null;
+                                }
+                            }
                         }
                         String email = null;
                         if(parameters.length > 13){
@@ -344,13 +359,18 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
                         boolean c = false;
                         if(guardians.size() > 0) {
-                            if (phone != null && !phone.isEmpty()) {
+                            if (phones != null && (phones.length > 0)) {
                                 for (Client g : guardians) {
-                                    if (phone.equals(g.getPhone())) {
-                                        LineResult result = new LineResult(currentLineNo, 130, "Представитель найден по телефонному номеру",
-                                                client.getIdOfClient());
-                                        lineResults.add(result);
-                                        c = true;
+                                    for(String phone : phones) {
+                                        if (phone != null && (phone.equals(g.getPhone()) || phone.equals(g.getMobile()))) {
+                                            LineResult result = new LineResult(currentLineNo, 130,
+                                                    "Представитель найден по телефонному номеру", client.getIdOfClient());
+                                            lineResults.add(result);
+                                            c = true;
+                                            break;
+                                        }
+                                    }
+                                    if(c){
                                         break;
                                     }
                                 }
@@ -389,7 +409,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
                         try {
                             Long idOfGuardian = createGuardian(persistenceSession, persistenceTransaction, client, firstName, surname,
-                                    secondName, phone, email, relation);
+                                    secondName, phones, email, relation);
                             LineResult result = new LineResult(currentLineNo, 100, "Создан новый представитель ИД=" + idOfGuardian,
                                     client.getIdOfClient());
                             lineResults.add(result);
@@ -437,7 +457,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
     private Long createGuardian(Session persistenceSession, Transaction persistenceTransaction,
             Client client, String firstName, String surname,
-            String secondName, String phone, String email, String relation) throws Exception{
+            String secondName, String[] phones, String email, String relation) throws Exception{
 
         persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -473,15 +493,22 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 client.isNotifyViaPUSH(), contractId, date, 0, "" + contractId, 0,
                 clientRegistryVersion, limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 
-        guardian.setMobile(phone);
+        if(phones.length > 0) {
+            for(String phone : phones){
+                if(phone != null){
+                    if(guardian.getMobile() == null){
+                        guardian.setMobile(phone);
+                    } else {
+                        if(guardian.getPhone() == null){
+                            guardian.setPhone(phone);
+                        }
+                    }
+                }
+            }
+        }
         guardian.setAddress("");
         guardian.setEmail(email);
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        Set<ClientNotificationSetting> set = new HashSet<ClientNotificationSetting>();
-        for(ClientNotificationSetting setting : client.getNotificationSettings()){
-            set.add(new ClientNotificationSetting(guardian, setting.getNotifyType()));
-        }
-        guardian.setNotificationSettings(set);
         persistenceSession.persist(guardian);
 
         ClientMigration clientMigration = new ClientMigration(guardian, org, date);
