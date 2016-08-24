@@ -2373,6 +2373,16 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sync.emulatorOn", "0").equals("1")) {
+            try {
+                correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
+            } catch (Exception e) {
+                String message = String
+                        .format("Failed to process numbers of Orders and EnterEvent, IdOfOrg == %s", request.getIdOfOrg());
+                logger.error(message, e);
+            }
+        }
+
         updateOrgSyncDate(request.getIdOfOrg());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),

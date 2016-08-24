@@ -11,18 +11,23 @@ import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.ClientCount;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +48,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClie
 @Repository
 public class ClientDao extends WritableJpaDao {
     public static final String UNKNOWN_PERSON_DATA = "Не заполнено";
+    private static final Logger logger = LoggerFactory.getLogger(ClientDao.class);
 
     public static ClientDao getInstance() {
         return RuntimeContext.getAppContext().getBean(ClientDao.class);
@@ -104,69 +110,76 @@ public class ClientDao extends WritableJpaDao {
         return (String) criteria.uniqueResult();
     }
 
-    @Transactional
     public int runGenerateGuardians(List idOfOrgs) throws Exception {
         int result = 0;
-        Session session = entityManager.unwrap(Session.class);
-        //Получаем клиентов, у которых указан телефон или мейл
-        String squery = "select c.idOfClient, c.idOfOrg, c.idOfClientGroup, c.mobile, c.email, c.contractId, c.notifyViaSMS, c.notifyViaEmail, c.notifyViaPUSH, c.ssoid, "
-                + "(select count(idofclientguardian) from cf_client_guardian cg where cg.idofchildren = c.idofclient) as guardCount "
-                + "from cf_clients c "
-                + "where "
-                + (idOfOrgs == null ? "" : "c.idOfOrg in :orgs and "
-                + "c.idOfClientGroup not between 1100000000 and 1100000080 and ")
-                + "((c.mobile is not null and c.mobile <> '') or (c.email is not null and c.email <> ''))";
-        SQLQuery query = session.createSQLQuery(squery);
-        if (idOfOrgs != null) {
-            query.setParameterList("orgs", idOfOrgs);
-        }
-        query.addScalar("idOfClient", new LongType());
-        query.addScalar("idOfOrg", new LongType());
-        query.addScalar("idOfClientGroup", new LongType());
-        query.addScalar("mobile", new StringType());
-        query.addScalar("email", new StringType());
-        query.addScalar("contractId", new LongType());
-        query.addScalar("notifyViaSMS", new IntegerType());
-        query.addScalar("notifyViaEmail", new IntegerType());
-        query.addScalar("notifyViaPUSH", new IntegerType());
-        query.addScalar("ssoid", new StringType());
-        query.addScalar("guardCount", new LongType());
-        query.setResultTransformer(Transformers.aliasToBean(ClientContactInfo.class));
-        List<ClientContactInfo> clients = query.list();
-        for (ClientContactInfo ccInfo : clients) {
-            boolean doGenerate = false;
-            if (ccInfo.getGuardCount() == 0) {
-                //опекунов нет, надо сгенерить
-                doGenerate = true;
-            } else {
-                List<ClientGuardian> guardians = getGuardians(session, ccInfo.getIdOfClient());
-                boolean mobileFound = false;
-                for (ClientGuardian cg : guardians) {
-                    Client guardian = (Client)session.load(Client.class, cg.getIdOfGuardian());
-                    if (PhoneNumberCanonicalizator.canonicalize(guardian.getMobile()).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
-                        //хотя бы у одного опекуна найден номер мобильного ребенка - очищаем контактные данные у ребенка
-                        mobileFound = true;
-                        Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
-                        clearClientContacts(child);
-                        session.save(child);
-                        break;
+        Transaction transaction = null;
+        Session session = RuntimeContext.getInstance().createPersistenceSession();
+        try {
+            transaction = session.beginTransaction();
+            //Получаем клиентов, у которых указан телефон или мейл
+            String squery = "select c.idOfClient, c.idOfOrg, c.idOfClientGroup, c.mobile, c.email, c.contractId, c.notifyViaSMS, c.notifyViaEmail, c.notifyViaPUSH, c.ssoid, "
+                    + "(select count(idofclientguardian) from cf_client_guardian cg where cg.idofchildren = c.idofclient) as guardCount "
+                    + "from cf_clients c "
+                    + "where "
+                    + (idOfOrgs == null ? "" : "c.idOfOrg in :orgs and "
+                    + "c.idOfClientGroup not between 1100000000 and 1100000080 and ")
+                    + "((c.mobile is not null and c.mobile <> '') or (c.email is not null and c.email <> ''))";
+            SQLQuery query = session.createSQLQuery(squery);
+            if (idOfOrgs != null) {
+                query.setParameterList("orgs", idOfOrgs);
+            }
+            query.addScalar("idOfClient", new LongType());
+            query.addScalar("idOfOrg", new LongType());
+            query.addScalar("idOfClientGroup", new LongType());
+            query.addScalar("mobile", new StringType());
+            query.addScalar("email", new StringType());
+            query.addScalar("contractId", new LongType());
+            query.addScalar("notifyViaSMS", new IntegerType());
+            query.addScalar("notifyViaEmail", new IntegerType());
+            query.addScalar("notifyViaPUSH", new IntegerType());
+            query.addScalar("ssoid", new StringType());
+            query.addScalar("guardCount", new LongType());
+            query.setResultTransformer(Transformers.aliasToBean(ClientContactInfo.class));
+            List<ClientContactInfo> clients = query.list();
+            for (ClientContactInfo ccInfo : clients) {
+                boolean doGenerate = false;
+                if (ccInfo.getGuardCount() == 0) {
+                    //опекунов нет, надо сгенерить
+                    doGenerate = true;
+                } else {
+                    List<ClientGuardian> guardians = getGuardians(session, ccInfo.getIdOfClient());
+                    boolean mobileFound = false;
+                    for (ClientGuardian cg : guardians) {
+                        Client guardian = (Client)session.load(Client.class, cg.getIdOfGuardian());
+                        if (PhoneNumberCanonicalizator.canonicalize(guardian.getMobile()).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
+                            //хотя бы у одного опекуна найден номер мобильного ребенка - очищаем контактные данные у ребенка
+                            mobileFound = true;
+                            Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
+                            clearClientContacts(child, session);
+                            session.save(child);
+                            break;
+                        }
+                    }
+                    if (!mobileFound) {
+                        doGenerate = true;
                     }
                 }
-                if (!mobileFound) {
-                    doGenerate = true;
+                if (doGenerate) {
+                    createParentAndGuardianship(session, ccInfo);
+                    result++;
                 }
             }
-            if (doGenerate) {
-                createParentAndGuardianship(session, ccInfo);
-                result++;
-            }
+            session.flush();
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-
-        session.flush();
         return result;
     }
 
-    public List<ClientGuardian> getGuardians(Session session, Long idOfClient) {
+    private List<ClientGuardian> getGuardians(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
         //criteria.add(Restrictions.eq("disabled", false));
@@ -185,7 +198,9 @@ public class ClientDao extends WritableJpaDao {
         createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, clientInfo.getNotifyViaEmail());
         createConfig.setValue(ClientManager.FieldId.MOBILE_PHONE, clientInfo.getMobile());
         createConfig.setValue(ClientManager.FieldId.EMAIL, clientInfo.getEmail());
-        createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
+        if (clientInfo.getSsoid() != null) {
+            createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
+        }
         Long id = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
                 (ClientManager.ClientFieldConfig) createConfig, false, session);
 
@@ -195,16 +210,18 @@ public class ClientDao extends WritableJpaDao {
 
         //Очищаем данные клиента (ребенка)
         Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
-        clearClientContacts(client);
+        clearClientContacts(client, session);
         session.update(client);
     }
 
-    private void clearClientContacts(Client client) {
+    private void clearClientContacts(Client client, Session session) throws Exception {
         client.setMobile("");
         client.setEmail("");
         client.setNotifyViaSMS(false);
         client.setNotifyViaPUSH(false);
         client.setNotifyViaEmail(false);
         client.setSsoid("");
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        client.setClientRegistryVersion(clientRegistryVersion);
     }
 }
