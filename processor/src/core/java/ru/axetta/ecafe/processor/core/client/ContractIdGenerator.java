@@ -7,9 +7,13 @@ package ru.axetta.ecafe.processor.core.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,7 +24,7 @@ import org.hibernate.SessionFactory;
  */
 public class ContractIdGenerator {
 
-    //private static final Logger logger = LoggerFactory.getLogger(ContractIdGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ContractIdGenerator.class);
     private static final long MIN_ORDER_ID = 0;
     private static final long MAX_ORDER_ID = 99999;
 
@@ -53,6 +57,23 @@ public class ContractIdGenerator {
         session.update(org);
         session.flush();
         return newClientContractId;
+    }
+
+    public long generate(long idOfOrg) throws Exception {
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            transaction = session.beginTransaction();
+
+            long newClientContractId =generateTransactionFree (idOfOrg, session);
+
+            transaction.commit();
+            transaction = null;
+            return newClientContractId;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     protected static long getNextContractId(long idOfOrg, long lastClientContractId) {

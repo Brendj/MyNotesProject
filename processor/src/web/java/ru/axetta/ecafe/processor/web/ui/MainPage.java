@@ -3558,7 +3558,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            contractBuildPage.generateContractNumber(persistenceSession);
+            contractBuildPage.generateContractNumber();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
