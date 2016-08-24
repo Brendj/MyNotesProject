@@ -288,15 +288,19 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                         continue;
                     }
                     if(parameters[0] == null || parameters[0].isEmpty()){
-                        if(parameters[8].isEmpty()){
+                        if(parameters.length < 9 || parameters[8].isEmpty()){
                             continue;
                         }
                     } else {
+                        if(parameters.length < 9 || parameters[8].isEmpty()){
+                            continue;
+                        }
                         client = DAOUtils.findClientByGuid(persistenceSession, parameters[2]);
-                        guardians = getGuardians(persistenceSession, client);
+                        guardians = new ArrayList<Client>();
                     }
 
                     if(client != null) {
+                        guardians = getGuardians(persistenceSession, client);
                         String surname = null;
                         if(parameters.length > 8){
                             surname = parameters[8];
@@ -422,10 +426,15 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
         Org org = client.getOrg();
         boolean goodConId = false;
-        long contractId = 0L;
+        Long contractId = null;
+        int count = 0;
         while (!goodConId) {
+            if(count == 3){
+                throw new Exception("Не удалось сгенерировать л/с представителя");
+            }
             contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(org.getIdOfOrg(), persistenceSession);
             Client byConId = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            count++;
             if(byConId == null){
                 goodConId = true;
             }
