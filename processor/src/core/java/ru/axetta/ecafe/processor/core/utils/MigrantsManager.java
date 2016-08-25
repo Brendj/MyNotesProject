@@ -47,7 +47,6 @@ public class MigrantsManager {
         if(isOn()){
             closeOverdueMigrants();
         }
-        closeOverdueMigrants();
     }
 
     private void closeOverdueMigrants() throws Exception{
