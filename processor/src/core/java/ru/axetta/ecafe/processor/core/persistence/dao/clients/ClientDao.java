@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.ClientCount;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -35,6 +36,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -115,7 +117,7 @@ public class ClientDao extends WritableJpaDao {
         Transaction transaction = null;
         Session session = RuntimeContext.getInstance().createPersistenceSession();
         try {
-            transaction = session.beginTransaction();
+
             //Получаем клиентов, у которых указан телефон или мейл
             String squery = "select c.idOfClient, c.idOfOrg, c.idOfClientGroup, c.mobile, c.email, c.contractId, c.notifyViaSMS, c.notifyViaEmail, c.notifyViaPUSH, c.ssoid, "
                     + "(select count(idofclientguardian) from cf_client_guardian cg where cg.idofchildren = c.idofclient) as guardCount "
@@ -142,38 +144,42 @@ public class ClientDao extends WritableJpaDao {
             query.setResultTransformer(Transformers.aliasToBean(ClientContactInfo.class));
             List<ClientContactInfo> clients = query.list();
             for (ClientContactInfo ccInfo : clients) {
-                boolean doGenerate = false;
-                if (ccInfo.getGuardCount() == 0) {
-                    //опекунов нет, надо сгенерить
-                    doGenerate = true;
-                } else {
-                    List<ClientGuardian> guardians = getGuardians(session, ccInfo.getIdOfClient());
-                    boolean mobileFound = false;
-                    for (ClientGuardian cg : guardians) {
-                        Client guardian = (Client)session.load(Client.class, cg.getIdOfGuardian());
-                        if (PhoneNumberCanonicalizator.canonicalize(guardian.getMobile()).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
-                            //хотя бы у одного опекуна найден номер мобильного ребенка - очищаем контактные данные у ребенка
-                            mobileFound = true;
-                            Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
-                            clearClientContacts(child, session);
-                            session.save(child);
-                            break;
+                try {
+                    transaction = session.beginTransaction();
+                    boolean doGenerate = false;
+                    if (ccInfo.getGuardCount() == 0) {
+                        //опекунов нет, надо сгенерить
+                        doGenerate = true;
+                    } else {
+                        List<ClientGuardian> guardians = getGuardians(session, ccInfo.getIdOfClient());
+                        boolean mobileFound = false;
+                        for (ClientGuardian cg : guardians) {
+                            Client guardian = (Client)session.load(Client.class, cg.getIdOfGuardian());
+                            if (PhoneNumberCanonicalizator.canonicalize(guardian.getMobile()).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
+                                //хотя бы у одного опекуна найден номер мобильного ребенка - очищаем контактные данные у ребенка
+                                mobileFound = true;
+                                Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
+                                clearClientContacts(child, session);
+                                session.save(child);
+                                break;
+                            }
+                        }
+                        if (!mobileFound) {
+                            doGenerate = true;
                         }
                     }
-                    if (!mobileFound) {
-                        doGenerate = true;
+                    if (doGenerate) {
+                        createParentAndGuardianship(session, ccInfo);
+                        result++;
                     }
-                }
-                if (doGenerate) {
-                    createParentAndGuardianship(session, ccInfo);
-                    result++;
+                    session.flush();
+                    transaction.commit();
+                    transaction = null;
+                } finally {
+                    HibernateUtils.rollback(transaction, logger);
                 }
             }
-            session.flush();
-            transaction.commit();
-            transaction = null;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
         return result;
@@ -204,12 +210,20 @@ public class ClientDao extends WritableJpaDao {
         Long id = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
                 (ClientManager.ClientFieldConfig) createConfig, false, session);
 
+        Client guardian = (Client)session.load(Client.class, id);
+        Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
+        Set<ClientNotificationSetting> set = new HashSet<ClientNotificationSetting>();
+        for(ClientNotificationSetting setting : client.getNotificationSettings()){
+            set.add(new ClientNotificationSetting(guardian, setting.getNotifyType()));
+        }
+        guardian.setNotificationSettings(set);
+        session.save(guardian);
         //Создаем опекунскую связь
         Long version = generateNewClientGuardianVersion(session);
         ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), id, version, false, null);
 
         //Очищаем данные клиента (ребенка)
-        Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
+        //Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
         clearClientContacts(client, session);
         session.update(client);
     }
