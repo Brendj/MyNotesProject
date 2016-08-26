@@ -3499,6 +3499,9 @@ public class Processor implements SyncProcessor {
 
             /* заносим клиента в группу */
                 if (clientParamItem.getGroupName() != null) {
+                    //TODO УБРАТЬ ВРЕМЕННЫЙ ЗАПРЕТ РЕДАКТИРОВАНИЯ ГРУППЫ В СИНХРЕ
+                    if (!(client.getOrg().getDisableEditingClientsFromAISReestr() && ClientGroup.Predefined.parse(clientParamItem.getGroupName()) == null)) {
+
                     ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
                     //если группы нет то создаем
                     if (clientGroup == null) {
@@ -3525,6 +3528,7 @@ public class Processor implements SyncProcessor {
                     }
                     client.setClientGroup(clientGroup);
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    }
                 }
 
                 if (clientParamItem.getIsUseLastEEModeForPlan() != null) {

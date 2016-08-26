@@ -335,8 +335,12 @@ public class SyncRequest {
                 if (paymentRegistryNode == null)
                     return new ClientParamRegistry();
 
+                //TODO - УБРАТЬ ВРЕМЕННОЕ ОГРАНИЧЕНИЕ НА 1000 ЗАПИСЕЙ
                 Node itemNode = paymentRegistryNode.getFirstChild();
                 while (null != itemNode) {
+                    if (items.size() > 1000) {
+                        break;
+                    }
                     if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("CP")) {
                         items.add(itemBuilder.build(itemNode, loadContext));
                     }

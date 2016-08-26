@@ -242,17 +242,18 @@ public class FrontControllerProcessor {
                 return Collections.EMPTY_LIST;
             }
 
-            boolean authPassed = false;
+            //boolean authPassed = false;
             for (Long idOfRegistryChange : changesList) {
-                if(!authPassed) {
+                /*if(!authPassed) {
                     RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(idOfRegistryChange);
                     authPassed = true;
-                }
+                } */
                 try {
                     RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
                     result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
                 } catch (Exception e1) {
                     //if(e1 instanceof ClientAlreadyExistException) {
+                    logger.error("Error sverka: ", e1);
                     RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).setChangeError(
                             idOfRegistryChange, e1);
                     //}

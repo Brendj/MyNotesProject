@@ -471,9 +471,9 @@ public class ClientManager {
 
             client.setUpdateTime(new Date());
 
-            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             client.setClientRegistryVersion(clientRegistryVersion);
-
+            persistenceSession.update(client);
             return client.getIdOfClient();
         } catch (Exception e) {
             logger.error("Ошибка при обновлении данных клиента", e);
@@ -589,7 +589,8 @@ public class ClientManager {
 
         try {
             logger.debug("exist organization");
-            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            Org organization = DAOUtils.findOrgWithPessimisticLock(persistenceSession, idOfOrg);
+            //Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             if (null == organization) {
                 throw new Exception("Организация не найдена: " + idOfOrg);
             }

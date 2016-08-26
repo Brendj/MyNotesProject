@@ -14,10 +14,12 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -951,92 +953,95 @@ public class ImportRegisterClientsService {
         return e;
     }
 
-    @Transactional
+    //@Transactional
     public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
-        RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
         Session session = null;
+        Transaction transaction = null;
         try {
-            session = (Session) em.getDelegate();
-        } catch (Exception e) {
-            logger.error("Failed to craete session", e);
-            throw e;
-        }
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            RegistryChange change = (RegistryChange)session.load(RegistryChange.class, idOfRegistryChange);
 
+            Client dbClient = null;
+            if (change.getIdOfClient() != null) {
+                dbClient = (Client)session.load(Client.class, change.getIdOfClient());
+            }
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            switch (change.getOperation()) {
+                case CREATE_OPERATION:
+                    //  добавление нового клиента
 
-        Client dbClient = null;
-        if (change.getIdOfClient() != null) {
-            dbClient = em.find(Client.class, change.getIdOfClient());
-        }
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        switch (change.getOperation()) {
-            case CREATE_OPERATION:
-                //  добавление нового клиента
-
-                String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
-                FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
-                createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
-                createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
-                createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
-                createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
-                createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
-                createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
-                createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
-                createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
-                Date createDateBirth = new Date(change.getBirthDate());
-                createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
-                long id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
-                        (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
-                change.setIdOfClient(id);
-                break;
-            case DELETE_OPERATION:
-                ClientGroup deletedClientGroup = DAOUtils
-                        .findClientGroupByGroupNameAndIdOfOrg(session, change.getIdOfOrg(),
+                    String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+                    FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
+                    createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                    createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
+                    createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
+                    createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
+                    createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                    createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+                    createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                    createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                    Date createDateBirth = new Date(change.getBirthDate());
+                    createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
+                    createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
+                    long id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
+                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
+                    change.setIdOfClient(id);
+                    break;
+                case DELETE_OPERATION:
+                    ClientGroup deletedClientGroup = DAOUtils
+                            .findClientGroupByGroupNameAndIdOfOrg(session, change.getIdOfOrg(),
+                                    ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                    if (deletedClientGroup == null) {
+                        deletedClientGroup = DAOUtils.createClientGroup(session, change.getIdOfOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                if (deletedClientGroup == null) {
-                    deletedClientGroup = DAOUtils.createClientGroup(session, change.getIdOfOrg(),
-                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                }
-                dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                session.save(dbClient);
-                break;
-            case MOVE_OPERATION:
-                Org newOrg = em.find(Org.class, change.getIdOfMigrateOrgTo());
-                addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
-                dbClient.setOrg(newOrg);
-            case MODIFY_OPERATION:
-                Org newOrg1 = em.find(Org.class, change.getIdOfOrg());
-                if (dbClient.getOrg().getIdOfOrg() == change.getIdOfOrg()) {
-                    addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change); //если орг. не меняется, добавляем историю миграции внутри ОО
-                }
-                String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-                FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
-                modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
-                modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
-                modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
-                modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
-                modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
-                modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
-                Date modifyDateBirth = new Date(change.getBirthDate());
-                modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
-                if (dbClient.getOrg().getIdOfOrg() != change.getIdOfOrg()) {
-                    addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
-                    dbClient.setOrg(newOrg1);
-                }
-                ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
-                        newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
-                        dbClient, session, true);
+                    }
+                    dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    session.save(dbClient);
+                    break;
+                case MOVE_OPERATION:
+                    Org newOrg = (Org)session.load(Org.class, change.getIdOfMigrateOrgTo());
+                    addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
+                    dbClient.setOrg(newOrg);
+                case MODIFY_OPERATION:
+                    Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
+                    if (dbClient.getOrg().getIdOfOrg() == change.getIdOfOrg()) {
+                        addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change); //если орг. не меняется, добавляем историю миграции внутри ОО
+                    }
+                    String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+                    FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
+                    modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                    modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
+                    modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
+                    modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
+                    modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                    modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                    Date modifyDateBirth = new Date(change.getBirthDate());
+                    modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
+                    modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
+                    if (dbClient.getOrg().getIdOfOrg() != change.getIdOfOrg()) {
+                        addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
+                        dbClient.setOrg(newOrg1);
+                    }
+                    ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
+                            newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
+                            dbClient, session, true);
 
-                break;
-            default:
-                logger.error("Unknown update registry change operation " + change.getOperation());
+                    break;
+                default:
+                    logger.error("Unknown update registry change operation " + change.getOperation());
+            }
+            change.setApplied(true);
+            session.update(change);
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        change.setApplied(true);
-        session.update(change);
     }
 
-    @Transactional
+    //@Transactional
     private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
         migration.setComment(ClientMigration.MODIFY_IN_REGISTRY);
@@ -1045,7 +1050,7 @@ public class ImportRegisterClientsService {
         session.save(migration);
     }
 
-    @Transactional
+    //@Transactional
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
         ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
         migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY);
@@ -1068,7 +1073,7 @@ public class ImportRegisterClientsService {
             throw ex;
         }
         String err = e.getMessage();
-        if (err.length() > 255) {
+        if (err != null && err.length() > 255) {
             err = err.substring(0, 255).trim();
         }
         change.setError(err);

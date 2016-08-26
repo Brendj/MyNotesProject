@@ -269,6 +269,18 @@ public class DAOUtils {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
     }
 
+    public static Org findOrgWithPessimisticLock(Session persistenceSession, long idOfOrg) throws Exception {
+        Query query = persistenceSession.createQuery(
+                "from Org o where o.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setLockMode("o", LockMode.PESSIMISTIC_WRITE);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Org) res.get(0);
+        }
+        return null;
+    }
+
     public static Org findOrgByShortname(Session session, String shortname) {
         Query query = session.createQuery(
                 "from Org o where o.shortName=:shortName");
@@ -864,6 +876,25 @@ public class DAOUtils {
         return registry.getClientRegistryVersion();
     }
 
+    public static long updateClientRegistryVersionWithPessimisticLock() throws Exception {
+        Transaction transaction = null;
+        Session session = RuntimeContext.getInstance().createPersistenceSession();
+        try {
+            transaction = session.beginTransaction();
+            Query query = session.createQuery("from Registry r where r.idOfRegistry=:idOfRegistry");
+            query.setParameter("idOfRegistry", Registry.THE_ONLY_INSTANCE_ID);
+            query.setLockMode("r", LockMode.PESSIMISTIC_WRITE);
+            Registry registry = (Registry)query.uniqueResult();
+            registry.setClientRegistryVersion(registry.getClientRegistryVersion() + 1);
+            session.update(registry);
+            transaction.commit();
+            transaction = null;
+            return registry.getClientRegistryVersion();
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
 
     public static Long findMenuExchangeSourceOrg(Session persistenceSession, Long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(MenuExchangeRule.class);
