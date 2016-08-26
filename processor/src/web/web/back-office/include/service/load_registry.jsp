@@ -37,7 +37,7 @@
 
         <h:outputText escape="true" value="Обработка параметров" styleClass="output-text" />
         <h:selectOneRadio value="#{mainPage.registryLoadPage.parameters}" styleClass="input-text">
-            <f:selectItem itemValue="1" itemLabel="Пол и день рождения" />
+            <f:selectItem itemValue="1" itemLabel="Пол и дата рождения" />
             <f:selectItem itemValue="2" itemLabel="Представители" />
         </h:selectOneRadio>
     </h:panelGrid>
