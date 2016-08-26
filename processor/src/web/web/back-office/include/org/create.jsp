@@ -174,6 +174,9 @@
         <f:converter converterId="organizationSecurityLevelConverter"/>
         <f:selectItems value="#{mainPage.orgCreatePage.securityLevels}" />
     </h:selectOneMenu>
+
+    <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.photoRegistry}"  styleClass="input-text"  />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать новую организацию" action="#{mainPage.createOrg}"

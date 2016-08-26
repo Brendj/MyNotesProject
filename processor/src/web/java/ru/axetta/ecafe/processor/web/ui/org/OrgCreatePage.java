@@ -80,6 +80,7 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     private Boolean payByCashier;
     private Boolean oneActiveCard;
+    private Boolean photoRegistry;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -537,6 +538,9 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setRefectoryType(refectoryType);
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
+        PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
+        org.setPhotoRegistryDirective(photoD);
+
         if (this.coSupplier != null && this.coSupplier.getIdOfContragent() != null) {
             Contragent coSupplier = (Contragent) session.load(Contragent.class, this.coSupplier.getIdOfContragent());
             org.setCoSupplier(coSupplier);
@@ -691,5 +695,13 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setOneActiveCard(Boolean oneActiveCard) {
         this.oneActiveCard = oneActiveCard;
+    }
+
+    public Boolean getPhotoRegistry() {
+        return photoRegistry;
+    }
+
+    public void setPhotoRegistry(Boolean photoRegistry) {
+        this.photoRegistry = photoRegistry;
     }
 }

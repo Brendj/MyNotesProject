@@ -237,6 +237,7 @@ public class ImportRegisterOrgsService {
         org.setStatus(OrganizationStatus.PLANNED);
         org.setState(0);
         org.setSecurityLevel(OrganizationSecurityLevel.STANDARD);
+        org.setPhotoRegistryDirective(PhotoRegistryDirective.DISALLOWED);
 
         return org;
     }

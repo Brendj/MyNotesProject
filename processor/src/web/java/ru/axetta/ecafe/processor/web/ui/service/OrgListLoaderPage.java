@@ -302,6 +302,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 }
                 org.getFriendlyOrg().add(org);
                 org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
+                org.setPhotoRegistryDirective(PhotoRegistryDirective.DISALLOWED);
                 session.save(org);
 
                 return new OrgEntry(lineNo, 0, "Ok", org.getIdOfOrg());
