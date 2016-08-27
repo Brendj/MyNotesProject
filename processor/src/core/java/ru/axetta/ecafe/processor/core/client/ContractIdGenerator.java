@@ -61,7 +61,7 @@ public class ContractIdGenerator {
 
     public long generate(long idOfOrg) throws Exception {
         Transaction transaction = null;
-        Session session = sessionFactory.openSession();
+        Session session = RuntimeContext.getInstance().createPersistenceSession();
         try {
             transaction = session.beginTransaction();
 

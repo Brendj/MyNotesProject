@@ -599,6 +599,7 @@ public class Processor implements SyncProcessor {
         }
 
         try {
+            ProcessorUtils.refreshOrg(persistenceSessionFactory, request.getOrg());
             directiveElement = processFullSyncDirective(request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);

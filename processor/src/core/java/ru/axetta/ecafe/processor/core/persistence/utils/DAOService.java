@@ -15,11 +15,13 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
@@ -106,16 +108,12 @@ public class DAOService {
     }
 
     public Long getNextFreeLastClientContractId(long divider, long idOfOrg, long lastClientContractId) {
-        /*String qstr = "SELECT min(num) FROM (SELECT num FROM generate_series(:lastClientContractId, 99999) num\n"
-                + "                EXCEPT\n" + "                SELECT\n" + "        CASE\n"
-                + "                WHEN contractid/:divider > 0 THEN (contractid/:divider)*10000 + (contractid%100000)/10\n"
-                + "        WHEN contractid/:divider = 0 THEN (contractid%100000)/10\n" + "        END AS num\n"
-                + "        FROM cf_clients WHERE (contractid/:divider > 0 AND (contractid%:divider)/100000=:idoforg) OR (contractid/:divider = 0 AND contractid/100000=:idoforg)) AS list";*/
+        //Запрос правильный, не менять.
         String qstr = "SELECT min(num) FROM (SELECT num FROM generate_series(:lastClientContractId, 99999) num\n"
                 + "                EXCEPT\n" + "                SELECT\n" + "        CASE\n"
                 + "                WHEN contractid/:divider > 0 THEN (contractid/:divider)*10000 + (contractid%100000)/10\n"
                 + "        WHEN contractid/:divider = 0 THEN (contractid%100000)/10\n" + "        END AS num\n"
-                + "        FROM cf_clients WHERE (idoforg=:idoforg)) AS list";
+                + "        FROM cf_clients WHERE (contractid/:divider > 0 AND (contractid%:divider)/100000=:idoforg) OR (contractid/:divider = 0 AND contractid/100000=:idoforg)) AS list";
         Query nativeQuery = entityManager.createNativeQuery(qstr);
         nativeQuery.setParameter("lastClientContractId", lastClientContractId);
         nativeQuery.setParameter("divider", divider);
@@ -2231,5 +2229,25 @@ public class DAOService {
         org.setSecurityLevel(securityLevel);
         entityManager.persist(org);
         entityManager.flush();
+    }
+
+    public void setFullSyncByOrg(Long idOfOrg, boolean value) throws Exception {
+        Transaction transaction = null;
+        Session session = RuntimeContext.getInstance().createPersistenceSession();
+        try {
+            transaction = session.beginTransaction();
+            org.hibernate.Query query = session.createQuery("update Org set fullSyncParam=:value where id=:idOfOrg");
+            query.setParameter("idOfOrg",idOfOrg);
+            query.setParameter("value", value);
+            query.executeUpdate();
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("e", e);
+        }
+        finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 }

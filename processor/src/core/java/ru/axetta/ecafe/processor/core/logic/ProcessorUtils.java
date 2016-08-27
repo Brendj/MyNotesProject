@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfLastProcessSectionsDates;
 import ru.axetta.ecafe.processor.core.persistence.LastProcessSectionsDates;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.bk.BKRegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -73,6 +74,22 @@ public class ProcessorUtils {
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Error saving LastProcessSectionDate", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
+    }
+
+    public static void refreshOrg(SessionFactory sessionFactory, Org org){
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = sessionFactory.openSession();
+            persistenceTransaction = session.beginTransaction();
+            session.refresh(org);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);

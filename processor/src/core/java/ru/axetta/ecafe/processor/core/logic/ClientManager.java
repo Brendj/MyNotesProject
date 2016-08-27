@@ -608,7 +608,7 @@ public class ClientManager {
 
             logger.debug("update version");
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-            String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
+            /*String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
             long contractId;
             if (StringUtils.equals(contractIdText, "AUTO")) {
                 logger.debug("generate ContractId");
@@ -616,7 +616,7 @@ public class ClientManager {
                         organization.getIdOfOrg(), persistenceSession);
             } else {
                 contractId = Long.parseLong(contractIdText);
-            }
+            }*/
 
             logger.debug("create contractPerson");
             Person contractPerson = new Person(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_NAME),
@@ -639,10 +639,10 @@ public class ClientManager {
                 limit = CurrencyStringUtils
                         .rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));//tokens[19]);
             }
-            String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);//tokens[1];
+            /*String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);//tokens[1];
             if (password.equals("X")) {
                 password = "" + contractId;
-            }
+            }*/
 
             boolean notifyByEmail = fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_EMAIL);
             boolean notifyBySms = fieldConfig.getValueBool(ClientManager.FieldId.NOTIFY_BY_SMS);
@@ -663,6 +663,21 @@ public class ClientManager {
                 expenditureLimit = CurrencyStringUtils
                         .rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//tokens[19]);
             }
+
+            String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
+            long contractId;
+            if (StringUtils.equals(contractIdText, "AUTO")) {
+                logger.debug("generate ContractId");
+                contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+            } else {
+                contractId = Long.parseLong(contractIdText);
+            }
+
+            String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);//tokens[1];
+            if (password.equals("X")) {
+                password = "" + contractId;
+            }
+
             logger.debug("create client");
             Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms,
                     notifyByPUSH, contractId, contractDate, contractState, password, payForSms, clientRegistryVersion,

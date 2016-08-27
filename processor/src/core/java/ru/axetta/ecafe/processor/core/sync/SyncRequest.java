@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
@@ -339,6 +340,12 @@ public class SyncRequest {
                 Node itemNode = paymentRegistryNode.getFirstChild();
                 while (null != itemNode) {
                     if (items.size() > 1000) {
+                        try {
+                            Node cafeteriaExchangeNode = itemNode.getParentNode().getParentNode();
+                            Long idOfOrg = Long.parseLong(
+                                    cafeteriaExchangeNode.getAttributes().getNamedItem("IdOfOrg").getNodeValue());
+                            DAOService.getInstance().setFullSyncByOrg(idOfOrg, true);
+                        } catch (Exception ignore) {}
                         break;
                     }
                     if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("CP")) {

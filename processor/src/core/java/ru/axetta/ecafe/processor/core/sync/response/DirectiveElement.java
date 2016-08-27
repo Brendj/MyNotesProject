@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
@@ -96,6 +97,12 @@ public class DirectiveElement implements AbstractToElement{
         Integer disableEmailEdit = RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_DISABLE_EMAIL_EDIT);
         directiveItemList.add(new DirectiveItem("DISABLE_EMAIL_EDIT", disableEmailEdit.toString()));
+
+        Boolean fullSync = org.getFullSyncParam();
+        if(fullSync) {
+            directiveItemList.add(new DirectiveItem("FullSync","1"));
+            DAOService.getInstance().setFullSyncByOrg(org.getIdOfOrg(), false);
+        }
     }
 
     public Element toElement(Document document) throws Exception {
