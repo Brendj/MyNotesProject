@@ -62,10 +62,17 @@ public class OrganizationStructure implements AbstractToElement{
             OrganizationStructureItem item = new OrganizationStructureItem(o.getIdOfOrg(), o.getType().ordinal(),
                     o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
-                    o.getConfigurationProvider() != null ? o.getConfigurationProvider()
-                            .getIdOfConfigurationProvider() : null, isFriendly, o.getDistrict(), o.getState(), o.getOrgStructureVersion());
+                    getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(), o.getOrgStructureVersion());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
+    }
+
+    private Long getConfigurationId(Org o) {
+        return o.getConfigurationProvider() != null ? o.getConfigurationProvider().getIdOfConfigurationProvider() : null;
+    }
+
+    private Long getSupplierId(Org o) {
+        return o.getDefaultSupplier() != null ? o.getDefaultSupplier().getIdOfContragent() : null;
     }
 
     private static class OrganizationStructureItem {
@@ -78,13 +85,14 @@ public class OrganizationStructure implements AbstractToElement{
         private final String address;
         private final Boolean useSubscriptionFeeding;
         private final Long configurationId;
+        private final Long defaultSupplier;
         private final Boolean isFriendly;
         private final String nCounty;
         private final Long version;
         private final Integer state;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
-                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId, Boolean isFriendly,
+                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId,Long defaultSupplier, Boolean isFriendly,
                 String nCounty, Integer state, Long version) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
@@ -95,6 +103,7 @@ public class OrganizationStructure implements AbstractToElement{
             this.address = address;
             this.useSubscriptionFeeding = useSubscriptionFeeding;
             this.configurationId = configurationId;
+            this.defaultSupplier = defaultSupplier;
             this.isFriendly = isFriendly;
             this.nCounty = nCounty;
             this.state = state;
@@ -114,6 +123,9 @@ public class OrganizationStructure implements AbstractToElement{
             element.setAttribute("Version", Long.toString(version));
             if (configurationId != null) {
                 element.setAttribute("ConfId", Long.toString(configurationId));
+            }
+            if (defaultSupplier != null) {
+                element.setAttribute("SuplId",Long.toString(defaultSupplier));
             }
             element.setAttribute("Fr", isFriendly ? "1" : "0");
             element.setAttribute("NCounty", nCounty);
