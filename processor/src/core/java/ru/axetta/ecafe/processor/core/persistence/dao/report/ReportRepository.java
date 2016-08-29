@@ -47,7 +47,9 @@ import java.util.*;
 @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
 public class ReportRepository extends BaseJpaDao {
     private final String REPORT_DELIVERED_SERVICES = "DeliveredServicesReport";
-    private final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам";
+    private final String REPORT_DELIVERED_SERVICES_SUBJECT = "Сводный отчет по услугам (электронная сверка)";
+    private final String REPORT_DELIVERED_SERVICES_PRIOR = "DeliveredServicesReportPrior";
+    private final String REPORT_DELIVERED_SERVICES_PRIOR_SUBJECT = "Сводный отчет по услугам (предварительный)";
     private final String REPORT_REGISTER_STAMP = "RegisterStampReport";
     private final String REPORT_REGISTER_STAMP_SUBJECT = "Реестр талонов по льготному питанию";
     private final String REPORT_REGISTER_STAMP_PAID = "RegisterStampPaidReport";
@@ -73,14 +75,17 @@ public class ReportRepository extends BaseJpaDao {
     public byte[] buildReportAndReturnRawDataByType(String reportType, List<ReportParameter> parameters) throws Exception {
         if (reportType.equals(REPORT_DELIVERED_SERVICES)) {
             return getDeliveredServicesElectronicCollationReport(parameters, REPORT_DELIVERED_SERVICES_SUBJECT);
+        } else if (reportType.equals(REPORT_DELIVERED_SERVICES_PRIOR)) {
+            // TODO: 29.08.2016  добавить генерацию сводного отчета по услугам (предварительный)
         } else if (reportType.equals(REPORT_DAILY_SALES_BY_GROUPS_REPORT)) {
             return getDailySalesByGroupsReport(parameters, REPORT_DAILY_SALES_BY_GROUPS_REPORT_SUBJECT);
         } else if (reportType.equals(REPORT_REGISTER_STAMP)) {
-           return getRegisterStampReport(parameters, REPORT_REGISTER_STAMP_SUBJECT);
+            return getRegisterStampReport(parameters, REPORT_REGISTER_STAMP_SUBJECT);
         } else if (reportType.equals(REPORT_REGISTER_STAMP_PAID)) {
             return getRegisterStampPaidReport(parameters, REPORT_REGISTER_STAMP_PAID_SUBJECT);
         } else if (reportType.equals(REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING)) {
-            return getRegisterStampSubscriptionFeedingReport(parameters,REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT);
+            return getRegisterStampSubscriptionFeedingReport(parameters,
+                    REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT);
         }
         return null;
     }
