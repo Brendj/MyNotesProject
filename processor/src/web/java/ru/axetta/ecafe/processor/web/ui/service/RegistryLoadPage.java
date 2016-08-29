@@ -493,21 +493,27 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 client.isNotifyViaPUSH(), contractId, date, 0, "" + contractId, 0,
                 clientRegistryVersion, limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 
-        if(phones.length > 0) {
-            for(String phone : phones){
-                if(phone != null){
-                    if(guardian.getMobile() == null){
-                        guardian.setMobile(phone);
-                    } else {
-                        if(guardian.getPhone() == null){
-                            guardian.setPhone(phone);
+        if(phones != null) {
+            if (phones.length > 0) {
+                for (String phone : phones) {
+                    if (phone != null) {
+                        if (guardian.getMobile() == null) {
+                            guardian.setMobile(phone);
+                        } else {
+                            if (guardian.getPhone() == null) {
+                                guardian.setPhone(phone);
+                            }
                         }
                     }
                 }
             }
         }
+
         guardian.setAddress("");
-        guardian.setEmail(email);
+
+        if(email != null) {
+            guardian.setEmail(email);
+        }
         guardian.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         persistenceSession.persist(guardian);
 
