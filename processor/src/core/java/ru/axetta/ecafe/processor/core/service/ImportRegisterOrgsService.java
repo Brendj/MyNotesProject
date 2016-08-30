@@ -565,7 +565,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setShortName(String shortName) {
-            this.shortName = shortName == null ? null : shortName;
+            this.shortName = shortName == null ? null : solveLength(shortName);
         }
 
         public String getShortNameFrom() {
@@ -573,7 +573,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setShortNameFrom(String shortNameFrom) {
-            this.shortNameFrom = shortNameFrom == null ? null : shortNameFrom;
+            this.shortNameFrom = shortNameFrom == null ? null : solveLength(shortNameFrom);
         }
 
         public String getShortNameSupplierFrom() {
@@ -589,7 +589,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setOfficialName(String officialName) {
-            this.officialName = officialName == null ? null : officialName.trim();
+            this.officialName = officialName == null ? null : solveLength(officialName.trim());
         }
 
         public String getOfficialNameFrom() {
@@ -597,7 +597,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setOfficialNameFrom(String officialNameFrom) {
-            this.officialNameFrom = officialNameFrom == null ? null : officialNameFrom;
+            this.officialNameFrom = officialNameFrom == null ? null : solveLength(officialNameFrom);
         }
 
         public String getAddress() {
@@ -605,7 +605,15 @@ public class ImportRegisterOrgsService {
         }
 
         public void setAddress(String address) {
-            this.address = address == null ? null : address;
+            this.address = address == null ? null : solveLength(address);
+        }
+
+        private String solveLength(String str) {
+            if (str.length() > 255) {
+                return str.substring(0, 255);
+            } else {
+                return str;
+            }
         }
 
         public String getAddressFrom() {
@@ -613,7 +621,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setAddressFrom(String addressFrom) {
-            this.addressFrom = addressFrom == null ? null : addressFrom;
+            this.addressFrom = addressFrom == null ? null : solveLength(addressFrom);
         }
 
         public String getCity() {
@@ -621,7 +629,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setCity(String city) {
-            this.city = city == null ? null : city;
+            this.city = city == null ? null : solveLength(city);
         }
 
         public String getCityFrom() {
@@ -629,7 +637,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setCityFrom(String cityFrom) {
-            this.cityFrom = cityFrom == null ? null : cityFrom;
+            this.cityFrom = cityFrom == null ? null : solveLength(cityFrom);
         }
 
         public String getRegion() {
@@ -637,7 +645,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setRegion(String region) {
-            this.region = region == null ? null : region;
+            this.region = region == null ? null : solveLength(region);
         }
 
         public String getRegionFrom() {
@@ -645,7 +653,7 @@ public class ImportRegisterOrgsService {
         }
 
         public void setRegionFrom(String regionFrom) {
-            this.regionFrom = regionFrom == null ? null : regionFrom;
+            this.regionFrom = regionFrom == null ? null : solveLength(regionFrom);
         }
 
         public Long getUnom() {

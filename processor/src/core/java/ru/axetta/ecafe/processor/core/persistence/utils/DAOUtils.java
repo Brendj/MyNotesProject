@@ -870,14 +870,14 @@ public class DAOUtils {
     }
 
     public static long updateClientRegistryVersion(Session persistenceSession) throws Exception {
-        return updateClientRegistryVersionTransactionForce();
+        return updateClientRegistryVersionWithPessimisticLock();
         /*Registry registry = (Registry) persistenceSession.get(Registry.class, Registry.THE_ONLY_INSTANCE_ID);
         registry.setClientRegistryVersion(registry.getClientRegistryVersion() + 1);
         persistenceSession.update(registry);
         return registry.getClientRegistryVersion();*/
     }
 
-    public static long updateClientRegistryVersionTransactionForce() throws Exception {
+    /*public static long updateClientRegistryVersionTransactionForce() throws Exception {
         Transaction transaction = null;
         Session session = RuntimeContext.getInstance().createPersistenceSession();
         try {
@@ -893,7 +893,7 @@ public class DAOUtils {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-    }
+    }*/
 
     public static long updateClientRegistryVersionWithPessimisticLock() throws Exception {
         Transaction transaction = null;

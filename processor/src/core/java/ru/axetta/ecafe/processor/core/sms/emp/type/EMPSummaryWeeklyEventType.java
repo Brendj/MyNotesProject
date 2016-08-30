@@ -24,7 +24,7 @@ public class EMPSummaryWeeklyEventType extends EMPAbstractEventType {
 
     public EMPSummaryWeeklyEventType() {
         stream = STREAM;
-        type = EMPEventTypeFactory.SUMMARY_DAILY_EVENT;
+        type = EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT;
         name = NAME;
         text = TEXT;
     }
