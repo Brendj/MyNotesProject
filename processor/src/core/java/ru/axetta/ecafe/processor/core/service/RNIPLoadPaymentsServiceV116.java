@@ -262,21 +262,22 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         for(ExportPaymentsResponseType.Payments.PaymentInfo pi : piList) {
             String paymentInfoStr = new String(pi.getPaymentData(), "utf8").replaceAll("(\\r|\\n)", "");
 
-            is.setCharacterStream(new StringReader(paymentInfoStr));
-            Document doc = builderFactory.newDocumentBuilder().parse(is);
-            Map map = parsePayment(doc); //парсим по старому как в формате 1.15
-            if (map.size() > 0) {
+            Map map = null;
+            try {
+                StringReader reader = new StringReader(paymentInfoStr);
+                PaymentType payment = (PaymentType) unmarshaller.unmarshal(reader);
+                map = parsePayment(payment); //парсинг по формату 1.16
+            } catch (Exception e) {
+                logger.error(String.format("Cant parse payment %s", paymentInfoStr));
+            }
+            if (map != null && map.size() > 0) {
                 result.add(map);
             } else {
-                //парсим по новому - 1.16
-                try {
-                    StringReader reader = new StringReader(paymentInfoStr);
-                    PaymentType payment = (PaymentType) unmarshaller.unmarshal(reader);
-                    result.add(parsePayment(payment));
-                } catch (Exception e) {
-                    logger.error(String.format("Cant parse payment %s", paymentInfoStr));
-                }
+                is.setCharacterStream(new StringReader(paymentInfoStr));
+                Document doc = builderFactory.newDocumentBuilder().parse(is);
+                result.add(parsePayment(doc)); //парсинг по формату 1.15
             }
+
         }
 
         RNIPLoadPaymentsService.RNIPPaymentsResponse res = new RNIPLoadPaymentsService.RNIPPaymentsResponse(result, rnipDate);
