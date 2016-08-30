@@ -405,17 +405,21 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                                 for (Client g : guardians) {
                                     if (firstName.equalsIgnoreCase(g.getPerson().getFirstName()) && surname
                                             .equalsIgnoreCase(g.getPerson().getSurname())) {
-                                        persistenceTransaction = persistenceSession.beginTransaction();
-                                        Long idOfGuardian = updateGuardian(persistenceSession, g, client,
-                                                phones, email, relation);
-                                        persistenceTransaction.commit();
-                                        persistenceTransaction = null;
-                                        LineResult result = new LineResult(currentLineNo, 160,
-                                                "Представитель найден по фамилии и имени, данные представителя ИД=" + idOfGuardian
-                                                        + " обновлены", client.getIdOfClient());
-                                        lineResults.add(result);
-                                        c = true;
-                                        break;
+                                        try {
+                                            persistenceTransaction = persistenceSession.beginTransaction();
+                                            Long idOfGuardian = updateGuardian(persistenceSession, g, client, phones,
+                                                    email, relation);
+                                            persistenceTransaction.commit();
+                                            persistenceTransaction = null;
+                                            LineResult result = new LineResult(currentLineNo, 160,
+                                                    "Представитель найден по фамилии и имени, данные представителя ИД="
+                                                            + idOfGuardian + " обновлены", client.getIdOfClient());
+                                            lineResults.add(result);
+                                            c = true;
+                                            break;
+                                        } finally {
+                                            HibernateUtils.rollback(persistenceTransaction, logger);
+                                        }
                                     }
                                 }
                                 if (c) {
@@ -436,6 +440,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                                 LineResult result = new LineResult(currentLineNo, 120,
                                         "Не удалось создать представителя:" + e.getMessage(), client.getIdOfClient());
                                 lineResults.add(result);
+                            } finally {
+                                HibernateUtils.rollback(persistenceTransaction, logger);
                             }
 
                         } else {
@@ -447,7 +453,6 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                         }
 
                     } finally {
-                        HibernateUtils.rollback(persistenceTransaction, logger);
                         HibernateUtils.close(persistenceSession, logger);
                     }
                 }
