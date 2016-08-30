@@ -36,6 +36,10 @@ public class ContractIdGenerator {
 
     public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
+        return generateTransactionFree(org, session);
+    }
+
+    public long generateTransactionFree (Org org, Session session) throws Exception {
         Long lastClientContractId = org.getLastClientContractId();
 
         Long contractIdSize = null;
@@ -46,7 +50,7 @@ public class ContractIdGenerator {
             contractIdSize = 10L;
         }
         Long divider = (contractIdSize == 10) ? 1000000000L : 100000000L;
-        lastClientContractId = DAOService.getInstance().getNextFreeLastClientContractId(divider, idOfOrg, lastClientContractId);
+        lastClientContractId = DAOService.getInstance().getNextFreeLastClientContractId(divider, org.getIdOfOrg(), lastClientContractId);
         if (lastClientContractId == null) {
             throw new IllegalArgumentException("Not available client contractId");
         }
