@@ -91,9 +91,19 @@ public class ReportRepository extends BaseJpaDao {
     }
 
     private byte[] getDeliveredServicesElectronicCollationReport(List<ReportParameter> parameters, String subject) throws Exception {
-        //todo реализовать построение отчета по аналогии с getDeliveredServicesElectronicCollationApprovalReport
-        // только для сводного отчета (предварительный)
-        return new byte[0];
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildDeliveredServicesReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] arr = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, arr);
+        return arr;
     }
 
     private byte[] getDeliveredServicesElectronicCollationApprovalReport(List<ReportParameter> parameters, String subject) throws Exception {
@@ -199,6 +209,26 @@ public class ReportRepository extends BaseJpaDao {
         String templateFilename =
                 autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class.getSimpleName() + ".jasper";
         DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(
+                templateFilename);
+        builder.setOrg(reportParameters.getIdOfOrg());
+        try {
+            BasicJasperReport deliveredServicesReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
+                            new GregorianCalendar(), reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
+                            reportParameters.getRegion(), false);
+            return deliveredServicesReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;  //не найдена организация
+        }
+    }
+
+    private BasicJasperReport buildDeliveredServicesReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
+        DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(
                 templateFilename);
         builder.setOrg(reportParameters.getIdOfOrg());
         try {
