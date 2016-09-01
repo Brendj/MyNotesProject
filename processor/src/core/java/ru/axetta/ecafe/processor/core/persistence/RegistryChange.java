@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
  * User: chirikov
@@ -42,6 +44,7 @@ public class RegistryChange {
     protected String benefitOnAdmissionFrom;
 
     protected Integer guardiansCount;
+    protected Set<RegistryChangeGuardians> registryChangeGuardiansSet;
 
     public static final int FULL_COMPARISON = 1;
     public static final int CHANGES_UPDATE = 2;
@@ -295,5 +298,13 @@ public class RegistryChange {
 
     public void setGuardiansCount(Integer guardiansCount) {
         this.guardiansCount = guardiansCount;
+    }
+
+    public Set<RegistryChangeGuardians> getRegistryChangeGuardiansSet() {
+        return registryChangeGuardiansSet;
+    }
+
+    public void setRegistryChangeGuardiansSet(Set<RegistryChangeGuardians> registryChangeGuardiansSet) {
+        this.registryChangeGuardiansSet = registryChangeGuardiansSet;
     }
 }

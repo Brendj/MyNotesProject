@@ -262,6 +262,41 @@ public class ClientMskNSIService extends MskNSIService {
                     pupilInfo.gender = attr.getValue().get(0).getValue();
                 }
 
+                if (attr.getName().equals("Представители")) {
+                    for (GroupValue groupValue : attr.getGroupValue()) {
+                        ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+
+                        for (Attribute attr1 : groupValue.getAttribute()) {
+                            if (attr1.getName().equals("Фамилия представителя")) {
+
+                                String famName = attr1.getValue().get(0).getValue();
+                                guardianInfo.setFamilyName(famName == null ? null : famName.trim());
+                            }
+                            if (attr1.getName().equals("Имя представителя")) {
+
+                                String fName = attr1.getValue().get(0).getValue();
+                                guardianInfo.setFirstName(fName == null ? null : fName.trim());
+                            }
+                            if (attr1.getName().equals("Отчество представителя")) {
+
+                                String sName = attr1.getValue().get(0).getValue();
+                                guardianInfo.setSecondName(sName == null ? null : sName.trim());
+                            }
+                            if (attr1.getName().equals("Кем приходится")) {
+                                guardianInfo.setRelationship(attr1.getValue().get(0).getValue());
+                            }
+                            if (attr1.getName().equals("Телефон представителя")) {
+                                guardianInfo.setPhoneNumber(attr1.getValue().get(0).getValue());
+                            }
+                            if (attr1.getName().equals("Адрес электронной почты")) {
+                                guardianInfo.setEmailAddress(attr1.getValue().get(0).getValue());
+                            }
+                        }
+                        pupilInfo.getGuardianInfoList().add(guardianInfo);
+                    }
+                }
+
+                pupilInfo.guardiansCount = String.valueOf(pupilInfo.getGuardianInfoList().size());
             }
 
             pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();

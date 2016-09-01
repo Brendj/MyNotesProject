@@ -74,3 +74,19 @@ OIDS=FALSE
 
 insert into cf_orgs_contract_ids(idoforg, lastclientcontractid, version)
     select idoforg, lastclientcontractid, 0 from cf_orgs;
+
+--Реестры информация об опекунах
+CREATE TABLE cf_registrychange_guardians (
+  idOfRegistryGuardian BIGSERIAL NOT NULL,
+  idofregistrychange BIGINT,
+  familyname CHARACTER VARYING(128),
+  firstname CHARACTER VARYING(128),
+  secondname CHARACTER VARYING(128),
+  relationship CHARACTER VARYING(128),
+  phonenumber CHARACTER VARYING(128),
+  emailaddress CHARACTER VARYING(128),
+  CreatedDate BIGINT NOT NULL,
+  Applied boolean not null default false,
+  CONSTRAINT cf_registrychange_guardians_pk PRIMARY KEY (idOfRegistryGuardian),
+  CONSTRAINT cf_registrychange_guardians_registrychange_fk FOREIGN KEY (idofregistrychange) REFERENCES cf_registrychange (idofregistrychange)
+);

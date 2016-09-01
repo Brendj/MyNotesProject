@@ -414,6 +414,13 @@ public class ImportRegisterClientsService {
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
                     cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
 
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
+                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
+
+            if (!pupil.getGuardianInfoList().isEmpty()) {
+                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
+            }
+
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
                         cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
@@ -585,6 +592,8 @@ public class ImportRegisterClientsService {
         String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, clientGuid, "Пол");
         String clientBenefitOnAdmission = trim(fieldConfig.getValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION), 3000, clientGuid, "Льгота при поступлении");
         String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
+        String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, clientGuid, "Количество представителей");
+        List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
         RegistryChange ch = new RegistryChange();
         ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
@@ -609,6 +618,24 @@ public class ImportRegisterClientsService {
         }
 
         ch.setBenefitOnAdmission(clientBenefitOnAdmission);
+
+        if (operation == CREATE_OPERATION) {
+            if (guardiansCount != null) {
+                ch.setGuardiansCount(Integer.valueOf(guardiansCount));
+            }
+
+            if (guardianInfoList != null && !guardianInfoList.isEmpty()) {
+                Set<RegistryChangeGuardians> registryChangeGuardiansSet = new HashSet<RegistryChangeGuardians>();
+
+                for (GuardianInfo guardianInfo : guardianInfoList) {
+                    RegistryChangeGuardians guardians = new RegistryChangeGuardians(guardianInfo.getFamilyName(),
+                            guardianInfo.getFirstName(), guardianInfo.getSecondName(), guardianInfo.getRelationship(),
+                            guardianInfo.getPhoneNumber(), guardianInfo.getEmailAddress(), new Date(), ch, false);
+                    registryChangeGuardiansSet.add(guardians);
+                }
+                ch.setRegistryChangeGuardiansSet(registryChangeGuardiansSet);
+            }
+        }
 
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         Date date = format.parse(clientBirthDate);
@@ -957,6 +984,9 @@ public class ImportRegisterClientsService {
     public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
         Session session = null;
         Transaction transaction = null;
+
+        Long id = null;
+
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -984,7 +1014,9 @@ public class ImportRegisterClientsService {
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                     createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
-                    long id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
+                    createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
+                    createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
+                    id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                             (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
                     change.setIdOfClient(id);
                     break;
@@ -1038,6 +1070,47 @@ public class ImportRegisterClientsService {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+
+        if (id != null) {
+            saveClientGuardians(idOfRegistryChange);
+        }
+
+    }
+
+    private static void saveClientGuardians(Long idOfRegistryChange) throws Exception {
+
+        Session sessionOne = null;
+        Transaction transactionOne = null;
+        try {
+            sessionOne = RuntimeContext.getInstance().createPersistenceSession();
+            transactionOne = sessionOne.beginTransaction();
+            RegistryChange registryChange = (RegistryChange) sessionOne.load(RegistryChange.class, idOfRegistryChange);
+
+            Set<RegistryChangeGuardians> registryChangeGuardiansSet = registryChange.getRegistryChangeGuardiansSet();
+
+            for (RegistryChangeGuardians registryChangeGuardians : registryChangeGuardiansSet) {
+
+                Session session = null;
+                Transaction transaction = null;
+                try {
+                    session = RuntimeContext.getInstance().createPersistenceSession();
+                    transaction = session.beginTransaction();
+                    Long clientId = registryChange.getIdOfClient();
+                    Long idOfOrg = registryChange.getIdOfOrg();
+                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId);
+                    transaction.commit();
+                    transaction = null;
+                } finally {
+                    HibernateUtils.rollback(transaction, logger);
+                    HibernateUtils.close(session, logger);
+                }
+            }
+            transactionOne.commit();
+            transactionOne = null;
+        } finally {
+            HibernateUtils.rollback(transactionOne, logger);
+            HibernateUtils.close(sessionOne, logger);
         }
     }
 
@@ -1148,8 +1221,18 @@ public class ImportRegisterClientsService {
         return doClientUpdate || !currentValue.trim().equals(reesterValue.trim());
     }
 
+    public void doClientUpdate(FieldProcessor.Config fieldConfig, Object fieldID, List<GuardianInfo> reesterValue)
+            throws Exception {
+        reesterValue = emptyIfNull(reesterValue);
+        fieldConfig.setValueList(fieldID, reesterValue);
+    }
+
     private static String emptyIfNull(String str) {
         return str == null ? "" : str;
+    }
+
+    private static List<GuardianInfo> emptyIfNull(List<GuardianInfo> list) {
+        return list.isEmpty() ? new ArrayList<GuardianInfo>() : list;
     }
 
     /*
@@ -1229,6 +1312,9 @@ public class ImportRegisterClientsService {
         public String guidOfOrg;
         public String recordState;
         public String gender;
+        public String guardiansCount;
+
+        public List<GuardianInfo> guardianInfoList = new ArrayList<GuardianInfo>();
 
         public boolean isDeleted() {
             return deleted;
@@ -1322,6 +1408,22 @@ public class ImportRegisterClientsService {
             this.leaveDate = leaveDate;
         }
 
+        public List<GuardianInfo> getGuardianInfoList() {
+            return guardianInfoList;
+        }
+
+        public void setGuardianInfoList(List<GuardianInfo> guardianInfoList) {
+            this.guardianInfoList = guardianInfoList;
+        }
+
+        public String getGuardiansCount() {
+            return guardiansCount;
+        }
+
+        public void setGuardiansCount(String guardiansCount) {
+            this.guardiansCount = guardiansCount;
+        }
+
         public void copyFrom(ExpandedPupilInfo pi) {
             this.familyName = pi.familyName;
             this.firstName = pi.firstName;
@@ -1338,6 +1440,77 @@ public class ImportRegisterClientsService {
             this.enterGroup = pi.enterGroup;
             this.enterDate = pi.enterDate;
             this.leaveDate = pi.leaveDate;
+        }
+    }
+
+    public static class GuardianInfo {
+
+        private String familyName;
+        private String firstName;
+        private String secondName;
+        private String relationship;
+        private String phoneNumber;
+        private String emailAddress;
+
+        public GuardianInfo() {
+        }
+
+        public GuardianInfo(String familyName, String firstName, String secondName, String relationship,
+                String phoneNumber, String emailAddress) {
+            this.familyName = familyName;
+            this.firstName = firstName;
+            this.secondName = secondName;
+            this.relationship = relationship;
+            this.phoneNumber = phoneNumber;
+            this.emailAddress = emailAddress;
+        }
+
+        public String getFamilyName() {
+            return familyName;
+        }
+
+        public void setFamilyName(String familyName) {
+            this.familyName = familyName;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getSecondName() {
+            return secondName;
+        }
+
+        public void setSecondName(String secondName) {
+            this.secondName = secondName;
+        }
+
+        public String getRelationship() {
+            return relationship;
+        }
+
+        public void setRelationship(String relationship) {
+            this.relationship = relationship;
+        }
+
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        public void setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        public String getEmailAddress() {
+            return emailAddress;
+        }
+
+        public void setEmailAddress(String emailAddress) {
+            this.emailAddress = emailAddress;
         }
     }
 }

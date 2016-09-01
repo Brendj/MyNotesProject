@@ -115,6 +115,16 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static Client findClientByMobile(Session session, String mobile) {
+        Criteria mobileCriteria = session.createCriteria(Client.class);
+        mobileCriteria.add(Restrictions.eq("mobile", mobile));
+        mobileCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L));
+        mobileCriteria.add(Restrictions.ne("idOfClientGroup", 1100000070L));
+        List<Client> resultList = (List<Client>) mobileCriteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
     public static Client findClientByGuid(Session persistenceSession, String guid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.eq("clientGUID", guid));

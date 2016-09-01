@@ -121,6 +121,8 @@ public class Client {
     private Date birthDate;
     private String benefitOnAdmission;
 
+    private String guardiansCount;
+
     private ClientPhoto photo;
 
     protected Client() {
@@ -942,6 +944,14 @@ public class Client {
 
     public void setBenefitOnAdmission(String benefitOnAdmission) {
         this.benefitOnAdmission = benefitOnAdmission;
+    }
+
+    public String getGuardiansCount() {
+        return guardiansCount;
+    }
+
+    public void setGuardiansCount(String guardiansCount) {
+        this.guardiansCount = guardiansCount;
     }
 
     public ClientPhoto getPhoto() {

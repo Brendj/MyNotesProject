@@ -576,7 +576,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         protected String birthDateFrom;
         protected String benefitOnAdmission;
         protected String benefitOnAdmissionFrom;
-        //protected String guardiansCount;
+        protected String guardiansCount;
 
         public WebRegistryChangeItem() {
             super();
@@ -648,7 +648,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             }
 
             benefitOnAdmissionFrom = parent.getList().get(23).getFieldValueParam();
-           // guardiansCount = parent.getList().get(24).getFieldValueParam();
+            guardiansCount = parent.getList().get(24).getFieldValueParam();
         }
 
         public Long getIdOfMigrateOrgFrom() {
@@ -825,13 +825,13 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
         }
 
-     /*   public String getGuardiansCount() {
+        public String getGuardiansCount() {
             return guardiansCount;
         }
 
         public void setGuardiansCount(String guardiansCount) {
             this.guardiansCount = guardiansCount;
-        }*/
+        }
     }
 
     public long getRevisionCreateDate() {

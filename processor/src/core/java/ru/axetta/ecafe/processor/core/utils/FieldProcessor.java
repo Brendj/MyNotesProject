@@ -4,11 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.persistence.RegistryChangeGuardians;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class FieldProcessor {
     final static int UPDATABLE=0, NON_UPDATABLE=1;
@@ -21,6 +26,8 @@ public class FieldProcessor {
         public String defValue;
         public int realPos=-1;
         public String currentValue;
+        public List<ImportRegisterClientsService.GuardianInfo> objectList;
+        public Set<RegistryChangeGuardians> guardiansSet;
         public boolean updatable;
 
         public Def(int defaultPos, boolean requiredForInsert, boolean requiredForUpdate, String fieldName, String defValue, Object fieldId, boolean updatable) {
@@ -108,6 +115,24 @@ public class FieldProcessor {
             return null;
         }
 
+        public List<ImportRegisterClientsService.GuardianInfo> getValueList(Object id) {
+            for (int n = 0; n < currentConfig.length; ++n) {
+                if (currentConfig[n].fieldId == id) {
+                    return currentConfig[n].objectList;
+                }
+            }
+            return null;
+        }
+
+        public Set<RegistryChangeGuardians> getValueSet(Object id) {
+            for (int n = 0; n < currentConfig.length; ++n) {
+                if (currentConfig[n].fieldId == id) {
+                    return currentConfig[n].guardiansSet;
+                }
+            }
+            return null;
+        }
+
         public boolean getValueBool(Object id) {
             String v = getValue(id);
             if (v==null) return false;
@@ -157,6 +182,13 @@ public class FieldProcessor {
             else getField(id).currentValue = value.toString();
         }
 
+        public void setValueList(Object id, List<ImportRegisterClientsService.GuardianInfo> value) throws Exception {
+            getField(id).objectList = value;
+        }
+
+        public void setValueSet(Object id, Set<RegistryChangeGuardians> value) throws Exception {
+            getField(id).guardiansSet = value;
+        }
     }
 
 }

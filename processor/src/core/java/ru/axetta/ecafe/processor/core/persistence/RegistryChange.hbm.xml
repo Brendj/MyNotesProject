@@ -41,6 +41,10 @@
         <property name="birthDateFrom" column="BirthDateFrom" type="long"/>
         <property name="benefitOnAdmissionFrom" column="BenefitOnAdmissionFrom" type="string" length="3000"/>
         <property name="guardiansCount" column="GuardiansCount" type="int"/>
+        <set name="registryChangeGuardiansSet" table="cf_registrychange_guardians" cascade="all" inverse="true">
+            <key column="IdOfRegistryChange" not-null="true"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.RegistryChangeGuardians"/>
+        </set>
     </class>
 </hibernate-mapping>
 

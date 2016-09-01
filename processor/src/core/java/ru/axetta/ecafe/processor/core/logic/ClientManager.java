@@ -16,10 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
@@ -71,6 +68,8 @@ public class ClientManager {
         GENDER,
         BIRTH_DATE,
         BENEFIT_ON_ADMISSION,
+        GUARDIANS_COUNT,
+        GUARDIANS_COUNT_LIST,
         SSOID
     }
 
@@ -111,7 +110,9 @@ public class ClientManager {
             new FieldProcessor.Def(32, false, false, "Пол", null, FieldId.GENDER, true),
             new FieldProcessor.Def(33, false, false, "Дата рождения", null, FieldId.BIRTH_DATE, true),
             new FieldProcessor.Def(34, false, false, "Льгота при поступлении", null, FieldId.BENEFIT_ON_ADMISSION, true),
-            new FieldProcessor.Def(35, false, false, "SSOID", null, FieldId.SSOID, true),
+            new FieldProcessor.Def(35, false, false, "Количество представителей", null, FieldId.GUARDIANS_COUNT, false),
+            new FieldProcessor.Def(36, false, false, "Коллекция представителей", null, FieldId.GUARDIANS_COUNT_LIST, false),
+            new FieldProcessor.Def(37, false, false, "SSOID", null, FieldId.SSOID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -469,6 +470,11 @@ public class ClientManager {
                 client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
             }
 
+            //token[35])
+            if (fieldConfig.getValue(FieldId.GUARDIANS_COUNT) != null) {
+                client.setGuardiansCount(fieldConfig.getValue(FieldId.GUARDIANS_COUNT));
+            }
+
             client.setUpdateTime(new Date());
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -756,6 +762,11 @@ public class ClientManager {
                 client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
             }
 
+            //token[35])
+            if (fieldConfig.getValue(FieldId.GUARDIANS_COUNT) != null) {
+                client.setGuardiansCount(fieldConfig.getValue(FieldId.GUARDIANS_COUNT));
+            }
+
             if (fieldConfig.getValue(FieldId.SSOID) != null) {
                 client.setSsoid(fieldConfig.getValue(FieldId.SSOID));
             }
@@ -780,6 +791,154 @@ public class ClientManager {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public static void applyClientGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
+            Long idOfOrg, Long idOfClientChild) throws Exception {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        try {
+            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
+
+            if (null == organization) {
+                throw new Exception("Организация не найдена: " + idOfOrg);
+            }
+
+            if (registryChangeGuardians.getApplied() == false) {
+
+                if (registryChangeGuardians.getPhoneNumber() != null && !registryChangeGuardians.getPhoneNumber().isEmpty()) {
+
+                    String mobilePhoneGuardianAno = registryChangeGuardians.getPhoneNumber();
+
+                    if (mobilePhoneGuardianAno != null) {
+                        mobilePhoneGuardianAno = Client.checkAndConvertMobile(mobilePhoneGuardianAno);
+                        if (mobilePhoneGuardianAno == null) {
+                            throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
+                        }
+                    }
+
+                    if (mobilePhoneGuardianAno != null && !mobilePhoneGuardianAno.isEmpty()) {
+
+                        Client clientByMobile = DAOUtils.findClientByMobile(persistenceSession, mobilePhoneGuardianAno);
+
+                        if (clientByMobile != null) {
+
+                            Client child = (Client) persistenceSession.load(Client.class, idOfClientChild);
+
+                            //проверка гуидов
+                            if (clientByMobile.getOrg().getGuid().equals(child.getOrg().getGuid())) {
+
+                                String relation = registryChangeGuardians.getRelationship();
+
+                                ClientGuardianRelationType relationType = null;
+                                for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
+                                    if (relation.equalsIgnoreCase(type.toString())) {
+                                        relationType = type;
+                                    }
+                                }
+
+                                //сохранение связки представителя
+                                Long newGuardiansVersions = ClientManager
+                                        .generateNewClientGuardianVersion(persistenceSession);
+                                ClientGuardian clientGuardian = new ClientGuardian(child.getIdOfClient(),
+                                        clientByMobile.getIdOfClient());
+                                clientGuardian.setVersion(newGuardiansVersions);
+                                clientGuardian.setDisabled(false);
+                                clientGuardian.setDeletedState(false);
+                                clientGuardian.setRelation(relationType);
+                                persistenceSession.persist(clientGuardian);
+                                persistenceSession.flush();
+
+                                setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
+
+                            } else {
+                                applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext,
+                                        organization, idOfClientChild);
+                            }
+                        } else {
+                            applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext, organization,
+                                    idOfClientChild);
+                        }
+                    } else {
+                        applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext, organization,
+                                idOfClientChild);
+                    }
+                } else {
+                    applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext, organization,
+                            idOfClientChild);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession, RuntimeContext runtimeContext, Org organization, Long idOfClientChild) throws Exception{
+        Person personGuardian = new Person(registryChangeGuardians.getFirstName(),
+                registryChangeGuardians.getFamilyName(), registryChangeGuardians.getSecondName());
+        personGuardian.setIdDocument("");
+        persistenceSession.persist(personGuardian);
+        Person contractGuardianPerson = new Person("", "", "");
+        contractGuardianPerson.setIdDocument(null);
+        persistenceSession.persist(contractGuardianPerson);
+
+        Date currentDate = new Date();
+
+        Long contractIdGuardian = runtimeContext.getClientContractIdGenerator()
+                .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+
+        long clientRegistryVersionGuardian = DAOUtils.updateClientRegistryVersion(persistenceSession);
+        Long limitGuardian = RuntimeContext.getInstance()
+                .getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
+
+        Client clientGuardianToSave = new Client(organization, personGuardian, contractGuardianPerson, 0, false,
+                false, false, contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
+                clientRegistryVersionGuardian, limitGuardian,
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
+
+        ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(persistenceSession, organization.getIdOfOrg(),
+                "Родители");
+
+        if (clientGroup != null) {
+            clientGuardianToSave
+                    .setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        }
+
+        String mobilePhoneGuardian = registryChangeGuardians.getPhoneNumber();
+
+        if (mobilePhoneGuardian != null) {
+            mobilePhoneGuardian = Client.checkAndConvertMobile(mobilePhoneGuardian);
+            if (mobilePhoneGuardian == null) {
+                throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
+            }
+        }
+
+        clientGuardianToSave.setMobile(mobilePhoneGuardian);
+        clientGuardianToSave.setAddress("");
+        clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
+        clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
+        persistenceSession.persist(clientGuardianToSave);
+
+        String relation = registryChangeGuardians.getRelationship();
+
+        ClientGuardianRelationType relationType = null;
+        for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
+            if (relation.equalsIgnoreCase(type.toString())) {
+                relationType = type;
+            }
+        }
+
+        //сохранение связки представителя
+        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
+        ClientGuardian clientGuardian = new ClientGuardian(idOfClientChild,
+                clientGuardianToSave.getIdOfClient());
+        clientGuardian.setVersion(newGuardiansVersions);
+        clientGuardian.setDisabled(false);
+        clientGuardian.setDeletedState(false);
+        clientGuardian.setRelation(relationType);
+        persistenceSession.persist(clientGuardian);
+        persistenceSession.flush();
+
+        setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
 
 
@@ -1217,6 +1376,25 @@ public class ClientManager {
         }
         return clientMigrationItemInfoList;
 
+    }
+
+    /* Разногласия по родителям после принятия applied = true */
+    public static void setAppliedRegistryChangeGuardian(Session session, RegistryChangeGuardians registryChangeGuardians) {
+        registryChangeGuardians.setApplied(true);
+        session.update(registryChangeGuardians);
+    }
+
+    public static String firstUpperCase(String word){
+        if(word == null || word.isEmpty()) return "";
+        return word.substring(0, 1).toUpperCase() + word.substring(1);
+    }
+
+
+    private static ClientGroup findGroupByIdOfOrgAndGroupName(Session session, Long idOfOrg, String groupName) throws Exception {
+        Criteria criteria = session.createCriteria(ClientGroup.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("groupName", groupName));
+        return (ClientGroup) criteria.uniqueResult();
     }
 
 }
