@@ -118,158 +118,162 @@ public class OrgMskNSIService extends MskNSIService {
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         LinkedList<ImportRegisterOrgsService.OrgInfo> list = new LinkedList<ImportRegisterOrgsService.OrgInfo>();
         for(Item i : queryResults) {
-            ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
+            try {
+                ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
 
-            for(Attribute attr : i.getAttribute()) {
-                if (attr.getName().equals("Типы образовательных учреждений")) {
-                    for(Attribute.Value val : attr.getValue()) {
-                        if(val.getValue().equals("Общеобразовательное учреждение")) {
-                            info.setOrganizationType(OrganizationType.SCHOOL);
-                        } else {
-                            info.setOrganizationType(OrganizationType.PROFESSIONAL);
-                            // TODO: добавить детский сад
-                        }
-                    }
-                }
-                if (attr.getName().equals("Краткое наименование учреждения")) {
-                    info.setShortName(attr.getValue().get(0).getValue());
-                }
-                if (attr.getName().equals("Полное название учреждения")) {
-                    info.setOfficialName(attr.getValue().get(0).getValue());
-                }
-                if (attr.getName().equals("ИНН образовательного учреждения")) {
-                    info.setInn(attr.getValue().get(0).getValue());
-                }
-
-                if (attr.getName().equals("Официальный адрес")) {
-                    info.setAddress(attr.getValue().get(0).getValue());
-                }
-                info.setCity("Москва");
-                if (attr.getName().equals("Округ")) {
-                    info.setRegion(attr.getValue().get(0).getValue());
-                }
-
-                if (attr.getName().equals("Сведения о БТИ")) {
-                    info.setOrgInfos(parseBTIInfo(attr, info.getGuid()));
-                    if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
-                        info.setGuid(attr.getValue().get(0).getValue());
-                    }
-
-                    for (GroupValue groupValue : attr.getGroupValue()) {
-                        for (Attribute attribute : groupValue.getAttribute()) {
-                            if("БТИ.unom".equals(attribute.getName())){
-                                Long value = null;
-                                try {
-                                    value = Long.valueOf(attribute.getValue().get(0).getValue());
-                                }
-                                catch (Exception e) {
-                                    logger.error("Empty value of bti unom. Use null value");
-                                }
-                                info.setUnom(value);
-                            }
-                            if ("unique_address_id".equals(attribute.getName())){
-                                Long value = null;
-                                try {
-                                    value = Long.valueOf(attribute.getValue().get(0).getValue());
-                                }
-                                catch (Exception e) {
-                                    logger.error("Empty value of unique_address_id. Use null value");
-                                }
-                                info.setUniqueAddressId(value);
+                for(Attribute attr : i.getAttribute()) {
+                    if (attr.getName().equals("Типы образовательных учреждений")) {
+                        for(Attribute.Value val : attr.getValue()) {
+                            if(val.getValue().equals("Общеобразовательное учреждение")) {
+                                info.setOrganizationType(OrganizationType.SCHOOL);
+                            } else {
+                                info.setOrganizationType(OrganizationType.PROFESSIONAL);
+                                // TODO: добавить детский сад
                             }
                         }
                     }
-                }
-                if (attr.getName().equals("Сведения о КЛАДР")) {
-                    if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                    if (attr.getName().equals("Краткое наименование учреждения")) {
+                        info.setShortName(attr.getValue().get(0).getValue());
+                    }
+                    if (attr.getName().equals("Полное название учреждения")) {
                         info.setOfficialName(attr.getValue().get(0).getValue());
                     }
-                }
-
-                if (attr.getName().equals("GUID Образовательного учреждения")) {
-                    info.setGuid(attr.getValue().get(0).getValue());
-                }
-                if (attr.getName().equals("Первичный ключ")) {
-                    String v = attr.getValue().get(0).getValue();
-                    Long registryPrimaryId = null;
-                    if(NumberUtils.isNumber(v)) {
-                        registryPrimaryId = NumberUtils.toLong(v);
+                    if (attr.getName().equals("ИНН образовательного учреждения")) {
+                        info.setInn(attr.getValue().get(0).getValue());
                     }
-                    if(registryPrimaryId == null) {
-                        break;
+
+                    if (attr.getName().equals("Официальный адрес")) {
+                        info.setAddress(attr.getValue().get(0).getValue());
                     }
-                    info.setRegisteryPrimaryId(registryPrimaryId);
-                }
-                if (attr.getName().equals("interdistrict_council")) {
-                    info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
+                    info.setCity("Москва");
+                    if (attr.getName().equals("Округ")) {
+                        info.setRegion(attr.getValue().get(0).getValue());
+                    }
+
+                    if (attr.getName().equals("Сведения о БТИ")) {
+                        info.setOrgInfos(parseBTIInfo(attr, info.getGuid()));
+                        if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                            info.setGuid(attr.getValue().get(0).getValue());
+                        }
+
+                        for (GroupValue groupValue : attr.getGroupValue()) {
+                            for (Attribute attribute : groupValue.getAttribute()) {
+                                if("БТИ.unom".equals(attribute.getName())){
+                                    Long value = null;
+                                    try {
+                                        value = Long.valueOf(attribute.getValue().get(0).getValue());
+                                    }
+                                    catch (Exception e) {
+                                        logger.error("Empty value of bti unom. Use null value");
+                                    }
+                                    info.setUnom(value);
+                                }
+                                if ("unique_address_id".equals(attribute.getName())){
+                                    Long value = null;
+                                    try {
+                                        value = Long.valueOf(attribute.getValue().get(0).getValue());
+                                    }
+                                    catch (Exception e) {
+                                        logger.error("Empty value of unique_address_id. Use null value");
+                                    }
+                                    info.setUniqueAddressId(value);
+                                }
+                            }
+                        }
+                    }
+                    if (attr.getName().equals("Сведения о КЛАДР")) {
+                        if(attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                            info.setOfficialName(attr.getValue().get(0).getValue());
+                        }
+                    }
+
+                    if (attr.getName().equals("GUID Образовательного учреждения")) {
+                        info.setGuid(attr.getValue().get(0).getValue());
+                    }
+                    if (attr.getName().equals("Первичный ключ")) {
+                        String v = attr.getValue().get(0).getValue();
+                        Long registryPrimaryId = null;
+                        if(NumberUtils.isNumber(v)) {
+                            registryPrimaryId = NumberUtils.toLong(v);
+                        }
+                        if(registryPrimaryId == null) {
+                            break;
+                        }
+                        info.setRegisteryPrimaryId(registryPrimaryId);
+                    }
+                    if (attr.getName().equals("interdistrict_council")) {
+                        info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
+                    }
+
+                    if (attr.getName().equals("interdistrict_council_chief")) {
+                        info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
+                    }
+                    if (attr.getName().equals("ФИО директора")) {
+                        info.setDirectorFullName(attr.getValue().get(0).getValue());
+                    }
+
+                    if (attr.getName().equals("Код ОГРН")) {
+                        info.setOGRN(attr.getValue().get(0).getValue());
+                    }
+                    if (attr.getName().equals("Признак активности")) {
+                        info.setState(attr.getValue().get(0).getValue());
+                    }
                 }
 
-                if (attr.getName().equals("interdistrict_council_chief")) {
-                    info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
-                }
-                if (attr.getName().equals("ФИО директора")) {
-                    info.setDirectorFullName(attr.getValue().get(0).getValue());
+                if (info.getOrgInfos().size() == 0) {
+                    info.setOrgInfos(addInfosWithoutBTIData(info.getAddress()));
                 }
 
-                if (attr.getName().equals("Код ОГРН")) {
-                    info.setOGRN(attr.getValue().get(0).getValue());
+                //Здесь - переписать значение полей OrgRegistryChange в каждую запись OrgRegistryChangeItem
+                boolean modify = false;
+                for (ImportRegisterOrgsService.OrgInfo item : info.getOrgInfos()) {
+                    item.setShortName(info.getShortName());
+                    item.setOfficialName(info.getOfficialName());
+                    item.setCity(info.getCity());
+                    item.setRegion(info.getRegion());
+                    item.setGuid(info.getGuid());
+                    item.setInn(info.getInn());
+
+                    Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
+                            item.getInn(), item.getUnom(), item.getUnad());
+                    if (fOrg != null) {
+                        fillInfOWithOrg(item, fOrg);
+                        item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                        //item.setShortNameFrom(fOrg.getShortName());
+                        //item.setOfficialNameFrom(fOrg.getOfficialName());
+                        modify = true;
+                    }
+                    else {
+                        item.setOperationType(OrgRegistryChange.CREATE_OPERATION);
+                    }
+
                 }
-                if (attr.getName().equals("Признак активности")) {
-                    info.setState(attr.getValue().get(0).getValue());
-                }
-            }
+                //теперь добавим в таблицу _items организации, не найденные по точным критериям (гуид и уник_аддресс_ид).
+                // Совпадение м.б. по номеру организации, адресу, гуиду или ИНН по отдельности
+                //addSimilarOrgs(info);
 
-            if (info.getOrgInfos().size() == 0) {
-                info.setOrgInfos(addInfosWithoutBTIData(info.getAddress()));
-            }
-
-            //Здесь - переписать значение полей OrgRegistryChange в каждую запись OrgRegistryChangeItem
-            boolean modify = false;
-            for (ImportRegisterOrgsService.OrgInfo item : info.getOrgInfos()) {
-                item.setShortName(info.getShortName());
-                item.setOfficialName(info.getOfficialName());
-                item.setCity(info.getCity());
-                item.setRegion(info.getRegion());
-                item.setGuid(info.getGuid());
-                item.setInn(info.getInn());
-
-                Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
-                        item.getInn(), item.getUnom(), item.getUnad());
-                if (fOrg != null) {
-                    fillInfOWithOrg(item, fOrg);
-                    item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
-                    //item.setShortNameFrom(fOrg.getShortName());
-                    //item.setOfficialNameFrom(fOrg.getOfficialName());
-                    modify = true;
-                }
-                else {
-                    item.setOperationType(OrgRegistryChange.CREATE_OPERATION);
+                if (modify) {
+                    info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                } else {
+                    info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
                 }
 
-            }
-            //теперь добавим в таблицу _items организации, не найденные по точным критериям (гуид и уник_аддресс_ид).
-            // Совпадение м.б. по номеру организации, адресу, гуиду или ИНН по отдельности
-            //addSimilarOrgs(info);
-
-            if (modify) {
-                info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
-            } else {
-                info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
-            }
-
-            if(info.getOrganizationType() == null) {
-                logger.error(String.format("При сверке с Реестрами, организация '%s' [%s] "
-                        + "не имееет тип организации в Реестрах, или "
-                        + "он указан не корректно.", info.getShortName(), info.getGuid()));
-            }
-            else if(info.getRegisteryPrimaryId() == null) {
-                logger.error(String.format("При сверке с Реестрами, организация '%s' [%s] "
-                        + "не имееет первичного ключа в Реестрах, или "
-                        + "он указан не корректно.", info.getShortName(), info.getGuid()));
-            } else {
-                info.setCreateDate(System.currentTimeMillis());
-                info.setAdditionalId(info.getRegisteryPrimaryId());
-                list.add(info);
+                if(info.getOrganizationType() == null) {
+                    logger.error(String.format("При сверке с Реестрами, организация '%s' [%s] "
+                            + "не имееет тип организации в Реестрах, или "
+                            + "он указан не корректно.", info.getShortName(), info.getGuid()));
+                }
+                else if(info.getRegisteryPrimaryId() == null) {
+                    logger.error(String.format("При сверке с Реестрами, организация '%s' [%s] "
+                            + "не имееет первичного ключа в Реестрах, или "
+                            + "он указан не корректно.", info.getShortName(), info.getGuid()));
+                } else {
+                    info.setCreateDate(System.currentTimeMillis());
+                    info.setAdditionalId(info.getRegisteryPrimaryId());
+                    list.add(info);
+                }
+            } catch (Exception e) {
+                logger.error("Error parsing ORGs info from registry", e);
             }
         }
         return list;
