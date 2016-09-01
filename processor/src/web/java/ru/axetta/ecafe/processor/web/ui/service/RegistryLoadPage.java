@@ -534,11 +534,13 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
 
-        Org org = DAOUtils.findOrgWithPessimisticLock(persistenceSession, client.getOrg().getIdOfOrg());
+        //Org org = DAOUtils.findOrgWithPessimisticLock(persistenceSession, client.getOrg().getIdOfOrg());
+        Org org = DAOUtils.findOrg(persistenceSession, client.getOrg().getIdOfOrg());
 
         Long contractId = null;
 
-        contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(org, persistenceSession);
+        //contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(org, persistenceSession);
+        contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(org);
         Client byConId = DAOUtils.findClientByContractId(persistenceSession, contractId);
         if(byConId != null){
             throw new Exception("Не удалось сгенерировать л/с представителя");

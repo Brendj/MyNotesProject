@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -36,11 +37,12 @@ public class ContractIdGenerator {
 
     public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
-        return generateTransactionFree(org, session);
+        return generateTransactionFree(org);
     }
 
-    public long generateTransactionFree (Org org, Session session) throws Exception {
-        Long lastClientContractId = org.getLastClientContractId();
+    //public long generateTransactionFree (Org org, Session session) throws Exception {
+    public long generateTransactionFree (Org org) throws Exception {
+        Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(org.getIdOfOrg()); //org.getLastClientContractId();
 
         Long contractIdSize = null;
         String s = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.client.contractIdSize");
@@ -56,10 +58,10 @@ public class ContractIdGenerator {
         }
 
         long newClientContractId = getNextContractId(org.getIdOfOrg(), lastClientContractId);
-        org.setLastClientContractId(lastClientContractId);
-        org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
-        session.update(org);
-        session.flush();
+        //org.setLastClientContractId(lastClientContractId);
+        //org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
+        //session.update(org);
+        //session.flush();
         return newClientContractId;
     }
 

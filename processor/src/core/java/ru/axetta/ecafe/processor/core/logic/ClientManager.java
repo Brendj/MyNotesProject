@@ -589,8 +589,8 @@ public class ClientManager {
 
         try {
             logger.debug("exist organization");
-            Org organization = DAOUtils.findOrgWithPessimisticLock(persistenceSession, idOfOrg);
-            //Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            //Org organization = DAOUtils.findOrgWithPessimisticLock(persistenceSession, idOfOrg);
+            Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             if (null == organization) {
                 throw new Exception("Организация не найдена: " + idOfOrg);
             }

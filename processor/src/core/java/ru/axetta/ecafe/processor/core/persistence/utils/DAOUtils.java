@@ -269,7 +269,7 @@ public class DAOUtils {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
     }
 
-    public static Org findOrgWithPessimisticLock(Session persistenceSession, long idOfOrg) throws Exception {
+    /*public static Org findOrgWithPessimisticLock(Session persistenceSession, long idOfOrg) throws Exception {
         Query query = persistenceSession.createQuery(
                 "from Org o where o.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
@@ -279,7 +279,7 @@ public class DAOUtils {
             return (Org) res.get(0);
         }
         return null;
-    }
+    }*/
 
     public static Org findOrgByShortname(Session session, String shortname) {
         Query query = session.createQuery(
@@ -871,29 +871,7 @@ public class DAOUtils {
 
     public static long updateClientRegistryVersion(Session persistenceSession) throws Exception {
         return updateClientRegistryVersionWithPessimisticLock();
-        /*Registry registry = (Registry) persistenceSession.get(Registry.class, Registry.THE_ONLY_INSTANCE_ID);
-        registry.setClientRegistryVersion(registry.getClientRegistryVersion() + 1);
-        persistenceSession.update(registry);
-        return registry.getClientRegistryVersion();*/
     }
-
-    /*public static long updateClientRegistryVersionTransactionForce() throws Exception {
-        Transaction transaction = null;
-        Session session = RuntimeContext.getInstance().createPersistenceSession();
-        try {
-            transaction = session.beginTransaction();
-            Registry registry = (Registry) session.get(Registry.class, Registry.THE_ONLY_INSTANCE_ID);
-            registry.setClientRegistryVersion(registry.getClientRegistryVersion() + 1);
-            session.update(registry);
-            long newV = registry.getClientRegistryVersion();
-            transaction.commit();
-            transaction = null;
-            return newV ;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-    }*/
 
     public static long updateClientRegistryVersionWithPessimisticLock() throws Exception {
         Transaction transaction = null;
@@ -909,6 +887,26 @@ public class DAOUtils {
             transaction.commit();
             transaction = null;
             return registry.getClientRegistryVersion();
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public static long updateOrgLastContractIdWithPessimisticLock(Long idOfOrg) throws Exception {
+        Transaction transaction = null;
+        Session session = RuntimeContext.getInstance().createPersistenceSession();
+        try {
+            transaction = session.beginTransaction();
+            Query query = session.createQuery("from OrgContractId r where r.idOfOrg=:idOfOrg");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setLockMode("r", LockMode.PESSIMISTIC_WRITE);
+            OrgContractId orgContractId = (OrgContractId)query.uniqueResult();
+            orgContractId.setLastClientContractId(orgContractId.getLastClientContractId() + 1);
+            session.update(orgContractId);
+            transaction.commit();
+            transaction = null;
+            return orgContractId.getLastClientContractId();
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

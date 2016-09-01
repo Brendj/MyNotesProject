@@ -57,3 +57,20 @@ insert into cf_client_guardian_notificationsettings(idofclientguardian, notifyty
 --После импорта данных создаем индексы на таблицу флагов оповещений
 CREATE INDEX cf_client_guardian_notificationsettings_idofclientguardian_idx
 ON cf_client_guardian_notificationsettings USING btree (idofclientguardian);
+
+CREATE TABLE cf_orgs_contract_ids
+(
+  idoforg bigint NOT NULL,
+  version bigint NOT NULL,
+  lastclientcontractid bigint NOT NULL default 0,
+  CONSTRAINT cf_orgs_contract_ids_pk PRIMARY KEY (idoforg),
+  CONSTRAINT cf_orgs_contract_ids_idoforg_fk FOREIGN KEY (idoforg)
+  REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+OIDS=FALSE
+);
+
+insert into cf_orgs_contract_ids(idoforg, lastclientcontractid, version)
+    select idoforg, lastclientcontractid, 0 from cf_orgs;

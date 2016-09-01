@@ -124,6 +124,7 @@ public class Org implements Serializable {
     private Long additionalIdBuilding;
     private String statusDetailing;
     private OrgSync orgSync;
+    private OrgContractId orgContractId;
     private Boolean payByCashier;
     private Boolean oneActiveCard;
     private Set<Card> cards = new HashSet<Card>();
@@ -178,6 +179,9 @@ public class Org implements Serializable {
         this.orgSync = new OrgSync();
         this.orgSync.setIdOfPacket(0L);
         this.orgSync.setOrg(this);
+        this.orgContractId = new OrgContractId();
+        this.orgContractId.setLastClientContractId(1L);
+        this.orgContractId.setOrg(this);
         updateTime = new Date();
         this.orgStructureVersion = orgStructureVersion;
     }
@@ -990,5 +994,13 @@ public class Org implements Serializable {
 
     public void setCoSupplier(Contragent coSupplier) {
         this.coSupplier = coSupplier;
+    }
+
+    public OrgContractId getOrgContractId() {
+        return orgContractId;
+    }
+
+    public void setOrgContractId(OrgContractId orgContractId) {
+        this.orgContractId = orgContractId;
     }
 }
