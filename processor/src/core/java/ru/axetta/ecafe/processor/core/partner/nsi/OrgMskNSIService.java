@@ -118,9 +118,8 @@ public class OrgMskNSIService extends MskNSIService {
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         LinkedList<ImportRegisterOrgsService.OrgInfo> list = new LinkedList<ImportRegisterOrgsService.OrgInfo>();
         for(Item i : queryResults) {
+            ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
             try {
-                ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
-
                 for(Attribute attr : i.getAttribute()) {
                     if (attr.getName().equals("Типы образовательных учреждений")) {
                         for(Attribute.Value val : attr.getValue()) {
@@ -159,24 +158,10 @@ public class OrgMskNSIService extends MskNSIService {
                         for (GroupValue groupValue : attr.getGroupValue()) {
                             for (Attribute attribute : groupValue.getAttribute()) {
                                 if("БТИ.unom".equals(attribute.getName())){
-                                    Long value = null;
-                                    try {
-                                        value = Long.valueOf(attribute.getValue().get(0).getValue());
-                                    }
-                                    catch (Exception e) {
-                                        logger.error("Empty value of bti unom. Use null value");
-                                    }
-                                    info.setUnom(value);
+                                    info.setUnom(stringToLongNullSafe(attribute.getValue().get(0).getValue()));
                                 }
                                 if ("unique_address_id".equals(attribute.getName())){
-                                    Long value = null;
-                                    try {
-                                        value = Long.valueOf(attribute.getValue().get(0).getValue());
-                                    }
-                                    catch (Exception e) {
-                                        logger.error("Empty value of unique_address_id. Use null value");
-                                    }
-                                    info.setUniqueAddressId(value);
+                                    info.setUniqueAddressId(stringToLongNullSafe(attribute.getValue().get(0).getValue()));
                                 }
                             }
                         }
@@ -273,7 +258,8 @@ public class OrgMskNSIService extends MskNSIService {
                     list.add(info);
                 }
             } catch (Exception e) {
-                logger.error("Error parsing ORGs info from registry", e);
+                String str = info.getShortName() == null ? "" : info.getShortName();
+                logger.error(String.format("Error parsing ORGs info from registry. Org: %s", str), e);
             }
         }
         return list;
@@ -358,13 +344,7 @@ public class OrgMskNSIService extends MskNSIService {
                         info.setAddress(attribute.getValue().get(0).getValue());
                     }
                     if("unique_address_id".equals(attribute.getName())){
-                        Long value = null;
-                        try {
-                            value = Long.valueOf(attribute.getValue().get(0).getValue());
-                        }
-                        catch (Exception e) {
-                            logger.error("Empty value of unique_address_id. Use null value");
-                        }
+                        Long value = stringToLongNullSafe(attribute.getValue().get(0).getValue());
                         info.setAdditionalId(value);
                         info.setUniqueAddressId(value); //todo почему 2 одинаковых значения?
                     }
@@ -380,10 +360,10 @@ public class OrgMskNSIService extends MskNSIService {
                     }
                     //====begin сюда добавляю заполнение полей для __Item
                     if("БТИ.unom".equals(attribute.getName())){
-                        info.setUnom(Long.valueOf(attribute.getValue().get(0).getValue()));
+                        info.setUnom(stringToLongNullSafe(attribute.getValue().get(0).getValue()));
                     }
                     if("БТИ.unad".equals(attribute.getName())){
-                        info.setUnad(Long.valueOf(attribute.getValue().get(0).getValue()));
+                        info.setUnad(stringToLongNullSafe(attribute.getValue().get(0).getValue()));
                     }
                     /*if("unique_address_id".equals(attribute.getName())){
                         info.setUniqueAddressId(Long.valueOf(attribute.getValue().get(0).getValue()));
@@ -393,6 +373,14 @@ public class OrgMskNSIService extends MskNSIService {
                 result.add(info);
             }
         }
+        return result;
+    }
+
+    private Long stringToLongNullSafe(String value) {
+        Long result = null;
+        try {
+            result = Long.valueOf(value);
+        } catch (Exception ignore) { }
         return result;
     }
 
