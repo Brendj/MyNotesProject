@@ -187,6 +187,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
+                Long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock(MAX_BATCH_SIZE);
+                int count = 0;
                 try {
                     String csvFile = path + i + ".csv";
                     br = new BufferedReader(new FileReader(csvFile));
@@ -206,6 +208,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                         }
 
                         Client client = DAOUtils.findClientByGuid(persistenceSession, parameters[2]);
+
                         if (client != null) {
 
                             String gender = parameters[6];
@@ -234,7 +237,12 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                                 }
                             }
 
+                            client.setClientRegistryVersion(clientRegistryVersion + count);
                             persistenceSession.update(client);
+                            count++;
+                            if(count == (MAX_BATCH_SIZE - 1)){
+                                clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock(MAX_BATCH_SIZE);
+                            }
                             LineResult result = new LineResult(currentLineNo, 0, "Данные успешно изменены", client.getIdOfClient());
                             lineResults.add(result);
 
@@ -439,7 +447,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
         Map<GuardianItem, ClientItem> batchMap = new HashMap<GuardianItem, ClientItem>();
         for(Map.Entry<Long, Map<GuardianItem, ClientItem>> entry : orgMap.entrySet()) {
-            for(Map.Entry<GuardianItem, ClientItem> entry1 : createMap.entrySet()) {
+            for(Map.Entry<GuardianItem, ClientItem> entry1 : entry.getValue().entrySet()) {
                 batchMap.put(entry1.getKey(), entry1.getValue());
                 if(batchMap.size() % MAX_BATCH_SIZE == 0){
                     createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey());
@@ -447,6 +455,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 }
             }
             createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey());
+            batchMap = new HashMap<GuardianItem, ClientItem>();
         }
 
 
