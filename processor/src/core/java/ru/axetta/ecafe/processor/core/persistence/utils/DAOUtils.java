@@ -896,11 +896,12 @@ public class DAOUtils {
             query.setParameter("idOfRegistry", Registry.THE_ONLY_INSTANCE_ID);
             query.setLockMode("r", LockMode.PESSIMISTIC_WRITE);
             Registry registry = (Registry)query.uniqueResult();
+            Long result = registry.getClientRegistryVersion() + 1;
             registry.setClientRegistryVersion(registry.getClientRegistryVersion() + count);
             session.update(registry);
             transaction.commit();
             transaction = null;
-            return registry.getClientRegistryVersion();
+            return result;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
