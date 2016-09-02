@@ -4,13 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.AddPayment;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.LogicalExpression;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
 
@@ -119,7 +118,8 @@ public class CurrentPositionsManager {
     }
 
     public void changeCurrentPosition(Long sum, Contragent debtor, Contragent creditor) {
-        if (currentPositionList != null) {
+        return;
+        /*if (currentPositionList != null) {
             CurrentPositionItem currentPosition = null;
             for (CurrentPositionItem currentPositionItem : currentPositionList) {
                 if ((currentPositionItem.getIdOfContragentDebtor().equals(debtor.getIdOfContragent()) &&
@@ -162,7 +162,7 @@ public class CurrentPositionsManager {
                 currentPosition.setSumma(sum);
                 session.persist(currentPosition);
             }
-        }
+        }*/
     }
 
 
