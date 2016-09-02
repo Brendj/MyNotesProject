@@ -539,13 +539,15 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
     private Long updateGuardian(Session persistenceSession, GuardianItem guardianItem, GuardianData guardianData,
             Long newGuardiansVersions, Long clientRegistryVersion) throws Exception {
-        if(!guardianItem.getRelationType().equals(guardianData.getRelationType())){
-            Query query = persistenceSession.createQuery("UPDATE ClientGuardian SET version = :version, relation = :relation "
-                    + "WHERE idOfClientGuardian = :idOfClientGuardian");
-            query.setParameter("version", newGuardiansVersions);
-            query.setParameter("relation", guardianItem.getRelationType());
-            query.setParameter("idOfClientGuardian", guardianData.getIdOfClientGuardian());
-            query.executeUpdate();
+        if(guardianItem.getRelationType() != null){
+            if(!guardianItem.getRelationType().equals(guardianData.getRelationType())) {
+                Query query = persistenceSession.createQuery(
+                        "UPDATE ClientGuardian SET version = :version, relation = :relation " + "WHERE idOfClientGuardian = :idOfClientGuardian");
+                query.setParameter("version", newGuardiansVersions);
+                query.setParameter("relation", guardianItem.getRelationType());
+                query.setParameter("idOfClientGuardian", guardianData.getIdOfClientGuardian());
+                query.executeUpdate();
+            }
         }
 
         Query query = persistenceSession.createQuery("UPDATE Client SET clientRegistryVersion = :clientRegistryVersion, "
