@@ -205,8 +205,12 @@ public class ClientDao extends WritableJpaDao {
         createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, clientInfo.getNotifyViaPUSH());
         createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, clientInfo.getNotifyViaSMS());
         createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, clientInfo.getNotifyViaEmail());
-        createConfig.setValue(ClientManager.FieldId.MOBILE_PHONE, clientInfo.getMobile());
-        createConfig.setValue(ClientManager.FieldId.EMAIL, clientInfo.getEmail());
+        if (clientInfo.getMobile() != null) {
+            createConfig.setValue(ClientManager.FieldId.MOBILE_PHONE, clientInfo.getMobile());
+        }
+        if (clientInfo.getEmail() != null) {
+            createConfig.setValue(ClientManager.FieldId.EMAIL, clientInfo.getEmail());
+        }
         if (clientInfo.getSsoid() != null) {
             createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
         }
