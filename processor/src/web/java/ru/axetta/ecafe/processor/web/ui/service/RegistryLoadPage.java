@@ -25,6 +25,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.findClientGroupByGroupNameAndIdOfOrg;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Liya
@@ -386,7 +388,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
 
         for(ClientItem clientItem : clientItems){
             if(clientItem.getClientData() == null){
-                LineResult result = new LineResult(orgInt + "/" + clientItem.getCount(), 110, "Клиент с GUID=" + clientItem.getGuid() + " не найден", null);
+                LineResult result = new LineResult(orgInt + "/" + clientItem.getCount(), 110, "Клиент с GUID=" +
+                        clientItem.getGuid() + " не найден или находится в группе выбывших", null);
                 lineResults.put(clientItem.getCount(), result);
                 continue;
             }
@@ -457,8 +460,6 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             createGuardiansBatch(orgInt, lineResults, batchMap, entry.getKey());
             batchMap = new HashMap<GuardianItem, ClientItem>();
         }
-
-
     }
 
     private void createGuardiansBatch(int orgInt, Map<Integer, LineResult> lineResults,
@@ -471,6 +472,8 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+            ClientGroup clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession,
+                    idOfOrg, ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
             List<Long> contractIds = RuntimeContext.getInstance().getClientContractIdGenerator()
                     .generateTransactionFree(idOfOrg, createMap.size());
             int i = 0;
@@ -480,7 +483,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             for(Map.Entry<GuardianItem, ClientItem> entry : createMap.entrySet()) {
                 try {
                     Long idOfGuardian = createGuardian(persistenceSession, entry.getKey(), entry.getValue(), org,
-                            contractIds.get(i), newGuardiansVersions, clientRegistryVersion);
+                            contractIds.get(i), newGuardiansVersions, clientRegistryVersion, clientGroup);
                     i++;
                     newGuardiansVersions++;
                     clientRegistryVersion++;
@@ -572,7 +575,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
     }
 
     private Long createGuardian(Session persistenceSession, GuardianItem guardianItem, ClientItem clientItem, Org org,
-            Long contractId, Long newGuardiansVersions, Long clientRegistryVersion) throws Exception {
+            Long contractId, Long newGuardiansVersions, Long clientRegistryVersion, ClientGroup clientGroup) throws Exception {
         Long limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
 
         Person person = new Person(guardianItem.getFirstName(), guardianItem.getSurName(), guardianItem.getSecondName());
@@ -589,6 +592,9 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 date, 0, "" + contractId, 0, clientRegistryVersion, limit,
                 RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 
+        if (clientGroup != null) {
+            guardian.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        }
         guardian.setMobile(guardianItem.getPhones().get(0));
         if(guardianItem.getPhones().size() > 1){
             guardian.setPhone(guardianItem.getPhones().get(1));
@@ -617,6 +623,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         }
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.in("clientGUID", guids));
+        criteria.add(Restrictions.lt("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
         criteria.createAlias("org", "org");
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.property("idOfClient"))
