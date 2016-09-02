@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -15,6 +14,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,13 +38,11 @@ public class ContractIdGenerator {
     }
 
     public long generateTransactionFree (long idOfOrg, Session session) throws Exception {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        return generateTransactionFree(org);
+        return generateTransactionFree(idOfOrg, 1).get(0);
     }
 
-    //public long generateTransactionFree (Org org, Session session) throws Exception {
-    public long generateTransactionFree (Org org) throws Exception {
-        Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(org.getIdOfOrg()); //org.getLastClientContractId();
+    public List<Long> generateTransactionFree (long idOfOrg, int count) throws Exception {
+        Long lastClientContractId = DAOUtils.updateOrgLastContractIdWithPessimisticLock(idOfOrg, count); //org.getLastClientContractId();
 
         Long contractIdSize = null;
         String s = (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.client.contractIdSize");
@@ -52,17 +52,16 @@ public class ContractIdGenerator {
             contractIdSize = 10L;
         }
         Long divider = (contractIdSize == 10) ? 1000000000L : 100000000L;
-        lastClientContractId = DAOService.getInstance().getNextFreeLastClientContractId(divider, org.getIdOfOrg(), lastClientContractId);
-        if (lastClientContractId == null) {
+        List<Long> lastClientContractIds = DAOService.getInstance().getNextFreeLastClientContractId(divider, idOfOrg, lastClientContractId, count);
+        if (lastClientContractIds.isEmpty()) {
             throw new IllegalArgumentException("Not available client contractId");
         }
 
-        long newClientContractId = getNextContractId(org.getIdOfOrg(), lastClientContractId);
         //org.setLastClientContractId(lastClientContractId);
         //org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         //session.update(org);
         //session.flush();
-        return newClientContractId;
+        return getNextContractIds(idOfOrg, lastClientContractIds);
     }
 
     public long generate(long idOfOrg) throws Exception {
@@ -80,6 +79,14 @@ public class ContractIdGenerator {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    protected static List<Long> getNextContractIds(long idOfOrg, List<Long> lastClientContractIds) {
+        List<Long> result = new ArrayList<Long>();
+        for(Long lastClientContractId : lastClientContractIds){
+            result.add(getNextContractId(idOfOrg, lastClientContractId));
+        }
+        return result;
     }
 
     protected static long getNextContractId(long idOfOrg, long lastClientContractId) {

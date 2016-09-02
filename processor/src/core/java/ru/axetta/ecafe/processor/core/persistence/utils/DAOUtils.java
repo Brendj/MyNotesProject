@@ -884,6 +884,10 @@ public class DAOUtils {
     }
 
     public static long updateClientRegistryVersionWithPessimisticLock() throws Exception {
+        return updateClientRegistryVersionWithPessimisticLock(1);
+    }
+
+    public static long updateClientRegistryVersionWithPessimisticLock(int count) throws Exception {
         Transaction transaction = null;
         Session session = RuntimeContext.getInstance().createPersistenceSession();
         try {
@@ -892,7 +896,7 @@ public class DAOUtils {
             query.setParameter("idOfRegistry", Registry.THE_ONLY_INSTANCE_ID);
             query.setLockMode("r", LockMode.PESSIMISTIC_WRITE);
             Registry registry = (Registry)query.uniqueResult();
-            registry.setClientRegistryVersion(registry.getClientRegistryVersion() + 1);
+            registry.setClientRegistryVersion(registry.getClientRegistryVersion() + count);
             session.update(registry);
             transaction.commit();
             transaction = null;
@@ -903,7 +907,7 @@ public class DAOUtils {
         }
     }
 
-    public static long updateOrgLastContractIdWithPessimisticLock(Long idOfOrg) throws Exception {
+    public static long updateOrgLastContractIdWithPessimisticLock(Long idOfOrg, int count) throws Exception {
         Transaction transaction = null;
         Session session = RuntimeContext.getInstance().createPersistenceSession();
         try {
@@ -912,11 +916,12 @@ public class DAOUtils {
             query.setParameter("idOfOrg", idOfOrg);
             query.setLockMode("r", LockMode.PESSIMISTIC_WRITE);
             OrgContractId orgContractId = (OrgContractId)query.uniqueResult();
-            orgContractId.setLastClientContractId(orgContractId.getLastClientContractId() + 1);
+            Long result = orgContractId.getLastClientContractId() + 1;
+            orgContractId.setLastClientContractId(orgContractId.getLastClientContractId() + count);
             session.update(orgContractId);
             transaction.commit();
             transaction = null;
-            return orgContractId.getLastClientContractId();
+            return result;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);

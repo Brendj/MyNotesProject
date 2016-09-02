@@ -107,23 +107,34 @@ public class DAOService {
         return !list.isEmpty();
     }
 
-    public Long getNextFreeLastClientContractId(long divider, long idOfOrg, long lastClientContractId) {
+    public List<Long> getNextFreeLastClientContractId(long divider, long idOfOrg, long lastClientContractId, int count) {
         //Запрос правильный, не менять.
-        String qstr = "SELECT min(num) FROM (SELECT num FROM generate_series(:lastClientContractId, 99999) num\n"
+        String num = "";
+        String end = "";
+        if(count == 1){
+            num = "min(num)";
+        } else {
+            num = "num";
+            end = " order by num limit " + count;
+        }
+        String qstr = "SELECT " + num + " FROM (SELECT num FROM generate_series(:lastClientContractId, 99999) num\n"
                 + "                EXCEPT\n" + "                SELECT\n" + "        CASE\n"
                 + "                WHEN contractid/:divider > 0 THEN (contractid/:divider)*10000 + (contractid%100000)/10\n"
                 + "        WHEN contractid/:divider = 0 THEN (contractid%100000)/10\n" + "        END AS num\n"
-                + "        FROM cf_clients WHERE (contractid/:divider > 0 AND (contractid%:divider)/100000=:idoforg) OR (contractid/:divider = 0 AND contractid/100000=:idoforg)) AS list";
+                + "        FROM cf_clients WHERE (contractid/:divider > 0 AND (contractid%:divider)/100000=:idoforg) "
+                + "OR (contractid/:divider = 0 AND contractid/100000=:idoforg)) AS list" + end;
         Query nativeQuery = entityManager.createNativeQuery(qstr);
         nativeQuery.setParameter("lastClientContractId", lastClientContractId);
         nativeQuery.setParameter("divider", divider);
         nativeQuery.setParameter("idoforg", idOfOrg);
-        Object res = nativeQuery.getSingleResult();
-        Long result = null;
+        List res = nativeQuery.getResultList();
+        List<Long> result = new ArrayList<Long>();
         if (res != null) {
-            result = ((BigInteger)res).longValue();
+            for(Object o : res){
+                Long value = ((BigInteger)o).longValue();
+                result.add(value);
+            }
         }
-
         return result;
     }
 
