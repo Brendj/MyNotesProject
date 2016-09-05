@@ -65,10 +65,6 @@ public class AccountsRegistryHandler {
             accountsRegistry.getAccountItems().add(new AccountItem(client));
         }
 
-        for (Client client : clientList) {
-            accountsRegistry.getAccountItems().add(new AccountItem(client));
-        }
-
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
         /*List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrg(idOfOrgs);
         for (Visitor visitor : visitorsWithCardsByOrg) {
