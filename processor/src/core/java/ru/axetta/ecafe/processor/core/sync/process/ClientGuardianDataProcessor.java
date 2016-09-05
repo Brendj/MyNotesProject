@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sync.response.ClientGuardianData;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
@@ -50,6 +51,11 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
         List<Long> clientIds = clientsCriteria.list();
         List<Long> migrantIds = MigrantsUtils.getActiveMigrantsIdsForOrg(session, idOfOrg);
 
+        DetachedCriteria subCriteria = DetachedCriteria.forClass(Client.class);
+        subCriteria.createAlias("org", "o");
+        subCriteria.add(Restrictions.in("o.idOfOrg", getFriendlyOrgsId(idOfOrg)));
+        subCriteria.setProjection(Property.forName("idOfClient"));
+
         ClientGuardianData clientGuardianData;
         if (clientIds.size() > 0 || migrantIds.size() > 0) {
 
@@ -57,7 +63,7 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
             if(clientIds.size() > 0) {
                 Criteria criteria = session.createCriteria(ClientGuardian.class);
                 criteria.add(Restrictions
-                        .or(Restrictions.in("idOfGuardian", clientIds), Restrictions.in("idOfChildren", clientIds)));
+                        .or(Property.forName("idOfGuardian").in(subCriteria), Property.forName("idOfChildren").in(subCriteria)));
                 criteria.add(Restrictions.gt("version", maxVersion));
                 clientList = criteria.list();
             }
