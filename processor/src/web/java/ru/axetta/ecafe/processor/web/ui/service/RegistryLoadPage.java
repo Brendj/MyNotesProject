@@ -279,7 +279,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         }
     }
 
-    private void processGuardians(String path, Long lastFile, Long firstFile, List<LineResult> lineResults) throws Exception {
+    private synchronized void processGuardians(String path, Long lastFile, Long firstFile, List<LineResult> lineResults) throws Exception {
         BufferedReader br = null;
         String line;
         for(int i = firstFile.intValue(); i <= lastFile; i++) {
