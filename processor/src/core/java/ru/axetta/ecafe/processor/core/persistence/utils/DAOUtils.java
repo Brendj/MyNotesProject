@@ -151,6 +151,17 @@ public class DAOUtils {
         return ((Client)l.get(0));
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<Client> findClientsByGuids(EntityManager em, List<String> guids) {
+        if(guids.size() == 0){
+            return new ArrayList<Client>();
+        }
+        javax.persistence.Query q = em.createQuery("from Client where clientGUID in :guids");
+        q.setParameter("guids", guids);
+        List<Client> result = (List<Client>) q.getResultList();
+        return result != null ? result : new ArrayList<Client>();
+    }
+
     public static Client getClientByMobilePhone(EntityManager em, String mobile) {
         /*javax.persistence.Query q = em.createQuery("from Client where mobile=:mobile");
         q.setParameter("mobile", mobile);

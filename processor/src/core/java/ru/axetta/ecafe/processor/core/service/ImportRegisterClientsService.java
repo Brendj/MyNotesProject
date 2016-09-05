@@ -306,6 +306,18 @@ public class ImportRegisterClientsService {
         List<Client> currentClients = DAOUtils.findClientsWithoutPredefinedForOrgAndFriendly(em, org);
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
+        List<String> pupilsGuidList = new ArrayList<String>();
+        for (ExpandedPupilInfo pupil : pupils) {
+            if(pupil.getGuid() != null && !pupil.getGuid().isEmpty()) {
+                pupilsGuidList.add(pupil.getGuid());
+            }
+        }
+
+        List<Client> findByGuidsList = DAOUtils.findClientsByGuids(em, pupilsGuidList);
+        Map<String, Client> guidMap = new HashMap<String, Client>();
+        for(Client client : findByGuidsList){
+            guidMap.put(client.getClientGUID(), client);
+        }
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
         //  наличие в школе. Иначе - смотрим флаг удалено/не удалено и в зависимости от этого помещаем ученика в удаленные
@@ -358,7 +370,7 @@ public class ImportRegisterClientsService {
         } else {
             for (ExpandedPupilInfo epi : pupils) {
                 if (epi.deleted) {
-                    Client dbClient = DAOUtils.findClientByGuid(em, epi.guid);
+                    Client dbClient = guidMap.get(emptyIfNull(epi.getGuid()));
                     if (dbClient == null) {
                         continue;
                     }
@@ -381,7 +393,7 @@ public class ImportRegisterClientsService {
         for (ExpandedPupilInfo pupil : pupils) {
             FieldProcessor.Config fieldConfig;
             boolean updateClient = false;
-            Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
+            Client cl = guidMap.get(emptyIfNull(pupil.getGuid()));
             if (cl == null) {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
@@ -742,6 +754,18 @@ public class ImportRegisterClientsService {
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
         //orgsList.add(org);
 
+        List<String> pupilsGuidList = new ArrayList<String>();
+        for (ExpandedPupilInfo pupil : pupils) {
+            if(pupil.getGuid() != null && !pupil.getGuid().isEmpty()) {
+                pupilsGuidList.add(pupil.getGuid());
+            }
+        }
+
+        List<Client> findByGuidsList = DAOUtils.findClientsByGuids(em, pupilsGuidList);
+        Map<String, Client> guidMap = new HashMap<String, Client>();
+        for(Client client : findByGuidsList){
+            guidMap.put(client.getClientGUID(), client);
+        }
 
         //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
         //  отправляем уведомление на email
@@ -847,7 +871,7 @@ public class ImportRegisterClientsService {
         for (ExpandedPupilInfo pupil : pupils) {
             FieldProcessor.Config fieldConfig;
             boolean updateClient = false;
-            Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
+            Client cl = guidMap.get(emptyIfNull(pupil.getGuid()));
             if (cl == null) {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
