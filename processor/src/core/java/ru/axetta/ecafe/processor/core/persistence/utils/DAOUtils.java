@@ -140,8 +140,12 @@ public class DAOUtils {
     }
 
     public static Client findClientByGuid(EntityManager em, String guid) {
+        if(guid == null || guid.isEmpty()){
+            return null;
+        }
         javax.persistence.Query q = em.createQuery("from Client where clientGUID=:guid");
         q.setParameter("guid", guid);
+        q.setMaxResults(1);
         List l = q.getResultList();
         if (l.size()==0) return null;
         return ((Client)l.get(0));
