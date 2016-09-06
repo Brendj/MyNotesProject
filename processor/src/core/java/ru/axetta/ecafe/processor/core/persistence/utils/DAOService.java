@@ -2261,4 +2261,43 @@ public class DAOService {
             HibernateUtils.close(session, logger);
         }
     }
+
+    @Transactional
+    public Boolean isSverkaEnabled() {
+        try {
+            String str_query = "select optiontext from cf_options where idofoption = :idofoption";
+            Query q = entityManager
+                    .createNativeQuery(str_query);
+            q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
+            List list = q.getResultList();
+            if (list.size() == 0) {
+                return true;
+            } else {
+                return ((String)list.get(0)).equals("1");
+            }
+        } catch (Exception e) {
+            logger.error("Can't get sverka permission value");
+            return true;
+        }
+    }
+
+    @Transactional
+    public void setSverkaEnabled(Boolean value) {
+        String val_str = value ? "1" : "0";
+        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
+        Query q = entityManager
+                .createNativeQuery(str_query);
+        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
+        List list = q.getResultList();
+        if (list.size() == 0) {
+            str_query = "insert into cf_options (idofoption, optiontext) values(:idofoption, :value)";
+        } else {
+            str_query = "update cf_options set optiontext = :value where idofoption = :idofoption";
+        }
+
+        q = entityManager.createNativeQuery(str_query);
+        q.setParameter("value", val_str);
+        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
+        q.executeUpdate();
+    }
 }

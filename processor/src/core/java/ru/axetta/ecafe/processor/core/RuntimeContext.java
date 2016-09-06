@@ -1451,6 +1451,7 @@ public class RuntimeContext implements ApplicationContextAware {
     @Transactional
     public void saveOptionValues() {
         for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
+            if (e.getKey().equals(Option.OPTION_SVERKA_ENABLED)) continue;
             Option o = new Option((long) e.getKey(), e.getValue());
             o = entityManager.merge(o);
             entityManager.persist(o);

@@ -305,6 +305,12 @@
                 <f:facet name="header"><h:outputText styleClass="column-header"
                                                                       value="Импорт данных из АИС Реестры" /></f:facet>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Состояние сверки контингента: #{optionPage.isSverkaEnabledString()}"
+                                  styleClass="output-text" />
+                    <a4j:commandButton value="Включить" action="#{optionPage.turnOnSverka()}" rendered="#{!optionPage.isSverkaEnabled()}"
+                                       reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
+                    <a4j:commandButton value="Выключить" action="#{optionPage.turnOffSverka()}" rendered="#{optionPage.isSverkaEnabled()}"
+                                       reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
                     <h:outputText escape="true" value="Производить автоматическую сверку клиентов"
                                                        styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterClients}" styleClass="output-text" />

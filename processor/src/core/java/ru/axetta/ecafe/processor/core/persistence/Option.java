@@ -127,7 +127,8 @@ public class Option {
             OPTION_SECURITY_MAX_AUTH_FAULT_COUNT = 100077,
             OPTION_SECURITY_TMP_BLOCK_ACC_TIME = 100078,
             OPTION_IMPORT_RNIP_USE_XADEST_ON=100079,
-            OPTION_DISABLE_EMAIL_EDIT=100080;
+            OPTION_DISABLE_EMAIL_EDIT=100080,
+            OPTION_SVERKA_ENABLED=100081;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -232,6 +233,7 @@ public class Option {
             OPTION_SECURITY_TMP_BLOCK_ACC_TIME, "5",
             OPTION_IMPORT_RNIP_USE_XADEST_ON, "0",
             OPTION_DISABLE_EMAIL_EDIT, "0",
+            OPTION_SVERKA_ENABLED, "1",
 };
 
     private Long idOfOption;

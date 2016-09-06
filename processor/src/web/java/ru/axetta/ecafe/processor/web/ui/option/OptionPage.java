@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.RNIPVersion;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -1050,5 +1051,21 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setRNIPTSAServer(String RNIPTSAServer) {
         this.RNIPTSAServer = RNIPTSAServer;
+    }
+
+    public Boolean isSverkaEnabled() {
+        return DAOService.getInstance().isSverkaEnabled();
+    }
+
+    public String isSverkaEnabledString() {
+        return DAOService.getInstance().isSverkaEnabled() ? "Включено" : "Выключено";
+    }
+
+    public void turnOnSverka() {
+        DAOService.getInstance().setSverkaEnabled(true);
+    }
+
+    public void turnOffSverka() {
+        DAOService.getInstance().setSverkaEnabled(false);
     }
 }
