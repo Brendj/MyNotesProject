@@ -74,3 +74,7 @@ CREATE TABLE cf_registrychange_guardians (
   CONSTRAINT cf_registrychange_guardians_pk PRIMARY KEY (idOfRegistryGuardian),
   CONSTRAINT cf_registrychange_guardians_registrychange_fk FOREIGN KEY (idofregistrychange) REFERENCES cf_registrychange (idofregistrychange)
 );
+
+--ИНдексы на таблицу истороии синхронизации
+CREATE INDEX cf_synchistory_calc2_idoforg_idx ON cf_synchistory_calc2 USING btree (idoforg);
+CREATE INDEX cf_synchistory_calc2_calcdateat_idx ON cf_synchistory_calc2 USING btree (calcdateat);
