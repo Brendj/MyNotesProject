@@ -1180,6 +1180,9 @@ public class ImportRegisterClientsService {
     @Transactional
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {
+        if (!DAOService.getInstance().isSverkaEnabled()) {
+            throw new Exception("Service temporary unavailable");
+        }
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         Org org = em.find(Org.class, idOfOrg);
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
