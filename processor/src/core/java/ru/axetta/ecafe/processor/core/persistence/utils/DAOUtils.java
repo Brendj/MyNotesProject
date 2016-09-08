@@ -1989,23 +1989,16 @@ public class DAOUtils {
         List<Long> clients = q.list();
 
         if (clients != null && !clients.isEmpty()){
-            List<BigInteger> children = new ArrayList<BigInteger>();
             List<Long> clientsCopy = new ArrayList<Long>(clients);
             for(Long id : clientsCopy){
                 Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                 criteria.add(Restrictions.eq("idOfGuardian", id));
                 List<ClientGuardian> list = criteria.list();
                 if (list != null && list.size() > 0) {
-                    Boolean activeGuardianshipExists = false;
                     for (ClientGuardian cg : list) {
-                        if (!cg.isDisabled()) {
-                            clients.add(cg.getIdOfChildren());
-                            activeGuardianshipExists = true;
-                        }
+                        clients.add(cg.getIdOfChildren());
                     }
-                    if (activeGuardianshipExists) {
-                        clients.remove(id);
-                    }
+                    clients.remove(id);
                 }
             }
         }
