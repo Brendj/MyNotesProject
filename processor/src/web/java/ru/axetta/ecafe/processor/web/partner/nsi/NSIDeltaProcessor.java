@@ -18,8 +18,6 @@ import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.util.IOUtils;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -29,9 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -350,9 +347,6 @@ public class NSIDeltaProcessor {
                 }
                 else if(attributeName.endsWith("guid образовательного учреждения")) {
                     orgGuid = getSingleValue(at);
-                }
-                else if(attributeName.endsWith("статус записи")) {
-                    action = Action.DELETED.ordinal();
                 }
             }
         }
