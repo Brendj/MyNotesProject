@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,17 +43,33 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
         ResClientPhotos result = new ResClientPhotos();
         List<ResClientPhotosItem> items = new ArrayList<ResClientPhotosItem>();
         try {
+            List<Long> clientIdsList = new ArrayList<Long>();
+            for(ClientPhotosItem item : clientPhotos.getItems()) {
+                clientIdsList.add(item.getIdOfClient());
+            }
+            List<Client> clientList = DAOUtils.findClients(session, clientIdsList);
+            Map<Long, Client> clientMap = new HashMap<Long, Client>();
+            for(Client client : clientList) {
+                clientMap.put(client.getIdOfClient(), client);
+            }
+            List<ClientPhoto> clientPhotosList = ImageUtils.findClientPhotos(session, clientIdsList);
+            Map<Long, ClientPhoto> clientPhotoMap = new HashMap<Long, ClientPhoto>();
+            for(ClientPhoto clientPhoto : clientPhotosList) {
+                clientPhotoMap.put(clientPhoto.getIdOfClient(), clientPhoto);
+            }
+
             ResClientPhotosItem resItem;
             for(ClientPhotosItem item : clientPhotos.getItems()){
                 Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
-                if(item.getResCode().equals(ClientPhotosItem.ERROR_CODE_ALL_OK)){
-                    Client client = (Client) session.load(Client.class, item.getIdOfClient());
-                    ClientPhoto clientPhoto = client.getPhoto();
+                if(item.getResCode().equals(ClientPhotosItem.ERROR_CODE_ALL_OK)) {
+                    Client client = clientMap.get(item.getIdOfClient());
+                    ClientPhoto clientPhoto = clientPhotoMap.get(client.getIdOfClient());
                     if(clientPhoto == null){
                         try {
                             String imageName = ImageUtils
-                                    .saveImage(client.getContractId(), client.getIdOfClient(), item.getImageData(), false);
-                            clientPhoto = new ClientPhoto(client, null, imageName, false);
+                                    .saveImage(client.getContractId(), client.getIdOfClient(),
+                                            ImageUtils.getImageFromString(item.getImage()), false);
+                            clientPhoto = new ClientPhoto(client.getIdOfClient(), null, imageName, false);
                             clientPhoto.setIsApproved(true);
                             clientPhoto.setVersion(nextVersion);
                             session.save(clientPhoto);
@@ -64,7 +80,8 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
                         }
                     } else {
                         try {
-                            ImageUtils.saveImage(client, item.getImageData(), false);
+                            ImageUtils.saveImage(client, clientPhoto,
+                                    ImageUtils.getImageFromString(item.getImage()), false);
                             clientPhoto.setIsApproved(true);
                             clientPhoto.setVersion(nextVersion);
                             session.update(clientPhoto);
@@ -107,22 +124,22 @@ public class ClientPhotosProcessor extends AbstractProcessor<ResClientPhotos>{
         List<ResClientPhotosItem> items = new ArrayList<ResClientPhotosItem>();
         ResClientPhotosItem resItem;
         List<ClientPhoto> list = DAOUtils.getClientPhotosForFriendlyOrgsSinceVersion(session,
-                clientPhotos.getIdOfOrgOwner(), clientPhotos.getMaxVersion());
-        Collections.sort(list, new Comparator<ClientPhoto>() {
+                clientPhotos.getIdOfOrgOwner(), clientPhotos.getMaxVersion(), clientPhotos.getSyncPhotoCount());
+        List<Long> clientsIds = new ArrayList<Long>();
+        for(ClientPhoto clientPhoto : list) {
+            clientsIds.add(clientPhoto.getIdOfClient());
+        }
+        List<Client> clientList = DAOUtils.findClients(session, clientsIds);
+        Map<Long, Client> clientMap = new HashMap<Long, Client>();
+        for(Client client : clientList) {
+            clientMap.put(client.getIdOfClient(), client);
+        }
 
-            public int compare(ClientPhoto cp1, ClientPhoto cp2) {
-                return cp1.getVersion().compareTo(cp2.getVersion());
-            }
-        });
-        int count = 1;
         for(ClientPhoto cp : list){
-            if(count > clientPhotos.getSyncPhotoCount()){
-                break;
-            }
             resItem = new ResClientPhotosItem(cp);
-            resItem.setImageData(ImageUtils.getPhotoString(cp.getClient(), ImageUtils.ImageSize.MEDIUM.getValue(), false));
+            resItem.setImageData(ImageUtils.getPhotoString(clientMap.get(cp.getIdOfClient()), cp,
+                    ImageUtils.ImageSize.MEDIUM.getValue(), false));
             items.add(resItem);
-            count++;
         }
 
         result.setItems(items);

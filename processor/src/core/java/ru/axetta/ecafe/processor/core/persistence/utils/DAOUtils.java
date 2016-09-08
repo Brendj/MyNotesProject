@@ -85,6 +85,16 @@ public class DAOUtils {
         return (Client) persistenceSession.get(Client.class, idOfClient);
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<Client> findClients(Session session, List<Long> clientIds){
+        if(clientIds.size() == 0) {
+            return new ArrayList<Client>();
+        }
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.in("idOfClient", clientIds));
+        return criteria.list();
+    }
+
     public static List findClientsBySan (Session persistenceSession, String san) {
         org.hibernate.Query query = persistenceSession.createSQLQuery("select CF_Clients.IdOfClient "
                                                                     + "from CF_Clients "
@@ -2333,12 +2343,18 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List<ClientPhoto> getClientPhotosForFriendlyOrgsSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
-        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+    public static List<ClientPhoto> getClientPhotosForFriendlyOrgsSinceVersion(Session session, Long idOfOrg,
+            long version, int limit) throws Exception {
+        Org org1 = (Org) session.load(Org.class, idOfOrg);
+        DetachedCriteria subCriteria = DetachedCriteria.forClass(Client.class);
+        subCriteria.createAlias("org", "o");
+        subCriteria.add(Restrictions.in("o.idOfOrg", OrgUtils.getFriendlyOrgIds(org1)));
+        subCriteria.setProjection(Property.forName("idOfClient"));
         Criteria criteria = session.createCriteria(ClientPhoto.class);
-        criteria.createAlias("client", "client");
-        criteria.add(Restrictions.in("client.org", orgs));
+        criteria.add(Property.forName("idOfClient").in(subCriteria));
         criteria.add(Restrictions.gt("version", version));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("version"));
+        criteria.setMaxResults(limit);
         return criteria.list();
     }
 

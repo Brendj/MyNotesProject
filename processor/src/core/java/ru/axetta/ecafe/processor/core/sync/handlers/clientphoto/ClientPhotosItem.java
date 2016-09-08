@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.clientphoto;
 
-import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -12,7 +11,6 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
@@ -27,13 +25,13 @@ public class ClientPhotosItem {
     public static final Integer ERROR_CODE_PHOTO_NOT_SAVED = 110;
 
     private Long idOfClient;
-    private BufferedImage imageData;
+    private String image;
     private String errorMessage;
     private Integer resCode;
 
     public static ClientPhotosItem build(Node itemNode, Long orgOwner) {
         Long idOfClient = null;
-        BufferedImage imageData = null;
+        String image = null;
 
         EMSetter emSetter = new EMSetter("");
 
@@ -51,26 +49,12 @@ public class ClientPhotosItem {
 
         }
 
-        String imageString = XMLUtils.getAttributeValue(itemNode, "ImageData");
-        if(StringUtils.isNotEmpty(imageString)){
-            try {
-                imageData = ImageUtils.getImageFromString(imageString);
-                if(imageData == null) {
-                    emSetter.setCompositeErrorMessage("Атрибут ImageData некорректен");
-                }
-                //ImageUtils.validateImage(imageData, null, null);
-            //} catch (IOException e) {
-            //    emSetter.setCompositeErrorMessage("Attribute ImageData is incorrect: " + e.getMessage());
-            //} catch (ImageUtils.ImageUtilsException e){
-            //    emSetter.setCompositeErrorMessage("Attribute ImageData is incorrect: " + e.getMessage());
-            } catch (Exception e){
-                emSetter.setCompositeErrorMessage("Атрибут ImageData некорректен");
-            }
-        } else {
+        image = XMLUtils.getAttributeValue(itemNode, "ImageData");
+        if(StringUtils.isEmpty(image)){
             emSetter.setCompositeErrorMessage("Атрибут ImageData не найден");
         }
 
-        return new ClientPhotosItem(idOfClient, imageData, emSetter.getStr());
+        return new ClientPhotosItem(idOfClient, image, emSetter.getStr());
     }
 
     private static Long getLongValue(Node itemNode, String nodeName, ISetErrorMessage www, boolean checkExists) {
@@ -120,9 +104,9 @@ public class ClientPhotosItem {
     public ClientPhotosItem() {
     }
 
-    public ClientPhotosItem(Long idOfClient, BufferedImage imageData, String errorMessage) {
+    public ClientPhotosItem(Long idOfClient, String image, String errorMessage) {
         this.idOfClient = idOfClient;
-        this.imageData = imageData;
+        this.image = image;
         this.errorMessage = errorMessage;
         if(errorMessage.isEmpty() || errorMessage == null){
             this.resCode = ERROR_CODE_ALL_OK;
@@ -139,12 +123,12 @@ public class ClientPhotosItem {
         this.idOfClient = idOfClient;
     }
 
-    public BufferedImage getImageData() {
-        return imageData;
+    public String getImage() {
+        return image;
     }
 
-    public void setImageData(BufferedImage imageData) {
-        this.imageData = imageData;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getErrorMessage() {
