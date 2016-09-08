@@ -1273,9 +1273,19 @@ public class FrontController extends HttpServlet {
             orgs.addAll(org.getFriendlyOrg());
             List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, orgs);
 
+            List<Long> clientsIds = new ArrayList<Long>();
+            for(ClientPhoto clientPhoto : clientPhotos) {
+                clientsIds.add(clientPhoto.getIdOfClient());
+            }
+            List<Client> clientList = DAOUtils.findClients(persistenceSession, clientsIds);
+            Map<Long, Client> clientMap = new HashMap<Long, Client>();
+            for(Client client : clientList) {
+                clientMap.put(client.getIdOfClient(), client);
+            }
+
             for(ClientPhoto clientPhoto : clientPhotos){
-                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
-                        ImageUtils.ImageSize.SMALL.getValue(), true);
+                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientMap.get(clientPhoto.getIdOfClient()),
+                        clientPhoto, ImageUtils.ImageSize.SMALL.getValue(), true);
                 Client guardian = clientPhoto.getGuardian();
                 String guardianName = null;
                 if(guardian != null){
@@ -1308,45 +1318,61 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            List<Long> clientIdsList = new ArrayList<Long>();
+            for(ClientPhotoChangeResult result : results) {
+                clientIdsList.add(result.getClientId());
+            }
+            List<Client> clientList = DAOUtils.findClients(persistenceSession, clientIdsList);
+            Map<Long, Client> clientMap = new HashMap<Long, Client>();
+            for(Client client : clientList) {
+                clientMap.put(client.getIdOfClient(), client);
+            }
+            List<ClientPhoto> clientPhotosList = ImageUtils.findClientPhotos(persistenceSession, clientIdsList);
+            Map<Long, ClientPhoto> clientPhotoMap = new HashMap<Long, ClientPhoto>();
+            for(ClientPhoto clientPhoto : clientPhotosList) {
+                clientPhotoMap.put(clientPhoto.getIdOfClient(), clientPhoto);
+            }
+
             for(ClientPhotoChangeResult result : results){
-                Client client = (Client) persistenceSession.load(Client.class, result.getClientId());
-                int currentPhotoHash = ImageUtils.getPhotoHash(client, ImageUtils.ImageSize.SMALL.getValue(), true);
+                Client client = clientMap.get(result.getClientId());
+                ClientPhoto clientPhoto = clientPhotoMap.get(client.getIdOfClient());
+                int currentPhotoHash = ImageUtils.getPhotoHash(client, clientPhoto, ImageUtils.ImageSize.SMALL.getValue(), true);
                 if(result.getState() == 1){
                     if(result.getSrc() == currentPhotoHash){
                         try {
-                            ImageUtils.moveImage(client);
-                            client.getPhoto().setIsNew(false);
-                            client.getPhoto().setIsCanceled(false);
-                            client.getPhoto().setIsApproved(true);
-                            client.getPhoto().setLastProceedError(null);
+                            ImageUtils.moveImage(client, clientPhoto);
+                            clientPhoto.setIsNew(false);
+                            clientPhoto.setIsCanceled(false);
+                            clientPhoto.setIsApproved(true);
+                            clientPhoto.setLastProceedError(null);
                             Long nextVersion = DAOUtils.nextVersionByClientPhoto(persistenceSession);
-                            client.getPhoto().setVersion(nextVersion);
-                            persistenceSession.update(client.getPhoto());
+                            clientPhoto.setVersion(nextVersion);
+                            persistenceSession.update(clientPhoto);
                         } catch (IOException e){
                             logger.error(e.getMessage(), e);
                             String error = "Не удалось принять фото-расхождение. Обратитесь к администратору сервера: " + e.getMessage();
                             if(error.length() > 256){
                                 error = error.substring(0, 256);
                             }
-                            client.getPhoto().setLastProceedError(error);
-                            persistenceSession.update(client.getPhoto());
+                            clientPhoto.setLastProceedError(error);
+                            persistenceSession.update(clientPhoto);
                         }
                     } else {
-                        client.getPhoto().setLastProceedError("Фото-расхождение было изменено во время сверки");
-                        persistenceSession.update(client.getPhoto());
+                        clientPhoto.setLastProceedError("Фото-расхождение было изменено во время сверки");
+                        persistenceSession.update(clientPhoto);
                     }
                 }
                 if(result.getState() == 2){
                     if(result.getSrc() == currentPhotoHash){
-                        boolean deleted = ImageUtils.deleteImage(client, true);
+                        boolean deleted = ImageUtils.deleteImage(client, clientPhoto, true);
                         if (!deleted) {
-                            client.getPhoto().setLastProceedError("Не удалось удалить фото-расхождение. Обратитесь к администратору сервера.");
-                            persistenceSession.update(client.getPhoto());
+                            clientPhoto.setLastProceedError("Не удалось удалить фото-расхождение. Обратитесь к администратору сервера.");
+                            persistenceSession.update(clientPhoto);
                         } else {
-                            client.getPhoto().setIsNew(false);
-                            client.getPhoto().setIsCanceled(true);
-                            client.getPhoto().setLastProceedError(null);
-                            persistenceSession.update(client.getPhoto());
+                            clientPhoto.setIsNew(false);
+                            clientPhoto.setIsCanceled(true);
+                            clientPhoto.setLastProceedError(null);
+                            persistenceSession.update(clientPhoto);
                         }
                     }
                 }

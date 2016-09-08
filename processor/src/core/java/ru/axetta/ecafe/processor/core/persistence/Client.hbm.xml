@@ -184,8 +184,6 @@
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountChange"/>
         </set>
-
-        <one-to-one name="photo" class="ru.axetta.ecafe.processor.core.persistence.ClientPhoto" cascade="delete"/>
     </class>
 </hibernate-mapping>
 

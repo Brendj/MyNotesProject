@@ -436,7 +436,8 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.clientWardItems = loadWardsByClient(session, idOfClient);
 
         try {
-            this.photoURL = ImageUtils.getPhotoURL(client, ImageUtils.ImageSize.MEDIUM.getValue(), false);
+            ClientPhoto clientPhoto = ImageUtils.findClientPhoto(session, client.getIdOfClient());
+            this.photoURL = ImageUtils.getPhotoURL(client, clientPhoto, ImageUtils.ImageSize.MEDIUM.getValue(), false);
         } catch (Exception e){
             this.photoURL = ImageUtils.getDefaultImageURL();
         }

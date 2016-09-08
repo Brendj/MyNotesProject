@@ -6,13 +6,10 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientPhoto" table="cf_clientphoto" optimistic-lock="version">
-
-        <id name="idOfClient" column="IdOfClient" type="long">
-            <generator class="foreign">
-                <param name="property">client</param>
-            </generator>
+        <id name="idOfClientPhoto" column="IdOfClientPhoto" type="long">
+            <generator class="identity"/>
         </id>
-        <one-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" constrained="true"/>
+        <property name="idOfClient" column="IdOfClient" type="long" not-null="true"/>
         <property name="name" column="name" type="string" not-null="true"/>
         <property name="isNew" column="isnew" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="isCanceled" column="iscanceled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>

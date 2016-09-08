@@ -1825,7 +1825,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (client == null) {
                     return result;
                 }
-                getPhotoUrl(size, result, client, isNew);
+                getPhotoUrl(size, result, client, ImageUtils.findClientPhoto(session, client.getIdOfClient()), isNew);
                 transaction.commit();
                 transaction = null;
             } finally {
@@ -1840,12 +1840,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private void getPhotoUrl(int size, PhotoURLResult result, Client client, boolean isNew) {
+    private void getPhotoUrl(int size, PhotoURLResult result, Client client, ClientPhoto photo, boolean isNew) {
         try {
-            result.URL = ImageUtils.getPhotoURL(client, size, isNew);
+            result.URL = ImageUtils.getPhotoURL(client, photo, size, isNew);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
-            result.status = ImageUtils.getPhotoStatus(client);
+            result.status = ImageUtils.getPhotoStatus(photo);
         } catch (ImageUtils.NoPhotoException e) {
             result.URL = ImageUtils.getDefaultImageURL();
             result.resultCode = RC_CLIENT_DOES_NOT_HAVE_PHOTO;
@@ -1876,21 +1876,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (guardian == null) {
                     return result;
                 }
-                ClientPhoto clientPhoto;
-                if (client.getPhoto() != null) {
-                    clientPhoto = client.getPhoto();
-                    ImageUtils.saveImage(client, photo, true);
+                ClientPhoto clientPhoto = ImageUtils.findClientPhoto(session, client.getIdOfClient());
+                if (clientPhoto != null) {
+                    ImageUtils.saveImage(client, clientPhoto, photo, true);
                     clientPhoto.setIsNew(true);
                     clientPhoto.setIsCanceled(false);
                 } else {
                     String imageName = ImageUtils.saveImage(client.getContractId(), client.getIdOfClient(), photo, true);
-                    clientPhoto = new ClientPhoto(client, guardian, imageName, true);
-                    client.setPhoto(clientPhoto);
+                    clientPhoto = new ClientPhoto(client.getIdOfClient(), guardian, imageName, true);
                 }
                 session.saveOrUpdate(clientPhoto);
                 transaction.commit();
                 transaction = null;
-                getPhotoUrl(size, result, client, true);
+                getPhotoUrl(size, result, client, clientPhoto, true);
             } catch (IOException e){
                 logger.error(RC_IMAGE_NOT_SAVED_DESC + ": " + e.getMessage(), e);
                 result.resultCode = RC_IMAGE_NOT_SAVED;
@@ -1925,17 +1923,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (client == null) {
                     return result;
                 }
-                if (client.getPhoto() != null && client.getPhoto().getIsNew()) {
+                ClientPhoto photo = ImageUtils.findClientPhoto(session, client.getIdOfClient());
+                if (photo != null && photo.getIsNew()) {
                     boolean deleted = ImageUtils.deleteImage(client.getContractId(), client.getIdOfClient(),
-                            client.getPhoto().getName(), true);
+                            photo.getName(), true);
                     if(!deleted){
                         result.resultCode = RC_IMAGE_NOT_DELETED;
                         result.description = RC_IMAGE_NOT_DELETED_DESC;
                     } else {
                         result.resultCode = RC_OK;
                         result.description = RC_OK_DESC;
-                        client.getPhoto().setIsNew(false);
-                        session.update(client.getPhoto());
+                        photo.setIsNew(false);
+                        session.update(photo);
                     }
                 } else {
                     result.resultCode = RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO;

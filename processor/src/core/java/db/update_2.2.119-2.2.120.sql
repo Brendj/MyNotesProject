@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.118
+-- Пакет обновлений 2.2.120
 
 --Получение ид поля таблицы ClientGuardian через генератор
 ALTER TABLE CF_Generators ADD COLUMN idOfClientGuardian BIGINT NOT NULL DEFAULT 0;
@@ -78,3 +78,8 @@ CREATE TABLE cf_registrychange_guardians (
 --ИНдексы на таблицу истороии синхронизации
 CREATE INDEX cf_synchistory_calc2_idoforg_idx ON cf_synchistory_calc2 USING btree (idoforg);
 CREATE INDEX cf_synchistory_calc2_calcdateat_idx ON cf_synchistory_calc2 USING btree (calcdateat);
+
+--Новый ИД для фото
+ALTER TABLE cf_clientphoto
+  DROP CONSTRAINT cf_clientphoto_pk,
+  ADD COLUMN idofclientphoto BIGSERIAL PRIMARY KEY;

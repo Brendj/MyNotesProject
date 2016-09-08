@@ -23,7 +23,9 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.event.ValueChangeEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -127,9 +129,19 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
         orgs.addAll(org1.getFriendlyOrg());
         List<ClientPhoto> clientPhotos = ImageUtils.getNewClientPhotos(persistenceSession, orgs);
 
+        List<Long> clientsIds = new ArrayList<Long>();
+        for(ClientPhoto clientPhoto : clientPhotos) {
+            clientsIds.add(clientPhoto.getIdOfClient());
+        }
+        List<Client> clientList = DAOUtils.findClients(persistenceSession, clientsIds);
+        Map<Long, Client> clientMap = new HashMap<Long, Client>();
+        for(Client client : clientList) {
+            clientMap.put(client.getIdOfClient(), client);
+        }
+
         items = new ArrayList<PhotoRegistryItem>();
         for(ClientPhoto clientPhoto : clientPhotos){
-            items.add(new PhotoRegistryItem(clientPhoto));
+            items.add(new PhotoRegistryItem(clientPhoto, clientMap.get(clientPhoto.getIdOfClient())));
         }
     }
 
@@ -177,10 +189,11 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
     private boolean movePhoto(Session session, PhotoRegistryItem item){
         boolean result = false;
         try {
-            int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), ImageUtils.ImageSize.SMALL.getValue(), true);
+            int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), item.getClientPhoto(),
+                    ImageUtils.ImageSize.SMALL.getValue(), true);
             if(currentPhotoHash == item.getNewPhotoHash()) {
                 Long nextVersion = DAOUtils.nextVersionByClientPhoto(session);
-                ImageUtils.moveImage(item.getClientPhoto().getClient());
+                ImageUtils.moveImage(item.getClient(), item.getClientPhoto());
                 item.getClientPhoto().setIsNew(false);
                 item.getClientPhoto().setIsCanceled(false);
                 item.getClientPhoto().setIsApproved(true);
@@ -208,12 +221,13 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
     private boolean deleteNewPhoto(Session session, PhotoRegistryItem item){
         boolean result = false;
         try {
-            int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), ImageUtils.ImageSize.SMALL.getValue(), true);
+            int currentPhotoHash = ImageUtils.getPhotoHash(item.getClient(), item.getClientPhoto(),
+                    ImageUtils.ImageSize.SMALL.getValue(), true);
             if (currentPhotoHash == item.getNewPhotoHash()) {
-                boolean deleted = ImageUtils.deleteImage(item.getClientPhoto().getClient(), true);
+                boolean deleted = ImageUtils.deleteImage(item.getClient(), item.getClientPhoto(), true);
                 if (!deleted) {
                     logger.error(String.format("Не удалось удалить фото-расхождение для клиента id=%s",
-                            item.getClientPhoto().getClient().getIdOfClient()));
+                            item.getClient().getIdOfClient()));
                     item.getClientPhoto().setLastProceedError("Не удалось удалить фото-расхождение");
                     session.update(item.getClientPhoto());
                 } else {
@@ -309,11 +323,11 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
         private boolean denied;
         private ClientPhoto clientPhoto;
 
-        public PhotoRegistryItem(ClientPhoto clientPhoto) {
-            this.idOfOrg = clientPhoto.getClient().getOrg().getIdOfOrg();
-            this.idOfClient = clientPhoto.getClient().getIdOfClient();
-            this.client = clientPhoto.getClient();
-            this.fullName = clientPhoto.getClient().getPerson().getFullName();
+        public PhotoRegistryItem(ClientPhoto clientPhoto, Client client) {
+            this.idOfOrg = client.getOrg().getIdOfOrg();
+            this.idOfClient = client.getIdOfClient();
+            this.client = client;
+            this.fullName = client.getPerson().getFullName();
             Client guardian = clientPhoto.getGuardian();
             String guardianName = "";
             if(guardian != null){
@@ -322,7 +336,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
             this.guardianName = guardianName;
             this.error = clientPhoto.getLastProceedError();
             try {
-                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
+                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(client, clientPhoto,
                         ImageUtils.ImageSize.SMALL.getValue(), false);
                 this.photoContentBase64 = photoContent.getBase64();
                 this.photoHash = photoContent.getHash();
@@ -330,7 +344,7 @@ public class PhotoRegistryPage extends BasicWorkspacePage implements OrgSelectPa
                 logger.error(e.getMessage(), e);
             }
             try {
-                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(clientPhoto.getClient(),
+                ImageUtils.PhotoContent photoContent = ImageUtils.getPhotoContent(client, clientPhoto,
                         ImageUtils.ImageSize.SMALL.getValue(), true);
                 this.newPhotoContentBase64 = photoContent.getBase64();
                 this.newPhotoHash = photoContent.getHash();

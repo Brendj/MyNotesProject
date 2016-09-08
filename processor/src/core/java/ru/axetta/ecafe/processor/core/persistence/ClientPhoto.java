@@ -11,8 +11,8 @@ package ru.axetta.ecafe.processor.core.persistence;
  * Time: 10:37
  */
 public class ClientPhoto {
+    private Long idOfClientPhoto;
     private Long idOfClient;
-    private Client client;
     private String name;
     private boolean isNew;
     private boolean isCanceled;
@@ -24,16 +24,24 @@ public class ClientPhoto {
     public ClientPhoto() {
     }
 
-    public ClientPhoto(Client client, String name) {
-        this.client = client;
+    public ClientPhoto(Long idOfClient, String name) {
+        this.idOfClient = idOfClient;
         this.name = name;
     }
 
-    public ClientPhoto(Client client, Client guardian, String name, boolean isNew) {
-        this.client = client;
+    public ClientPhoto(Long idOfClient, Client guardian, String name, boolean isNew) {
+        this.idOfClient = idOfClient;
         this.guardian = guardian;
         this.name = name;
         this.isNew = isNew;
+    }
+
+    public Long getIdOfClientPhoto() {
+        return idOfClientPhoto;
+    }
+
+    public void setIdOfClientPhoto(Long idOfClientPhoto) {
+        this.idOfClientPhoto = idOfClientPhoto;
     }
 
     public Long getIdOfClient() {
@@ -42,14 +50,6 @@ public class ClientPhoto {
 
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public String getName() {

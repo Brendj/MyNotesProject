@@ -123,8 +123,6 @@ public class Client {
 
     private String guardiansCount;
 
-    private ClientPhoto photo;
-
     protected Client() {
         // For Hibernate only
     }
@@ -952,14 +950,6 @@ public class Client {
 
     public void setGuardiansCount(String guardiansCount) {
         this.guardiansCount = guardiansCount;
-    }
-
-    public ClientPhoto getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(ClientPhoto clientPhoto) {
-        this.photo = clientPhoto;
     }
 
     @Override

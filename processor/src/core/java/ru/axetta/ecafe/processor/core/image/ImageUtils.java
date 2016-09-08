@@ -69,11 +69,11 @@ public class ImageUtils {
         return IMAGE_DIRECTORY + DELIMITER + DEFAULT + JPG;
     }
 
-    public static String getPhotoURL(Client client, int size, boolean isNew) throws NoPhotoException, NoNewPhotoException, NoSuchImageSizeException {
-        if(client.getPhoto() == null || (!client.getPhoto().getIsApproved() && !isNew)){
+    public static String getPhotoURL(Client client, ClientPhoto photo, int size, boolean isNew) throws NoPhotoException, NoNewPhotoException, NoSuchImageSizeException {
+        if(photo == null || (!photo.getIsApproved() && !isNew)){
             throw new NoPhotoException("У клиента нет фото.");
         }
-        if(!client.getPhoto().getIsNew() && isNew){
+        if(!photo.getIsNew() && isNew){
             throw new NoNewPhotoException();
         }
         int layer = (int)(client.getIdOfClient() / 3000) + 1;
@@ -86,15 +86,15 @@ public class ImageUtils {
         tmp.append(layer);
         tmp.append(DELIMITER);
         tmp.append(client.getContractId().toString());
-        tmp.append(client.getPhoto().getName());
+        tmp.append(photo.getName());
         return tmp.toString();
     }
 
-    public static int getPhotoStatus(Client client) {
-        if(client.getPhoto().getIsNew()){
+    public static int getPhotoStatus(ClientPhoto photo) {
+        if(photo.getIsNew()){
             return PhotoStatus.NEW.getValue();
         }
-        if(client.getPhoto().getIsCanceled()){
+        if(photo.getIsCanceled()){
             return PhotoStatus.WAS_CANCELED.getValue();
         }
         return PhotoStatus.CONFIRMED.getValue();
@@ -104,10 +104,10 @@ public class ImageUtils {
         return DEFAULT;
     }
 
-    public static PhotoContent getPhotoContent(Client client, int size, boolean isNew) throws IOException {
+    public static PhotoContent getPhotoContent(Client client, ClientPhoto photo, int size, boolean isNew) throws IOException {
         String path = "";
         try {
-            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, client.getPhoto().getName(),
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(),
                     ImageSize.fromIntegerToEnum(size));
         } catch (NoSuchImageSizeException e) {
             logger.error(e.getMessage(), e);
@@ -116,10 +116,10 @@ public class ImageUtils {
         return getPhotoContent(path);
     }
 
-    public static String getPhotoString(Client client, int size, boolean isNew) throws IOException {
+    public static String getPhotoString(Client client, ClientPhoto photo, int size, boolean isNew) throws IOException {
         String path = "";
         try {
-            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, client.getPhoto().getName(),
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(),
                     ImageSize.fromIntegerToEnum(size));
         } catch (NoSuchImageSizeException e) {
             logger.error(e.getMessage(), e);
@@ -128,10 +128,10 @@ public class ImageUtils {
         return getPhotoString(path);
     }
 
-    public static int getPhotoHash(Client client, int size, boolean isNew) throws IOException {
+    public static int getPhotoHash(Client client, ClientPhoto photo, int size, boolean isNew) throws IOException {
         String path = "";
         try {
-            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, client.getPhoto().getName(),
+            path = formImagePath(client.getContractId(), client.getIdOfClient(), isNew, photo.getName(),
                     ImageSize.fromIntegerToEnum(size));
         } catch (NoSuchImageSizeException e) {
             logger.error(e.getMessage(), e);
@@ -205,6 +205,19 @@ public class ImageUtils {
         bis.close();
 
         return image;
+    }
+
+    public static ClientPhoto findClientPhoto(Session session, Long idOfClient){
+        Criteria criteria = session.createCriteria(ClientPhoto.class);
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        return (ClientPhoto) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<ClientPhoto> findClientPhotos(Session session, List<Long> clientIds){
+        Criteria criteria = session.createCriteria(ClientPhoto.class);
+        criteria.add(Restrictions.in("idOfClient", clientIds));
+        return criteria.list();
     }
 
     public static String generateHashFileName(int length){
@@ -316,19 +329,19 @@ public class ImageUtils {
         saveImage(formImagePath(contractId, idOfClient, isNew, hashFileName, ImageSize.SMALL), sbimage);
     }
 
-    public static void saveImage(Client client, Image image, boolean isNew) throws IOException, ImageUtilsException {
-        saveImage(client.getContractId(), client.getIdOfClient(), image, isNew, client.getPhoto().getName());
+    public static void saveImage(Client client, ClientPhoto photo, Image image, boolean isNew) throws IOException, ImageUtilsException {
+        saveImage(client.getContractId(), client.getIdOfClient(), image, isNew, photo.getName());
     }
 
-    public static void saveImage(Client client, BufferedImage image, boolean isNew) throws IOException, ImageUtilsException {
-        saveImage(client.getContractId(), client.getIdOfClient(), image, isNew, client.getPhoto().getName());
+    public static void saveImage(Client client, ClientPhoto photo, BufferedImage image, boolean isNew) throws IOException, ImageUtilsException {
+        saveImage(client.getContractId(), client.getIdOfClient(), image, isNew, photo.getName());
     }
 
-    public static void moveImage(Client client) throws IOException {
-        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, client.getPhoto().getName(), ImageSize.MEDIUM),
-                formImagePath(client.getContractId(), client.getIdOfClient(), false, client.getPhoto().getName(), ImageSize.MEDIUM));
-        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, client.getPhoto().getName(), ImageSize.SMALL),
-                formImagePath(client.getContractId(), client.getIdOfClient(), false, client.getPhoto().getName(), ImageSize.SMALL));
+    public static void moveImage(Client client, ClientPhoto photo) throws IOException {
+        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, photo.getName(), ImageSize.MEDIUM),
+                formImagePath(client.getContractId(), client.getIdOfClient(), false, photo.getName(), ImageSize.MEDIUM));
+        moveImage(formImagePath(client.getContractId(), client.getIdOfClient(), true, photo.getName(), ImageSize.SMALL),
+                formImagePath(client.getContractId(), client.getIdOfClient(), false, photo.getName(), ImageSize.SMALL));
     }
 
     private static void moveImage(String src, String target) throws IOException {
@@ -342,8 +355,8 @@ public class ImageUtils {
         }
     }
 
-    public static boolean deleteImage(Client client, boolean isNew) {
-        return deleteImage(client.getContractId(), client.getIdOfClient(), client.getPhoto().getName(), isNew);
+    public static boolean deleteImage(Client client, ClientPhoto photo, boolean isNew) {
+        return deleteImage(client.getContractId(), client.getIdOfClient(), photo.getName(), isNew);
     }
 
     public static boolean deleteImage(Long contractId, Long idOfClient, String hashFileName, boolean isNew) {
@@ -359,8 +372,8 @@ public class ImageUtils {
         return file.delete();
     }
 
-    public static boolean checkImageExists(Client client, boolean isNew) throws SmallPhotoNotFoundException {
-        return checkImageExists(client.getContractId(), client.getIdOfClient(), client.getPhoto().getName(), isNew);
+    public static boolean checkImageExists(Client client, ClientPhoto photo, boolean isNew) throws SmallPhotoNotFoundException {
+        return checkImageExists(client.getContractId(), client.getIdOfClient(), photo.getName(), isNew);
     }
 
     public static boolean checkImageExists(Long contractId, Long idOfClient, String hashFileName, boolean isNew) throws SmallPhotoNotFoundException {
