@@ -162,6 +162,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         stats.setValue(type, stats.getValue(type) + inc);
 
         if(System.currentTimeMillis() >= stats.getCreateDate().getTime() + empProcessor.getConfigStatsLifetime()) {
+            stats.setCreateDate(new Date(System.currentTimeMillis()));
             stats = DAOService.getInstance().saveStatsForExtermalSystem(stats);
         }
     }
