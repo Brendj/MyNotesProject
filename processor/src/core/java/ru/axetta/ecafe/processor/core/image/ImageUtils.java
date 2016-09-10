@@ -15,8 +15,9 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +27,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.*;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -215,9 +214,13 @@ public class ImageUtils {
 
     @SuppressWarnings("unchecked")
     public static List<ClientPhoto> findClientPhotos(Session session, List<Long> clientIds){
+        if(clientIds == null || clientIds.isEmpty()) {
+            return new ArrayList<ClientPhoto>();
+        }
         Criteria criteria = session.createCriteria(ClientPhoto.class);
         criteria.add(Restrictions.in("idOfClient", clientIds));
-        return criteria.list();
+        List<ClientPhoto> result = criteria.list();
+        return result != null ? result : new ArrayList<ClientPhoto>();
     }
 
     public static String generateHashFileName(int length){
@@ -459,9 +462,12 @@ public class ImageUtils {
     }
 
     public static List<ClientPhoto> getNewClientPhotos(Session session, List<Org> orgs){
+        DetachedCriteria subCriteria = DetachedCriteria.forClass(Client.class);
+        subCriteria.createAlias("org", "org");
+        subCriteria.add(Restrictions.in("org", orgs));
+        subCriteria.setProjection(Property.forName("idOfClient"));
         Criteria criteria = session.createCriteria(ClientPhoto.class);
-        criteria.createAlias("client", "client", JoinType.LEFT_OUTER_JOIN);
-        criteria.add(Restrictions.in("client.org", orgs));
+        criteria.add(Property.forName("idOfClient").in(subCriteria));
         criteria.add(Restrictions.eq("isNew", true));
         return criteria.list();
     }

@@ -82,4 +82,5 @@ CREATE INDEX cf_synchistory_calc2_calcdateat_idx ON cf_synchistory_calc2 USING b
 --Новый ИД для фото
 ALTER TABLE cf_clientphoto
   DROP CONSTRAINT cf_clientphoto_pk,
-  ADD COLUMN idofclientphoto BIGSERIAL PRIMARY KEY;
+  ADD COLUMN idofclientphoto BIGSERIAL PRIMARY KEY,
+  ADD CONSTRAINT cf_clientphoto_idofclient UNIQUE (idofclient);
