@@ -344,7 +344,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 clientItemIdMap.put(idOfClient, clientItem);
             }
 
-            Map<Long, ClientItem> clientItemGuarIdMap = new HashMap<Long, ClientItem>();
+            Map<Long, List<ClientItem>> clientItemGuarIdMap = new HashMap<Long, List<ClientItem>>();
             List<Object[]> clientGuardianDatas = findClientGuardians(persistenceSession, clientItemIdMap.keySet());
             for(Object[] cgd : clientGuardianDatas) {
                 Long idOfClientGuardian = (Long)cgd[0];
@@ -354,7 +354,12 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 ClientItem clientItem = clientItemIdMap.get(idOfClient);
                 clientItem.getGuardianDatas().add(new GuardianData(idOfClient, idOfClientGuardian,
                         idOfGuardian, relation));
-                clientItemGuarIdMap.put(idOfGuardian, clientItem);
+                if(clientItemGuarIdMap.containsKey(idOfGuardian)){
+                    clientItemGuarIdMap.get(idOfGuardian).add(clientItem);
+                } else {
+                    clientItemGuarIdMap.put(idOfGuardian, new ArrayList<ClientItem>());
+                    clientItemGuarIdMap.get(idOfGuardian).add(clientItem);
+                }
             }
 
             List<Object[]> guardianDatas = findGuardians(persistenceSession, clientItemGuarIdMap.keySet());
@@ -366,9 +371,11 @@ public class RegistryLoadPage extends BasicWorkspacePage {
                 String firstName = (String)gd[4];
                 String surName = (String)gd[5];
                 String secondName = (String)gd[6];
-                ClientItem clientItem = clientItemGuarIdMap.get(idOfGuardian);
-                GuardianData guardianData = clientItem.getGuardianData(idOfGuardian);
-                guardianData.setParameters(firstName, surName, secondName, phone, mobile, email);
+                List<ClientItem> clientItemList = clientItemGuarIdMap.get(idOfGuardian);
+                for(ClientItem clientItem : clientItemList) {
+                    GuardianData guardianData = clientItem.getGuardianData(idOfGuardian);
+                    guardianData.setParameters(firstName, surName, secondName, phone, mobile, email);
+                }
             }
 
             persistenceTransaction.commit();
