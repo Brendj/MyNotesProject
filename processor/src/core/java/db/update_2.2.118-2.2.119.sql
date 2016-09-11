@@ -21,3 +21,9 @@ OIDS=FALSE
 
 insert into cf_orgs_contract_ids(idoforg, lastclientcontractid, version)
   select idoforg, lastclientcontractid, 0 from cf_orgs;
+
+--ИНдексы на таблицу истороии синхронизации
+CREATE INDEX cf_synchistory_calc2_idoforg_idx ON cf_synchistory_calc2 USING btree (idoforg);
+CREATE INDEX cf_synchistory_calc2_calcdateat_idx ON cf_synchistory_calc2 USING btree (calcdateat);
+
+--! ФИНАЛИЗИРОВАН
