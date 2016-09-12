@@ -356,6 +356,13 @@
 
     <security-constraint>
         <web-resource-collection>
+            <web-resource-name>Restrict direct access to JSFs</web-resource-name>
+            <url-pattern>/back-office/elections.jsp</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
             <web-resource-name>Restrict direct access to include-only JSPs</web-resource-name>
             <url-pattern>/client-room/pages/*</url-pattern>
         </web-resource-collection>
