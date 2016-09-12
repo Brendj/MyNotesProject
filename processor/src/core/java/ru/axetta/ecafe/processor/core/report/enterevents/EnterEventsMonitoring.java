@@ -164,6 +164,9 @@ public class EnterEventsMonitoring {
                     continue;
                 }
                 long idOfOrg = (Long) enterEvent[0];
+                if(accMap.get(idOfOrg) == null) {
+                    continue;
+                }
                 AccessoryItem accessoryItem = accMap.get(idOfOrg).get(turnstileAddr);
                 if(accessoryItem == null) {
                     continue;
