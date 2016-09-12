@@ -89,6 +89,7 @@
         <!--EP-320 <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup"
                         fixed-delay="60000"/> -->
         <task:scheduled ref="smsDeliveryCalculationService" method="run" cron="0 45 3 ? * *"/>
+        <task:scheduled ref="enterEventsMonitoring" method="calculateEnterEvents" cron="0 0/10 * * * ?"/>
     </task:scheduled-tasks>
     <task:scheduler id="myScheduler" pool-size="5"/>
 

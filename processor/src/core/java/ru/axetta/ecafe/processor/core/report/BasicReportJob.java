@@ -116,7 +116,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         protected List<OrgShortItem> orgShortItemList;
         protected long userId;
         
-        Properties reportProperties = new Properties();
+        public Properties reportProperties = new Properties();
 
         public void setUserId(long value) {
             userId = value;

@@ -278,6 +278,7 @@ public class MainPage implements Serializable {
     private final SpecialDatesReportPage specialDatesReportPage = new SpecialDatesReportPage();
     private final MigrantsReportPage migrantsReportPage = new MigrantsReportPage();
     //private final BasicBasketReportPage basicBasketReportPage = new BasicBasketReportPage();
+    private final EnterEventsMonitoringReportPage enterEventsMonitoringReportPage = new EnterEventsMonitoringReportPage();
 
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
@@ -6888,6 +6889,23 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }*/
+
+    public EnterEventsMonitoringReportPage getEnterEventsMonitoringReportPage() {
+        return enterEventsMonitoringReportPage;
+    }
+
+    public Object showEnterEventsMonitoringReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = enterEventsMonitoringReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set EnterEventsMonitoringReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
 
     public SpecialDatesReportPage getSpecialDatesReportPage() {
         return specialDatesReportPage;

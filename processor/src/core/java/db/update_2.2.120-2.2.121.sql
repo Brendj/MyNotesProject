@@ -75,5 +75,9 @@ CREATE TABLE cf_registrychange_guardians (
   CONSTRAINT cf_registrychange_guardians_registrychange_fk FOREIGN KEY (idofregistrychange) REFERENCES cf_registrychange (idofregistrychange)
 );
 
+--Признак использования турникета с 1 сентября
+ALTER TABLE cf_org_accessories
+  ADD COLUMN usedsinceseptember boolean NOT NULL DEFAULT false;
+
 
 
