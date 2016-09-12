@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Component
 @Scope("prototype")
@@ -89,7 +90,6 @@ public class EnterEventsMonitoring {
             CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
             Date morning = calendar.getTime();
 
-            report = null;
             generateElectionAreaMap();
             runUpdateAccesories(persistenceSession);
 
@@ -109,8 +109,8 @@ public class EnterEventsMonitoring {
                     if(strings.length > 1) {
                         city = strings[1];
                     }
-                } else if (city.contains(".")) {
-                    String[] strings = city.split(".");
+                } else if (city.contains("г")) {
+                    String[] strings = city.split(Pattern.quote("."));
                     if(strings.length > 1) {
                         city = strings[1];
                     }
@@ -129,7 +129,7 @@ public class EnterEventsMonitoring {
                 }
 
                 accMap.get(idOfOrg).put(accessoryNumber, new AccessoryItem(idOfOrg, accessoryNumber, usedSinceSeptember,
-                        (accMap.get(idOfOrg).size() + 1), city, district.trim(), shortName, address));
+                        (accMap.get(idOfOrg).size() + 1), city.trim(), district.trim(), shortName, address));
             }
 
             for(Long idOfOrg : accMap.keySet()) {
@@ -198,6 +198,7 @@ public class EnterEventsMonitoring {
                 }
             }
 
+            report = null;
             enterEventMap = result;
 
             persistenceTransaction.commit();
