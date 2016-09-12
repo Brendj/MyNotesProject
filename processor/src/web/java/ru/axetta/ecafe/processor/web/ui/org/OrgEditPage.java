@@ -224,12 +224,15 @@ public class OrgEditPage extends BasicWorkspacePage
         if (!org.isMainBuilding()) {
             if ((org.getFriendlyOrg() == null || (org.getFriendlyOrg() != null && org.getFriendlyOrg().size() == 0))) {
                 org.setMainBuilding(true);
+                DAOUtils.setMainBuildingGroupnamesToOrgs(session, org.getIdOfOrg());
             } else if (mainBuilding) {
                 for (Org fOrg : org.getFriendlyOrg()) {
                     if (fOrg.isMainBuilding()) {
                         fOrg.setMainBuilding(false);
                         DAOUtils.orgMainBuildingUnset(session, fOrg.getIdOfOrg());
+                        DAOUtils.groupNamesToOrgsMainBuildingUnset(session, org.getIdOfOrg());
                     }
+                    DAOUtils.setMainBuildingGroupnamesToOrgsByIdOfOrg(session, fOrg.getIdOfOrg(), org.getIdOfOrg());
                 }
                 org.setMainBuilding(true);
             } else {

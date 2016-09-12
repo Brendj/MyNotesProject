@@ -2450,4 +2450,62 @@ public class DAOUtils {
         session.delete(interactiveReportDataEntity);
         session.flush();
     }
+
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("idOfMainOrg", idOfOrg));
+
+        List<GroupNamesToOrgs> result = criteria.list();
+
+        return result;
+    }
+
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfMainOrg(Session session, Long idOfMainOrg) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfMainOrg", idOfMainOrg));
+
+        List<GroupNamesToOrgs> result = criteria.list();
+
+        return result;
+    }
+
+    public static void setMainBuildingGroupnamesToOrgs(Session session, Long idOfOrg) {
+        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrg(session, idOfOrg);
+
+        if (!groupNamesToOrgsList.isEmpty()) {
+            for (GroupNamesToOrgs groupNamesToOrg : groupNamesToOrgsList) {
+                groupNamesToOrg.setMainBuilding(1);
+                groupNamesToOrg.setIdOfMainOrg(idOfOrg);
+                groupNamesToOrg.setVersion(nextVersionByGroupNameToOrg(session));
+                session.update(groupNamesToOrg);
+            }
+        }
+    }
+
+    public static void setMainBuildingGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg, Long idOfMainOrg) {
+        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfMainOrg(session, idOfOrg);
+
+        if (!groupNamesToOrgsList.isEmpty()) {
+            for (GroupNamesToOrgs groupNamesToOrg : groupNamesToOrgsList) {
+                groupNamesToOrg.setMainBuilding(1);
+                groupNamesToOrg.setIdOfMainOrg(idOfMainOrg);
+                groupNamesToOrg.setVersion(nextVersionByGroupNameToOrg(session));
+                session.update(groupNamesToOrg);
+                session.flush();
+            }
+        }
+    }
+
+    public static void groupNamesToOrgsMainBuildingUnset(Session session, Long idOfMainOrg) {
+        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfMainOrg(session, idOfMainOrg);
+
+        if (!groupNamesToOrgsList.isEmpty()) {
+            for (GroupNamesToOrgs groupNamesToOrg : groupNamesToOrgsList) {
+                groupNamesToOrg.setIdOfMainOrg(null);
+                groupNamesToOrg.setVersion(nextVersionByGroupNameToOrg(session));
+                session.update(groupNamesToOrg);
+            }
+        }
+    }
 }
