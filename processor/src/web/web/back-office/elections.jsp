@@ -31,19 +31,18 @@
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">
-                    Мониторонг проходов<%-- Заголовок страницы --%>
+                    Мониторинг проходов<%-- Заголовок страницы --%>
             </td>
         </tr>
             <%-- Центральная область --%>
         <tr>
             <td style="min-width: 210px; vertical-align: top;" width="215px">
-                    <%-- Главное меню --%>
             </td>
             <td style="vertical-align: top;" width="*">
                     <%-- Рабочая область --%>
-                <f:subview id="workspaceSubView">
-                    <c:import url="/back-office/include/report/online/enter_events_report.jsp" />
-                </f:subview>
+                    <a4j:form id="workspaceForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                        <c:import url="/back-office/include/report/online/enter_events_report.jsp" />
+                    </a4j:form>
             </td>
         </tr>
         <tr>

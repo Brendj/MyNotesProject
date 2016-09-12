@@ -11,7 +11,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 
-<h:panelGrid id="enterEventsReportPanelGrid" binding="#{mainPage.enterEventsMonitoringReportPage.pageComponent}"
+<h:panelGrid id="enterEventsReportPanelGrid" binding="#{electionsPage.pageComponent}"
              styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -22,11 +22,11 @@
 
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="3">
-        <a4j:commandButton value="Обновить" action="#{mainPage.enterEventsMonitoringReportPage.buildReportHTML}"
+    <h:panelGrid styleClass="borderless-grid" columns="3" id="blah">
+        <a4j:commandButton value="Обновить" action="#{electionsPage.enterEventsMonitoringReportPage.buildReportHTML}"
                            reRender="enterEventsReportTable"
                            styleClass="command-button" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.enterEventsMonitoringReportPage.exportToXLS}" styleClass="command-button" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{electionsPage.enterEventsMonitoringReportPage.exportToXLS}" styleClass="command-button" />
         <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -37,14 +37,14 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid" id="enterEventsReportTable">
-        <c:if test="${not empty mainPage.enterEventsMonitoringReportPage.htmlReport}">
+        <c:if test="${not empty electionsPage.enterEventsMonitoringReportPage.htmlReport}">
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {
                         display: none;
                     }
                 </style>
-                <div class="htmlReportContent"> ${mainPage.enterEventsMonitoringReportPage.htmlReport} </div>
+                <div class="htmlReportContent"> ${electionsPage.enterEventsMonitoringReportPage.htmlReport} </div>
             </f:verbatim>
         </c:if>
     </h:panelGrid>

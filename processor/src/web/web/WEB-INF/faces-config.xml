@@ -31,6 +31,13 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
 
+    <managed-bean>
+        <display-name>electionsPage</display-name>
+        <managed-bean-name>electionsPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.ElectionsPage</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
     <converter>
         <description>fromTypeConverter</description>
         <converter-id>fromTypeConverter</converter-id>
