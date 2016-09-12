@@ -31,7 +31,7 @@
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">
-                    Мониторинг проходов<%-- Заголовок страницы --%>
+
             </td>
         </tr>
             <%-- Центральная область --%>
@@ -41,6 +41,7 @@
             <td style="vertical-align: top;" width="*">
                     <%-- Рабочая область --%>
                     <a4j:form id="workspaceForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                        <h:outputText styleClass="output-text-big" escape="true" value="Мониторинг проходов" />
                         <c:import url="/back-office/include/report/online/enter_events_report.jsp" />
                     </a4j:form>
             </td>

@@ -851,10 +851,6 @@
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
     <a4j:support event="onclick" action="#{mainPage.showReportOnlineGroupPage}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="enterEventsMonitoringMenuItem" binding="#{mainPage.enterEventsMonitoringReportPage.mainMenuComponent}"
-                        label="Мониторинг проходов" action="#{mainPage.showEnterEventsMonitoringReportPage}"
-                        reRender="workspaceForm" />
-
     <rich:panelMenuGroup id="complexGroupMenu" binding="#{mainPage.complexGroupPage.mainMenuComponent}"
                          label="Отчет по комплексам" rendered="#{mainPage.eligibleToViewComplexReports}">
         <a4j:support event="onclick" action="#{mainPage.showComplexGroupPage}" reRender="workspaceForm" />

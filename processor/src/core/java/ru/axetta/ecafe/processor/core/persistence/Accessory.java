@@ -19,6 +19,7 @@ public class Accessory implements Serializable {
     protected Long idOfTargetOrg;
     protected Integer accessoryType;
     protected String accessoryNumber;
+    private Boolean usedSinceSeptember;
 
     public static final int BANK_ACCESSORY_TYPE = 1;
     public static final int GATE_ACCESSORY_TYPE = 2;
@@ -35,6 +36,7 @@ public class Accessory implements Serializable {
         this.idOfTargetOrg = idOfTargetOrg;
         this.accessoryType = accessoryType;
         this.accessoryNumber = accessoryNumber;
+        this.usedSinceSeptember = false;
     }
 
     public Long getIdOfAccessory() {
@@ -75,6 +77,14 @@ public class Accessory implements Serializable {
 
     public void setAccessoryNumber(String accessoryNumber) {
         this.accessoryNumber = accessoryNumber;
+    }
+
+    public Boolean getUsedSinceSeptember() {
+        return usedSinceSeptember;
+    }
+
+    public void setUsedSinceSeptember(Boolean usedSinceSeptember) {
+        this.usedSinceSeptember = usedSinceSeptember;
     }
 
     @Override

@@ -1939,6 +1939,7 @@ public class DAOService {
         accessory.setIdOfTargetOrg(idoforg);
         accessory.setAccessoryType(accessoryType);
         accessory.setAccessoryNumber(accessoryNumber);
+        accessory.setUsedSinceSeptember(false);
         entityManager.merge(accessory);
         return accessory;
     }

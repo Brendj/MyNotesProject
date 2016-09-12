@@ -19,6 +19,7 @@
         <property name="idOfTargetOrg" column="IdOfTargetOrg" type="long" not-null="true"/>
         <property name="accessoryType" column="AccessoryType" type="integer" not-null="true"/>
         <property name="accessoryNumber" column="AccessoryNumber" type="string" length="40" not-null="true"/>
+        <property name="usedSinceSeptember" column="UsedSinceSeptember" type="boolean" not-null="true"/>
     </class>
 </hibernate-mapping>
 

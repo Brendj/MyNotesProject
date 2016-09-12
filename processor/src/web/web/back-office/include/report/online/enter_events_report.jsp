@@ -14,14 +14,6 @@
 <h:panelGrid id="enterEventsReportPanelGrid" binding="#{electionsPage.pageComponent}"
              styleClass="borderless-grid">
 
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-
-        <h:outputText escape="true" value="Город" styleClass="output-text" />
-
-        <h:outputText styleClass="output-text" escape="true" value="Округ" />
-
-    </h:panelGrid>
-
     <h:panelGrid styleClass="borderless-grid" columns="3" id="blah">
         <a4j:commandButton value="Обновить" action="#{electionsPage.enterEventsMonitoringReportPage.buildReportHTML}"
                            reRender="enterEventsReportTable"

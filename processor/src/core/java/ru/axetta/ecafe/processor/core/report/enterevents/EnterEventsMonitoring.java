@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.report.enterevents;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Accessory;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -35,11 +34,23 @@ import java.util.*;
 public class EnterEventsMonitoring {
     private static final Logger logger = LoggerFactory.getLogger(EnterEventsMonitoring.class);
 
+    private static final long MINUTES10 = 10 * 60 * 1000;
+    private static final long MINUTES30 = 30 * 60 * 1000;
+
     private static Map<Long, List<EnterEventItem>> enterEventMap = new HashMap<Long, List<EnterEventItem>>();
     private static Map<Long, String> electionAreaMap = new HashMap<Long, String>();
+    private static EnterEventsMonitoringReport report = null;
 
     public static Map<Long, List<EnterEventItem>> getEnterEventMap() {
         return enterEventMap;
+    }
+
+    public static EnterEventsMonitoringReport getReport() {
+        return report;
+    }
+
+    public static void setReport(EnterEventsMonitoringReport report) {
+        EnterEventsMonitoring.report = report;
     }
 
     public static boolean isOn() {
@@ -71,49 +82,94 @@ public class EnterEventsMonitoring {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            Date date = new Date();
+
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(new Date().getTime());
+            CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
+            Date morning = calendar.getTime();
+
+            report = null;
             generateElectionAreaMap();
             runUpdateAccesories(persistenceSession);
 
-            Map<Long, Map<String, Integer>> accMap = new HashMap<Long, Map<String, Integer>>();
-            for(Object[] accessory : getAccesories(persistenceSession)) {
-                long idOfOrg = (Long) accessory[0];
-                String accessoryNumber = (String) accessory[1];
-
-                if(accMap.get(idOfOrg) == null) {
-                    accMap.put(idOfOrg, new HashMap<String, Integer>());
-                }
-
-                accMap.get(idOfOrg).put(accessoryNumber, accMap.get(idOfOrg).size() + 1);
-            }
+            persistenceSession.flush();
 
             Map<Long, Map<Integer, EnterEventItem>> map = new HashMap<Long, Map<Integer, EnterEventItem>>();
-            for(Object[] enterEvent : getEnterEvents(persistenceSession)) {
-                long idOfOrg = (Long) enterEvent[0];
-                int passDirection = (Integer) enterEvent[5];
-                String turnstileAddr = (String)enterEvent[6];
+            Map<Long, Map<String, AccessoryItem>> accMap = new HashMap<Long, Map<String, AccessoryItem>>();
+
+            for(Object[] accessory : getAccesories(persistenceSession)) {
+                long idOfOrg = (Long) accessory[0];
+                String city = (String) accessory[3];
+                if(StringUtils.isEmpty(city)) {
+                    continue;
+                }
+                if(city.contains(" ")) {
+                    String[] strings = city.split(" ");
+                    if(strings.length > 1) {
+                        city = strings[1];
+                    }
+                } else if (city.contains(".")) {
+                    String[] strings = city.split(".");
+                    if(strings.length > 1) {
+                        city = strings[1];
+                    }
+                }
+                String district = (String) accessory[4];
+                if(StringUtils.isEmpty(district)) {
+                    continue;
+                }
+                String accessoryNumber = (String) accessory[1];
+                boolean usedSinceSeptember = (Boolean) accessory[2];
+                String shortName = (String) accessory[5];
+                String address = (String) accessory[6];
+
+                if(accMap.get(idOfOrg) == null) {
+                    accMap.put(idOfOrg, new HashMap<String, AccessoryItem>());
+                }
+
+                accMap.get(idOfOrg).put(accessoryNumber, new AccessoryItem(idOfOrg, accessoryNumber, usedSinceSeptember,
+                        (accMap.get(idOfOrg).size() + 1), city, district.trim(), shortName, address));
+            }
+
+            for(Long idOfOrg : accMap.keySet()) {
+                map.put(idOfOrg, new HashMap<Integer, EnterEventItem>());
+
+                for(String accessoryNumber : accMap.get(idOfOrg).keySet()) {
+                    AccessoryItem item = accMap.get(idOfOrg).get(accessoryNumber);
+                    String electionArea = electionAreaMap.get(idOfOrg);
+                    String orgNumStr = Org.extractOrgNumberFromName(item.getOrgShortName());
+                    Integer orgNum = null;
+                    if(!StringUtils.isEmpty(orgNumStr)) {
+                        orgNum = Integer.parseInt(orgNumStr);
+                    }
+                    int colorType = item.isUsedSinceSeptember() ? EnterEventItem.COLOR_BLUE : EnterEventItem.COLOR_GRAY;
+                    map.get(idOfOrg).put(item.getTurnStileNumber(),
+                            new EnterEventItem(idOfOrg, item.getCity(), item.getDistrict(),
+                                    orgNum, item.getOrgShortName(), item.getAddress(),
+                            electionArea, item.getTurnStileNumber(), accessoryNumber, colorType));
+                }
+            }
+
+            for(Object[] enterEvent : getEnterEvents(persistenceSession, morning)) {
+                String turnstileAddr = (String)enterEvent[2];
+                if(turnstileAddr.length() < 12) {
+                    continue;
+                }
+                int passDirection = (Integer) enterEvent[1];
                 if(turnstileAddr.length() == 12 && passDirection == 1) {
                     continue;
                 }
-                int turnstile = accMap.get(idOfOrg).get(turnstileAddr);
+                long idOfOrg = (Long) enterEvent[0];
+                int turnstile = accMap.get(idOfOrg).get(turnstileAddr).getTurnStileNumber();
 
-                if(map.get(idOfOrg) == null) {
-                    map.put(idOfOrg, new HashMap<Integer, EnterEventItem>());
-                }
+                EnterEventItem item = map.get(idOfOrg).get(turnstile);
 
-                if(map.get(idOfOrg).get(turnstile) == null) {
-                    String city = (String) enterEvent[1];
-                    String district = (String) enterEvent[2];
-                    String shortName = (String) enterEvent[3];
-                    String address = (String)enterEvent[4];
-                    String electionArea = electionAreaMap.get(idOfOrg);
-                    int orgNum = Integer.parseInt(Org.extractOrgNumberFromName(shortName));
-                    if(electionArea == null) {
-                        electionArea = "";
-                    }
-                    map.get(idOfOrg).put(turnstile, new EnterEventItem(idOfOrg, city, district, orgNum, shortName, address,
-                            electionArea, turnstile, turnstileAddr, 1, 1));
+                if(item.getEventCount() == null) {
+                    Date evtDateTime = (Date) enterEvent[3];
+                    item.setEventCount(1);
+                    item.setEvtDateTime(evtDateTime);
                 } else {
-                    EnterEventItem item = map.get(idOfOrg).get(turnstile);
                     item.setEventCount(item.getEventCount() + 1);
                 }
             }
@@ -125,10 +181,20 @@ public class EnterEventsMonitoring {
                         result.put(idOfOrg, new ArrayList<EnterEventItem>());
                     }
                     EnterEventItem item = map.get(idOfOrg).get(turnstile);
-                    if(item.getTurnstileAddr().length() > 12) {
-                        item.setEventCount(item.getEventCount() / 2);
+                    if(item.getEventCount() != null && item.getEventCount() != 0) {
+                        if(item.getTurnstileAddr().length() > 12) {
+                            item.setEventCount((item.getEventCount() + 1) / 2);
+                        }
+                        long delay = date.getTime() - item.getEvtDateTime().getTime();
+                        if(delay <= MINUTES10) {
+                            item.setColorType(EnterEventItem.COLOR_GREEN);
+                        } else if (delay <= MINUTES30) {
+                            item.setColorType(EnterEventItem.COLOR_YELLOW);
+                        } else {
+                            item.setColorType(EnterEventItem.COLOR_RED);
+                        }
                     }
-                    result.get(idOfOrg).add(map.get(idOfOrg).get(turnstile));
+                    result.get(idOfOrg).add(item);
                 }
             }
 
@@ -144,46 +210,37 @@ public class EnterEventsMonitoring {
 
     @SuppressWarnings("unchecked")
     private List<Object[]> getAccesories(Session session) {
-        Criteria criteria = session.createCriteria(Accessory.class);
-        criteria.add(Restrictions.eq("accessoryType", 2));
-        /*criteria.add(Restrictions.or(
-                Restrictions.sqlRestriction("length({alias}.accessoryNumber) = 12"),
-                Restrictions.like("accessoryNumber", "ERA%")));*/
-        criteria.addOrder(Order.asc("idOfAccessory"));
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.property("idOfSourceOrg"))
-                .add(Projections.property("accessoryNumber")));
-        return (List<Object[]>) criteria.list();
+        Query query = session.createQuery("SELECT ac.idOfSourceOrg, ac.accessoryNumber, ac.usedSinceSeptember, "
+                + "o.city, o.district, o.shortNameInfoService, o.shortAddress from Accessory AS ac, Org AS o "
+                + "WHERE ac.idOfSourceOrg = o.idOfOrg AND length(ac.accessoryNumber) > 11 "
+                + "AND ac.accessoryType = 2 ORDER BY ac.idOfAccessory");
+        List<Object[]> result = (List<Object[]>) query.list();
+        return result;
     }
 
     @SuppressWarnings("unchecked")
-    private List<Object[]> getEnterEvents(Session session) {
+    private List<Object[]> getEnterEvents(Session session, Date date) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(new Date().getTime());
         CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
 
         Criteria criteria = session.createCriteria(EnterEvent.class);
-        criteria.add(Restrictions.ge("evtDateTime", calendar.getTime()));
+        criteria.add(Restrictions.ge("evtDateTime", date));
         criteria.add(Restrictions.eq("eventCode", 112));
-        /*criteria.add(Restrictions.or(
-                Restrictions.sqlRestriction("length({alias}.turnstileAddr) = 12"),
-                Restrictions.like("turnstileAddr", "ERA%")));*/
+        //criteria.add(Restrictions.sqlRestriction("length({alias}.turnstileAddr) > 11"));
         criteria.add(Restrictions.or(
                 Restrictions.eq("passDirection", 0),
                 Restrictions.eq("passDirection", 1)));
         criteria.add(Restrictions.isNull("idOfCard"));
         criteria.add(Restrictions.isNull("client"));
         criteria.add(Restrictions.isNull("idOfVisitor"));
-
+        criteria.addOrder(Order.desc("evtDateTime"));
         criteria.createAlias("org", "org");
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.property("org.idOfOrg"))
-                .add(Projections.property("org.city"))
-                .add(Projections.property("org.district"))
-                .add(Projections.property("org.shortName"))
-                .add(Projections.property("org.address"))
                 .add(Projections.property("passDirection"))
-                .add(Projections.property("turnstileAddr")));
+                .add(Projections.property("turnstileAddr"))
+                .add(Projections.property("evtDateTime")));
         return (List<Object[]>) criteria.list();
     }
 
@@ -238,22 +295,115 @@ public class EnterEventsMonitoring {
         return hour > 6 && hour < 21;
     }
 
+    public static class AccessoryItem {
+        private long idOfSourceOrg;
+        private String accessoryNumber;
+        private boolean usedSinceSeptember;
+        private int turnStileNumber;
+        private String city;
+        private String district;
+        private String orgShortName;
+        private String address;
+
+        public AccessoryItem(long idOfSourceOrg, String accessoryNumber, boolean usedSinceSeptember,
+                int turnStileNumber, String city, String district, String orgShortName, String address) {
+            this.idOfSourceOrg = idOfSourceOrg;
+            this.accessoryNumber = accessoryNumber;
+            this.usedSinceSeptember = usedSinceSeptember;
+            this.turnStileNumber = turnStileNumber;
+            this.city = city;
+            this.district = district;
+            this.orgShortName = orgShortName;
+            this.address = address;
+        }
+
+        public long getIdOfSourceOrg() {
+            return idOfSourceOrg;
+        }
+
+        public void setIdOfSourceOrg(long idOfSourceOrg) {
+            this.idOfSourceOrg = idOfSourceOrg;
+        }
+
+        public String getAccessoryNumber() {
+            return accessoryNumber;
+        }
+
+        public void setAccessoryNumber(String accessoryNumber) {
+            this.accessoryNumber = accessoryNumber;
+        }
+
+        public boolean isUsedSinceSeptember() {
+            return usedSinceSeptember;
+        }
+
+        public void setUsedSinceSeptember(boolean usedSinceSeptember) {
+            this.usedSinceSeptember = usedSinceSeptember;
+        }
+
+        public int getTurnStileNumber() {
+            return turnStileNumber;
+        }
+
+        public void setTurnStileNumber(int turnStileNumber) {
+            this.turnStileNumber = turnStileNumber;
+        }
+
+        public String getCity() {
+            return city;
+        }
+
+        public void setCity(String city) {
+            this.city = city;
+        }
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public void setDistrict(String district) {
+            this.district = district;
+        }
+
+        public String getOrgShortName() {
+            return orgShortName;
+        }
+
+        public void setOrgShortName(String orgShortName) {
+            this.orgShortName = orgShortName;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+    }
+
     public class EnterEventItem {
+        private static final int COLOR_GREEN = 1;
+        private static final int COLOR_YELLOW = 2;
+        private static final int COLOR_RED = 3;
+        private static final int COLOR_BLUE = 4;
+        private static final int COLOR_GRAY = 5;
+
         private Long idOfOrg;
         private String city;
         private String district;
-        private int orgNum;
+        private Integer orgNum;
         private String orgShortName;
         private String address;
         private String electionArea;
         private int turnstile;
         private String turnstileAddr;
-        private int eventCount;
+        private Integer eventCount;
         private int colorType;
+        private Date evtDateTime;
 
-        public EnterEventItem(Long idOfOrg, String city, String district, int orgNum, String orgShortName,
-                String address, String electionArea, int turnstile, String turnstileAddr, int eventCount,
-                int colorType) {
+        public EnterEventItem(Long idOfOrg, String city, String district, Integer orgNum, String orgShortName,
+                String address, String electionArea, int turnstile, String turnstileAddr, int colorType) {
             this.idOfOrg = idOfOrg;
             this.city = city;
             this.district = district;
@@ -263,8 +413,9 @@ public class EnterEventsMonitoring {
             this.electionArea = electionArea;
             this.turnstile = turnstile;
             this.turnstileAddr = turnstileAddr;
-            this.eventCount = eventCount;
             this.colorType = colorType;
+            this.eventCount = null;
+            this.evtDateTime = null;
         }
 
         public Long getIdOfOrg() {
@@ -291,11 +442,11 @@ public class EnterEventsMonitoring {
             this.district = district;
         }
 
-        public int getOrgNum() {
+        public Integer getOrgNum() {
             return orgNum;
         }
 
-        public void setOrgNum(int orgNum) {
+        public void setOrgNum(Integer orgNum) {
             this.orgNum = orgNum;
         }
 
@@ -339,11 +490,11 @@ public class EnterEventsMonitoring {
             this.turnstileAddr = turnstileAddr;
         }
 
-        public int getEventCount() {
+        public Integer getEventCount() {
             return eventCount;
         }
 
-        public void setEventCount(int eventCount) {
+        public void setEventCount(Integer eventCount) {
             this.eventCount = eventCount;
         }
 
@@ -353,6 +504,14 @@ public class EnterEventsMonitoring {
 
         public void setColorType(int colorType) {
             this.colorType = colorType;
+        }
+
+        public Date getEvtDateTime() {
+            return evtDateTime;
+        }
+
+        public void setEvtDateTime(Date evtDateTime) {
+            this.evtDateTime = evtDateTime;
         }
     }
 }

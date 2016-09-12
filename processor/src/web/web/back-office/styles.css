@@ -42,6 +42,12 @@
     color: #000;
 }
 
+.output-text-big {
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 16pt;
+    color: #000;
+}
+
 .report-error-output-text {
     font-family: Tahoma, Arial, Sans-Serif;
     font-size: 10pt;

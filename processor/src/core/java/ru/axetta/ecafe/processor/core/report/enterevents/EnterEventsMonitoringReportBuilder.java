@@ -30,6 +30,9 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
 
     @Override
     public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        if(EnterEventsMonitoring.getReport() != null) {
+            return EnterEventsMonitoring.getReport();
+        }
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename =
                 autoReportGenerator.getReportsTemplateFilePath() + "EnterEventsMonitoringReport.jasper";
@@ -60,7 +63,10 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
         exporter.exportReport();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
 
-        return new EnterEventsMonitoringReport(generateBeginTime, generateDuration, jasperPrint, startTime, endTime).setHtmlReport(os.toString("UTF-8"));
+        EnterEventsMonitoringReport report = new EnterEventsMonitoringReport(generateBeginTime,
+                generateDuration, jasperPrint, startTime, endTime).setHtmlReport(os.toString("UTF-8"));
+        EnterEventsMonitoring.setReport(report);
+        return report;
     }
 
     private JRDataSource buildDataSource(Session session, Date startDate, Date endDate) throws Exception {

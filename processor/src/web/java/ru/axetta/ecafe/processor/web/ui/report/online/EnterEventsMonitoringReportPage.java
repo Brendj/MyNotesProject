@@ -46,7 +46,9 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            logger.info("Starting to build EnterEventsMonitoringReport");
             report =  builder.build(persistenceSession, null, null, null);
+            logger.info("EnterEventsMonitoringReport build finished");
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -89,7 +91,9 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            logger.info("Starting to build EnterEventsMonitoringReport");
             report =  builder.build(persistenceSession, null, null, null);
+            logger.info("EnterEventsMonitoringReport build finished");
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -132,7 +136,7 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
         String format = timeFormat.format(generateTime);
-        return String.format("%s-%s", "Мониторинг работы турникетов", format);
+        return String.format("%s-%s", "ElectionsMonitoring", format);
     }
 
     @Override
