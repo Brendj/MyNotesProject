@@ -164,7 +164,11 @@ public class EnterEventsMonitoring {
                     continue;
                 }
                 long idOfOrg = (Long) enterEvent[0];
-                int turnstile = accMap.get(idOfOrg).get(turnstileAddr).getTurnStileNumber();
+                AccessoryItem accessoryItem = accMap.get(idOfOrg).get(turnstileAddr);
+                if(accessoryItem == null) {
+                    continue;
+                }
+                int turnstile = accessoryItem.getTurnStileNumber();
 
                 EnterEventItem item = map.get(idOfOrg).get(turnstile);
 
