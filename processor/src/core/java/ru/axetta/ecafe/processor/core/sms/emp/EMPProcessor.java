@@ -782,13 +782,13 @@ public class EMPProcessor {
 
         if (client.getSsoid() != null && !client.getSsoid().equals("") &&
             !client.getSsoid().equals(SSOID_REGISTERED_AND_WAITING_FOR_DATA) && !client.getSsoid().equals(SSOID_FAILED_TO_REGISTER)) {
-            logger.debug("Клиент уже привязан к ЕМП, обновление через SSOID " + client.getSsoid());
+            log("Клиент уже привязан к ЕМП, обновление через SSOID " + client.getSsoid());
             EntryAttribute ssoid = new EntryAttribute();
             ssoid.setName(ATTRIBUTE_SSOID_NAME);
             ssoid.getValue().add(client.getSsoid());
             criteria.add(ssoid);
         } else {
-            logger.debug("Клиент не привязан к ЕМП, обновление через мобильный телефон " + client.getMobile());
+            log("Клиент не привязан к ЕМП, обновление через мобильный телефон " + client.getMobile());
             EntryAttribute msisdn = new EntryAttribute();
             msisdn.setName(ATTRIBUTE_MOBILE_PHONE_NAME);
             msisdn.getValue().add(client.getMobile());
@@ -812,7 +812,10 @@ public class EMPProcessor {
         emailSend.getValue().add(client.isNotifyViaEmail());
         attribute.add(emailSend);
 
-        logger.debug("Отправка запроса на изменение информирования клиента...");
+        String flags = String.format("notifyViaSms=%s, notifyViaPush=%s, notifyViaEmail=%s",
+                client.isNotifyViaSMS(), client.isNotifyViaPUSH(), client.isNotifyViaEmail());
+        log(String.format("Отправка запроса на изменение информирования клиента...Телефон: %s. Флаги к отправке: %s",
+                client.getMobile() == null ? "" : client.getMobile(), flags));
         UpdateEntriesResponse response = storage.updateEntries(request);
         if (response.getErrorCode() != 0) {
             logger.error(String.format("Failed to proceed updates: [code=%s] %s", response.getErrorCode(),
