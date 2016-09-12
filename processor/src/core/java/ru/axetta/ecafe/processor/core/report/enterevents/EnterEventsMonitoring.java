@@ -66,10 +66,7 @@ public class EnterEventsMonitoring {
      * Обертка для запуска по расписанию
      */
     public void calculateEnterEvents() throws Exception {
-        if(isOn()){
-            if(!checkDateTime()){
-                return;
-            }
+        if(isOn()) {
             logger.info("Starting calculate EnterEvent data for monitoring.");
             calculateEnterEventsDay();
             logger.info("EnterEvent data for monitoring calculated.");
@@ -86,9 +83,15 @@ public class EnterEventsMonitoring {
             Date date = new Date();
 
             Calendar calendar = new GregorianCalendar();
-            calendar.setTimeInMillis(new Date().getTime());
+            calendar.setTimeInMillis(date.getTime());
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            if(hour < 7) {
+                calendar.add(Calendar.DAY_OF_MONTH, -1);
+            }
             CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
             Date morning = calendar.getTime();
+            CalendarUtils.setHoursAndMinutes(calendar, 21, 0);
+            Date evening = calendar.getTime();
 
             generateElectionAreaMap();
             runUpdateAccesories(persistenceSession);
@@ -151,7 +154,7 @@ public class EnterEventsMonitoring {
                 }
             }
 
-            for(Object[] enterEvent : getEnterEvents(persistenceSession, morning)) {
+            for(Object[] enterEvent : getEnterEvents(persistenceSession, morning, evening)) {
                 String turnstileAddr = (String)enterEvent[2];
                 if(turnstileAddr.length() < 12) {
                     continue;
@@ -220,13 +223,13 @@ public class EnterEventsMonitoring {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Object[]> getEnterEvents(Session session, Date date) {
+    private List<Object[]> getEnterEvents(Session session, Date start, Date end) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(new Date().getTime());
         CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
 
         Criteria criteria = session.createCriteria(EnterEvent.class);
-        criteria.add(Restrictions.ge("evtDateTime", date));
+        criteria.add(Restrictions.between("evtDateTime", start, end));
         criteria.add(Restrictions.eq("eventCode", 112));
         //criteria.add(Restrictions.sqlRestriction("length({alias}.turnstileAddr) > 11"));
         criteria.add(Restrictions.or(
