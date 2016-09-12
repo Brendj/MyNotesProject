@@ -4,7 +4,6 @@ package generated.nsiws_delta;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
-import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -15,7 +14,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * Generated source version: 2.1
  * 
  */
-@WebService(name = "NSIDeltaService", targetNamespace = "http://rstyle.com/nsi/delta/service")
+//@WebService(name = "NSIDeltaService", targetNamespace = "http://rstyle.com/nsi/delta/service")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @XmlSeeAlso({
     ObjectFactory.class
