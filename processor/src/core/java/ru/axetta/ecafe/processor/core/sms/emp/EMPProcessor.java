@@ -319,7 +319,7 @@ public class EMPProcessor {
                         client.getMobile() + "] применяются изменения: "+logStr.toString());
                     for (Client cl : clients) {
                         //cl.setSsoid(null); // сбрасбываем SSOID чтобы инициировать импорт настроек через последующую привязку
-                        if (newSsoid!=null) cl.setSsoid(newSsoid);
+                        if (newSsoid!=null && !newSsoid.equals("")) cl.setSsoid(newSsoid);
                         if (newEmail!=null) cl.setEmail(newEmail);
                         if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
                         if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
