@@ -25,12 +25,14 @@ import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(EnterEventsMonitoringReportPage.class);
 
     private String htmlReport = null;
     private Boolean applyUserSettings = false;
+    private Boolean showElectionAreaOnly = true;
 
     public EnterEventsMonitoringReportPage() {
         super();
@@ -39,6 +41,7 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     public Object buildReportHTML() {
         htmlReport = null;
         EnterEventsMonitoringReportBuilder builder = new EnterEventsMonitoringReportBuilder();
+        builder.setReportProperties(buildProperties());
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -84,6 +87,7 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     public void exportToXLS(ActionEvent actionEvent){
         Date generateTime = new Date();
         EnterEventsMonitoringReportBuilder builder = new EnterEventsMonitoringReportBuilder();
+        builder.setReportProperties(buildProperties());
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -139,6 +143,12 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
         return String.format("%s-%s", "ElectionsMonitoring", format);
     }
 
+    private Properties buildProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("showElectionAreaOnly", Boolean.toString(showElectionAreaOnly));
+        return properties;
+    }
+
     @Override
     public String getPageFilename() {
         return "report/online/enter_events_report";
@@ -154,5 +164,13 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
 
     public void setApplyUserSettings(Boolean applyUserSettings) {
         this.applyUserSettings = applyUserSettings;
+    }
+
+    public Boolean getShowElectionAreaOnly() {
+        return showElectionAreaOnly;
+    }
+
+    public void setShowElectionAreaOnly(Boolean showElectionAreaOnly) {
+        this.showElectionAreaOnly = showElectionAreaOnly;
     }
 }

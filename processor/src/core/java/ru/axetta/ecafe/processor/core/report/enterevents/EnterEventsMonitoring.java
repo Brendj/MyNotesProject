@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -40,18 +41,9 @@ public class EnterEventsMonitoring {
 
     private static Map<Long, List<EnterEventItem>> enterEventMap = new HashMap<Long, List<EnterEventItem>>();
     private static Map<Long, String> electionAreaMap = new HashMap<Long, String>();
-    private static EnterEventsMonitoringReport report = null;
 
     public static Map<Long, List<EnterEventItem>> getEnterEventMap() {
         return enterEventMap;
-    }
-
-    public static EnterEventsMonitoringReport getReport() {
-        return report;
-    }
-
-    public static void setReport(EnterEventsMonitoringReport report) {
-        EnterEventsMonitoring.report = report;
     }
 
     public static boolean isOn() {
@@ -155,30 +147,19 @@ public class EnterEventsMonitoring {
             }
 
             for(Object[] enterEvent : getEnterEvents(persistenceSession, morning, evening)) {
-                String turnstileAddr = (String)enterEvent[2];
-                if(turnstileAddr.length() < 12) {
-                    continue;
-                }
-                int passDirection = (Integer) enterEvent[1];
-                if(turnstileAddr.length() == 12 && passDirection == 1) {
-                    continue;
-                }
                 long idOfOrg = (Long) enterEvent[0];
-                if(accMap.get(idOfOrg) == null) {
+                String turnstileAddr = (String)enterEvent[1];
+                if(accMap.get(idOfOrg) == null || accMap.get(idOfOrg).get(turnstileAddr) == null) {
                     continue;
                 }
-                AccessoryItem accessoryItem = accMap.get(idOfOrg).get(turnstileAddr);
-                if(accessoryItem == null) {
-                    continue;
-                }
-                int turnstile = accessoryItem.getTurnStileNumber();
-
+                int turnstile = accMap.get(idOfOrg).get(turnstileAddr).getTurnStileNumber();
                 EnterEventItem item = map.get(idOfOrg).get(turnstile);
-
                 if(item.getEventCount() == null) {
-                    Date evtDateTime = (Date) enterEvent[3];
+                    Date evtDateTime = (Date) enterEvent[2];
+                    int eventCode = (Integer) enterEvent[3];
                     item.setEventCount(1);
                     item.setEvtDateTime(evtDateTime);
+                    item.setEventCode(eventCode);
                 } else {
                     item.setEventCount(item.getEventCount() + 1);
                 }
@@ -192,7 +173,7 @@ public class EnterEventsMonitoring {
                     }
                     EnterEventItem item = map.get(idOfOrg).get(turnstile);
                     if(item.getEventCount() != null && item.getEventCount() != 0) {
-                        if(item.getTurnstileAddr().length() > 12) {
+                        if(item.getEventCode() == 191) {
                             item.setEventCount((item.getEventCount() + 1) / 2);
                         }
                         long delay = date.getTime() - item.getEvtDateTime().getTime();
@@ -203,12 +184,14 @@ public class EnterEventsMonitoring {
                         } else {
                             item.setColorType(EnterEventItem.COLOR_RED);
                         }
+                        if(item.getColorType() == EnterEventItem.COLOR_BLUE) {
+                            item.setEventCount(0);
+                        }
                     }
                     result.get(idOfOrg).add(item);
                 }
             }
 
-            report = null;
             enterEventMap = result;
 
             persistenceTransaction.commit();
@@ -231,17 +214,14 @@ public class EnterEventsMonitoring {
 
     @SuppressWarnings("unchecked")
     private List<Object[]> getEnterEvents(Session session, Date start, Date end) {
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(new Date().getTime());
-        CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
-
+        Criterion expression1 = Restrictions
+                .and(Restrictions.eq("eventCode", 112), Restrictions.eq("passDirection", 0));
+        Criterion expression2 = Restrictions
+                .and(Restrictions.eq("eventCode", 190), Restrictions.in("passDirection", new Object[]{0, 1}));
+        Criterion expression = Restrictions.or(expression1, expression2);
         Criteria criteria = session.createCriteria(EnterEvent.class);
         criteria.add(Restrictions.between("evtDateTime", start, end));
-        criteria.add(Restrictions.eq("eventCode", 112));
-        //criteria.add(Restrictions.sqlRestriction("length({alias}.turnstileAddr) > 11"));
-        criteria.add(Restrictions.or(
-                Restrictions.eq("passDirection", 0),
-                Restrictions.eq("passDirection", 1)));
+        criteria.add(expression);
         criteria.add(Restrictions.isNull("idOfCard"));
         criteria.add(Restrictions.isNull("client"));
         criteria.add(Restrictions.isNull("idOfVisitor"));
@@ -249,9 +229,9 @@ public class EnterEventsMonitoring {
         criteria.createAlias("org", "org");
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.property("org.idOfOrg"))
-                .add(Projections.property("passDirection"))
                 .add(Projections.property("turnstileAddr"))
-                .add(Projections.property("evtDateTime")));
+                .add(Projections.property("evtDateTime"))
+                .add(Projections.property("eventCode")));
         return (List<Object[]>) criteria.list();
     }
 
@@ -412,6 +392,7 @@ public class EnterEventsMonitoring {
         private Integer eventCount;
         private int colorType;
         private Date evtDateTime;
+        private int eventCode;
 
         public EnterEventItem(Long idOfOrg, String city, String district, Integer orgNum, String orgShortName,
                 String address, String electionArea, int turnstile, String turnstileAddr, int colorType) {
@@ -523,6 +504,14 @@ public class EnterEventsMonitoring {
 
         public void setEvtDateTime(Date evtDateTime) {
             this.evtDateTime = evtDateTime;
+        }
+
+        public int getEventCode() {
+            return eventCode;
+        }
+
+        public void setEventCode(int eventCode) {
+            this.eventCode = eventCode;
         }
     }
 }

@@ -14,6 +14,14 @@
 <h:panelGrid id="enterEventsReportPanelGrid" binding="#{electionsPage.pageComponent}"
              styleClass="borderless-grid">
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+
+        <h:outputText escape="false" value="Показать только организации с УИК" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showElectionAreaOnly}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+    </h:panelGrid>
+
     <h:panelGrid styleClass="borderless-grid" columns="3" id="blah">
         <a4j:commandButton value="Обновить" action="#{electionsPage.enterEventsMonitoringReportPage.buildReportHTML}"
                            reRender="enterEventsReportTable"
