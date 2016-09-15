@@ -57,11 +57,7 @@ public class EnterEventsMonitoring {
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(date.getTime());
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        if(day > 18) {
-            return true;
-        } else {
-            return false;
-        }
+        return day > 18;
     }
 
     /**
@@ -156,7 +152,10 @@ public class EnterEventsMonitoring {
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
+            List<StringBuilder> sbList = new ArrayList<StringBuilder>();
+            for(int i = 0; i < 14; i++) {
+                sbList.add(new StringBuilder());
+            }
 
             for(Object[] enterEvent : getEnterEvents(persistenceSession, morning, evening)) {
                 long idOfOrg = (Long) enterEvent[0];
@@ -164,6 +163,8 @@ public class EnterEventsMonitoring {
                 Date evtDateTime = (Date) enterEvent[2];
                 int eventCode = (Integer) enterEvent[3];
                 int passdir = (Integer) enterEvent[4];
+                calendar.setTimeInMillis(evtDateTime.getTime());
+                int hourOfEvent = calendar.get(Calendar.HOUR_OF_DAY);
 
                 if(accMap.get(idOfOrg) == null || accMap.get(idOfOrg).get(turnstileAddr) == null) {
                     logger.error("EnterEvent not in AccMap idOfOrg=" + idOfOrg + ", turnstileAddr="
@@ -173,6 +174,7 @@ public class EnterEventsMonitoring {
                 int turnstile = accMap.get(idOfOrg).get(turnstileAddr).getTurnStileNumber();
                 EnterEventItem item = map.get(idOfOrg).get(turnstile);
 
+                StringBuilder sb = sbList.get(hourOfEvent - 7);
                 if(StringUtils.isNotEmpty(item.getElectionArea())) {
                     sb.append(idOfOrg);
                     sb.append(";");
@@ -192,9 +194,10 @@ public class EnterEventsMonitoring {
                     item.setEventCount(item.getEventCount() + 1);
                 }
             }
-
-            sb.append("endoffile");
-            generateEventsCSV(sb);
+            
+            for(int i = 0; i < 14; i++) {
+                generateEventsCSV(sbList.get(i), i + 7);
+            }
 
             Map<Long, List<EnterEventItem>> result = new HashMap<Long, List<EnterEventItem>>();
             for(Long idOfOrg : map.keySet()) {
@@ -267,12 +270,13 @@ public class EnterEventsMonitoring {
         return (List<Object[]>) criteria.list();
     }
 
-    private void generateEventsCSV(StringBuilder sb) {
+    private void generateEventsCSV(StringBuilder sb, int hour) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String filePath = runtimeContext.getConfigProperties().getProperty("ecafe.processor.entereventsmonitoring.eventscsvpath", "");
         PrintWriter pw = null;
         try {
-            pw = new PrintWriter(new File(filePath));
+            sb.append("endoffile");
+            pw = new PrintWriter(new File(filePath + "events-" + hour + ".csv"));
             pw.write(sb.toString());
         } catch (FileNotFoundException e) {
             logger.error("EventsCSVPath for EnterEvent csv not found!");
