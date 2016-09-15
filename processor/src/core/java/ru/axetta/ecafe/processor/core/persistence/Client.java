@@ -121,8 +121,6 @@ public class Client {
     private Date birthDate;
     private String benefitOnAdmission;
 
-    private String guardiansCount;
-
     protected Client() {
         // For Hibernate only
     }
@@ -942,14 +940,6 @@ public class Client {
 
     public void setBenefitOnAdmission(String benefitOnAdmission) {
         this.benefitOnAdmission = benefitOnAdmission;
-    }
-
-    public String getGuardiansCount() {
-        return guardiansCount;
-    }
-
-    public void setGuardiansCount(String guardiansCount) {
-        this.guardiansCount = guardiansCount;
     }
 
     @Override
