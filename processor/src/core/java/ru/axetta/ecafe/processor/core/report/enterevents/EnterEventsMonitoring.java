@@ -24,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -54,11 +51,24 @@ public class EnterEventsMonitoring {
                 .equals(reqInstance.trim()));
     }
 
+    private static boolean isAfter18Day() {
+        // проверяем прошли ли выборы
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(date.getTime());
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        if(day > 18) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Обертка для запуска по расписанию
      */
     public void calculateEnterEvents() throws Exception {
-        if(isOn()) {
+        if(!isAfter18Day() && isOn()) {
             logger.info("Starting calculate EnterEvent data for monitoring.");
             calculateEnterEventsDay();
             logger.info("EnterEvent data for monitoring calculated.");
@@ -146,17 +156,35 @@ public class EnterEventsMonitoring {
                 }
             }
 
+            StringBuilder sb = new StringBuilder();
+
             for(Object[] enterEvent : getEnterEvents(persistenceSession, morning, evening)) {
                 long idOfOrg = (Long) enterEvent[0];
                 String turnstileAddr = (String)enterEvent[1];
+                Date evtDateTime = (Date) enterEvent[2];
+                int eventCode = (Integer) enterEvent[3];
+                int passdir = (Integer) enterEvent[4];
+
                 if(accMap.get(idOfOrg) == null || accMap.get(idOfOrg).get(turnstileAddr) == null) {
+                    logger.error("EnterEvent not in AccMap idOfOrg=" + idOfOrg + ", turnstileAddr="
+                            + turnstileAddr + ", evtDateTime=" + evtDateTime);
                     continue;
                 }
                 int turnstile = accMap.get(idOfOrg).get(turnstileAddr).getTurnStileNumber();
                 EnterEventItem item = map.get(idOfOrg).get(turnstile);
+
+                if(StringUtils.isNotEmpty(item.getElectionArea())) {
+                    sb.append(idOfOrg);
+                    sb.append(";");
+                    sb.append(evtDateTime.getTime());
+                    sb.append(";");
+                    sb.append(eventCode);
+                    sb.append(";");
+                    sb.append(passdir);
+                    sb.append("\r\n");
+                }
+
                 if(item.getEventCount() == null) {
-                    Date evtDateTime = (Date) enterEvent[2];
-                    int eventCode = (Integer) enterEvent[3];
                     item.setEventCount(1);
                     item.setEvtDateTime(evtDateTime);
                     item.setEventCode(eventCode);
@@ -164,6 +192,9 @@ public class EnterEventsMonitoring {
                     item.setEventCount(item.getEventCount() + 1);
                 }
             }
+
+            sb.append("endoffile");
+            generateEventsCSV(sb);
 
             Map<Long, List<EnterEventItem>> result = new HashMap<Long, List<EnterEventItem>>();
             for(Long idOfOrg : map.keySet()) {
@@ -206,7 +237,7 @@ public class EnterEventsMonitoring {
     private List<Object[]> getAccesories(Session session) {
         Query query = session.createQuery("SELECT ac.idOfSourceOrg, ac.accessoryNumber, ac.usedSinceSeptember, "
                 + "o.city, o.district, o.shortNameInfoService, o.shortAddress from Accessory AS ac, Org AS o "
-                + "WHERE ac.idOfSourceOrg = o.idOfOrg AND length(ac.accessoryNumber) > 11 "
+                + "WHERE ac.idOfSourceOrg = o.idOfOrg "   //AND length(ac.accessoryNumber) > 11 "
                 + "AND ac.accessoryType = 2 ORDER BY ac.idOfAccessory");
         List<Object[]> result = (List<Object[]>) query.list();
         return result;
@@ -231,13 +262,30 @@ public class EnterEventsMonitoring {
                 .add(Projections.property("org.idOfOrg"))
                 .add(Projections.property("turnstileAddr"))
                 .add(Projections.property("evtDateTime"))
-                .add(Projections.property("eventCode")));
+                .add(Projections.property("eventCode"))
+                .add(Projections.property("passDirection")));
         return (List<Object[]>) criteria.list();
+    }
+
+    private void generateEventsCSV(StringBuilder sb) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String filePath = runtimeContext.getConfigProperties().getProperty("ecafe.processor.entereventsmonitoring.eventscsvpath", "");
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(new File(filePath));
+            pw.write(sb.toString());
+        } catch (FileNotFoundException e) {
+            logger.error("EventsCSVPath for EnterEvent csv not found!");
+        } finally {
+            if (pw != null) {
+                pw.close();
+            }
+        }
     }
 
     private void generateElectionAreaMap() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String filePath = runtimeContext.getConfigProperties().getProperty("ecafe.processor.entereventsmonitoring.csvpath", "");
+        String filePath = runtimeContext.getConfigProperties().getProperty("ecafe.processor.entereventsmonitoring.uikcsvpath", "");
         BufferedReader br = null;
         String line;
         Map<Long, String> map = new HashMap<Long, String>();
@@ -253,8 +301,8 @@ public class EnterEventsMonitoring {
                 map.put(idOfOrg, electionArea);
             }
             electionAreaMap = map;
-        } catch (FileNotFoundException ignore) {
-            logger.info("ElectionArea File for EnterEvent monitoring not found!");
+        } catch (FileNotFoundException e) {
+            logger.error("ElectionArea File for EnterEvent monitoring not found!");
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -277,13 +325,6 @@ public class EnterEventsMonitoring {
                 + " temp.idoforg=oa.idofsourceorg AND temp.turnstileAddr=oa.accessorynumber"
                 + " AND oa.usedsinceseptember = FALSE AND oa.accessorytype = 2");
         q.executeUpdate();
-    }
-
-    private boolean checkDateTime() {
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(new Date().getTime());
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        return hour > 6 && hour < 21;
     }
 
     public static class AccessoryItem {
