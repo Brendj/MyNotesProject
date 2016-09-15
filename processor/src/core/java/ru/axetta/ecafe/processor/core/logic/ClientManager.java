@@ -413,14 +413,32 @@ public class ClientManager {
                 //tokens[21];
                 if (fieldConfig.getValue(ClientManager.FieldId.GROUP).length() > 0) {
                     String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
-                    ClientGroup clientGroup = DAOUtils
-                            .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession, client.getOrg().getIdOfOrg(),
+
+                    GroupNamesToOrgs groupNamesToOrgs = DAOUtils
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(persistenceSession, client.getOrg().getIdOfOrg(),
                                     clientGroupName);
-                    if (clientGroup == null) {
-                        clientGroup = DAOUtils
-                                .createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientGroupName);
+
+                    if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
+                        ClientGroup clientGroup = DAOUtils
+                                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
+                                        groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
+                        if (clientGroup == null) {
+                            clientGroup = DAOUtils.createClientGroup(persistenceSession, groupNamesToOrgs.getIdOfOrg(),
+                                    groupNamesToOrgs.getGroupName());
+                        }
+                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        Org org1 = (Org) persistenceSession.load(Org.class, groupNamesToOrgs.getIdOfOrg());
+                        client.setOrg(org1);
+                    } else {
+                        ClientGroup clientGroup = DAOUtils
+                                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
+                                        client.getOrg().getIdOfOrg(), clientGroupName);
+                        if (clientGroup == null) {
+                            clientGroup = DAOUtils.createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
+                                    clientGroupName);
+                        }
+                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     }
-                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 } else {
                     client.setIdOfClientGroup(null);
                 }
@@ -720,12 +738,30 @@ public class ClientManager {
                 //if (tokens.length >=22){
                 if (fieldConfig.getValue(ClientManager.FieldId.GROUP).length() > 0) {
                     String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
-                    ClientGroup clientGroup = DAOUtils
-                            .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
-                    if (clientGroup == null) {
-                        clientGroup = DAOUtils.createClientGroup(persistenceSession, idOfOrg, clientGroupName);
+
+                    GroupNamesToOrgs groupNamesToOrgs = DAOUtils
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(persistenceSession, idOfOrg,
+                                    clientGroupName);
+
+                    if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
+                        ClientGroup clientGroup = DAOUtils
+                                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
+                                        groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
+                        if (clientGroup == null) {
+                            clientGroup = DAOUtils.createClientGroup(persistenceSession, groupNamesToOrgs.getIdOfOrg(),
+                                    groupNamesToOrgs.getGroupName());
+                        }
+                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        Org org1 = (Org) persistenceSession.load(Org.class, groupNamesToOrgs.getIdOfOrg());
+                        client.setOrg(org1);
+                    } else {
+                        ClientGroup clientGroup = DAOUtils
+                                .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
+                        if (clientGroup == null) {
+                            clientGroup = DAOUtils.createClientGroup(persistenceSession, idOfOrg, clientGroupName);
+                        }
+                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     }
-                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 } else {
                     client.setIdOfClientGroup(null);
                 }

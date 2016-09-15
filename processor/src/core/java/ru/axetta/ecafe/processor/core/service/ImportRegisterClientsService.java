@@ -1056,9 +1056,34 @@ public class ImportRegisterClientsService {
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:
-                    Org newOrg = (Org)session.load(Org.class, change.getIdOfMigrateOrgTo());
+                    Org newOrg = (Org) session.load(Org.class, change.getIdOfMigrateOrgTo());
                     addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
-                    dbClient.setOrg(newOrg);
+
+                    GroupNamesToOrgs groupNamesToOrgs = DAOUtils
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(session, newOrg.getIdOfOrg(), change.getGroupName());
+
+                    if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
+                        ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
+                                groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
+                        if (clientGroup == null) {
+                            clientGroup = DAOUtils.createClientGroup(session, groupNamesToOrgs.getIdOfOrg(),
+                                    groupNamesToOrgs.getGroupName());
+                        }
+                        dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        Org org = (Org) session.load(Org.class, groupNamesToOrgs.getIdOfOrg());
+                        dbClient.setOrg(org);
+                    } else {
+                        ClientGroup clientGroup = DAOUtils
+                                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session, newOrg.getIdOfOrg(),
+                                        change.getGroupName());
+                        if (clientGroup == null) {
+                            clientGroup = DAOUtils
+                                    .createClientGroup(session, newOrg.getIdOfOrg(), change.getGroupName());
+                        }
+                        dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        dbClient.setOrg(newOrg);
+                    }
+
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     if (dbClient.getOrg().getIdOfOrg() == change.getIdOfOrg()) {

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
@@ -2507,5 +2508,31 @@ public class DAOUtils {
                 session.update(groupNamesToOrg);
             }
         }
+    }
+
+    public static GroupNamesToOrgs getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(Session session, Long idOfOrg,
+            String groupName) {
+
+        Org o = (Org) session.load(Org.class, idOfOrg);
+
+        Long idOfMainOrg = null;
+
+        for (Org org1 : o.getFriendlyOrg()) {
+            if (org1.isMainBuilding()) {
+                idOfMainOrg = org1.getIdOfOrg();
+            }
+        }
+
+        if (idOfMainOrg == null) {
+            idOfMainOrg = o.getIdOfOrg();
+        }
+
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfMainOrg", idOfMainOrg));
+        criteria.add(Restrictions.eq("groupName", groupName));
+
+        GroupNamesToOrgs result = (GroupNamesToOrgs) criteria.uniqueResult();
+
+        return result;
     }
 }
