@@ -58,10 +58,10 @@
 
 
     <h:panelGrid styleClass="borderless-grid" columns="3">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByOrgReportPage.exportToHtml}"
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByOrgReportPage.exportToHtmlOnePerUser}"
                            reRender="clientBalanceByOrgReportTable"
                            styleClass="command-button" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.clientBalanceByOrgReportPage.exportToXLS}" styleClass="command-button" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.clientBalanceByOrgReportPage.exportToXLSOnePerUser}" styleClass="command-button" />
         <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

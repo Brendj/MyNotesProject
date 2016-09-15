@@ -54,11 +54,11 @@
         </h:selectOneMenu>
     </h:panelGroup>
     <h:panelGrid styleClass="borderless-grid" columns="3">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.buildReport}"
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientBalanceByDayReportPage.exportToHtmlOnePerUser}"
                            reRender="clientBalanceByDayReportTable, clientBalanceByDayReportTableDatascroller"
                            styleClass="command-button" status="clientBalanceByDayReportGenerateStatus" />
         <h:commandButton value="Генерировать отчет в Excel"
-                         actionListener="#{mainPage.clientBalanceByDayReportPage.exportToXLS}"
+                         actionListener="#{mainPage.clientBalanceByDayReportPage.exportToXLSOnePerUser}"
                          styleClass="command-button" />
     </h:panelGrid>
     <a4j:status id="clientBalanceByDayReportGenerateStatus">

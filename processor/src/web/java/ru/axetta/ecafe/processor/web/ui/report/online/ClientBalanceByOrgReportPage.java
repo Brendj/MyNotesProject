@@ -44,7 +44,7 @@ import java.util.*;
  * Time: 12:01
  * To change this template use File | Settings | File Templates.
  */
-public class ClientBalanceByOrgReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
+public class ClientBalanceByOrgReportPage extends OnlineReportPageOnePerUser implements ContragentSelectPage.CompleteHandler {
 
     private final static Logger logger = LoggerFactory.getLogger(ClientBalanceByOrgReportPage.class);
     private List<ClientBalanceByOrgReport.Builder.OrgBalanceInfo> clientsBalance;
@@ -194,12 +194,13 @@ public class ClientBalanceByOrgReportPage extends OnlineReportPage implements Co
         return report;
     }
 
-    public void exportToHtml() {
+    public Object exportToHtml() {
         if (validateFormData()) {
-            return;
+            return null;
         }
         this.clientBalanceByOrg = (ClientBalanceByOrgReport)makeReport();
         htmlReport = clientBalanceByOrg.getHtmlReport();
+        return null;
     }
 
     public void exportToXLS(ActionEvent actionEvent) {
