@@ -145,7 +145,7 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
     }
 
     public SyncStatsPage() {
-        update();
+
     }
 
     public Long getIdOfOrg() {
