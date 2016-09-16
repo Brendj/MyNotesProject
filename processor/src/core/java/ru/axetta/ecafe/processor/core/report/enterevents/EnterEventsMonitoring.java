@@ -233,6 +233,8 @@ public class EnterEventsMonitoring {
                     lastSync = dateFormat.format(lastSyncs.get(idOfOrg));
                 }
 
+                boolean plus1 = false;
+
                 for(Integer turnstile : map.get(idOfOrg).keySet()) {
                     if(result.get(idOfOrg) == null) {
                         result.put(idOfOrg, new ArrayList<EnterEventItem>());
@@ -240,7 +242,15 @@ public class EnterEventsMonitoring {
                     EnterEventItem item = map.get(idOfOrg).get(turnstile);
                     if(item.getEventCount() != null && item.getEventCount() != 0) {
                         if(item.getEventCode() == 190) {
-                            item.setEventCount((item.getEventCount() + 1) / 2);
+                            if(item.getEventCount() % 2 == 1 && !plus1) {
+                                item.setEventCount((item.getEventCount() + 1) / 2);
+                                plus1 = true;
+                            } else if (item.getEventCount() % 2 == 1 && plus1){
+                                item.setEventCount(item.getEventCount()/ 2);
+                                plus1 = false;
+                            } else {
+                                item.setEventCount(item.getEventCount()/ 2);
+                            }
                         }
                         long delay = date.getTime() - item.getEvtDateTime().getTime();
                         if(delay <= MINUTES10) {
