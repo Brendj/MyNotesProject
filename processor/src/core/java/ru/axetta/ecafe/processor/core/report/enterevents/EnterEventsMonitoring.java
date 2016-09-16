@@ -6,7 +6,9 @@ package ru.axetta.ecafe.processor.core.report.enterevents;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.LastProcessSectionsDates;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -25,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -33,11 +36,12 @@ import java.util.regex.Pattern;
 public class EnterEventsMonitoring {
     private static final Logger logger = LoggerFactory.getLogger(EnterEventsMonitoring.class);
 
+    private static final long MINUTES5 = 5 * 60 * 1000;
     private static final long MINUTES10 = 10 * 60 * 1000;
     private static final long MINUTES30 = 30 * 60 * 1000;
 
     private static Map<Long, List<EnterEventItem>> enterEventMap = new HashMap<Long, List<EnterEventItem>>();
-    private static Map<Long, String> electionAreaMap = new HashMap<Long, String>();
+    private static Map<Long, List<String>> electionAreaMap = new HashMap<Long, List<String>>();
 
     public static Map<Long, List<EnterEventItem>> getEnterEventMap() {
         return enterEventMap;
@@ -138,7 +142,11 @@ public class EnterEventsMonitoring {
 
                 for(String accessoryNumber : accMap.get(idOfOrg).keySet()) {
                     AccessoryItem item = accMap.get(idOfOrg).get(accessoryNumber);
-                    String electionArea = electionAreaMap.get(idOfOrg);
+                    String electionArea = null;
+                    if(electionAreaMap.get(idOfOrg) != null) {
+                        Collections.sort(electionAreaMap.get(idOfOrg));
+                        electionArea = StringUtils.join(electionAreaMap.get(idOfOrg), ", ");
+                    }
                     String orgNumStr = Org.extractOrgNumberFromName(item.getOrgShortName());
                     Integer orgNum = null;
                     if(!StringUtils.isEmpty(orgNumStr)) {
@@ -199,15 +207,32 @@ public class EnterEventsMonitoring {
                 generateEventsCSV(sbList.get(i), i + 7);
             }
 
+            Map<Long, Date> lastSyncs = getlastSyncMap(persistenceSession, map.keySet());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             Map<Long, List<EnterEventItem>> result = new HashMap<Long, List<EnterEventItem>>();
+            Map<Long, Integer> total = new HashMap<Long, Integer>();
+            Map<Long, Date> lastEvent = new HashMap<Long, Date>();
             for(Long idOfOrg : map.keySet()) {
+
+                String lastSync = null;
+                int lastSyncColor = EnterEventItem.COLOR_RED;
+                if(lastSyncs.get(idOfOrg) != null) {
+                    long delay = date.getTime() - lastSyncs.get(idOfOrg).getTime();
+                    if(delay <= MINUTES5) {
+                        lastSyncColor = EnterEventItem.COLOR_GREEN;
+                    } else if (delay <= MINUTES10) {
+                        lastSyncColor = EnterEventItem.COLOR_YELLOW;
+                    }
+                    lastSync = dateFormat.format(lastSyncs.get(idOfOrg));
+                }
+
                 for(Integer turnstile : map.get(idOfOrg).keySet()) {
                     if(result.get(idOfOrg) == null) {
                         result.put(idOfOrg, new ArrayList<EnterEventItem>());
                     }
                     EnterEventItem item = map.get(idOfOrg).get(turnstile);
                     if(item.getEventCount() != null && item.getEventCount() != 0) {
-                        if(item.getEventCode() == 191) {
+                        if(item.getEventCode() == 190) {
                             item.setEventCount((item.getEventCount() + 1) / 2);
                         }
                         long delay = date.getTime() - item.getEvtDateTime().getTime();
@@ -222,7 +247,59 @@ public class EnterEventsMonitoring {
                             item.setEventCount(0);
                         }
                     }
+
+                    item.setLastSync(lastSync);
+                    item.setLastSyncColor(lastSyncColor);
+
+                    if(total.get(idOfOrg) != null && item.getEventCount() != null) {
+                        if(item.getEventCount() != null) {
+                            total.put(idOfOrg, total.get(idOfOrg) + item.getEventCount());
+                        }
+                    } else {
+                        if(item.getEventCount() != null) {
+                            total.put(idOfOrg, item.getEventCount());
+                        }
+                    }
+
+                    if(lastEvent.get(idOfOrg) != null) {
+                        if(item.getEvtDateTime() != null) {
+                            if (!lastEvent.get(idOfOrg).after(item.getEvtDateTime())) {
+                                lastEvent.put(idOfOrg, item.getEvtDateTime());
+                            }
+                        }
+                    } else {
+                        if(item.getEvtDateTime() != null) {
+                            lastEvent.put(idOfOrg, item.getEvtDateTime());
+                        }
+                    }
+
                     result.get(idOfOrg).add(item);
+                }
+            }
+
+            for(Long idOfOrg : result.keySet()) {
+                String lastEventDate = null;
+                int lastEventColor = EnterEventItem.COLOR_RED;
+                if(lastEvent.get(idOfOrg) != null) {
+                    lastEventDate = dateFormat.format(lastEvent.get(idOfOrg));
+                    long delay = date.getTime() - lastEvent.get(idOfOrg).getTime();
+                    if (delay <= MINUTES5) {
+                        lastEventColor = EnterEventItem.COLOR_GREEN;
+                    } else if (delay <= MINUTES10) {
+                        lastEventColor = EnterEventItem.COLOR_YELLOW;
+                    }
+                }
+                for (EnterEventItem item : result.get(idOfOrg)) {
+                    item.setLastEvent(lastEventDate);
+                    item.setLastEventColor(lastEventColor);
+                }
+            }
+
+            for(Long idOfOrg : result.keySet()) {
+                for(EnterEventItem item : result.get(idOfOrg)) {
+                    if(total.get(idOfOrg) != null) {
+                        item.setEventCountTotal(total.get(idOfOrg));
+                    }
                 }
             }
 
@@ -240,7 +317,7 @@ public class EnterEventsMonitoring {
     private List<Object[]> getAccesories(Session session) {
         Query query = session.createQuery("SELECT ac.idOfSourceOrg, ac.accessoryNumber, ac.usedSinceSeptember, "
                 + "o.city, o.district, o.shortNameInfoService, o.shortAddress from Accessory AS ac, Org AS o "
-                + "WHERE ac.idOfSourceOrg = o.idOfOrg "   //AND length(ac.accessoryNumber) > 11 "
+                + "WHERE ac.idOfSourceOrg = o.idOfOrg AND length(ac.accessoryNumber) > 11 "
                 + "AND ac.accessoryType = 2 ORDER BY ac.idOfAccessory");
         List<Object[]> result = (List<Object[]>) query.list();
         return result;
@@ -270,6 +347,24 @@ public class EnterEventsMonitoring {
         return (List<Object[]>) criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<Long, Date> getlastSyncMap(Session session, Set<Long> orgIds) {
+        Criteria criteria = session.createCriteria(LastProcessSectionsDates.class);
+        criteria.add(Restrictions.in("compositeIdOfLastProcessSectionsDates.idOfOrg", orgIds));
+        criteria.add(Restrictions.eq("compositeIdOfLastProcessSectionsDates.type", SectionType.ENTER_EVENTS.getType()));
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("compositeIdOfLastProcessSectionsDates.idOfOrg"))
+                .add(Projections.property("date")));
+        List<Object[]> list = (List<Object[]>) criteria.list();
+        Map<Long, Date> result = new HashMap<Long, Date>();
+        for(Object[] objects : list) {
+            long idOfOrg = (Long) objects[0];
+            Date date = (Date) objects[1];
+            result.put(idOfOrg, date);
+        }
+        return result;
+    }
+
     private void generateEventsCSV(StringBuilder sb, int hour) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String filePath = runtimeContext.getConfigProperties().getProperty("ecafe.processor.entereventsmonitoring.eventscsvpath", "");
@@ -292,7 +387,7 @@ public class EnterEventsMonitoring {
         String filePath = runtimeContext.getConfigProperties().getProperty("ecafe.processor.entereventsmonitoring.uikcsvpath", "");
         BufferedReader br = null;
         String line;
-        Map<Long, String> map = new HashMap<Long, String>();
+        Map<Long, List<String>> map = new HashMap<Long, List<String>>();
         try {
             br = new BufferedReader(new FileReader(filePath));
             while ((line = br.readLine()) != null) {
@@ -302,7 +397,10 @@ public class EnterEventsMonitoring {
                 }
                 Long idOfOrg = Long.parseLong(data[0]);
                 String electionArea = data[1];
-                map.put(idOfOrg, electionArea);
+                if(map.get(idOfOrg) == null) {
+                    map.put(idOfOrg, new ArrayList<String>());
+                }
+                map.get(idOfOrg).add(electionArea);
             }
             electionAreaMap = map;
         } catch (FileNotFoundException e) {
@@ -419,11 +517,11 @@ public class EnterEventsMonitoring {
     }
 
     public class EnterEventItem {
-        private static final int COLOR_GREEN = 1;
-        private static final int COLOR_YELLOW = 2;
-        private static final int COLOR_RED = 3;
-        private static final int COLOR_BLUE = 4;
-        private static final int COLOR_GRAY = 5;
+        public static final int COLOR_GREEN = 1;
+        public static final int COLOR_YELLOW = 2;
+        public static final int COLOR_RED = 3;
+        public static final int COLOR_BLUE = 4;
+        public static final int COLOR_GRAY = 5;
 
         private Long idOfOrg;
         private String city;
@@ -438,6 +536,11 @@ public class EnterEventsMonitoring {
         private int colorType;
         private Date evtDateTime;
         private int eventCode;
+        private int eventCountTotal;
+        private String lastSync;
+        private int lastSyncColor;
+        private String lastEvent;
+        private int lastEventColor;
 
         public EnterEventItem(Long idOfOrg, String city, String district, Integer orgNum, String orgShortName,
                 String address, String electionArea, int turnstile, String turnstileAddr, int colorType) {
@@ -557,6 +660,46 @@ public class EnterEventsMonitoring {
 
         public void setEventCode(int eventCode) {
             this.eventCode = eventCode;
+        }
+
+        public int getEventCountTotal() {
+            return eventCountTotal;
+        }
+
+        public void setEventCountTotal(int eventCountTotal) {
+            this.eventCountTotal = eventCountTotal;
+        }
+
+        public String getLastSync() {
+            return lastSync;
+        }
+
+        public void setLastSync(String lastSync) {
+            this.lastSync = lastSync;
+        }
+
+        public int getLastSyncColor() {
+            return lastSyncColor;
+        }
+
+        public void setLastSyncColor(int lastSyncColor) {
+            this.lastSyncColor = lastSyncColor;
+        }
+
+        public String getLastEvent() {
+            return lastEvent;
+        }
+
+        public void setLastEvent(String lastEvent) {
+            this.lastEvent = lastEvent;
+        }
+
+        public int getLastEventColor() {
+            return lastEventColor;
+        }
+
+        public void setLastEventColor(int lastEventColor) {
+            this.lastEventColor = lastEventColor;
         }
     }
 }

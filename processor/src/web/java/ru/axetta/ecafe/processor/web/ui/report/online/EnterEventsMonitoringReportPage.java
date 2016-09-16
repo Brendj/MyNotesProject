@@ -33,6 +33,15 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     private String htmlReport = null;
     private Boolean applyUserSettings = false;
     private Boolean showElectionAreaOnly = true;
+    private Boolean showStatus1 = true;
+    private Boolean showStatus2 = true;
+    private Boolean showStatus3 = true;
+    private Boolean showStatus4 = true;
+    private Boolean showStatus5 = true;
+    private String UIKfilter;
+    private String idOfOrgFilter;
+    private String addressFilter;
+    private String orgNameFilter;
 
     public EnterEventsMonitoringReportPage() {
         super();
@@ -146,7 +155,28 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     private Properties buildProperties() {
         Properties properties = new Properties();
         properties.setProperty("showElectionAreaOnly", Boolean.toString(showElectionAreaOnly));
+        properties.setProperty("showStatus1", Boolean.toString(showStatus1));
+        properties.setProperty("showStatus2", Boolean.toString(showStatus2));
+        properties.setProperty("showStatus3", Boolean.toString(showStatus3));
+        properties.setProperty("showStatus4", Boolean.toString(showStatus4));
+        properties.setProperty("showStatus5", Boolean.toString(showStatus5));
+        properties.setProperty("UIKfilter", UIKfilter);
+        properties.setProperty("idOfOrgFilter", idOfOrgFilter);
+        properties.setProperty("addressFilter", addressFilter);
+        properties.setProperty("orgNameFilter", orgNameFilter);
         return properties;
+    }
+
+    public void clear() {
+        UIKfilter = null;
+        idOfOrgFilter = null;
+        addressFilter = null;
+        orgNameFilter = null;
+        showStatus1 = true;
+        showStatus2 = true;
+        showStatus3 = true;
+        showStatus4 = true;
+        showStatus5 = true;
     }
 
     @Override
@@ -172,5 +202,77 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
 
     public void setShowElectionAreaOnly(Boolean showElectionAreaOnly) {
         this.showElectionAreaOnly = showElectionAreaOnly;
+    }
+
+    public String getUIKfilter() {
+        return UIKfilter;
+    }
+
+    public void setUIKfilter(String UIKfilter) {
+        this.UIKfilter = UIKfilter;
+    }
+
+    public String getIdOfOrgFilter() {
+        return idOfOrgFilter;
+    }
+
+    public void setIdOfOrgFilter(String idOfOrgFilter) {
+        this.idOfOrgFilter = idOfOrgFilter;
+    }
+
+    public String getAddressFilter() {
+        return addressFilter;
+    }
+
+    public void setAddressFilter(String addressFilter) {
+        this.addressFilter = addressFilter;
+    }
+
+    public String getOrgNameFilter() {
+        return orgNameFilter;
+    }
+
+    public void setOrgNameFilter(String orgNameFilter) {
+        this.orgNameFilter = orgNameFilter;
+    }
+
+    public Boolean getShowStatus1() {
+        return showStatus1;
+    }
+
+    public void setShowStatus1(Boolean showStatus1) {
+        this.showStatus1 = showStatus1;
+    }
+
+    public Boolean getShowStatus2() {
+        return showStatus2;
+    }
+
+    public void setShowStatus2(Boolean showStatus2) {
+        this.showStatus2 = showStatus2;
+    }
+
+    public Boolean getShowStatus3() {
+        return showStatus3;
+    }
+
+    public void setShowStatus3(Boolean showStatus3) {
+        this.showStatus3 = showStatus3;
+    }
+
+    public Boolean getShowStatus4() {
+        return showStatus4;
+    }
+
+    public void setShowStatus4(Boolean showStatus4) {
+        this.showStatus4 = showStatus4;
+    }
+
+    public Boolean getShowStatus5() {
+        return showStatus5;
+    }
+
+    public void setShowStatus5(Boolean showStatus5) {
+        this.showStatus5 = showStatus5;
     }
 }
