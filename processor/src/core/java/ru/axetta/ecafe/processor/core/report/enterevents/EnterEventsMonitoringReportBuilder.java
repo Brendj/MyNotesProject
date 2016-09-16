@@ -106,7 +106,9 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
         int lastEventTotal3 = 0;
 
         List<EnterEventsMonitoring.EnterEventItem> list = new ArrayList<EnterEventsMonitoring.EnterEventItem>();
+        parameterMap.put("formDate", EnterEventsMonitoring.getFormDate());
         Map<Long, List<EnterEventsMonitoring.EnterEventItem>> enterEventMap = EnterEventsMonitoring.getEnterEventMap();
+
         for(Long idOfOrg : enterEventMap.keySet()) {
             int count = 0;
             for(EnterEventsMonitoring.EnterEventItem item : enterEventMap.get(idOfOrg)) {

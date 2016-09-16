@@ -36,7 +36,7 @@
         </tr>
             <%-- Центральная область --%>
         <tr>
-            <td style="min-width: 210px; vertical-align: top;" width="215px">
+            <td style="min-width: 20px; vertical-align: top;" width="20px">
             </td>
             <td style="vertical-align: top;" width="*">
                     <%-- Рабочая область --%>

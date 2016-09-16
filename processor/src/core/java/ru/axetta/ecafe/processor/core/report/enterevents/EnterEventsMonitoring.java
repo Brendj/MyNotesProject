@@ -40,11 +40,16 @@ public class EnterEventsMonitoring {
     private static final long MINUTES10 = 10 * 60 * 1000;
     private static final long MINUTES30 = 30 * 60 * 1000;
 
+    private static String formDate = "";
     private static Map<Long, List<EnterEventItem>> enterEventMap = new HashMap<Long, List<EnterEventItem>>();
     private static Map<Long, List<String>> electionAreaMap = new HashMap<Long, List<String>>();
 
     public static Map<Long, List<EnterEventItem>> getEnterEventMap() {
         return enterEventMap;
+    }
+
+    public static String getFormDate() {
+        return formDate;
     }
 
     public static boolean isOn() {
@@ -128,13 +133,14 @@ public class EnterEventsMonitoring {
                 boolean usedSinceSeptember = (Boolean) accessory[2];
                 String shortName = (String) accessory[5];
                 String address = (String) accessory[6];
+                String shortAddress = formShortAddress(address);
 
                 if(accMap.get(idOfOrg) == null) {
                     accMap.put(idOfOrg, new HashMap<String, AccessoryItem>());
                 }
 
                 accMap.get(idOfOrg).put(accessoryNumber, new AccessoryItem(idOfOrg, accessoryNumber, usedSinceSeptember,
-                        (accMap.get(idOfOrg).size() + 1), city.trim(), district.trim(), shortName, address));
+                        (accMap.get(idOfOrg).size() + 1), city.trim(), district.trim(), shortName, shortAddress));
             }
 
             for(Long idOfOrg : accMap.keySet()) {
@@ -165,6 +171,7 @@ public class EnterEventsMonitoring {
                 sbList.add(new StringBuilder());
             }
 
+            Date date1 = new Date();
             for(Object[] enterEvent : getEnterEvents(persistenceSession, morning, evening)) {
                 long idOfOrg = (Long) enterEvent[0];
                 String turnstileAddr = (String)enterEvent[1];
@@ -303,6 +310,8 @@ public class EnterEventsMonitoring {
                 }
             }
 
+            SimpleDateFormat dateFormat1 = new SimpleDateFormat("HH:mm:ss");
+            formDate = dateFormat1.format(date1);
             enterEventMap = result;
 
             persistenceTransaction.commit();
@@ -316,7 +325,7 @@ public class EnterEventsMonitoring {
     @SuppressWarnings("unchecked")
     private List<Object[]> getAccesories(Session session) {
         Query query = session.createQuery("SELECT ac.idOfSourceOrg, ac.accessoryNumber, ac.usedSinceSeptember, "
-                + "o.city, o.district, o.shortNameInfoService, o.shortAddress from Accessory AS ac, Org AS o "
+                + "o.city, o.district, o.shortNameInfoService, o.address from Accessory AS ac, Org AS o "
                 + "WHERE ac.idOfSourceOrg = o.idOfOrg AND length(ac.accessoryNumber) > 11 "
                 + "AND ac.accessoryType = 2 ORDER BY ac.idOfAccessory");
         List<Object[]> result = (List<Object[]>) query.list();
@@ -427,6 +436,23 @@ public class EnterEventsMonitoring {
                 + " temp.idoforg=oa.idofsourceorg AND temp.turnstileAddr=oa.accessorynumber"
                 + " AND oa.usedsinceseptember = FALSE AND oa.accessorytype = 2");
         q.executeUpdate();
+    }
+
+    private String formShortAddress(String address) {
+        if(StringUtils.isEmpty(address)) {
+            return "";
+        }
+        String[] parts = address.split("/");
+        if(parts.length < 4) {
+            return address;
+        } else if(parts.length == 4) {
+            return parts[2] + " / " + parts[3];
+        } else if(parts.length == 5) {
+            return parts[2] + " / " + parts[3] + " / " + parts[4];
+        } else if(parts.length == 6) {
+            return parts[2] + " / " + parts[3] + " / " + parts[4] + parts[5];
+        }
+        return null;
     }
 
     public static class AccessoryItem {
