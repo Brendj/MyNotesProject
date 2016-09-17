@@ -256,9 +256,11 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
         parameterMap.put("lastSyncTotal1", lastSyncTotal1);
         parameterMap.put("lastSyncTotal2", lastSyncTotal2);
         parameterMap.put("lastSyncTotal3", lastSyncTotal3);
+        parameterMap.put("lastSyncTotal4", lastSyncTotal4);
         parameterMap.put("lastEventTotal1", lastEventTotal1);
         parameterMap.put("lastEventTotal2", lastEventTotal2);
         parameterMap.put("lastEventTotal3", lastEventTotal3);
+        parameterMap.put("lastEventTotal4", lastEventTotal4);
         return new JRBeanCollectionDataSource(list);
     }
 }
