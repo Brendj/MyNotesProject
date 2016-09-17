@@ -44,32 +44,75 @@
 
     </h:panelGrid>
 
+    <h:outputText escape="false" value="Фильтры данных турникетов:" styleClass="output-text" />
+
     <h:panelGrid styleClass="borderless-grid" columns="2">
 
-        <h:outputText escape="false" value="Показать данные турникетов со статусом 1 (зеленый цвет) - последний вход был в последние 10 минут" styleClass="output-text" />
+        <h:outputText escape="false" value="Показать данные с зеленым цветом - последний вход был менее 10 минут назад" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showStatus1}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
-        <h:outputText escape="false" value="Показать данные турникетов со статусом 2 (желтый цвет) - последний вход был в последние 30 минут" styleClass="output-text" />
+        <h:outputText escape="false" value="Показать данные с желтым цветом - последний вход был более 10 минут назад, но не более 30 минут назад" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showStatus2}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
-        <h:outputText escape="false" value="Показать данные турникетов со статусом 3 (розовый цвет) - последний вход был более 30 минут назад" styleClass="output-text" />
+        <h:outputText escape="false" value="Показать данные с красным цветом - последний вход был более 30 минут назад" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showStatus3}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
-        <h:outputText escape="false" value="Показать данные турникетов со статусом 4 (голубой цвет) - сегодня входов не было, но турникет работает" styleClass="output-text" />
+        <h:outputText escape="false" value="Показать данные с голубым цветом - сегодня входов не было, но турникет работает" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showStatus4}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
-        <h:outputText escape="false" value="Показать данные турникетов со статусом 5 (серый цвет) - сегодня входов не было, турникет не работает" styleClass="output-text" />
+        <h:outputText escape="false" value="Показать данные с серым цветом - сегодня входов не было, турникет не работает" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showStatus5}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
     </h:panelGrid>
 
-    <h:outputText escape="false" value="Примечание: для столбцов \"Последняя синхронизация\" и \"Последний вход\" зеленый цвет - в течении 5 минут была активность, " styleClass="output-text" />
-    <h:outputText escape="false" value="желтый цвет - в течении 10 минут была активность, розовый цвет - больше 10 минут не было активности." styleClass="output-text" />
+    <h:outputText escape="false" value="Фильтры данных последней синхронизации:" styleClass="output-text" />
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+
+        <h:outputText escape="false" value="Показать данные с зеленым цветом - последняя синхронизация была менее 10 минут назад" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastSync1}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать данные с желтым цветом - последняя синхронизация была более 10 минут назад, но не более 30 минут назад" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastSync2}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать данные с оранжевым цветом - последняя синхронизация была более 30 минут назад" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastSync3}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать данные с красным цветом - сегодня не было синхронизации" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastSync4}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+    </h:panelGrid>
+
+    <h:outputText escape="false" value="Фильтры данных последнего входа:" styleClass="output-text" />
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+
+        <h:outputText escape="false" value="Показать данные с зеленым цветом - последний вход был менее 10 минут назад" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastEvent1}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать данные с желтым цветом - последний вход был более 10 минут назад, но не более 30 минут назад" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastEvent2}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать данные с оранжевым цветом - последний вход был более 30 минут назад" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastEvent3}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="false" value="Показать данные с красным цветом - сегодня не было входа" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{electionsPage.enterEventsMonitoringReportPage.showLastEvent4}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
+    </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="4" id="blah-blah">
         <a4j:commandButton value="Обновить" action="#{electionsPage.enterEventsMonitoringReportPage.buildReportHTML}"

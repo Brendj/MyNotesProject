@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 public class EnterEventsMonitoring {
     private static final Logger logger = LoggerFactory.getLogger(EnterEventsMonitoring.class);
 
-    private static final long MINUTES5 = 5 * 60 * 1000;
     private static final long MINUTES10 = 10 * 60 * 1000;
     private static final long MINUTES30 = 30 * 60 * 1000;
 
@@ -95,6 +94,8 @@ public class EnterEventsMonitoring {
             if(hour < 7) {
                 calendar.add(Calendar.DAY_OF_MONTH, -1);
             }
+            CalendarUtils.setHoursAndMinutes(calendar, 0, 0);
+            Date dayStart = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 7, 0);
             Date morning = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 21, 0);
@@ -171,8 +172,9 @@ public class EnterEventsMonitoring {
                 sbList.add(new StringBuilder());
             }
 
+            List<Object[]> enterEventsList = getEnterEvents(persistenceSession, morning, evening);
             Date date1 = new Date();
-            for(Object[] enterEvent : getEnterEvents(persistenceSession, morning, evening)) {
+            for(Object[] enterEvent : enterEventsList) {
                 long idOfOrg = (Long) enterEvent[0];
                 String turnstileAddr = (String)enterEvent[1];
                 Date evtDateTime = (Date) enterEvent[2];
@@ -225,10 +227,12 @@ public class EnterEventsMonitoring {
                 int lastSyncColor = EnterEventItem.COLOR_RED;
                 if(lastSyncs.get(idOfOrg) != null) {
                     long delay = date.getTime() - lastSyncs.get(idOfOrg).getTime();
-                    if(delay <= MINUTES5) {
+                    if(delay <= MINUTES10) {
                         lastSyncColor = EnterEventItem.COLOR_GREEN;
-                    } else if (delay <= MINUTES10) {
+                    } else if (delay <= MINUTES30) {
                         lastSyncColor = EnterEventItem.COLOR_YELLOW;
+                    } else if(lastSyncs.get(idOfOrg).after(dayStart)) {
+                        lastSyncColor = EnterEventItem.COLOR_ORANGE;
                     }
                     lastSync = dateFormat.format(lastSyncs.get(idOfOrg));
                 }
@@ -300,10 +304,12 @@ public class EnterEventsMonitoring {
                 if(lastEvent.get(idOfOrg) != null) {
                     lastEventDate = dateFormat.format(lastEvent.get(idOfOrg));
                     long delay = date.getTime() - lastEvent.get(idOfOrg).getTime();
-                    if (delay <= MINUTES5) {
+                    if (delay <= MINUTES10) {
                         lastEventColor = EnterEventItem.COLOR_GREEN;
-                    } else if (delay <= MINUTES10) {
+                    } else if (delay <= MINUTES30) {
                         lastEventColor = EnterEventItem.COLOR_YELLOW;
+                    } else if(lastEvent.get(idOfOrg).after(dayStart)) {
+                        lastEventColor = EnterEventItem.COLOR_ORANGE;
                     }
                 }
                 for (EnterEventItem item : result.get(idOfOrg)) {
@@ -558,6 +564,7 @@ public class EnterEventsMonitoring {
         public static final int COLOR_RED = 3;
         public static final int COLOR_BLUE = 4;
         public static final int COLOR_GRAY = 5;
+        public static final int COLOR_ORANGE = 6;
 
         private Long idOfOrg;
         private String city;

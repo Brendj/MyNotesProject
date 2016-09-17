@@ -72,6 +72,14 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
         boolean showStatus3 = Boolean.valueOf(getReportProperties().getProperty("showStatus3"));
         boolean showStatus4 = Boolean.valueOf(getReportProperties().getProperty("showStatus4"));
         boolean showStatus5 = Boolean.valueOf(getReportProperties().getProperty("showStatus5"));
+        boolean showLastSync1 = Boolean.valueOf(getReportProperties().getProperty("showLastSync1"));
+        boolean showLastSync2 = Boolean.valueOf(getReportProperties().getProperty("showLastSync2"));
+        boolean showLastSync3 = Boolean.valueOf(getReportProperties().getProperty("showLastSync3"));
+        boolean showLastSync4 = Boolean.valueOf(getReportProperties().getProperty("showLastSync4"));
+        boolean showLastEvent1 = Boolean.valueOf(getReportProperties().getProperty("showLastEvent1"));
+        boolean showLastEvent2 = Boolean.valueOf(getReportProperties().getProperty("showLastEvent2"));
+        boolean showLastEvent3 = Boolean.valueOf(getReportProperties().getProperty("showLastEvent3"));
+        boolean showLastEvent4 = Boolean.valueOf(getReportProperties().getProperty("showLastEvent4"));
         String UIKfilter = getReportProperties().getProperty("UIKfilter");
         String idOfOrgFilter = getReportProperties().getProperty("idOfOrgFilter");
         String addressFilter = getReportProperties().getProperty("addressFilter");
@@ -129,6 +137,30 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
                     continue;
                 }
                 if(!showStatus5 && item.getColorType() == EnterEventsMonitoring.EnterEventItem.COLOR_GRAY){
+                    continue;
+                }
+                if(!showLastSync1 && item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_GREEN){
+                    continue;
+                }
+                if(!showLastSync2 && item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_YELLOW){
+                    continue;
+                }
+                if(!showLastSync3 && item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_ORANGE){
+                    continue;
+                }
+                if(!showLastSync4 && item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_RED){
+                    continue;
+                }
+                if(!showLastEvent1 && item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_GREEN){
+                    continue;
+                }
+                if(!showLastEvent2 && item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_YELLOW){
+                    continue;
+                }
+                if(!showLastEvent3 && item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_ORANGE){
+                    continue;
+                }
+                if(!showLastEvent4 && item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_RED){
                     continue;
                 }
                 if(UIKfilters != null && UIKfilters.size() > 0) {

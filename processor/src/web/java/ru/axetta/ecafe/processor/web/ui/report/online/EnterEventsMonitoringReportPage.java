@@ -38,6 +38,14 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
     private Boolean showStatus3 = true;
     private Boolean showStatus4 = true;
     private Boolean showStatus5 = true;
+    private Boolean showLastSync1 = true;
+    private Boolean showLastSync2 = true;
+    private Boolean showLastSync3 = true;
+    private Boolean showLastSync4 = true;
+    private Boolean showLastEvent1 = true;
+    private Boolean showLastEvent2 = true;
+    private Boolean showLastEvent3 = true;
+    private Boolean showLastEvent4 = true;
     private String UIKfilter;
     private String idOfOrgFilter;
     private String addressFilter;
@@ -160,6 +168,14 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
         properties.setProperty("showStatus3", Boolean.toString(showStatus3));
         properties.setProperty("showStatus4", Boolean.toString(showStatus4));
         properties.setProperty("showStatus5", Boolean.toString(showStatus5));
+        properties.setProperty("showLastSync1", Boolean.toString(showLastSync1));
+        properties.setProperty("showLastSync2", Boolean.toString(showLastSync2));
+        properties.setProperty("showLastSync3", Boolean.toString(showLastSync3));
+        properties.setProperty("showLastSync4", Boolean.toString(showLastSync4));
+        properties.setProperty("showLastEvent1", Boolean.toString(showLastEvent1));
+        properties.setProperty("showLastEvent2", Boolean.toString(showLastEvent2));
+        properties.setProperty("showLastEvent3", Boolean.toString(showLastEvent3));
+        properties.setProperty("showLastEvent4", Boolean.toString(showLastEvent4));
         properties.setProperty("UIKfilter", UIKfilter);
         properties.setProperty("idOfOrgFilter", idOfOrgFilter);
         properties.setProperty("addressFilter", addressFilter);
@@ -177,6 +193,15 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
         showStatus3 = true;
         showStatus4 = true;
         showStatus5 = true;
+        showLastSync1 = true;
+        showLastSync2 = true;
+        showLastSync3 = true;
+        showLastSync4 = true;
+        showLastEvent1 = true;
+        showLastEvent2 = true;
+        showLastEvent3 = true;
+        showLastEvent4 = true;
+
     }
 
     @Override
@@ -274,5 +299,69 @@ public class EnterEventsMonitoringReportPage extends OnlineReportPage {
 
     public void setShowStatus5(Boolean showStatus5) {
         this.showStatus5 = showStatus5;
+    }
+
+    public Boolean getShowLastSync1() {
+        return showLastSync1;
+    }
+
+    public void setShowLastSync1(Boolean showLastSync1) {
+        this.showLastSync1 = showLastSync1;
+    }
+
+    public Boolean getShowLastSync2() {
+        return showLastSync2;
+    }
+
+    public void setShowLastSync2(Boolean showLastSync2) {
+        this.showLastSync2 = showLastSync2;
+    }
+
+    public Boolean getShowLastSync3() {
+        return showLastSync3;
+    }
+
+    public void setShowLastSync3(Boolean showLastSync3) {
+        this.showLastSync3 = showLastSync3;
+    }
+
+    public Boolean getShowLastSync4() {
+        return showLastSync4;
+    }
+
+    public void setShowLastSync4(Boolean showLastSync4) {
+        this.showLastSync4 = showLastSync4;
+    }
+
+    public Boolean getShowLastEvent1() {
+        return showLastEvent1;
+    }
+
+    public void setShowLastEvent1(Boolean showLastEvent1) {
+        this.showLastEvent1 = showLastEvent1;
+    }
+
+    public Boolean getShowLastEvent2() {
+        return showLastEvent2;
+    }
+
+    public void setShowLastEvent2(Boolean showLastEvent2) {
+        this.showLastEvent2 = showLastEvent2;
+    }
+
+    public Boolean getShowLastEvent3() {
+        return showLastEvent3;
+    }
+
+    public void setShowLastEvent3(Boolean showLastEvent3) {
+        this.showLastEvent3 = showLastEvent3;
+    }
+
+    public Boolean getShowLastEvent4() {
+        return showLastEvent4;
+    }
+
+    public void setShowLastEvent4(Boolean showLastEvent4) {
+        this.showLastEvent4 = showLastEvent4;
     }
 }
