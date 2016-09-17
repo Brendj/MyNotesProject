@@ -109,9 +109,11 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
         int lastSyncTotal1 = 0;
         int lastSyncTotal2 = 0;
         int lastSyncTotal3 = 0;
+        int lastSyncTotal4 = 0;
         int lastEventTotal1 = 0;
         int lastEventTotal2 = 0;
         int lastEventTotal3 = 0;
+        int lastEventTotal4 = 0;
 
         List<EnterEventsMonitoring.EnterEventItem> list = new ArrayList<EnterEventsMonitoring.EnterEventItem>();
         parameterMap.put("formDate", EnterEventsMonitoring.getFormDate());
@@ -225,8 +227,11 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
                     if (item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_YELLOW) {
                         lastSyncTotal2 = lastSyncTotal2 + 1;
                     }
-                    if (item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_RED) {
+                    if (item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_ORANGE) {
                         lastSyncTotal3 = lastSyncTotal3 + 1;
+                    }
+                    if (item.getLastSyncColor() == EnterEventsMonitoring.EnterEventItem.COLOR_RED) {
+                        lastSyncTotal4 = lastSyncTotal4 + 1;
                     }
                     if (item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_GREEN) {
                         lastEventTotal1 = lastEventTotal1 + 1;
@@ -234,8 +239,11 @@ public class EnterEventsMonitoringReportBuilder extends BasicReportForAllOrgJob.
                     if (item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_YELLOW) {
                         lastEventTotal2 = lastEventTotal2 + 1;
                     }
-                    if (item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_RED) {
+                    if (item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_ORANGE) {
                         lastEventTotal3 = lastEventTotal3 + 1;
+                    }
+                    if (item.getLastEventColor() == EnterEventsMonitoring.EnterEventItem.COLOR_RED) {
+                        lastEventTotal4 = lastEventTotal4 + 1;
                     }
                 }
                 list.add(item);
