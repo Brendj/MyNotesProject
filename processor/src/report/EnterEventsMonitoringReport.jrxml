@@ -1,0 +1,1480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SpecialDatesReport" pageWidth="920" pageHeight="70000" orientation="Landscape" columnWidth="920" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="517f8c9f-0327-4ef0-9a03-493f3b265d01">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.html.wrap.break.word" value="true"/>
+	<property name="net.sf.jasperreports.text.truncate.at.char" value="true"/>
+	<style name="Crosstab Data Text" hAlign="Center" vAlign="Top"/>
+	<parameter name="eventsTotal1" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="eventsTotal2" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="eventsTotal3" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastSyncTotal1" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastSyncTotal2" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastSyncTotal3" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastSyncTotal4" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastEventTotal1" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastEventTotal2" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastEventTotal3" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="lastEventTotal4" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
+	</parameter>
+	<parameter name="formDate" class="java.lang.String"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="city" class="java.lang.String"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="orgNum" class="java.lang.Integer"/>
+	<field name="orgShortName" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="electionArea" class="java.lang.String"/>
+	<field name="turnstile" class="java.lang.Integer"/>
+	<field name="turnstileAddr" class="java.lang.String"/>
+	<field name="eventCount" class="java.lang.Integer"/>
+	<field name="colorType" class="java.lang.Integer"/>
+	<field name="eventCountTotal" class="java.lang.Integer"/>
+	<field name="lastSync" class="java.lang.String"/>
+	<field name="lastSyncColor" class="java.lang.Integer"/>
+	<field name="lastEvent" class="java.lang.String"/>
+	<field name="lastEventColor" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="10000">
+			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false" columnBreakOffset="3000" ignoreWidth="true">
+				<reportElement uuid="e75ea8ca-a2be-42b4-b215-9c01e4d0d293" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="75" width="920" height="9925"/>
+				<crosstabHeaderCell>
+					<cellContents>
+						<textField>
+							<reportElement uuid="cfefc653-db97-481e-af79-015d761e5b3f" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="440" y="0" width="200" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Здание"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="c03bf4a9-2a94-411a-b26f-dfea2c32343e" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Город"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="c03bf4a9-2a94-411a-b26f-dfea2c32343e" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="120" y="0" width="100" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Округ"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="c03bf4a9-2a94-411a-b26f-dfea2c32343e" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="220" y="0" width="100" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Школа"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="c03bf4a9-2a94-411a-b26f-dfea2c32343e" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="320" y="0" width="120" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["ИД организации"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="24af7b1a-4872-4db7-9433-6eeebb7e11d1" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="640" y="0" width="200" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Адрес"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="24af7b1a-4872-4db7-9433-6eeebb7e11d1" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="840" y="0" width="200" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["УИК"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="24af7b1a-4872-4db7-9433-6eeebb7e11d1" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="1040" y="0" width="150" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Последняя синхронизация"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="24af7b1a-4872-4db7-9433-6eeebb7e11d1" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="1340" y="0" width="150" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Всего входов за день"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="24af7b1a-4872-4db7-9433-6eeebb7e11d1" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" x="1190" y="0" width="150" height="30" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Последний вход"]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="city" width="120">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{city}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="4715e4dc-3f53-43ed-96bc-1e8417e16d52" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{city}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="4715e4dc-3f53-43ed-96bc-1e8417e16d52" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{city}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="4715e4dc-3f53-43ed-96bc-1e8417e16d52" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{city}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="4715e4dc-3f53-43ed-96bc-1e8417e16d52" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{city}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="4715e4dc-3f53-43ed-96bc-1e8417e16d52" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{city}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="district" width="100">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{district}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="dc1af538-23d0-49ad-8da5-5ca119ecdb16" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="dc1af538-23d0-49ad-8da5-5ca119ecdb16" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="dc1af538-23d0-49ad-8da5-5ca119ecdb16" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="dc1af538-23d0-49ad-8da5-5ca119ecdb16" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="dc1af538-23d0-49ad-8da5-5ca119ecdb16" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="orgNum" width="100">
+					<bucket class="java.lang.Integer">
+						<bucketExpression><![CDATA[$F{orgNum}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="9ec23bc4-212d-487a-8959-1d2ee3c46b9f" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="9ec23bc4-212d-487a-8959-1d2ee3c46b9f" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="9ec23bc4-212d-487a-8959-1d2ee3c46b9f" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="9ec23bc4-212d-487a-8959-1d2ee3c46b9f" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="9ec23bc4-212d-487a-8959-1d2ee3c46b9f" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+								</reportElement>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="idOfOrg" width="1170">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{idOfOrg}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<elementGroup>
+								<textField>
+									<reportElement uuid="8a09d37b-c06f-4517-9c25-add593e35604" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+								</textField>
+								<textField>
+									<reportElement uuid="8a09d37b-c06f-4517-9c25-add593e35604" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+								</textField>
+								<textField>
+									<reportElement uuid="8a09d37b-c06f-4517-9c25-add593e35604" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+								</textField>
+								<textField>
+									<reportElement uuid="8a09d37b-c06f-4517-9c25-add593e35604" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+									</reportElement>
+									<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+								</textField>
+								<textField>
+									<reportElement uuid="8a09d37b-c06f-4517-9c25-add593e35604" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+									</reportElement>
+									<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="320" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{addressMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="320" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{addressMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="320" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{addressMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="320" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{addressMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="320" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{addressMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="520" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{electionAreaMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="520" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{electionAreaMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="520" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{electionAreaMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="520" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{electionAreaMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="520" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{electionAreaMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="720" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{lastSyncColorMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastSyncMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="720" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{lastSyncColorMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastSyncMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="720" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF9900">
+										<printWhenExpression><![CDATA[new Boolean($V{lastSyncColorMeasure}.equals(6))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastSyncMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="720" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{lastSyncColorMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastSyncMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="870" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{lastEventColorMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastEventMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="870" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{lastEventColorMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastEventMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="870" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF9900">
+										<printWhenExpression><![CDATA[new Boolean($V{lastEventColorMeasure}.equals(6))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastEventMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="870" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{lastEventColorMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{lastEventMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1020" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{eventCountTotalMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1020" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{eventCountTotalMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1020" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{eventCountTotalMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1020" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{eventCountTotalMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="1020" y="0" width="150" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{eventCountTotalMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="120" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#CCFFCC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{orgShortNameMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="120" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#FFFF99">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{orgShortNameMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="120" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF99CC">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{orgShortNameMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="120" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#99CCFF">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{orgShortNameMeasure}]]></textFieldExpression>
+								</textField>
+								<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+									<reportElement uuid="45723306-e8e2-4079-8b5f-a57cacc402d2" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="120" y="0" width="200" height="30" isPrintWhenDetailOverflows="true" backcolor="#969696">
+										<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+									</reportElement>
+									<box>
+										<pen lineWidth="0.5"/>
+										<topPen lineWidth="0.5"/>
+										<leftPen lineWidth="0.5"/>
+										<bottomPen lineWidth="0.5"/>
+										<rightPen lineWidth="0.5"/>
+									</box>
+									<textElement verticalAlignment="Middle">
+										<font isBold="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$V{orgShortNameMeasure}]]></textFieldExpression>
+								</textField>
+							</elementGroup>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="turnstile" height="30">
+					<bucket class="java.lang.Integer">
+						<bucketExpression><![CDATA[$F{turnstile}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField>
+								<reportElement uuid="237a21e2-11c2-4dab-ac4d-7275ee3965a9" style="Crosstab Data Text" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+								</reportElement>
+								<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+								<textElement verticalAlignment="Middle" rotation="None">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Турникет №"+$V{turnstile}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="colorTypeMeasure" class="java.lang.Integer" calculation="Lowest">
+					<measureExpression><![CDATA[$F{colorType}]]></measureExpression>
+				</measure>
+				<measure name="orgShortNameMeasure" class="java.lang.String">
+					<measureExpression><![CDATA[$F{orgShortName}]]></measureExpression>
+				</measure>
+				<measure name="eventCountMeasure" class="java.lang.Integer" calculation="First">
+					<measureExpression><![CDATA[$F{eventCount}]]></measureExpression>
+				</measure>
+				<measure name="addressMeasure" class="java.lang.String">
+					<measureExpression><![CDATA[$F{address}]]></measureExpression>
+				</measure>
+				<measure name="electionAreaMeasure" class="java.lang.String">
+					<measureExpression><![CDATA[$F{electionArea}]]></measureExpression>
+				</measure>
+				<measure name="eventCountTotalMeasure" class="java.lang.Integer" calculation="First">
+					<measureExpression><![CDATA[$F{eventCountTotal}]]></measureExpression>
+				</measure>
+				<measure name="lastSyncMeasure" class="java.lang.String" calculation="First">
+					<measureExpression><![CDATA[$F{lastSync}]]></measureExpression>
+				</measure>
+				<measure name="lastSyncColorMeasure" class="java.lang.Integer" calculation="First">
+					<measureExpression><![CDATA[$F{lastSyncColor}]]></measureExpression>
+				</measure>
+				<measure name="lastEventMeasure" class="java.lang.String" calculation="First">
+					<measureExpression><![CDATA[$F{lastEvent}]]></measureExpression>
+				</measure>
+				<measure name="lastEventColorMeasure" class="java.lang.Integer" calculation="First">
+					<measureExpression><![CDATA[$F{lastEventColor}]]></measureExpression>
+				</measure>
+				<crosstabCell width="100" height="30">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<elementGroup>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e0e3737b-bb97-462b-9ecb-1922dde25d5d" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="100" height="30" forecolor="#000000" backcolor="#CCFFCC">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(1))]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{eventCountMeasure}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e0e3737b-bb97-462b-9ecb-1922dde25d5d" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="100" height="30" forecolor="#000000" backcolor="#FFFF99">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(2))]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{eventCountMeasure}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e0e3737b-bb97-462b-9ecb-1922dde25d5d" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="100" height="30" forecolor="#000000" backcolor="#FF99CC">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(3))]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{eventCountMeasure}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e0e3737b-bb97-462b-9ecb-1922dde25d5d" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="100" height="30" forecolor="#000000" backcolor="#99CCFF">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(4))]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{eventCountMeasure}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e0e3737b-bb97-462b-9ecb-1922dde25d5d" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="100" height="30" forecolor="#000000" backcolor="#969696">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+									<printWhenExpression><![CDATA[new Boolean($V{colorTypeMeasure}.equals(5))]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{eventCountMeasure}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e0e3737b-bb97-462b-9ecb-1922dde25d5d" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="100" height="30" forecolor="#000000" backcolor="#FFFFFF">
+									<property name="net.sf.jasperreports.export.xls.column.width" value="200"/>
+									<printWhenExpression><![CDATA[new Boolean(null == $V{colorTypeMeasure})]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{eventCountMeasure}]]></textFieldExpression>
+							</textField>
+						</elementGroup>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="idOfOrg">
+					<cellContents backcolor="#FFBFBF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement uuid="f0b1f929-b060-4988-a54f-b20f0c660e34" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{colorTypeMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="turnstile">
+					<cellContents backcolor="#FFBFBF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement uuid="9f36e478-8a9e-4a80-8588-73e408faa11e" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{colorTypeMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg" columnTotalGroup="turnstile">
+					<cellContents backcolor="#FFBFBF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement uuid="26b0925f-721e-4876-822a-edfea4ae5c30" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{colorTypeMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="city">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="city" columnTotalGroup="turnstile">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="district">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="district" columnTotalGroup="turnstile">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgNum">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgNum" columnTotalGroup="turnstile">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+			<staticText>
+				<reportElement uuid="af8a9166-8053-4ff0-af64-2b8a9ee19838" x="150" y="0" width="210" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество входов]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="22f16610-419f-4ce9-aa11-5f70732e4fca" mode="Opaque" x="150" y="50" width="70" height="25" backcolor="#CCFFCC"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{eventsTotal1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b920b58e-e950-4802-90c5-199cb1ed8e7b" mode="Opaque" x="220" y="50" width="70" height="25" backcolor="#FFFF99"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{eventsTotal2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f573e44c-c647-4e13-94cc-22f293e7e714" mode="Opaque" x="290" y="50" width="70" height="25" backcolor="#FF99CC"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{eventsTotal3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="853e9341-753a-4cb4-98bf-4e7d1a68a1f3" mode="Opaque" x="360" y="50" width="70" height="25" backcolor="#CCFFCC"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastSyncTotal1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="125c0444-f67f-4d6b-9b37-3f152c3aada0" mode="Opaque" x="430" y="50" width="70" height="25" backcolor="#FFFF99"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastSyncTotal2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dbd16453-b180-4f49-babd-d6275997e6b1" mode="Opaque" x="500" y="50" width="70" height="25" backcolor="#FF9900"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastSyncTotal3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="378d58ac-b6ee-4865-8c58-e5478bf95f9a" mode="Opaque" x="640" y="50" width="70" height="25" backcolor="#CCFFCC"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastEventTotal1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="5d8343cc-6a08-467d-9a8e-da3c4ec294c9" mode="Opaque" x="710" y="50" width="70" height="25" backcolor="#FFFF99"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastEventTotal2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="3d23b12a-8c29-4246-8c62-adccb0d5cd5e" mode="Opaque" x="780" y="50" width="70" height="25" backcolor="#FF9900"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastEventTotal3}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="d559dcf5-51f5-4b7f-9ecf-37019d45cfb2" x="360" y="0" width="280" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество школ по статусам синхронизации]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="960ec2d0-49a1-47f9-9600-96725f1c0a36" x="640" y="0" width="280" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество школ по статусу последнего входа]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="20851bd9-70b0-4c03-9804-9e1496a2107e" mode="Transparent" x="0" y="50" width="150" height="25" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{formDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="933b0879-c91c-49f6-932b-83687e5a33f8" x="0" y="0" width="150" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Время последнего формирования данных]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="f58a97ee-e7d8-44b2-8a6f-29e0721853f8" mode="Opaque" x="850" y="50" width="70" height="25" backcolor="#FF99CC"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastEventTotal4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="44092b53-a7c7-408a-a054-49f92f8ab767" mode="Opaque" x="570" y="50" width="70" height="25" backcolor="#FF99CC"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{lastSyncTotal4}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
