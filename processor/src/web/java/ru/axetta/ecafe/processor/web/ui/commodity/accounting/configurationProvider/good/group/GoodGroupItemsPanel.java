@@ -69,6 +69,11 @@ public class GoodGroupItemsPanel extends BasicPage {
     }
 
     @PostConstruct
+    public void postConstruct() {
+        goodGroupList = new ArrayList<GoodGroup>();
+        filter="";
+    }
+
     public void reload() throws Exception {
         goodGroupList = new ArrayList<GoodGroup>();
         filter="";
