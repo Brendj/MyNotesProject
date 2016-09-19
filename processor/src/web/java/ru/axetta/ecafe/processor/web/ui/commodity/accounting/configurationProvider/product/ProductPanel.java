@@ -69,6 +69,11 @@ public class ProductPanel extends BasicPage {
     }
 
     @PostConstruct
+    public void postConstruct() {
+        productList = new ArrayList<Product>();
+        filter="";
+    }
+
     public void reload() throws Exception {
          productList = new ArrayList<Product>();
          filter="";

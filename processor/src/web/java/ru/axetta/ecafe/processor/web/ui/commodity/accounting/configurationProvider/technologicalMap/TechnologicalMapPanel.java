@@ -17,13 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,6 +71,11 @@ public class TechnologicalMapPanel extends BasicPage {
     }
 
     @PostConstruct
+    public void postConstruct() {
+        technologicalMapList = new ArrayList<TechnologicalMap>();
+        filter="";
+    }
+
     public void reload() throws Exception {
          technologicalMapList = new ArrayList<TechnologicalMap>();
          filter="";

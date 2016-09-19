@@ -17,14 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -70,6 +70,12 @@ public class TechnologicalMapGroupItemsPanel extends BasicPage {
     }
 
     @PostConstruct
+    public void postConstruct() {
+        technologicalMapGroupList = new ArrayList<TechnologicalMapGroup>();
+        selectTechnologicalMapGroup = new TechnologicalMapGroup();
+        filter="";
+    }
+
     public void reload() throws Exception {
          technologicalMapGroupList = new ArrayList<TechnologicalMapGroup>();
          selectTechnologicalMapGroup = new TechnologicalMapGroup();
