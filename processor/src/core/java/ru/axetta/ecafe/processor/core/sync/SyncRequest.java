@@ -109,7 +109,7 @@ public class SyncRequest {
                     String remarks = getStringValueNullSafe(namedNodeMap, "Remarks");
                     String notifyViaEmail = getStringValueNullSafe(namedNodeMap, "NotifyViaEmail");
                     String notifyViaSMS = getStringValueNullSafe(namedNodeMap, "NotifyViaSMS");
-                    String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPUSH");
+                    String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPush");
                     String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
                     String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap, "CanConfirmGroupPayment");
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
