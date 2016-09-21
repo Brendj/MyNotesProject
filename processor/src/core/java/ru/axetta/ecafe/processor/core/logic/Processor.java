@@ -3437,10 +3437,8 @@ public class Processor implements SyncProcessor {
                         client.setSsoid("");
                     }
                     client.setEmail(email);
-                    if(!ignoreNotifyFlags) {
-                        if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
-                            client.setNotifyViaEmail(true);
-                        }
+                    if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
+                        client.setNotifyViaEmail(true);
                     }
                 }
                 if (clientParamItem.getMobilePhone() != null) {
@@ -3450,14 +3448,12 @@ public class Processor implements SyncProcessor {
                         client.setSsoid("");
                     }
                     client.setMobile(mobile);
-                    if(!ignoreNotifyFlags) {
-                        if (!StringUtils.isEmpty(mobile)) {
-                            if (clientParamItem.getNotifyViaSMS() == null) {
-                                client.setNotifyViaSMS(true);
-                            }
-                            if (clientParamItem.getNotifyViaPUSH() == null) {
-                                client.setNotifyViaPUSH(false);
-                            }
+                    if (!StringUtils.isEmpty(mobile)) {
+                        if (clientParamItem.getNotifyViaSMS() == null) {
+                            client.setNotifyViaSMS(true);
+                        }
+                        if (clientParamItem.getNotifyViaPUSH() == null) {
+                            client.setNotifyViaPUSH(false);
                         }
                     }
                 }
@@ -3485,14 +3481,16 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getRemarks() != null) {
                     client.setRemarks(clientParamItem.getRemarks());
                 }
-                if (clientParamItem.getNotifyViaEmail() != null) {
-                    client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
-                }
-                if (clientParamItem.getNotifyViaSMS() != null) {
-                    client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
-                }
-                if (clientParamItem.getNotifyViaPUSH() != null) {
-                    client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
+                if(!ignoreNotifyFlags) {
+                    if (clientParamItem.getNotifyViaEmail() != null) {
+                        client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
+                    }
+                    if (clientParamItem.getNotifyViaSMS() != null) {
+                        client.setNotifyViaSMS(clientParamItem.getNotifyViaSMS());
+                    }
+                    if (clientParamItem.getNotifyViaPUSH() != null) {
+                        client.setNotifyViaPUSH(clientParamItem.getNotifyViaPUSH());
+                    }
                 }
             /* FAX клиента */
                 if (clientParamItem.getFax() != null) {
