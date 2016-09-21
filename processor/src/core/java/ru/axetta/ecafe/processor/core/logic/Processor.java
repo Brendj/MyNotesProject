@@ -3401,6 +3401,7 @@ public class Processor implements SyncProcessor {
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg)
             throws Exception {
+        boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -3436,8 +3437,10 @@ public class Processor implements SyncProcessor {
                         client.setSsoid("");
                     }
                     client.setEmail(email);
-                    if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
-                        client.setNotifyViaEmail(true);
+                    if(!ignoreNotifyFlags) {
+                        if (!StringUtils.isEmpty(clientParamItem.getEmail()) && clientParamItem.getNotifyViaEmail() == null) {
+                            client.setNotifyViaEmail(true);
+                        }
                     }
                 }
                 if (clientParamItem.getMobilePhone() != null) {
@@ -3447,12 +3450,14 @@ public class Processor implements SyncProcessor {
                         client.setSsoid("");
                     }
                     client.setMobile(mobile);
-                    if (!StringUtils.isEmpty(mobile)) {
-                        if (clientParamItem.getNotifyViaSMS() == null) {
-                            client.setNotifyViaSMS(true);
-                        }
-                        if (clientParamItem.getNotifyViaPUSH() == null) {
-                            client.setNotifyViaPUSH(false);
+                    if(!ignoreNotifyFlags) {
+                        if (!StringUtils.isEmpty(mobile)) {
+                            if (clientParamItem.getNotifyViaSMS() == null) {
+                                client.setNotifyViaSMS(true);
+                            }
+                            if (clientParamItem.getNotifyViaPUSH() == null) {
+                                client.setNotifyViaPUSH(false);
+                            }
                         }
                     }
                 }

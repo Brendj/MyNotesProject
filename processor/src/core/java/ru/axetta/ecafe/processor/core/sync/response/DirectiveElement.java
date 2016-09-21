@@ -74,6 +74,9 @@ public class DirectiveElement implements AbstractToElement{
         Integer photoRegistryFlag = org.getPhotoRegistryDirective().getCode();
         directiveItemList.add(new DirectiveItem("IS_ALLOWED_PHOTO_REGISTRY", photoRegistryFlag.toString()));
 
+        Boolean disEditServicesInfoFlag = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
+        directiveItemList.add(new DirectiveItem("DISABLE_EDIT_INFORMATION_SERVICES_FOR_CLIENTS", disEditServicesInfoFlag ? "1":"0"));
+
         Integer loginUniqControlPeriod = RuntimeContext.getInstance().getOptionValueInt(
                 Option.OPTION_SECURITY_CLIENT_PERIOD_BLOCK_LOGIN_REUSE);
         directiveItemList.add(new DirectiveItem("IS_LOGIN_UNIQ_CONTROL_PERIOD", loginUniqControlPeriod.toString()));
