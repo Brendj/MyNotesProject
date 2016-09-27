@@ -264,6 +264,9 @@ public class OrgEditPage extends BasicWorkspacePage
             idOfOrgList = new ArrayList<Long>();
             idOfOrgList.add(idOfOrg);
         }
+        if(!idOfOrgList.contains(idOfOrg)) {
+            idOfOrgList.add(idOfOrg);
+        }
         HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
         if(!selectOrg.equals(friendlyOrg)){
             // Если убрали или внесли организацию в список дружественных, то обновляем версию
@@ -576,7 +579,7 @@ public class OrgEditPage extends BasicWorkspacePage
     }
 
     public String getIdOfFriendlyOrgList() {
-        return friendlyIdOfOrgList.toString().replaceAll("[^0-9,]","");
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
     public List<Long> getFriendlyIdOfOrgList() {
