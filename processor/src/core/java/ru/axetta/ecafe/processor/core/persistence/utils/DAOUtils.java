@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
-import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
@@ -1994,6 +1993,8 @@ public class DAOUtils {
             for(Long id : clientsCopy){
                 Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                 criteria.add(Restrictions.eq("idOfGuardian", id));
+                criteria.add(Restrictions.eq("deletedState", false));
+                //criteria.add(Restrictions.eq("disabled", false));
                 List<ClientGuardian> list = criteria.list();
                 if (list != null && list.size() > 0) {
                     for (ClientGuardian cg : list) {

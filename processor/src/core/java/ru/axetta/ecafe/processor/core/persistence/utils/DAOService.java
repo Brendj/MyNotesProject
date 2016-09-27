@@ -353,25 +353,25 @@ public class DAOService {
         return (Long) criteria.uniqueResult();
     }
 
-    public boolean enableClientNotificationBySMS(Long contractId, boolean state) {
+    public boolean enableClientNotificationBySMS(List<Long> contractId, boolean state) {
         Query q = entityManager
-                .createQuery("update Client set notifyViaSMS=:notifyViaSMS where contractId=:contractId");
+                .createQuery("update Client set notifyViaSMS=:notifyViaSMS where contractId in (:contractId)");
         q.setParameter("notifyViaSMS", state);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
 
-    public boolean enableClientNotificationByPUSH(Long contractId, boolean state) {
+    public boolean enableClientNotificationByPUSH(List<Long> contractId, boolean state) {
         Query q = entityManager
-                .createQuery("update Client set notifyViaPUSH=:notifyViaPUSH where contractId=:contractId");
+                .createQuery("update Client set notifyViaPUSH=:notifyViaPUSH where contractId in (:contractId)");
         q.setParameter("notifyViaPUSH", state);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;
     }
 
-    public boolean enableClientNotificationByEmail(Long contractId, boolean state) {
+    public boolean enableClientNotificationByEmail(List<Long> contractId, boolean state) {
         Query q = entityManager
-                .createQuery("update Client set notifyViaEmail=:notifyViaEmail where contractId=:contractId");
+                .createQuery("update Client set notifyViaEmail=:notifyViaEmail where contractId in (:contractId)");
         q.setParameter("notifyViaEmail", state);
         q.setParameter("contractId", contractId);
         return q.executeUpdate() != 0;

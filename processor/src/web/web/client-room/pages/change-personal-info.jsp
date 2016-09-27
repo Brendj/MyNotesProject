@@ -5,6 +5,7 @@
 
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
+<%@ page import="ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
@@ -14,7 +15,6 @@
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem" %>
 <%@ page import="ru.axetta.ecafe.processor.web.util.ClientRoomNotificationSettingsUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>

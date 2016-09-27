@@ -355,6 +355,15 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.photoURL = photoURL;
     }
 
+    public boolean getOldFlagsShow() {
+        if (clientGuardianItems == null) return true;
+        boolean result = true;
+        for (ClientGuardianItem item : clientGuardianItems) {
+            if (!item.getDisabled()) return false;
+        }
+        return result;
+    }
+
     @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);

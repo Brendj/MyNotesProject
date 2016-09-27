@@ -1,12 +1,15 @@
 /*
- * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2016. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,15 +18,15 @@ import java.util.Date;
  * Time: 16:40
  * To change this template use File | Settings | File Templates.
  */
-//Правила оповещения теперь принадлежат паре клиент-опекун, а не клиенту.
-@Deprecated
-public class ClientNotificationSetting {
+public class ClientGuardianNotificationSetting {
 
     public enum Predefined {
-        SMS_SETTING_CHANGED(1L, "Настройки были изменены", true), // наличие данной записи у клиента означает что настройки уведомлений отличаются от дефолтных
-        SMS_NOTIFY_REFILLS(1000000000L, "Оповещать о пополнениях", EventNotificationService.NOTIFICATION_BALANCE_TOPUP, true),
-        SMS_NOTIFY_EVENTS(1100000000L, "Оповещать о проходах", EventNotificationService.NOTIFICATION_ENTER_EVENT, true),
-        SMS_NOTIFY_ORDERS(1200000000L, "Оповещать о покупках", EventNotificationService.MESSAGE_PAYMENT),
+        SMS_SETTING_CHANGED(1L, "Настройки были изменены", true), // наличие данной записи у связки клиент-представитель означает что настройки уведомлений отличаются от дефолтных
+        SMS_NOTIFY_REFILLS(1000000000L, "Оповещать о пополнениях", EventNotificationService.NOTIFICATION_BALANCE_TOPUP),
+        SMS_NOTIFY_EVENTS(1100000000L, "Оповещать о проходах", EventNotificationService.NOTIFICATION_ENTER_EVENT),
+        SMS_NOTIFY_ORDERS_BAR(1200000000L, "Оповещать о покупках в буфете", EventNotificationService.MESSAGE_PAYMENT_BAR),
+        SMS_NOTIFY_ORDERS_PAY(1220000000L, "Оповещать о покупках обедов", EventNotificationService.MESSAGE_PAYMENT_PAY),
+        SMS_NOTIFY_ORDERS_FREE(1230000000L, "Оповещать о покупках льготного питания", EventNotificationService.MESSAGE_PAYMENT_FREE),
         SMS_NOTIFY_SUMMARY_DAY(1300000000L, "Оповещать по итогам дня", EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY),
         SMS_NOTIFY_SUMMARY_WEEK(1400000000L, "Оповещать по итогам недели", EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK);
 
@@ -59,13 +62,16 @@ public class ClientNotificationSetting {
             this.enabledAtDefault = enabledAtDefault;
         }
 
-        public static Predefined parse(Long value) {
+        public static Predefined parse(Long value) throws Exception {
             Predefined currentPredefined = null;
             for (Predefined predefined : Predefined.values()) {
                 if (predefined.value.equals(value)) {
                     currentPredefined = predefined;
                     break;
                 }
+            }
+            if (currentPredefined == null) {
+                throw new IllegalArgumentException(String.format("Неизвестный тип уведомления %s", value));
             }
             return currentPredefined;
         }
@@ -105,21 +111,27 @@ public class ClientNotificationSetting {
         }
 
         public boolean isEnabledAtDefault() {
-            return enabledAtDefault;
+            if (value.equals(SMS_NOTIFY_SUMMARY_DAY.getValue()) || value.equals(SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+                return false;
+            }
+            return RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.forceSend", "0").equals("1") ? true : false;
         }
     }
 
+    public static List<Long> ORDER_NOTIFY_TYPES = Arrays.asList(Predefined.SMS_NOTIFY_ORDERS_BAR.getValue(),
+                                                                Predefined.SMS_NOTIFY_ORDERS_PAY.getValue(),
+                                                                Predefined.SMS_NOTIFY_ORDERS_FREE.getValue());
+
     private Long idOfSetting;
     private Long notifyType;
-    private Client client;
+    private ClientGuardian clientGuardian;
     private Date createdDate;
 
-
-    protected ClientNotificationSetting() {
+    protected ClientGuardianNotificationSetting() {
     }
 
-    public ClientNotificationSetting(Client client, Long notifyType) {
-        this.client = client;
+    public ClientGuardianNotificationSetting(ClientGuardian clientGuardian, Long notifyType) {
+        this.clientGuardian = clientGuardian;
         this.notifyType = notifyType;
         createdDate = new Date();
     }
@@ -140,17 +152,17 @@ public class ClientNotificationSetting {
         this.notifyType = notifyType;
     }
 
-    public Client getClient() {
-        return client;
+    public ClientGuardian getClientGuardian() {
+        return clientGuardian;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public void setClientGuardian(ClientGuardian clientGuardian) {
+        this.clientGuardian = clientGuardian;
     }
 
     @Override
     public String toString() {
-        return "ClientSms{client=" + client + ", notifyType=" + notifyType + "}";
+        return "ClientGuardianNotificationSetting{clientGuardian=" + clientGuardian + ", notifyType=" + notifyType + "}";
     }
 
     public Date getCreatedDate() {
@@ -169,14 +181,8 @@ public class ClientNotificationSetting {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ClientNotificationSetting setting = (ClientNotificationSetting) o;
-        return notifyType.equals(setting.notifyType) && client.equals(setting.client);
+        ClientGuardianNotificationSetting setting = (ClientGuardianNotificationSetting) o;
+        return notifyType.equals(setting.notifyType) && clientGuardian.equals(setting.clientGuardian);
     }
 
-    @Override
-    public int hashCode() {
-        int result = notifyType.hashCode();
-        result = 31 * result + client.hashCode();
-        return result;
-    }
 }

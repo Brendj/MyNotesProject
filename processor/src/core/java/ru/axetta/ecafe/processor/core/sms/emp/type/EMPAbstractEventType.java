@@ -214,6 +214,16 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         return buildText();
     }
 
+    public String toFullString() {
+        String result = buildText();
+        result += String.format(", type=%s", type);
+        for(String k : params.keySet()) {
+            String v = params.get(k);
+            result += String.format(", param %s=%s", k, v);
+        }
+        return result;
+    }
+
     protected String getOrgName(Org org) {
         return org.getShortName();
     }

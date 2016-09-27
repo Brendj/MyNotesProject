@@ -58,6 +58,11 @@
             <h:outputText escape="true" value="Результат" styleClass="output-text" />
             <h:inputTextarea value="#{debugInfoPage.result}" cols="50" rows="20" id="debug_result" readonly="true" />
         </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Test VFS" styleClass="output-text" />
+            <a4j:commandButton value="Запуск" action="#{debugInfoPage.runVFSCollapse()}" reRender="debug_result"
+                               status="debugTaskStatus" />
+        </h:panelGrid>
     </rich:simpleTogglePanel>
 </h:panelGrid>
 

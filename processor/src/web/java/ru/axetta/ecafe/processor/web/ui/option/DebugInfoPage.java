@@ -7,16 +7,18 @@ package ru.axetta.ecafe.processor.web.ui.option;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
-import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsServiceV116;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
+import org.jboss.vfs.VFS;
+import org.jboss.vfs.VirtualFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -28,6 +30,7 @@ import javax.persistence.PersistenceContext;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.*;
 
 @Component
@@ -85,10 +88,15 @@ public class DebugInfoPage extends BasicWorkspacePage {
     }
 
     public void runTest2() throws Exception {
+        /*ClientMskNSIService nsiService = RuntimeContext.getAppContext().getBean(ClientMskNSIService.class);
+        MskNSIService.SearchPredicateInfo searchPredicateInfo = new MskNSIService.SearchPredicateInfo();
+        searchPredicateInfo.setCatalogName("Вид представителя");
+        List<Item> queryResults = nsiService.executeQuery(searchPredicateInfo, 1);
+        System.out.println(queryResults.size());*/
+
         //CardService cardService = CardService.getInstance();
         //System.out.println(DAOService.getInstance().runDebugTest2());
         //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsServiceV116.class).executeExportCatalog(DAOService.getInstance().getContragentById(16L), null, null);
-        System.out.println();
         /*SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         service.run(getStartDate(), getEndDate(),
                 ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());*/
@@ -178,7 +186,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
     public void runEmpSummaryWeek() throws Exception {
         SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         List<SummaryCalculationService.ClientEE> list = service.generateNotificationParams(getStartDate(), getEndDate(),
-                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
+                ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
         String res = "";
         for (SummaryCalculationService.ClientEE client : list) {
             res += String.format("Ид клиента=%s\n", client.getIdOfClient());
@@ -186,6 +194,31 @@ public class DebugInfoPage extends BasicWorkspacePage {
                 res += client.getValues()[i] + " | " + client.getValues()[i+1] + "\n";
             }
             res += "\n";
+        }
+        result = res;
+    }
+
+    public void runVFSCollapse() throws Exception {
+        System.out.println("ss");
+        //urls = Thread.currentThread().getContextClassLoader().getResources("config.properties");
+        Enumeration<URL> en = getClass().getClassLoader().getResources(".");
+        String res = "";
+        while (en.hasMoreElements()) {
+            URL url = en.nextElement();
+            String surl = url.toString();
+            res += surl + "\n";
+            if (surl.startsWith("vfs:/") && surl.endsWith("/WEB-INF/classes/")) {
+                VirtualFile zzz = VFS.getChild(surl.substring(5));
+                if (zzz.isFile()) {
+                    res += "!" + zzz.getPhysicalFile().getAbsolutePath() + "\n";
+                }
+                List<VirtualFile> virtualFiles = zzz.getChildrenRecursively();
+                for (VirtualFile vf : virtualFiles) {
+                    if (vf.isFile()) {
+                        res += vf.getPhysicalFile().getAbsolutePath() + "\n";
+                    }
+                }
+            }
         }
         result = res;
     }

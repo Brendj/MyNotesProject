@@ -127,11 +127,12 @@
          readonly="#{mainPage.clientEditPage.isEmailReadOnly()}" disabled="#{mainPage.clientEditPage.isEmailReadOnly()}" />
     <h:outputText escape="true" value="Уведомлять по электронной почте" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaEmail}" styleClass="output-text" />
-    <h:outputText escape="true" value="Правила оповещения" styleClass="output-text" />
+    <h:outputText escape="true" value="Правила оповещения" styleClass="output-text" rendered="#{mainPage.clientEditPage.oldFlagsShow}" />
     <rich:dataTable id="clientNotificationSetting" value="#{mainPage.clientEditPage.notificationSettings}" var="it"
                     rows="8"
                     columnClasses="left-aligned-column, center-aligned-column"
-                    footerClass="data-table-footer">
+                    footerClass="data-table-footer"
+                    rendered="#{mainPage.clientEditPage.oldFlagsShow}">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Тип оповещения" />
@@ -225,6 +226,20 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Правила оповещения" />
+            </f:facet>
+            <rich:dataTable id="clientNotificationSetting" value="#{clientGuardian.notificationItems}" var="it"
+                            rows="8" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
+                <rich:column styleClass="borderless-grid-all-client">
+                    <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="borderless-grid-all-client">
+                    <h:selectBooleanCheckbox value="#{it.enabled}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Удалить" />
             </f:facet>
             <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientGuardianEditTable"
@@ -281,6 +296,20 @@
             <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
                 <f:selectItems value="#{mainPage.clientEditPage.relations}" />
             </h:selectOneMenu>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Правила оповещения" />
+            </f:facet>
+            <rich:dataTable id="clientNotificationSetting" value="#{clientWard.notificationItems}" var="it"
+                            rows="8" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
+                <rich:column styleClass="borderless-grid-all-client">
+                    <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="borderless-grid-all-client">
+                    <h:selectBooleanCheckbox value="#{it.enabled}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

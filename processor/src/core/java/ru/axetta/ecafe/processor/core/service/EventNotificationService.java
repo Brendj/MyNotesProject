@@ -43,6 +43,9 @@ public class EventNotificationService {
     public static String MESSAGE_LINKING_TOKEN_GENERATED = "linkingToken";
     public static String MESSAGE_RESTORE_PASSWORD = "restorePassword";
     public static String MESSAGE_PAYMENT = "payment";
+    public static String MESSAGE_PAYMENT_BAR = "paymentBuffet";
+    public static String MESSAGE_PAYMENT_PAY = "paymentPay";
+    public static String MESSAGE_PAYMENT_FREE = "paymentReduced";
     public static String NOTIFICATION_PASS_WITH_GUARDIAN = "passWithGuardian";
     public static String NOTIFICATION_SMS_SUBSCRIPTION_FEE = "smsSubscriptionFee";
     public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS = "smsSubFeeWithdrawSuccessful";
@@ -276,7 +279,7 @@ public class EventNotificationService {
 
     public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync, Date eventTime) {
 
-        if (!isNotificationEnabled(destClient, type)) {
+        if (dataClient == null && !isNotificationEnabled(destClient, type)) {
             return;
         }
         Boolean sms = null;
@@ -736,7 +739,7 @@ public class EventNotificationService {
         }
     }
 
-    protected static boolean findBooleanValueInParams(String valueNames[], String values[]) {
+    public static boolean findBooleanValueInParams(String valueNames[], String values[]) {
         String res = findValueInParams(valueNames, values);
         if(res == null || StringUtils.isBlank(res)) {
             return false;

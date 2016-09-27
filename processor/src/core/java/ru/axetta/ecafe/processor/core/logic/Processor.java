@@ -92,7 +92,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.isGuardianshipDisabled;
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
 
 /**
@@ -3235,7 +3234,7 @@ public class Processor implements SyncProcessor {
                 // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
-                if (client != null && payment.isNotify()) {
+                if (client != null) {
 
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     if (payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) ||
@@ -3280,8 +3279,8 @@ public class Processor implements SyncProcessor {
 
                     if (!(guardians == null || guardians.isEmpty())) {
                         for (Client destGuardian : guardians) {
-                            if (!isGuardianshipDisabled(persistenceSession, destGuardian.getIdOfClient(),
-                                    client.getIdOfClient())) {
+                            if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                    client.getIdOfClient(), getOrderNotificationType(values))) {
                                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                                         .sendNotificationAsync(destGuardian, client,
                                                 EventNotificationService.MESSAGE_PAYMENT, values,
@@ -3321,6 +3320,17 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    private Long getOrderNotificationType(String[] values) throws Exception {
+        if(EventNotificationService.findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
+            return ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_BAR.getValue();
+        } else if(EventNotificationService.findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+            return ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_PAY.getValue();
+        } else if(EventNotificationService.findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
+            return ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue();
+        } else {
+            throw new Exception("Не определен тип события");
+        }
+    }
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
             SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds) throws Exception {
@@ -4760,8 +4770,8 @@ public class Processor implements SyncProcessor {
 
                                 if (!(guardians == null || guardians.isEmpty())) {
                                     for (Client destGuardian : guardians) {
-                                        if (!isGuardianshipDisabled(persistenceSession, destGuardian.getIdOfClient(),
-                                                clientFromEnterEvent.getIdOfClient())) {
+                                        if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                                clientFromEnterEvent.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                                             notificationService
                                                     .sendNotificationAsync(destGuardian, clientFromEnterEvent,
                                                             EventNotificationService.NOTIFICATION_ENTER_EVENT, values,
@@ -4789,9 +4799,8 @@ public class Processor implements SyncProcessor {
                                                     .equals(guardianFromEnterEvent.getIdOfClient())) {
                                                 continue;
                                             }
-                                            if (!isGuardianshipDisabled(persistenceSession,
-                                                    destGuardian.getIdOfClient(),
-                                                    clientFromEnterEvent.getIdOfClient())) {
+                                            if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                                    clientFromEnterEvent.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                                                 notificationService
                                                         .sendNotificationAsync(destGuardian, clientFromEnterEvent,
                                                                 EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN,

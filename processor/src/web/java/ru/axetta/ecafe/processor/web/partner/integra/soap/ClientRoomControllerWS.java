@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
+import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
@@ -43,6 +44,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
@@ -150,6 +152,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_IMAGE_NOT_DELETED = 540L;
     private static final Long RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO = 550L;
     private static final Long RC_CLIENT_PHOTO_UNDER_REGISTRY = 560L;
+    private static final Long RC_CLIENT_GUARDIAN_NOT_FOUND = 570L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -179,6 +182,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_IMAGE_NOT_DELETED_DESC = "Не удалось удалить фото";
     private static final String RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO_DESC = "У клиента нет неподтвержденного фото";
     private static final String RC_CLIENT_PHOTO_UNDER_REGISTRY_DESC = "Фото клиента в процессе сверки";
+    private static final String RC_CLIENT_GUARDIAN_NOT_FOUND_DESC = "Связка клиент-представитель не найдена";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -3522,25 +3526,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     public ClientsData getClientsByGuardMobile(String mobile) {
-        //authenticateRequest(null);
 
         ClientsData data = new ClientsData();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            List<Long> idOfClients = DAOUtils.extractIDFromGuardByGuardMobile(persistenceSession,
-                    Client.checkAndConvertMobile(mobile));
+            List<Long> idOfClients = DAOReadonlyService.getInstance().extractIDFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile));
             data.clientList = new ClientList();
             if (idOfClients.isEmpty()) {
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Клиент не найден";
             } else {
                 for (Long idOfClient : idOfClients) {
-                    Client cl = DAOUtils.findClient(persistenceSession, idOfClient);
+                    Client cl = DAOReadonlyService.getInstance().findClientById(idOfClient);
                     ClientItem clientItem = new ClientItem();
                     clientItem.setContractId(cl.getContractId());
                     clientItem.setSan(cl.getSan());
@@ -3550,16 +3546,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 data.resultCode = RC_OK;
                 data.description = "OK";
             }
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.toString();
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
         return data;
     }
@@ -3903,7 +3893,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 ClientSummaryResult cs = getSummary(ci.getContractId());
                 if (cs.clientSummary != null) {
                     clientSummaries.add(cs.clientSummary);
-                    Long idOfClient = DAOService.getInstance().getClientByContractId(cs.clientSummary.getContractId()).getIdOfClient();
+                    Long idOfClient = DAOReadonlyService.getInstance().getClientIdByContract(cs.clientSummary.getContractId());
                     handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                             idOfClient, handler.getData().getOperationType());
                 }
@@ -3918,40 +3908,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientSummaryExtListResult;
     }
 
-    private void saveLogInfoService(String idOfSystem, Date createdDate, String ssoId, Long idOfClient, String opType) {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String strIsOn = runtimeContext.getConfigProperties().getProperty("ecafe.processor.log.infoservice", "0");
-        if (strIsOn.equals("0")) {
-            return;
-        }
-        if (opType != null && opType.trim().equals("")) {
-            return;
-        }
-
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
-            Criteria criteria = session.createCriteria(LogInfoServiceOperationType.class);
-            criteria.add(Restrictions.eq("nameOfOperationType", opType));
-            LogInfoServiceOperationType type = (LogInfoServiceOperationType)criteria.uniqueResult();
-            if (type == null) {
-                type = new LogInfoServiceOperationType(opType);
-                session.persist(type);
-            }
-
-            LogInfoService log = new LogInfoService(idOfSystem, createdDate, ssoId, idOfClient, type);
-            session.persist(log);
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            logger.error("Error saving record to LogInfoService: ", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-    }
 /*    @Override
     public ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
         Long contractIdLong = Long.valueOf(contractId);
@@ -4059,35 +4015,58 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result enableNotificationBySMS(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state) {
-        authenticateRequest(contractId);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(contractId, handler);
 
         Result r = new Result();
         r.resultCode = RC_OK;
         r.description = RC_OK_DESC;
-        if (!DAOService.getInstance().enableClientNotificationBySMS(contractId, state)) {
+        List<Long> contracts = getContracts(contractId, handler);
+        if (!DAOService.getInstance().enableClientNotificationBySMS(contracts, state)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         } else {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
-            processor.updateNotificationParams(contractId);
+            for (Long cId : contracts) {
+                processor.updateNotificationParams(cId);
+            }
         }
         return r;
+    }
+
+    private List<Long> getContracts(Long contractId, HTTPDataHandler handler) {
+        List<Long> contracts = new ArrayList<Long>();
+        contracts.add(contractId);
+        try {
+            String ssoid = handler.getData().getSsoId();
+            List<Long> contractIds = DAOReadonlyService.getInstance().findContractsBySsoid(ssoid);
+            for (Long cId : contractIds) {
+                contracts.add(cId);
+            }
+        } catch (Exception ignore) {}
+        return contracts;
     }
 
     @Override
     public Result enableNotificationByPUSH(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state) {
-        authenticateRequest(contractId);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(contractId, handler);
 
         Result r = new Result();
         r.resultCode = RC_OK;
         r.description = RC_OK_DESC;
-        if (!DAOService.getInstance().enableClientNotificationByPUSH(contractId, state)) {
+        List<Long> contracts = getContracts(contractId, handler);
+        if (!DAOService.getInstance().enableClientNotificationByPUSH(contracts, state)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         } else {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
-            processor.updateNotificationParams(contractId);
+            for (Long cId : contracts) {
+                processor.updateNotificationParams(cId);
+            }
         }
         return r;
     }
@@ -4095,17 +4074,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result enableNotificationByEmail(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "state") boolean state) {
-        authenticateRequest(contractId);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(contractId, handler);
 
         Result r = new Result();
         r.resultCode = RC_OK;
         r.description = RC_OK_DESC;
-        if (!DAOService.getInstance().enableClientNotificationByEmail(contractId, state)) {
+        List<Long> contracts = getContracts(contractId, handler);
+        if (!DAOService.getInstance().enableClientNotificationByEmail(contracts, state)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         } else {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
-            processor.updateNotificationParams(contractId);
+            for (Long cId : contracts) {
+                processor.updateNotificationParams(cId);
+            }
         }
         return r;
     }
@@ -5172,7 +5156,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    //TODO оставить только один метод authenticateRequest
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId, HTTPDataHandler handler) throws Error {
         if (RuntimeContext.getInstance().isTestMode()){
             return null;
@@ -5250,75 +5233,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId) throws Error {
-        if (RuntimeContext.getInstance().isTestMode()){
-            return null;
-        }
-        MessageContext jaxwsContext = context.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
-        String clientAddress = request.getRemoteAddr();
-        ////
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        X509Certificate[] certificates = (X509Certificate[]) request
-              .getAttribute("javax.servlet.request.X509Certificate");
-        ////
-        IntegraPartnerConfig.LinkConfig linkConfig = null;
-        String DNs = "";
-        if (certificates != null && certificates.length > 0) {
-            for (int n = 0; n < certificates.length; ++n) {
-                String dn = certificates[0].getSubjectDN().getName();
-                linkConfig = runtimeContext.getIntegraPartnerConfig().getLinkConfigByCertDN(dn);
-                if (linkConfig != null) {
-                    break;
-                }
-                DNs += dn + ";";
-            }
-        }
-        /////
-        // пробуем по имени и паролю
-        if (linkConfig == null) {
-            AuthorizationPolicy authorizationPolicy = (AuthorizationPolicy) jaxwsContext
-                  .get("org.apache.cxf.configuration.security.AuthorizationPolicy");
-            if (authorizationPolicy != null && authorizationPolicy.getUserName() != null) {
-                linkConfig = runtimeContext.getIntegraPartnerConfig()
-                      .getLinkConfigWithAuthTypeBasicMatching(authorizationPolicy.getUserName(),
-                            authorizationPolicy.getPassword());
-            }
-        }
-        /////
-        if (linkConfig == null) {
-            linkConfig = runtimeContext.getIntegraPartnerConfig()
-                  .getLinkConfigWithAuthTypeNoneAndMatchingAddress(clientAddress);
-        } else {
-            // check remote addr
-            if (!linkConfig.matchAddress(clientAddress)) {
-                throw new Error("Integra partner auth failed: remote address does not match: " + clientAddress
-                      + " for link config: " + linkConfig.id + "; request: ip=" + clientAddress + "; ssl DNs=" + DNs);
-            }
-        }
-        /////
-        if (linkConfig == null) {
-            throw new Error(
-                  "Integra partner auth failed: link config not found: ip=" + clientAddress + "; ssl DNs=" + DNs);
-        }
-        /////
-        if (contractId != null && linkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
-            DAOService daoService = DAOService.getInstance();
-            Client client = null;
-            try {
-                client = daoService.getClientByContractId(contractId);
-            } catch (Throwable e) {
-            }
-            if (client == null) {
-                throw new Error("Integra partner auth failed: client not found: contractId=" + contractId + "; ip="
-                      + clientAddress + "; ssl DNs=" + DNs);
-            }
-
-            if (!client.hasIntegraPartnerAccessPermission(linkConfig.id)) {
-                throw new Error("Integra partner auth failed: access prohibited for client: contractId=" + contractId
-                      + ", authorize client first; ip=" + clientAddress + "; ssl DNs=" + DNs);
-            }
-        }
-        return linkConfig;
+        return authenticateRequest(contractId, null);
     }
 
     @Override
@@ -5749,7 +5664,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             //enableNotificationBySms
-            if (!daoService.enableClientNotificationBySMS(contractId, smsNotificationState)) {
+            List<Long> list = new ArrayList<Long>();
+            list.add(contractId);
+            if (!daoService.enableClientNotificationBySMS(list, smsNotificationState)) {
                 r.resultCode = RC_CLIENT_NOT_FOUND;
                 r.description = RC_CLIENT_NOT_FOUND_DESC;
             }
@@ -5876,8 +5793,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         List<ClientNotificationSettingsItem> list = new ArrayList<ClientNotificationSettingsItem>();
         try {
-            for (ClientNotificationSetting.Predefined predef : ClientNotificationSetting.Predefined.values()) {
-                if (predef.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+            for (ClientGuardianNotificationSetting.Predefined predef : ClientGuardianNotificationSetting.Predefined.values()) {
+                if (predef.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                     continue;
                 }
                 ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
@@ -5894,6 +5811,75 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
+    @Override
+    public ClientNotificationSettingsResult getClientGuardianNotificationSettings(@WebParam(name = "childContractId") Long childContractId,
+            @WebParam(name = "guardianMobile") String guardianMobile) {
+        authenticateRequest(childContractId);
+
+        ClientNotificationSettingsResult res = new ClientNotificationSettingsResult(RC_OK, RC_OK_DESC);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+
+        Set<ClientNotificationSettingsItem> set = new HashSet<ClientNotificationSettingsItem>();
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            Long childId = DAOReadonlyService.getInstance().getClientIdByContract(childContractId);
+
+            if (childId == null) {
+                res.setResultCode(RC_CLIENT_NOT_FOUND);
+                res.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+                return res;
+            }
+
+            List<Long> clientGuardians = DAOReadonlyService.getInstance().findClientGuardiansByMobile(childId, Client.checkAndConvertMobile(guardianMobile));
+            if (clientGuardians == null || clientGuardians.size() == 0) {
+                return getClientNotificationSettings(childContractId);
+                /*res.setResultCode(RC_CLIENT_GUARDIAN_NOT_FOUND);
+                res.setDescription(RC_CLIENT_GUARDIAN_NOT_FOUND_DESC);
+                return res;*/
+            }
+
+            boolean clientHasCustomNotificationSettings = false;
+            for (Long id : clientGuardians) {
+                ClientGuardian clientGuardian = (ClientGuardian)persistenceSession.get(ClientGuardian.class, id);
+                for (ClientGuardianNotificationSetting setting : clientGuardian.getNotificationSettings()) {
+                    if (setting.getNotifyType().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                        clientHasCustomNotificationSettings = true;
+                        continue;
+                    }
+                    ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                    it.setTypeOfNotification(setting.getNotifyType());
+                    it.setNameOfNotification(
+                            ClientGuardianNotificationSetting.Predefined.parse(setting.getNotifyType()).getName());
+                    set.add(it);
+                }
+                // если у клиента нет записи изменения настроек - выдаем настройки по умолчанию
+                if (!clientHasCustomNotificationSettings) {
+                    for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined
+                            .values()) {
+                        if (predefined.isEnabledAtDefault()) {
+                            ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                            it.setTypeOfNotification(predefined.getValue());
+                            it.setNameOfNotification(predefined.getName());
+                            set.add(it);
+                        }
+                    }
+                }
+            }
+            List<ClientNotificationSettingsItem> list = new ArrayList<ClientNotificationSettingsItem>();
+            for (ClientNotificationSettingsItem item : set) {
+                list.add(item);
+            }
+            res.setSettings(list);
+        } catch (Exception e) {
+            res.setResultCode(RC_INTERNAL_ERROR);
+            res.setDescription(RC_INTERNAL_ERROR_DESC);
+            logger.error(e.getMessage(), e);
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return res;
+    }
 
     @Override @SuppressWarnings("unchecked")
     public ClientNotificationSettingsResult getClientNotificationSettings(
@@ -5915,27 +5901,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return res;
             }
 
-            boolean clientHasCustomNotificationSettings = false;
-            for (ClientNotificationSetting setting : client.getNotificationSettings()) {
-                if (setting.getNotifyType()
-                      .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
-                    clientHasCustomNotificationSettings = true;
-                    continue;
-                }
-                ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
-                it.setTypeOfNotification(setting.getNotifyType());
-                it.setNameOfNotification(ClientNotificationSetting.Predefined.parse(setting.getNotifyType()).getName());
-                list.add(it);
-            }
-            // если у клиента нет записи изменения настроек - выдаем настройки по умолчанию
-            if (!clientHasCustomNotificationSettings) {
-                for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
-                    if (predefined.isEnabledAtDefault()) {
-                        ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
-                        it.setTypeOfNotification(predefined.getValue());
-                        it.setNameOfNotification(predefined.getName());
-                        list.add(it);
+            List<Client> guardians = ClientManager.findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
+            if (guardians.size() > 0) {
+                retrieveNotificationsForClientGuardian(persistenceSession, list, client, guardians);
+            } else {
+                //----------------------------ниже старый код
+                Set<ClientNotificationSettingsItem> set = new HashSet<ClientNotificationSettingsItem>();
+                boolean clientHasCustomNotificationSettings = false;
+                for (ClientNotificationSetting setting : client.getNotificationSettings()) {
+                    if (setting.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                        clientHasCustomNotificationSettings = true;
+                        continue;
                     }
+                    ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                    it.setTypeOfNotification(setting.getNotifyType());
+                    it.setNameOfNotification(ClientNotificationSetting.Predefined.parse(setting.getNotifyType()).getName());
+                    set.add(it);
+                }
+                // если у клиента нет записи изменения настроек - выдаем настройки по умолчанию
+                if (!clientHasCustomNotificationSettings) {
+                    for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+                        if (predefined.isEnabledAtDefault()) {
+                            ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
+                            it.setTypeOfNotification(predefined.getValue());
+                            it.setNameOfNotification(predefined.getName());
+                            set.add(it);
+                        }
+                    }
+                }
+                for (ClientNotificationSettingsItem item : set) {
+                    list.add(item);
                 }
             }
             res.setSettings(list);
@@ -5949,6 +5944,120 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
+    private void retrieveNotificationsForClientGuardian(Session session, List<ClientNotificationSettingsItem> list, Client client, List<Client> guardians) {
+        for (ClientGuardianNotificationSetting.Predefined pd : ClientGuardianNotificationSetting.Predefined.values()) {
+            if (pd.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                continue;
+            }
+            boolean found = false;
+            for (Client guardian : guardians) {
+                found = false;
+                ClientGuardian clientGuardian = DAOReadonlyService.getInstance()
+                        .findClientGuardianById(session, client.getIdOfClient(), guardian.getIdOfClient());
+                if (clientGuardian == null) { continue; }
+                for (ClientGuardianNotificationSetting setting : clientGuardian.getNotificationSettings()) {
+                    if (pd.getValue().equals(setting.getNotifyType())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) break;
+            }
+            if (!found) {
+                continue;
+            } else {
+                ClientNotificationSettingsItem item = new ClientNotificationSettingsItem();
+                item.setNameOfNotification(pd.getName());
+                item.setTypeOfNotification(pd.getValue());
+                list.add(item);
+            }
+        }
+
+    }
+
+    @Override
+    public ClientNotificationChangeResult setClientGuardianNotificationSettings(@WebParam(name = "childContractId") Long childContractId,
+            @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "notificationType") List<Long> notificationTypes) {
+        authenticateRequest(childContractId);
+
+        ClientNotificationChangeResult res = new ClientNotificationChangeResult(RC_OK, RC_OK_DESC);
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Long childId = DAOReadonlyService.getInstance().getClientIdByContract(childContractId);
+            if (childId == null) {
+                res.resultCode = RC_CLIENT_NOT_FOUND;
+                res.description = RC_CLIENT_NOT_FOUND_DESC;
+                return res;
+            }
+
+            List<Long> guardianIds = DAOReadonlyService.getInstance().findClientGuardiansByMobile(childId, Client.checkAndConvertMobile(guardianMobile));
+
+            if (guardianIds == null || guardianIds.size() == 0) {
+                //Если нет представителей, то работаем по старому алгоритму (плюс удаляем из переданного списка новые типы уведомелений)
+                boolean order_types_removed = false;
+                boolean old_order_type_exists = false;
+                if (notificationTypes != null) {
+                    for (Iterator<Long> iterator = notificationTypes.iterator(); iterator.hasNext(); ) {
+                        Long type = iterator.next();
+                        if (type.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue())
+                                || type.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_PAY.getValue())) {
+                            iterator.remove();
+                            order_types_removed = true;
+                        }
+                        if (type.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_BAR.getValue())) {
+                            old_order_type_exists = true;
+                        }
+                    }
+                    if (!old_order_type_exists && order_types_removed) {
+                        notificationTypes.add(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_BAR.getValue());
+                    }
+                }
+                return setClientNotificationSettings(childContractId, notificationTypes); //Если нет представителей, работаем по старому алгоритму
+            }
+            for (Long id : guardianIds) {
+                ClientGuardian clientGuardian = (ClientGuardian) persistenceSession.get(ClientGuardian.class, id);
+                processNotificationsForClientGuardian(notificationTypes, clientGuardian);
+                persistenceSession.update(clientGuardian);
+            }
+
+            persistenceTransaction.commit();
+        } catch (Exception e) {
+            res.resultCode = RC_INTERNAL_ERROR;
+            res.description = RC_INTERNAL_ERROR_DESC;
+            logger.error(e.getMessage(), e);
+            HibernateUtils.rollback(persistenceTransaction, logger);
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return res;
+    }
+
+    private void processNotificationsForClientGuardian(List<Long> notificationTypes, ClientGuardian clientGuardian) throws Exception {
+        boolean pdFound;
+        List<NotificationSettingItem> notificationItems = new ArrayList<NotificationSettingItem>();
+        for (ClientGuardianNotificationSetting.Predefined pd : ClientGuardianNotificationSetting.Predefined.values()) {
+            if (pd.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                continue;
+            }
+            pdFound = false;
+            for (Long notificationType : notificationTypes) {
+                if (notificationType.equals(pd.getValue())) {
+                    pdFound = true;
+                    break;
+                }
+            }
+            NotificationSettingItem item = new NotificationSettingItem(pd, pdFound);
+            notificationItems.add(item);
+        }
+
+        ClientManager.attachNotifications(clientGuardian, notificationItems);
+    }
 
     @Override
     public ClientNotificationChangeResult setClientNotificationSettings(@WebParam(name = "contractId") Long contractId,
@@ -5968,13 +6077,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 res.description = RC_CLIENT_NOT_FOUND_DESC;
                 return res;
             }
-            for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
-                ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
-                if ((notificationTypes!=null && notificationTypes.contains(pd.getValue())) || pd.getValue()
-                      .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
-                    client.getNotificationSettings().add(cns);
-                } else {
-                    client.getNotificationSettings().remove(cns);
+            Long orderType = null;
+            List<Client> guardians = ClientManager.findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
+            if (guardians.size() > 0) {
+                for (Long nType : notificationTypes) {
+                    if (nType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_ORDERS.getValue())) {
+                        orderType = nType;
+                    }
+                }
+                //К старому типу уведомлений о покупках добавляем два новых типа
+                if (orderType != null) {
+                    notificationTypes.add(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue());
+                    notificationTypes.add(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_PAY.getValue());
+                }
+
+                for (Client guardian : guardians) {
+                    ClientGuardian clientGuardian = DAOReadonlyService.getInstance()
+                            .findClientGuardianById(persistenceSession, client.getIdOfClient(), guardian.getIdOfClient());
+                    if (clientGuardian == null) { continue; }
+                    processNotificationsForClientGuardian(notificationTypes, clientGuardian);
+                    persistenceSession.update(clientGuardian);
+                }
+            } else {
+                for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
+                    ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
+                    if ((notificationTypes!=null && notificationTypes.contains(pd.getValue())) || pd.getValue()
+                          .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                        client.getNotificationSettings().add(cns);
+                    } else {
+                        client.getNotificationSettings().remove(cns);
+                    }
                 }
             }
             persistenceTransaction.commit();

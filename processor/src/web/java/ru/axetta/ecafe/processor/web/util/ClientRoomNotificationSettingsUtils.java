@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.util;
 
+import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
-import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 
 import org.apache.commons.lang.StringUtils;
 

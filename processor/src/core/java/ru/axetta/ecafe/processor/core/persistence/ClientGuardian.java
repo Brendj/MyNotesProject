@@ -3,6 +3,8 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,12 +24,20 @@ public class ClientGuardian {
     private Boolean deletedState;
     private Date deleteDate;
     private ClientGuardianRelationType relation;
+    private Set<ClientGuardianNotificationSetting> notificationSettings = new HashSet<ClientGuardianNotificationSetting>();
 
     protected ClientGuardian() {}
 
     public ClientGuardian(Long idOfChildren, Long idOfGuardian) {
         this.idOfChildren = idOfChildren;
         this.idOfGuardian = idOfGuardian;
+        // При создании опекунской связи проставляем ей настройки оповещений по умолчанию.
+        /*for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined.values()) {
+            if (predefined.isEnabledAtDefault()) {
+                ClientGuardian clientGuardian = DAOReadonlyService.getInstance().findClientGuardianById(idOfChildren, idOfGuardian);
+                notificationSettings.add(new ClientGuardianNotificationSetting(clientGuardian, predefined.getValue()));
+            }
+        }*/
     }
 
     public Long getIdOfClientGuardian() {
@@ -114,5 +124,18 @@ public class ClientGuardian {
 
     public void setRelation(ClientGuardianRelationType relation) {
         this.relation = relation;
+    }
+
+    public Set<ClientGuardianNotificationSetting> getNotificationSettings() {
+        return notificationSettings;
+    }
+
+    public void setNotificationSettings(Set<ClientGuardianNotificationSetting> notificationSettings) {
+        this.notificationSettings = notificationSettings;
+    }
+
+    @Override
+    public int hashCode() {
+        return idOfClientGuardian.hashCode();
     }
 }

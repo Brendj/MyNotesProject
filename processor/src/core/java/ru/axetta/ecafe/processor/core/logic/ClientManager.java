@@ -8,15 +8,20 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
+import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
@@ -1230,7 +1235,8 @@ public class ClientManager {
             ClientGuardian clientGuardian = (ClientGuardian) o;
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
-                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation()));
+                List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
+                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(), notificationSettings));
             }
         }
         return guardianItems;
@@ -1246,14 +1252,34 @@ public class ClientManager {
             ClientGuardian clientWard = (ClientGuardian) o;
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
-                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation()));
+                List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
+                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(), notificationSettings));
             }
         }
         return wardItems;
     }
 
-    public static List<Client> loadGuardiansByChildren(Session session, Long idOfChildren) throws Exception {
-        return findGuardiansByClient(session, idOfChildren, null);
+    public static List<NotificationSettingItem> getNotificationSettings(ClientGuardian clientGuardian) {
+        Set<ClientGuardianNotificationSetting> settings = clientGuardian.getNotificationSettings();
+        List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
+        for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined.values()) {
+            if (predefined.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                continue;
+            }
+            notificationSettings.add(new NotificationSettingItem(predefined, settings));
+        }
+        return notificationSettings;
+    }
+
+    public static List<NotificationSettingItem> getNotificationSettings() {
+        List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
+        for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined.values()) {
+            if (predefined.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                continue;
+            }
+            notificationSettings.add(new NotificationSettingItem(predefined));
+        }
+        return notificationSettings;
     }
 
     @SuppressWarnings("unchecked")
@@ -1263,6 +1289,8 @@ public class ClientManager {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        idOfGuardianCriteria.add(Restrictions.eq("disabled", false));
         if(idOfGuardian!=null){
             idOfGuardianCriteria.add(Restrictions.ne("idOfGuardian", idOfGuardian));
         }
@@ -1282,6 +1310,7 @@ public class ClientManager {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1298,6 +1327,7 @@ public class ClientManager {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1317,6 +1347,12 @@ public class ClientManager {
         ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
         if (cg == null) return false;
         return cg.isDisabled();
+    }
+
+    /*Является ли опекунская связь Опекун-Клиент активной и включен ли в ней нужный тип оповещения*/
+    public static Boolean allowedGuardianshipNotification(Long guardianId, Long clientId,
+            Long notifyType) throws Exception {
+        return DAOReadonlyService.getInstance().allowedGuardianshipNotification(guardianId, clientId, notifyType);
     }
 
     /* Удалить список опекунов клиента */
@@ -1351,12 +1387,14 @@ public class ClientManager {
     public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
-            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(), ClientGuardianRelationType.fromInteger(item.getRelation()));
+            addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems());
         }
     }
 
     /* Добавить опекуна клиенту */
-    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled, ClientGuardianRelationType relation) {
+    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
+            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1367,20 +1405,59 @@ public class ClientManager {
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
+            attachNotifications(clientGuardian, notificationItems);
             session.persist(clientGuardian);
         } else {
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
-            session.saveOrUpdate(clientGuardian);
+            attachNotifications(clientGuardian, notificationItems);
+            session.update(clientGuardian);
+        }
+    }
+
+    public static void attachNotifications(ClientGuardian clientGuardian, List<NotificationSettingItem> notificationItems) {
+        if (notificationItems == null) return;
+        Set<ClientGuardianNotificationSetting> dbSettings = clientGuardian.getNotificationSettings();
+        for (NotificationSettingItem item : notificationItems) {
+            ClientGuardianNotificationSetting newSetting = new ClientGuardianNotificationSetting(clientGuardian, item.getNotifyType());
+            createOrRemoveSetting(dbSettings, newSetting, item.isEnabled());
+        }
+        boolean defaultPredefineFound = false;
+        for (ClientGuardianNotificationSetting dbSetting : dbSettings) {
+            if (dbSetting.getNotifyType().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                defaultPredefineFound = true;
+                break;
+            }
+        }
+        if (!defaultPredefineFound) {
+            ClientGuardianNotificationSetting newSetting =
+                    new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue());
+            dbSettings.add(newSetting);
+        }
+    }
+
+    private static void createOrRemoveSetting(Set<ClientGuardianNotificationSetting> dbSettings,
+                                                                    ClientGuardianNotificationSetting newSetting, Boolean enabled) {
+        for (ClientGuardianNotificationSetting dbSetting : dbSettings) {
+            if (dbSetting.getNotifyType().equals(newSetting.getNotifyType())) {
+                if (!enabled) {
+                    dbSettings.remove(dbSetting);
+                }
+                return;
+            }
+        }
+        if (enabled) {
+            dbSettings.add(newSetting);
         }
     }
 
     public static void addWardsByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientWards) {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
-            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(), ClientGuardianRelationType.fromInteger(item.getRelation()));
+            addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems());
         }
     }
 

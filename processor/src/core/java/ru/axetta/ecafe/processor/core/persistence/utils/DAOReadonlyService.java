@@ -6,11 +6,14 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.jboss.as.web.security.SecurityContextAssociationValve;
@@ -18,16 +21,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,7 +41,7 @@ import java.util.List;
  */
 @Component
 @Scope("singleton")
-@Transactional
+@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class DAOReadonlyService {
     private final static Logger logger = LoggerFactory.getLogger(DAOReadonlyService.class);
 
@@ -87,8 +90,7 @@ public class DAOReadonlyService {
     }
 
     public Org findOrg(Long idOfOrg) throws Exception {
-        Session session = entityManager.unwrap(Session.class);
-        Org org = (Org) session.get(Org.class, idOfOrg);
+        Org org = entityManager.find(Org.class, idOfOrg);
         if (null == org) {
             final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
             logger.error(message);
@@ -138,4 +140,146 @@ public class DAOReadonlyService {
         Order order = entityManager.find(Order.class, new CompositeIdOfOrder(idOfOrg, idOfOrder));
         return order;
     }
+
+    public Client findClientById(long idOfClient) throws Exception {
+        Client client = entityManager.find(Client.class, idOfClient);
+        return client;
+    }
+
+    public Long getClientIdByContract(Long contractId) {
+        try {
+            Query query = entityManager
+                    .createQuery("select c.idOfClient from Client c where c.contractId = :contractId", Long.class);
+            query.setParameter("contractId", contractId);
+            return (Long) query.getSingleResult();
+        } catch (Exception e) {
+            logger.error("error retrieving ifOfClient from contractId", e);
+            return null;
+        }
+    }
+
+    public ClientGuardian findClientGuardianById(Session session, long idOfChildren, long idOfGuardian) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        criteria.add(Restrictions.ne("deletedState", true));
+        criteria.add(Restrictions.eq("disabled", false));
+        return (ClientGuardian)criteria.uniqueResult();
+    }
+
+    public List<Long> findClientGuardiansByMobile(Long idOfChildren, String mobile) {
+        Query query = entityManager.createQuery("select cg.idOfClientGuardian from ClientGuardian cg, Client child, Client guardian where guardian.idOfClient = cg.idOfGuardian " +
+                "and child.idOfClient = cg.idOfChildren " +
+                "and child.idOfClient = :idOfChildren " +
+                "and cg.deletedState = false and cg.disabled = false and guardian.idOfClientGroup not in (:leaving, :deleted) " +
+                "and guardian.mobile = :mobile", Long.class);
+        query.setParameter("idOfChildren", idOfChildren);
+        query.setParameter("leaving", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        query.setParameter("mobile", mobile);
+        return query.getResultList();
+    }
+
+    public List<Long> findContractsBySsoid(String ssoid) {
+        if (ssoid == null || ssoid.equals("") || ssoid.equals(EMPProcessor.SSOID_FAILED_TO_REGISTER)
+                || ssoid.equals(EMPProcessor.SSOID_REGISTERED_AND_WAITING_FOR_DATA)) {
+            return null;
+        }
+        Query query = entityManager.createQuery("select c.contractId from Client c where c.ssoid = :ssoid", Long.class);
+        query.setParameter("ssoid", ssoid);
+        return query.getResultList();
+    }
+
+    /**
+     *
+     * @param guardianId
+     * @param clientId
+     * @param notifyType
+     * @return Возвращает факт того, что у связки клиент-представитель включен хотя бы один из типов уведомления из notifyTypes
+     */
+    //TODO - надо ли возвращать true, когда все флаги выключены, но forcesend в конфиге выставлена в 1 - ВОПРОС ??
+    public Boolean allowedGuardianshipNotification(Long guardianId, Long clientId, Long notifyType) throws Exception {
+        ClientGuardianNotificationSetting.Predefined predefined = ClientGuardianNotificationSetting.Predefined.parse(notifyType);
+        if (predefined == null) {
+            return true;
+        }
+        Session session = entityManager.unwrap(Session.class);
+        org.hibernate.Query query = session
+                .createSQLQuery("select notifyType from cf_client_guardian_notificationsettings n " +
+                        "where idOfClientGuardian = (select idOfClientGuardian from cf_client_guardian cg " +
+                        "where cg.disabled = 0 and cg.IdOfChildren = :idOfChildren and cg.IdOfGuardian = :idOfGuardian and cg.deletedState = false)");
+        query.setParameter("idOfChildren", clientId);
+        query.setParameter("idOfGuardian", guardianId);
+        List resultList = query.list();
+        if (resultList.size() < 1 && predefined.isEnabledAtDefault()) {
+            return true;
+        }
+        for (Object o : resultList) {
+            BigInteger bi = (BigInteger) o;
+            if (bi.longValue() == predefined.getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<ItemListByGuardMobile> extractClientItemListFromGuardByGuardMobile(String guardMobile) {
+        String query = "select client.idOfClient, client.contractId, client.san, 0 as disabled from cf_clients client where client.phone=:guardMobile or client.mobile=:guardMobile";
+        Query q = entityManager.createNativeQuery(query, ItemListByGuardMobile.class);
+        q.setParameter("guardMobile", guardMobile);
+        List<ItemListByGuardMobile> clients = q.getResultList();
+
+        if (clients != null && !clients.isEmpty()){
+            List<ItemListByGuardMobile> clientsCopy = new ArrayList<ItemListByGuardMobile>(clients);
+            for (ItemListByGuardMobile item : clientsCopy) {
+                Long id = item.getIdOfClient();
+                Query q2 = entityManager.createNativeQuery("select cl.idOfClient, cl.contractid, cl.san, cg.disabled from cf_client_guardian cg inner join cf_clients cl " +
+                        "on cl.idOfClient = cg.idOfChildren " +
+                        "where cg.idOfGuardian = :idOfGuardian and cg.deletedState = false", ItemListByGuardMobile.class);
+                q2.setParameter("idOfGuardian", id);
+                List<ItemListByGuardMobile> list = q2.getResultList();
+                if (list != null && list.size() > 0) {
+                    for (ItemListByGuardMobile cg : list) {
+                        if (cg.getDisabled().equals(1)) {
+                            clients.add(cg);
+                        }
+                    }
+                    clients.remove(item);
+                }
+            }
+        }
+
+        Set<ItemListByGuardMobile> tempSet = new HashSet<ItemListByGuardMobile>();
+        tempSet.addAll(clients);
+        clients.clear();
+        clients.addAll(tempSet);
+        return clients;
+    }
+
+    public List<Long> extractIDFromGuardByGuardMobile(String guardMobile) {
+        Set<Long> result = new HashSet<Long>();
+        String query = "select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
+        Query q = entityManager.createQuery(query, Long.class);
+        q.setParameter("guardMobile", guardMobile);
+        List<Long> clients = q.getResultList();
+
+        if (clients != null && !clients.isEmpty()){
+            for(Long id : clients){
+                Query q2 = entityManager.createQuery("select cg from ClientGuardian cg " +
+                        "where cg.idOfGuardian = :idOfGuardian and cg.deletedState = false", ClientGuardian.class);  //все дети текущего клиента
+                q2.setParameter("idOfGuardian", id);
+                List<ClientGuardian> list = q2.getResultList();
+                if (list != null && list.size() > 0) {
+                    for (ClientGuardian cg : list) {
+                        if (!cg.isDisabled()) {
+                            result.add(cg.getIdOfChildren());
+                        }
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<Long>(result);
+    }
+
 }

@@ -30,29 +30,23 @@ CREATE TABLE cf_client_guardian_notificationsettings
 -- у кого нет записей в cf_notificationsettings, в том числе записи с notifytype =1
 insert into cf_client_guardian_notificationsettings(idofclientguardian, notifytype, createddate)
   select g.idofclientguardian, s.notifytype, extract(epoch from now()) * 1000
-  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofguardian
-  where g.deletedstate = false and s.notifytype <> 1200000000
-    union
-  select g.idofclientguardian, 1210000000, extract(epoch from now()) * 1000
-  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofguardian
-  where g.deletedstate = false and s.notifytype = 1200000000
-    union
+  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofchildren
+  where g.deletedstate = false
+  union
   select g.idofclientguardian, 1220000000, extract(epoch from now()) * 1000
-  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofguardian
+  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofchildren
   where g.deletedstate = false and s.notifytype = 1200000000
-    union
+  union
   select g.idofclientguardian, 1230000000, extract(epoch from now()) * 1000
-  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofguardian
+  from cf_clientsnotificationsettings s join cf_client_guardian g on s.idofclient = g.idofchildren
   where g.deletedstate = false and s.notifytype = 1200000000
-    union
+  union
   select g.idofclientguardian, 1000000000, extract(epoch from now()) * 1000
-  from cf_client_guardian g where g.idofguardian in
-  (select idofclient from cf_clients c where not exists(select idofclient from cf_clientsnotificationsettings where idofclient = c.idofclient))
-    union
+  from cf_client_guardian g where not exists (select idofclient from cf_clientsnotificationsettings where idofclient = g.idofchildren)
+  union
   select g.idofclientguardian, 1100000000, extract(epoch from now()) * 1000
-  from cf_client_guardian g where g.idofguardian in
-  (select idofclient from cf_clients c where not exists(select idofclient from cf_clientsnotificationsettings where idofclient = c.idofclient))
-    order by idofclientguardian, notifytype;
+  from cf_client_guardian g where not exists (select idofclient from cf_clientsnotificationsettings where idofclient = g.idofchildren)
+  order by idofclientguardian, notifytype;
 
 --После импорта данных создаем индексы на таблицу флагов оповещений
 CREATE INDEX cf_client_guardian_notificationsettings_idofclientguardian_idx
@@ -75,5 +69,7 @@ CREATE TABLE cf_registrychange_guardians (
   CONSTRAINT cf_registrychange_guardians_registrychange_fk FOREIGN KEY (idofregistrychange) REFERENCES cf_registrychange (idofregistrychange)
 );
 
+--Индекс на поле ssoid
+CREATE INDEX cf_clients_ssoid_idx ON cf_clients USING btree (ssoid);
 
-
+--! ФИНАЛИЗИРОВАН (Семенов, 270916) НЕ МЕНЯТЬ

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPAbstractEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
 
@@ -200,6 +201,7 @@ public class SMSService {
                 for (int i = 0; i < 3; i++) {
                     try {
                         if(smsService instanceof EMPSmsServiceImpl) {
+                            logger.info(String.format("Test sending sms: %s", ((EMPAbstractEventType)textObject).toFullString()));
                             sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(sender, client, textObject);
                             boolean isSuccess = sendResponse.isSuccess();
                             if(sendResponse != null && !isSuccess) {

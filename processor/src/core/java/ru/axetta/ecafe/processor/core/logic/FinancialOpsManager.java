@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.isGuardianshipDisabled;
 
 @Component
 @Scope("singleton")
@@ -350,7 +349,8 @@ public class FinancialOpsManager {
 
         if (!(guardians == null || guardians.isEmpty())) {
             for (Client destGuardian : guardians) {
-                if (!isGuardianshipDisabled(session, destGuardian.getIdOfClient(), client.getIdOfClient())) {
+                if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                        client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
                     eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
                 }
             }
@@ -381,6 +381,17 @@ public class FinancialOpsManager {
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
         eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
+
+        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+
+        if (!(guardians == null || guardians.isEmpty())) {
+            for (Client destGuardian : guardians) {
+                if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                        client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
+                    eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
+                }
+            }
+        }
     }
 
 

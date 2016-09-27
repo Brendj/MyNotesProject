@@ -327,9 +327,18 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getNotificationSettings")
     ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId);
 
+    @WebMethod(operationName = "getNotificationSettingsByClientGuardian")
+    ClientNotificationSettingsResult getClientGuardianNotificationSettings(@WebParam(name = "childContractId") Long childContractId,
+            @WebParam(name = "guardianMobile") String guardianMobile);
+
     @WebMethod(operationName = "setNotificationSettings")
     ClientNotificationChangeResult setClientNotificationSettings(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "notificationType") List<Long> notificationTypes);
+
+    @WebMethod(operationName = "setNotificationSettingsByClientGuardian")
+    ClientNotificationChangeResult setClientGuardianNotificationSettings(@WebParam(name = "childContractId") Long childContractId,
+            @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "notificationType") List<Long> notificationTypes);
 
     @WebMethod(operationName = "getNotificationTypes") ClientNotificationSettingsResult getClientNotificationTypes();
 

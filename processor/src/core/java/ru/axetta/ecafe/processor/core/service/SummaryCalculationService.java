@@ -52,13 +52,12 @@ public class SummaryCalculationService {
     private EntityManager entityManager;
 
     public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_MAX = "amountEntereventsTime";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_MONDAY = "amountEntereventsTimeMonday";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_TUESDAY = "amountEntereventsTimeTuesday";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_WEDNESDAY = "amountEntereventsTimeWednesday";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_THURSDAY = "amountEntereventsTimeThursday";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_FRIDAY = "amountEntereventsTimeFriday";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_SATURDAY = "amountEntereventsTimeSaturday";
-    public static String VALUE_AMOUNT_ENTER_EVENTS_TIME_SUNDAY = "amountEntereventsTimeSunday";
+    public static String[] VALUES_ENTER_EVENTS = {"amountEntereventsTimeMonday", "amountEntereventsTimeTuesday", "amountEntereventsTimeWednesday",
+                                                  "amountEntereventsTimeThursday", "amountEntereventsTimeFriday", "amountEntereventsTimeSaturday", "amountEntereventsTimeSunday",
+                                                  "startTimeMonday", "startTimeTuesday", "startTimeWednesday",
+                                                  "startTimeThursday", "startTimeFriday", "startTimeSaturday", "startTimeSunday",
+                                                  "endTimeMonday", "endTimeTuesday", "endTimeWednesday",
+                                                  "endTimeThursday", "endTimeFriday", "endTimeSaturday", "endTimeSunday" };
     public static String VALUE_TIME_ENTER = "StartTime";
     public static String VALUE_TIME_EXIT = "EndTime";
     public static String VALUE_ACCOUNT = "account";
@@ -146,10 +145,10 @@ public class SummaryCalculationService {
                 Client client = (Client)session.load(Client.class, clientEE.getIdOfClient());
                 String type = "";
                 int notificationType = 0;
-                if (notyfyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+                if (notyfyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
                     type = EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY;
                     notificationType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
-                } else if (notyfyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+                } else if (notyfyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
                     type = EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK;
                     notificationType = ClientSms.TYPE_SUMMARY_WEEKLY_NOTIFICATION;
                 }
@@ -167,7 +166,7 @@ public class SummaryCalculationService {
         Date today = new Date(System.currentTimeMillis());
         Date endDate = CalendarUtils.endOfDay(today);
         Date startDate = CalendarUtils.truncateToDayOfMonth(today);
-        run(startDate, endDate, ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+        run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
     }
 
     public void runWeekly() {
@@ -175,7 +174,7 @@ public class SummaryCalculationService {
         Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
         Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
         Date endDate = CalendarUtils.endOfDay(dates[1]);
-        run(startDate, endDate, ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
+        run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
     }
 
     public static boolean isOn() {
@@ -256,25 +255,6 @@ public class SummaryCalculationService {
         attachEEValues(clients, notifyType, startDate, endDate);
 
         //Подсчет данных по балансам
-        /*String query_balance = "SELECT c.idofclient, p.surname, p.firstname, c.limits, c.balance, "
-                + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :startTime "
-                + "AND t.transactionDate <= :curTime), 0) as sum1, "                                                                    //сумма всех движений от начальной даты до текущего времени
-                + "coalesce((SELECT -sum(t.transactionsum) from cf_transactions t inner join cf_orders o on t.idoftransaction = o.idoftransaction "
-                + "WHERE t.idofclient = c.idofclient AND t.transactionDate BETWEEN :startTime AND :endTime "
-                + "AND o.orderdate BETWEEN :startTime AND :endTime AND o.idofclient = c.idofclient AND t.sourcetype = :transactionType), 0) as sum2, "                //сумма заказов за период
-                + "c.contractid, "
-                + "coalesce((select count(o.idoforder) from cf_orders o WHERE "
-                + "o.orderdate BETWEEN :startTime AND :endTime AND o.idofclient = c.idofclient "
-                + "AND o.ordertype in (:orderTypes)), 0) as count1, "                                                                   //количество горячих обедов
-                + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :endTime "
-                + "AND t.transactionDate <= :curTime), 0) as sum3, "                                                                    //сумма всех движений от конечной даты до текущего времени
-                + "coalesce((select count(idofclientpayment) from cf_clientpayments p inner join cf_transactions t on p.idoftransaction = t.idoftransaction "
-                + "where p.createddate BETWEEN :startTime AND :endTime and t.transactionDate BETWEEN :startTime AND :endTime AND t.idofclient = c.idofclient), 0) as count2 " // количество пополнений
-                + "FROM cf_clientsnotificationsettings n inner join cf_clients c on c.idofclient = n.idofclient "
-                + "INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
-                + "WHERE n.notifytype = :notifyType "
-                + "ORDER BY c.idofclient, p.surname, p.firstname";*/
-        //выше медленный запрос, ниже быстрый
         String query_balance = "SELECT c.idofclient, p.surname, p.firstname, c.expenditurelimit, c.balance, coalesce(query1.sum1, 0) as sum1, coalesce(query2.sum2, 0) AS sum2, "
                 + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2, coalesce(query5.sum4, 0) as sum4 "
                 + "FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
@@ -396,9 +376,9 @@ public class SummaryCalculationService {
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ORG_NUM, clientEE.getOrgNum()));
 
             int upto = 0;
-            if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+            if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
                 upto = 1;
-            } else if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+            } else if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
                 upto = 7;
             }
 
@@ -445,7 +425,7 @@ public class SummaryCalculationService {
                         exitGuardianId = ee.getGuardianId();
                     }
                 }
-                if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+                if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
                     if (!enterExists && !exitExists) {
                         clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_DATE, "0"));
                         clientEE.setValues(attachValue(clientEE.getValues(), VALUE_TIME_ENTER, "-"));
@@ -478,8 +458,8 @@ public class SummaryCalculationService {
                     }
                     attachEnterMethod(enterExists, session, clientEE);
                     attachExitMethod(exitExists, session, clientEE);
-                } else if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
-                    String day = getDayByIteration(iteration);
+                } else if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+                    String day = getDayByIteration(iteration, 0);
                     if (clientInside != 0) {
                         seconds = clientInside / 1000;
                         hours = seconds / 3600;
@@ -492,20 +472,36 @@ public class SummaryCalculationService {
                             clientEE.setValues(attachValue(clientEE.getValues(), day, "-"));
                         }
                     }
-
+                    String day2 = getDayByIteration(iteration, 1);
+                    String day3 = getDayByIteration(iteration, 2);
+                    if (enterExists) {
+                        clientEE.setValues(attachValue(clientEE.getValues(), day2, CalendarUtils.timeToString(enterTime)));
+                    } else {
+                        clientEE.setValues(attachValue(clientEE.getValues(), day2, ""));
+                    }
+                    if (exitExists) {
+                        clientEE.setValues(attachValue(clientEE.getValues(), day3, CalendarUtils.timeToString(exitTime)));
+                    } else {
+                        clientEE.setValues(attachValue(clientEE.getValues(), day3, ""));
+                    }
                 }
             }
             if (enterExists || exitExists) {
                 daysInside++;
             }
-            if (notifyType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+            if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
                 clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_ENTER_EVENTS_DATE, daysInside.toString()));
             }
         }
     }
 
-    private String getDayByIteration(int iteration) {
-        if (iteration == 1) {
+    private String getDayByIteration(int iteration, int type) {
+        try {
+            return VALUES_ENTER_EVENTS[7 * type + (iteration - 1)];
+        } catch (Exception e) {
+            return "-";
+        }
+        /*if (iteration == 1) {
             return VALUE_AMOUNT_ENTER_EVENTS_TIME_MONDAY;
         } else if (iteration == 2) {
             return VALUE_AMOUNT_ENTER_EVENTS_TIME_TUESDAY;
@@ -521,7 +517,7 @@ public class SummaryCalculationService {
             return VALUE_AMOUNT_ENTER_EVENTS_TIME_SUNDAY;
         } else {
             return "-";
-        }
+        }*/
     }
 
     private void attachEnterMethod(boolean enterExists, Session session, ClientEE clientEE) {

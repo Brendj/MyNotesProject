@@ -31,4 +31,14 @@ public class ClientNotificationSettingsItem {
     public void setNameOfNotification(String nameOfNotification) {
         this.nameOfNotification = nameOfNotification;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return this.typeOfNotification.equals(((ClientNotificationSettingsItem)o).getTypeOfNotification());
+    }
+
+    @Override
+    public int hashCode() {
+        return typeOfNotification.hashCode();
+    }
 }

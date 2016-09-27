@@ -3,6 +3,9 @@ package ru.axetta.ecafe.processor.core.client.items;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -18,6 +21,7 @@ public class ClientGuardianItem {
     private String mobile;
     private boolean isNew;
     private Integer relation;
+    private List<NotificationSettingItem> notificationItems = new ArrayList<NotificationSettingItem>();
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -28,13 +32,14 @@ public class ClientGuardianItem {
         isNew = true;
     }
 
-    public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation) {
+    public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation, List notificationSettings) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
         this.relation = relation == null ? null : relation.ordinal();
+        this.notificationItems = notificationSettings;
         isNew = false;
     }
 
@@ -88,5 +93,13 @@ public class ClientGuardianItem {
 
     public String getRelationStr() {
         return relation == null ? "" : ClientGuardianRelationType.fromInteger(relation).toString();
+    }
+
+    public List<NotificationSettingItem> getNotificationItems() {
+        return notificationItems;
+    }
+
+    public void setNotificationItems(List<NotificationSettingItem> items) {
+        this.notificationItems = items;
     }
 }

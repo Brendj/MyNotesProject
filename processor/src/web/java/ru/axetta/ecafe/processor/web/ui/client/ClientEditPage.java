@@ -7,12 +7,13 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
+import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -692,6 +693,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         return clientGuardianItems;
     }
 
+    public boolean getOldFlagsShow() {
+        if (clientGuardianItems == null) return true;
+        boolean result = true;
+        for (ClientGuardianItem item : clientGuardianItems) {
+            if (!item.getDisabled()) return false;
+        }
+        return result;
+    }
+
     private List<ClientGuardianItem> clientWardItems;
 
     public List<ClientGuardianItem> getClientWardItems() {
@@ -715,11 +725,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if (typeAddClient == null) return;
             if (typeAddClient.equals("guardian")) {
                 if (!guardianExists(idOfClient))
-                    clientGuardianItems.add(new ClientGuardianItem(client));
+                    clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings()));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
-                    clientWardItems.add(new ClientGuardianItem(client));
+                    clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings()));
             }
         }
     }
@@ -1023,15 +1033,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
         }
 
+        if (clientWardItems != null && !clientWardItems.isEmpty()) {
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
+        }
         if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
             removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
         }
 
         resetNewFlags();
-
-        if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
-        }
 
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
