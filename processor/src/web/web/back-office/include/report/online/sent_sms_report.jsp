@@ -30,23 +30,23 @@
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{sentSmsReportPage.filter}}" />
         </h:panelGroup>
+    </h:panelGrid>
 
-        <h:panelGroup>
-            <a4j:commandButton value="Генерировать отчет" action="#{sentSmsReportPage.buildReport}"
-                               reRender="workspaceTogglePanel" styleClass="command-button"
-                               status="reportGenerateStatus" />
-            <a4j:status id="reportGenerateStatus">
-                <f:facet name="start">
-                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                </f:facet>
-            </a4j:status>
-        </h:panelGroup>
-
+    <h:panelGrid styleClass="borderless-grid" columns="3">
+        <a4j:commandButton value="Генерировать отчет" action="#{sentSmsReportPage.buildReport}"
+                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           status="reportGenerateStatus" />
         <h:commandButton value="Выгрузить в Excel" actionListener="#{sentSmsReportPage.showXLS}"
                          styleClass="command-button" />
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages" />
+        <a4j:status id="reportGenerateStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
     </h:panelGrid>
+
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
