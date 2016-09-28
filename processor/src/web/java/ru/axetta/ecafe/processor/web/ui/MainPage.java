@@ -2285,6 +2285,8 @@ public class MainPage implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не удалось загрузить данные контрагента в РНИП",
                                 null));
             }
+        } catch (IllegalArgumentException ise) {
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));
         } catch (IllegalStateException ise) {
             logger.error("Failed to update contragent catalog in RNIP", ise);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ise.getMessage(), null));

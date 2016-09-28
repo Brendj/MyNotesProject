@@ -385,9 +385,8 @@ public class ContragentEditPage extends BasicWorkspacePage implements Contragent
 
         contragent.setDefaultPayContragent(defaultPayContragent);
         if(defaultPayContragent == null ){
-            contragent.setPayByCashier(false);
-            payByCashier = false;
-        }else {
+            throw new IllegalArgumentException("Укажите платежного контрагента по умолчанию");
+        } else {
             contragent.setPayByCashier(payByCashier);
         }
         session.update(contragent);
