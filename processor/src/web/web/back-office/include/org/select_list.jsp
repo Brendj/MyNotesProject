@@ -63,7 +63,7 @@
                                     <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                                     <h:inputText id="inputFilter" value="#{mainPage.orgListSelectPage.filter}" size="60"
                                                  maxlength="120" styleClass="input-text">
-                                        <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                        <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
                                     <h:outputText escape="true" value="Округ: " styleClass="output-text" />
@@ -83,13 +83,13 @@
                                             <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
                                             <h:inputText id="inputTagFilter" value="#{mainPage.orgListSelectPage.tagFilter}"
                                                  size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                             </h:inputText>
                                             <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                                             <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
                                                  size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                             </h:inputText>
                                         </h:panelGrid>
