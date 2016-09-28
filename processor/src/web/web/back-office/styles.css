@@ -404,3 +404,11 @@
 .changed-permission-option {
     background-color: #ff9df5;
 }
+
+.column-width-250 {
+    width: 250px;
+}
+
+.column-width-500 {
+    width: 500px;
+}
