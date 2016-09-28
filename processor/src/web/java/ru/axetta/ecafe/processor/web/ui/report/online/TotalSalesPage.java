@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
@@ -440,13 +441,19 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
-            Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            Set<Org> contragentOrgs = contragent.getOrgs();
-
             List<Long> idOfOrgs = new ArrayList<Long>();
 
-            for (Org org : contragentOrgs) {
-                idOfOrgs.add(org.getIdOfOrg());
+            if (!idOfOrgList.isEmpty()) {
+                for (Long orgId: idOfOrgList) {
+                    idOfOrgs.add(orgId);
+                }
+            } else {
+                Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+                Set<Org> contragentOrgs = contragent.getOrgs();
+
+                for (Org org : contragentOrgs) {
+                    idOfOrgs.add(org.getIdOfOrg());
+                }
             }
 
             if (!idOfOrgs.isEmpty()) {
@@ -497,5 +504,13 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             HibernateUtils.close(session, logger);
         }
         return titles;
+    }
+
+    public Object showOrgListSelectPage() {
+        if (contragent != null) {
+            MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(contragent.getIdOfContragent()));
+        }
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 }

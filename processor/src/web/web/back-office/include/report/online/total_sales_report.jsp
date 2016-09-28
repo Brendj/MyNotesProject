@@ -38,7 +38,8 @@
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{mainPage.totalSalesPage.contragent.contragentName}" readonly="true"
                              styleClass="input-text" style="margin-right: 2px; width: 275px;" />
-                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.showContragentSelectPage}"
                                    reRender="modalContragentSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
@@ -47,6 +48,18 @@
                 </a4j:commandButton>
             </h:panelGroup>
 
+            <h:outputText escape="true" value="Организация" styleClass="output-text" />
+            <h:panelGroup styleClass="borderless-div">
+                <a4j:commandButton value="..." action="#{mainPage.totalSalesPage.showOrgListSelectPage}"
+                                   reRender="modalOrgListSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   style="width: 25px;">
+                    <f:setPropertyActionListener value="#{mainPage.totalSalesPage.getStringIdOfOrgList}"
+                                                 target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.totalSalesPage.filter}}" />
+            </h:panelGroup>
 
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.totalSalesPage.startDate}" datePattern="dd.MM.yyyy"
