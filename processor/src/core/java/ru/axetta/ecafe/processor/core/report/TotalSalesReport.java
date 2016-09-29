@@ -73,6 +73,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         private List<String> titlesComplexes;
 
         private Long idOfContragent = -1L;
+        private List<Long> idOfOrgList;
 
         private Long sumComplex = 0L;
         private Long sumBuffet = 0L;
@@ -216,6 +217,14 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             titlesComplexes = new ArrayList<String>();
 
+            String idOfOrgListString = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
+
+            List<String> idOfOrgListStrings = new ArrayList<String>();
+
+            if (!idOfOrgListString.equals("")) {
+                idOfOrgListStrings = Arrays.asList(StringUtils.split(idOfOrgListString, ','));
+            }
+
             String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("titleComplexes"));
 
             String titleAndSums = StringUtils.trimToEmpty(getReportProperties().getProperty("titleAndSumList"));
@@ -230,6 +239,14 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             for (String title : Arrays.asList(StringUtils.split(titles, ','))) {
                 titlesComplexes.add(title);
+            }
+
+            idOfOrgList = new ArrayList<Long>();
+
+            if (!idOfOrgListStrings.isEmpty()) {
+                for (String idOfOrg : idOfOrgListStrings) {
+                    idOfOrgList.add(Long.valueOf(idOfOrg));
+                }
             }
 
             long l = System.currentTimeMillis();
@@ -368,7 +385,15 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             if (idOfContragent != -1) {
 
             }
-            List<OrgItem> allNames = orgRepository.findAllNamesByContragentTSP(idOfContragent);
+
+            List<OrgItem> allNames;
+
+            if (!idOfOrgList.isEmpty()) {
+                allNames = orgRepository.findAllNamesByContragentTSPByListOfOrgIds(idOfContragent, idOfOrgList);
+            } else {
+                allNames = orgRepository.findAllNamesByContragentTSP(idOfContragent);
+            }
+
             List<TotalSalesItem> totalSalesItemList;
             for (OrgItem orgItem : allNames) {
                 totalSalesItemList = new ArrayList<TotalSalesItem>();

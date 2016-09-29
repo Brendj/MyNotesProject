@@ -251,6 +251,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
             builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
             builder.getReportProperties().setProperty("titleAndSumList", titleAndSumString);
+            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -331,6 +332,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
             builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
             builder.getReportProperties().setProperty("titleAndSumList", titleAndSumString);
+            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             TotalSalesReport totalSalesReport = (TotalSalesReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();

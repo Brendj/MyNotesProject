@@ -110,6 +110,21 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         return orgItemList;
     }
 
+    public List<OrgItem> findAllNamesByContragentTSPByListOfOrgIds(long idOfContragent, List<Long> idOfOrgList){
+        List<OrgItem> orgItemList = new ArrayList<OrgItem>();
+        Query nativeQuery = entityManager.createNativeQuery("SELECT IdOfOrg, ShortName, District FROM CF_Orgs "
+                + " WHERE State =1 and OrganizationType=0 and DefaultSupplier=:idOfContragent and RefectoryType != 3 and IdOfOrg in (:idOfOrgList) ORDER BY OfficialName ")
+                .setParameter("idOfContragent",idOfContragent)
+                .setParameter("idOfOrgList", idOfOrgList);
+
+        List<Object[]> temp = nativeQuery.getResultList();
+        for(Object[] o : temp){
+            orgItemList.add(new OrgItem(((BigInteger)o[0]).longValue(),(String)o[1],(String)o[2]));
+        }
+
+        return orgItemList;
+    }
+
     public Org findOrgWithFriendlyOrgs(long idOfOrg) {
         return entityManager.createQuery("select o from Org o left join fetch o.friendlyOrg where o.idOfOrg=:idOfOrg", Org.class)
                 .setParameter("idOfOrg", idOfOrg)
