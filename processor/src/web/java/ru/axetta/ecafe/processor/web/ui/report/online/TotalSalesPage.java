@@ -284,7 +284,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
     public Object clear(){
 
-        filter=null;
+        filter = "Не выбрано";
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -303,6 +303,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         contragent = null;
         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         preferentialTitleComplexes = null;
+        idOfOrgList.clear();
         return null;
     }
 
