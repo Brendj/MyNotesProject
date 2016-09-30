@@ -279,7 +279,7 @@ public class OrgEditPage extends BasicWorkspacePage
             for (Org o : selectOrg) {
                 ClientManager.updateClientVersion(session, o.getClients());
                 o.setFriendlyOrg(selectOrg);
-                if(o.isMainBuilding()) {
+                if(o.isMainBuilding() && !o.getIdOfOrg().equals(idOfOrg)) {
                     o.setMainBuilding(false);
                 }
                 orgsForVersionUpdate.add(o);
