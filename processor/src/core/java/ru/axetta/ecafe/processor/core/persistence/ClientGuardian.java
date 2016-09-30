@@ -82,6 +82,7 @@ public class ClientGuardian {
 
     public void delete(Long version) {
         this.setDeletedState(true);
+        this.setDisabled(true);
         this.setDeleteDate(RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime());
         this.setVersion(version);
     }
