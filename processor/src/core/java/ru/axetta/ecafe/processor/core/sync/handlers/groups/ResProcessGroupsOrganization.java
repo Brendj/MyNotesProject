@@ -27,8 +27,10 @@ public class ResProcessGroupsOrganization implements AbstractToElement {
         if (resultOperation != null && !resultOperation.isSuccess()) {
             XMLUtils.setAttributeIfNotNull(element, "Error", resultOperation.getMessage());
         }
-        for (ResProcessGroupsOrganizationItem item : items) {
-            element.appendChild(item.toElement(document));
+        if (items != null) {
+            for (ResProcessGroupsOrganizationItem item : items) {
+                element.appendChild(item.toElement(document));
+            }
         }
         return element;
     }

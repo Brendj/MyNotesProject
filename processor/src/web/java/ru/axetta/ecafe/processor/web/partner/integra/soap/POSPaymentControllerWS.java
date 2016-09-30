@@ -54,7 +54,7 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
                 List<Purchase> purchases = new ArrayList<Purchase>(posPayment.getPurchases().size());
                 for (PosPurchase p: posPayment.getPurchases()){
                         Purchase purchase = new Purchase(p.getDiscount(), p.getSocDiscount(), p.getIdOfOrderDetail(), p.getName(), p.getQty(), p.getrPrice(),
-                            p.getRootMenu(), p.getMenuOutput(), p.getType(), p.getMenuGroup(), p.getMenuOrigin(), p.getItemCode(), p.getGuidOfGoods(), p.getIdOfRule(), p.getIdOfMenu());
+                            p.getRootMenu(), p.getMenuOutput(), p.getType(), p.getMenuGroup(), p.getMenuOrigin(), p.getItemCode(), p.getGuidOfGoods(), p.getIdOfRule(), p.getIdOfMenu(), p.getManufacturer());
                     purchases.add(purchase);
                 }
                 // for friendly org access pass here idOfFriendlyOrg instead of null

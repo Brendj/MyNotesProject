@@ -8,6 +8,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getLongValue;
+import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getStringAttributeValue;
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getStringValueNullSafe;
 
 /**
@@ -34,6 +35,7 @@ public class Purchase {
     private final String guidOfGoods;
     private final Long idOfRule;
     private final Long idOfMenu;
+    private final String manufacturer;
 
     public static Purchase build(Node purchaseNode, SyncRequest.MenuGroups menuGroups) throws Exception {
         NamedNodeMap namedNodeMap = purchaseNode.getAttributes();
@@ -91,13 +93,15 @@ public class Purchase {
             idOfMenu = Long.parseLong(idOfMenuStr);
         }
 
+        String manufacturer = getStringValueNullSafe(namedNodeMap, "Manufacturer");
+
         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu);
+                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer);
     }
 
     public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
             long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
-            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu) {
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer) {
         this.discount = discount;
         this.socDiscount = socDiscount;
         this.idOfOrderDetail = idOfOrderDetail;
@@ -113,6 +117,7 @@ public class Purchase {
         this.guidOfGoods = guidOfGoods;
         this.idOfRule = idOfRule;
         this.idOfMenu = idOfMenu;
+        this.manufacturer = manufacturer;
     }
 
     public Long getDiscount() {
@@ -175,6 +180,10 @@ public class Purchase {
         return idOfMenu;
     }
 
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
     @Override
     public String toString() {
         return "Purchase{" +
@@ -193,6 +202,7 @@ public class Purchase {
                 ", guidOfGoods='" + guidOfGoods + '\'' +
                 ", idOfRule=" + idOfRule +
                 ", idOfMenu=" + idOfMenu +
+                ", manufacturer=" + manufacturer +
                 '}';
     }
 }

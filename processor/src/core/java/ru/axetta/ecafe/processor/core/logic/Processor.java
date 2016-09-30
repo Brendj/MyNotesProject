@@ -3188,7 +3188,7 @@ public class Processor implements SyncProcessor {
                             payment.getIdOfOrder(), purchase.getQty(), purchase.getDiscount(),
                             purchase.getSocDiscount(), purchase.getrPrice(), purchase.getName(), purchase.getRootMenu(),
                             purchase.getMenuGroup(), purchase.getMenuOrigin(), purchase.getMenuOutput(),
-                            purchase.getType(), purchase.getIdOfMenu());
+                            purchase.getType(), purchase.getIdOfMenu(), purchase.getManufacturer());
                     if (purchase.getItemCode() != null) {
                         orderDetail.setItemCode(purchase.getItemCode());
                     }

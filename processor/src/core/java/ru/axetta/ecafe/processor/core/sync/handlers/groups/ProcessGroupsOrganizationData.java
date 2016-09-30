@@ -24,7 +24,13 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("GroupsOrganization");
         for (ProcessGroupsOrganizationDataItem item : items) {
-            element.appendChild(item.toElement(document));
+            if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
+                if (item.getMiddleGroup() == true) {
+                    element.appendChild(item.toSubGroupElement(document));
+                } else {
+                    element.appendChild(item.toElement(document));
+                }
+            }
         }
         return element;
     }

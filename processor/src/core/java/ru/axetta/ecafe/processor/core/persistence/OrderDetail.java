@@ -66,6 +66,15 @@ public class OrderDetail {
     private Good good;
     private Set<GoodComplaintOrders> goodComplaintOrdersInternal;
     private Long idOfMenuFromSync;
+    private String manufacturer;
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
 
     public Long getIdOfMenuFromSync() {
         return idOfMenuFromSync;
@@ -129,7 +138,7 @@ public class OrderDetail {
 
     public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
             long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
-            String menuOutput, int menuType, Long idOfMenuFromSync) {
+            String menuOutput, int menuType, Long idOfMenuFromSync, String manufacturer) {
         this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
         this.idOfOrder = idOfOrder;
         this.qty = qty;
@@ -143,6 +152,7 @@ public class OrderDetail {
         this.menuOutput = menuOutput;
         this.menuType = menuType;
         this.idOfMenuFromSync = idOfMenuFromSync;
+        this.manufacturer = manufacturer;
     }
 
     public CompositeIdOfOrderDetail getCompositeIdOfOrderDetail() {
