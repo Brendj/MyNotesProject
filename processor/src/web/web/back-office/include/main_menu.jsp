@@ -1144,6 +1144,10 @@
         <%--@elvariable id="totalSalesPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalSalesPage"--%>
         <rich:panelMenuItem id="totalSalesReportMenuItem" binding="#{mainPage.totalSalesPage.mainMenuComponent}"
                             label="Сводный отчет по продажам" action="#{mainPage.showTotalSalesPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="ordersByManufacturerReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.OrdersByManufacturerReportPage"--%>
+        <rich:panelMenuItem id="ordersByManufacturerReportMenuItem" binding="#{mainPage.ordersByManufacturerReportPage.mainMenuComponent}"
+                            label="Сводный отчет по производителю" action="#{mainPage.showOrdersByManufacturerReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"

@@ -109,6 +109,7 @@ public class ReportRuleConstants {
             LatePaymentReport.class,
             MenuDetailsGroupByMenuOriginReport.class,
             OrderDetailsGroupByMenuOriginReport.class,
+            OrdersByManufacturerReport.class,
             OrgBalanceReport.class,
             OrgBalanceJasperReport.class,
             OrgDiscountsReport.class,

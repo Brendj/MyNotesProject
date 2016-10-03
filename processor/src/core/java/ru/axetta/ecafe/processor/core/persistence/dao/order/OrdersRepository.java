@@ -147,6 +147,85 @@ public class OrdersRepository extends BaseJpaDao {
         return orderItemList;
     }
 
+    public List<String> findAllManufacturers(List<Long> idOfOrgsList, Date startDate, Date endDate) {
+        List<String> manufacturerList = new ArrayList<String>();
+
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            org.hibernate.Query nativeQuery = session.createSQLQuery(
+                    "SELECT DISTINCT od.manufacturer "
+                            + "FROM CF_Orders o "
+                            + "INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                            + "WHERE o.idoforg IN (:idOfOrgs) "
+                            + "AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
+                            + "AND od.manufacturer IS NOT NULL "
+                            + "AND o.state=0 AND od.state=0");
+            nativeQuery.setParameterList("idOfOrgs", idOfOrgsList);
+            nativeQuery.setParameter("startDate", startDate.getTime());
+            nativeQuery.setParameter("endDate", endDate.getTime());
+
+            List temp = nativeQuery.list();
+            for (Object entry : temp) {
+                manufacturerList.add((String) entry);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return manufacturerList;
+    }
+
+    public List<OrderItem> findAllOrdersByManufacturer(List<Long> idOfOrgsList, Date startDate, Date endDate) {
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            org.hibernate.Query nativeQuery = session.createSQLQuery(
+                    "SELECT o.idoforg, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.manufacturer "
+                            + "FROM CF_Orders o "
+                            + "INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                            + "WHERE o.idoforg IN (:idOfOrgs) "
+                            + "AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
+                            + "AND od.manufacturer IS NOT NULL "
+                            + "AND o.state=0 AND od.state=0");
+            nativeQuery.setParameterList("idOfOrgs", idOfOrgsList);
+            nativeQuery.setParameter("startDate", startDate.getTime());
+            nativeQuery.setParameter("endDate", endDate.getTime());
+
+            List temp = nativeQuery.list();
+            for (Object entry : temp) {
+                Object o[] = (Object[]) entry;
+
+                orderItemList.add(new OrderItem(((BigInteger) o[0]).longValue(), ((BigInteger) o[1]).longValue(),
+                        ((BigInteger) o[2]).longValue(), (String) o[3]));
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return orderItemList;
+    }
+
     public List<OrderItem> findAllBeneficiaryComplexes(Date startTime, Date endTime){
         List<OrderItem> orderItemList = new ArrayList<OrderItem>();
 

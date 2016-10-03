@@ -27,6 +27,7 @@ public class OrderItem {
     private long socDiscount;
     private int menutype;
     private int menuOrigin;
+    private String manufacturer;
 
     public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname, long createdDateEqualsOrderDate) {
@@ -70,6 +71,12 @@ public class OrderItem {
         this.menuOrigin = menuOrigin;
     }
 
+    public OrderItem(long idOfOrg, long orderDate, long sum, String manufacturer) {
+        this.idOfOrg = idOfOrg;
+        this.orderDate = orderDate;
+        this.sum = sum;
+        this.manufacturer = manufacturer;
+    }
 
     public OrderItem(long idOfOrg, int ordertype, long sum) {
         this.idOfOrg = idOfOrg;
@@ -222,5 +229,13 @@ public class OrderItem {
 
     public void setMenuOrigin(int menuOrigin) {
         this.menuOrigin = menuOrigin;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 }

@@ -286,6 +286,7 @@ public class MainPage implements Serializable {
     private final CurrentPositionsReportPage currentPositionsReportPage = new CurrentPositionsReportPage();
     private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
+    private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
 
     // POS manipulation
     private final BasicWorkspacePage posGroupPage = new BasicWorkspacePage();
@@ -7030,6 +7031,23 @@ public class MainPage implements Serializable {
         } finally {
 
         }
+        return null;
+    }
+
+    public OrdersByManufacturerReportPage getOrdersByManufacturerReportPage() {
+        return ordersByManufacturerReportPage;
+    }
+
+    public Object showOrdersByManufacturerReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = ordersByManufacturerReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set OrdersByManufacturerReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы сводного отчета по производителю: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
         return null;
     }
 
