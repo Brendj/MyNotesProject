@@ -31,15 +31,30 @@ public class GroupsOrganizationRequest implements SectionRequest {
         this.idOfOrg = idOfOrg;
         Node node = groupsOrganizationRequestNode.getFirstChild();
         while (node != null) {
+            String parentGroupName = null;
+
             if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("CG")) {
-                GroupOrganizationItem item = null;
+                GroupOrganizationItem item;
                 try {
                     item = GroupOrganizationItem.build(node, idOfOrg);
+                    // подгруппа
+                    parentGroupName = item.getName();
                     items.add(item);
                 } catch (Exception e) {
                     logger.error("failed to create group organization item," + e);
                 }
             }
+
+            if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("CMG")) {
+                GroupOrganizationItem item;
+                try {
+                    item = GroupOrganizationItem.buildSubGroup(node, idOfOrg, parentGroupName);
+                    items.add(item);
+                } catch (Exception e) {
+                    logger.error("failed to create middleGroup organization item," + e);
+                }
+            }
+
             node = node.getNextSibling();
         }
     }

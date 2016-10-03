@@ -42,7 +42,7 @@ public class GroupsOrganizationDataProcessor extends AbstractProcessor<ProcessGr
             List<GroupNamesToOrgs> groupNamesToOrgsForOrgSinceVersion = DAOUtils.getGroupNamesToOrgsForOrgSinceVersion(session, mainBuilding.getIdOfOrg(), maxVersion);
             for (GroupNamesToOrgs groupNamesToOrgs : groupNamesToOrgsForOrgSinceVersion) {
                 ProcessGroupsOrganizationDataItem item = new ProcessGroupsOrganizationDataItem(groupNamesToOrgs.getGroupName(),
-                        groupNamesToOrgs.getVersion(), groupNamesToOrgs.getIdOfOrg());
+                        groupNamesToOrgs.getVersion(), groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getParentGroupName(), groupNamesToOrgs.getIsMiddleGroup());
                 resultItems.add(item);
             }
         } catch (Exception e) {

@@ -108,12 +108,16 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
                 savedGroupNamesToOrgs.setGroupName(groupItem.getName());
                 savedGroupNamesToOrgs.setIdOfOrg(groupItem.getBindingToOrg());
                 savedGroupNamesToOrgs.setIdOfMainOrg(mainOrg.getIdOfOrg());
+                savedGroupNamesToOrgs.setParentGroupName(groupItem.getParentGroupName());
+                savedGroupNamesToOrgs.setIsMiddleGroup(groupItem.getMiddleGroup());
                 savedGroupNamesToOrgs.setMainBuilding(1);
                 savedGroupNamesToOrgs.setVersion(nextVersion);
             } else {
                 savedGroupNamesToOrgs.setGroupName(groupItem.getName());
                 savedGroupNamesToOrgs.setIdOfOrg(groupItem.getBindingToOrg());
                 savedGroupNamesToOrgs.setIdOfMainOrg(mainOrg.getIdOfOrg());
+                savedGroupNamesToOrgs.setParentGroupName(groupItem.getParentGroupName());
+                savedGroupNamesToOrgs.setIsMiddleGroup(groupItem.getMiddleGroup());
                 savedGroupNamesToOrgs.setVersion(nextVersion);
                 savedGroupNamesToOrgs.setMainBuilding(1);
             }

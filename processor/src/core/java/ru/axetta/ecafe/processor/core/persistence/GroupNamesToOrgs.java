@@ -19,6 +19,9 @@ public class GroupNamesToOrgs {
     private Integer mainBuilding;
     private String groupName;
     private Long version;
+    private String parentGroupName;
+    private Boolean isMiddleGroup;
+
 
     public GroupNamesToOrgs() {
     }
@@ -31,6 +34,17 @@ public class GroupNamesToOrgs {
         this.mainBuilding = mainBuilding;
         this.groupName = groupName;
         this.version = version;
+    }
+
+    public GroupNamesToOrgs(Long idOfMainOrg, Long idOfOrg, Integer mainBuilding, String groupName, Long version,
+            String parentGroupName, Boolean isMiddleGroup) {
+        this.idOfMainOrg = idOfMainOrg;
+        this.idOfOrg = idOfOrg;
+        this.mainBuilding = mainBuilding;
+        this.groupName = groupName;
+        this.version = version;
+        this.parentGroupName = parentGroupName;
+        this.isMiddleGroup = isMiddleGroup;
     }
 
     public Long getVersion() {
@@ -81,5 +95,21 @@ public class GroupNamesToOrgs {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getParentGroupName() {
+        return parentGroupName;
+    }
+
+    public void setParentGroupName(String parentGroupName) {
+        this.parentGroupName = parentGroupName;
+    }
+
+    public Boolean getIsMiddleGroup() {
+        return isMiddleGroup;
+    }
+
+    public void setIsMiddleGroup(Boolean middleGroup) {
+        isMiddleGroup = middleGroup;
     }
 }

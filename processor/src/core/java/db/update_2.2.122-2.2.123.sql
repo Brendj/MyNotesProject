@@ -5,3 +5,6 @@
 -- Пакет обновлений 2.2.123
 
 ALTER TABLE CF_OrderDetails ADD COLUMN manufacturer CHARACTER VARYING(128);
+
+ALTER TABLE Cf_GroupNames_To_Orgs ADD COLUMN parentGroupName CHARACTER VARYING(128);
+ALTER TABLE Cf_GroupNames_To_Orgs ADD COLUMN isMiddleGroup INTEGER;
