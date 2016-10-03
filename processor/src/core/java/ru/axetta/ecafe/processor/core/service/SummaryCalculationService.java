@@ -75,6 +75,8 @@ public class SummaryCalculationService {
     public static String VALUE_AMOUNT_ENTER_EVENTS_DATE = "amountEntereventsDate";
     public static String VALUE_QUANTITY_AMOUNT = "quantityamount";
     public static String VALUE_PAYMENT_SUM = "PaymentSum";
+    public static String VALUE_MENU_DETAIL = "menuDetail";
+    public static String VALUE_BALANCE_DAYS = "balanceOnDays";
 
     final static String JOB_NAME_DAILY="NotificationSummaryDaily";
     final static String JOB_NAME_WEEKLY="NotificationSummaryWeekly";
@@ -197,7 +199,7 @@ public class SummaryCalculationService {
         result[2] = "Enddate";
         result[3] = eDate;
 
-        //Подсчет данных по событиям проходов
+        //Подсчет данных по событиям проходов. Первый запрос - старая таблица уведомлений, второй - новая
         String query_ee = "SELECT c.idofclient, p.surname, p.firstname, "
                 + "coalesce(e.evtdatetime, -1) as evtdatetime, coalesce(e.passdirection, -1) as passdirection, "
                 + "coalesce(e.guardianid, -1) as guardianId, coalesce(e.childpasschecker, -1) as childpasschecker, "
@@ -208,7 +210,20 @@ public class SummaryCalculationService {
                 + "LEFT OUTER JOIN cf_enterevents e ON c.idofclient = e.idofclient "
                 + "AND e.evtdatetime BETWEEN :startTime AND :endTime "
                 + "WHERE n.notifytype = :notifyType "
-                + "ORDER BY c.idofclient, p.surname, p.firstname, e.evtdatetime";
+                + "and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + " UNION "
+                + "SELECT c.idofclient, p.surname, p.firstname, "
+                + "coalesce(e.evtdatetime, -1) as evtdatetime, coalesce(e.passdirection, -1) as passdirection, "
+                + "coalesce(e.guardianid, -1) as guardianId, coalesce(e.childpasschecker, -1) as childpasschecker, "
+                + "coalesce(e.childpasscheckerid, -1) as childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
+                + "from cf_client_guardian_notificationsettings n inner join cf_client_guardian cg on cg.idofclientguardian = n.idofclientguardian "
+                + "inner join cf_clients c on c.idofclient = cg.idofchildren "
+                + "INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
+                + "INNER JOIN cf_orgs o on c.idoforg = o.idoforg "
+                + "LEFT OUTER JOIN cf_enterevents e ON c.idofclient = e.idofclient "
+                + "AND e.evtdatetime BETWEEN :startTime AND :endTime "
+                + "WHERE n.notifytype = :notifyType "
+                + "ORDER BY idofclient, surname, firstname, evtdatetime ";
         Query equery = entityManager.createNativeQuery(query_ee);
         equery.setParameter("notifyType", notifyType);
         equery.setParameter("startTime", startDate.getTime());
@@ -254,6 +269,52 @@ public class SummaryCalculationService {
 
         attachEEValues(clients, notifyType, startDate, endDate);
 
+        //Подсчет значений для детализации меню в случае уведомления по итогам дня
+        Map menuMap = new TreeMap<Long, String>();
+        if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+            String query_menu =
+                    "select c.idofclient, od.qty, od.rprice, od.menudetailname from cf_clients c inner join cf_orders o on c.idofclient = o.idofclient "
+                    + "inner join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg "
+                    + "inner join cf_clientsnotificationsettings n on c.idofclient = n.idofclient "
+                    + "where n.notifyType = :notifyType AND o.createddate BETWEEN :startTime AND :endTime "
+                    + "and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                    + " UNION "
+                    + "select cg.idofguardian, od.qty, od.rprice, od.menudetailname "
+                    + "from cf_client_guardian_notificationsettings n inner join cf_client_guardian cg on cg.idofclientguardian = n.idofclientguardian "
+                    + "inner join cf_clients c on c.idofclient = cg.idofchildren "
+                    + "inner join cf_orders o on o.idofclient = c.idofclient "
+                    + "inner join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg "
+                    + "where n.notifyType = :notifyType AND o.createddate BETWEEN :startTime AND :endTime "
+                    + "order by idofclient, menudetailname";
+            Query mquery = entityManager.createNativeQuery(query_menu);
+            mquery.setParameter("notifyType", notifyType);
+            mquery.setParameter("startTime", startDate.getTime());
+            mquery.setParameter("endTime", endDate.getTime());
+            List mlist = mquery.getResultList();
+
+            //String menu_name = "";
+            for (Object obj : mlist) {
+                Object[] row = (Object[]) obj;
+                Long id = ((BigInteger)row[0]).longValue();
+                //if (id.equals(21175L)) {
+                //    logger.info("pp");
+                //}
+                Integer qty = ((Integer)row[1]).intValue();
+                Long rprice = ((BigInteger)row[2]).longValue();
+                Long sum = qty * rprice;
+                String menu = (String)row[3];
+                String menu_name = (String)menuMap.get(id);
+                menu_name = (menu_name == null ? "" : menu_name);
+                menu_name += "%" + menu + " " + (qty > 1 ? String.format("(%s шт.) ", qty) : "") + sum / 100 + " руб.";
+                if (sum % 100 != 0) {
+                    menu_name += " " + sum % 100 + " коп.";
+                }
+                menu_name += "%";
+                menuMap.put(id, menu_name);
+            }
+        }
+        //
+
         //Подсчет данных по балансам
         String query_balance = "SELECT c.idofclient, p.surname, p.firstname, c.expenditurelimit, c.balance, coalesce(query1.sum1, 0) as sum1, coalesce(query2.sum2, 0) AS sum2, "
                 + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2, coalesce(query5.sum4, 0) as sum4 "
@@ -261,26 +322,69 @@ public class SummaryCalculationService {
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, sum(t1.transactionsum) AS sum1 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT JOIN cf_transactions t1 ON t1.idofclient = c.idofclient AND t1.transactionDate BETWEEN :startTime AND :curTime "
-                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query1 ON c.idofclient = query1.idofclient "
+                + "WHERE n.notifytype = :notifyType and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + "GROUP BY c.idofclient) AS query1 ON c.idofclient = query1.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, sum(-t2.transactionsum) AS sum2 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT JOIN cf_transactions t2 ON t2.idofclient = c.idofclient AND t2.transactionDate BETWEEN :startTime AND :endTime AND (t2.sourcetype = :transactionType1 "
-                + "OR t2.sourcetype = :transactionType2) WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query2 ON c.idofclient = query2.idofclient "
+                + "OR t2.sourcetype = :transactionType2) WHERE n.notifytype = :notifyType and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + "GROUP BY c.idofclient) AS query2 ON c.idofclient = query2.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, count(distinct extract(day from TO_TIMESTAMP(o.createddate / 1000))) AS count1 FROM cf_clientsnotificationsettings n "
                 + "INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
-                + "AND o.state = :orderState WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query3 ON c.idofclient = query3.idofclient "
+                + "AND o.state = :orderState WHERE n.notifytype = :notifyType and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + "GROUP BY c.idofclient) AS query3 ON c.idofclient = query3.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, sum(t.transactionsum) AS sum3 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT OUTER JOIN cf_transactions t ON t.idofclient = c.idofclient AND t.transactionDate >= :endTime AND t.transactionDate <= :curTime "
-                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query4 ON c.idofclient = query4.idofclient "
+                + "WHERE n.notifytype = :notifyType and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + "GROUP BY c.idofclient) AS query4 ON c.idofclient = query4.idofclient "
                 + "INNER JOIN "
                 + "(SELECT c.idofclient, count(idofclientpayment) as count2, sum(paysum) as sum4 FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT OUTER JOIN cf_transactions t ON t.idofclient = c.idofclient AND t.transactionDate BETWEEN :startTime AND :endTime "
                 + "LEFT OUTER JOIN cf_clientpayments p ON p.idoftransaction = t.idoftransaction AND p.createddate BETWEEN :startTime AND :endTime "
-                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient) AS query5 ON c.idofclient = query5.idofclient "
-                + "WHERE n.notifytype = :notifyType ORDER BY c.idofclient, p.surname, p.firstname";
+                + "WHERE n.notifytype = :notifyType and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + "GROUP BY c.idofclient) AS query5 ON c.idofclient = query5.idofclient "
+                + "WHERE n.notifytype = :notifyType "
+                + "and not exists (select * from cf_client_guardian cg2 where cg2.idofchildren = c.idofclient and cg2.deletedState = false) "
+                + " UNION "
+                + "SELECT c.idofclient, p.surname, p.firstname, c.expenditurelimit, c.balance, coalesce(query1.sum1, 0) as sum1, coalesce(query2.sum2, 0) AS sum2, "
+                + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2, coalesce(query5.sum4, 0) as sum4 "
+                + "FROM cf_client_guardian_notificationsettings n INNER JOIN cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian "
+                + "inner join cf_clients c ON c.idofclient = cg.idofchildren INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
+                + "INNER JOIN "
+                + "(SELECT c.idofclient, cg.idofguardian, sum(t1.transactionsum) AS sum1 FROM cf_client_guardian_notificationsettings n "
+                + "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian "
+                + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
+                + "LEFT JOIN cf_transactions t1 ON t1.idofclient = c.idofclient AND t1.transactionDate BETWEEN :startTime AND :curTime "
+                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient, cg.idofguardian) AS query1 ON c.idofclient = query1.idofclient "
+                + "INNER JOIN "
+                + "(SELECT c.idofclient, cg.idofguardian, sum(-t2.transactionsum) AS sum2 FROM cf_client_guardian_notificationsettings n "
+                + "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian "
+                + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
+                + "LEFT JOIN cf_transactions t2 ON t2.idofclient = c.idofclient AND t2.transactionDate BETWEEN :startTime AND :endTime AND (t2.sourcetype = :transactionType1 "
+                + "OR t2.sourcetype = :transactionType2) WHERE n.notifytype = :notifyType GROUP BY c.idofclient, cg.idofguardian) AS query2 ON c.idofclient = query2.idofclient "
+                + "INNER JOIN "
+                + "(SELECT c.idofclient, cg.idofguardian, count(distinct extract(day from TO_TIMESTAMP(o.createddate / 1000))) AS count1 FROM cf_client_guardian_notificationsettings n "
+                + "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian "
+                + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
+                + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
+                + "AND o.state = :orderState WHERE n.notifytype = :notifyType GROUP BY c.idofclient, cg.idofguardian) AS query3 ON c.idofclient = query3.idofclient "
+                + "INNER JOIN "
+                + "(SELECT c.idofclient, cg.idofguardian, sum(t.transactionsum) AS sum3 FROM cf_client_guardian_notificationsettings n "
+                + "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian "
+                + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
+                + "LEFT OUTER JOIN cf_transactions t ON t.idofclient = c.idofclient AND t.transactionDate >= :endTime AND t.transactionDate <= :curTime "
+                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient, cg.idofguardian) AS query4 ON c.idofclient = query4.idofclient "
+                + "INNER JOIN "
+                + "(SELECT c.idofclient, cg.idofguardian, count(idofclientpayment) as count2, sum(paysum) as sum4 FROM cf_client_guardian_notificationsettings n "
+                + "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian "
+                + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
+                + "LEFT OUTER JOIN cf_transactions t ON t.idofclient = c.idofclient AND t.transactionDate BETWEEN :startTime AND :endTime "
+                + "LEFT OUTER JOIN cf_clientpayments p ON p.idoftransaction = t.idoftransaction AND p.createddate BETWEEN :startTime AND :endTime "
+                + "WHERE n.notifytype = :notifyType GROUP BY c.idofclient, cg.idofguardian) AS query5 ON c.idofclient = query5.idofclient "
+                + "WHERE n.notifytype = :notifyType ORDER BY idofclient, surname, firstname";
         Query bquery = entityManager.createNativeQuery(query_balance);
         bquery.setParameter("notifyType", notifyType);
         bquery.setParameter("startTime", startDate.getTime());
@@ -330,6 +434,14 @@ public class SummaryCalculationService {
             balances.setAmountComplexDate(amountComplexDate); // > 0 ? 1L : 0L);
             balances.setQuantityAmount(quantityAmount);
             balances.setPaymentSum(paymentSum);
+            String menu = (String)menuMap.get(id);
+            balances.setMenu_detail(menu == null ? "" : menu);
+            Long balanceOnDays = null;
+            if (orderSum > 0) {
+                balanceOnDays = balances.getBalance() / orderSum;
+                if (balanceOnDays < 0) balanceOnDays = 0L;
+            }
+            balances.setBalanceOnDays(balanceOnDays == null ? null : balanceOnDays.intValue());
             clientEE.setBalances(balances);
         }
 
@@ -570,26 +682,26 @@ public class SummaryCalculationService {
 
     private void attachBalanceValues(List<ClientEE> clients) {
         for (ClientEE clientEE : clients) {
-            clientEE.setValues(
-                    attachValue(clientEE.getValues(), VALUE_ACCOUNT, clientEE.getBalances().getAccount().toString()));
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_BALANCE_START_DATE, getStringMoneyValue(
-                    clientEE.getBalances().getBalanceStartDate())));
-            clientEE.setValues(
-                    attachValue(clientEE.getValues(), VALUE_BALANCE, getStringMoneyValue(
-                            clientEE.getBalances().getBalance())));
-            clientEE.setValues(attachValue(
-                    clientEE.getValues(), VALUE_AMOUNT_BUY_ALL, getStringMoneyValue(
-                    clientEE.getBalances().getAmountBuyAll())));
-            clientEE.setValues(
-                    attachValue(clientEE.getValues(), VALUE_LIMIT, getStringMoneyValue(clientEE.getBalances().getLimit())));
-            clientEE.setValues(attachValue(
-                    clientEE.getValues(), VALUE_AMOUNT_COMPLEX_DATE, clientEE.getBalances().getAmountComplexDate()
-                    .toString()));
-            clientEE.setValues(
-                    attachValue(clientEE.getValues(), VALUE_QUANTITY_AMOUNT, clientEE.getBalances().getQuantityAmount().toString()));
-            clientEE.setValues(attachValue(
-                    clientEE.getValues(), VALUE_PAYMENT_SUM, getStringMoneyValue(
-                    clientEE.getBalances().getPaymentSum())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ACCOUNT,
+                            clientEE.getBalances().getAccount() == null ? "" : clientEE.getBalances().getAccount().toString()));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_BALANCE_START_DATE,
+                    getStringMoneyValue(clientEE.getBalances().getBalanceStartDate() == null ? 0L : clientEE.getBalances().getBalanceStartDate())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_BALANCE,
+                    getStringMoneyValue(clientEE.getBalances().getBalance() == null ? 0L : clientEE.getBalances().getBalance())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_BUY_ALL,
+                    getStringMoneyValue(clientEE.getBalances().getAmountBuyAll() == null ? 0L : clientEE.getBalances().getAmountBuyAll())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_LIMIT,
+                    getStringMoneyValue(clientEE.getBalances().getLimit() == null ? 0L : clientEE.getBalances().getLimit())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_COMPLEX_DATE,
+                    clientEE.getBalances().getAmountComplexDate() == null ? "" : clientEE.getBalances().getAmountComplexDate().toString()));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_QUANTITY_AMOUNT,
+                    clientEE.getBalances().getQuantityAmount() == null ? "" : clientEE.getBalances().getQuantityAmount().toString()));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_PAYMENT_SUM,
+                    getStringMoneyValue(clientEE.getBalances().getPaymentSum() == null ? 0L : clientEE.getBalances().getPaymentSum())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_MENU_DETAIL,
+                    clientEE.getBalances().getMenu_detail() == null ? "" : clientEE.getBalances().getMenu_detail()));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_BALANCE_DAYS,
+                            clientEE.getBalances().getBalanceOnDays() == null ? "" : clientEE.getBalances().getBalanceOnDays().toString()));
         }
     }
 
@@ -774,6 +886,8 @@ public class SummaryCalculationService {
         private Long amountComplexDate;
         private Long quantityAmount;
         private Long paymentSum;
+        private String menu_detail;
+        private Integer balanceOnDays;
 
         public Long getLimit() {
             return limit;
@@ -837,6 +951,22 @@ public class SummaryCalculationService {
 
         public void setPaymentSum(Long paymentSum) {
             this.paymentSum = paymentSum;
+        }
+
+        public String getMenu_detail() {
+            return menu_detail;
+        }
+
+        public void setMenu_detail(String menu_detail) {
+            this.menu_detail = menu_detail;
+        }
+
+        public Integer getBalanceOnDays() {
+            return balanceOnDays;
+        }
+
+        public void setBalanceOnDays(Integer balanceOnDays) {
+            this.balanceOnDays = balanceOnDays;
         }
     }
 }

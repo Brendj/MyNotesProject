@@ -181,7 +181,7 @@ public class DAOReadonlyService {
     }
 
     public List<Long> findContractsBySsoid(String ssoid) {
-        if (ssoid == null || ssoid.equals("") || ssoid.equals(EMPProcessor.SSOID_FAILED_TO_REGISTER)
+        if (ssoid == null || ssoid.trim().equals("") || ssoid.equals(EMPProcessor.SSOID_FAILED_TO_REGISTER)
                 || ssoid.equals(EMPProcessor.SSOID_REGISTERED_AND_WAITING_FOR_DATA)) {
             return null;
         }

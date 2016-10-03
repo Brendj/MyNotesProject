@@ -8,3 +8,6 @@ ALTER TABLE CF_OrderDetails ADD COLUMN manufacturer CHARACTER VARYING(128);
 
 ALTER TABLE Cf_GroupNames_To_Orgs ADD COLUMN parentGroupName CHARACTER VARYING(128);
 ALTER TABLE Cf_GroupNames_To_Orgs ADD COLUMN isMiddleGroup INTEGER;
+
+--Индекс на поле idofclientguardian
+CREATE INDEX cf_client_guardian_clientguardian_idx ON cf_client_guardian USING btree (idofclientguardian);
