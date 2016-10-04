@@ -111,15 +111,13 @@ public class OrdersByManufacturerReport extends BasicReportForContragentJob {
                 }
             }
 
-            manufacturers = OrdersRepository.getInstance().findAllManufacturers(idOfOrgList, startTime, endTime);
-
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             List<String> dates = CalendarUtils.datesBetween(startTime, endTime);
             Map<Long, List<ReportItem>> totalListMap = new HashMap<Long, List<ReportItem>>();
             //Получаем список всех школ, заполняем ими список
             List<Long> idOfOrgsList = new LinkedList<Long>();
-            retreiveAllOrgs(totalListMap, dates, idOfOrgsList);
+            retreiveAllOrgs(totalListMap, dates, idOfOrgsList, startTime, endTime);
             if (idOfOrgsList.size() == 0) {
                 return new JREmptyDataSource();
             }
@@ -150,7 +148,7 @@ public class OrdersByManufacturerReport extends BasicReportForContragentJob {
         }
 
         private void retreiveAllOrgs(Map<Long, List<ReportItem>> totalItemMap, List<String> dates,
-                List<Long> idOfOrgsList) {
+                List<Long> idOfOrgsList, Date startTime, Date endTime) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
             List<OrgItem> allNames;
 
@@ -158,7 +156,13 @@ public class OrdersByManufacturerReport extends BasicReportForContragentJob {
                 allNames = orgRepository.findAllNamesByContragentTSPByListOfOrgIds(idOfContragent, idOfOrgList);
             } else {
                 allNames = orgRepository.findAllNamesByContragentTSP(idOfContragent);
+                idOfOrgList = new ArrayList<Long>();
+                for(OrgItem orgItem : allNames) {
+                    idOfOrgList.add(orgItem.getIdOfOrg());
+                }
             }
+
+            manufacturers = OrdersRepository.getInstance().findAllManufacturers(idOfOrgList, startTime, endTime);
 
             List<ReportItem> totalItemList;
             for (OrgItem orgItem : allNames) {
@@ -184,7 +188,6 @@ public class OrdersByManufacturerReport extends BasicReportForContragentJob {
                     }
                 }
             }
-
         }
 
         private List<TotalReportItem> summaries(Map<Long, List<ReportItem>> totalListMap) {

@@ -168,8 +168,7 @@ public class OrdersByManufacturerReportPage extends OnlineReportPage implements 
     }
 
     public Object clear(){
-
-        filter=null;
+        filter = "Не выбрано";
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -187,6 +186,7 @@ public class OrdersByManufacturerReportPage extends OnlineReportPage implements 
         htmlReport = null;
         contragent = null;
         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        idOfOrgList.clear();
         return null;
     }
 
@@ -209,6 +209,8 @@ public class OrdersByManufacturerReportPage extends OnlineReportPage implements 
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+
+            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             OrdersByManufacturerReport ordersByManufacturerReport = (OrdersByManufacturerReport) builder
                     .build(session, startDate, endDate, localCalendar);
