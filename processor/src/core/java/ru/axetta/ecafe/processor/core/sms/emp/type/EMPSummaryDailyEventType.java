@@ -17,10 +17,18 @@ import java.util.Map;
  */
 public class EMPSummaryDailyEventType extends EMPAbstractEventType {
     protected static final String NAME = "Итоговые данные о событиях прохода и питания обучающегося в ОО за сутки";
-    protected static final String TEXT = "Здравствуйте! В период %Startdate% Ваш ребенок %surname% %name% присутствовал в ОО следующее количество дней: " +
+    /*protected static final String TEXT = "Здравствуйте! В период %Startdate% Ваш ребенок %surname% %name% присутствовал в ОО следующее количество дней: " +
             "%amountEntereventsDate%. Вход %StartTime%, выход %EndTime%, время, проведенное в ОО, %amountEntereventsTime%. " +
             "Движения по лицевому счету %account%: баланс на начало дня: %balanceStartdate%; баланс на конец дня: %balance%; " +
-            "сумма всех покупок: %amountBuyAll%; лимит трат: %limit%. Количество дней, когда было получено горячее питание: %amountComplexDate%.";
+            "сумма всех покупок: %amountBuyAll%; лимит трат: %limit%. Количество дней, когда было получено горячее питание: %amountComplexDate%.";*/
+
+    protected static final String TEXT = "Добрый день, %guardian_name% %guardian_surname%! "
+            + "Хотим рассказать, как прошел у вашего ребенка этот день в школе: %name% "
+            + "%DayWeeks% %date%. %StartTime% Пришел в школу %EndTime% Покинул школу "
+            + "Остаток на лицевом счете по состоянию на 19:00 %date% %balance% руб. "
+            + "%menuDetail% Итого Сумма расходов по электронной карте за день составила %amountBuyAll% руб. "
+            + "Подробная детализация доступна в личном кабинете. "
+            + "При сохранении текущей динамики расходов пополнение потребуется %balanceOnDays%";
 
     public EMPSummaryDailyEventType() {
         stream = STREAM;
