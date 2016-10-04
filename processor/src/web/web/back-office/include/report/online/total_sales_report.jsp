@@ -83,21 +83,70 @@
                              actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
             </rich:calendar>
 
-            <h:outputText escape="true" value="Отображать детализацию" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showDetail}" styleClass="output-text">
-                <a4j:support event="onclick" reRender="registerStampReportPanelGrid" ajaxSingle="true" />
-            </h:selectBooleanCheckbox>
+            <h:panelGrid styleClass="borderless-grid" columns="1">
+                <h:panelGrid id="preferencialPanel" styleClass="borderless-grid" columns="1">
+                    <h:panelGroup styleClass="borderless-div">
+                        <h:outputText escape="true" value="Отображать детализацию буфетной продукции "
+                                      styleClass="output-text" />
+                        <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showDetail}" styleClass="output-text">
+                            <a4j:support event="onclick" reRender="preferencialPanel" ajaxSingle="true" />
+                        </h:selectBooleanCheckbox>
 
-            <h:outputText value="Льготные комплексы с ценой" styleClass="output-text"
-                          rendered="#{mainPage.totalSalesPage.showDetail}" />
-            <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;"
-                          rendered="#{mainPage.totalSalesPage.showDetail}">
-                <h:selectManyCheckbox id="titles" value="#{mainPage.totalSalesPage.preferentialTitleComplexes}"
-                                      layout="pageDirection" styleClass="output-text"
+                        <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
                                       rendered="#{mainPage.totalSalesPage.showDetail}">
-                    <f:selectItems value="#{mainPage.totalSalesPage.availableTitleComplexes}" />
-                </h:selectManyCheckbox>
-            </h:panelGroup>
+                            <h:selectManyCheckbox id="preferentialTitles"
+                                                  value="#{mainPage.totalSalesPage.preferentialTitleComplexes}"
+                                                  layout="pageDirection" styleClass="output-text"
+                                                  rendered="#{mainPage.totalSalesPage.showDetail}">
+                                <f:selectItems value="#{mainPage.totalSalesPage.availableTitleComplexes}" />
+                            </h:selectManyCheckbox>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <h:panelGrid id="benefitPanel" styleClass="borderless-grid" columns="1">
+                    <h:panelGroup styleClass="borderless-div">
+                        <h:outputText escape="true" value="Отображать детализацию льготных комплексов"
+                                      styleClass="output-text" />
+                        <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showBenefitDetail}"
+                                                 styleClass="output-text">
+                            <a4j:support event="onclick" reRender="benefitPanel" ajaxSingle="true" />
+                        </h:selectBooleanCheckbox>
+
+                        <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                                      rendered="#{mainPage.totalSalesPage.showBenefitDetail}">
+                            <h:selectManyCheckbox id="benefitTitles"
+                                                  value="#{mainPage.totalSalesPage.benefitTitleComplexes}"
+                                                  layout="pageDirection" styleClass="output-text"
+                                                  rendered="#{mainPage.totalSalesPage.showBenefitDetail}">
+                                <f:selectItems
+                                        value="#{mainPage.totalSalesPage.availableComplexesWithPriceTitlesBenefit}" />
+                            </h:selectManyCheckbox>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <h:panelGrid id="paidPanel" styleClass="borderless-grid" columns="1">
+                    <h:panelGroup styleClass="borderless-div">
+                        <h:outputText escape="true" value="Отображать детализацию платных комплексов  "
+                                      styleClass="output-text" />
+                        <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showPaidDetail}"
+                                                 styleClass="output-text">
+                            <a4j:support event="onclick" reRender="paidPanel" ajaxSingle="true" />
+                        </h:selectBooleanCheckbox>
+
+                        <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                                      rendered="#{mainPage.totalSalesPage.showPaidDetail}">
+                            <h:selectManyCheckbox id="paidTitles" value="#{mainPage.totalSalesPage.paidTitleComplexes}"
+                                                  layout="pageDirection" styleClass="output-text"
+                                                  rendered="#{mainPage.totalSalesPage.showPaidDetail}">
+                                <f:selectItems
+                                        value="#{mainPage.totalSalesPage.availableComplexesWithPriceTitlesPaid}" />
+                            </h:selectManyCheckbox>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:panelGrid>
 
         </h:panelGrid>
 

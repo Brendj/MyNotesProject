@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.contragent.ContragentReadOnlyRepository;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
@@ -67,11 +66,20 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private Boolean includeActDiscrepancies = true;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     private Long contragentId = -1L;
-    private List<SelectItem> contragentsSelectItems;
-    private List<String> titlesComplex;
-    private List<String>  titleAndSumList;
-    private HashMap<String, String> titleAndSumMap;
 
+    private List<SelectItem> contragentsSelectItemsPrefer;
+    private List<SelectItem> contragentsSelectItemsBenefit;
+    private List<SelectItem> contragentsSelectItemsPaid;
+
+    private List<String> titlesComplex;
+
+    private List<String> benefitTitleAndSumList;
+    private List<String> paidTitleAndSumList;
+
+    private HashMap<String, String> titleAndSumBenefitMap;
+    private HashMap<String, String> titleAndSumPaidMap;
+
+    // буф прод
     private Integer[] preferentialTitleComplexes;
 
     public Integer[] getPreferentialTitleComplexes() {
@@ -82,6 +90,28 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         this.preferentialTitleComplexes = preferentialTitleComplexes;
     }
 
+    // льгот компл
+    private Integer[] benefitTitleComplexes;
+
+    public Integer[] getBenefitTitleComplexes() {
+        return benefitTitleComplexes;
+    }
+
+    public void setBenefitTitleComplexes(Integer[] benefitTitleComplexes) {
+        this.benefitTitleComplexes = benefitTitleComplexes;
+    }
+
+    // платн компл
+    private Integer[] paidTitleComplexes;
+
+    public Integer[] getPaidTitleComplexes() {
+        return paidTitleComplexes;
+    }
+
+    public void setPaidTitleComplexes(Integer[] paidTitleComplexes) {
+        this.paidTitleComplexes = paidTitleComplexes;
+    }
+
     private boolean showDetail;
 
     public boolean isShowDetail() {
@@ -90,6 +120,26 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
     public void setShowDetail(boolean showDetail) {
         this.showDetail = showDetail;
+    }
+
+    private boolean showBenefitDetail;
+
+    public boolean isShowBenefitDetail() {
+        return showBenefitDetail;
+    }
+
+    public void setShowBenefitDetail(boolean showBenefitDetail) {
+        this.showBenefitDetail = showBenefitDetail;
+    }
+
+    private boolean showPaidDetail;
+
+    public boolean isShowPaidDetail() {
+        return showPaidDetail;
+    }
+
+    public void setShowPaidDetail(boolean showPaidDetail) {
+        this.showPaidDetail = showPaidDetail;
     }
 
     public List<SelectItem> getAvailableTitleComplexes() {
@@ -103,11 +153,22 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             i++;
         }
 
+        contragentsSelectItemsPrefer = list;
+
+        preferentialTitleComplexes = new Integer[contragentsSelectItemsPrefer.size()];
+
+        return list;
+    }
+
+    public List<SelectItem> getAvailableComplexesWithPriceTitlesBenefit() {
+
+        List<SelectItem> list = new ArrayList<SelectItem>();
+        int i = 0;
         if (contragent != null) {
             List<String> complexesWithPriceTitles;
 
             Long idOfContragent = contragent.getIdOfContragent();
-            complexesWithPriceTitles = getTitlesComplexesWithPriceByContragent(startDate, endDate, idOfContragent);
+            complexesWithPriceTitles = getTitlesComplexesWithPriceBenefitByContragent(startDate, endDate, idOfContragent);
 
             if (!complexesWithPriceTitles.isEmpty() && complexesWithPriceTitles != null) {
 
@@ -119,7 +180,35 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             }
         }
 
-        contragentsSelectItems = list;
+        contragentsSelectItemsBenefit = list;
+
+        benefitTitleComplexes = new Integer[contragentsSelectItemsBenefit.size()];
+
+        return list;
+    }
+
+    public List<SelectItem> getAvailableComplexesWithPriceTitlesPaid() {
+        List<SelectItem> list = new ArrayList<SelectItem>();
+        int i = 0;
+        if (contragent != null) {
+            List<String> complexesWithPriceTitles;
+
+            Long idOfContragent = contragent.getIdOfContragent();
+            complexesWithPriceTitles = getTitlesComplexesWithPricePaidByContragent(startDate, endDate, idOfContragent);
+
+            if (!complexesWithPriceTitles.isEmpty() && complexesWithPriceTitles != null) {
+
+                for (String title: complexesWithPriceTitles) {
+                    SelectItem selectItem = new SelectItem(i, title);
+                    list.add(selectItem);
+                    i++;
+                }
+            }
+        }
+
+        contragentsSelectItemsPaid = list;
+
+        paidTitleComplexes = new Integer[contragentsSelectItemsPaid.size()];
 
         return list;
     }
@@ -168,10 +257,10 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
     @Override
     public void onShow() throws Exception {
-        contragentsSelectItems = new ArrayList<SelectItem>();
+        contragentsSelectItemsPrefer = new ArrayList<SelectItem>();
         ContragentReadOnlyRepository contragentReadOnlyRepository = ContragentReadOnlyRepository.getInstance();
         for(Contragent contragent :contragentReadOnlyRepository.findAllByType(Contragent.TSP)){
-            contragentsSelectItems.add(new SelectItem(contragent.getIdOfContragent(), contragent.getContragentName()));
+            contragentsSelectItemsPrefer.add(new SelectItem(contragent.getIdOfContragent(), contragent.getContragentName()));
         }
     }
 
@@ -185,30 +274,36 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         if (preferentialTitleComplexes != null) {
             if (preferentialTitleComplexes.length > 0) {
                 for (Integer prefer : preferentialTitleComplexes) {
-                    titlesComplexList.add(contragentsSelectItems.get(prefer).getLabel());
+                    titlesComplexList.add(contragentsSelectItemsPrefer.get(prefer).getLabel());
                 }
             }
         }
         return titlesComplexList;
     }
 
-    public String getStringTitleComplexes(String titleComplexesString) {
+    public String getStringPreferentialTitleComplexes(String preferentialTitleComplexesString) {
         titlesComplex = getTitlesComplexes();
 
         for (String titleComplexItem: titlesComplex) {
-            titleComplexesString = titleComplexesString.concat(titleComplexItem).concat(",");
+            preferentialTitleComplexesString = preferentialTitleComplexesString.concat(titleComplexItem).concat(",");
         }
-        return titleComplexesString;
+        return preferentialTitleComplexesString;
     }
 
-    private List<String> getTitleAndSums() {
+    private List<String> getBenefitTitleAndSums() {
         List<String> titleAndSumList = new ArrayList<String>();
 
-        if (preferentialTitleComplexes != null) {
-            if (preferentialTitleComplexes.length > 0) {
-                for (Integer prefer : preferentialTitleComplexes) {
-                    if (titleAndSumMap != null && titleAndSumMap.get(contragentsSelectItems.get(prefer).getLabel()) != null) {
-                        titleAndSumList.add(contragentsSelectItems.get(prefer).getLabel() + "," + titleAndSumMap.get(contragentsSelectItems.get(prefer).getLabel()));
+        if (benefitTitleComplexes != null) {
+            if (benefitTitleComplexes.length > 0) {
+                //Льгот
+                for (Integer prefer : benefitTitleComplexes) {
+                    if (prefer != null) {
+                        if (titleAndSumBenefitMap != null
+                                && titleAndSumBenefitMap.get(contragentsSelectItemsBenefit.get(prefer).getLabel())
+                                != null) {
+                            titleAndSumList.add(contragentsSelectItemsBenefit.get(prefer).getLabel() + ","
+                                    + titleAndSumBenefitMap.get(contragentsSelectItemsBenefit.get(prefer).getLabel()));
+                        }
                     }
                 }
             }
@@ -216,20 +311,52 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         return titleAndSumList;
     }
 
-    public String getTitleAndSumByString(String titleAndSumListString) {
-        titleAndSumList = getTitleAndSums();
+    private List<String> getPaidTitleAndSums() {
+        List<String> titleAndSumList = new ArrayList<String>();
 
-        for (String titleAndSumItem: titleAndSumList) {
-            titleAndSumListString = titleAndSumListString.concat(titleAndSumItem).concat(";");
+        if (paidTitleComplexes != null) {
+            if (paidTitleComplexes.length > 0) {
+                //Платные
+                for (Integer prefer : paidTitleComplexes) {
+                    if (prefer != null) {
+                        if (titleAndSumPaidMap != null
+                                && titleAndSumPaidMap.get(contragentsSelectItemsPaid.get(prefer).getLabel()) != null) {
+                            titleAndSumList
+                                    .add(contragentsSelectItemsPaid.get(prefer).getLabel() + "," + titleAndSumPaidMap
+                                            .get(contragentsSelectItemsPaid.get(prefer).getLabel()));
+                        }
+                    }
+                }
+            }
         }
-        return titleAndSumListString;
+        return titleAndSumList;
+    }
+
+    public String getBenefitTitleAndSumByString(String benefitTitleAndSumListString) {
+        benefitTitleAndSumList = getBenefitTitleAndSums();
+
+        for (String titleAndSumItem: benefitTitleAndSumList) {
+            benefitTitleAndSumListString = benefitTitleAndSumListString.concat(titleAndSumItem).concat(";");
+        }
+        return benefitTitleAndSumListString;
+    }
+
+    public String getPaidTitleAndSumByString(String paidTitleAndSumListString) {
+        paidTitleAndSumList = getPaidTitleAndSums();
+
+        for (String titleAndSumItem: paidTitleAndSumList) {
+            paidTitleAndSumListString = paidTitleAndSumListString.concat(titleAndSumItem).concat(";");
+        }
+        return paidTitleAndSumListString;
     }
 
     public Object buildReportHTML() {
 
-        String titleComplexesString = getStringTitleComplexes("");
+        String preferentialTitleComplexesString = getStringPreferentialTitleComplexes("");
 
-        String titleAndSumString = getTitleAndSumByString("");
+        String benefitTitleAndSumListString = getBenefitTitleAndSumByString("");
+
+        String paidTitleAndSumListString = getPaidTitleAndSumByString("");
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
@@ -249,8 +376,9 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
-            builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
-            builder.getReportProperties().setProperty("titleAndSumList", titleAndSumString);
+            builder.getReportProperties().setProperty("preferentialTitleComplexes", preferentialTitleComplexesString);
+            builder.getReportProperties().setProperty("benefitTitleAndSumList", benefitTitleAndSumListString);
+            builder.getReportProperties().setProperty("paidTitleAndSumList", paidTitleAndSumListString);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
@@ -303,14 +431,21 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         contragent = null;
         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         preferentialTitleComplexes = null;
+        benefitTitleComplexes = null;
+        paidTitleComplexes = null;
+        showDetail = false;
+        showBenefitDetail = false;
+        showPaidDetail = false;
         idOfOrgList.clear();
         return null;
     }
 
     public void showCSVList(ActionEvent actionEvent){
-        String titleComplexesString = getStringTitleComplexes("");
+        String preferentialTitleComplexesString = getStringPreferentialTitleComplexes("");
 
-        String titleAndSumString = getTitleAndSumByString("");
+        String benefitTitleAndSumString = getBenefitTitleAndSumByString("");
+
+        String paidTitleAndSumListString = getPaidTitleAndSumByString("");
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
@@ -331,8 +466,9 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
-            builder.getReportProperties().setProperty("titleComplexes", titleComplexesString);
-            builder.getReportProperties().setProperty("titleAndSumList", titleAndSumString);
+            builder.getReportProperties().setProperty("preferentialTitleComplexes", preferentialTitleComplexesString);
+            builder.getReportProperties().setProperty("benefitTitleAndSumList", benefitTitleAndSumString);
+            builder.getReportProperties().setProperty("paidTitleAndSumList", paidTitleAndSumListString);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             TotalSalesReport totalSalesReport = (TotalSalesReport) builder.build(session,startDate, endDate, localCalendar);
@@ -407,14 +543,29 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         return contragentId;
     }
 
-    public void setContragentsSelectItems(List<SelectItem> contragentsSelectItems) {
-        this.contragentsSelectItems = contragentsSelectItems;
+    public List<SelectItem> getContragentsSelectItemsPrefer() {
+        return contragentsSelectItemsPrefer;
     }
 
-    public List<SelectItem> getContragentsSelectItems() {
-        return contragentsSelectItems;
+    public void setContragentsSelectItemsPrefer(List<SelectItem> contragentsSelectItemsPrefer) {
+        this.contragentsSelectItemsPrefer = contragentsSelectItemsPrefer;
     }
 
+    public List<SelectItem> getContragentsSelectItemsBenefit() {
+        return contragentsSelectItemsBenefit;
+    }
+
+    public void setContragentsSelectItemsBenefit(List<SelectItem> contragentsSelectItemsBenefit) {
+        this.contragentsSelectItemsBenefit = contragentsSelectItemsBenefit;
+    }
+
+    public List<SelectItem> getContragentsSelectItemsPaid() {
+        return contragentsSelectItemsPaid;
+    }
+
+    public void setContragentsSelectItemsPaid(List<SelectItem> contragentsSelectItemsPaid) {
+        this.contragentsSelectItemsPaid = contragentsSelectItemsPaid;
+    }
 
     private Contragent contragent;
 
@@ -434,7 +585,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         }
     }
 
-    public List<String> getTitlesComplexesWithPriceByContragent(Date startDate, Date endDate, Long idOfContragent) {
+    public List<String> getTitlesComplexesWithPriceBenefitByContragent(Date startDate, Date endDate, Long idOfContragent) {
         List<String> titles = new ArrayList<String>();
 
         Session session = null;
@@ -481,11 +632,86 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
                 List resultList = query.list();
 
                 String str;
-                titleAndSumMap = new HashMap<String, String>();
+                titleAndSumBenefitMap = new HashMap<String, String>();
                 for (Object o : resultList) {
                     str = "Льготный комплекс " + ((BigInteger) o).longValue() / 100 + "."
                             + ((BigInteger) o).longValue() % 100 + " руб.";
-                    titleAndSumMap.put(str, o.toString());
+                    titleAndSumBenefitMap.put(str, o.toString());
+                    titles.add(str);
+                }
+            }
+
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    connection.prepareStatement("SET enable_seqscan TO ON").execute();
+                }
+            });
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return titles;
+    }
+
+    public List<String> getTitlesComplexesWithPricePaidByContragent(Date startDate, Date endDate, Long idOfContragent) {
+        List<String> titles = new ArrayList<String>();
+
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            List<Long> idOfOrgs = new ArrayList<Long>();
+
+            if (!idOfOrgList.isEmpty()) {
+                for (Long orgId: idOfOrgList) {
+                    idOfOrgs.add(orgId);
+                }
+            } else {
+                Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+                Set<Org> contragentOrgs = contragent.getOrgs();
+
+                for (Org org : contragentOrgs) {
+                    idOfOrgs.add(org.getIdOfOrg());
+                }
+            }
+
+            if (!idOfOrgs.isEmpty()) {
+
+                session.doWork(new Work() {
+                    @Override
+                    public void execute(Connection connection) throws SQLException {
+                        connection.prepareStatement("SET enable_seqscan TO OFF").execute();
+                    }
+                });
+
+                Query query = session.createSQLQuery(
+                        "SELECT od.rprice FROM CF_Orders o INNER JOIN CF_OrderDetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                                + "WHERE o.idoforg IN (:idOfOrgs) AND o.createdDate >= :startDate AND o.createdDate <= :endDate  AND od.socdiscount = 0 "
+                                + "AND(od.menuType >= 50 AND od.menuType <= 99) AND o.state = 0 AND od.state = 0"
+                                + "GROUP BY od.rprice ORDER BY od.rprice");
+
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameterList("idOfOrgs", idOfOrgs);
+
+                List resultList = query.list();
+
+                String str;
+                titleAndSumPaidMap = new HashMap<String, String>();
+                for (Object o : resultList) {
+                    str = "Платный комплекс " + ((BigInteger) o).longValue() / 100 + "."
+                            + ((BigInteger) o).longValue() % 100 + " руб.";
+                    titleAndSumPaidMap.put(str, o.toString());
                     titles.add(str);
                 }
             }

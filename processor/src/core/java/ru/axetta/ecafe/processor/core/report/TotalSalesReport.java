@@ -225,16 +225,28 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 idOfOrgListStrings = Arrays.asList(StringUtils.split(idOfOrgListString, ','));
             }
 
-            String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("titleComplexes"));
+            String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("preferentialTitleComplexes"));
 
-            String titleAndSums = StringUtils.trimToEmpty(getReportProperties().getProperty("titleAndSumList"));
+            String benefitTitleAndSums = StringUtils.trimToEmpty(getReportProperties().getProperty("benefitTitleAndSumList"));
 
-            //Мапа с названием колонки, ценой, и суммой
-            HashMap<Long, PriceAndSum> priceAndSumHashMap = new HashMap<Long, PriceAndSum>();
+            String paidTitleAndSumList = StringUtils.trimToEmpty(getReportProperties().getProperty("paidTitleAndSumList"));
 
-            for (String titleAndSum : Arrays.asList(StringUtils.split(titleAndSums, ';'))) {
+            //Мапа с названием колонки Льготный, ценой, и суммой
+            HashMap<Long, PriceAndSum> priceAndSumBenefitHashMap = new HashMap<Long, PriceAndSum>();
+
+            for (String titleAndSum : Arrays.asList(StringUtils.split(benefitTitleAndSums, ';'))) {
                 String[] str = StringUtils.split(titleAndSum, ',');
-                priceAndSumHashMap.put(Long.parseLong(str[1]), new PriceAndSum(str[0].trim(), 0L));
+                priceAndSumBenefitHashMap.put(Long.parseLong(str[1]), new PriceAndSum(str[0].trim(), 0L));
+                titlesComplexes.add(str[0].trim());
+            }
+
+            //Мапа с названием колонки Платный, церщй и суммой
+            HashMap<Long, PriceAndSum> priceAndSumPaidHashMap = new HashMap<Long, PriceAndSum>();
+
+            for (String titleAndSum : Arrays.asList(StringUtils.split(paidTitleAndSumList, ';'))) {
+                String[] strings = StringUtils.split(titleAndSum, ',');
+                priceAndSumPaidHashMap.put(Long.parseLong(strings[1]), new PriceAndSum(strings[0].trim(), 0L));
+                titlesComplexes.add(strings[0].trim());
             }
 
             for (String title : Arrays.asList(StringUtils.split(titles, ','))) {
@@ -265,7 +277,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (List<TotalSalesItem> totalSalesItemList : totalListMap.values()) {
                 totalSalesTMP.getItemList().addAll(totalSalesItemList);
             }
-            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime, priceAndSumHashMap);
+            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime, priceAndSumBenefitHashMap);
+            retreiveAllOrdersPaid(totalListMap, idOfOrgsList, startTime, endTime, priceAndSumPaidHashMap);
             logger.error("e2 : " + (System.currentTimeMillis() - l));
 
             //Вывод, разбивка по районам.
@@ -358,6 +371,23 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 }
             }
 
+        }
+
+        private void retreiveAllOrdersPaid(Map<Long, List<TotalSalesItem>> totalListMap, List<Long> idOfOrgsList, Date startTime, Date endTime,
+                HashMap<Long, PriceAndSum> priceAndSumPaidHashMap) {
+            OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
+            List<OrderItem> allOrdersPaid = ordersRepository.findAllOrdersPaid(idOfOrgsList, startTime, endTime);
+
+            for (OrderItem allOrder : allOrdersPaid) {
+                if (!priceAndSumPaidHashMap.isEmpty()) {
+                    if (priceAndSumPaidHashMap.get(allOrder.getSum()) != null) {
+                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSum()).getSum();
+                        sum += handleOrders(totalListMap, allOrder,
+                                priceAndSumPaidHashMap.get(allOrder.getSum()).getTitle());
+                        priceAndSumPaidHashMap.get(allOrder.getSum()).setSum(sum);
+                    }
+                }
+            }
         }
 
 

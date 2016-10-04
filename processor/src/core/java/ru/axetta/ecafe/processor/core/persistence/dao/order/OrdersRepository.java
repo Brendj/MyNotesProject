@@ -147,6 +147,61 @@ public class OrdersRepository extends BaseJpaDao {
         return orderItemList;
     }
 
+    public List<OrderItem> findAllOrdersPaid(List<Long> idOfOrgsList, Date startDate, Date endDate) {
+        List<OrderItem> orderItemList = new ArrayList<OrderItem>();
+
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    connection.prepareStatement("SET enable_seqscan TO OFF").execute();
+                }
+            });
+
+            org.hibernate.Query nativeQuery = session.createSQLQuery(
+                    "SELECT (o.idoforg) AS name, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.socDiscount,  od.menutype, od.menuOrigin"
+                            + "                 FROM CF_Orders o "
+                            + "                 INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
+                            + "                 WHERE o.idoforg IN (:idOfOrgs) "
+                            + "                  AND o.createdDate >= :startDate AND o.createdDate <= :endDate AND od.socdiscount = 0 AND (od.menuType >= 50 AND od.menuType <= 99)"
+                            + " AND o.state=0 AND od.state=0 ORDER BY o.idoforg");
+            nativeQuery.setParameterList("idOfOrgs", idOfOrgsList);
+            nativeQuery.setParameter("startDate", startDate.getTime());
+            nativeQuery.setParameter("endDate", endDate.getTime());
+
+            List temp = nativeQuery.list();
+            for (Object entry : temp) {
+                Object o[] = (Object[]) entry;
+
+                orderItemList.add(new OrderItem(((BigInteger) o[0]).longValue(), ((BigInteger) o[1]).longValue(),
+                        ((BigInteger) o[2]).longValue(), ((BigInteger) o[3]).longValue(), (Integer) o[4],
+                        (Integer) o[5]));
+            }
+
+            session.doWork(new Work() {
+                @Override
+                public void execute(Connection connection) throws SQLException {
+                    connection.prepareStatement("SET enable_seqscan TO ON").execute();
+                }
+            });
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return orderItemList;
+    }
+
     public List<String> findAllManufacturers(List<Long> idOfOrgsList, Date startDate, Date endDate) {
         List<String> manufacturerList = new ArrayList<String>();
 
