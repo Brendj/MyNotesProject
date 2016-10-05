@@ -151,11 +151,8 @@ public class SummaryCalculationService {
             final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                     EventNotificationService.class);
             List<ClientEE> clients = generateNotificationParams(startDate, endDate, notyfyType);
-            //EntityManager em = entityManager.getEntityManagerFactory().createEntityManager();
-            //Session session = em.unwrap(Session.class);
 
             for (ClientEE clientEE : clients) {
-                //Client client = (Client)session.load(Client.class, clientEE.getIdOfClient());
                 if (clientEE.getNotInform()) continue;
                 String type = "";
                 int notificationType = 0;
@@ -173,6 +170,8 @@ public class SummaryCalculationService {
 
                 Client client = entityManager.find(Client.class, clientEE.getIdOfClient());
                 if (clientEE.getGuardians().size() == 0) {
+                    clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_NAME, ""));
+                    clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_SURNAME, ""));
                     notificationService.sendNotificationSummary(client, null, type, clientEE.getValues(), new Date(System.currentTimeMillis()), notificationType);
                 } else {
                     for (String ww : clientEE.getGuardians()) {
@@ -250,11 +249,15 @@ public class SummaryCalculationService {
                 + "INNER JOIN cf_orgs o on c.idoforg = o.idoforg "
                 + "LEFT OUTER JOIN cf_enterevents e ON c.idofclient = e.idofclient "
                 + "AND e.evtdatetime BETWEEN :startTime AND :endTime "
-                + "WHERE n.notifytype = :notifyType ";
+                + "WHERE (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
+                + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.IdOfClient)) "
+                + "and c.idofclientgroup not between :group_employees and :group_displaced";
         Query equery = entityManager.createNativeQuery(query_ee);
         equery.setParameter("notifyType", notifyType);
         equery.setParameter("startTime", startDate.getTime());
         equery.setParameter("endTime", endDate.getTime());
+        equery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        equery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
         List list = equery.getResultList();
         Long idOfClient = -1L;
         List<ClientEE> clients = new ArrayList<ClientEE>();
@@ -303,11 +306,15 @@ public class SummaryCalculationService {
                     "select c.idofclient, od.qty, od.rprice, od.menudetailname from cf_clients c inner join cf_orders o on c.idofclient = o.idofclient "
                     + "inner join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg "
                     + "inner join cf_clientsnotificationsettings n on c.idofclient = n.idofclient "
-                    + "where n.notifyType = :notifyType AND o.createddate BETWEEN :startTime AND :endTime ";
+                    + "where (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
+                    + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.idofclient)) "
+                    + "AND o.createddate BETWEEN :startTime AND :endTime  and c.idofclientgroup not between :group_employees and :group_displaced";
             Query mquery = entityManager.createNativeQuery(query_menu);
             mquery.setParameter("notifyType", notifyType);
             mquery.setParameter("startTime", startDate.getTime());
             mquery.setParameter("endTime", endDate.getTime());
+            mquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            mquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
             List mlist = mquery.getResultList();
 
             //String menu_name = "";
@@ -400,7 +407,9 @@ public class SummaryCalculationService {
                 + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
                 + "AND o.state = :orderState and extract(dow from TO_TIMESTAMP(o.createddate / 1000)) = 6 WHERE n.notifytype = :notifyType "
                 + "GROUP BY c.idofclient) AS query11 ON c.idofclient = query11.idofclient ")
-                + "WHERE n.notifytype = :notifyType ";
+                + "WHERE (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
+                + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.idofclient)) "
+                + "and c.idofclientgroup not between :group_employees and :group_displaced";
         Query bquery = entityManager.createNativeQuery(query_balance);
         bquery.setParameter("notifyType", notifyType);
         bquery.setParameter("startTime", startDate.getTime());
@@ -417,6 +426,8 @@ public class SummaryCalculationService {
         oTypes.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
         oTypes.add(OrderTypeEnumType.CORRECTION_TYPE.ordinal());
         bquery.setParameter("orderTypes", oTypes);
+        bquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        bquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
         List blist = bquery.getResultList();
         Long order1 = null, order2 = null, order3 = null, order4 = null, order5 = null, order6 = null;
         for (Object obj : blist) {
@@ -476,13 +487,13 @@ public class SummaryCalculationService {
             clientEE.setBalances(balances);
         }
 
-        attachBalanceValues(clients);
+        attachBalanceValues(clients, notifyType);
 
         for(ClientEE cEE : clients) {
             String q = "select cg.disabled, cg.idofguardian, p.firstname, p.surname from cf_client_guardian_notificationsettings n " +
                     "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian " +
                     "inner join cf_clients cl on cg.idofguardian = cl.idofclient " +
-                    "inner join cf_persons p on p.idofperson = cl.idofperson where cg.idofchildren = :idOfClient and cg.deletedState = false and n.notifyType = :notifyType";
+                    "inner join cf_persons p on p.idofperson = cl.idofperson where cg.idofchildren = :idOfClient and cg.deletedState = false and n.notifyType = :notifyType ";
             Query gquery = entityManager.createNativeQuery(q);
             gquery.setParameter("idOfClient", cEE.getIdOfClient());
             gquery.setParameter("notifyType", notifyType);
@@ -640,7 +651,7 @@ public class SummaryCalculationService {
                         if (enterExists || exitExists) {
                             clientEE.setValues(attachValue(clientEE.getValues(), day, "+"));
                         } else {
-                            clientEE.setValues(attachValue(clientEE.getValues(), day, "-"));
+                            clientEE.setValues(attachValue(clientEE.getValues(), day, "Нет информации"));
                         }
                     }
                     String day2 = getDayByIteration(iteration, 1);
@@ -739,7 +750,7 @@ public class SummaryCalculationService {
         clientEE.setValues(attachValue(clientEE.getValues(), VALUE_METHOD_END, exitMethod));
     }
 
-    private void attachBalanceValues(List<ClientEE> clients) {
+    private void attachBalanceValues(List<ClientEE> clients, Long notifyType) {
         for (ClientEE clientEE : clients) {
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_ACCOUNT,
                             clientEE.getBalances().getAccount() == null ? "" : clientEE.getBalances().getAccount().toString()));
@@ -759,21 +770,27 @@ public class SummaryCalculationService {
                     getStringMoneyValue(clientEE.getBalances().getPaymentSum() == null ? 0L : clientEE.getBalances().getPaymentSum())));
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_MENU_DETAIL,
                     clientEE.getBalances().getMenu_detail() == null ? "" : clientEE.getBalances().getMenu_detail()));
+            Date date = new Date(System.currentTimeMillis());
+            if (clientEE.getBalances().getBalanceOnDays() != null) {
+                date = CalendarUtils.addDays(date, clientEE.getBalances().getBalanceOnDays());
+            }
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_BALANCE_DAYS,
-                            clientEE.getBalances().getBalanceOnDays() == null ? "" : clientEE.getBalances().getBalanceOnDays().toString()));
+                            clientEE.getBalances().getBalanceOnDays() == null ? "" : CalendarUtils.dateToString(date)));
 
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_MONDAY,
-                    clientEE.getBalances().getOrder1() == null || clientEE.getBalances().getOrder1() == 0L ? "Нет" : "Да"));
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_TUESDAY,
-                    clientEE.getBalances().getOrder2() == null || clientEE.getBalances().getOrder2() == 0L ? "Нет" : "Да"));
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_WEDNESDAY,
-                    clientEE.getBalances().getOrder3() == null || clientEE.getBalances().getOrder3() == 0L ? "Нет" : "Да"));
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_THURSDAY,
-                    clientEE.getBalances().getOrder4() == null || clientEE.getBalances().getOrder4() == 0L ? "Нет" : "Да"));
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_FRIDAY,
-                    clientEE.getBalances().getOrder5() == null || clientEE.getBalances().getOrder5() == 0L ? "Нет" : "Да"));
-            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_SATURDAY,
-                    clientEE.getBalances().getOrder6() == null || clientEE.getBalances().getOrder6() == 0L ? "Нет" : "Да"));
+            if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_MONDAY,
+                        clientEE.getBalances().getOrder1() == null || clientEE.getBalances().getOrder1() == 0L ? "Нет" : "Да"));
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_TUESDAY,
+                        clientEE.getBalances().getOrder2() == null || clientEE.getBalances().getOrder2() == 0L ? "Нет" : "Да"));
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_WEDNESDAY,
+                        clientEE.getBalances().getOrder3() == null || clientEE.getBalances().getOrder3() == 0L ? "Нет" : "Да"));
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_THURSDAY,
+                        clientEE.getBalances().getOrder4() == null || clientEE.getBalances().getOrder4() == 0L ? "Нет" : "Да"));
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_FRIDAY,
+                        clientEE.getBalances().getOrder5() == null || clientEE.getBalances().getOrder5() == 0L ? "Нет" : "Да"));
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_SATURDAY,
+                        clientEE.getBalances().getOrder6() == null || clientEE.getBalances().getOrder6() == 0L ? "Нет" : "Да"));
+            }
         }
     }
 

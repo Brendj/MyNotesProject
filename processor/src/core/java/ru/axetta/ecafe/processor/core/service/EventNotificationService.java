@@ -477,10 +477,16 @@ public class EventNotificationService {
     private Object getSummaryNotificationObject(String type, Client destClient, Client dataClient, String[] values) {
         EMPEventType empType = null;
         if(type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
-            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, dataClient, destClient);
+            if (dataClient != null)
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, dataClient, destClient);
+            else
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, destClient);
         }
         if(type.equals(NOTIFICATION_SUMMARY_BY_WEEK)) {
-            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, dataClient, destClient);
+            if (dataClient != null)
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, dataClient, destClient);
+            else
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, destClient);
         }
 
         for (int i = 0; i < values.length-1; i=i+2) {
