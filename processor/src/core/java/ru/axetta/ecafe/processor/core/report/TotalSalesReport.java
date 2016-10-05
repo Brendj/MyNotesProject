@@ -316,7 +316,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                             if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN
                                     && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
                                 sumProductOwn += handleOrders(totalListMap, allOrder, title);
-                                sumBuffetOwnPlusSumComplex += sumProductOwn + handleOrders(totalListMap, allOrder,
+                                sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder,
                                         TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
                             }
                         } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
@@ -361,12 +361,12 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
                     sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET);
-                    sumBuffetPlusSumComplex += sumBuffet + handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
+                    sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
                 }else if(allOrder.getSocDiscount() == 0L){//Pay
                     sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX);
-                    sumBuffetPlusSumComplex += sumComplex + handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
+                    sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
 
-                    sumBuffetOwnPlusSumComplex += sumComplex + handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
+                    sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
                 }else{ // free
                     sumBen += handleOrders(totalListMap, allOrder, NAME_BEN);
 
