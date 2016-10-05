@@ -955,8 +955,10 @@ public class ClientManager {
 
         clientGuardianToSave.setMobile(mobilePhoneGuardian);
         clientGuardianToSave.setAddress("");
-        clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
+        //clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
+        Date date = new Date();
+        clientGuardianToSave.setRemarks(String.format(MskNSIService.COMMENT_AUTO_MODIFY, date));
         persistenceSession.persist(clientGuardianToSave);
 
         String relation = registryChangeGuardians.getRelationship();
