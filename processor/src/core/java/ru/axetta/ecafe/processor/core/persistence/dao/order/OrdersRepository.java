@@ -110,11 +110,10 @@ public class OrdersRepository extends BaseJpaDao {
 
             org.hibernate.Query nativeQuery = session.createSQLQuery(
                     "SELECT (o.idoforg) AS name, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.socDiscount, "
-                            + "od.menutype, od.menuOrigin, c.idofclient, g.groupname, g.idofclientgroup "
+                            + "od.menutype, od.menuOrigin, o.idofclient, g.groupname, o.idofclientgroup "
                             + "FROM CF_Orders o "
                             + "INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
-                            + "INNER JOIN cf_clients c ON c.idofclient = o.idofclient "
-                            + "INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
+                            + "LEFT JOIN cf_clientgroups g ON o.idofclientgroup = g.idofclientgroup AND o.idoforg = g.idoforg "
                             + "WHERE o.idoforg IN (:idOfOrgs) "
                             + "AND o.createdDate >= :startDate AND o.createdDate <= :endDate "
                             + "AND (od.menuType = 0 OR (od.menuType >= 50 AND od.menuType <= 99)) "
@@ -129,7 +128,7 @@ public class OrdersRepository extends BaseJpaDao {
 
                 orderItemList.add(new OrderItem(((BigInteger) o[0]).longValue(), ((BigInteger) o[1]).longValue(),
                         ((BigInteger) o[2]).longValue(), ((BigInteger) o[3]).longValue(), (Integer) o[4],
-                        (Integer) o[5], ((BigInteger) o[6]).longValue(), (String) o[7], ((BigInteger) o[8]).longValue()));
+                        (Integer) o[5], o[6] == null ? null : ((BigInteger) o[6]).longValue(), (String) o[7], o[8] == null ? null : ((BigInteger) o[8]).longValue()));
             }
 
             session.doWork(new Work() {
@@ -169,11 +168,10 @@ public class OrdersRepository extends BaseJpaDao {
 
             org.hibernate.Query nativeQuery = session.createSQLQuery(
                     "SELECT (o.idoforg) AS name, o.createdDate, ((od.rprice + od.discount) *od.qty)AS sum, od.socDiscount, "
-                            + "od.menutype, od.menuOrigin, c.idofclient, g.groupname, g.idofclientgroup "
+                            + "od.menutype, od.menuOrigin, o.idofclient, g.groupname, o.idofclientgroup "
                             + "FROM CF_Orders o "
                             + "INNER JOIN cf_orderdetails od ON o.idOfOrder = od.idOfOrder AND o.idOfOrg = od.idOfOrg "
-                            + "INNER JOIN cf_clients c ON c.idofclient = o.idofclient "
-                            + "INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND g.idoforg = c.idoforg "
+                            + "LEFT JOIN cf_clientgroups g ON o.idofclientgroup = g.idofclientgroup AND o.idoforg = g.idoforg "
                             + "WHERE o.idoforg IN (:idOfOrgs) "
                             + "AND o.createdDate >= :startDate AND o.createdDate <= :endDate AND od.socdiscount = 0 AND (od.menuType >= 50 AND od.menuType <= 99) "
                             + "AND o.state=0 AND od.state=0 ORDER BY o.idoforg");
@@ -187,7 +185,7 @@ public class OrdersRepository extends BaseJpaDao {
 
                 orderItemList.add(new OrderItem(((BigInteger) o[0]).longValue(), ((BigInteger) o[1]).longValue(),
                         ((BigInteger) o[2]).longValue(), ((BigInteger) o[3]).longValue(), (Integer) o[4],
-                        (Integer) o[5], ((BigInteger) o[6]).longValue(), (String) o[7], ((BigInteger) o[8]).longValue()));
+                        (Integer) o[5], o[6] == null ? null : ((BigInteger) o[6]).longValue(), (String) o[7], o[8] == null ? null : ((BigInteger) o[8]).longValue()));
             }
 
             session.doWork(new Work() {

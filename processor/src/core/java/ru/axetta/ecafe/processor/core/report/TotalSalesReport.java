@@ -407,7 +407,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))
                         && totalSalesItem.getAgeGroup().equals(ageGroup)) {
                     totalSalesItem.setSum(totalSalesItem.getSum() + buffetOrder.getSum());
-                    if(!totalSalesItem.getIdOfClientList().contains(buffetOrder.getIdOfClient())) {
+                    if(buffetOrder.getIdOfClient() != null && !totalSalesItem.getIdOfClientList().contains(buffetOrder.getIdOfClient())) {
                         totalSalesItem.getIdOfClientList().add(buffetOrder.getIdOfClient());
                         totalSalesItem.setUniqueClientCount(totalSalesItem.getIdOfClientList().size());
                     }
@@ -418,7 +418,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private String getAgeGroup(OrderItem buffetOrder) {
-            if(buffetOrder.getIdOfClientGroup() == null && buffetOrder.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
+            if(buffetOrder.getIdOfClientGroup() == null || buffetOrder.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
                 return AGE_GROUP_NAMES[3];
             } else if(is511Group(buffetOrder.getGroupName())) {
                 return AGE_GROUP_NAMES[1];

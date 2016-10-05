@@ -9,7 +9,7 @@ public class OrderItem {
 
     public long idOfOrg;
     public String orgName;
-    public long idOfClient;
+    public Long idOfClient;
     public String fullname;
     public long idOfClientOrg;
     public String clientOrgName;
@@ -30,7 +30,7 @@ public class OrderItem {
     private String manufacturer;
     private Long idOfClientGroup;
 
-    public OrderItem(long idOfOrg, String orgName, long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
+    public OrderItem(long idOfOrg, String orgName, Long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty, long idOfClientOrg, String clientOrgName, String fullname, long createdDateEqualsOrderDate) {
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -47,7 +47,7 @@ public class OrderItem {
         this.createdDateEqualsOrderDate = createdDateEqualsOrderDate;
     }
 
-    public OrderItem(long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
+    public OrderItem(Long idOfClient, long orderDate, int ordertype, int idOfComplex, String complexName,
             String groupName, int qty) {
         this.idOfClient = idOfClient;
         this.orderDate = orderDate;
@@ -63,7 +63,7 @@ public class OrderItem {
         this.orderDate = orderDate;
         this.sum = sum;
     }
-    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype, int menuOrigin, long idOfClient, String groupName, Long idOfClientGroup) {
+    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype, int menuOrigin, Long idOfClient, String groupName, Long idOfClientGroup) {
         this.idOfOrg = idOfOrg;
         this.orderDate = orderDate;
         this.sum = sum;
@@ -88,7 +88,7 @@ public class OrderItem {
         this.sum = sum;
     }
 
-    public OrderItem(long idOfOrg, int ordertype, long sum, long idOfClient) {
+    public OrderItem(long idOfOrg, int ordertype, long sum, Long idOfClient) {
         this.idOfOrg = idOfOrg;
         this.ordertype = ordertype;
         this.sum = sum;
@@ -123,11 +123,11 @@ public class OrderItem {
         this.orgName = orgName;
     }
 
-    public long getIdOfClient() {
+    public Long getIdOfClient() {
         return idOfClient;
     }
 
-    public void setIdOfClient(long idOfClient) {
+    public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
     }
 
