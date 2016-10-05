@@ -88,6 +88,7 @@ public class SummaryCalculationService {
     public static String VALUE_AMOUNT_THURSDAY = "ComplexThursday";
     public static String VALUE_AMOUNT_FRIDAY = "ComplexFriday";
     public static String VALUE_AMOUNT_SATURDAY = "ComplexSaturday";
+    public static String VALUE_AMOUNT_SUNDAY = "ComplexSunday";
 
     final static String JOB_NAME_DAILY="NotificationSummaryDaily";
     final static String JOB_NAME_WEEKLY="NotificationSummaryWeekly";
@@ -222,6 +223,7 @@ public class SummaryCalculationService {
         else if (day.equals("Чт")) return "Четверг";
         else if (day.equals("Пт")) return "Пятница";
         else if (day.equals("Сб")) return "Суббота";
+        else if (day.equals("Вс")) return "Воскресенье";
         else return "";
     }
 
@@ -406,7 +408,13 @@ public class SummaryCalculationService {
                 + "INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
                 + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
                 + "AND o.state = :orderState and extract(dow from TO_TIMESTAMP(o.createddate / 1000)) = 6 WHERE n.notifytype = :notifyType "
-                + "GROUP BY c.idofclient) AS query11 ON c.idofclient = query11.idofclient ")
+                + "GROUP BY c.idofclient) AS query11 ON c.idofclient = query11.idofclient "
+                        + "inner join "
+                        + "(SELECT c.idofclient, count(o.idoforder) AS countw7 FROM cf_clientsnotificationsettings n "
+                        + "INNER JOIN cf_clients c ON c.idofclient = n.idofclient "
+                        + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
+                        + "AND o.state = :orderState and extract(dow from TO_TIMESTAMP(o.createddate / 1000)) = 7 WHERE n.notifytype = :notifyType "
+                        + "GROUP BY c.idofclient) AS query12 ON c.idofclient = query12.idofclient " )
                 + "WHERE (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
                 + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.idofclient)) "
                 + "and c.idofclientgroup not between :group_employees and :group_displaced";
@@ -429,7 +437,7 @@ public class SummaryCalculationService {
         bquery.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
         bquery.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
         List blist = bquery.getResultList();
-        Long order1 = null, order2 = null, order3 = null, order4 = null, order5 = null, order6 = null;
+        Long order1 = null, order2 = null, order3 = null, order4 = null, order5 = null, order6 = null, order7 = null;
         for (Object obj : blist) {
             Object[] row = (Object[]) obj;
             Long id = ((BigInteger)row[0]).longValue();
@@ -451,6 +459,7 @@ public class SummaryCalculationService {
                 order4 = ((BigInteger) row[15]).longValue();
                 order5 = ((BigInteger) row[16]).longValue();
                 order6 = ((BigInteger) row[17]).longValue();
+                order7 = ((BigInteger) row[18]).longValue();
             }
             clientEE = findClientEEByClientId(clients, id);
             if (clientEE == null) {
@@ -484,6 +493,7 @@ public class SummaryCalculationService {
             balances.setOrder4(order4);
             balances.setOrder5(order5);
             balances.setOrder6(order6);
+            balances.setOrder6(order7);
             clientEE.setBalances(balances);
         }
 
@@ -649,9 +659,9 @@ public class SummaryCalculationService {
                         clientEE.setValues(attachValue(clientEE.getValues(), day, hours.toString() + ":" + minutes.toString()));
                     } else {
                         if (enterExists || exitExists) {
-                            clientEE.setValues(attachValue(clientEE.getValues(), day, "+"));
+                            clientEE.setValues(attachValue(clientEE.getValues(), day, "Нет информации о выходе"));
                         } else {
-                            clientEE.setValues(attachValue(clientEE.getValues(), day, "Нет информации"));
+                            clientEE.setValues(attachValue(clientEE.getValues(), day, "Нет информации о входе"));
                         }
                     }
                     String day2 = getDayByIteration(iteration, 1);
@@ -790,6 +800,8 @@ public class SummaryCalculationService {
                         clientEE.getBalances().getOrder5() == null || clientEE.getBalances().getOrder5() == 0L ? "Нет" : "Да"));
                 clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_SATURDAY,
                         clientEE.getBalances().getOrder6() == null || clientEE.getBalances().getOrder6() == 0L ? "Нет" : "Да"));
+                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_AMOUNT_SUNDAY,
+                        clientEE.getBalances().getOrder7() == null || clientEE.getBalances().getOrder7() == 0L ? "Нет" : "Да"));
             }
         }
     }
@@ -1003,6 +1015,7 @@ public class SummaryCalculationService {
         private Long order4;
         private Long order5;
         private Long order6;
+        private Long order7;
 
         public Long getLimit() {
             return limit;
@@ -1130,6 +1143,14 @@ public class SummaryCalculationService {
 
         public void setOrder6(Long order6) {
             this.order6 = order6;
+        }
+
+        public Long getOrder7() {
+            return order7;
+        }
+
+        public void setOrder7(Long order7) {
+            this.order7 = order7;
         }
     }
 }
