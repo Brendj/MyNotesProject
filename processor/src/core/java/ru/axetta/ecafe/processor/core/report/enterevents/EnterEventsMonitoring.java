@@ -72,6 +72,9 @@ public class EnterEventsMonitoring {
      * Обертка для запуска по расписанию
      */
     public void calculateEnterEvents() throws Exception {
+        if(true){
+            return;
+        }
         if(!isAfter18Day() && isOn()) {
             logger.info("Starting calculate EnterEvent data for monitoring.");
             calculateEnterEventsDay();
