@@ -6,6 +6,9 @@ package ru.axetta.ecafe.processor.core.report.model.totalsales;
 
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * User: regal
  * Date: 25.01.15
@@ -17,14 +20,20 @@ public class TotalSalesItem {
     private String date;
     private long sum;
     private String type;
+    private String ageGroup;
+    private List<Long> idOfClientList;
+    private int uniqueClientCount;
 
 
-    public TotalSalesItem(String name,String disctrict , String date, long sum, String type) {
+    public TotalSalesItem(String name,String disctrict , String date, long sum, String type, String ageGroup) {
         this.name = name;
         this.disctrict = disctrict;
         this.date = date;
         this.sum = sum;
         this.type = type;
+        this.ageGroup = ageGroup;
+        this.idOfClientList = new ArrayList<Long>();
+        this.uniqueClientCount = 0;
     }
 
     public String getName() {
@@ -69,5 +78,29 @@ public class TotalSalesItem {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public List<Long> getIdOfClientList() {
+        return idOfClientList;
+    }
+
+    public void setIdOfClientList(List<Long> idOfClientList) {
+        this.idOfClientList = idOfClientList;
+    }
+
+    public int getUniqueClientCount() {
+        return uniqueClientCount;
+    }
+
+    public void setUniqueClientCount(int uniqueClientCount) {
+        this.uniqueClientCount = uniqueClientCount;
     }
 }

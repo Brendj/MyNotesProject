@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.order.OrderItem;
@@ -57,6 +58,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
     private static final String NAME_BEN = "Льготные комплексы";
     private static final String TOTAL_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет собственное + Платные комплексы"; // Буфет собственное + Платные комплексы
     private static final String TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX = "Итого буфет все + Платные комплексы"; // Буфетная продукция + Платные комплексы
+    private static final String[] AGE_GROUP_NAMES = {"1 - 4 классы", "5 - 11 классы", "Прочие группы обучающихся", "Прочие группы"};
 
     final private static Logger logger = LoggerFactory.getLogger(TotalSalesReport.class);
 
@@ -272,14 +274,14 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             if (idOfOrgsList.size() == 0) {
                 return new JREmptyDataSource();
             }
-            logger.error("e1 : " + (System.currentTimeMillis() - l));
+
             TotalSalesData totalSalesTMP = new TotalSalesData();
             for (List<TotalSalesItem> totalSalesItemList : totalListMap.values()) {
                 totalSalesTMP.getItemList().addAll(totalSalesItemList);
             }
             retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime, priceAndSumBenefitHashMap);
             retreiveAllOrdersPaid(totalListMap, idOfOrgsList, startTime, endTime, priceAndSumPaidHashMap);
-            logger.error("e2 : " + (System.currentTimeMillis() - l));
+
 
             //Вывод, разбивка по районам.
             Map<String, TotalSalesData> totalSalesResult = new HashMap<String, TotalSalesData>();
@@ -399,14 +401,49 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             if (totalSalesItemList == null) {
                 return 0L;
             }
+            String ageGroup = getAgeGroup(buffetOrder);
             String date = CalendarUtils.dateShortToString(buffetOrder.getOrderDate());
             for (TotalSalesItem totalSalesItem : totalSalesItemList) {
-                if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))) {
+                if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))
+                        && totalSalesItem.getAgeGroup().equals(ageGroup)) {
                     totalSalesItem.setSum(totalSalesItem.getSum() + buffetOrder.getSum());
+                    if(!totalSalesItem.getIdOfClientList().contains(buffetOrder.getIdOfClient())) {
+                        totalSalesItem.getIdOfClientList().add(buffetOrder.getIdOfClient());
+                        totalSalesItem.setUniqueClientCount(totalSalesItem.getIdOfClientList().size());
+                    }
                     sum += buffetOrder.getSum();
                 }
             }
             return sum;
+        }
+
+        private String getAgeGroup(OrderItem buffetOrder) {
+            if(buffetOrder.getIdOfClientGroup() == null && buffetOrder.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
+                return AGE_GROUP_NAMES[3];
+            } else if(is511Group(buffetOrder.getGroupName())) {
+                return AGE_GROUP_NAMES[1];
+            } else if(is14Group(buffetOrder.getGroupName())) {
+                return AGE_GROUP_NAMES[0];
+            } else {
+                return AGE_GROUP_NAMES[2];
+            }
+        }
+
+        private boolean is14Group(String groupName) {
+            return (groupName.startsWith("1") ||
+                    groupName.startsWith("2") ||
+                    groupName.startsWith("3") ||
+                    groupName.startsWith("4")) && !Character.isDigit(groupName.charAt(1));
+        }
+
+        private boolean is511Group(String groupName) {
+            return ((groupName.startsWith("5") ||
+                    groupName.startsWith("6") ||
+                    groupName.startsWith("7") ||
+                    groupName.startsWith("8") ||
+                    groupName.startsWith("9")) && !Character.isDigit(groupName.charAt(1))) ||
+                    ((groupName.startsWith("10") ||
+                    groupName.startsWith("11")) && !Character.isDigit(groupName.charAt(2)));
         }
 
         private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
@@ -427,23 +464,28 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             List<TotalSalesItem> totalSalesItemList;
             for (OrgItem orgItem : allNames) {
                 totalSalesItemList = new ArrayList<TotalSalesItem>();
-                for (String date : dates) {
-                    totalSalesItemList.add(
-                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BUFFET));
-                    totalSalesItemList.add(
-                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, NAME_BEN));
-                    totalSalesItemList.add(
-                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                    NAME_COMPLEX));
-                    totalSalesItemList.add(
-                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                    TOTAL_BUFFET_PLUS_NAME_COMPLEX));
-                    totalSalesItemList.add(
-                            new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                    TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX));
-                    for (String title: titleComplexes) {
-                        totalSalesItemList.add(
-                                new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L, title));
+                for(String ageGroup : AGE_GROUP_NAMES) {
+                    for (String date : dates) {
+                        totalSalesItemList
+                                .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                        NAME_BUFFET, ageGroup));
+                        totalSalesItemList
+                                .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                        NAME_BEN, ageGroup));
+                        totalSalesItemList
+                                .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                        NAME_COMPLEX, ageGroup));
+                        totalSalesItemList
+                                .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX, ageGroup));
+                        totalSalesItemList
+                                .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                        TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, ageGroup));
+                        for (String title : titleComplexes) {
+                            totalSalesItemList
+                                    .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
+                                            title, ageGroup));
+                        }
                     }
                 }
                 totalSalesItemMap.put(orgItem.getIdOfOrg(), totalSalesItemList);
