@@ -11,3 +11,5 @@ ALTER TABLE Cf_GroupNames_To_Orgs ADD COLUMN isMiddleGroup INTEGER;
 
 --Индекс на поле idofclientguardian
 CREATE INDEX cf_client_guardian_clientguardian_idx ON cf_client_guardian USING btree (idofclientguardian);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 061016) НЕ МЕНЯТЬ
