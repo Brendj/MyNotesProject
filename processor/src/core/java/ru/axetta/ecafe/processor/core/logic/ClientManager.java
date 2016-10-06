@@ -883,7 +883,7 @@ public class ClientManager {
                                 ClientGuardian clientGuardian = new ClientGuardian(child.getIdOfClient(),
                                         clientByMobile.getIdOfClient());
                                 clientGuardian.setVersion(newGuardiansVersions);
-                                clientGuardian.setDisabled(false);
+                                clientGuardian.setDisabled(true);
                                 clientGuardian.setDeletedState(false);
                                 clientGuardian.setRelation(relationType);
                                 persistenceSession.persist(clientGuardian);
@@ -957,8 +957,8 @@ public class ClientManager {
         clientGuardianToSave.setAddress("");
         //clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        Date date = new Date();
-        clientGuardianToSave.setRemarks(String.format(MskNSIService.COMMENT_AUTO_MODIFY, date));
+        String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+        clientGuardianToSave.setRemarks(String.format(MskNSIService.COMMENT_AUTO_MODIFY, dateString));
         persistenceSession.persist(clientGuardianToSave);
 
         String relation = registryChangeGuardians.getRelationship();
@@ -975,7 +975,7 @@ public class ClientManager {
         ClientGuardian clientGuardian = new ClientGuardian(idOfClientChild,
                 clientGuardianToSave.getIdOfClient());
         clientGuardian.setVersion(newGuardiansVersions);
-        clientGuardian.setDisabled(false);
+        clientGuardian.setDisabled(true);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
         persistenceSession.persist(clientGuardian);
