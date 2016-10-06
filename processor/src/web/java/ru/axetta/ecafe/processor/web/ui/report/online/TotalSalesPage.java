@@ -114,7 +114,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
     private boolean showDetail;
 
-    public boolean isShowDetail() {
+    public boolean getShowDetail() {
         return showDetail;
     }
 
@@ -124,7 +124,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
     private boolean showBenefitDetail;
 
-    public boolean isShowBenefitDetail() {
+    public boolean getShowBenefitDetail() {
         return showBenefitDetail;
     }
 
@@ -134,7 +134,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
     private boolean showPaidDetail;
 
-    public boolean isShowPaidDetail() {
+    public boolean getShowPaidDetail() {
         return showPaidDetail;
     }
 
@@ -376,9 +376,15 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
-            builder.getReportProperties().setProperty("preferentialTitleComplexes", preferentialTitleComplexesString);
-            builder.getReportProperties().setProperty("benefitTitleAndSumList", benefitTitleAndSumListString);
-            builder.getReportProperties().setProperty("paidTitleAndSumList", paidTitleAndSumListString);
+            if(showDetail) {
+                builder.getReportProperties().setProperty("preferentialTitleComplexes", preferentialTitleComplexesString);
+            }
+            if(showBenefitDetail) {
+                builder.getReportProperties().setProperty("benefitTitleAndSumList", benefitTitleAndSumListString);
+            }
+            if(showPaidDetail) {
+                builder.getReportProperties().setProperty("paidTitleAndSumList", paidTitleAndSumListString);
+            }
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
