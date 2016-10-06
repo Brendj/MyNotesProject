@@ -274,7 +274,9 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         if (preferentialTitleComplexes != null) {
             if (preferentialTitleComplexes.length > 0) {
                 for (Integer prefer : preferentialTitleComplexes) {
-                    titlesComplexList.add(contragentsSelectItemsPrefer.get(prefer).getLabel());
+                    if (prefer != null) {
+                        titlesComplexList.add(contragentsSelectItemsPrefer.get(prefer).getLabel());
+                    }
                 }
             }
         }
