@@ -3997,7 +3997,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ClientRepresentative clientRepresentative = objectFactory.creteClientRepresentative();
                     clientRepresentative.setId(cl.getContractId());
                     clientRepresentative.setName(cl.getPerson().getSurnameAndFirstLetters());
-                    clientRepresentative.setEmail(""); //(cl.getEmail());
+                    clientRepresentative.setEmail(cl.getEmail());
                     clientRepresentative.setMobile(cl.getMobile());
                     clientRepresentative.setNotifyviaemail(cl.isNotifyViaEmail());
                     clientRepresentative.setNotifyviapush(cl.isNotifyViaPUSH());
