@@ -73,6 +73,9 @@
 		<field name="uniqueClientCount" class="java.lang.Integer">
 			<fieldDescription><![CDATA[uniqueClientCount]]></fieldDescription>
 		</field>
+		<field name="count" class="java.lang.Boolean">
+			<fieldDescription><![CDATA[count]]></fieldDescription>
+		</field>
 	</subDataset>
 	<subDataset name="Table Dataset 2" uuid="27dbee13-bb62-40e7-836e-4173a60421e1">
 		<queryString>
@@ -85,17 +88,6 @@
 	</subDataset>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
-	<parameter name="sumComplex" class="java.lang.Double"/>
-	<parameter name="sumBuffet" class="java.lang.Double"/>
-	<parameter name="sumBen" class="java.lang.Double"/>
-	<parameter name="sumBuffetPlusSumComplex" class="java.lang.Double"/>
-	<parameter name="sumBuffetOwnPlusSumComplex" class="java.lang.Double"/>
-	<parameter name="sumProductCentralize" class="java.lang.Double"/>
-	<parameter name="sumProductVending" class="java.lang.Double"/>
-	<parameter name="sumProductPurchase" class="java.lang.Double"/>
-	<parameter name="sumProductCommercial" class="java.lang.Double"/>
-	<parameter name="sumProductOwn" class="java.lang.Double"/>
-	<parameter name="sumProductCentralizeCook" class="java.lang.Double"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -414,7 +406,7 @@
 					<measureExpression><![CDATA[Double.valueOf($F{sum})/100]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasure" class="java.lang.Double" calculation="Sum">
-					<measureExpression><![CDATA[($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы")? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
+					<measureExpression><![CDATA[($F{count})? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
 				</measure>
 				<measure name="uniqueClientCountMeasure" class="java.lang.Integer">
 					<measureExpression><![CDATA[$F{uniqueClientCount}]]></measureExpression>
@@ -447,31 +439,31 @@
 					<measureExpression><![CDATA[$F{ageGroup} == "Прочие группы" ? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasure14" class="java.lang.Double" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "1 - 4 классы" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "1 - 4 классы" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasure511" class="java.lang.Double" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "5 - 11 классы" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "5 - 11 классы" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureSt" class="java.lang.Double" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "Прочие группы обучающихся" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "Прочие группы обучающихся" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureNotSt" class="java.lang.Double" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "Прочие группы" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "Прочие группы" )? Double.valueOf($F{sum})/100 : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureGroup" class="java.lang.Integer" calculation="Sum">
-					<measureExpression><![CDATA[($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы")? $F{uniqueClientCount} : 0]]></measureExpression>
+					<measureExpression><![CDATA[($F{count})? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureGroup14" class="java.lang.Integer" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "1 - 4 классы" )? $F{uniqueClientCount} : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "1 - 4 классы" )? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureGroup511" class="java.lang.Integer" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "5 - 11 классы" )? $F{uniqueClientCount} : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "5 - 11 классы" )? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureGroupSt" class="java.lang.Integer" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "Прочие группы обучающихся" )? $F{uniqueClientCount} : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "Прочие группы обучающихся" )? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
 				<measure name="LogicMeasureGroupNotSt" class="java.lang.Integer" calculation="Sum">
-					<measureExpression><![CDATA[(($F{type} == "Итого буфет все + Платные комплексы" || $F{type} == "Итого буфет собственное + Платные комплексы") && $F{ageGroup} == "Прочие группы" )? $F{uniqueClientCount} : 0]]></measureExpression>
+					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "Прочие группы" )? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
 				<crosstabCell width="197" height="25">
 					<cellContents>
@@ -570,7 +562,7 @@
 							<textElement>
 								<font size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{measureUniqueClientCount}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{measureUniqueClientCount}-$V{LogicMeasureGroup}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -601,7 +593,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement/>
-							<textFieldExpression><![CDATA[$V{measureUniqueClientCount}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{measureUniqueClientCount}-$V{LogicMeasureGroup}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
