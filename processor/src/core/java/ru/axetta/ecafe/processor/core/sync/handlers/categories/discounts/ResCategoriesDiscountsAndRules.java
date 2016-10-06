@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.apache.commons.lang.StringUtils;
@@ -43,7 +44,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             addRulesForOrgWithCategoryOrgSet(discountRules, org);
         }
         if (existOrgWithEmptyCategoryOrgSet) {
-            addRulesWithEmptyCategoryOrgSet(discountRules);
+            addRulesWithEmptyCategoryOrgSet(discountRules, idOfOrg);
         }
     }
 
@@ -52,7 +53,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         return criteriaDiscountRule.list();
     }
 
-    private void addRulesWithEmptyCategoryOrgSet(List discountRules) {
+    private void addRulesWithEmptyCategoryOrgSet(List discountRules, Long idOfOrg) {
         for (Object object : discountRules) {
             DiscountRule discountRule = (DiscountRule) object;
             if (containRule(discountRule.getIdOfRule())) {
@@ -60,7 +61,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             }
                 /* если правила не установлены категории организаций то отправляем*/
             if (discountRule.getCategoryOrgs().isEmpty()) {
-                addDCRI(new DiscountCategoryRuleItem(discountRule));
+                addDCRI(new DiscountCategoryRuleItem(discountRule, idOfOrg));
             }
         }
     }
@@ -92,7 +93,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
                 bIncludeRule = true;
             }
             if (bIncludeRule) {
-                addDCRI(new DiscountCategoryRuleItem(discountRule));
+                addDCRI(new DiscountCategoryRuleItem(discountRule, org.getIdOfOrg()));
             }
         }
     }
@@ -227,6 +228,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         private Boolean operationor;
         private String complexesMap;
         private String subCategory;
+        private String orgIds;
 
         public String getComplexesMap() {
             return complexesMap;
@@ -253,7 +255,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         }
         //
 
-        public DiscountCategoryRuleItem(DiscountRule discountRule) {
+        public DiscountCategoryRuleItem(DiscountRule discountRule, Long idOfOrg) {
             this.idOfRule = discountRule.getIdOfRule();
             this.description = discountRule.getDescription();
             this.categoryDiscounts = discountRule.getCategoryDiscounts();
@@ -271,6 +273,16 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             this.operationor = discountRule.getOperationOr();
             this.complexesMap = discountRule.getComplexesMap();
             this.subCategory = discountRule.getSubCategory();
+            Set<Long> orgs = new HashSet<Long>();
+            List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(idOfOrg);
+            for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
+                for (Org org : categoryOrg.getOrgs()) {
+                    if (fOrgs.contains(org.getIdOfOrg())) {
+                        orgs.add(org.getIdOfOrg());
+                    }
+                }
+            }
+            this.orgIds = StringUtils.join(orgs, ',');
         }
 
         public long getIdOfRule() {
@@ -346,6 +358,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
                 element.setAttribute("ComplexesMap", this.complexesMap);
             }
             element.setAttribute("SubCategory", this.subCategory);
+            element.setAttribute("OrgIds", this.orgIds);
             return element;
         }
 
@@ -356,7 +369,12 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
                     + ", complex2=" + complex2 + ", complex3=" + complex3 + ", complex4=" + complex4 + ", complex5="
                     + complex5 + ", complex6=" + complex6 + ", complex7=" + complex7 + ", complex8=" + complex8
                     + ", complex9=" + complex9 + ", priority=" + priority + ", operationor=" + operationor
-                    + ", complexesMap=\'" + complexesMap + '\'' + ", subCategory='" + subCategory + '\'' + '}';
+                    + ", complexesMap=\'" + complexesMap + '\'' + ", subCategory='" + subCategory + '\''
+                    + ", orgIds='" + orgIds + '\'' + '}';
+        }
+
+        public String getOrgIds() {
+            return orgIds;
         }
     }
 
