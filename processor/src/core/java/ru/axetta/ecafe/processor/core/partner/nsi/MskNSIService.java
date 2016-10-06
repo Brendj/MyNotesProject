@@ -49,6 +49,7 @@ public class MskNSIService {
     public static final String COMMENT_MANUAL_IMPORT = "{Ручной импорт из Реестров}";
     public static final String COMMENT_AUTO_IMPORT = "{Импорт из Реестров %s}";
     public static final String COMMENT_AUTO_MODIFY = "{Изменено из Реестров %s}";
+    public static final String COMMENT_AUTO_CREATE = "{Создано из Реестров %s}";
     public static final String COMMENT_AUTO_DELETED = "{Исключен по Реестру %s}";
     public static final String REPLACEMENT_REGEXP = "\\{[^}]* Реестр[^}]*\\}";
     public static int SERVICE_ROWS_LIMIT = 300;

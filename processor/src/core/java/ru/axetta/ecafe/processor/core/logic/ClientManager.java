@@ -958,7 +958,7 @@ public class ClientManager {
         //clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-        clientGuardianToSave.setRemarks(String.format(MskNSIService.COMMENT_AUTO_MODIFY, dateString));
+        clientGuardianToSave.setRemarks(String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString));
         persistenceSession.persist(clientGuardianToSave);
 
         String relation = registryChangeGuardians.getRelationship();
