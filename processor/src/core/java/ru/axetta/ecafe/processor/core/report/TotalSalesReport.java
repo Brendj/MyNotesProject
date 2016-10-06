@@ -139,35 +139,47 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             if (!titlesComplexes.isEmpty()) {
 
-                TotalSalesReportItem totalSalesReportItemSumProductVending = new TotalSalesReportItem(
-                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]),
-                        Double.parseDouble(sumProductVending.toString())/100);
-                totalSalesReportItemList.add(totalSalesReportItemSumProductVending);
+                if(titlesComplexes.contains("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
+                    TotalSalesReportItem totalSalesReportItemSumProductVending =
+                            new TotalSalesReportItem("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]),
+                            Double.parseDouble(sumProductVending.toString()) / 100);
+                    totalSalesReportItemList.add(totalSalesReportItemSumProductVending);
+                }
 
-                TotalSalesReportItem totalSalesReportItemSumProductPurchase = new TotalSalesReportItem(
-                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]),
-                        Double.parseDouble(sumProductPurchase.toString())/100);
-                totalSalesReportItemList.add(totalSalesReportItemSumProductPurchase);
+                if(titlesComplexes.contains("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
+                    TotalSalesReportItem totalSalesReportItemSumProductPurchase = new TotalSalesReportItem(
+                            "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]),
+                            Double.parseDouble(sumProductPurchase.toString())/100);
+                    totalSalesReportItemList.add(totalSalesReportItemSumProductPurchase);
+                }
 
-                TotalSalesReportItem totalSalesReportItemSumProductCommercial = new TotalSalesReportItem(
-                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]),
-                        Double.parseDouble(sumProductCommercial.toString())/100);
-                totalSalesReportItemList.add(totalSalesReportItemSumProductCommercial);
+                if(titlesComplexes.contains("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
+                    TotalSalesReportItem totalSalesReportItemSumProductCommercial = new TotalSalesReportItem(
+                            "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]),
+                            Double.parseDouble(sumProductCommercial.toString())/100);
+                    totalSalesReportItemList.add(totalSalesReportItemSumProductCommercial);
+                }
 
-                TotalSalesReportItem totalSalesReportItemSumProductOwn = new TotalSalesReportItem(
-                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]),
-                        Double.parseDouble(sumProductOwn.toString())/100);
-                totalSalesReportItemList.add(totalSalesReportItemSumProductOwn);
+                if(titlesComplexes.contains("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
+                    TotalSalesReportItem totalSalesReportItemSumProductOwn = new TotalSalesReportItem(
+                            "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]),
+                            Double.parseDouble(sumProductOwn.toString())/100);
+                    totalSalesReportItemList.add(totalSalesReportItemSumProductOwn);
+                }
 
-                TotalSalesReportItem totalSalesReportItemSumProductCentralize = new TotalSalesReportItem(
-                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]),
-                        Double.parseDouble(sumProductCentralize.toString())/100);
-                totalSalesReportItemList.add(totalSalesReportItemSumProductCentralize);
+                if(titlesComplexes.contains("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
+                    TotalSalesReportItem totalSalesReportItemSumProductCentralize = new TotalSalesReportItem(
+                            "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]),
+                            Double.parseDouble(sumProductCentralize.toString())/100);
+                    totalSalesReportItemList.add(totalSalesReportItemSumProductCentralize);
+                }
 
-                TotalSalesReportItem totalSalesReportItemSumProductCentralizeCook = new TotalSalesReportItem(
-                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]),
-                        Double.parseDouble(sumProductCentralizeCook.toString())/100);
-                totalSalesReportItemList.add(totalSalesReportItemSumProductCentralizeCook);
+                if(titlesComplexes.contains("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
+                    TotalSalesReportItem totalSalesReportItemSumProductCentralizeCook = new TotalSalesReportItem(
+                            "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]),
+                            Double.parseDouble(sumProductCentralizeCook.toString())/100);
+                    totalSalesReportItemList.add(totalSalesReportItemSumProductCentralizeCook);
+                }
 
                 for(PriceAndSum value : priceAndSumBenefitHashMap.values()) {
                     totalSalesReportItemList.add(new TotalSalesReportItem(value.getTitle(), Double.parseDouble(value.getSum().toString())/100));
