@@ -127,18 +127,6 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
-            parameterMap.put("sumComplex", Double.parseDouble(sumComplex.toString()));
-            parameterMap.put("sumBuffet", Double.parseDouble(sumBuffet.toString()));
-            parameterMap.put("sumBen", Double.parseDouble(sumBen.toString()));
-            parameterMap.put("sumBuffetPlusSumComplex", Double.parseDouble(sumBuffetPlusSumComplex.toString()));
-            parameterMap.put("sumBuffetOwnPlusSumComplex", Double.parseDouble(sumBuffetOwnPlusSumComplex.toString()));
-
-            parameterMap.put("sumProductCentralize", Double.parseDouble(sumProductCentralize.toString()));
-            parameterMap.put("sumProductCentralizeCook", Double.parseDouble(sumProductCentralizeCook.toString()));
-            parameterMap.put("sumProductPurchase", Double.parseDouble(sumProductPurchase.toString()));
-            parameterMap.put("sumProductVending", Double.parseDouble(sumProductVending.toString()));
-            parameterMap.put("sumProductCommercial", Double.parseDouble(sumProductCommercial.toString()));
-            parameterMap.put("sumProductOwn", Double.parseDouble(sumProductOwn.toString()));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
@@ -146,48 +134,47 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     startTime, endTime, idOfContragent);
         }
 
-        private  List<TotalSalesReportItem> summaries() {
+        private  List<TotalSalesReportItem> summaries(HashMap<Long, PriceAndSum> priceAndSumBenefitHashMap, HashMap<Long, PriceAndSum> priceAndSumPaidHashMap) {
             totalSalesReportItemList = new ArrayList<TotalSalesReportItem>();
 
             if (!titlesComplexes.isEmpty()) {
-                for (String title : titlesComplexes) {
 
-                    if (title.equals("Буфет Вендинг")) {
-                        TotalSalesReportItem totalSalesReportItemSumProductVending = new TotalSalesReportItem(
-                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]),
-                                Double.parseDouble(sumProductVending.toString())/100);
-                        totalSalesReportItemList.add(totalSalesReportItemSumProductVending);
-                    }
-                    if (title.equals("Буфет Закупленное")) {
-                        TotalSalesReportItem totalSalesReportItemSumProductPurchase = new TotalSalesReportItem(
-                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]),
-                                Double.parseDouble(sumProductPurchase.toString())/100);
-                        totalSalesReportItemList.add(totalSalesReportItemSumProductPurchase);
-                    }
-                    if (title.equals("Буфет Коммерческое питание")) {
-                        TotalSalesReportItem totalSalesReportItemSumProductCommercial = new TotalSalesReportItem(
-                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]),
-                                Double.parseDouble(sumProductCommercial.toString())/100);
-                        totalSalesReportItemList.add(totalSalesReportItemSumProductCommercial);
-                    }
-                    if (title.equals("Буфет Собственное")) {
-                        TotalSalesReportItem totalSalesReportItemSumProductOwn = new TotalSalesReportItem(
-                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]),
-                                Double.parseDouble(sumProductOwn.toString())/100);
-                        totalSalesReportItemList.add(totalSalesReportItemSumProductOwn);
-                    }
-                    if (title.equals("Буфет Централизованное")) {
-                        TotalSalesReportItem totalSalesReportItemSumProductCentralize = new TotalSalesReportItem(
-                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]),
-                                Double.parseDouble(sumProductCentralize.toString())/100);
-                        totalSalesReportItemList.add(totalSalesReportItemSumProductCentralize);
-                    }
-                    if (title.equals("Буфет Централизованное с доготовкой")) {
-                        TotalSalesReportItem totalSalesReportItemSumProductCentralizeCook = new TotalSalesReportItem(
-                                "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]),
-                                Double.parseDouble(sumProductCentralizeCook.toString())/100);
-                        totalSalesReportItemList.add(totalSalesReportItemSumProductCentralizeCook);
-                    }
+                TotalSalesReportItem totalSalesReportItemSumProductVending = new TotalSalesReportItem(
+                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]),
+                        Double.parseDouble(sumProductVending.toString())/100);
+                totalSalesReportItemList.add(totalSalesReportItemSumProductVending);
+
+                TotalSalesReportItem totalSalesReportItemSumProductPurchase = new TotalSalesReportItem(
+                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]),
+                        Double.parseDouble(sumProductPurchase.toString())/100);
+                totalSalesReportItemList.add(totalSalesReportItemSumProductPurchase);
+
+                TotalSalesReportItem totalSalesReportItemSumProductCommercial = new TotalSalesReportItem(
+                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]),
+                        Double.parseDouble(sumProductCommercial.toString())/100);
+                totalSalesReportItemList.add(totalSalesReportItemSumProductCommercial);
+
+                TotalSalesReportItem totalSalesReportItemSumProductOwn = new TotalSalesReportItem(
+                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]),
+                        Double.parseDouble(sumProductOwn.toString())/100);
+                totalSalesReportItemList.add(totalSalesReportItemSumProductOwn);
+
+                TotalSalesReportItem totalSalesReportItemSumProductCentralize = new TotalSalesReportItem(
+                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]),
+                        Double.parseDouble(sumProductCentralize.toString())/100);
+                totalSalesReportItemList.add(totalSalesReportItemSumProductCentralize);
+
+                TotalSalesReportItem totalSalesReportItemSumProductCentralizeCook = new TotalSalesReportItem(
+                        "Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]),
+                        Double.parseDouble(sumProductCentralizeCook.toString())/100);
+                totalSalesReportItemList.add(totalSalesReportItemSumProductCentralizeCook);
+
+                for(PriceAndSum value : priceAndSumBenefitHashMap.values()) {
+                    totalSalesReportItemList.add(new TotalSalesReportItem(value.getTitle(), Double.parseDouble(value.getSum().toString())/100));
+                }
+
+                for(PriceAndSum value : priceAndSumPaidHashMap.values()) {
+                    totalSalesReportItemList.add(new TotalSalesReportItem(value.getTitle(), Double.parseDouble(value.getSum().toString())/100));
                 }
             }
 
@@ -286,7 +273,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             //Вывод, разбивка по районам.
             Map<String, TotalSalesData> totalSalesResult = new HashMap<String, TotalSalesData>();
 
-            List<TotalSalesReportItem> tot = summaries();
+            List<TotalSalesReportItem> tot = summaries(priceAndSumBenefitHashMap, priceAndSumPaidHashMap);
 
             for (TotalSalesItem o : totalSalesTMP.getItemList()) {
                 if (!totalSalesResult.containsKey(o.getDisctrict())) {
@@ -468,23 +455,23 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     for (String date : dates) {
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        NAME_BUFFET, ageGroup));
+                                        NAME_BUFFET, ageGroup, false));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        NAME_BEN, ageGroup));
+                                        NAME_BEN, ageGroup, false));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        NAME_COMPLEX, ageGroup));
+                                        NAME_COMPLEX, ageGroup, false));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX, ageGroup));
+                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX, ageGroup, true));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, ageGroup));
+                                        TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, ageGroup, true));
                         for (String title : titleComplexes) {
                             totalSalesItemList
                                     .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                            title, ageGroup));
+                                            title, ageGroup, true));
                         }
                     }
                 }

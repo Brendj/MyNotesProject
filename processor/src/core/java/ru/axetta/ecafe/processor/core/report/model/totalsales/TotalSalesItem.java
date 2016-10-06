@@ -20,12 +20,13 @@ public class TotalSalesItem {
     private String date;
     private long sum;
     private String type;
+    private Boolean count;
     private String ageGroup;
     private List<Long> idOfClientList;
     private int uniqueClientCount;
 
 
-    public TotalSalesItem(String name,String disctrict , String date, long sum, String type, String ageGroup) {
+    public TotalSalesItem(String name,String disctrict , String date, long sum, String type, String ageGroup, Boolean count) {
         this.name = name;
         this.disctrict = disctrict;
         this.date = date;
@@ -34,6 +35,7 @@ public class TotalSalesItem {
         this.ageGroup = ageGroup;
         this.idOfClientList = new ArrayList<Long>();
         this.uniqueClientCount = 0;
+        this.count = count;
     }
 
     public String getName() {
@@ -102,5 +104,13 @@ public class TotalSalesItem {
 
     public void setUniqueClientCount(int uniqueClientCount) {
         this.uniqueClientCount = uniqueClientCount;
+    }
+
+    public Boolean getCount() {
+        return count;
+    }
+
+    public void setCount(Boolean count) {
+        this.count = count;
     }
 }
