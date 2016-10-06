@@ -376,15 +376,9 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
-            if(showDetail) {
-                builder.getReportProperties().setProperty("preferentialTitleComplexes", preferentialTitleComplexesString);
-            }
-            if(showBenefitDetail) {
-                builder.getReportProperties().setProperty("benefitTitleAndSumList", benefitTitleAndSumListString);
-            }
-            if(showPaidDetail) {
-                builder.getReportProperties().setProperty("paidTitleAndSumList", paidTitleAndSumListString);
-            }
+            builder.getReportProperties().setProperty("preferentialTitleComplexes", showDetail ? preferentialTitleComplexesString : "");
+            builder.getReportProperties().setProperty("benefitTitleAndSumList", showBenefitDetail ? benefitTitleAndSumListString : "");
+            builder.getReportProperties().setProperty("paidTitleAndSumList", showPaidDetail ? paidTitleAndSumListString : "");
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);

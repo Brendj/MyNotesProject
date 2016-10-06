@@ -295,42 +295,45 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
             List<OrderItem> allOrders = ordersRepository.findAllOrders(idOfOrgsList, startTime, endTime);
 
+            boolean wasSumProductOwn = false;
+            if(titleComplexes.isEmpty()) {
+                wasSumProductOwn = true;
+                titleComplexes.add("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]));
+            }
             for (OrderItem allOrder : allOrders) {
 
-                if (!titleComplexes.isEmpty()) {
-                    for (String title : titleComplexes) {
-                        if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN
-                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                                sumProductOwn += handleOrders(totalListMap, allOrder, title);
-                                sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder,
-                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
-                            }
-                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE
-                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                                sumProductCentralize += handleOrders(totalListMap, allOrder, title);
-                            }
-                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE_COOK
-                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                                sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
-                            }
-                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_PURCHASE
-                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                                sumProductPurchase += handleOrders(totalListMap, allOrder, title);
-                            }
-                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_VENDING
-                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                                sumProductVending += handleOrders(totalListMap, allOrder, title);
-                            }
-                        } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
-                            if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL
-                                    && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                                sumProductCommercial += handleOrders(totalListMap, allOrder, title);
-                            }
+                for (String title : titleComplexes) {
+                    if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
+                        if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN
+                                && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            sumProductOwn += handleOrders(totalListMap, allOrder, title);
+                            sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder,
+                                    TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
+                        }
+                    } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
+                        if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE
+                                && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            sumProductCentralize += handleOrders(totalListMap, allOrder, title);
+                        }
+                    } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
+                        if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE_COOK
+                                && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
+                        }
+                    } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
+                        if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_PURCHASE
+                                && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            sumProductPurchase += handleOrders(totalListMap, allOrder, title);
+                        }
+                    } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
+                        if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_VENDING
+                                && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            sumProductVending += handleOrders(totalListMap, allOrder, title);
+                        }
+                    } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
+                        if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL
+                                && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
+                            sumProductCommercial += handleOrders(totalListMap, allOrder, title);
                         }
                     }
                 }
@@ -358,6 +361,10 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     sumBen += handleOrders(totalListMap, allOrder, NAME_BEN);
 
                 }
+            }
+
+            if(wasSumProductOwn) {
+                titleComplexes.remove(titleComplexes.indexOf("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0])));
             }
 
         }
@@ -407,9 +414,9 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         private String getAgeGroup(OrderItem buffetOrder) {
             if(buffetOrder.getIdOfClientGroup() == null || buffetOrder.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
                 return AGE_GROUP_NAMES[3];
-            } else if(is511Group(buffetOrder.getGroupName())) {
+            } else if(StringUtils.isNotEmpty(buffetOrder.getGroupName()) && is511Group(buffetOrder.getGroupName())) {
                 return AGE_GROUP_NAMES[1];
-            } else if(is14Group(buffetOrder.getGroupName())) {
+            } else if(StringUtils.isNotEmpty(buffetOrder.getGroupName()) && is14Group(buffetOrder.getGroupName())) {
                 return AGE_GROUP_NAMES[0];
             } else {
                 return AGE_GROUP_NAMES[2];
