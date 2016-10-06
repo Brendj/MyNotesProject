@@ -253,7 +253,7 @@ public class SummaryCalculationService {
                 + "AND e.evtdatetime BETWEEN :startTime AND :endTime "
                 + "WHERE (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
                 + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.IdOfClient)) "
-                + "and c.idofclientgroup not between :group_employees and :group_displaced";
+                + "and c.idofclientgroup not between :group_employees and :group_displaced order by 1, 4";
         Query equery = entityManager.createNativeQuery(query_ee);
         equery.setParameter("notifyType", notifyType);
         equery.setParameter("startTime", startDate.getTime());
