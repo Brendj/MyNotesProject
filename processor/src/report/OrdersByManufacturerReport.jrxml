@@ -147,6 +147,13 @@
 					<cellContents>
 						<textField>
 							<reportElement uuid="624d1c50-a084-47bd-bcce-62b3d5e2e1f8" style="border" x="0" y="0" width="194" height="30"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -154,6 +161,13 @@
 						</textField>
 						<textField>
 							<reportElement uuid="345bdf24-92d5-450d-84dc-ea8db5a80ee4" style="border" x="194" y="0" width="87" height="30"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true" isStrikeThrough="false"/>
 							</textElement>
