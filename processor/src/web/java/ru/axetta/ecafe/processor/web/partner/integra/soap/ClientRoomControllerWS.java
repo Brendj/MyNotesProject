@@ -4804,7 +4804,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             session.flush();
             persistenceTransaction.commit();
-            session.close();
+            persistenceTransaction = null;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         }
@@ -4812,6 +4812,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error("Failed to process client room controller request", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = e.getMessage();
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }

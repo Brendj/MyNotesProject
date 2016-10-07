@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report.taloonApproval;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfTaloonApproval;
 import ru.axetta.ecafe.processor.core.persistence.TaloonApproval;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -23,10 +24,13 @@ public class TaloonApprovalVerification {
 
     public List<TaloonApprovalVerificationItem> getItems(Session session, Date startDate, Date endDate, Long idOfOrg) {
         if (startDate == null || endDate == null || idOfOrg == null) return null;
+
+        Date eDate = CalendarUtils.endOfDay(endDate);
+
         List<TaloonApprovalVerificationItem> items = new ArrayList<TaloonApprovalVerificationItem>();
         Criteria criteria = session.createCriteria(TaloonApproval.class);
         criteria.add(Restrictions.gt("compositeIdOfTaloonApproval.taloonDate", startDate));
-        criteria.add(Restrictions.lt("compositeIdOfTaloonApproval.taloonDate", endDate));
+        criteria.add(Restrictions.lt("compositeIdOfTaloonApproval.taloonDate", eDate));
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.addOrder(Order.asc("compositeIdOfTaloonApproval.taloonDate"));
         criteria.addOrder(Order.asc("compositeIdOfTaloonApproval.taloonName"));
