@@ -275,6 +275,8 @@ public class DAOReadonlyService {
                             result.add(cg.getIdOfChildren());
                         }
                     }
+                } else {
+                    result.add(id);
                 }
             }
         }
