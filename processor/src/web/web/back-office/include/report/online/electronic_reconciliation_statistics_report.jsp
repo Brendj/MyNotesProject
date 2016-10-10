@@ -8,16 +8,18 @@
 <h:panelGrid id="electronicReconciliationStatisticsReportPageGrid"
              binding="#{mainPage.electronicReconciliationStatisticsPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-
-        <h:inputText value="#{mainPage.electronicReconciliationStatisticsPage.contragent.contragentName}"
-                     readonly="true" styleClass="input-text" style="margin-right: 2px; width: 275px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                           reRender="modalContragentSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;">
-            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
-            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
-        </a4j:commandButton>
+        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.electronicReconciliationStatisticsPage.contragent.contragentName}"
+                         readonly="true" styleClass="input-text" style="margin-right: 2px; width: 275px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                               reRender="modalContragentSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            </a4j:commandButton>
+        </h:panelGroup>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
@@ -30,7 +32,8 @@
                         value="#{mainPage.electronicReconciliationStatisticsPage.getStringIdOfOrgList}"
                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.electronicReconciliationStatisticsPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true"
+                          value=" {#{mainPage.electronicReconciliationStatisticsPage.filter}}" />
         </h:panelGroup>
 
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
