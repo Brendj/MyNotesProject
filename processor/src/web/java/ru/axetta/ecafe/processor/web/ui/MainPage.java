@@ -403,6 +403,7 @@ public class MainPage implements Serializable {
     private final AdjustmentPaymentReportPage adjustmentPaymentReportPage = new AdjustmentPaymentReportPage();
     private final SalesReportGroupPage salesReportGroupPage = new SalesReportGroupPage();
     private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
+    private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -6182,6 +6183,20 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showElectronicReconciliationStatisticsPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = electronicReconciliationStatisticsPage;
+            currentWorkspacePage.show();
+        } catch (Exception e) {
+            logger.error("Failed to set electronic reconciliation statistics verification page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы cтатистикb электронной сверки: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showDeliveredServicesElectronicCollationReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -9152,6 +9167,10 @@ public class MainPage implements Serializable {
 
     public TaloonApprovalVerificationPage getTaloonApprovalVerificationPage() {
         return taloonApprovalVerificationPage;
+    }
+
+    public ElectronicReconciliationStatisticsPage getElectronicReconciliationStatisticsPage() {
+        return electronicReconciliationStatisticsPage;
     }
 
     /*public BasicBasketReportPage getBasicBasketReportPage() {
