@@ -912,11 +912,14 @@
                          rendered="#{electronicReconciliationReportGroupPage.eligibleToWorkCommodityAccounting}">
         <a4j:support event="onclick" action="#{electronicReconciliationReportGroupPage.show}"
                      reRender="workspaceForm" />
-
+        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier()}"
+                            binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
+                            reRender="workspaceForm" />
         <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier()}"
-                             binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
-                             label="Статистика электронной сверки" action="#{mainPage.showElectronicReconciliationStatisticsPage}"
-                             reRender="workspaceForm" />
+                            binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
+                            label="Статистика электронной сверки"
+                            action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
@@ -932,10 +935,6 @@
         <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"
                             label="Отчет по питанию и посещению" action="#{feedingAndVisitSPage.show}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier()}"
-                            binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
-                            label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
-                            reRender="workspaceForm" />
         <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Сводный отчет по услугам (предварительный)"
