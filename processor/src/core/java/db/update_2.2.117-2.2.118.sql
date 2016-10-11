@@ -4,8 +4,6 @@
 
 -- Пакет обновлений 2.2.118
 
-ALTER TABLE CF_RegistryChange ADD COLUMN guardiansCount integer;
-
 ALTER TABLE cf_clientphoto
   ADD COLUMN iscanceled INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN isapproved INTEGER NOT NULL DEFAULT 0,
