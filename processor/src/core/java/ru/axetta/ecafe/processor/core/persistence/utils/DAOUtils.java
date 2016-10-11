@@ -2538,10 +2538,10 @@ public class DAOUtils {
     }
 
     //Промежуточная группа
-    public static void deleteByParentGroupName(Session session, Long idOfOrg, String parentGroupName, Long idOfMainOrg) {
-        Query q = session.createQuery("DELETE FROM GroupNamesToOrgs WHERE parentGroupName =: parentGroupName AND idOfOrg =: idOfOrg AND idOfMainOrg =: idOfMainOrg");
+    public static void deleteByParentGroupName(Session session, String parentGroupName, Long idOfMainOrg) {
+        Query q = session.createQuery(
+                "DELETE FROM GroupNamesToOrgs WHERE parentGroupName =:parentGroupName AND idOfMainOrg =:idOfMainOrg AND isMiddleGroup = true");
         q.setParameter("parentGroupName", parentGroupName);
-        q.setParameter("idOfOrg", idOfOrg);
         q.setParameter("idOfMainOrg", idOfMainOrg);
         q.executeUpdate();
     }

@@ -4,10 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.groups;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -37,24 +42,47 @@ public class GroupsOrganizationRequest implements SectionRequest {
                 GroupOrganizationItem item;
                 try {
                     item = GroupOrganizationItem.build(node, idOfOrg);
+
                     // подгруппа
                     parentGroupName = item.getName();
-                    items.add(item);
+
+                    Node childNodeOfCg = node.getFirstChild();
+
+                    List<GroupOrganizationItem> itemsCmg = new ArrayList<GroupOrganizationItem>();
+                    while (childNodeOfCg != null) {
+                        if (childNodeOfCg.getNodeType() == Node.ELEMENT_NODE && childNodeOfCg.getNodeName()
+                                .equals("CMG")) {
+                            GroupOrganizationItem itemNextSibling;
+                            try {
+                                itemNextSibling = GroupOrganizationItem
+                                        .buildSubGroup(childNodeOfCg, idOfOrg, parentGroupName);
+                                itemsCmg.add(itemNextSibling);
+                            } catch (Exception e) {
+                                logger.error("failed to create middleGroup organization itemNextSibling," + e);
+                            }
+                        }
+                        childNodeOfCg = childNodeOfCg.getNextSibling();
+                    }
+                    if (itemsCmg.isEmpty()) {
+                        items.add(item);
+                    } else {
+                        Transaction transaction = null;
+                        Session session = RuntimeContext.getInstance().createPersistenceSession();
+                        try {
+                            transaction = session.beginTransaction();
+                            DAOUtils.deleteByParentGroupName(session, parentGroupName, idOfOrg);
+                            transaction.commit();
+                            transaction = null;
+                        } finally {
+                            HibernateUtils.rollback(transaction, logger);
+                            HibernateUtils.close(session, logger);
+                            items.addAll(itemsCmg);
+                        }
+                    }
                 } catch (Exception e) {
                     logger.error("failed to create group organization item," + e);
                 }
             }
-
-            if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("CMG")) {
-                GroupOrganizationItem item;
-                try {
-                    item = GroupOrganizationItem.buildSubGroup(node, idOfOrg, parentGroupName);
-                    items.add(item);
-                } catch (Exception e) {
-                    logger.error("failed to create middleGroup organization item," + e);
-                }
-            }
-
             node = node.getNextSibling();
         }
     }

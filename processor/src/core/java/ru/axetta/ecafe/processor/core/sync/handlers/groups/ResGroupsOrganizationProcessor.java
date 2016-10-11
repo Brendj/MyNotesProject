@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
         loadOrgFromRequest();
         if (!foundMainBuilding()) {
             result.setErrorResult(new ResultOperation(500,
-                    String.format("Not found main bilding for current org, id=%s", sectionRequest.getIdOfOrg())));
+                    String.format("Not found main building for current org, id=%s", sectionRequest.getIdOfOrg())));
             return result;
         }
         Long nextVersion = getNextVersion();
@@ -50,10 +51,30 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
         ArrayList<ResProcessGroupsOrganizationItem> resultItems = new ArrayList<ResProcessGroupsOrganizationItem>();
         if (sectionRequest.getItems().size() > 0) {
             List<GroupNamesToOrgs> groupsFromMainBuilding = loadGroupsFromMainBuilding();
+
+            Set<String> uniqueParentGroupNames = new HashSet<String>();
+
+            for (GroupOrganizationItem groupOrganizationItem : sectionRequest.getItems()) {
+                if (groupOrganizationItem.getMiddleGroup() == true) {
+                    uniqueParentGroupNames.add(groupOrganizationItem.getParentGroupName());
+                }
+            }
+
             for (GroupOrganizationItem groupItem : sectionRequest.getItems()) {
-                ResultOperation resultOperation = processResultGroupOrganizationItem(groupsFromMainBuilding, groupItem, nextVersion);
-                ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(groupItem.getName(),
-                        nextVersion, resultOperation);
+                ResultOperation resultOperation = processResultGroupOrganizationItem(groupsFromMainBuilding, groupItem,
+                        nextVersion);
+
+                if (groupItem.getMiddleGroup() == false) {
+                    ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(groupItem.getName(),
+                            nextVersion, resultOperation);
+                    resultItems.add(item);
+                }
+            }
+
+            for (String unique : uniqueParentGroupNames) {
+                GroupNamesToOrgs groupNamesToOrg = loadGroupFromMainBuilding(unique);
+                ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(
+                        groupNamesToOrg.getParentGroupName(), groupNamesToOrg.getVersion(), null);
                 resultItems.add(item);
             }
         }
@@ -65,6 +86,13 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
         Query query = session.createQuery("select g from GroupNamesToOrgs g where g.idOfMainOrg=:orgId");
         query.setParameter("orgId", mainOrg.getIdOfOrg());
         return query.list();
+    }
+
+    private GroupNamesToOrgs loadGroupFromMainBuilding(String parentGroupName) {
+        Query query = session.createQuery("select g from GroupNamesToOrgs g where g.idOfMainOrg=:orgId and g.isMiddleGroup=true and g.parentGroupName=:parentGroupName order by g.version desc");
+        query.setParameter("orgId", mainOrg.getIdOfOrg());
+        query.setParameter("parentGroupName", parentGroupName);
+        return (GroupNamesToOrgs) query.list().get(0);
     }
 
     private boolean foundMainBuilding() {
