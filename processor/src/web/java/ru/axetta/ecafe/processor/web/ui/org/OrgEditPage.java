@@ -257,7 +257,7 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
-        long nextVersion = DAOUtils.nextVersionByOrgStucture(session);
+        Long nextVersion = null; //DAOUtils.nextVersionByOrgStucture(session);
 
         Set<Org> friendlyOrg = org.getFriendlyOrg();
         if(idOfOrgList == null || idOfOrgList.isEmpty()){
@@ -277,7 +277,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 orgsForVersionUpdate.add(o);
             }
             for (Org o : selectOrg) {
-                ClientManager.updateClientVersion(session, o.getClients());
+                ClientManager.updateClientVersionBatch(session, o.getIdOfOrg());
                 o.setFriendlyOrg(selectOrg);
                 if(o.isMainBuilding() && !o.getIdOfOrg().equals(idOfOrg)) {
                     o.setMainBuilding(false);
@@ -287,6 +287,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
                 //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
             }
+            nextVersion = DAOUtils.nextVersionByOrgStucture(session);
             for (Org o : orgsForVersionUpdate) {
                 o.setOrgStructureVersion(nextVersion);
                 session.update(o);
@@ -333,6 +334,9 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
+        if (nextVersion == null) {
+            nextVersion = DAOUtils.nextVersionByOrgStucture(session);
+        }
         org.setOrgStructureVersion(nextVersion);
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
         org.setPhotoRegistryDirective(photoD);

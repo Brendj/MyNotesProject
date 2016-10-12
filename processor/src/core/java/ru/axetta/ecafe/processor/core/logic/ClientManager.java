@@ -1216,6 +1216,14 @@ public class ClientManager {
         }
     }
 
+    public static void updateClientVersionBatch(Session session, Long idOfOrg) throws Exception {
+        Long version = DAOUtils.updateClientRegistryVersion(session);
+        Query q = session.createSQLQuery("UPDATE cf_clients SET clientregistryversion = :version where idoforg = :idoforg");
+        q.setParameter("version", version);
+        q.setParameter("idoforg", idOfOrg);
+        q.executeUpdate();
+    }
+
     public static List<Client> findAllAllocatedClients(Session session, Org destinationOrg) {
         Map<String, Set<Client>> map = findAllocatedClients(session, destinationOrg);
         List<Client> res = new ArrayList<Client>();
