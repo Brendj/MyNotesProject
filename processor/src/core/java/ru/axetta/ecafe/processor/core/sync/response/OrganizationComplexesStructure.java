@@ -88,7 +88,9 @@ public class OrganizationComplexesStructure implements AbstractToElement{
                 result.add(configurationProvider.getIdOfConfigurationProvider());
             }
         }
-
+        if (result.size() == 0) {
+            return new HashSet<ConfigurationProvider>();
+        }
         Query query = session.createQuery(
                 "select distinct cfp from ConfigurationProvider cfp where cfp.idOfConfigurationProvider in :ids");
         query.setParameterList("ids", result);
