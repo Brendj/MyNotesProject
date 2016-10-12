@@ -23,6 +23,9 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("GroupsOrganization");
+
+       // Set<String> parentGroupNameSet = new HashSet<String>();
+
         for (ProcessGroupsOrganizationDataItem item : items) {
             if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
                 if (item.getMiddleGroup() == true) {
@@ -32,6 +35,19 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
                 }
             }
         }
+
+      /*  Map<String, List<ProcessGroupsOrganizationDataItem>> parentGroupNameDataMap = new HashMap<String, List<ProcessGroupsOrganizationDataItem>>();
+
+        for (String parentGroupName : parentGroupNameSet) {
+            parentGroupNameDataMap.put(parentGroupName, new LinkedList<ProcessGroupsOrganizationDataItem>());
+        }
+
+        for (ProcessGroupsOrganizationDataItem item : items) {
+            if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
+                parentGroupNameDataMap.get(item.getParentGroupName()).addAll(items);
+            }
+        }*/
+
         return element;
     }
 
