@@ -58,67 +58,90 @@
 
     <rich:dataTable id="orgListTable" value="#{mainPage.orgListPage.items}"
                     var="item" rows="20" footerClass="data-table-footer">
-        <rich:column headerClass="column-header" styleClass="right-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор" />
-            </f:facet>
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column colspan="2" headerClass="column-header">
+                    <h:outputText value="Организация" />
+                </rich:column>
+                <rich:column colspan="2" headerClass="column-header">
+                    <h:outputText value="Главный корпус" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Статус" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Номер договора" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Тэги" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Город" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Район" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Локация" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Контактный телефон" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Редактировать" />
+                </rich:column>
+                <rich:column breakBefore="true" headerClass="column-header">
+                    <h:outputText value="ИД" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Наименование" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="ИД" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Наименование" />
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column styleClass="right-aligned-column">
             <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Организация" />
-            </f:facet>
+        <rich:column styleClass="left-aligned-column">
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Статус" />
-            </f:facet>
+        <rich:column styleClass="right-aligned-column">
+            <h:outputText escape="true" value="#{item.idOfOrgMain}" styleClass="output-text" />
+        </rich:column>
+        <rich:column styleClass="left-aligned-column">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.shortNameMain}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{item.idOfOrgMain}" target="#{mainPage.selectedIdOfOrg}" />
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.state}" converter="orgStateConverter" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="right-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер договора" />
-            </f:facet>
+        <rich:column styleClass="right-aligned-column">
             <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Тэги" />
-            </f:facet>
+        <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.tag}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Город" />
-            </f:facet>
+        <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.city}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Район" />
-            </f:facet>
+        <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.district}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Локация" />
-            </f:facet>
+        <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.location}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="left-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Контактный телефон" />
-            </f:facet>
+        <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
         </rich:column>
-
-        <rich:column headerClass="column-header" styleClass="center-aligned-column">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Редактировать" />
-            </f:facet>
+        <rich:column styleClass="center-aligned-column">
             <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showOrgEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />

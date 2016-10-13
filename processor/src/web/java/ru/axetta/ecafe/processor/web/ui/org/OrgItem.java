@@ -15,6 +15,8 @@ public class OrgItem {
 
     private Long idOfOrg;
     private String shortName;
+    private Long idOfOrgMain;
+    private String shortNameMain;
     private String contractId;
     private Integer state;
     private String phone;
@@ -37,6 +39,22 @@ public class OrgItem {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public Long getIdOfOrgMain() {
+        return idOfOrgMain;
+    }
+
+    public void setIdOfOrgMain(Long idOfOrgMain) {
+        this.idOfOrgMain = idOfOrgMain;
+    }
+
+    public String getShortNameMain() {
+        return shortNameMain;
+    }
+
+    public void setShortNameMain(String shortNameMain) {
+        this.shortNameMain = shortNameMain;
     }
 
     public String getContractId() {

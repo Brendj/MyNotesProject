@@ -69,7 +69,7 @@ public class OrgFilter {
             ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, criteria);
         } catch (Exception e) {
         }
-        if (idOfOrg != null && idOfOrg.compareTo(Long.parseLong("0")) > 0) {
+        if (idOfOrg != null && idOfOrg.compareTo(Long.parseLong("-1")) > 0) {
             criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         } else if (StringUtils.isNotEmpty(officialName)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", officialName, MatchMode.ANYWHERE).ignoreCase(),
