@@ -5,12 +5,13 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.groups;
 
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: akmukov
@@ -24,29 +25,54 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("GroupsOrganization");
 
-       // Set<String> parentGroupNameSet = new HashSet<String>();
+        Map<String, List<ProcessGroupsOrganizationDataItem>> middleGroupsByGroup = new HashMap<String, List<ProcessGroupsOrganizationDataItem>>();
 
         for (ProcessGroupsOrganizationDataItem item : items) {
             if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
                 if (item.getMiddleGroup() == true) {
-                    element.appendChild(item.toSubGroupElement(document));
-                } else {
-                    element.appendChild(item.toElement(document));
+                    if (middleGroupsByGroup.containsKey(item.getParentGroupName())) {
+                        middleGroupsByGroup.get(item.getParentGroupName()).add(item);
+                    } else {
+                        List<ProcessGroupsOrganizationDataItem> array = new ArrayList<ProcessGroupsOrganizationDataItem>();
+                        array.add(item);
+                        middleGroupsByGroup.put(item.getParentGroupName(), array);
+                    }
                 }
+            } else {
+                element.appendChild(item.toElement(document));
             }
         }
 
-      /*  Map<String, List<ProcessGroupsOrganizationDataItem>> parentGroupNameDataMap = new HashMap<String, List<ProcessGroupsOrganizationDataItem>>();
+        Set<String> groupNamesSet = middleGroupsByGroup.keySet();
 
-        for (String parentGroupName : parentGroupNameSet) {
-            parentGroupNameDataMap.put(parentGroupName, new LinkedList<ProcessGroupsOrganizationDataItem>());
+        for (String groupName : groupNamesSet) {
+            List<ProcessGroupsOrganizationDataItem> middleGroups = middleGroupsByGroup.get(groupName);
+            element.appendChild(middleGroupsToElement(groupName, middleGroups, document));
         }
 
-        for (ProcessGroupsOrganizationDataItem item : items) {
-            if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
-                parentGroupNameDataMap.get(item.getParentGroupName()).addAll(items);
+        return element;
+    }
+
+    private Node middleGroupsToElement(String groupName, List<ProcessGroupsOrganizationDataItem> middleGroups,
+            Document document) {
+        Long maxVersion = 0L;
+
+        for (ProcessGroupsOrganizationDataItem groupsOrganizationDataItem : middleGroups) {
+            if (maxVersion < groupsOrganizationDataItem.getVersion()) {
+                maxVersion = groupsOrganizationDataItem.getVersion();
             }
-        }*/
+        }
+
+        Element element = document.createElement("CG");
+        XMLUtils.setAttributeIfNotNull(element, "Name", groupName);
+        XMLUtils.setAttributeIfNotNull(element, "V", maxVersion);
+
+        for (ProcessGroupsOrganizationDataItem groupsOrganizationData : middleGroups) {
+            Element elementCmg = document.createElement("CMG");
+            XMLUtils.setAttributeIfNotNull(elementCmg, "Name", groupsOrganizationData.getName());
+            XMLUtils.setAttributeIfNotNull(elementCmg, "BindingToOrg", groupsOrganizationData.getBindingToOrg());
+            element.appendChild(elementCmg);
+        }
 
         return element;
     }
