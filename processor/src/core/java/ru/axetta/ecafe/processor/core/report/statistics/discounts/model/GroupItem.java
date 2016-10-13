@@ -36,8 +36,14 @@ public class GroupItem implements Comparable<GroupItem> {
         if (groupName.contains("-") && o.getGroupName().contains("-")) {
             String[] name1 = groupName.split("-");
             String[] name2 = o.getGroupName().split("-");
-            int number1 = Integer.valueOf(name1[0]);
-            int number2 = Integer.valueOf(name2[0]);
+            int number1;
+            int number2;
+            try {
+                number1 = Integer.valueOf(name1[0]);
+                number2 = Integer.valueOf(name2[0]);
+            } catch (NumberFormatException e) {
+                return groupName.compareTo(o.getGroupName());
+            }
             if (number1 != number2) {
                 return Double.compare(number1, number2);
             } else {
