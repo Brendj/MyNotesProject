@@ -1033,7 +1033,12 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
-                    createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                    if (change.getGender() != null) {
+                        if (change.getGender().equals(0))
+                            createConfig.setValue(ClientManager.FieldId.GENDER, "f");
+                        if (change.getGender().equals(1))
+                            createConfig.setValue(ClientManager.FieldId.GENDER, "m");
+                    }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                     createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
