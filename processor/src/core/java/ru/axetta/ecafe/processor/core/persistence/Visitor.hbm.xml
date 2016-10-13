@@ -50,5 +50,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
         </set>
 
+        <property name="position" column="position" type="string"/>
+
     </class>
 </hibernate-mapping>

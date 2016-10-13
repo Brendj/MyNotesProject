@@ -18,3 +18,11 @@ SET shortaddress = i.a FROM (SELECT idoforg, trim(FROM substring(address FROM '%
 where trim(FROM substring(address FROM '%/%/#"%/%/%#"' FOR '#')) <> '') i
 WHERE i.idoforg = o.idoforg;
 
+-- Поле "должность" для временных посетителей
+ALTER TABLE cf_visitors
+  ADD COLUMN position character varying (128);
+
+UPDATE cf_visitors
+SET position = 'Инженер ИС ПП'
+WHERE VisitorType = 1;
+

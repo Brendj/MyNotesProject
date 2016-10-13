@@ -17,6 +17,7 @@ public class Visitor {
 
     public static final Integer DEFAULT_TYPE = 0;
     public static final Integer EMPLOYEE_TYPE = 1;
+    public static final Integer VISITORDOGM_TYPE = 2;
     private Long idOfVisitor;
     private Person person;
     private String passportNumber;
@@ -29,6 +30,7 @@ public class Visitor {
     private Integer visitorType;
     private Set<CardTemp> cards = new HashSet<CardTemp>();
     private Set<Card> cardsInternal = new HashSet<Card>();
+    private String position;
     private boolean deleted;
 
     private String freeDocName;
@@ -164,6 +166,14 @@ public class Visitor {
 
     public void setCardsInternal(Set<Card> cardsInternal) {
         this.cardsInternal = cardsInternal;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     @Override
