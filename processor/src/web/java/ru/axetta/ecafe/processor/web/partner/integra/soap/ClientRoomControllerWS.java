@@ -6079,36 +6079,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 res.description = RC_CLIENT_NOT_FOUND_DESC;
                 return res;
             }
-            Long orderType = null;
             List<Client> guardians = ClientManager.findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
-            if (guardians.size() > 0) {
-                for (Long nType : notificationTypes) {
-                    if (nType.equals(ClientNotificationSetting.Predefined.SMS_NOTIFY_ORDERS.getValue())) {
-                        orderType = nType;
-                    }
-                }
-                //К старому типу уведомлений о покупках добавляем два новых типа
-                if (orderType != null) {
-                    notificationTypes.add(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue());
-                    notificationTypes.add(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_PAY.getValue());
-                }
-
-                for (Client guardian : guardians) {
-                    ClientGuardian clientGuardian = DAOReadonlyService.getInstance()
-                            .findClientGuardianById(persistenceSession, client.getIdOfClient(), guardian.getIdOfClient());
-                    if (clientGuardian == null) { continue; }
-                    processNotificationsForClientGuardian(notificationTypes, clientGuardian);
-                    persistenceSession.update(clientGuardian);
-                }
-            } else {
-                for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
-                    ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
-                    if ((notificationTypes!=null && notificationTypes.contains(pd.getValue())) || pd.getValue()
-                          .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
-                        client.getNotificationSettings().add(cns);
-                    } else {
-                        client.getNotificationSettings().remove(cns);
-                    }
+            for (Client guardian : guardians) {
+                ClientGuardian clientGuardian = DAOReadonlyService.getInstance()
+                        .findClientGuardianById(persistenceSession, client.getIdOfClient(), guardian.getIdOfClient());
+                if (clientGuardian == null) { continue; }
+                processNotificationsForClientGuardian(notificationTypes, clientGuardian);
+                persistenceSession.update(clientGuardian);
+            }
+            for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
+                ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
+                if ((notificationTypes!=null && notificationTypes.contains(pd.getValue())) || pd.getValue()
+                      .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                    client.getNotificationSettings().add(cns);
+                } else {
+                    client.getNotificationSettings().remove(cns);
                 }
             }
             persistenceTransaction.commit();
