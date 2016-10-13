@@ -30,17 +30,6 @@
          <h:outputLabel escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
          <h:inputText value="#{employeeCardCreatePage.card.cardPrintedNo}" styleClass="input-text" />
 
-         <h:outputLabel escape="true" value="Последний день действия" styleClass="output-text" />
-         <rich:calendar value="#{employeeCardCreatePage.card.validDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                        inputClass="input-text" showWeeksBar="false" />
-
-         <h:outputLabel escape="true" value="Статус карты" styleClass="output-text" />
-         <h:selectOneMenu value="#{employeeCardCreatePage.card.cardStation}" styleClass="input-text">
-             <f:converter converterId="cardStationConverter"/>
-             <f:selectItems value="#{employeeCardCreatePage.cardOperationStationMenu.items}" />
-         </h:selectOneMenu>
-         <h:inputText value="#{employeeCardCreatePage.card.cardStation}" styleClass="input-text" rendered="false"/>
-
      </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">

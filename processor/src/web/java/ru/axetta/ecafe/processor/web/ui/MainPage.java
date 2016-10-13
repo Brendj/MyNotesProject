@@ -213,6 +213,8 @@ public class MainPage implements Serializable {
     private final ServiceRNIPPage serviceRNIPPage = new ServiceRNIPPage();
     private final ServiceCheckSumsPage serviceCheckSumsPage = new ServiceCheckSumsPage();
 
+    private final BasicWorkspacePage visitorDogmPage = new BasicWorkspacePage();
+
     // Card manipulation
     private final BasicWorkspacePage cardGroupPage = new BasicWorkspacePage();
     private final CardListPage cardListPage = new CardListPage();
@@ -3830,6 +3832,16 @@ public class MainPage implements Serializable {
 
 
         }
+        return null;
+    }
+
+    public BasicWorkspacePage getVisitorDogmPage() {
+        return visitorDogmPage;
+    }
+
+    public Object showVisitorDogmPage() {
+        currentWorkspacePage = visitorDogmPage;
+        updateSelectedMainMenu();
         return null;
     }
 
@@ -8709,6 +8721,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToShowReportsRepository() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_SHOW_REPORTS_REPOSITORY);
+    }
+
+    public boolean isEligibleToEditVisitorDogm() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_VISITORDOGM_EDIT);
     }
 
     public Object removeClient() {

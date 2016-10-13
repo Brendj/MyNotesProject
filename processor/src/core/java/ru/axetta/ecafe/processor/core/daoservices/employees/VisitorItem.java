@@ -31,6 +31,7 @@ public class VisitorItem {
     private Date driverLicenceDate;
     private String warTicketNumber;
     private Date warTicketDate;
+    private String position;
     private boolean deleted;
     private List<CardItem> cardItems = new ArrayList<CardItem>();
 
@@ -51,6 +52,7 @@ public class VisitorItem {
         this.driverLicenceNumber = item.getDriverLicenceNumber();
         this.driverLicenceDate = item.getDriverLicenceDate();
         this.warTicketNumber = item.getWarTicketNumber();
+        this.position = item.getPosition();
         this.warTicketDate = item.getWarTicketDate();
         this.operationDate = item.getOperationDate();
         this.deleted = item.isDeleted();
@@ -66,6 +68,7 @@ public class VisitorItem {
         passportNumber="";
         driverLicenceNumber="";
         warTicketNumber="";
+        position="";
         freeDocName="";
         freeDocNumber="";
     }
@@ -81,6 +84,7 @@ public class VisitorItem {
         this.driverLicenceDate = visitor.getDriverLicenceDate();
         this.warTicketNumber = visitor.getWarTicketNumber();
         this.warTicketDate = visitor.getWarTicketDate();
+        this.position = visitor.getPosition();
         this.deleted = visitor.isDeleted();
         this.freeDocName = visitor.getFreeDocName();
         this.freeDocNumber = visitor.getFreeDocNumber();
@@ -258,6 +262,14 @@ public class VisitorItem {
         this.warTicketDate = warTicketDate;
     }
 
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -279,6 +291,7 @@ public class VisitorItem {
                 ", driverLicenceDate=" + driverLicenceDate +
                 ", warTicketNumber='" + warTicketNumber + '\'' +
                 ", warTicketDate=" + warTicketDate +
+                ", position=" + position +
                 ", freeDocName=" + freeDocName +
                 ", freeDocNumber=" + freeDocNumber +
                 ", freeDocDate=" + freeDocDate +
@@ -331,6 +344,9 @@ public class VisitorItem {
         if (warTicketNumber != null ? !warTicketNumber.equals(that.warTicketNumber) : that.warTicketNumber != null) {
             return false;
         }
+        if (position != null ? !position.equals(that.position) : that.position != null) {
+            return false;
+        }
         if (freeDocName != null ? !freeDocName.equals(that.freeDocName) : that.freeDocName != null) {
             return false;
         }
@@ -357,6 +373,7 @@ public class VisitorItem {
         result = 31 * result + (warTicketNumber != null ? warTicketNumber.hashCode() : 0);
         result = 31 * result + (warTicketDate != null ? warTicketDate.hashCode() : 0);
         result = 31 * result + (operationDate != null ? operationDate.hashCode() : 0);
+        result = 31 * result + (position != null ? position.hashCode() : 0);
         result = 31 * result + (freeDocName != null ? freeDocName.hashCode() : 0);
         result = 31 * result + (freeDocNumber != null ? freeDocNumber.hashCode() : 0);
         result = 31 * result + (freeDocDate != null ? freeDocDate.hashCode() : 0);

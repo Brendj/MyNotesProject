@@ -27,6 +27,9 @@
          <h:outputLabel escape="true" value="Отчество" styleClass="output-text" />
          <h:inputText value="#{employeeViewPage.employee.secondName}" readonly="true" styleClass="input-text" />
 
+         <h:outputLabel escape="true" value="Должность" styleClass="output-text" />
+         <h:inputText value="#{employeeViewPage.employee.position}" styleClass="input-text" maxlength="128" />
+
          <h:outputLabel escape="true" value="Дата выдачи паспорт" styleClass="output-text" />
          <h:inputText value="#{employeeViewPage.employee.passportDate}" converter="dateConverter" readonly="true" styleClass="input-text" />
          <h:outputLabel escape="true" value="Серийный номер паспорта" styleClass="output-text" />
@@ -55,16 +58,10 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Номер карты" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardViewPage.show}" styleClass="command-link">
+                <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{employeeCardViewPage.show}" styleClass="command-link">
                     <h:outputText escape="true" value="#{card.cardNo}" converter="cardNoConverter" styleClass="output-text" />
                     <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
                 </a4j:commandLink>
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Статус" />
-                </f:facet>
-                <h:outputText escape="true" value="#{card.cardStation}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
@@ -74,15 +71,9 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Последний день действия" />
-                </f:facet>
-                <h:outputText escape="true" value="#{card.validDate}" converter="timeConverter" styleClass="output-text" />
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
                     <h:outputText escape="true" value="Редактировать" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardEditPage.show}" styleClass="command-link">
+                <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{employeeCardEditPage.show}" styleClass="command-link">
                     <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                     <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
                 </a4j:commandLink>

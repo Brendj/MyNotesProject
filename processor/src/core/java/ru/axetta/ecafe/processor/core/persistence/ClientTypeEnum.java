@@ -12,7 +12,7 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public enum ClientTypeEnum {
-    CLIENT(0),VISITOR(1),EMPLOYEE(3);
+    CLIENT(0),VISITOR(1),EMPLOYEE(2),VISITORDOGM(3);
     private final int value;
 
     private ClientTypeEnum(int value) {

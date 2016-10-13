@@ -46,6 +46,9 @@
                 <rich:column headerClass="column-header" rowspan="2">
                     <h:outputText escape="true" value="Отчество" />
                 </rich:column>
+                <rich:column headerClass="column-header" rowspan="2">
+                    <h:outputText escape="true" value="Должность" />
+                </rich:column>
                 <rich:column headerClass="column-header" rowspan="1" colspan="2">
                     <h:outputText escape="true" value="Паспорт" />
                 </rich:column>
@@ -89,7 +92,7 @@
             <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
-            <a4j:commandLink value="#{employee.surname}" reRender="mainMenu, workspaceForm"
+            <a4j:commandLink value="#{employee.surname}" reRender="mainMenu, workspaceTogglePanel"
                              action="#{employeeViewPage.show}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}"/>
             </a4j:commandLink>
@@ -99,6 +102,9 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{employee.secondName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{employee.position}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{employee.passportDate}" converter="dateConverter" styleClass="output-text" />
@@ -120,7 +126,7 @@
         </rich:column>
 
         <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeEditPage.show}"
+            <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{employeeEditPage.show}"
                              styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}" />
@@ -128,7 +134,7 @@
         </rich:column>
 
         <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeListPage.deleteEmployee}"
+            <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{employeeListPage.deleteEmployee}"
                              styleClass="command-link" rendered="#{not employee.deleted}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}" />

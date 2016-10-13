@@ -23,6 +23,9 @@
          <h:outputLabel escape="true" value="Отчество" styleClass="output-text" />
          <h:inputText value="#{employeeEditPage.employee.secondName}" styleClass="input-text" />
 
+         <h:outputLabel escape="true" value="Должность" styleClass="output-text" />
+         <h:inputText value="#{employeeEditPage.employee.position}" styleClass="input-text" maxlength="128" />
+
          <h:outputLabel escape="true" value="Дата выдачи паспорт" styleClass="output-text" />
          <rich:calendar value="#{employeeEditPage.employee.passportDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />

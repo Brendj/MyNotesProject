@@ -41,7 +41,10 @@
                     <h:outputText escape="true" value="Дата" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
-                    <h:outputText escape="true" value="Ииженер" styleClass="column-header" />
+                    <h:outputText escape="true" value="Сотрудник ДОгМ" styleClass="column-header" />
+                </rich:column>
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText escape="true" value="Должность" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
                     <h:outputText escape="true" value="Название учреждения" styleClass="column-header" />
@@ -66,6 +69,9 @@
         </rich:column>
         <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
             <h:outputText escape="true" value="#{employeer.fullName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
+            <h:outputText escape="true" value="#{employeer.position}" styleClass="output-text" />
         </rich:column>
         <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
         </rich:column>

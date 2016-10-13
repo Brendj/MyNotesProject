@@ -370,6 +370,70 @@
 
 </rich:panelMenuGroup>
 
+<rich:panelMenuGroup id="visitorDogmGroupMenu" binding="#{mainPage.visitorDogmPage.mainMenuComponent}" label="Сотрудники ДОгМ"
+                     rendered="#{mainPage.eligibleToEditVisitorDogm}">
+    <a4j:support event="onclick" action="#{mainPage.showVisitorDogmPage}" reRender="workspaceForm" />
+
+    <%--@elvariable id="visitorDogmListPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmListPage"--%>
+    <%--@elvariable id="visitorDogmGroupPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmGroupPage"--%>
+    <%--@elvariable id="visitorDogmViewPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmViewPage"--%>
+    <%--@elvariable id="visitorDogmEditPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmEditPage"--%>
+    <%--@elvariable id="visitorDogmCreatePage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCreatePage"--%>
+    <%--@elvariable id="visitorDogmHistoryReportPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmHistoryReportPage"--%>
+
+    <rich:panelMenuItem id="showVisitorDogmListMenuItem" binding="#{visitorDogmListPage.mainMenuComponent}" label="Список"
+                        action="#{visitorDogmListPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="selectedVisitorDogmGroupMenu" label="#{visitorDogmGroupPage.currentVisitorDogm.shortFullName}"
+                         binding="#{visitorDogmGroupPage.mainMenuComponent}" rendered="false">
+        <a4j:support event="onclick" action="#{visitorDogmGroupPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="viewVisitorDogmMenuItem" binding="#{visitorDogmViewPage.mainMenuComponent}" label="Просмотр"
+                            action="#{visitorDogmViewPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="editVisitorDogmMenuItem" binding="#{visitorDogmEditPage.mainMenuComponent}"
+                            label="Редактировать" action="#{visitorDogmEditPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="createVisitorDogmListMenuItem" binding="#{visitorDogmCreatePage.mainMenuComponent}"
+                        label="Создание" action="#{visitorDogmCreatePage.show}" reRender="workspaceForm" />
+
+    <%--@elvariable id="visitorsDogmCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorsDogmCardGroupPage"--%>
+    <rich:panelMenuGroup id="visitorDogmCardGroupMenu" label="Карты"
+                         binding="#{visitorsDogmCardGroupPage.mainMenuComponent}">
+
+        <%--@elvariable id="visitorDogmCardListPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardListPage"--%>
+        <%--@elvariable id="visitorDogmCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardGroupPage"--%>
+        <%--@elvariable id="visitorDogmCardViewPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardViewPage"--%>
+        <%--@elvariable id="visitorDogmCardEditPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardEditPage"--%>
+        <%--@elvariable id="visitorDogmCardCreatePage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmCardCreatePage"--%>
+
+        <rich:panelMenuItem id="showVisitorDogmCardListMenuItem" binding="#{visitorDogmCardListPage.mainMenuComponent}"
+                            label="Список" action="#{visitorDogmCardListPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedVisitorDogmCardGroupMenu"
+                             label="#{visitorDogmCardGroupPage.currentCard.cardPrintedNo}"
+                             binding="#{visitorDogmCardGroupPage.mainMenuComponent}" rendered="false">
+            <a4j:support event="onclick" action="#{visitorDogmCardGroupPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="viewVisitorDogmCardMenuItem" binding="#{visitorDogmCardViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{visitorDogmCardViewPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="editVisitorDogmCardMenuItem" binding="#{visitorDogmCardEditPage.mainMenuComponent}"
+                                label="Редактировать" action="#{visitorDogmCardEditPage.show}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="createVisitorDogmCardListMenuItem" binding="#{visitorDogmCardCreatePage.mainMenuComponent}"
+                            label="Создание" action="#{visitorDogmCardCreatePage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="visitorDogmHistoryReportMenuItem" binding="#{visitorDogmHistoryReportPage.mainMenuComponent}"
+                        label="Отчет по проходам" action="#{visitorDogmHistoryReportPage.show}" reRender="workspaceForm" />
+</rich:panelMenuGroup>
+
 <rich:panelMenuGroup id="cardGroupMenu" binding="#{mainPage.cardGroupPage.mainMenuComponent}" label="Карты"
                      rendered="#{mainPage.eligibleToViewCards}">
     <a4j:support event="onclick" action="#{mainPage.showCardGroupPage}" reRender="workspaceForm" />
@@ -1346,7 +1410,7 @@
 
 
 <%--@elvariable id="employeesGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesGroupPage"--%>
-<rich:panelMenuGroup id="employeesGroupMenu" label="Инженеры" binding="#{employeesGroupPage.mainMenuComponent}"
+ <rich:panelMenuGroup id="employeesGroupMenu" label="Инженеры" binding="#{employeesGroupPage.mainMenuComponent}"
                      rendered="#{!mainPage.eligibleToViewUsers}">
 
     <%--@elvariable id="employeeListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeListPage"--%>

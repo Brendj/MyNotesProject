@@ -22,7 +22,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер карты" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardViewPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{employeeCardViewPage.show}" styleClass="command-link">
                 <h:outputText escape="true" value="#{card.cardNo}" converter="cardNoConverter" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
             </a4j:commandLink>
@@ -35,27 +35,15 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Статус" />
-            </f:facet>
-            <h:outputText escape="true" value="#{card.cardStation}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
                 <h:outputText escape="true" value="Дата создания" />
             </f:facet>
             <h:outputText escape="true" value="#{card.createDate}" converter="timeConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Последний день действия" />
-            </f:facet>
-            <h:outputText escape="true" value="#{card.validDate}" converter="dateConverter" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{employeeCardEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
             </a4j:commandLink>

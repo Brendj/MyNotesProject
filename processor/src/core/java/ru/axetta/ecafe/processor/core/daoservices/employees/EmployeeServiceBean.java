@@ -140,9 +140,6 @@ public class EmployeeServiceBean {
     @Transactional(rollbackFor = Exception.class)
     public Long saveEmployeeCard(CardItem cardItem, Long idOfEmployer) throws Exception{
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        if (cardItem.getValidDate().before(today)) {
-            throw new RuntimeException("Последний день действия карты не может быть меньше текущего дня.");
-        }
         Card c = DAOUtils.findCardByCardNo((Session) entityManager.getDelegate(), cardItem.getCardNo());
         if (c != null && c.getClient() != null) {
             final String format = "карта уже зарегистрирована на клиента: %d.";
@@ -175,22 +172,17 @@ public class EmployeeServiceBean {
                 cardTemp.setVisitor(visitor);
                 cardTemp.setCardNo(cardTemp.getCardNo());
                 cardTemp.setCardPrintedNo(cardPrintedNo);
-                cardTemp.setValidDate(cardItem.getValidDate());
-                cardTemp.setCardStation(cardItem.getCardStation());
                 entityManager.merge(cardTemp);
             }
         } else {
             if(cardItem.getId()==null){
-                cardTemp = new CardTemp(cardItem.getCardNo(), cardPrintedNo, cardItem.getCardStation(), 2); // ClientTypeEnum.EMPLOYEE);
-                cardTemp.setValidDate(cardItem.getValidDate());
+                cardTemp = new CardTemp(cardItem.getCardNo(), cardPrintedNo, CardOperationStation.REGISTRATION, 2); // ClientTypeEnum.EMPLOYEE);
                 cardTemp.setVisitor(visitor);
                 entityManager.persist(cardTemp);
             } else {
                 cardTemp = entityManager.find(CardTemp.class, cardItem.getId());
                 cardTemp.setCardPrintedNo(cardItem.getCardPrintedNo());
                 cardTemp.setCardNo(cardItem.getCardNo());
-                cardTemp.setValidDate(cardItem.getValidDate());
-                cardTemp.setCardStation(cardItem.getCardStation());
                 cardTemp.setVisitor(visitor);
                 entityManager.merge(cardTemp);
             }
@@ -235,6 +227,7 @@ public class EmployeeServiceBean {
             visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
             visitor.setWarTicketDate(visitorItem.getWarTicketDate());
             visitor.setVisitorType(Visitor.EMPLOYEE_TYPE);
+            visitor.setPosition(visitorItem.getPosition());
             entityManager.persist(visitor);
             return visitor.getIdOfVisitor();
         } else {
@@ -254,6 +247,7 @@ public class EmployeeServiceBean {
                 visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                 visitor.setWarTicketDate(visitorItem.getWarTicketDate());
                 visitor.setVisitorType(Visitor.EMPLOYEE_TYPE);
+                visitor.setPosition(visitorItem.getPosition());
                 entityManager.persist(visitor);
                 return visitor.getIdOfVisitor();
             }
