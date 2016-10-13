@@ -378,13 +378,13 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                     + "split_part(cft.taloonname, '/', 2) AS level2, "
                     + "split_part(cft.taloonname, '/', 3) AS level3, "
                     + "split_part(cft.taloonname, '/', 4) AS level4, sum(cft.soldedqty) AS cnt, "
-                    + "cft.price AS price, sum(cft.soldedqty) * cft.price AS sum, cf_orgs.address, "
+                    + "cft.price AS price, sum(cft.soldedqty) * cft.price AS sum, cf_orgs.shortaddress, "
                     + "substring(cf_orgs.officialname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                     + "cf_orgs.idoforg, CASE WHEN cft.taloonname LIKE '%вода%' THEN 1 ELSE 0 END AS orderType "
                     + "FROM cf_taloon_approval cft JOIN cf_orgs ON cft.idoforg = cf_orgs.idoforg WHERE cft.deletedstate = FALSE  AND "
                     + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                     + "cft.taloondate BETWEEN :start AND :end"
-                    + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, price, address, cft.soldedqty, level1, level2, level3, level4, price, address, cft.taloonname";
+                    + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, price, shortaddress, cft.soldedqty, level1, level2, level3, level4, price, shortaddress, cft.taloonname";
             Query queryTaloon = session.createSQLQuery(sqlTaloon);
             queryTaloon.setParameter("start", start.getTime());
             queryTaloon.setParameter("end", end.getTime());

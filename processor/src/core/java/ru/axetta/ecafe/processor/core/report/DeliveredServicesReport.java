@@ -308,7 +308,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                            + "split_part(cf_goods.fullname, '/', 4) as level4, " + "sum(cf_orderdetails.qty) as cnt, "
                            + "(cf_orderdetails.rprice + cf_orderdetails.socdiscount) price, "
                            + "sum(cf_orderdetails.qty) * (cf_orderdetails.rprice + cf_orderdetails.socdiscount) as sum, "
-                           + "cf_orgs.address, "
+                           + "cf_orgs.shortaddress, "
                            + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg, "
                            + "case cf_orders.orderType when 10 then 1 else 0 end as orderType "
                     + "from cf_orgs "
@@ -318,7 +318,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                     + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
                     + typeCondition + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                     + " cf_orders.createddate between :start and :end  "
-                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, address "
+                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, shortaddress "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
             query.setParameter("start", start.getTime());
