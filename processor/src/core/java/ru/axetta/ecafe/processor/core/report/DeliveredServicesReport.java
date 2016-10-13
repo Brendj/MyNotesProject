@@ -149,12 +149,23 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 nameOrg = "                                                                   ";
             } else  {
                 StringBuilder stringBuilder = new StringBuilder();
+                List<Long> orgs = new ArrayList<Long>();
                 for(OrgShortItem orgShortItem : orgShortItemList) {
-                    Org org = (Org) session.load(Org.class, orgShortItem.getIdOfOrg());
-                    stringBuilder.append(org.getOfficialName());
-                    stringBuilder.append(", ");
+                    orgs.add(orgShortItem.getIdOfOrg());
                 }
-                nameOrg = stringBuilder.substring(0, stringBuilder.length() - 2);
+                Query query = session.createSQLQuery("select distinct o.officialname from cf_orgs o where o.idoforg in "
+                        + "(select f.friendlyorg from cf_friendly_organization f "
+                        + "inner join cf_orgs o on o.idoforg = f.friendlyorg "
+                        + "where f.currentorg in :orgs and o.mainbuilding = 1)");
+                query.setParameterList("orgs", orgs);
+                List<String> list = (List<String>) query.list();
+                if (list != null && list.size() != 0) {
+                    for(String name : list) {
+                        stringBuilder.append(name);
+                        stringBuilder.append(", ");
+                    }
+                    nameOrg = stringBuilder.substring(0, stringBuilder.length() - 2);
+                }
                 if ((nameOrg == null) || nameOrg.isEmpty()) {
                     nameOrg = "                                                                   ";
                 }
