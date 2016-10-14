@@ -136,8 +136,7 @@ public class SyncStatsPage extends OnlineReportWithContragentPage {
     }
 
     private List<SyncHistoryCalc> getSyncHistoryCalcList(Session persistenceSession, Long idOfOrg, Date periodStart, Date periodEnd) {
-        return DAOUtils
-                .getSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, periodEnd, null);
+        return DAOUtils.getSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, periodEnd);
     }
 
     public String getPageFilename() {

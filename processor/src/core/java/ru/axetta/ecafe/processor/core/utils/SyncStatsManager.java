@@ -77,9 +77,7 @@ public class SyncStatsManager {
                 List<SyncData> orgSyncDataList = syncDataMap.get(idOfOrg);
 
                 Map<Integer, String> orgStats = getOrgStats(orgSyncDataList);
-                for (Integer type : orgStats.keySet()) {
-                    createSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, type, orgStats.get(type), false);
-                }
+                createSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, orgStats, false);
             }
 
             persistenceSession.flush();
@@ -295,28 +293,40 @@ public class SyncStatsManager {
      *
      * @param idOfOrg   - id ОО
      * @param syncTime  - время сеанса синхронизации (начало 10-минутног или суточного интервала)
-     * @param syncType  - тип сохраняемых данных
-     * @param syncValue - значение сохраняемых данных
+     * @param syncValues - значения сохраняемых данных
      * @return - сохраненный объект
      * @throws Exception
      */
-    private static SyncHistoryCalc createSyncHistoryCalc(Session persistenceSession, Long idOfOrg, Date syncTime,
-            Integer syncType, String syncValue, boolean isProcessLogData) throws Exception {
+    private static void createSyncHistoryCalc(Session persistenceSession, Long idOfOrg, Date syncTime,
+            Map<Integer, String> syncValues, boolean isProcessLogData) throws Exception {
         List<SyncHistoryCalc> existedSyncHistoryCalcList = DAOUtils
-                .getSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, new Date(), syncType);
-        SyncHistoryCalc syncHistoryCalc;
-        if (existedSyncHistoryCalcList.size() > 0) {
-            if (existedSyncHistoryCalcList.size() > 1 && !isProcessLogData) {
-                throw new Exception("Critical error in SyncStatsManager");
+                .getSyncHistoryCalc(persistenceSession, idOfOrg, syncTime, new Date());
+        Map<Integer, List<SyncHistoryCalc>> map = new HashMap<Integer, List<SyncHistoryCalc>>();
+        for(SyncHistoryCalc syncHistoryCalc : existedSyncHistoryCalcList) {
+            if(map.get(syncHistoryCalc.getDataType()) == null) {
+                List<SyncHistoryCalc> syncHistoryCalcList = new ArrayList<SyncHistoryCalc>();
+                syncHistoryCalcList.add(syncHistoryCalc);
+                map.put(syncHistoryCalc.getDataType(), syncHistoryCalcList);
+            } else {
+                map.get(syncHistoryCalc.getDataType()).add(syncHistoryCalc);
             }
-            syncHistoryCalc = existedSyncHistoryCalcList.get(0);
-            Long syncValueLong = (Long.parseLong(syncValue) + Long.parseLong(syncHistoryCalc.getValue()));
-            syncValue = syncValueLong.toString();
-            persistenceSession.delete(syncHistoryCalc);
         }
-        syncHistoryCalc = new SyncHistoryCalc(idOfOrg, syncTime, syncType, syncValue);
-        persistenceSession.save(syncHistoryCalc);
-        return syncHistoryCalc;
+        for(Integer syncType : map.keySet()) {
+            String syncValue = syncValues.get(syncType);
+            List<SyncHistoryCalc> syncHistoryCalcList = map.get(syncType);
+            SyncHistoryCalc syncHistoryCalc;
+            if (syncHistoryCalcList.size() > 0) {
+                if (syncHistoryCalcList.size() > 1 && !isProcessLogData) {
+                    throw new Exception("Critical error in SyncStatsManager");
+                }
+                syncHistoryCalc = syncHistoryCalcList.get(0);
+                Long syncValueLong = (Long.parseLong(syncValue) + Long.parseLong(syncHistoryCalc.getValue()));
+                syncValue = syncValueLong.toString();
+                persistenceSession.delete(syncHistoryCalc);
+            }
+            syncHistoryCalc = new SyncHistoryCalc(idOfOrg, syncTime, syncType, syncValue);
+            persistenceSession.save(syncHistoryCalc);
+        }
     }
 
 
@@ -444,9 +454,7 @@ public class SyncStatsManager {
                 Map<Integer, String> stats = getStats(successfullSyncCount, filteredSyncCount, errorSyncCount,
                         averageReconnectTime, reconnectIntervals, minSyncDuration, averageSyncDuration,
                         maxSyncDuration, syncDurations);
-                for (Integer type : stats.keySet()) {
-                    createSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, type, stats.get(type), true);
-                }
+                createSyncHistoryCalc(persistenceSession, idOfOrg, periodStart, stats, true);
             }
 
             persistenceSession.flush();

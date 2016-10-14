@@ -1164,16 +1164,13 @@ public class DAOUtils {
      */
     @SuppressWarnings("unchecked")
     public static List<SyncHistoryCalc> getSyncHistoryCalc(Session persistenceSession, Long idOfOrg, Date fromDateTime,
-            Date toDateTime, Integer syncType) {
+            Date toDateTime) {
         Criteria criteria = persistenceSession.createCriteria(SyncHistoryCalc.class);
         if (idOfOrg != null) {
             criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         }
         criteria.add(Restrictions.ge("syncDay", fromDateTime)); // >=
         criteria.add(Restrictions.le("syncDay", toDateTime));   // <=
-        if (syncType != null) {
-            criteria.add(Restrictions.eq("dataType", syncType));
-        }
         return criteria.list();
     }
 
