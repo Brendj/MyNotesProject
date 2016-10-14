@@ -59,6 +59,10 @@
         <c:import url="include/option/employees/employee/select.jsp" />
     </f:subview>
 
+    <f:subview id="dogmSelectSubView">
+        <c:import url="include/visitorsdogm/visitordogm/select.jsp" />
+    </f:subview>
+
     <f:subview id="bankDeleteSubView">
         <c:import url="include/option/confirm_delete_bank.jsp" />
     </f:subview>

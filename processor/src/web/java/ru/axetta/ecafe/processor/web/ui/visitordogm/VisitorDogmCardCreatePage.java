@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 public class VisitorDogmCardCreatePage extends BasicWorkspacePage implements SelectVisitorDogm {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SelectVisitorDogm.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(VisitorDogmCardCreatePage.class);
 
     @Autowired
     private VisitorDogmServiceBean serviceBean;
