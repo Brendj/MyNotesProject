@@ -279,7 +279,7 @@ public class EventNotificationService {
 
     public void sendNotification(Client destClient, Client dataClient, String type, String[] values, Integer passDirection, Client guardian, Boolean sendAsync, Date eventTime) {
 
-        if (dataClient == null && !isNotificationEnabled(destClient, type)) {
+        if (dataClient == null && !isNotificationEnabled(destClient, type, values)) {
             return;
         }
         Boolean sms = null;
@@ -317,7 +317,10 @@ public class EventNotificationService {
         }
     }
 
-    public boolean isNotificationEnabled(Client client, String type) {
+    public boolean isNotificationEnabled(Client client, String type, String[] values) {
+        if (type.equals(EventNotificationService.MESSAGE_PAYMENT)) {
+            type = getOrderNotificationType(values);
+        }
         ClientNotificationSetting.Predefined predefined = ClientNotificationSetting.Predefined.parseByBinding(type);
         if (predefined == null) {
             return true;
@@ -358,6 +361,18 @@ public class EventNotificationService {
             }
         }
         return true;
+    }
+
+    private String getOrderNotificationType(String[] values) {
+        if(EventNotificationService.findBooleanValueInParams(new String[]{"isBarOrder"}, values)) {
+            return MESSAGE_PAYMENT;
+        } else if(EventNotificationService.findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
+            return MESSAGE_PAYMENT_PAY;
+        } else if(EventNotificationService.findBooleanValueInParams(new String[]{"isFreeOrder"}, values)) {
+            return MESSAGE_PAYMENT_FREE;
+        } else {
+            return MESSAGE_PAYMENT;
+        }
     }
 
     public boolean sendMessage(Client client, String type, String[] values, Date eventTime) {

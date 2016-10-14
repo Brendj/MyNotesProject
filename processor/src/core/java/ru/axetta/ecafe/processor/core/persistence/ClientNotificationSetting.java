@@ -23,7 +23,7 @@ public class ClientNotificationSetting {
         SMS_SETTING_CHANGED(1L, "Настройки были изменены", true), // наличие данной записи у клиента означает что настройки уведомлений отличаются от дефолтных
         SMS_NOTIFY_REFILLS(1000000000L, "Оповещать о пополнениях", EventNotificationService.NOTIFICATION_BALANCE_TOPUP, true),
         SMS_NOTIFY_EVENTS(1100000000L, "Оповещать о проходах", EventNotificationService.NOTIFICATION_ENTER_EVENT, true),
-        SMS_NOTIFY_ORDERS(1200000000L, "Оповещать о покупках", EventNotificationService.MESSAGE_PAYMENT),
+        SMS_NOTIFY_ORDERS(1200000000L, "Оповещать о покупках в буфете", EventNotificationService.MESSAGE_PAYMENT),
         SMS_NOTIFY_ORDERS_PAY(1220000000L, "Оповещать о покупках обедов", EventNotificationService.MESSAGE_PAYMENT_PAY),
         SMS_NOTIFY_ORDERS_FREE(1230000000L, "Оповещать о покупках льготного питания", EventNotificationService.MESSAGE_PAYMENT_FREE),
         SMS_NOTIFY_SUMMARY_DAY(1300000000L, "Оповещать по итогам дня", EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY),
