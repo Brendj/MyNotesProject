@@ -1305,13 +1305,11 @@ public class ClientManager {
             idOfGuardianCriteria.add(Restrictions.ne("idOfGuardian", idOfGuardian));
         }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
-        Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
-        Integer countResult = subCriteria.list().size();
-        if(countResult>0){
-            Criteria clientCriteria = session.createCriteria(Client.class);
-            clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
-            clients = clientCriteria.list();
-        }
+
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
+        clients = clientCriteria.list();
+
         return clients;
     }
 
