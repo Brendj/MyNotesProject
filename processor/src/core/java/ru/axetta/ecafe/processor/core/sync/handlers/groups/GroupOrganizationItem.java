@@ -19,12 +19,14 @@ public class GroupOrganizationItem {
     private Long bindingToOrg;
     private Boolean isMiddleGroup;
     private String parentGroupName;
+    private Boolean isNeedDeleteMiddleGroups;
 
-    public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg) {
+    public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg, Boolean isNeedDeleteMiddleGroups) {
 
         this.name = name;
         this.idOfOrg = idOfOrg;
         this.bindingToOrg = bindingToOrg;
+        this.isNeedDeleteMiddleGroups = isNeedDeleteMiddleGroups;
     }
 
     public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg, Boolean middleGroup,
@@ -34,7 +36,7 @@ public class GroupOrganizationItem {
         this.idOfOrg = idOfOrg;
         this.bindingToOrg = bindingToOrg;
 
-        isMiddleGroup = middleGroup;
+        this.isMiddleGroup = middleGroup;
         this.parentGroupName = parentGroupName;
     }
 
@@ -45,7 +47,18 @@ public class GroupOrganizationItem {
         if (StringUtils.isNotEmpty(bindingToOrgStr)) {
             bindingToOrg = Long.parseLong(bindingToOrgStr);
         }
-        return new GroupOrganizationItem(name, idOfOrg, bindingToOrg);
+
+        String isNeedDeleteMiddleGroupsString = XMLUtils.getAttributeValue(node, "IsNeedDeleteMiddleGroups");
+
+        boolean isNeedDeleteMiddleGroups;
+
+        if (isNeedDeleteMiddleGroupsString.equals("0")) {
+            isNeedDeleteMiddleGroups = false;
+        } else {
+            isNeedDeleteMiddleGroups = true;
+        }
+
+        return new GroupOrganizationItem(name, idOfOrg, bindingToOrg, isNeedDeleteMiddleGroups);
     }
 
     public static GroupOrganizationItem buildSubGroup(Node node, long idOfOrg, String parentGroupName) throws Exception {
@@ -85,5 +98,13 @@ public class GroupOrganizationItem {
 
     public void setParentGroupName(String parentGroupName) {
         this.parentGroupName = parentGroupName;
+    }
+
+    public Boolean getNeedDeleteMiddleGroups() {
+        return isNeedDeleteMiddleGroups;
+    }
+
+    public void setNeedDeleteMiddleGroups(Boolean needDeleteMiddleGroups) {
+        isNeedDeleteMiddleGroups = needDeleteMiddleGroups;
     }
 }
