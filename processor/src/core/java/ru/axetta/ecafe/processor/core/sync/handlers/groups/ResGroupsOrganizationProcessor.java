@@ -55,8 +55,10 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
             Set<String> uniqueParentGroupNames = new HashSet<String>();
 
             for (GroupOrganizationItem groupOrganizationItem : sectionRequest.getItems()) {
-                if (groupOrganizationItem.getMiddleGroup() == true) {
-                    uniqueParentGroupNames.add(groupOrganizationItem.getParentGroupName());
+                if (groupOrganizationItem.getMiddleGroup() != null) {
+                    if (groupOrganizationItem.getMiddleGroup() == true) {
+                        uniqueParentGroupNames.add(groupOrganizationItem.getParentGroupName());
+                    }
                 }
             }
 
@@ -64,10 +66,12 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
                 ResultOperation resultOperation = processResultGroupOrganizationItem(groupsFromMainBuilding, groupItem,
                         nextVersion);
 
-                if (groupItem.getMiddleGroup() == false) {
-                    ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(groupItem.getName(),
-                            nextVersion, resultOperation);
-                    resultItems.add(item);
+                if (groupItem.getMiddleGroup() != null) {
+                    if (groupItem.getMiddleGroup() == false) {
+                        ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(
+                                groupItem.getName(), nextVersion, resultOperation);
+                        resultItems.add(item);
+                    }
                 }
             }
 
