@@ -72,8 +72,6 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
-import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2172,7 +2170,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     if (od.getIdOfMenuFromSync() != null) {
 
-                        MenuDetail menuDetail = getMenuDetailConstitutionByOrder(session, od.getIdOfMenuFromSync(), ((Order) o).getOrg(), CalendarUtils.truncateToDayOfMonth(((Order) o).getCreateTime()));
+                        //MenuDetail menuDetail = getMenuDetailConstitutionByOrder(session, od.getIdOfMenuFromSync(), ((Order) o).getOrg(), CalendarUtils.truncateToDayOfMonth(((Order) o).getCreateTime()));
+                        MenuDetail menuDetail = DAOReadonlyService.getInstance()
+                                .getMenuDetailConstitutionByOrder(od.getIdOfMenuFromSync(), ((Order) o).getOrg(), CalendarUtils.truncateToDayOfMonth(((Order) o).getCreateTime()));
 
                         if (menuDetail != null) {
                             purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
@@ -2214,7 +2214,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    public MenuDetail getMenuDetailConstitutionByOrder(Session session, Long idOfMenuFromSync, Org orgFromOrder,
+    /*public MenuDetail getMenuDetailConstitutionByOrder(Session session, Long idOfMenuFromSync, Org orgFromOrder,
             Date orderDate) {
 
         Date endDate  = CalendarUtils.addOneDay(orderDate);
@@ -2271,7 +2271,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         MenuDetail menuDetail = (MenuDetail) query.uniqueResult();
 
         return menuDetail;
-    }
+    }*/
 
     @Override
     public PaymentListResult getPaymentList(Long contractId, final Date startDate, final Date endDate) {

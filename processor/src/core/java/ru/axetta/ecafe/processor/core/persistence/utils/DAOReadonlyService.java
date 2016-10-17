@@ -284,4 +284,28 @@ public class DAOReadonlyService {
         return new ArrayList<Long>(result);
     }
 
+    public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Org orgFromOrder, Date orderDate) {
+        Date endDate  = CalendarUtils.addOneDay(orderDate);
+
+        Query query = entityManager.createQuery(
+                "SELECT cfm "
+                        + "FROM MenuDetail cfm left join cfm.menu cm "
+                        + "WHERE cfm.idOfMenuFromSync = :idofmenufromsync "
+                        + "AND cm.org = :idoforg "
+                        + "AND cm.menuDate between :orderdate and :enddate "
+                        + "ORDER BY cfm.idOfMenuDetail DESC");
+        query.setParameter("idofmenufromsync", idOfMenuFromSync);
+        query.setParameter("idoforg", orgFromOrder);
+        query.setParameter("orderdate", orderDate);
+        query.setParameter("enddate", endDate);
+        query.setMaxResults(1);
+
+        try {
+            MenuDetail menuDetail = (MenuDetail) query.getSingleResult();
+            return menuDetail;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
