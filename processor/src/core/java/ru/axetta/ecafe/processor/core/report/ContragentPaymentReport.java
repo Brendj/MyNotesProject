@@ -16,6 +16,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -339,6 +340,9 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 orgList.add(localOrg);
             }
 
+            //Учитываем время до последней секунды
+            endTime = CalendarUtils.addMinute(endTime, 1);
+
             // Принадлежность транзакции какой-либо организации берем из таблицы транзакций
             Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
             clientPaymentCriteria.createAlias("transaction", "t");
@@ -360,7 +364,8 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 clientPaymentCriteria.add(Restrictions.in("contragentReceiver", contragentReceiverList));
             if (contragentPaymentReceiverList != null)
                 clientPaymentCriteria.add(Restrictions.in("contragent", contragentPaymentReceiverList));
-            clientPaymentCriteria.add(Restrictions.between("createTime", startTime, endTime));
+            clientPaymentCriteria.add(Restrictions.ge("createTime", startTime));
+            clientPaymentCriteria.add(Restrictions.lt("createTime", endTime));
             Object[] types = {ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, ClientPayment.CANCELLED_PAYMENT};
             clientPaymentCriteria.add(Restrictions.in("payType", types));
             HibernateUtils.addAscOrder(clientPaymentCriteria, "createTime");
