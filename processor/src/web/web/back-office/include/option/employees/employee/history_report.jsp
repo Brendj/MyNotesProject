@@ -41,7 +41,7 @@
                     <h:outputText escape="true" value="Дата" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
-                    <h:outputText escape="true" value="Сотрудник ДОгМ" styleClass="column-header" />
+                    <h:outputText escape="true" value="Инженер" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
                     <h:outputText escape="true" value="Должность" styleClass="column-header" />
