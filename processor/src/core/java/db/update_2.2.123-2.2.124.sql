@@ -26,3 +26,4 @@ UPDATE cf_visitors
 SET position = 'Инженер ИС ПП'
 WHERE VisitorType = 1;
 
+--! ФИНАЛИЗИРОВАН (Семенов, 171016) НЕ МЕНЯТЬ
