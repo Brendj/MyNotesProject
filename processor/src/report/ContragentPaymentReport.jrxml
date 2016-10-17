@@ -54,14 +54,14 @@
 				<textFieldExpression><![CDATA["Отчет по платежам"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="ab7657ea-10b9-4d20-9cd3-ff0ac44c9d71" x="315" y="36" width="35" height="20"/>
+				<reportElement uuid="ab7657ea-10b9-4d20-9cd3-ff0ac44c9d71" x="346" y="36" width="35" height="20"/>
 				<textElement textAlignment="Center">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[-]]></text>
 			</staticText>
-			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="72fdfc22-15c9-46d3-b36e-d238b86fbc5c" x="211" y="36" width="104" height="20"/>
+			<textField pattern="dd.MM.yy HH:mm" isBlankWhenNull="true">
+				<reportElement uuid="72fdfc22-15c9-46d3-b36e-d238b86fbc5c" x="211" y="36" width="135" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -75,8 +75,8 @@
 				</textElement>
 				<text><![CDATA[Период отчета:]]></text>
 			</staticText>
-			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="a5a9fdd2-292e-48af-a4ba-e4241462d5fd" x="350" y="36" width="150" height="20"/>
+			<textField pattern="dd.MM.yy HH:mm" isBlankWhenNull="true">
+				<reportElement uuid="a5a9fdd2-292e-48af-a4ba-e4241462d5fd" x="381" y="36" width="135" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -145,7 +145,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{nameOfContragentReceiver}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{nameOfContragentReceiver}.substring(0, $P{nameOfContragentReceiver}.length() - 2)]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="69b7a077-8bb1-460d-b6cf-44b7a52f651d" x="0" y="59" width="210" height="20"/>
@@ -160,7 +160,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{nameOfContragentSender}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{nameOfContragentSender}.substring(0, $P{nameOfContragentSender}.length() - 2)]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="a0bfa804-8f90-4c2c-b3fd-bbcc427cc6ea" x="231" y="229" width="220" height="41"/>
