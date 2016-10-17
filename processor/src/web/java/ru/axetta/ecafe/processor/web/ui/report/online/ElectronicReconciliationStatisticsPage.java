@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ElectronicReconciliationStatisticsBuilder;
@@ -20,19 +20,16 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +39,9 @@ import java.util.Map;
  */
 
 public class ElectronicReconciliationStatisticsPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
+
+    private String isppStateFilter;
+    private String ppStateFilter;
 
     private String htmlReport;
 
@@ -57,6 +57,26 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
 
     public void setContragent(Contragent contragent) {
         this.contragent = contragent;
+    }
+
+    private String region;
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public List<SelectItem> getRegions() {
+        List<String> regions = DAOService.getInstance().getRegions();
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(""));
+        for(String reg : regions) {
+            items.add(new SelectItem(reg));
+        }
+        return items;
     }
 
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
@@ -115,7 +135,6 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
 
 
     private ElectronicReconciliationStatisticsReport buildReport() {
-
         BasicReportJob report = null;
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename =
@@ -123,12 +142,24 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
         ElectronicReconciliationStatisticsBuilder builder = new ElectronicReconciliationStatisticsBuilder(
                 templateFilename);
 
+        if (contragent != null) {
+            builder.setContragent(contragent);
+        }
+
+        builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+
+        Properties properties = addRegionProperty(null, region);
+        report.setReportProperties(properties);
+
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+
             report = builder.build(session, startDate, endDate, localCalendar);
+
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -214,5 +245,64 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
         if (null != idOfContragent) {
             this.contragent = (Contragent) session.get(Contragent.class, idOfContragent);
         }
+    }
+
+    public void resetOrg() {
+        if (!emptyRegion() || !emptyContragent()) {
+            idOfOrg = null;
+            idOfOrgList = null;
+        }
+    }
+
+    public boolean emptyRegion() {
+        return ((region == null) || (region.isEmpty())) ? true : false;
+    }
+
+    public boolean emptyContragent() {
+        return (contragent.getIdOfContragent() == null) ? true : false;
+    }
+
+    public Properties addRegionProperty(Properties props, String region) {
+        if(props == null) {
+            props = new Properties();
+        }
+        if(region != null && region.trim().length() > 0) {
+            props.put("region", region);
+        }
+        return props;
+    }
+
+
+    public List<SelectItem> getIsppStateFilters() {
+        List<SelectItem> filters = new ArrayList<SelectItem>();
+        filters.add(new SelectItem(""));
+        filters.add(new SelectItem("Согласовано"));
+        filters.add(new SelectItem("Не указано"));
+        return filters;
+    }
+
+    public List<SelectItem> getPpStateFilters() {
+        List<SelectItem> filters = new ArrayList<SelectItem>();
+        filters.add(new SelectItem(""));
+        filters.add(new SelectItem("Согласовано"));
+        filters.add(new SelectItem("Отказ"));
+        filters.add(new SelectItem("Не указано"));
+        return filters;
+    }
+
+    public String getIsppStateFilter() {
+        return isppStateFilter;
+    }
+
+    public void setIsppStateFilter(String isppStateFilter) {
+        this.isppStateFilter = isppStateFilter;
+    }
+
+    public String getPpStateFilter() {
+        return ppStateFilter;
+    }
+
+    public void setPpStateFilter(String ppStateFilter) {
+        this.ppStateFilter = ppStateFilter;
     }
 }

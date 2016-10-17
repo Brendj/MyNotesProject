@@ -11,7 +11,7 @@
         <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{mainPage.electronicReconciliationStatisticsPage.contragent.contragentName}"
-                         readonly="true" styleClass="input-text" style="margin-right: 2px; width: 275px;" />
+                         readonly="true" styleClass="input-text" style="margin-right: 2px; width: 225px;" />
             <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
                                reRender="modalContragentSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
@@ -19,6 +19,15 @@
                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
             </a4j:commandButton>
+        </h:panelGroup>
+
+        <h:outputText escape="true" value="Округ" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:selectOneMenu id="regionsList" value="#{mainPage.electronicReconciliationStatisticsPage.region}" style="width:250px;" >
+                <a4j:support event="onchange" reRender="districtOtherCheckBox,orgDeliveredServicesSelectButton,orgDeliveredServicesOrgText" ajaxSingle="true"
+                             actionListener="#{mainPage.electronicReconciliationStatisticsPage.resetOrg()}"/>
+                <f:selectItems value="#{mainPage.electronicReconciliationStatisticsPage.regions}"/>
+            </h:selectOneMenu>
         </h:panelGroup>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
@@ -58,6 +67,16 @@
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                          actionListener="#{mainPage.electronicReconciliationStatisticsPage.onEndDateSpecified}" />
         </rich:calendar>
+
+        <h:outputText escape="true" value="Статус сверки ОО" styleClass="output-text" />
+        <h:selectOneMenu id="isppStateList" value="#{mainPage.electronicReconciliationStatisticsPage.isppStateFilter}" style="width:120px">
+            <f:selectItems value="#{mainPage.electronicReconciliationStatisticsPage.isppStateFilters}" />
+        </h:selectOneMenu>
+
+        <h:outputText escape="true" value="Статус сверки ПП" styleClass="output-text" />
+        <h:selectOneMenu id="ppStateList" value="#{mainPage.electronicReconciliationStatisticsPage.ppStateFilter}" style="width:120px">
+            <f:selectItems value="#{mainPage.electronicReconciliationStatisticsPage.ppStateFilters}" />
+        </h:selectOneMenu>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Генерировать отчет"
