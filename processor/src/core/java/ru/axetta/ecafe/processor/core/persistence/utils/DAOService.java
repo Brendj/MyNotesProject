@@ -2100,7 +2100,7 @@ public class DAOService {
     }
 
     @Transactional
-    public boolean registerSyncRequest(long idOfOrg, String idOfSync) {
+    public void registerSyncRequest(long idOfOrg, String idOfSync) {
         long dateAt = System.currentTimeMillis();
         try {
             if (idOfSync.length() > 30) {
@@ -2112,11 +2112,11 @@ public class DAOService {
             q.setParameter("idofsync", idOfSync);
             q.setParameter("idoforg", idOfOrg);
             q.setParameter("syncdate", dateAt);
-            return q.executeUpdate() > 0;
+            q.executeUpdate();
         } catch (Exception e) {
             logger.error("Failed to add new synch daily history entry", e);
         }
-        return false;
+        logger.info("test register sync request");
     }
 
     public Long getClientGroupByClientId(Long idOfClient) {

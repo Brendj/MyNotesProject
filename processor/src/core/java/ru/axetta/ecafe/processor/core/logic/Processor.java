@@ -86,6 +86,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -2406,6 +2407,7 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    @Async
     private void createSyncHistoryException(long idOfOrg, SyncHistory syncHistory, String s) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

@@ -26,4 +26,6 @@ UPDATE cf_visitors
 SET position = 'Инженер ИС ПП'
 WHERE VisitorType = 1;
 
+drop index CF_ClientSms_Price_idx;
+
 --! ФИНАЛИЗИРОВАН (Семенов, 171016) НЕ МЕНЯТЬ
