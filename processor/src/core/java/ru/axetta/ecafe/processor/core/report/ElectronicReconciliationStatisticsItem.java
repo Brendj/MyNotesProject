@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
@@ -19,21 +21,17 @@ public class ElectronicReconciliationStatisticsItem {
     private String district;            // Округ
     private String address;             // Адресс ОО
 
-    private String verificationStatus;  // Статус сверки ОО
-    private String verificationStatusPowerSupplier; // Статус сверки ПП (поставщик питания)
+    private List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems;
 
     public ElectronicReconciliationStatisticsItem() {
     }
 
-    public ElectronicReconciliationStatisticsItem(Long rowNum, String orgName, String orgType, String district,
-            String address, String verificationStatus, String verificationStatusPowerSupplier) {
+    public ElectronicReconciliationStatisticsItem(Long rowNum, String orgName, String orgType, String district, String address) {
         this.rowNum = rowNum;
         this.orgName = orgName;
         this.orgType = orgType;
         this.district = district;
         this.address = address;
-        this.verificationStatus = verificationStatus;
-        this.verificationStatusPowerSupplier = verificationStatusPowerSupplier;
     }
 
     public Long getRowNum() {
@@ -76,19 +74,12 @@ public class ElectronicReconciliationStatisticsItem {
         this.address = address;
     }
 
-    public String getVerificationStatus() {
-        return verificationStatus;
+    public List<ElectronicReconciliationStatisticsSubItem> getElectronicReconciliationStatisticsSubItems() {
+        return electronicReconciliationStatisticsSubItems;
     }
 
-    public void setVerificationStatus(String verificationStatus) {
-        this.verificationStatus = verificationStatus;
-    }
-
-    public String getVerificationStatusPowerSupplier() {
-        return verificationStatusPowerSupplier;
-    }
-
-    public void setVerificationStatusPowerSupplier(String verificationStatusPowerSupplier) {
-        this.verificationStatusPowerSupplier = verificationStatusPowerSupplier;
+    public void setElectronicReconciliationStatisticsSubItems(
+            List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems) {
+        this.electronicReconciliationStatisticsSubItems = electronicReconciliationStatisticsSubItems;
     }
 }

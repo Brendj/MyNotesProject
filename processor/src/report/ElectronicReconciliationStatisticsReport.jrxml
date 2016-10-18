@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport" pageWidth="600" pageHeight="842" columnWidth="560" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="976489f7-3055-43f5-93e7-e4de05fb40a9">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport" pageWidth="750" pageHeight="842" columnWidth="710" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="976489f7-3055-43f5-93e7-e4de05fb40a9">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\workspace\\branche\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
 	<field name="rowNum" class="java.lang.Long"/>
 	<field name="orgName" class="java.lang.String"/>
 	<field name="orgType" class="java.lang.String"/>
 	<field name="district" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
-	<field name="verificationStatus" class="java.lang.String"/>
-	<field name="verificationStatusPowerSupplier" class="java.lang.String"/>
+	<field name="electronicReconciliationStatisticsSubItems" class="java.util.List"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="67" splitType="Stretch">
 			<textField>
-				<reportElement uuid="407facf3-801c-4283-be77-1e01287d4372" x="0" y="0" width="560" height="67"/>
+				<reportElement uuid="407facf3-801c-4283-be77-1e01287d4372" x="0" y="0" width="710" height="67"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -99,7 +101,7 @@
 				<text><![CDATA[Наименование ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="94aab690-c85d-4ac6-897d-08702cc55114" x="420" y="0" width="70" height="50"/>
+				<reportElement uuid="94aab690-c85d-4ac6-897d-08702cc55114" x="570" y="0" width="70" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -113,7 +115,7 @@
 				<text><![CDATA[Статус сверки ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ae3a8650-927f-4efd-8dc2-8b0e9ad9dd96" x="490" y="0" width="70" height="50"/>
+				<reportElement uuid="ae3a8650-927f-4efd-8dc2-8b0e9ad9dd96" x="640" y="0" width="70" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -125,6 +127,20 @@
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Статус сверки ПП]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fe4496c4-ab92-492a-8036-1e63d5a05fc8" x="420" y="0" width="150" height="50"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Дата]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -190,30 +206,11 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="88cfa210-14de-4911-9855-79b878b1b2ae" x="420" y="0" width="70" height="25"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{verificationStatus}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="9c13572b-9e74-4dad-9ad7-7014750e68c9" x="490" y="0" width="70" height="25"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{verificationStatusPowerSupplier}]]></textFieldExpression>
-			</textField>
+			<subreport>
+				<reportElement uuid="987c7d21-af10-4c79-8eda-165f880f2523" x="420" y="0" width="290" height="25"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{electronicReconciliationStatisticsSubItems})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ElectronicReconciliationStatisticsReport_subreport.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</detail>
 </jasperReport>

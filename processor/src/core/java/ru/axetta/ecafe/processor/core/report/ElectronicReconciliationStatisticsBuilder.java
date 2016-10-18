@@ -68,10 +68,10 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
             idOfOrgList.add(Long.parseLong(idOfOrg));
         }
 
-        Object region = reportProperties.getProperty("region");
+       /* Object region = reportProperties.getProperty("region");
         if (region == null) {
             throw new IllegalArgumentException("Не указан Округ");
-        }
+        }*/
 
         JRDataSource dataSource = buildDataSource(session, startTime, endTime, idOfContragent, idOfOrgList);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);

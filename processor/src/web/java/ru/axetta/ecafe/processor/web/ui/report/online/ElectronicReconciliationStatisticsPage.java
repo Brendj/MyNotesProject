@@ -148,8 +148,8 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
 
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
 
-        Properties properties = addRegionProperty(null, region);
-        report.setReportProperties(properties);
+       // Properties properties = addRegionProperty(null, region);
+
 
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -158,7 +158,7 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
             persistenceTransaction = session.beginTransaction();
 
             report = builder.build(session, startDate, endDate, localCalendar);
-
+            //report.setReportProperties(properties);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
