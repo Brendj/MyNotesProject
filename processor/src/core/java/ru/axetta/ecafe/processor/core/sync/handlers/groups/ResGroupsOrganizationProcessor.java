@@ -65,13 +65,10 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
             for (GroupOrganizationItem groupItem : sectionRequest.getItems()) {
                 ResultOperation resultOperation = processResultGroupOrganizationItem(groupsFromMainBuilding, groupItem,
                         nextVersion);
-
-                if (groupItem.getMiddleGroup() != null) {
-                    if (groupItem.getMiddleGroup() == false) {
-                        ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(
-                                groupItem.getName(), nextVersion, resultOperation);
-                        resultItems.add(item);
-                    }
+                if (groupItem.getMiddleGroup() == null) {
+                    ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(groupItem.getName(),
+                            nextVersion, resultOperation);
+                    resultItems.add(item);
                 }
             }
 
