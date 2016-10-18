@@ -50,11 +50,9 @@ public class GroupOrganizationItem {
 
         String isNeedDeleteMiddleGroupsString = XMLUtils.getAttributeValue(node, "IsNeedDeleteMiddleGroups");
 
-        boolean isNeedDeleteMiddleGroups;
+        boolean isNeedDeleteMiddleGroups = false;
 
-        if (isNeedDeleteMiddleGroupsString.equals("0")) {
-            isNeedDeleteMiddleGroups = false;
-        } else {
+        if (isNeedDeleteMiddleGroupsString.equals("1")) {
             isNeedDeleteMiddleGroups = true;
         }
 
