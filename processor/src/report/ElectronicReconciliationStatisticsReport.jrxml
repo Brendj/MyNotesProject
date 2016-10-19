@@ -6,7 +6,7 @@
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["D:\\workspace\\branche\\processor\\src\\report\\"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<field name="rowNum" class="java.lang.Long"/>
 	<field name="orgName" class="java.lang.String"/>

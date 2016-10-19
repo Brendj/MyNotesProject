@@ -34,14 +34,17 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
     Long idOfContragent = -1L;
 
     private final String templateFilename;
+    private final String subReportDir;
 
     public ElectronicReconciliationStatisticsBuilder(String templateFilename) {
         this.templateFilename = templateFilename;
+        subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
     }
 
     public ElectronicReconciliationStatisticsBuilder() {
         templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath()
                 + ElectronicReconciliationStatisticsReport.class.getSimpleName() + ".jasper";
+        subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
     }
 
     @Override
@@ -56,6 +59,7 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
+        parameterMap.put("SUBREPORT_DIR", subReportDir);
 
         if (contragent != null) {
             parameterMap.put("contragentName", contragent.getContragentName());
