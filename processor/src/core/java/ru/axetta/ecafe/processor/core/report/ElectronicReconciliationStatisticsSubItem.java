@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: anvarov
@@ -11,18 +13,20 @@ package ru.axetta.ecafe.processor.core.report;
  * Time: 13:01
  */
 
-public class ElectronicReconciliationStatisticsSubItem {
+public class ElectronicReconciliationStatisticsSubItem implements Comparable<ElectronicReconciliationStatisticsSubItem> {
 
     public String date; // Дата
+    public Date taloonDate;
     private String verificationStatus;  // Статус сверки ОО
     private String verificationStatusPowerSupplier; // Статус сверки ПП (поставщик питания)
 
     public ElectronicReconciliationStatisticsSubItem() {
     }
 
-    public ElectronicReconciliationStatisticsSubItem(String date, String verificationStatus,
+    public ElectronicReconciliationStatisticsSubItem(String date, Date taloonDate, String verificationStatus,
             String verificationStatusPowerSupplier) {
         this.date = date;
+        this.taloonDate = taloonDate;
         this.verificationStatus = verificationStatus;
         this.verificationStatusPowerSupplier = verificationStatusPowerSupplier;
     }
@@ -33,6 +37,14 @@ public class ElectronicReconciliationStatisticsSubItem {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public Date getTaloonDate() {
+        return taloonDate;
+    }
+
+    public void setTaloonDate(Date taloonDate) {
+        this.taloonDate = taloonDate;
     }
 
     public String getVerificationStatus() {
@@ -49,6 +61,12 @@ public class ElectronicReconciliationStatisticsSubItem {
 
     public void setVerificationStatusPowerSupplier(String verificationStatusPowerSupplier) {
         this.verificationStatusPowerSupplier = verificationStatusPowerSupplier;
+    }
+
+    @Override
+    public int compareTo(ElectronicReconciliationStatisticsSubItem o) {
+        int retCode = this.taloonDate.compareTo(o.getTaloonDate());
+        return retCode;
     }
 }
 

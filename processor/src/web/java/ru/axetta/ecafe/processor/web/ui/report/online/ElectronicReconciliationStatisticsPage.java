@@ -147,6 +147,8 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
         }
 
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+        builder.getReportProperties().setProperty("isppStateFilter", isppStateFilter);
+        builder.getReportProperties().setProperty("ppStateFilter", ppStateFilter);
 
        // Properties properties = addRegionProperty(null, region);
 

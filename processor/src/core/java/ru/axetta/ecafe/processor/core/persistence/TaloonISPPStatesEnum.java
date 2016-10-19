@@ -16,8 +16,8 @@ import java.util.Map;
  */
 public enum TaloonISPPStatesEnum {
 
-    /*0*/ TALOON_ISPP_STATE_NOT_SELECTED("Не определен"),
-    /*1*/ TALOON_ISPP_STATE_CONFIRMED("Подтвержден");
+    /*0*/ TALOON_ISPP_STATE_NOT_SELECTED("Не указано"),
+    /*1*/ TALOON_ISPP_STATE_CONFIRMED("Согласовано");
 
     private final String description;
     static Map<Integer,TaloonISPPStatesEnum> map = new HashMap<Integer,TaloonISPPStatesEnum>();

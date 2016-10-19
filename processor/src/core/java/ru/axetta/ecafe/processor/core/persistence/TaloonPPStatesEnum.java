@@ -16,9 +16,9 @@ import java.util.Map;
  */
 public enum TaloonPPStatesEnum {
 
-    /*0*/ TALOON_PP_STATE_NOT_SELECTED("Не определен"),
-    /*1*/ TALOON_PP_STATE_CONFIRMED("Подтвержден"),
-    /*2*/ TALOON_PP_STATE_CANCELED("Отменен");
+    /*0*/ TALOON_PP_STATE_NOT_SELECTED("Не указано"),
+    /*1*/ TALOON_PP_STATE_CONFIRMED("Согласовано"),
+    /*2*/ TALOON_PP_STATE_CANCELED("Отказ");
 
     private final String description;
     static Map<Integer,TaloonPPStatesEnum> map = new HashMap<Integer,TaloonPPStatesEnum>();

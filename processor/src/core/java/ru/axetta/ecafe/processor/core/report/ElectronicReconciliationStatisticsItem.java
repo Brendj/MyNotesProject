@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  * Time: 12:59
  */
 
-public class ElectronicReconciliationStatisticsItem {
+public class ElectronicReconciliationStatisticsItem implements Comparable<ElectronicReconciliationStatisticsItem> {
 
     private Long rowNum;                // Номер по порядку
     private String orgName;             // Название организации
@@ -21,7 +22,7 @@ public class ElectronicReconciliationStatisticsItem {
     private String district;            // Округ
     private String address;             // Адресс ОО
 
-    private List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems;
+    private List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems = new ArrayList<ElectronicReconciliationStatisticsSubItem>();
 
     public ElectronicReconciliationStatisticsItem() {
     }
@@ -81,5 +82,10 @@ public class ElectronicReconciliationStatisticsItem {
     public void setElectronicReconciliationStatisticsSubItems(
             List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems) {
         this.electronicReconciliationStatisticsSubItems = electronicReconciliationStatisticsSubItems;
+    }
+
+    public int compareTo(ElectronicReconciliationStatisticsItem o) {
+        int retCode = this.rowNum.compareTo(o.getRowNum());
+        return retCode;
     }
 }

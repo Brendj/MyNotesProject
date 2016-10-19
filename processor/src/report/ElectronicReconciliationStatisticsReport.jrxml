@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport" pageWidth="750" pageHeight="842" columnWidth="710" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="976489f7-3055-43f5-93e7-e4de05fb40a9">
-	<property name="ireport.zoom" value="1.7715610000000013"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport" pageWidth="1050" pageHeight="10000" columnWidth="1010" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="976489f7-3055-43f5-93e7-e4de05fb40a9">
+	<property name="ireport.zoom" value="0.8264462809917359"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
@@ -20,7 +20,7 @@
 	<title>
 		<band height="67" splitType="Stretch">
 			<textField>
-				<reportElement uuid="407facf3-801c-4283-be77-1e01287d4372" x="0" y="0" width="710" height="67"/>
+				<reportElement uuid="407facf3-801c-4283-be77-1e01287d4372" x="0" y="0" width="1010" height="67"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -45,7 +45,7 @@
 				<text><![CDATA[№ п/п]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e4c8998a-fec5-4c27-958f-5d1aa2a5d73e" x="170" y="0" width="50" height="50"/>
+				<reportElement uuid="e4c8998a-fec5-4c27-958f-5d1aa2a5d73e" x="190" y="0" width="110" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -59,7 +59,7 @@
 				<text><![CDATA[Тип ОО ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a86ae4c9-f727-49bf-8487-6ac3931a5d38" x="270" y="0" width="150" height="50"/>
+				<reportElement uuid="a86ae4c9-f727-49bf-8487-6ac3931a5d38" x="410" y="0" width="250" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -73,7 +73,7 @@
 				<text><![CDATA[Адрес  ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0ce78319-9886-4ca9-88b4-a5459851c1df" x="220" y="0" width="50" height="50"/>
+				<reportElement uuid="0ce78319-9886-4ca9-88b4-a5459851c1df" x="300" y="0" width="110" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -87,7 +87,7 @@
 				<text><![CDATA[Округ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="924f40a5-fbfa-4127-afa7-f24139e73c10" x="40" y="0" width="130" height="50"/>
+				<reportElement uuid="924f40a5-fbfa-4127-afa7-f24139e73c10" x="40" y="0" width="150" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -101,7 +101,7 @@
 				<text><![CDATA[Наименование ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="94aab690-c85d-4ac6-897d-08702cc55114" x="570" y="0" width="70" height="50"/>
+				<reportElement uuid="94aab690-c85d-4ac6-897d-08702cc55114" x="810" y="0" width="100" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -115,7 +115,7 @@
 				<text><![CDATA[Статус сверки ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ae3a8650-927f-4efd-8dc2-8b0e9ad9dd96" x="640" y="0" width="70" height="50"/>
+				<reportElement uuid="ae3a8650-927f-4efd-8dc2-8b0e9ad9dd96" x="910" y="0" width="100" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -129,7 +129,7 @@
 				<text><![CDATA[Статус сверки ПП]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="fe4496c4-ab92-492a-8036-1e63d5a05fc8" x="420" y="0" width="150" height="50"/>
+				<reportElement uuid="fe4496c4-ab92-492a-8036-1e63d5a05fc8" x="660" y="0" width="150" height="50"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -147,7 +147,7 @@
 	<detail>
 		<band height="30" splitType="Stretch">
 			<textField>
-				<reportElement uuid="55110a22-fd56-4953-b064-37e6a27cfbc1" x="0" y="0" width="40" height="25"/>
+				<reportElement uuid="55110a22-fd56-4953-b064-37e6a27cfbc1" stretchType="RelativeToTallestObject" x="0" y="5" width="40" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -159,7 +159,7 @@
 				<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="85c1e608-a83e-477f-9f05-299b4d5dc68e" x="40" y="0" width="130" height="25"/>
+				<reportElement uuid="85c1e608-a83e-477f-9f05-299b4d5dc68e" stretchType="RelativeToTallestObject" x="40" y="5" width="150" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -171,7 +171,7 @@
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="f4a17dfb-94d5-405d-8a67-54e9b45d047e" x="170" y="0" width="50" height="25"/>
+				<reportElement uuid="f4a17dfb-94d5-405d-8a67-54e9b45d047e" stretchType="RelativeToTallestObject" x="190" y="5" width="110" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -183,7 +183,7 @@
 				<textFieldExpression><![CDATA[$F{orgType}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="032cea0e-7a98-4f2e-a6ab-bf554a6eda40" x="220" y="0" width="50" height="25"/>
+				<reportElement uuid="032cea0e-7a98-4f2e-a6ab-bf554a6eda40" stretchType="RelativeToTallestObject" x="300" y="5" width="110" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -195,7 +195,7 @@
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="efd3f774-c7c7-4ea8-80a1-c02cdaecdb9d" x="270" y="0" width="150" height="25"/>
+				<reportElement uuid="efd3f774-c7c7-4ea8-80a1-c02cdaecdb9d" stretchType="RelativeToTallestObject" x="410" y="5" width="250" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -207,12 +207,12 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="987c7d21-af10-4c79-8eda-165f880f2523" x="420" y="0" width="290" height="25"/>
+				<reportElement uuid="987c7d21-af10-4c79-8eda-165f880f2523" stretchType="RelativeToTallestObject" x="660" y="5" width="350" height="25"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{electronicReconciliationStatisticsSubItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ElectronicReconciliationStatisticsReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement uuid="3e139924-a2b3-4b6a-80b1-095033755794" mode="Opaque" x="0" y="25" width="710" height="5" backcolor="#006699"/>
+				<reportElement uuid="3e139924-a2b3-4b6a-80b1-095033755794" mode="Opaque" x="0" y="0" width="1010" height="5" backcolor="#006699"/>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
