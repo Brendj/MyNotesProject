@@ -64,33 +64,9 @@ public class GroupsOrganizationRequest implements SectionRequest {
                         childNodeOfCg = childNodeOfCg.getNextSibling();
                     }
                     if (itemsCmg.isEmpty()) {
-                        if (item.getNeedDeleteMiddleGroups()) {
-                            Transaction transaction = null;
-                            Session session = RuntimeContext.getInstance().createPersistenceSession();
-                            try {
-                                transaction = session.beginTransaction();
-                                DAOUtils.deleteByParentGroupName(session, parentGroupName, idOfOrg);
-                                transaction.commit();
-                                transaction = null;
-                            } finally {
-                                HibernateUtils.rollback(transaction, logger);
-                                HibernateUtils.close(session, logger);
-                            }
-                        }
                         items.add(item);
                     } else {
-                        Transaction transaction = null;
-                        Session session = RuntimeContext.getInstance().createPersistenceSession();
-                        try {
-                            transaction = session.beginTransaction();
-                            DAOUtils.deleteByParentGroupName(session, parentGroupName, idOfOrg);
-                            transaction.commit();
-                            transaction = null;
-                        } finally {
-                            HibernateUtils.rollback(transaction, logger);
-                            HibernateUtils.close(session, logger);
-                            items.addAll(itemsCmg);
-                        }
+                        items.addAll(itemsCmg);
                     }
                 } catch (Exception e) {
                     logger.error("failed to create group organization item," + e);

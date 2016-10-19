@@ -48,6 +48,21 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
         if (nextVersion == null) {
             return null;
         }
+
+        for (GroupOrganizationItem groupsOrganizationRequest : sectionRequest.getItems()) {
+            if (groupsOrganizationRequest.getNeedDeleteMiddleGroups() != null) {
+                if (groupsOrganizationRequest.getParentGroupName() == null) {
+                    DAOUtils.deleteByParentGroupName(session, groupsOrganizationRequest.getName(),
+                            groupsOrganizationRequest.getIdOfOrg());
+                }
+            } else {
+                if (groupsOrganizationRequest.getParentGroupName() != null) {
+                    DAOUtils.deleteByParentGroupName(session, groupsOrganizationRequest.getParentGroupName(),
+                            groupsOrganizationRequest.getIdOfOrg());
+                }
+            }
+        }
+
         ArrayList<ResProcessGroupsOrganizationItem> resultItems = new ArrayList<ResProcessGroupsOrganizationItem>();
         if (sectionRequest.getItems().size() > 0) {
             List<GroupNamesToOrgs> groupsFromMainBuilding = loadGroupsFromMainBuilding();
