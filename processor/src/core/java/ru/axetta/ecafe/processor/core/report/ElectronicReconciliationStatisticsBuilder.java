@@ -76,13 +76,9 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
             idOfOrgList.add(Long.parseLong(idOfOrg));
         }
 
-       /* Object region = reportProperties.getProperty("region");
-        if (region == null) {
-            throw new IllegalArgumentException("Не указан Округ");
-        }*/
-
         String isppState = getReportProperties().getProperty("isppStateFilter");
         String ppState = getReportProperties().getProperty("ppStateFilter");
+        String region = getReportProperties().getProperty("region");
 
         TaloonISPPStatesEnum ISPPStates = null;
         for (TaloonISPPStatesEnum taloonISPPStatesEnum : TaloonISPPStatesEnum.values()) {
@@ -98,7 +94,7 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
             }
         }
 
-        JRDataSource dataSource = buildDataSource(session, startTime, endTime, idOfContragent, idOfOrgList, ISPPStates, PPStateEnum);
+        JRDataSource dataSource = buildDataSource(session, startTime, endTime, idOfContragent, idOfOrgList, ISPPStates, PPStateEnum, region);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
         Date generateEndTime = new Date();
@@ -108,11 +104,12 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
     }
 
     private JRDataSource buildDataSource(Session session, Date startTime, Date endTime, Long idOfContragent,
-            List<Long> idOfOrgList, TaloonISPPStatesEnum taloonISPPStatesEnum, TaloonPPStatesEnum taloonPPStatesEnum) {
+            List<Long> idOfOrgList, TaloonISPPStatesEnum taloonISPPStatesEnum, TaloonPPStatesEnum taloonPPStatesEnum, String region) {
 
 
         // Главный запрос
         Criteria criteria = session.createCriteria(TaloonApproval.class);
+        criteria.createAlias("org", "org");
 
         if (!idOfOrgList.isEmpty()) {
             criteria.add(Restrictions.in("compositeIdOfTaloonApproval.idOfOrg", idOfOrgList));
@@ -133,6 +130,10 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
 
         if (taloonPPStatesEnum != null) {
             criteria.add(Restrictions.eq("ppState", taloonPPStatesEnum));
+        }
+
+        if (region != null && region != "") {
+            criteria.add(Restrictions.eq("org.district", region));
         }
 
         criteria.add(Restrictions.eq("deletedState", false));

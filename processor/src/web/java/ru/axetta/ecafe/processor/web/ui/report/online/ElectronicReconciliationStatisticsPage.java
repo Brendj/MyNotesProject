@@ -149,9 +149,7 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
         builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
         builder.getReportProperties().setProperty("isppStateFilter", isppStateFilter);
         builder.getReportProperties().setProperty("ppStateFilter", ppStateFilter);
-
-       // Properties properties = addRegionProperty(null, region);
-
+        builder.getReportProperties().setProperty("region", region);
 
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -160,7 +158,6 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
             persistenceTransaction = session.beginTransaction();
 
             report = builder.build(session, startDate, endDate, localCalendar);
-            //report.setReportProperties(properties);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -251,8 +248,6 @@ public class ElectronicReconciliationStatisticsPage extends OnlineReportPage imp
 
     public void resetOrg() {
         if (!emptyRegion() || !emptyContragent()) {
-            idOfOrg = null;
-            idOfOrgList = null;
         }
     }
 
