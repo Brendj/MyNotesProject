@@ -15,20 +15,31 @@ import java.util.Date;
 
 public class ElectronicReconciliationStatisticsSubItem implements Comparable<ElectronicReconciliationStatisticsSubItem> {
 
-    public String date; // Дата
-    public Date taloonDate;
-    private String verificationStatus;  // Статус сверки ОО
-    private String verificationStatusPowerSupplier; // Статус сверки ПП (поставщик питания)
+    private String date; // Дата
+    private Date taloonDate;
+    private Long complexCount;
+
+    private Long verificationStatusAgreed;        // Статус сверки ОО Согласовано
+    private Long verificationStatusNotIndicated;  // Статус сверки ОО Не указано
+
+    private Long powerSupplierStatusAgreed;         // Статус сверки ПП (поставщик питания) Согласовано
+    private Long powerSupplierStatusNotIndicated;   // Статус сверки ПП (поставщик питания) Не указано
+    private Long powerSupplierStatusRenouncement; // Статус сверки ПП (поставщик питания) Отказ
 
     public ElectronicReconciliationStatisticsSubItem() {
     }
 
-    public ElectronicReconciliationStatisticsSubItem(String date, Date taloonDate, String verificationStatus,
-            String verificationStatusPowerSupplier) {
+    public ElectronicReconciliationStatisticsSubItem(String date, Date taloonDate, Long complexCount,
+            Long verificationStatusAgreed, Long verificationStatusNotIndicated, Long powerSupplierStatusAgreed,
+            Long powerSupplierStatusNotIndicated, Long powerSupplierStatusRenouncement) {
         this.date = date;
         this.taloonDate = taloonDate;
-        this.verificationStatus = verificationStatus;
-        this.verificationStatusPowerSupplier = verificationStatusPowerSupplier;
+        this.complexCount = complexCount;
+        this.verificationStatusAgreed = verificationStatusAgreed;
+        this.verificationStatusNotIndicated = verificationStatusNotIndicated;
+        this.powerSupplierStatusAgreed = powerSupplierStatusAgreed;
+        this.powerSupplierStatusNotIndicated = powerSupplierStatusNotIndicated;
+        this.powerSupplierStatusRenouncement = powerSupplierStatusRenouncement;
     }
 
     public String getDate() {
@@ -47,20 +58,52 @@ public class ElectronicReconciliationStatisticsSubItem implements Comparable<Ele
         this.taloonDate = taloonDate;
     }
 
-    public String getVerificationStatus() {
-        return verificationStatus;
+    public Long getComplexCount() {
+        return complexCount;
     }
 
-    public void setVerificationStatus(String verificationStatus) {
-        this.verificationStatus = verificationStatus;
+    public void setComplexCount(Long complexCount) {
+        this.complexCount = complexCount;
     }
 
-    public String getVerificationStatusPowerSupplier() {
-        return verificationStatusPowerSupplier;
+    public Long getVerificationStatusAgreed() {
+        return verificationStatusAgreed;
     }
 
-    public void setVerificationStatusPowerSupplier(String verificationStatusPowerSupplier) {
-        this.verificationStatusPowerSupplier = verificationStatusPowerSupplier;
+    public void setVerificationStatusAgreed(Long verificationStatusAgreed) {
+        this.verificationStatusAgreed = verificationStatusAgreed;
+    }
+
+    public Long getVerificationStatusNotIndicated() {
+        return verificationStatusNotIndicated;
+    }
+
+    public void setVerificationStatusNotIndicated(Long verificationStatusNotIndicated) {
+        this.verificationStatusNotIndicated = verificationStatusNotIndicated;
+    }
+
+    public Long getPowerSupplierStatusAgreed() {
+        return powerSupplierStatusAgreed;
+    }
+
+    public void setPowerSupplierStatusAgreed(Long powerSupplierStatusAgreed) {
+        this.powerSupplierStatusAgreed = powerSupplierStatusAgreed;
+    }
+
+    public Long getPowerSupplierStatusNotIndicated() {
+        return powerSupplierStatusNotIndicated;
+    }
+
+    public void setPowerSupplierStatusNotIndicated(Long powerSupplierStatusNotIndicated) {
+        this.powerSupplierStatusNotIndicated = powerSupplierStatusNotIndicated;
+    }
+
+    public Long getPowerSupplierStatusRenouncement() {
+        return powerSupplierStatusRenouncement;
+    }
+
+    public void setPowerSupplierStatusRenouncement(Long powerSupplierStatusRenouncement) {
+        this.powerSupplierStatusRenouncement = powerSupplierStatusRenouncement;
     }
 
     @Override

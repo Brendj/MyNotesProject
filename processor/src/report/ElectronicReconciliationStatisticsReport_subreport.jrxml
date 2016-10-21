@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport_subreport" pageWidth="350" pageHeight="800" columnWidth="350" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="dbc8a18a-7638-4599-ae46-f2fd90004a39">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport_subreport" pageWidth="650" pageHeight="800" columnWidth="650" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="dbc8a18a-7638-4599-ae46-f2fd90004a39">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<field name="date" class="java.lang.String"/>
-	<field name="verificationStatus" class="java.lang.String"/>
-	<field name="verificationStatusPowerSupplier" class="java.lang.String"/>
+	<field name="complexCount" class="java.lang.Long"/>
+	<field name="verificationStatusAgreed" class="java.lang.Long"/>
+	<field name="verificationStatusNotIndicated" class="java.lang.Long"/>
+	<field name="powerSupplierStatusAgreed" class="java.lang.Long"/>
+	<field name="powerSupplierStatusNotIndicated" class="java.lang.Long"/>
+	<field name="powerSupplierStatusRenouncement" class="java.lang.Long"/>
 	<detail>
 		<band height="25" splitType="Stretch">
 			<textField>
@@ -21,7 +25,7 @@
 				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="2a709d8e-72f1-491a-8402-2f7a1df39b53" x="150" y="0" width="100" height="25"/>
+				<reportElement uuid="2a709d8e-72f1-491a-8402-2f7a1df39b53" x="300" y="0" width="70" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -30,10 +34,10 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{verificationStatus}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{verificationStatusAgreed}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="bdcea021-84ca-4f2d-95bc-5267a404e32d" x="250" y="0" width="100" height="25"/>
+				<reportElement uuid="bdcea021-84ca-4f2d-95bc-5267a404e32d" x="580" y="0" width="70" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -42,7 +46,55 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{verificationStatusPowerSupplier}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{powerSupplierStatusRenouncement}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a4ce495c-5c96-4122-9f96-172b619acbd4" x="150" y="0" width="150" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{complexCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="704bb3ca-915e-406c-97be-e25bb017e1c7" x="370" y="0" width="70" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{verificationStatusNotIndicated}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a5d83650-41ed-4e73-893d-da8d8391a6cc" x="440" y="0" width="70" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{powerSupplierStatusAgreed}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="fec657c1-6c09-4280-814f-4c330739cc9c" x="510" y="0" width="70" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{powerSupplierStatusNotIndicated}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
