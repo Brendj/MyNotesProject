@@ -1171,7 +1171,9 @@ public class ImportRegisterClientsService {
     private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
         migration.setComment(ClientMigration.MODIFY_IN_REGISTRY);
-        migration.setOldGroupName(client.getClientGroup().getGroupName());
+        if(client.getClientGroup() != null) {
+            migration.setOldGroupName(client.getClientGroup().getGroupName());
+        }
         migration.setNewGroupName(change.getGroupName());
         session.save(migration);
     }
