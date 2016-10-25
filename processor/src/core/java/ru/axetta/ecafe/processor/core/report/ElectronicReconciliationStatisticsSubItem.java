@@ -111,6 +111,15 @@ public class ElectronicReconciliationStatisticsSubItem implements Comparable<Ele
         int retCode = this.taloonDate.compareTo(o.getTaloonDate());
         return retCode;
     }
+
+    @Override
+    public int hashCode() {
+        int result = complexCount.hashCode();
+        result = 31 * result + verificationStatusAgreed.hashCode();
+        result = 31 * result + verificationStatusNotIndicated.hashCode();
+        result = 31 * result + powerSupplierStatusRenouncement.hashCode();
+        return result;
+    }
 }
 
 

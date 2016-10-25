@@ -88,4 +88,13 @@ public class ElectronicReconciliationStatisticsItem implements Comparable<Electr
         int retCode = this.rowNum.compareTo(o.getRowNum());
         return retCode;
     }
+
+    @Override
+    public int hashCode() {
+        int result = rowNum.hashCode();
+        result = 31 * result + orgType.hashCode();
+        result = 31 * result + district.hashCode();
+        result = 31 * result + address.hashCode();
+        return result;
+    }
 }

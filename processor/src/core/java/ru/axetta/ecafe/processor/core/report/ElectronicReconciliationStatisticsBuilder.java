@@ -159,25 +159,31 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
         Long powerSupplierStatusNotIndicated = 0L;
         Long powerSupplierStatusRenouncement = 0L;
 
-        List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubList = new ArrayList<ElectronicReconciliationStatisticsSubItem>();
+        List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubList;
 
-        Date date = startTime;
-
-        while (endTime.getTime() > date.getTime()) {
-            ElectronicReconciliationStatisticsSubItem electronicSubItem = new ElectronicReconciliationStatisticsSubItem(
-                    CalendarUtils.dateShortToStringFullYear(date), date, complexCount, verificationStatusAgreed,
-                    verificationStatusNotIndicated, powerSupplierStatusAgreed, powerSupplierStatusNotIndicated,
-                    powerSupplierStatusRenouncement);
-            electronicReconciliationStatisticsSubList.add(electronicSubItem);
-            date = CalendarUtils.addOneDay(date);
-        }
 
         for (TaloonApproval taloonApproval : taloonApprovalList) {
             if (!map.containsKey(taloonApproval.getOrg().getShortName())) {
+
+                electronicReconciliationStatisticsSubList = new ArrayList<ElectronicReconciliationStatisticsSubItem>();
+
                 ElectronicReconciliationStatisticsItem electronicReconciliationStatisticsItem = new ElectronicReconciliationStatisticsItem(
                         rowNum, taloonApproval.getOrg().getShortName(), taloonApproval.getOrg().getType().toString(),
                         taloonApproval.getOrg().getDistrict(), taloonApproval.getOrg().getAddress());
-                electronicReconciliationStatisticsItem.getElectronicReconciliationStatisticsSubItems().addAll(electronicReconciliationStatisticsSubList);
+
+                Date date = startTime;
+                while (endTime.getTime() > date.getTime()) {
+                    ElectronicReconciliationStatisticsSubItem electronicSubItem = new ElectronicReconciliationStatisticsSubItem(
+                            CalendarUtils.dateShortToStringFullYear(date), date, complexCount, verificationStatusAgreed,
+                            verificationStatusNotIndicated, powerSupplierStatusAgreed, powerSupplierStatusNotIndicated,
+                            powerSupplierStatusRenouncement);
+                    electronicReconciliationStatisticsSubList.add(electronicSubItem);
+                    date = CalendarUtils.addOneDay(date);
+                }
+
+                electronicReconciliationStatisticsItem.getElectronicReconciliationStatisticsSubItems()
+                        .addAll(electronicReconciliationStatisticsSubList);
+
                 map.put(taloonApproval.getOrg().getShortName(), electronicReconciliationStatisticsItem);
                 rowNum++;
             }
@@ -185,59 +191,50 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
 
         for (TaloonApproval taloonApproval : taloonApprovalList) {
 
-            if (map.containsKey(taloonApproval.getOrg().getShortName())) {
+            List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems = map.get(taloonApproval.getOrg().getShortName()).getElectronicReconciliationStatisticsSubItems();
 
-                List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems = map
-                        .get(taloonApproval.getOrg().getShortName()).getElectronicReconciliationStatisticsSubItems();
+            for (int i = 0; i < electronicReconciliationStatisticsSubItems.size(); i++) {
 
-                for (int i = 0; i < electronicReconciliationStatisticsSubItems.size(); i++) {
+                ElectronicReconciliationStatisticsSubItem subItem = electronicReconciliationStatisticsSubItems.get(i);
 
-                    ElectronicReconciliationStatisticsSubItem subItem = electronicReconciliationStatisticsSubItems
-                            .get(i);
+                if (CalendarUtils.dateShortToStringFullYear(taloonApproval.getCompositeIdOfTaloonApproval().getTaloonDate()).equals(subItem.getDate())) {
 
-                    if (CalendarUtils
-                            .dateShortToStringFullYear(taloonApproval.getCompositeIdOfTaloonApproval().getTaloonDate())
-                            .equals(subItem.getDate())) {
-
-                        String ispp = taloonApproval.getIsppState().toString();
-                        if (ispp.equals("Согласовано")) {
-                            ++verificationStatusAgreed;
-                        }
-                        if (ispp.equals("Не указано")) {
-                            ++verificationStatusNotIndicated;
-                        }
-
-                        String pp = taloonApproval.getPpState().toString();
-                        if (pp.equals("Согласовано")) {
-                            ++powerSupplierStatusAgreed;
-                        }
-                        if (pp.equals("Не указано")) {
-                            ++powerSupplierStatusNotIndicated;
-                        }
-                        if (pp.equals("Отказ")) {
-                            ++powerSupplierStatusRenouncement;
-                        }
-
-                        electronicReconciliationStatisticsSubItems.get(i)
-                                .setComplexCount(subItem.getComplexCount() + 1L);
-                        electronicReconciliationStatisticsSubItems.get(i).setVerificationStatusAgreed(
-                                subItem.getVerificationStatusAgreed() + verificationStatusAgreed);
-                        electronicReconciliationStatisticsSubItems.get(i).setVerificationStatusNotIndicated(
-                                subItem.getVerificationStatusNotIndicated() + verificationStatusNotIndicated);
-                        electronicReconciliationStatisticsSubItems.get(i).setPowerSupplierStatusAgreed(
-                                subItem.getPowerSupplierStatusAgreed() + powerSupplierStatusAgreed);
-                        electronicReconciliationStatisticsSubItems.get(i).setPowerSupplierStatusNotIndicated(
-                                subItem.getPowerSupplierStatusNotIndicated() + powerSupplierStatusNotIndicated);
-                        electronicReconciliationStatisticsSubItems.get(i).setPowerSupplierStatusRenouncement(
-                                subItem.getPowerSupplierStatusRenouncement() + powerSupplierStatusRenouncement);
-
-                        verificationStatusAgreed = 0L;
-                        verificationStatusNotIndicated = 0L;
-                        powerSupplierStatusAgreed = 0L;
-                        powerSupplierStatusNotIndicated = 0L;
-                        powerSupplierStatusRenouncement = 0L;
-                        break;
+                    String ispp = taloonApproval.getIsppState().toString();
+                    if (ispp.equals("Согласовано")) {
+                        ++verificationStatusAgreed;
                     }
+                    if (ispp.equals("Не указано")) {
+                        ++verificationStatusNotIndicated;
+                    }
+
+                    String pp = taloonApproval.getPpState().toString();
+                    if (pp.equals("Согласовано")) {
+                        ++powerSupplierStatusAgreed;
+                    }
+                    if (pp.equals("Не указано")) {
+                        ++powerSupplierStatusNotIndicated;
+                    }
+                    if (pp.equals("Отказ")) {
+                        ++powerSupplierStatusRenouncement;
+                    }
+
+                    electronicReconciliationStatisticsSubItems.get(i).setComplexCount(subItem.getComplexCount() + 1L);
+                    electronicReconciliationStatisticsSubItems.get(i).setVerificationStatusAgreed(
+                            subItem.getVerificationStatusAgreed() + verificationStatusAgreed);
+                    electronicReconciliationStatisticsSubItems.get(i).setVerificationStatusNotIndicated(
+                            subItem.getVerificationStatusNotIndicated() + verificationStatusNotIndicated);
+                    electronicReconciliationStatisticsSubItems.get(i).setPowerSupplierStatusAgreed(
+                            subItem.getPowerSupplierStatusAgreed() + powerSupplierStatusAgreed);
+                    electronicReconciliationStatisticsSubItems.get(i).setPowerSupplierStatusNotIndicated(
+                            subItem.getPowerSupplierStatusNotIndicated() + powerSupplierStatusNotIndicated);
+                    electronicReconciliationStatisticsSubItems.get(i).setPowerSupplierStatusRenouncement(
+                            subItem.getPowerSupplierStatusRenouncement() + powerSupplierStatusRenouncement);
+
+                    verificationStatusAgreed = 0L;
+                    verificationStatusNotIndicated = 0L;
+                    powerSupplierStatusAgreed = 0L;
+                    powerSupplierStatusNotIndicated = 0L;
+                    powerSupplierStatusRenouncement = 0L;
                 }
             }
         }
