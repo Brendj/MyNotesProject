@@ -163,12 +163,12 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
 
 
         for (TaloonApproval taloonApproval : taloonApprovalList) {
-            if (!map.containsKey(taloonApproval.getOrg().getShortName())) {
+            if (!map.containsKey(taloonApproval.getOrg().getShortNameInfoService())) {
 
                 electronicReconciliationStatisticsSubList = new ArrayList<ElectronicReconciliationStatisticsSubItem>();
 
                 ElectronicReconciliationStatisticsItem electronicReconciliationStatisticsItem = new ElectronicReconciliationStatisticsItem(
-                        rowNum, taloonApproval.getOrg().getShortName(), taloonApproval.getOrg().getType().toString(),
+                        rowNum, taloonApproval.getOrg().getShortNameInfoService(), taloonApproval.getOrg().getType().toString(),
                         taloonApproval.getOrg().getDistrict(), taloonApproval.getOrg().getShortAddress());
 
                 Date date = startTime;
@@ -184,14 +184,14 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
                 electronicReconciliationStatisticsItem.getElectronicReconciliationStatisticsSubItems()
                         .addAll(electronicReconciliationStatisticsSubList);
 
-                map.put(taloonApproval.getOrg().getShortName(), electronicReconciliationStatisticsItem);
+                map.put(taloonApproval.getOrg().getShortNameInfoService(), electronicReconciliationStatisticsItem);
                 rowNum++;
             }
         }
 
         for (TaloonApproval taloonApproval : taloonApprovalList) {
 
-            List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems = map.get(taloonApproval.getOrg().getShortName()).getElectronicReconciliationStatisticsSubItems();
+            List<ElectronicReconciliationStatisticsSubItem> electronicReconciliationStatisticsSubItems = map.get(taloonApproval.getOrg().getShortNameInfoService()).getElectronicReconciliationStatisticsSubItems();
 
             for (int i = 0; i < electronicReconciliationStatisticsSubItems.size(); i++) {
 
