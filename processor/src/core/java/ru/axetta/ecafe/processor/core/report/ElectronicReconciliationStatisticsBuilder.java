@@ -169,7 +169,7 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
 
                 ElectronicReconciliationStatisticsItem electronicReconciliationStatisticsItem = new ElectronicReconciliationStatisticsItem(
                         rowNum, taloonApproval.getOrg().getShortName(), taloonApproval.getOrg().getType().toString(),
-                        taloonApproval.getOrg().getDistrict(), taloonApproval.getOrg().getAddress());
+                        taloonApproval.getOrg().getDistrict(), taloonApproval.getOrg().getShortAddress());
 
                 Date date = startTime;
                 while (endTime.getTime() > date.getTime()) {
