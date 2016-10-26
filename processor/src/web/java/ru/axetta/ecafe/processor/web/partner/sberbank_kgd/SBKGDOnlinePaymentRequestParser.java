@@ -48,7 +48,11 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         defaultContragentId = linkConfig.idOfContragent;
         if(action.equals("check")){
             String number = parseResult.getParam("number");
-            contractId = Long.parseLong(number);
+            try {
+                contractId = Long.parseLong(number);
+            } catch (Exception e) {
+                contractId = -1L;
+            }
             String amount = parseResult.getParam("amount");
             String replacedString = amount.replaceAll(",", ".");
             Double result = Double.parseDouble(replacedString);
@@ -59,13 +63,17 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         }
         if(action.equals("payment")){
             String number = parseResult.getParam("number");
-            contractId = Long.parseLong(number);
+            try {
+                contractId = Long.parseLong(number);
+            } catch (Exception e) {
+                contractId = -1L;
+            }
             String amount = parseResult.getParam("amount");
             String replacedString = amount.replaceAll(",", ".");
             Double result = Double.parseDouble(replacedString);
             sum =  result.longValue() * 100;
             receipt = parseResult.getParam("receipt");
-            date = parseResult.getParam("date");
+            date = java.net.URLDecoder.decode(parseResult.getParam("date"), "UTF-8");
             source = source + "/" + date;
             final OnlinePaymentProcessor.PayRequest payRequest = new OnlinePaymentProcessor.PayRequest(
                     OnlinePaymentProcessor.PayRequest.V_0, false, defaultContragentId, null, paymentMethod, contractId,
