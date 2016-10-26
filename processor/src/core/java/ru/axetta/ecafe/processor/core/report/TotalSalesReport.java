@@ -436,20 +436,32 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private boolean is14Group(String groupName) {
+            boolean b = true;
+            if(groupName.length() > 1) {
+                b = !Character.isDigit(groupName.charAt(1));
+            }
             return (groupName.startsWith("1") ||
                     groupName.startsWith("2") ||
                     groupName.startsWith("3") ||
-                    groupName.startsWith("4")) && !Character.isDigit(groupName.charAt(1));
+                    groupName.startsWith("4")) && b;
         }
 
         private boolean is511Group(String groupName) {
+            boolean b1 = true;
+            if(groupName.length() > 1) {
+                b1 = !Character.isDigit(groupName.charAt(1));
+            }
+            boolean b2 = true;
+            if(groupName.length() > 2) {
+                b2 = !Character.isDigit(groupName.charAt(2));
+            }
             return ((groupName.startsWith("5") ||
                     groupName.startsWith("6") ||
                     groupName.startsWith("7") ||
                     groupName.startsWith("8") ||
-                    groupName.startsWith("9")) && !Character.isDigit(groupName.charAt(1))) ||
+                    groupName.startsWith("9")) && b1) ||
                     ((groupName.startsWith("10") ||
-                    groupName.startsWith("11")) && !Character.isDigit(groupName.charAt(2)));
+                    groupName.startsWith("11")) && b2);
         }
 
         private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
