@@ -66,7 +66,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private Boolean includeActDiscrepancies = true;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     private Long contragentId = -1L;
-    private Boolean showAgeGroups = true;
+    private Boolean showAgeGroups = false;
 
     private List<SelectItem> contragentsSelectItemsPrefer;
     private List<SelectItem> contragentsSelectItemsBenefit;
