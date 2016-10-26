@@ -83,6 +83,10 @@
                              actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
             </rich:calendar>
 
+            <h:outputText escape="false" value="Показать в разрезе возрастных категорий" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.totalSalesPage.showAgeGroups}" styleClass="output-text">
+            </h:selectBooleanCheckbox>
+
             <h:panelGrid styleClass="borderless-grid" columns="1">
                 <h:panelGrid id="preferencialPanel" styleClass="borderless-grid" columns="1">
                     <h:panelGroup styleClass="borderless-div">

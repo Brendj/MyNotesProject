@@ -48,7 +48,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
     */
     public static final String REPORT_NAME = "Сводный отчет по продажам (итоговые показатели)";
-    public static final String[] TEMPLATE_FILE_NAMES = {"TotalSalesReport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {"TotalSalesReport.jasper", "TotalSalesReportWithAgeGroups.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{3};
 
@@ -226,6 +226,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 idOfOrgListStrings = Arrays.asList(StringUtils.split(idOfOrgListString, ','));
             }
 
+            Boolean showAgeGroups = Boolean.valueOf(getReportProperties().getProperty("showAgeGroups"));
+
             String titles = StringUtils.trimToEmpty(getReportProperties().getProperty("preferentialTitleComplexes"));
 
             String benefitTitleAndSums = StringUtils.trimToEmpty(getReportProperties().getProperty("benefitTitleAndSumList"));
@@ -269,7 +271,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             Map<Long, List<TotalSalesItem>> totalListMap = new HashMap<Long, List<TotalSalesItem>>();
             //Получаем список всех школ, заполняем ими списов
             List<Long> idOfOrgsList = new LinkedList<Long>();
-            retreiveAllOrgs(totalListMap, dates, idOfOrgsList, titlesComplexes);
+            retreiveAllOrgs(totalListMap, dates, idOfOrgsList, titlesComplexes, showAgeGroups);
             if (idOfOrgsList.size() == 0) {
                 return new JREmptyDataSource();
             }
@@ -278,8 +280,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (List<TotalSalesItem> totalSalesItemList : totalListMap.values()) {
                 totalSalesTMP.getItemList().addAll(totalSalesItemList);
             }
-            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime, priceAndSumBenefitHashMap);
-            retreiveAllOrdersPaid(totalListMap, idOfOrgsList, startTime, endTime, priceAndSumPaidHashMap);
+            retreiveAllOrders(totalListMap, idOfOrgsList, titlesComplexes, startTime, endTime, priceAndSumBenefitHashMap, showAgeGroups);
+            retreiveAllOrdersPaid(totalListMap, idOfOrgsList, startTime, endTime, priceAndSumPaidHashMap, showAgeGroups);
 
 
             //Вывод, разбивка по районам.
@@ -303,7 +305,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
         private void retreiveAllOrders(Map<Long, List<TotalSalesItem>> totalListMap, List<Long> idOfOrgsList,
                 List<String> titleComplexes, Date startTime, Date endTime,
-                HashMap<Long, PriceAndSum> priceAndSumHashMap) {
+                HashMap<Long, PriceAndSum> priceAndSumHashMap, boolean showAgeGroups) {
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
             List<OrderItem> allOrders = ordersRepository.findAllOrders(idOfOrgsList, startTime, endTime);
 
@@ -318,34 +320,34 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[0]))) {
                         if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_OWN
                                 && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                            sumProductOwn += handleOrders(totalListMap, allOrder, title);
+                            sumProductOwn += handleOrders(totalListMap, allOrder, title, showAgeGroups);
                             sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder,
-                                    TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
+                                    TOTAL_BUFFET_PLUS_NAME_COMPLEX, showAgeGroups); //Буфет собственное + Платные комплексы
                         }
                     } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[1]))) {
                         if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE
                                 && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                            sumProductCentralize += handleOrders(totalListMap, allOrder, title);
+                            sumProductCentralize += handleOrders(totalListMap, allOrder, title, showAgeGroups);
                         }
                     } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[2]))) {
                         if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_CENTRALIZE_COOK
                                 && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                            sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title);
+                            sumProductCentralizeCook += handleOrders(totalListMap, allOrder, title, showAgeGroups);
                         }
                     } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[3]))) {
                         if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_PURCHASE
                                 && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                            sumProductPurchase += handleOrders(totalListMap, allOrder, title);
+                            sumProductPurchase += handleOrders(totalListMap, allOrder, title, showAgeGroups);
                         }
                     } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[4]))) {
                         if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_VENDING
                                 && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                            sumProductVending += handleOrders(totalListMap, allOrder, title);
+                            sumProductVending += handleOrders(totalListMap, allOrder, title, showAgeGroups);
                         }
                     } else if (title.equals("Буфет ".concat(OrderDetail.PRODUCTION_NAMES_TYPES[5]))) {
                         if (allOrder.getMenuOrigin() == OrderDetail.PRODUCT_COMMERCIAL
                                 && allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM) {
-                            sumProductCommercial += handleOrders(totalListMap, allOrder, title);
+                            sumProductCommercial += handleOrders(totalListMap, allOrder, title, showAgeGroups);
                         }
                     }
                 }
@@ -355,22 +357,22 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                         if (priceAndSumHashMap.get(allOrder.getSum()) != null) {
                             Long sum = priceAndSumHashMap.get(allOrder.getSum()).getSum();
                             sum += handleOrders(totalListMap, allOrder,
-                                    priceAndSumHashMap.get(allOrder.getSum()).getTitle());
+                                    priceAndSumHashMap.get(allOrder.getSum()).getTitle(), showAgeGroups);
                             priceAndSumHashMap.get(allOrder.getSum()).setSum(sum);
                         }
                     }
                 }
 
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
-                    sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET);
-                    sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
+                    sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET, showAgeGroups);
+                    sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, showAgeGroups); //Буфетная продукция + Платные комплексы
                 }else if(allOrder.getSocDiscount() == 0L){//Pay
-                    sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX);
-                    sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX); //Буфетная продукция + Платные комплексы
+                    sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX, showAgeGroups);
+                    sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, showAgeGroups); //Буфетная продукция + Платные комплексы
 
-                    sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX); //Буфет собственное + Платные комплексы
+                    sumBuffetOwnPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_BUFFET_PLUS_NAME_COMPLEX, showAgeGroups); //Буфет собственное + Платные комплексы
                 }else{ // free
-                    sumBen += handleOrders(totalListMap, allOrder, NAME_BEN);
+                    sumBen += handleOrders(totalListMap, allOrder, NAME_BEN, showAgeGroups);
 
                 }
             }
@@ -382,7 +384,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private void retreiveAllOrdersPaid(Map<Long, List<TotalSalesItem>> totalListMap, List<Long> idOfOrgsList, Date startTime, Date endTime,
-                HashMap<Long, PriceAndSum> priceAndSumPaidHashMap) {
+                HashMap<Long, PriceAndSum> priceAndSumPaidHashMap, boolean showAgeGroups) {
             OrdersRepository ordersRepository = RuntimeContext.getAppContext().getBean(OrdersRepository.class);
             List<OrderItem> allOrdersPaid = ordersRepository.findAllOrdersPaid(idOfOrgsList, startTime, endTime);
 
@@ -391,7 +393,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     if (priceAndSumPaidHashMap.get(allOrder.getSum()) != null) {
                         Long sum = priceAndSumPaidHashMap.get(allOrder.getSum()).getSum();
                         sum += handleOrders(totalListMap, allOrder,
-                                priceAndSumPaidHashMap.get(allOrder.getSum()).getTitle());
+                                priceAndSumPaidHashMap.get(allOrder.getSum()).getTitle(), showAgeGroups);
                         priceAndSumPaidHashMap.get(allOrder.getSum()).setSum(sum);
                     }
                 }
@@ -399,7 +401,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
 
-        private long handleOrders(Map<Long, List<TotalSalesItem>> totalListMap, OrderItem buffetOrder, String type) {
+        private long handleOrders(Map<Long, List<TotalSalesItem>> totalListMap, OrderItem buffetOrder, String type, boolean showAgeGroups) {
             List<TotalSalesItem> totalSalesItemList;
             long sum = 0L;
 
@@ -407,7 +409,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             if (totalSalesItemList == null) {
                 return 0L;
             }
-            String ageGroup = getAgeGroup(buffetOrder);
+            String ageGroup = showAgeGroups ? getAgeGroup(buffetOrder) : "";
             String date = CalendarUtils.dateShortToString(buffetOrder.getOrderDate());
             for (TotalSalesItem totalSalesItem : totalSalesItemList) {
                 if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))
@@ -465,11 +467,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
         }
 
         private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
-                List<Long> idOfOrgsList, List<String> titleComplexes) {
+                List<Long> idOfOrgsList, List<String> titleComplexes, boolean showAgeGroups) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
-            if (idOfContragent != -1) {
-
-            }
 
             List<OrgItem> allNames;
 
@@ -479,10 +478,12 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 allNames = orgRepository.findAllNamesByContragentTSP(idOfContragent);
             }
 
+            String[] ageGroups = showAgeGroups ? AGE_GROUP_NAMES : new String[]{""};
+
             List<TotalSalesItem> totalSalesItemList;
             for (OrgItem orgItem : allNames) {
                 totalSalesItemList = new ArrayList<TotalSalesItem>();
-                for(String ageGroup : AGE_GROUP_NAMES) {
+                for(String ageGroup : ageGroups) {
                     for (String date : dates) {
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,

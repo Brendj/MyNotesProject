@@ -66,6 +66,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
     private Boolean includeActDiscrepancies = true;
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     private Long contragentId = -1L;
+    private Boolean showAgeGroups = true;
 
     private List<SelectItem> contragentsSelectItemsPrefer;
     private List<SelectItem> contragentsSelectItemsBenefit;
@@ -362,7 +363,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-        String templateShortFileName = TotalSalesReport.class.getSimpleName() + ".jasper";
+        String templateShortName = showAgeGroups ? TotalSalesReport.class.getSimpleName() + "WithAgeGroups" : TotalSalesReport.class.getSimpleName();
+        String templateShortFileName = templateShortName + ".jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if(!(new File(templateFilename)).exists()){
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
@@ -382,6 +384,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             builder.getReportProperties().setProperty("benefitTitleAndSumList", showBenefitDetail ? benefitTitleAndSumListString : "");
             builder.getReportProperties().setProperty("paidTitleAndSumList", showPaidDetail ? paidTitleAndSumListString : "");
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty("showAgeGroups", Boolean.toString(showAgeGroups));
 
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -429,6 +432,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
         includeActDiscrepancies = true;
+        showAgeGroups = false;
         htmlReport = null;
         contragent = null;
         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
@@ -451,7 +455,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-        String templateShortFileName = TotalSalesReport.class.getSimpleName() + ".jasper";
+        String templateShortName = showAgeGroups ? TotalSalesReport.class.getSimpleName() + "WithAgeGroups" : TotalSalesReport.class.getSimpleName();
+        String templateShortFileName = templateShortName + ".jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if(!(new File(templateFilename)).exists()){
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
@@ -472,6 +477,7 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             builder.getReportProperties().setProperty("benefitTitleAndSumList", benefitTitleAndSumString);
             builder.getReportProperties().setProperty("paidTitleAndSumList", paidTitleAndSumListString);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty("showAgeGroups", Boolean.toString(showAgeGroups));
 
             TotalSalesReport totalSalesReport = (TotalSalesReport) builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
@@ -743,5 +749,13 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
         }
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
+    }
+
+    public Boolean getShowAgeGroups() {
+        return showAgeGroups;
+    }
+
+    public void setShowAgeGroups(Boolean showAgeGroups) {
+        this.showAgeGroups = showAgeGroups;
     }
 }
