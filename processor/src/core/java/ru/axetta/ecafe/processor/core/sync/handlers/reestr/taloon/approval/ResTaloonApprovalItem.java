@@ -51,8 +51,8 @@ public class ResTaloonApprovalItem {
         this.orgId = taloon.getCompositeIdOfTaloonApproval().getIdOfOrg();
         this.date = taloon.getCompositeIdOfTaloonApproval().getTaloonDate();
         this.name = taloon.getCompositeIdOfTaloonApproval().getTaloonName();
+        this.goodsGuid = taloon.getCompositeIdOfTaloonApproval().getGoodsGuid();
         this.goodsName = taloon.getGoodsName();
-        this.goodsGuid = taloon.getGoodsGuid();
         this.soldedQty = taloon.getSoldedQty();
         this.setRequestedQty(taloon.getRequestedQty());
         this.setShippedQty(taloon.getShippedQty());

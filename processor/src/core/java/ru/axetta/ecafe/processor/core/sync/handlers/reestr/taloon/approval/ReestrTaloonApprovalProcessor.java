@@ -44,7 +44,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
             for (TaloonApprovalItem item : reestrTaloonApproval.getItems()) {
 
                 if (item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK)) {
-                    CompositeIdOfTaloonApproval compositeId = new CompositeIdOfTaloonApproval(item.getOrgId(), item.getDate(), item.getName());
+                    CompositeIdOfTaloonApproval compositeId = new CompositeIdOfTaloonApproval(item.getOrgId(), item.getDate(), item.getName(), item.getGoodsGuid());
                     TaloonApproval taloon = DAOUtils.findTaloonApproval(session, compositeId);
                     Integer soldedQty = item.getSoldedQty();
                     Long price = item.getPrice();
@@ -54,13 +54,12 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     TaloonISPPStatesEnum isppState = item.getIsppState();
                     TaloonPPStatesEnum ppState = item.getPpState();
                     String goodsName = item.getGoodsName();
-                    String goodsGuid = item.getGoodsGuid();
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
                     Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
-                        taloon = new TaloonApproval(compositeId, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState,goodsName,goodsGuid);
+                        taloon = new TaloonApproval(compositeId, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState,goodsName);
                     }
                     taloon.setSoldedQty(soldedQty);
                     taloon.setRequestedQty(requestedQty);

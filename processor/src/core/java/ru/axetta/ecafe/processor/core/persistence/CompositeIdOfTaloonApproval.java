@@ -18,15 +18,17 @@ public class CompositeIdOfTaloonApproval implements Serializable {
     private Long idOfOrg;
     private Date taloonDate;
     private String taloonName;
+    private String goodsGuid;
 
     protected CompositeIdOfTaloonApproval() {
         //for Hibernate only
     }
 
-    public CompositeIdOfTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName) {
+    public CompositeIdOfTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid) {
         this.setIdOfOrg(idOfOrg);
         this.setTaloonDate(taloonDate);
         this.setTaloonName(taloonName);
+        this.setGoodsGuid(goodsGuid);
     }
 
     @Override
@@ -63,5 +65,13 @@ public class CompositeIdOfTaloonApproval implements Serializable {
 
     public void setTaloonName(String taloonName) {
         this.taloonName = taloonName;
+    }
+
+    public String getGoodsGuid() {
+        return goodsGuid;
+    }
+
+    public void setGoodsGuid(String goodsGuid) {
+        this.goodsGuid = goodsGuid;
     }
 }

@@ -27,7 +27,6 @@ public class TaloonApproval {
     private Long version;
     private Boolean deletedState;
     private String goodsName;
-    private String goodsGuid;
 
     public TaloonApproval() {
         //for Hibernate only
@@ -35,7 +34,7 @@ public class TaloonApproval {
 
     public TaloonApproval(CompositeIdOfTaloonApproval compositeIdOfTaloonApproval, Integer soldedQty, Long price,
             TaloonCreatedTypeEnum createdType, Integer requestedQty, Integer shippedQty,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,String goodsName,String goodsGuid) {
+            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,String goodsName) {
         this.compositeIdOfTaloonApproval = compositeIdOfTaloonApproval;
         this.soldedQty = soldedQty;
         this.price = price;
@@ -45,7 +44,6 @@ public class TaloonApproval {
         this.isppState = isppState;
         this.ppState = ppState;
         this.goodsName = goodsName;
-        this.goodsGuid = goodsGuid;
     }
 
     public CompositeIdOfTaloonApproval getCompositeIdOfTaloonApproval() {
@@ -62,14 +60,6 @@ public class TaloonApproval {
 
     public void setGoodsName(String goodsName) {
         this.goodsName = goodsName;
-    }
-
-    public String getGoodsGuid() {
-        return goodsGuid;
-    }
-
-    public void setGoodsGuid(String goodsGuid) {
-        this.goodsGuid = goodsGuid;
     }
 
     public Org getOrg() {

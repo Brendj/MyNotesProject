@@ -52,12 +52,13 @@ public class TaloonApprovalVerificationItem {
         private Long idOfOrg;
         private Date taloonDate;
         private boolean summaryDay;
+        private String goodsGuid;
 
         public TaloonApprovalVerificationItemDetail() {}
 
         public TaloonApprovalVerificationItemDetail(String taloonName, Integer soldedQty, Integer requestedQty,
                 Integer shippedQty, Long price, Long summa, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-                Long idOfOrg, Date taloonDate, boolean summaryDay) {
+                Long idOfOrg, Date taloonDate, boolean summaryDay, String goodsGuid) {
             this.setTaloonName(taloonName);
             this.setRequestedQty(requestedQty);
             this.setSoldedQty(soldedQty);
@@ -69,6 +70,7 @@ public class TaloonApprovalVerificationItem {
             this.setIdOfOrg(idOfOrg);
             this.setTaloonDate(taloonDate);
             this.setSummaryDay(summaryDay);
+            this.setGoodsGuid(goodsGuid);
         }
 
         public String getTaloonName() {
@@ -307,6 +309,14 @@ public class TaloonApprovalVerificationItem {
 
         public void setSummaryDay(boolean summaryDay) {
             this.summaryDay = summaryDay;
+        }
+
+        public String getGoodsGuid() {
+            return goodsGuid;
+        }
+
+        public void setGoodsGuid(String goodsGuid) {
+            this.goodsGuid = goodsGuid;
         }
     }
 

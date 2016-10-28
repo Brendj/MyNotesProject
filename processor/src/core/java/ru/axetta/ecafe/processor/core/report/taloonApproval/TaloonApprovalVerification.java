@@ -62,7 +62,7 @@ public class TaloonApprovalVerification {
                                 taloon.getSoldedQty(), taloon.getRequestedQty(), taloon.getShippedQty(), taloon.getPrice(),
                                 (taloon.getPrice() == null || taloon.getSoldedQty() == null) ? 0 : taloon.getPrice() * taloon.getSoldedQty(),
                                 taloon.getIsppState(),
-                                taloon.getPpState(), taloon.getCompositeIdOfTaloonApproval().getIdOfOrg(), d, false);
+                                taloon.getPpState(), taloon.getCompositeIdOfTaloonApproval().getIdOfOrg(), d, false, taloon.getCompositeIdOfTaloonApproval().getGoodsGuid());
 
                 sdRequestedQty += taloon.getRequestedQty() == null ? 0 : taloon.getRequestedQty();
                 sdSoldedQty += taloon.getSoldedQty() == null ? 0 : taloon.getSoldedQty();
@@ -74,7 +74,7 @@ public class TaloonApprovalVerification {
             TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
                     new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Всего",
                             sdSoldedQty, sdRequestedQty, sdShippedQty, null,
-                            sdSumma, null, null, null, d, true);
+                            sdSumma, null, null, null, d, true, null);
             item.getDetails().add(detail);
             tdRequestedQty += sdRequestedQty;
             tdShippedQty += sdShippedQty;
@@ -88,7 +88,7 @@ public class TaloonApprovalVerification {
         TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
                 new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Итого",
                         tdSoldedQty, tdRequestedQty, tdShippedQty, null,
-                        tdSumma, null, null, null, null, true);
+                        tdSumma, null, null, null, null, true, null);
         item.getDetails().add(detail);
         items.add(item);
 
@@ -104,8 +104,9 @@ public class TaloonApprovalVerification {
                     continue;
                 }
                 String taloonName = detail.getTaloonName();
+                String goodsGuid = detail.getGoodsGuid();
                 Long idOfOrg = detail.getIdOfOrg();
-                CompositeIdOfTaloonApproval id = new CompositeIdOfTaloonApproval(idOfOrg, taloonDate, taloonName);
+                CompositeIdOfTaloonApproval id = new CompositeIdOfTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid);
                 TaloonApproval taloon = (TaloonApproval) session.load(TaloonApproval.class, id);
                 if (taloon != null) {
                     taloon.setShippedQty(detail.getShippedQty());
