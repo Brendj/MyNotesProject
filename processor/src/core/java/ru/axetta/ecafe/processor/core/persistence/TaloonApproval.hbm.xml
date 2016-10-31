@@ -11,7 +11,7 @@
             <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
             <key-property name="taloonDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="taloonDate"/>
             <key-property name="taloonName" type="string" column="taloonName"/>
-            <key-property name="goodsGuid" type="string" column="goodsguid" />
+            <key-property name="goodsGuid" type="string" column="goodsGuid" />
         </composite-id>
 
         <property name="soldedQty" column="SoldedQty" type="integer" not-null="true"/>
