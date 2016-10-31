@@ -52,8 +52,10 @@ public class GroupOrganizationItem {
 
         boolean isNeedDeleteMiddleGroups = false;
 
-        if (isNeedDeleteMiddleGroupsString.equals("1")) {
-            isNeedDeleteMiddleGroups = true;
+        if (isNeedDeleteMiddleGroupsString != null) {
+            if (isNeedDeleteMiddleGroupsString.equals("1")) {
+                isNeedDeleteMiddleGroups = true;
+            }
         }
 
         return new GroupOrganizationItem(name, idOfOrg, bindingToOrg, isNeedDeleteMiddleGroups);

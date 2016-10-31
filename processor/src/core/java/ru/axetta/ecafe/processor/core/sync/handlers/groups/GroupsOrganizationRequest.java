@@ -4,15 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.groups;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -25,6 +20,7 @@ import java.util.List;
  * Date: 27.07.2016
  */
 public class GroupsOrganizationRequest implements SectionRequest {
+
     private static final String SECTION_NAME = "GroupsOrganization";
     private static Logger logger = LoggerFactory.getLogger(GroupsOrganizationRequest.class);
     private final long idOfOrg;
@@ -36,7 +32,7 @@ public class GroupsOrganizationRequest implements SectionRequest {
         this.idOfOrg = idOfOrg;
         Node node = groupsOrganizationRequestNode.getFirstChild();
         while (node != null) {
-            String parentGroupName = null;
+            String parentGroupName;
 
             if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("CG")) {
                 GroupOrganizationItem item;
@@ -111,8 +107,9 @@ public class GroupsOrganizationRequest implements SectionRequest {
             Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
             if (sectionElement != null) {
                 return new GroupsOrganizationRequest(sectionElement, idOfOrg);
-            } else
+            } else {
                 return null;
+            }
         }
     }
 
