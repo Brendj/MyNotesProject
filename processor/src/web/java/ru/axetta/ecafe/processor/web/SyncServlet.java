@@ -55,6 +55,7 @@ public class SyncServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(SyncServlet.class);
     private static final SyncCollector SYNC_COLLECTOR = SyncCollector.getInstance();
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
+    private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
     private static final List<String[]> restrictedFullSyncPeriods =
             getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
 
@@ -116,9 +117,12 @@ public class SyncServlet extends HttpServlet {
             boolean success, tooManyRequests = false;
             synchronized(syncsInProgress) {
                 success = syncsInProgress.add(idOfOrg);
+                if (success && syncType==SyncType.TYPE_FULL) {
+                    fullSyncsInProgress.add(idOfOrg);
+                }
                 // ограничение количества одновременных синхр - срабатывает только для полных синхр
                 if (success && (syncType==SyncType.TYPE_FULL &&
-                        syncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS))) {
+                        fullSyncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS))) {
                     tooManyRequests = true;
                 }
             }
@@ -247,7 +251,7 @@ public class SyncServlet extends HttpServlet {
                 throw new ServletException(e);
             }
 
-            final String message = String.format("End of synchronization with %s", request.getRemoteAddr());
+            final String message = String.format("End of synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg);
             logger.info(message);
             removeSyncInProgress(idOfOrg);
         } catch (RuntimeContext.NotInitializedException e) {
@@ -262,6 +266,7 @@ public class SyncServlet extends HttpServlet {
     private void removeSyncInProgress(long idOfOrg) {
         synchronized (syncsInProgress) {
             syncsInProgress.remove(idOfOrg);
+            fullSyncsInProgress.remove(idOfOrg);
         }
     }
 
