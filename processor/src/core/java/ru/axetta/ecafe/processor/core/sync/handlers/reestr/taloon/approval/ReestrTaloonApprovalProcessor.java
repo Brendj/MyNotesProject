@@ -113,8 +113,10 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
         ResTaloonApprovalItem resItem;
         List<TaloonApproval> list = DAOUtils.getTaloonApprovalForOrgSinceVersion(session, reestrTaloonApproval.getIdOfOrgOwner(), reestrTaloonApproval.getMaxVersion());
         for (TaloonApproval taloon : list) {
-            resItem = new ResTaloonApprovalItem(taloon);
-            items.add(resItem);
+            if (taloon != null) {
+                resItem = new ResTaloonApprovalItem(taloon);
+                items.add(resItem);
+            }
         }
 
         result.setItems(items);
