@@ -56,8 +56,13 @@
                            reRender="taloonApprovalVerificationPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton" />
     </h:panelGrid>
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
 
-    <rich:dataTable id="taloonApprovalVerificationTable" value="#{mainPage.taloonApprovalVerificationPage.items}" var="item" rows="20"
+    <rich:dataTable id="taloonApprovalVerificationTable" value="#{mainPage.taloonApprovalVerificationPage.items}" var="item" rows="25"
                     footerClass="data-table-footer">
         <f:facet name="header">
             <rich:columnGroup>
@@ -183,6 +188,19 @@
                 </a4j:commandLink>
             </rich:column>
         </rich:subTable>
+        <f:facet name="footer">
+            <rich:datascroller for="taloonApprovalVerificationTable" renderIfSinglePage="false"
+                               maxPages="5" fastControls="hide" stepControls="auto"
+                               boundaryControls="hide">
+                <a4j:support event="onpagechange" />
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
     </rich:dataTable>
 
     <h:panelGrid styleClass="borderless-grid" columns="1">
@@ -190,11 +208,6 @@
                            reRender="taloonApprovalVerificationTable" styleClass="command-button"
                            status="reportGenerateStatus" id="applyButton" />
     </h:panelGrid>
-    <a4j:status id="reportGenerateStatus">
-        <f:facet name="start">
-            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-        </f:facet>
-    </a4j:status>
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
