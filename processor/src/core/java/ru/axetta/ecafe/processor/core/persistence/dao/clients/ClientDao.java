@@ -229,6 +229,7 @@ public class ClientDao extends WritableJpaDao {
 
     private void clearClientContacts(Client client, Session session) throws Exception {
         client.setMobile("");
+        logger.info("class : ClientDao, method : clearClientContacts line : 231, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
         client.setEmail("");
         client.setNotifyViaSMS(false);
         client.setNotifyViaPUSH(false);

@@ -539,7 +539,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         client.setAddress(this.address);
         client.setPhone(this.phone);
+        getLogger().info("class : ClientCreatePage, method : createClient line : 541, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
         client.setMobile(this.mobile);
+        getLogger().info("class : ClientCreatePage, method : createClient line : 543, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
         client.setEmail(this.email);
         client.setFax(this.fax);
         client.setRemarks(this.remarks);

@@ -22,6 +22,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -864,11 +866,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFlags(this.flags);
         client.setAddress(this.address);
         client.setPhone(this.phone);
+        getLogger().info("class : ClientEditPage, method : updateClient line : 868, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
         //  если у клиента есть мобильный и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
         if (client != null && client.getMobile() != null && !client.getMobile().equals(mobile)) {
             client.setSsoid("");
         }
         client.setMobile(mobile);
+        getLogger().info("class : ClientEditPage, method : updateClient line : 874, idOfClient : " + client.getIdOfClient() + " phone : " + client.getMobile());
         client.setFax(this.fax);
         //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
         if (client != null && client.getEmail() != null && !client.getEmail().equals(this.email)) {

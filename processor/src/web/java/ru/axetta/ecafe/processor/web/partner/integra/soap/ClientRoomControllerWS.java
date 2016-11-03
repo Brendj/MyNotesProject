@@ -4788,12 +4788,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (value) {
                 if (client.getMobile().equals(guardMobile)) {
                     client.setMobile("");
+                    logger.info("class : ClientRoomControllerWS, method : processSetGuardianship line : 4790, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
                     session.persist(client);
                 }
             } else {
                 if (!guardianWithMobileFound) {
                     if (client.getMobile() == null || client.getMobile().isEmpty()) {
                         client.setMobile(guardMobile);
+                        logger.info("class : ClientRoomControllerWS, method : processSetGuardianship line : 4797, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
                         session.persist(client);
                     } else {
                         throw new IllegalArgumentException(String.format("Невозможно активировать опекунскую связь между клиентом " +
@@ -4858,6 +4860,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (phone.equals(currentMobile)) {
                 client.setMobile("");
+                logger.debug("class : ClientRoomControllerWS, method : processClearMobile line : 4860, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
                 session.persist(client);
                 logger.info(String.format("Очищен номер телефона %s у клиента с ContractId=%s", phone, client.getContractId()));
             }
@@ -4867,6 +4870,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Client guardian = DAOUtils.findClientByContractId(session, item.getContractId());
                 if (phone.equals(guardian.getMobile())) {
                     guardian.setMobile("");
+                    logger.debug("class : ClientRoomControllerWS, method : processClearMobile line : 4870, idOfClient : " + guardian.getIdOfClient() + " mobile : " + guardian.getMobile());
                     session.persist(guardian);
                     logger.info(String.format("Очищен номер телефона %s у клиента с ContractId=%s", phone, guardian.getContractId()));
                 }

@@ -342,6 +342,7 @@ public class ClientManager {
             //tokens[13])
             if (fieldConfig.getValue(FieldId.PHONE) != null) {
                 client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));
+                logger.info("class : ClientManager, method : modifyClientTransactionFree line : 344, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
             }
             //tokens[14])
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
@@ -355,6 +356,7 @@ public class ClientManager {
                     client.setSsoid("");
                 }
                 client.setMobile(mobilePhone);
+                logger.info("class : ClientManager, method : modifyClientTransactionFree line : 358, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             }
             String fax = fieldConfig.getValue(FieldId.FAX);
             if (fax != null && StringUtils.isNotEmpty(fax)) {
@@ -714,6 +716,7 @@ public class ClientManager {
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
+            logger.info("class : ClientManager, method : registerClientTransactionFree line : 717, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
             String fax = fieldConfig.getValue(FieldId.FAX);
             if (mobilePhone != null) {
@@ -729,6 +732,7 @@ public class ClientManager {
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
+            logger.info("class : ClientManager, method : registerClientTransactionFree line : 734, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
             client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
@@ -954,6 +958,7 @@ public class ClientManager {
         }
 
         clientGuardianToSave.setMobile(mobilePhoneGuardian);
+        logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         clientGuardianToSave.setAddress("");
         //clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);

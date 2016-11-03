@@ -3460,6 +3460,7 @@ public class Processor implements SyncProcessor {
                         client.setSsoid("");
                     }
                     client.setMobile(mobile);
+                    logger.info("class : ClientManager, method : modifyClientTransactionFree line : 344, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getPhone());
                     if (!StringUtils.isEmpty(mobile)) {
                         if (clientParamItem.getNotifyViaSMS() == null) {
                             client.setNotifyViaSMS(true);
@@ -3483,6 +3484,7 @@ public class Processor implements SyncProcessor {
                 }
                 if (clientParamItem.getPhone() != null) {
                     client.setPhone(clientParamItem.getPhone());
+                    logger.info("class : Processor, method : processSyncClientParamRegistryItem line : 3485, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
                 }
                 if (clientParamItem.getSecondName() != null) {
                     client.getPerson().setSecondName(clientParamItem.getSecondName());

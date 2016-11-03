@@ -603,8 +603,10 @@ public class RegistryLoadPage extends BasicWorkspacePage {
             guardian.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         }
         guardian.setMobile(guardianItem.getPhones().get(0));
+        logger.info("class : RegistryLoadPage, method : createGuardian line : 605, idOfClient : " + guardian.getIdOfClient() + " mobile : " + guardian.getMobile());
         if(guardianItem.getPhones().size() > 1){
             guardian.setPhone(guardianItem.getPhones().get(1));
+            logger.info("class : RegistryLoadPage, method : createGuardian line : 608, idOfClient : " + guardian.getIdOfClient() + " phone : " + guardian.getPhone());
         }
         guardian.setAddress("");
         guardian.setEmail(guardianItem.getEmail());

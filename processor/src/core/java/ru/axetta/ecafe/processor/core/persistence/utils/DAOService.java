@@ -381,6 +381,7 @@ public class DAOService {
         Query q = entityManager.createQuery("update Client set mobile=:mobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
         q.setParameter("contractId", contractId);
+        logger.info("class : DAOService, method : setClientMobilePhone line : 382, contractId : " + contractId + " mobile : " + mobile);
         return q.executeUpdate() != 0;
     }
 
@@ -388,6 +389,7 @@ public class DAOService {
         Query q = entityManager.createQuery("update Client set phone=:phone where contractId=:contractId");
         q.setParameter("phone", phone);
         q.setParameter("contractId", contractId);
+        logger.info("class : DAOService, method : setClientPhone line : 390, contractId : " + contractId + " phone : " + phone);
         return q.executeUpdate() != 0;
     }
 
