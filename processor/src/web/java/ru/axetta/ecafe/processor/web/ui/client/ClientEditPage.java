@@ -872,7 +872,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setSsoid("");
         }
         client.setMobile(mobile);
-        getLogger().info("class : ClientEditPage, method : updateClient line : 874, idOfClient : " + client.getIdOfClient() + " phone : " + client.getMobile());
+        getLogger().info("class : ClientEditPage, method : updateClient line : 874, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
         client.setFax(this.fax);
         //  если у клиента есть емайл и он не совпадает с новым, то сбрсываем ССОИД для ЕМП
         if (client != null && client.getEmail() != null && !client.getEmail().equals(this.email)) {
