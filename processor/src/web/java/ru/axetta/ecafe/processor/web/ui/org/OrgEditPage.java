@@ -269,7 +269,6 @@ public class OrgEditPage extends BasicWorkspacePage
         }
         HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
         Set<Org> orgsForVersionUpdate = new HashSet<Org>();
-        boolean orgStructureVersionUpdate = false;
         if(!selectOrg.equals(friendlyOrg)){
             // Если убрали или внесли организацию в список дружественных, то обновляем версию
             friendlyOrg.removeAll(selectOrg);
@@ -288,7 +287,6 @@ public class OrgEditPage extends BasicWorkspacePage
                 //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
                 //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
             }
-            orgStructureVersionUpdate = true;
         }
 
         org.setCommodityAccounting(changeCommodityAccounting);
@@ -339,15 +337,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
         nextVersion = DAOUtils.nextVersionByOrgStucture(session);
         org.setOrgStructureVersion(nextVersion);
-        if(orgStructureVersionUpdate) {
-            for (Org o : orgsForVersionUpdate) {
-                o.setOrgStructureVersion(nextVersion);
-                session.update(o);
-            }
+        for (Org o : orgsForVersionUpdate) {
+            o.setOrgStructureVersion(nextVersion);
+            session.update(o);
         }
+        
         session.update(org);
         fill(org);
-        
+
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
 
     }
