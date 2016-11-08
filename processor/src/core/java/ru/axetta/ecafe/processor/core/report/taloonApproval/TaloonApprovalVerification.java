@@ -4,8 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.taloonApproval;
 
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfTaloonApproval;
 import ru.axetta.ecafe.processor.core.persistence.TaloonApproval;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -29,15 +29,15 @@ public class TaloonApprovalVerification {
 
         List<TaloonApprovalVerificationItem> items = new ArrayList<TaloonApprovalVerificationItem>();
         Criteria criteria = session.createCriteria(TaloonApproval.class);
-        criteria.add(Restrictions.gt("compositeIdOfTaloonApproval.taloonDate", startDate));
-        criteria.add(Restrictions.lt("compositeIdOfTaloonApproval.taloonDate", eDate));
+        criteria.add(Restrictions.gt("taloonDate", startDate));
+        criteria.add(Restrictions.lt("taloonDate", eDate));
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        criteria.addOrder(Order.asc("compositeIdOfTaloonApproval.taloonDate"));
-        criteria.addOrder(Order.asc("compositeIdOfTaloonApproval.taloonName"));
+        criteria.addOrder(Order.asc("taloonDate"));
+        criteria.addOrder(Order.asc("taloonName"));
         List<TaloonApproval> list = criteria.list();
         Set<Date> map = new HashSet<Date>();
         for(TaloonApproval taloon : list) {
-            map.add(taloon.getCompositeIdOfTaloonApproval().getTaloonDate());
+            map.add(taloon.getTaloonDate());
         }
         List<Date> sortedMap = new ArrayList(map);
         Collections.sort(sortedMap);
@@ -53,16 +53,16 @@ public class TaloonApprovalVerification {
             Integer sdShippedQty = 0;
             Long sdSumma = 0L;
             for (TaloonApproval taloon : list) {
-                if (!d.equals(taloon.getCompositeIdOfTaloonApproval().getTaloonDate())) {
+                if (!d.equals(taloon.getTaloonDate())) {
                     continue;
                 }
 
                 TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
-                        new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail(taloon.getCompositeIdOfTaloonApproval().getTaloonName(),
+                        new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail(taloon.getTaloonName(),
                                 taloon.getSoldedQty(), taloon.getRequestedQty(), taloon.getShippedQty(), taloon.getPrice(),
                                 (taloon.getPrice() == null || taloon.getSoldedQty() == null) ? 0 : taloon.getPrice() * taloon.getSoldedQty(),
                                 taloon.getIsppState(),
-                                taloon.getPpState(), taloon.getCompositeIdOfTaloonApproval().getIdOfOrg(), d, false, taloon.getCompositeIdOfTaloonApproval().getGoodsGuid());
+                                taloon.getPpState(), taloon.getIdOfOrg(), d, false, taloon.getGoodsGuid());
 
                 sdRequestedQty += taloon.getRequestedQty() == null ? 0 : taloon.getRequestedQty();
                 sdSoldedQty += taloon.getSoldedQty() == null ? 0 : taloon.getSoldedQty();
@@ -106,8 +106,7 @@ public class TaloonApprovalVerification {
                 String taloonName = detail.getTaloonName();
                 String goodsGuid = detail.getGoodsGuid();
                 Long idOfOrg = detail.getIdOfOrg();
-                CompositeIdOfTaloonApproval id = new CompositeIdOfTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid);
-                TaloonApproval taloon = (TaloonApproval) session.load(TaloonApproval.class, id);
+                TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid);
                 if (taloon != null) {
                     taloon.setShippedQty(detail.getShippedQty());
                     taloon.setPpState(detail.getPpState());

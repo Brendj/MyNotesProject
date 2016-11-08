@@ -16,8 +16,8 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import java.io.File;
 import java.util.*;
@@ -197,7 +197,7 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
 
                 ElectronicReconciliationStatisticsSubItem subItem = electronicReconciliationStatisticsSubItems.get(i);
 
-                if (CalendarUtils.dateShortToStringFullYear(taloonApproval.getCompositeIdOfTaloonApproval().getTaloonDate()).equals(subItem.getDate())) {
+                if (CalendarUtils.dateShortToStringFullYear(taloonApproval.getTaloonDate()).equals(subItem.getDate())) {
 
                     String ispp = taloonApproval.getIsppState().toString();
                     if (ispp.equals("Согласовано")) {

@@ -68,6 +68,7 @@ public class SyncServlet extends HttpServlet {
         RuntimeContext runtimeContext = null;
         Long syncTime = new Date().getTime();
         SyncCollector.registerSyncStart(syncTime);
+        long idOfOrg = -1;
         try {
             runtimeContext = RuntimeContext.getInstance();
 
@@ -85,7 +86,7 @@ public class SyncServlet extends HttpServlet {
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
             Node envelopeNode;
             NamedNodeMap namedNodeMap;
-            long idOfOrg;
+
             String idOfSync;
             SyncType syncType;
             try {
@@ -255,6 +256,7 @@ public class SyncServlet extends HttpServlet {
             logger.info(message);
             removeSyncInProgress(idOfOrg);
         } catch (RuntimeContext.NotInitializedException e) {
+            removeSyncInProgress(idOfOrg);
             SyncCollector.setErrMessage(syncTime, e.getMessage());
             SyncCollector.registerSyncEnd(syncTime);
             throw new UnavailableException(e.getMessage());

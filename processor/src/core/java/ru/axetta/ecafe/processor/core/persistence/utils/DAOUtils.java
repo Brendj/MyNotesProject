@@ -365,10 +365,6 @@ public class DAOUtils {
         return (Order) persistenceSession.get(Order.class, compositeIdOfOrder);
     }
 
-    public static TaloonApproval findTaloonApproval(Session persistenceSession, CompositeIdOfTaloonApproval compositeIdOfTaloonApproval) throws Exception {
-        return (TaloonApproval) persistenceSession.get(TaloonApproval.class, compositeIdOfTaloonApproval);
-    }
-
     public static ZeroTransaction findZeroTransaction(Session persistenceSession, CompositeIdOfZeroTransaction compositeIdOfZeroTransaction) throws Exception {
         return (ZeroTransaction) persistenceSession.get(ZeroTransaction.class, compositeIdOfZeroTransaction);
     }

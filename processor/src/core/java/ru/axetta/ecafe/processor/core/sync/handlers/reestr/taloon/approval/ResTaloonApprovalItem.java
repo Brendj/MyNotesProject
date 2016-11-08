@@ -48,10 +48,10 @@ public class ResTaloonApprovalItem {
     }
 
     public ResTaloonApprovalItem(TaloonApproval taloon) {
-        this.orgId = taloon.getCompositeIdOfTaloonApproval().getIdOfOrg();
-        this.date = taloon.getCompositeIdOfTaloonApproval().getTaloonDate();
-        this.name = taloon.getCompositeIdOfTaloonApproval().getTaloonName();
-        this.goodsGuid = taloon.getCompositeIdOfTaloonApproval().getGoodsGuid();
+        this.orgId = taloon.getIdOfOrg();
+        this.date = taloon.getTaloonDate();
+        this.name = taloon.getTaloonName();
+        this.goodsGuid = taloon.getGoodsGuid();
         this.goodsName = taloon.getGoodsName();
         this.soldedQty = taloon.getSoldedQty();
         this.setRequestedQty(taloon.getRequestedQty());
@@ -83,12 +83,8 @@ public class ResTaloonApprovalItem {
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
-        if (this.goodsName != null) {
-            XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
-        }
-        if (this.goodsGuid != null) {
-            XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid);
-        }
+        XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName == null ? "" : this.goodsName);
+        XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
         XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState == null ? TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal() : isppState.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState == null ? TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal() : ppState.ordinal());
         if (resultCode != null && resultCode != 0) {

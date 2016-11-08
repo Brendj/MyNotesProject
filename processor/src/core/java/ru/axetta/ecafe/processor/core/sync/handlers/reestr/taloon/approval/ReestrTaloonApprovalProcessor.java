@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,8 +46,13 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
             for (TaloonApprovalItem item : reestrTaloonApproval.getItems()) {
 
                 if (item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK)) {
-                    CompositeIdOfTaloonApproval compositeId = new CompositeIdOfTaloonApproval(item.getOrgId(), item.getDate(), item.getName(), item.getGoodsGuid());
-                    TaloonApproval taloon = DAOUtils.findTaloonApproval(session, compositeId);
+                    //CompositeIdOfTaloonApproval compositeId = new CompositeIdOfTaloonApproval(item.getOrgId(), item.getDate(), item.getName(), item.getGoodsGuid());
+                    Long idOfOrg = item.getOrgId();
+                    Date date = item.getDate();
+                    String name = item.getName();
+                    String goodsGuid = item.getGoodsGuid();
+                    if (goodsGuid == null) goodsGuid = "";
+                    TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, date, name, goodsGuid);
                     Integer soldedQty = item.getSoldedQty();
                     Long price = item.getPrice();
                     Integer requestedQty = item.getRequestedQty();
@@ -59,7 +66,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
-                        taloon = new TaloonApproval(compositeId, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState,goodsName);
+                        taloon = new TaloonApproval(idOfOrg, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState,goodsName);
                     }
                     taloon.setSoldedQty(soldedQty);
                     taloon.setRequestedQty(requestedQty);
