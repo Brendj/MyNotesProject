@@ -268,9 +268,10 @@ public class OrgEditPage extends BasicWorkspacePage
             idOfOrgList.add(idOfOrg);
         }
         HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
+        Set<Org> orgsForVersionUpdate = new HashSet<Org>();
+        boolean orgStructureVersionUpdate = false;
         if(!selectOrg.equals(friendlyOrg)){
             // Если убрали или внесли организацию в список дружественных, то обновляем версию
-            Set<Org> orgsForVersionUpdate = new HashSet<Org>();
             friendlyOrg.removeAll(selectOrg);
             for (Org o: friendlyOrg){
                 int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
@@ -287,11 +288,7 @@ public class OrgEditPage extends BasicWorkspacePage
                 //RuntimeContext.reportsSessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
                 //RuntimeContext.sessionFactory.getCache().evictEntity(Org.class, o.getIdOfOrg());
             }
-            nextVersion = DAOUtils.nextVersionByOrgStucture(session);
-            for (Org o : orgsForVersionUpdate) {
-                o.setOrgStructureVersion(nextVersion);
-                session.update(o);
-            }
+            orgStructureVersionUpdate = true;
         }
 
         org.setCommodityAccounting(changeCommodityAccounting);
@@ -334,17 +331,23 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
-        if (nextVersion == null) {
-            nextVersion = DAOUtils.nextVersionByOrgStucture(session);
-        }
-        org.setOrgStructureVersion(nextVersion);
+
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
         org.setPhotoRegistryDirective(photoD);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
+
+        nextVersion = DAOUtils.nextVersionByOrgStucture(session);
+        org.setOrgStructureVersion(nextVersion);
+        if(orgStructureVersionUpdate) {
+            for (Org o : orgsForVersionUpdate) {
+                o.setOrgStructureVersion(nextVersion);
+                session.update(o);
+            }
+        }
         session.update(org);
         fill(org);
-        /////
+        
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
 
     }
