@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurrentDate;
 
@@ -191,8 +190,8 @@ public class VisitorDogmServiceBean {
 
     @Transactional(rollbackFor = Exception.class)
     public Long saveVisitorDogm(VisitorItem visitorItem) throws Exception{
-        if(isEmptyFullNameFields(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName())) {
-            throw new  Exception("все поля ФИО должны быть заполнены.");
+        if(StringUtils.isEmpty(visitorItem.getSurname()) || StringUtils.isEmpty(visitorItem.getFirstName()) ) {
+            throw new  Exception("Фамилия и имя должны быть заполнены.");
         }
 
         /**
