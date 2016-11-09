@@ -32,7 +32,7 @@
          <h:outputLabel escape="true" value="Серийный номер паспорта" styleClass="output-text" />
          <h:inputText value="#{employeeCreatePage.employee.passportNumber}" styleClass="input-text"
                       validatorMessage="Cерийный номер паспорта должен быть числом.">
-             <f:validateDoubleRange minimum="0" maximum="99999999" />
+             <f:validateDoubleRange minimum="0" maximum="9999999999" />
          </h:inputText>
 
          <h:outputLabel escape="true" value="Дата выдачи водительского удостоверения" styleClass="output-text" />
@@ -41,7 +41,7 @@
          <h:outputLabel escape="true" value="Серийный номер водительского удостоверения" styleClass="output-text" />
          <h:inputText value="#{employeeCreatePage.employee.driverLicenceNumber}" styleClass="input-text"
                       validatorMessage="Серийный номер водительского удостоверения должен быть числом.">
-             <f:validateDoubleRange minimum="0" maximum="99999999" />
+             <f:validateDoubleRange minimum="0" maximum="9999999999" />
          </h:inputText>
 
          <h:outputLabel escape="true" value="Дата выдачи военного билета" styleClass="output-text" />
@@ -50,7 +50,7 @@
          <h:outputLabel escape="true" value="Серийный номер военного билета" styleClass="output-text" />
          <h:inputText value="#{employeeCreatePage.employee.warTicketNumber}" styleClass="input-text"
                       validatorMessage="Серийный номер военного билета должен быть числом.">
-             <f:validateDoubleRange minimum="0" maximum="99999999" />
+             <f:validateDoubleRange minimum="0" maximum="9999999999" />
          </h:inputText>
 
      </h:panelGrid>
