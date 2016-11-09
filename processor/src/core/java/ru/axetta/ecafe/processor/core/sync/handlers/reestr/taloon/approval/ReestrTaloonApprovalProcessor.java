@@ -46,7 +46,6 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
             for (TaloonApprovalItem item : reestrTaloonApproval.getItems()) {
 
                 if (item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK)) {
-                    //CompositeIdOfTaloonApproval compositeId = new CompositeIdOfTaloonApproval(item.getOrgId(), item.getDate(), item.getName(), item.getGoodsGuid());
                     Long idOfOrg = item.getOrgId();
                     Date date = item.getDate();
                     String name = item.getName();

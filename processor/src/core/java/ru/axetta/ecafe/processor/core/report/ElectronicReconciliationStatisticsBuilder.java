@@ -114,7 +114,7 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
         criteria.createAlias("org", "org");
 
         if (!idOfOrgList.isEmpty()) {
-            criteria.add(Restrictions.in("compositeIdOfTaloonApproval.idOfOrg", idOfOrgList));
+            criteria.add(Restrictions.in("idOfOrg", idOfOrgList));
         } else {
             Contragent contragentById = (Contragent) session.load(Contragent.class, idOfContragent);
 
@@ -123,7 +123,7 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
                 idOfOrgs.add(contrOrg.getIdOfOrg());
             }
 
-            criteria.add(Restrictions.in("compositeIdOfTaloonApproval.idOfOrg", idOfOrgs));
+            criteria.add(Restrictions.in("idOfOrg", idOfOrgs));
         }
 
         if (taloonISPPStatesEnum != null) {
@@ -139,9 +139,9 @@ public class ElectronicReconciliationStatisticsBuilder extends BasicReportForAll
         }
 
         criteria.add(Restrictions.eq("deletedState", false));
-        criteria.add(Restrictions.ge("compositeIdOfTaloonApproval.taloonDate", startTime));
-        criteria.add(Restrictions.lt("compositeIdOfTaloonApproval.taloonDate", endTime));
-        criteria.addOrder(Order.asc("compositeIdOfTaloonApproval.taloonDate"));
+        criteria.add(Restrictions.ge("taloonDate", startTime));
+        criteria.add(Restrictions.lt("taloonDate", endTime));
+        criteria.addOrder(Order.asc("taloonDate"));
 
         List<TaloonApproval> taloonApprovalList = criteria.list();
 

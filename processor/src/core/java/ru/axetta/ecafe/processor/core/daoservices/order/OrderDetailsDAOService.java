@@ -18,10 +18,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Re
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
@@ -196,7 +194,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     public List<GoodItem> findAllGoodsElectronicCollation(Long idOfOrg, Date startTime, Date endTime) {
         List<GoodItem> result = new ArrayList<GoodItem>();
 
-        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) ORDER BY taloon_2";
+        String sql = "SELECT taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (taloonDate BETWEEN :startDate AND :endDate) ORDER BY taloon_2";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startTime);
@@ -223,7 +221,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
         boolean b = false;
 
-        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0  AND (isppState in (0) OR ppState in (0,2)) ORDER BY taloon_2";
+        String sql = "SELECT taloonName AS taloon_2 FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0  AND (isppState in (0) OR ppState in (0,2)) ORDER BY taloon_2";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate);
@@ -244,7 +242,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
         List<RegisterStampElectronicCollationReportItem> result = new ArrayList<RegisterStampElectronicCollationReportItem>();
 
-        String sql = "SELECT compositeIdOfTaloonApproval.taloonName AS taloon_2, soldedQty, compositeIdOfTaloonApproval.taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (compositeIdOfTaloonApproval.taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0 ORDER BY taloon_2";
+        String sql = "SELECT taloonName AS taloon_2, soldedQty, taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0 ORDER BY taloon_2";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startTime);

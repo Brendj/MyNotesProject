@@ -14,7 +14,6 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class TaloonApproval {
-    //private CompositeIdOfTaloonApproval compositeIdOfTaloonApproval;
 
     private Long idOfTaloonApproval;
     private Long idOfOrg;
@@ -56,14 +55,6 @@ public class TaloonApproval {
         this.ppState = ppState;
         this.goodsName = goodsName;
     }
-
-    /*public CompositeIdOfTaloonApproval getCompositeIdOfTaloonApproval() {
-        return compositeIdOfTaloonApproval;
-    }
-
-    public void setCompositeIdOfTaloonApproval(CompositeIdOfTaloonApproval compositeIdOfTaloonApproval) {
-        this.compositeIdOfTaloonApproval = compositeIdOfTaloonApproval;
-    }*/
 
     public String getGoodsName() {
         return goodsName;
