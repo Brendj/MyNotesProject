@@ -207,11 +207,17 @@ public class ImportRegisterClientsService {
     }
 
     public void run() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+        if (!RuntimeContext.getInstance().isMainNode()) {
             return;
         }
-        List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
+
         RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
+
+        if (!isOn()) {
+            return;
+        }
+
+        List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
         List<List<Org>> orgsPack = buildOrgsPack(orgs, MAX_THREADS);
 
         log("Start import register with " + MAX_THREADS + " threads", null);
