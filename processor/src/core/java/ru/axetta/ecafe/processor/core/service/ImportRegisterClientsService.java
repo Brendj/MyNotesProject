@@ -435,13 +435,6 @@ public class ImportRegisterClientsService {
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
                     cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
 
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
-                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
-
-            if (!pupil.getGuardianInfoList().isEmpty()) {
-                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
-            }
-
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
                         cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
@@ -482,6 +475,12 @@ public class ImportRegisterClientsService {
                 continue;
             }
 
+            doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
+                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
+
+            if (!pupil.getGuardianInfoList().isEmpty()) {
+                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
+            }
 
             try {
                 //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
@@ -1043,7 +1042,12 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
-                    createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                    if (change.getGender() != null) {
+                        if (change.getGender().equals(0))
+                            createConfig.setValue(ClientManager.FieldId.GENDER, "f");
+                        if (change.getGender().equals(1))
+                            createConfig.setValue(ClientManager.FieldId.GENDER, "m");
+                    }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                     createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
