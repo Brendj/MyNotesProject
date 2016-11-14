@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport" pageWidth="1390" pageHeight="10000" columnWidth="1350" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="976489f7-3055-43f5-93e7-e4de05fb40a9">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ElectronicReconciliationStatisticsReport" pageWidth="1390" pageHeight="100000000" columnWidth="1350" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="976489f7-3055-43f5-93e7-e4de05fb40a9">
 	<property name="ireport.zoom" value="1.000000000000002"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -242,8 +242,8 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{rowNum}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="85c1e608-a83e-477f-9f05-299b4d5dc68e" stretchType="RelativeToTallestObject" x="40" y="5" width="150" height="25"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="85c1e608-a83e-477f-9f05-299b4d5dc68e" stretchType="RelativeToTallestObject" x="40" y="5" width="150" height="25" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -254,8 +254,8 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="f4a17dfb-94d5-405d-8a67-54e9b45d047e" stretchType="RelativeToTallestObject" x="190" y="5" width="149" height="25"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="f4a17dfb-94d5-405d-8a67-54e9b45d047e" stretchType="RelativeToTallestObject" x="190" y="5" width="149" height="25" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -266,8 +266,8 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgType}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="032cea0e-7a98-4f2e-a6ab-bf554a6eda40" stretchType="RelativeToTallestObject" x="339" y="5" width="110" height="25"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="032cea0e-7a98-4f2e-a6ab-bf554a6eda40" stretchType="RelativeToTallestObject" x="339" y="5" width="110" height="25" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -278,8 +278,8 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="efd3f774-c7c7-4ea8-80a1-c02cdaecdb9d" stretchType="RelativeToTallestObject" x="449" y="5" width="250" height="25"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="efd3f774-c7c7-4ea8-80a1-c02cdaecdb9d" stretchType="RelativeToTallestObject" x="449" y="5" width="250" height="25" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
