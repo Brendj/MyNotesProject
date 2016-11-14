@@ -325,4 +325,24 @@ public class DAOReadonlyService {
         }
     }
 
+    public int findTaloonApprovalSoldedQty(Long idOfOrg, Date taloonDate, String taloonName) {
+        Date dateEnd = CalendarUtils.addOneDay(taloonDate);
+        try {
+            Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
+                    + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder "
+                    + "where od.idOfOrg= :idOfOrg "
+                    + "and od.menuDetailName = :taloonName "
+                    + "and o.orderDate >= :taloonDate "
+                    + "and o.orderDate < :dateEnd");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("taloonName", taloonName);
+            query.setParameter("taloonDate", taloonDate.getTime());
+            query.setParameter("dateEnd", dateEnd.getTime());
+            return ((BigInteger) query.getSingleResult()).intValue();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return 0;
+        }
+    }
+
 }
