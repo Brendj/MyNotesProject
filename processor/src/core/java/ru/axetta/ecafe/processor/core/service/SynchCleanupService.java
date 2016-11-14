@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
@@ -36,23 +37,31 @@ public class SynchCleanupService {
     private static final long WEEK_MILLISECONDS = 604800000L;
     private static final long DAY_MILLISECONDS  = 86400000L;
 
-
     public static boolean isOn() {
         return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SYNCH_CLEANUP_ON);
     }
-
 
     public static void setOn(boolean on) {
         RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_SYNCH_CLEANUP_ON, "" + (on ? "1" : "0"));
     }
 
-
     public void run() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+        if (!isNodeOn() || !isOn()) {
             //logger.info ("BI data export is turned off. You have to activate this tool using common Settings");
             return;
         }
         RuntimeContext.getAppContext().getBean(SynchCleanupService.class).execute();
+    }
+
+    public static boolean isNodeOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(RuntimeContext.PROCESSOR_PARAM_BASE + ".sync.clearsynchistory.node", "empty");
+        if("empty".equals(reqInstance)) {
+            return RuntimeContext.getInstance().isMainNode();
+        }
+        return !(StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
+                .equals(reqInstance.trim()));
     }
 
     @Transactional
@@ -63,19 +72,19 @@ public class SynchCleanupService {
         clearDaily(session);
     }
 
-    protected void clearExceptionsEntries(Session session) {
+    private void clearExceptionsEntries(Session session) {
         Query q = session.createSQLQuery("TRUNCATE table cf_synchistory_exceptions");
         q.executeUpdate();
     }
 
-    protected void clearEntries(Session session) {
+    private void clearEntries(Session session) {
         long datelimit = System.currentTimeMillis() - WEEK_MILLISECONDS;
         Query q = session.createSQLQuery("delete from cf_synchistory where syncendtime<:datelimit");
         q.setParameter("datelimit", datelimit);
         q.executeUpdate();
     }
 
-    protected void clearDaily(Session session) {
+    private void clearDaily(Session session) {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis() - DAY_MILLISECONDS);
         cal.set(Calendar.MILLISECOND, 0);
