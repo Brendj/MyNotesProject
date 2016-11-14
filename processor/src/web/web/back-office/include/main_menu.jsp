@@ -370,7 +370,7 @@
 
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="visitorDogmGroupMenu" binding="#{mainPage.visitorDogmPage.mainMenuComponent}" label="Сотрудники ДОгМ"
+<rich:panelMenuGroup id="visitorDogmGroupMenu" binding="#{mainPage.visitorDogmPage.mainMenuComponent}" label="Сотрудники"
                      rendered="#{mainPage.eligibleToEditVisitorDogm}">
     <a4j:support event="onclick" action="#{mainPage.showVisitorDogmPage}" reRender="workspaceForm" />
 

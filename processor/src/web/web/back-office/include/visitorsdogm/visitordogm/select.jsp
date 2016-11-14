@@ -12,7 +12,7 @@
 <rich:modalPanel id="modalVisitorDogmSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalVisitorDogmSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
-        <h:outputText escape="true" value="Выбор сотрудника ДОгМ" />
+        <h:outputText escape="true" value="Выбор сотрудника" />
     </f:facet>
     <a4j:form id="modalVisitorDogmSelectorForm" styleClass="borderless-form" eventsQueue="modalVisitorDogmSelectorFormEventsQueue"
               binding="#{visitorDogmSelectPage.pageComponent}">

@@ -15,7 +15,7 @@
 
      <h:panelGrid columns="2">
 
-         <h:outputText escape="true" value="Сотрудник ДОгМ" styleClass="output-text" />
+         <h:outputText escape="true" value="Сотрудник" styleClass="output-text" />
          <h:panelGroup styleClass="borderless-div">
              <h:inputText value="#{visitorDogmCardCreatePage.card.visitorItem.shortFullName}" readonly="true" styleClass="input-text"
                           style="margin-right: 2px;" />

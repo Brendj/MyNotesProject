@@ -98,7 +98,7 @@ public class Function {
     public static final String FUNC_SHOW_REPORTS_REPOSITORY = "showReportRepository";
     public static final String FUNCD_SHOW_REPORTS_REPOSITORY = "Репозиторий отчетов";
     public static final String FUNC_VISITORDOGM_EDIT = "visitorDogmEdit";
-    public static final String FUNCD_VISITORDOGM_EDIT= "Редактирование сотрудников ДОгМ";
+    public static final String FUNCD_VISITORDOGM_EDIT= "Редактирование сотрудников";
 
 
     private Long idOfFunction;
