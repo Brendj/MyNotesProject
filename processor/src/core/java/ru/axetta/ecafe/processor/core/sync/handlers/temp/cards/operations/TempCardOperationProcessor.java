@@ -42,19 +42,24 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
                     if(cardTemp==null) {
                         addResTempCardOperation(tempCardOperation, 3, "Карта не зарегистрирована как временная");
                     } else {
-                        /**TODO: подумать над работтой с временными картами визитеров*/
-                        if(cardTemp.getOrg()!=null && cardTemp.getOrg().getIdOfOrg().equals(tempCardOperation.getIdOfOrg())){
-                            if(tempCardOperation.getIdOfClient()==null && tempCardOperation.getIdOfVisitor()==null){
-                                resTempCardOperationList.add(registrOperation(tempCardOperation, cardTemp));
-                            }
-                            if(tempCardOperation.getIdOfClient()!=null){
-                                resTempCardOperationList.add(registrClientOperation(tempCardOperation, cardTemp));
-                            }
-                            if(tempCardOperation.getIdOfVisitor()!=null){
-                                resTempCardOperationList.add(registrVisitorOperation(tempCardOperation, cardTemp));
-                            }
+                        /**TODO: подумать над работой с временными картами визитеров*/
+                        if(tempCardOperation.getIdOfVisitor()!=null){
+                            resTempCardOperationList.add(registrVisitorOperation(tempCardOperation, cardTemp));
                         } else {
-                            addResTempCardOperation(tempCardOperation, 4,"Карта зарегистрирована на другую организацию");
+                            if (cardTemp.getOrg() != null && cardTemp.getOrg().getIdOfOrg()
+                                    .equals(tempCardOperation.getIdOfOrg())) {
+                                if (tempCardOperation.getIdOfClient() == null
+                                        && tempCardOperation.getIdOfVisitor() == null) {
+                                    resTempCardOperationList.add(registrOperation(tempCardOperation, cardTemp));
+                                }
+                                if (tempCardOperation.getIdOfClient() != null) {
+                                    resTempCardOperationList.add(registrClientOperation(tempCardOperation, cardTemp));
+                                }
+
+                            } else {
+                                addResTempCardOperation(tempCardOperation, 4,
+                                        "Карта зарегистрирована на другую организацию");
+                            }
                         }
                     }
                 }
@@ -71,7 +76,7 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
             return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),6,"Неверное значение даты окончания действия карты");
         } else {
             CardOperationStation operation = CardOperationStation.value(tempCardOperation.getOperationType());
-            CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), cardTemp.getOrg());
+            CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), cardTemp.getOrg().getIdOfOrg());
             if(cardTempOperation==null){
                 cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp, operation, tempCardOperation.getOperationDate());
                 session.save(cardTempOperation);
@@ -93,21 +98,18 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
             final String message = String.format("%d не связан с организацией idOfOrg = %d",tempCardOperation.getIdOfClient(), tempCardOperation.getIdOfOrg());
             return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),5,message);
         } else {
-            if(tempCardOperation.getIssueExpiryDate()!=null && System.currentTimeMillis()>tempCardOperation.getIssueExpiryDate().getTime()){
-                return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),6,"Неверное значение даты окончания действия карты");
-            } else {
-                CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), cardTemp.getOrg());
-                if(cardTempOperation==null){
-                    cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp, CardOperationStation
-                            .values()[tempCardOperation.getOperationType()], tempCardOperation.getOperationDate(),visitor);
-                    cardTemp.setVisitor(visitor);
-                    cardTemp.setValidDate(tempCardOperation.getIssueExpiryDate());
-                    session.save(cardTemp);
-                    session.save(cardTempOperation);
-                    return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),0,null);
-                }  else {
-                    return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),7,"Операция уже зарегистрирована");
-                }
+            Long idOfOrg = cardTemp.getOrg() == null ? tempCardOperation.getIdOfOrg() : cardTemp.getOrg().getIdOfOrg();
+            CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), idOfOrg);
+            if(cardTempOperation==null){
+                cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp, CardOperationStation
+                        .values()[tempCardOperation.getOperationType()], tempCardOperation.getOperationDate(),visitor);
+                cardTemp.setVisitor(visitor);
+                cardTemp.setValidDate(tempCardOperation.getIssueExpiryDate());
+                session.save(cardTemp);
+                session.save(cardTempOperation);
+                return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),0,null);
+            }  else {
+                return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),7,"Операция уже зарегистрирована");
             }
         }
     }
@@ -120,7 +122,7 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
                 return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),6,"Неверное значение даты окончания действия карты");
             } else {
                 CardOperationStation operation = CardOperationStation.value(tempCardOperation.getOperationType());
-                CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), cardTemp.getOrg());
+                CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), cardTemp.getOrg().getIdOfOrg());
                 if(cardTempOperation==null){
                     cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp,operation, tempCardOperation.getOperationDate(),clientIsOrg);
                     cardTemp.setClient(clientIsOrg);

@@ -38,9 +38,6 @@
                     <h:outputText escape="true" value="№" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
-                    <h:outputText escape="true" value="Дата" styleClass="column-header" />
-                </rich:column>
-                <rich:column headerClass="center-aligned-column">
                     <h:outputText escape="true" value="Инженер" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
@@ -63,9 +60,6 @@
 
         <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
             <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
-            <h:outputText escape="true" value="#{employeer.operationDate}" converter="dateConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header" rowspan="#{employeer.operationItemListCount}">
             <h:outputText escape="true" value="#{employeer.fullName}" styleClass="output-text" />

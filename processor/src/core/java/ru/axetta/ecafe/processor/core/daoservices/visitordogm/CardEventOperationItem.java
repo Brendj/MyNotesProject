@@ -16,11 +16,13 @@ import java.util.Date;
  */
 public class CardEventOperationItem {
 
+    private Long idOfVisitor;
     private Date operationDate;
     private OrgItem organization;
     private String passDirection;
 
-    public CardEventOperationItem(Date operationDate, Integer passdirection, Long idOfOrg, String shortName, Integer refectoryType) {
+    public CardEventOperationItem(Long idOfVisitor, Date operationDate, Integer passdirection, Long idOfOrg, String shortName, Integer refectoryType) {
+        this.idOfVisitor = idOfVisitor;
         this.operationDate = operationDate;
         this.organization = new OrgItem(idOfOrg, shortName, refectoryType);
         switch (passdirection){
@@ -37,6 +39,14 @@ public class CardEventOperationItem {
             case EnterEvent.CHECKED_BY_TEACHER_INT: passDirection="отмечен учителем внутри здания"; break;
             default: passDirection="Ошибка обратитесь администратору";
         }
+    }
+
+    public Long getIdOfVisitor() {
+        return idOfVisitor;
+    }
+
+    public void setIdOfVisitor(Long idOfVisitor) {
+        this.idOfVisitor = idOfVisitor;
     }
 
     public Date getOperationDate() {

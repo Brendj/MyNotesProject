@@ -38,10 +38,7 @@
                     <h:outputText escape="true" value="№" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
-                    <h:outputText escape="true" value="Дата" styleClass="column-header" />
-                </rich:column>
-                <rich:column headerClass="center-aligned-column">
-                    <h:outputText escape="true" value="Сотрудник ДОгМ" styleClass="column-header" />
+                    <h:outputText escape="true" value="Сотрудник" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
                     <h:outputText escape="true" value="Должность" styleClass="column-header" />
@@ -63,9 +60,6 @@
 
         <rich:column headerClass="column-header" rowspan="#{visitorDogm.operationItemListCount}">
             <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header" rowspan="#{visitorDogm.operationItemListCount}">
-            <h:outputText escape="true" value="#{visitorDogm.operationDate}" converter="dateConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header" rowspan="#{visitorDogm.operationItemListCount}">
             <h:outputText escape="true" value="#{visitorDogm.fullName}" styleClass="output-text" />

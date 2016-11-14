@@ -9,20 +9,14 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurrentDate;
@@ -42,7 +36,7 @@ public class EmployeeServiceBean {
     final String FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.person.firstName";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.visitorType=2 order by ct.createDate desc";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct, ct.visitor) from CardTemp ct where ct.visitorType=2 order by ct.createDate desc";
-    final String FIND_ENTER_EVENT_BY_EMPLOYEE ="select new ru.axetta.ecafe.processor.core.daoservices.employees.CardEventOperationItem(ee.evtDateTime, ee.passDirection, ee.org.idOfOrg, ee.org.shortName, ee.org.refectoryType) from EnterEvent ee where ee.idOfVisitor=:idOfVisitor and ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc";
+    final String FIND_ENTER_EVENT_BY_EMPLOYEE ="select new ru.axetta.ecafe.processor.core.daoservices.employees.CardEventOperationItem(ee.idOfVisitor, ee.evtDateTime, ee.passDirection, ee.org.idOfOrg, ee.org.shortName, ee.org.refectoryType) from EnterEvent ee where ee.idOfVisitor in :idOfVisitors and ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -58,82 +52,30 @@ public class EmployeeServiceBean {
         return query.getResultList();
     }
 
-    @Transactional
-    public List<VisitorItem> employeeHistoryReport(Date beginDate, Date endDate){
-        Session session = entityManager.unwrap(Session.class);
-        List<VisitorItem> reportResult = new ArrayList<VisitorItem>();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(beginDate);
-        Criteria visitorCriteria = session.createCriteria(Visitor.class);
-        visitorCriteria.add(Restrictions.eq("visitorType", 1));
-        List<Visitor> visitors = visitorCriteria.list();
-        while (endDate.getTime()>calendar.getTimeInMillis()){
-            VisitorItem currentVisitor = null;
-            Date startDate = calendar.getTime();
-            calendar.add(Calendar.DATE,1);
-            Date finishDate = calendar.getTime();
-            for (Visitor visitor: visitors){
-                Criteria criteria = session.createCriteria(EnterEvent.class);
-                criteria.add(Restrictions.eq("idOfVisitor", visitor.getIdOfVisitor()));
-                criteria.add(Restrictions.between("evtDateTime", startDate, finishDate));
-                criteria.addOrder(Order.desc("evtDateTime"));
-                criteria.addOrder(Order.asc("idOfVisitor"));
-                List<EnterEvent> enterEvents = criteria.list();
-
-                //ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc
-                if(enterEvents!=null && !enterEvents.isEmpty()){
-                    currentVisitor = new VisitorItem();
-                    final Person person = visitor.getPerson();
-                    currentVisitor.setFirstName(person.getFirstName());
-                    currentVisitor.setSecondName(person.getSecondName());
-                    currentVisitor.setSurname(person.getSurname());
-                    currentVisitor.setOperationDate(startDate);
-                    List<CardEventOperationItem> cardEventOperationItems = new ArrayList<CardEventOperationItem>();
-                    for (EnterEvent events: enterEvents){
-                        final Org org = events.getOrg();
-                        cardEventOperationItems.add(new CardEventOperationItem(events.getEvtDateTime(), events.getPassDirection(), org
-                                .getIdOfOrg(), org.getShortName(), org.getRefectoryType()));
-                    }
-                    currentVisitor.addOperationItem(cardEventOperationItems);
-                }
-                if(currentVisitor!=null) {
-                    reportResult.add(currentVisitor);
-                    currentVisitor=null;
-                }
-            }
-        }
-        return reportResult;
-    }
-
-    public List<VisitorItem> generateEmployeeHistoryReport(Date beginDate, Date endDate){
-        List<VisitorItem> reportResult = new ArrayList<VisitorItem>();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(beginDate);
-        TypedQuery<VisitorItem> visitorItemTypedQuery = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME, VisitorItem.class);
+    public List<VisitorItem> generateEmployeeHistoryReport(Date startDate, Date endDate){
+        TypedQuery<VisitorItem> visitorItemTypedQuery = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME, ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem.class);
         List<VisitorItem> visitorItemList = visitorItemTypedQuery.getResultList();
-        while (endDate.getTime()>calendar.getTimeInMillis()){
-            VisitorItem currentVisitor = null;
-            Date startDate = calendar.getTime();
-            calendar.add(Calendar.DATE,1);
-            Date finishDate = calendar.getTime();
-            for (VisitorItem item: visitorItemList){
-                TypedQuery<CardEventOperationItem> cardEventOperationItemTypedQuery = entityManager.createQuery(FIND_ENTER_EVENT_BY_EMPLOYEE, CardEventOperationItem.class);
-                cardEventOperationItemTypedQuery.setParameter("idOfVisitor", item.getIdOfVisitor());
-                cardEventOperationItemTypedQuery.setParameter("beginDate",startDate);
-                cardEventOperationItemTypedQuery.setParameter("endDate",finishDate);
-                List<CardEventOperationItem> cardEventOperationItems = cardEventOperationItemTypedQuery.getResultList();
-                if(cardEventOperationItems!=null && !cardEventOperationItems.isEmpty()){
-                    currentVisitor = new VisitorItem(item);
-                    currentVisitor.setOperationDate(startDate);
-                    currentVisitor.addOperationItem(cardEventOperationItems);
-                }
-                if(currentVisitor!=null) {
-                    reportResult.add(currentVisitor);
-                    currentVisitor=null;
-                }
+        List<Long> visitorIds = new ArrayList<Long>();
+        Map<Long, VisitorItem> visitorMap = new HashMap<Long, VisitorItem>();
+        for(VisitorItem visitorItem : visitorItemList) {
+            visitorIds.add(visitorItem.getIdOfVisitor());
+            visitorMap.put(visitorItem.getIdOfVisitor(), visitorItem);
+        }
+        TypedQuery<CardEventOperationItem> cardEventOperationItemTypedQuery = entityManager.createQuery(FIND_ENTER_EVENT_BY_EMPLOYEE, CardEventOperationItem.class);
+        cardEventOperationItemTypedQuery.setParameter("idOfVisitors", visitorIds);
+        cardEventOperationItemTypedQuery.setParameter("beginDate", startDate);
+        cardEventOperationItemTypedQuery.setParameter("endDate", endDate);
+        List<CardEventOperationItem> cardEventOperationItems = cardEventOperationItemTypedQuery.getResultList();
+        for(CardEventOperationItem eventOperationItem : cardEventOperationItems) {
+            visitorMap.get(eventOperationItem.getIdOfVisitor()).getOperationItemList().add(eventOperationItem);
+        }
+        List<VisitorItem> result = new ArrayList<VisitorItem>();
+        for(VisitorItem visitorItem : visitorMap.values()) {
+            if(visitorItem.getOperationItemList().size() > 0) {
+                result.add(visitorItem);
             }
         }
-        return reportResult;
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)

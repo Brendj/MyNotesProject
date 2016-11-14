@@ -1829,9 +1829,9 @@ public class DAOUtils {
         return (Client) clientQuery.uniqueResult();
     }
 
-    public static CardTempOperation findTempCartOperation(Session session, Long idOfOperation, Org org) {
+    public static CardTempOperation findTempCartOperation(Session session, Long idOfOperation, Long idOfOrg) {
         final Query query = session.createQuery("select cto from CardTempOperation cto right join cto.org organization where organization.idOfOrg=:idOfOrg and cto.localId=:localId");
-        query.setParameter("idOfOrg", org.getIdOfOrg());
+        query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("localId", idOfOperation);
         return (CardTempOperation) query.uniqueResult();
     }
