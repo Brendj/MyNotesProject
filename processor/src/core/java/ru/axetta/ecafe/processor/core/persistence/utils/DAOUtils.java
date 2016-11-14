@@ -2504,7 +2504,8 @@ public class DAOUtils {
         }
     }
 
-    public static GroupNamesToOrgs getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(Session session, Long idOfOrg,
+    @SuppressWarnings("unchecked")
+    public static GroupNamesToOrgs getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(Session session, Long idOfOrg,
             String groupName) {
 
         Org o = (Org) session.load(Org.class, idOfOrg);
@@ -2524,10 +2525,11 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfMainOrg", idOfMainOrg));
         criteria.add(Restrictions.eq("groupName", groupName));
+        criteria.add(Restrictions.eq("isMiddleGroup", false));
 
-        GroupNamesToOrgs result = (GroupNamesToOrgs) criteria.uniqueResult();
+        List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) criteria.list();
 
-        return result;
+        return list.size() == 1 ? list.get(0) : null;
     }
 
     //Промежуточная группа

@@ -422,7 +422,7 @@ public class ClientManager {
                     String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(persistenceSession, client.getOrg().getIdOfOrg(),
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(persistenceSession, client.getOrg().getIdOfOrg(),
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
@@ -749,7 +749,7 @@ public class ClientManager {
                     String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(persistenceSession, idOfOrg,
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(persistenceSession, idOfOrg,
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {

@@ -281,7 +281,10 @@ public class ImportRegisterClientsService {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Session session = (Session) em.getDelegate();
-        Query q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
+        Query q = session.createSQLQuery("delete from cf_registrychange_guardians where createdDate<:minCreateDate");
+        q.setLong("minCreateDate", cal.getTimeInMillis());
+        q.executeUpdate();
+        q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
         q.setLong("minCreateDate", cal.getTimeInMillis());
         q.executeUpdate();
         q = session.createSQLQuery("delete from cf_registrychange_errors where createDate<:minCreateDate");
@@ -1060,7 +1063,7 @@ public class ImportRegisterClientsService {
                     addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGruopName(session, newOrg.getIdOfOrg(), change.getGroupName());
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(), change.getGroupName());
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
                         ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
