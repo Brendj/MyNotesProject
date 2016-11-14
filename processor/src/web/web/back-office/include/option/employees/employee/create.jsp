@@ -30,28 +30,20 @@
          <rich:calendar value="#{employeeCreatePage.employee.passportDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />
          <h:outputLabel escape="true" value="Серийный номер паспорта" styleClass="output-text" />
-         <h:inputText value="#{employeeCreatePage.employee.passportNumber}" styleClass="input-text"
-                      validatorMessage="Cерийный номер паспорта должен быть числом.">
-             <f:validateDoubleRange minimum="0" maximum="9999999999" />
-         </h:inputText>
+         <h:inputText value="#{employeeCreatePage.employee.passportNumber}" styleClass="input-text"/>
 
          <h:outputLabel escape="true" value="Дата выдачи водительского удостоверения" styleClass="output-text" />
          <rich:calendar value="#{employeeCreatePage.employee.driverLicenceDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />
          <h:outputLabel escape="true" value="Серийный номер водительского удостоверения" styleClass="output-text" />
          <h:inputText value="#{employeeCreatePage.employee.driverLicenceNumber}" styleClass="input-text"
-                      validatorMessage="Серийный номер водительского удостоверения должен быть числом.">
-             <f:validateDoubleRange minimum="0" maximum="9999999999" />
-         </h:inputText>
+                      validatorMessage="Серийный номер водительского удостоверения должен быть числом."/>
 
          <h:outputLabel escape="true" value="Дата выдачи военного билета" styleClass="output-text" />
          <rich:calendar value="#{employeeCreatePage.employee.warTicketDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />
          <h:outputLabel escape="true" value="Серийный номер военного билета" styleClass="output-text" />
-         <h:inputText value="#{employeeCreatePage.employee.warTicketNumber}" styleClass="input-text"
-                      validatorMessage="Серийный номер военного билета должен быть числом.">
-             <f:validateDoubleRange minimum="0" maximum="9999999999" />
-         </h:inputText>
+         <h:inputText value="#{employeeCreatePage.employee.warTicketNumber}" styleClass="input-text"/>
 
      </h:panelGrid>
 
