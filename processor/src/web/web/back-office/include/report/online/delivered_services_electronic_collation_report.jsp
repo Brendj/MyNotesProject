@@ -92,42 +92,39 @@
         </h:panelGroup>
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет"
-                           action="#{mainPage.buildDeliveredServicesElectronicCollationReport}"
-                           reRender="workspaceTogglePanel" styleClass="command-button" status="reportGenerateStatus" />
-
-        <h:commandButton value="Выгрузить в Excel"
-                         actionListener="#{mainPage.deliveredServicesElectronicCollationReportPage.showCSVList}"
-                         styleClass="command-button" />
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid" columns="1">
+    <h:panelGrid styleClass="borderless-grid" columns="4">
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesElectronicCollationReport}"
+                           reRender="workspaceTogglePanel"
+                           styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.deliveredServicesElectronicCollationReportPage.showCSVList}" styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{mainPage.deliveredServicesElectronicCollationReportPage.clear}"
+                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           status="reportGenerateStatus" id="clearButton" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
+    </h:panelGrid>
 
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages" />
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 
-        <h:panelGrid styleClass="borderless-grid">
-            <%-- не показывать пустую таблицу --%>
-            <c:if test="${not empty mainPage.deliveredServicesElectronicCollationReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesElectronicCollationReportPage.deliveredServicesReport.htmlReport}">
-                <h:outputText escape="true" value="Сводный отчет по услугам" styleClass="output-text" />
+    <h:panelGrid styleClass="borderless-grid">
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${not empty mainPage.deliveredServicesElectronicCollationReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesElectronicCollationReportPage.deliveredServicesReport.htmlReport}">
+            <h:outputText escape="true" value="Сводный отчет по услугам" styleClass="output-text" />
 
-                <f:verbatim>
-                    <style type="text/css">
-                        div.htmlReportContent :empty {
-                            display: none;
-                        }
-                    </style>
-                    <div class="htmlReportContent"> ${mainPage.deliveredServicesElectronicCollationReportPage.deliveredServicesReport.htmlReport} </div>
-                </f:verbatim>
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent"> ${mainPage.deliveredServicesElectronicCollationReportPage.deliveredServicesReport.htmlReport} </div>
+            </f:verbatim>
 
-            </c:if>
-        </h:panelGrid>
+        </c:if>
     </h:panelGrid>
 
 </h:panelGrid>

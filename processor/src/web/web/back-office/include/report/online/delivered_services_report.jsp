@@ -79,16 +79,26 @@
             mainPage.deliveredServicesReportPage.filter : mainPage.deliveredServicesReportPage.FILTER_INIT}}"
                           id="orgDeliveredServicesOrgText"/>
         </h:panelGroup>
+    </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="4">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesReport}"
                            reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.deliveredServicesReportPage.showCSVList}" styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{mainPage.deliveredServicesReportPage.clear}"
+                           reRender="workspaceTogglePanel" styleClass="command-button"
+                           status="reportGenerateStatus" id="clearButton" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
     </h:panelGrid>
+
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.deliveredServicesReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesReportPage.deliveredServicesReport.htmlReport}" >
@@ -107,7 +117,5 @@
 
         </c:if>
     </h:panelGrid>
-    <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.deliveredServicesReportPage.showCSVList}" styleClass="command-button" />
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
+
 </h:panelGrid>

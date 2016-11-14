@@ -1,7 +1,8 @@
 package ru.axetta.ecafe.processor.core.report;
 
 
-import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,10 +13,85 @@ import java.math.BigInteger;
  */
 public class DeliveredServicesItem {
 
+    public static class DeliveredServicesData {
+        private List<DeliveredServicesItem> headerList = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> list153 = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> list37 = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> list14 = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> list511 = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> listTotal37 = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> listTotal511 = new ArrayList<DeliveredServicesItem>();
+        private List<DeliveredServicesItem> listTotalAll = new ArrayList<DeliveredServicesItem>();
+
+        public List<DeliveredServicesItem> getHeaderList() {
+            return headerList;
+        }
+
+        public void setHeaderList(List<DeliveredServicesItem> headerList) {
+            this.headerList = headerList;
+        }
+
+        public List<DeliveredServicesItem> getList153() {
+            return list153;
+        }
+
+        public void setList153(List<DeliveredServicesItem> list153) {
+            this.list153 = list153;
+        }
+
+        public List<DeliveredServicesItem> getList37() {
+            return list37;
+        }
+
+        public void setList37(List<DeliveredServicesItem> list37) {
+            this.list37 = list37;
+        }
+
+        public List<DeliveredServicesItem> getList14() {
+            return list14;
+        }
+
+        public void setList14(List<DeliveredServicesItem> list14) {
+            this.list14 = list14;
+        }
+
+        public List<DeliveredServicesItem> getList511() {
+            return list511;
+        }
+
+        public void setList511(List<DeliveredServicesItem> list511) {
+            this.list511 = list511;
+        }
+
+        public List<DeliveredServicesItem> getListTotal37() {
+            return listTotal37;
+        }
+
+        public void setListTotal37(List<DeliveredServicesItem> listTotal37) {
+            this.listTotal37 = listTotal37;
+        }
+
+        public List<DeliveredServicesItem> getListTotal511() {
+            return listTotal511;
+        }
+
+        public void setListTotal511(List<DeliveredServicesItem> listTotal511) {
+            this.listTotal511 = listTotal511;
+        }
+
+        public List<DeliveredServicesItem> getListTotalAll() {
+            return listTotalAll;
+        }
+
+        public void setListTotalAll(List<DeliveredServicesItem> listTotalAll) {
+            this.listTotalAll = listTotalAll;
+        }
+    }
+
     private String level1;
     private String level2;
     private String level3;
-    private String level4;
+    private String nameOfGood;
     private Long price;
     private Integer count;
     private Long summary;
@@ -23,7 +99,32 @@ public class DeliveredServicesItem {
     private String orgnum;
     private String address;
     private long idoforg;
-    private Integer orderType;
+    private Long priceWater;
+    private Integer countWater;
+    private Long summaryWater;
+    private Integer countOrg;
+
+    public DeliveredServicesItem() {
+    }
+
+    public DeliveredServicesItem(String level1, String level2, String level3, String nameOfGood, Long price,
+            Integer count, Long summary, String officialname, String orgnum, String address, long idoforg,
+            Long priceWater, Integer countWater, Long summaryWater) {
+        this.level1 = level1;
+        this.level2 = level2;
+        this.level3 = level3;
+        this.nameOfGood = nameOfGood;
+        this.price = price;
+        this.count = count;
+        this.summary = summary;
+        this.officialname = officialname;
+        this.orgnum = orgnum;
+        this.address = address;
+        this.idoforg = idoforg;
+        this.priceWater = priceWater;
+        this.countWater = countWater;
+        this.summaryWater = summaryWater;
+    }
 
     public String getLevel1() {
         return level1;
@@ -41,12 +142,12 @@ public class DeliveredServicesItem {
         this.level2 = level2;
     }
 
-    public String getLevel4() {
-        return level4;
+    public String getNameOfGood() {
+        return nameOfGood;
     }
 
-    public void setLevel4(String level4) {
-        this.level4 = level4;
+    public void setNameOfGood(String nameOfGood) {
+        this.nameOfGood = nameOfGood;
     }
 
     public String getLevel3() {
@@ -59,10 +160,6 @@ public class DeliveredServicesItem {
 
     public Long getPrice() {
         return price;
-    }
-
-    public void setPrice(BigInteger price) {
-        this.price = price.longValue();
     }
 
     public void setPrice(Long price) {
@@ -117,11 +214,35 @@ public class DeliveredServicesItem {
         this.idoforg = idoforg;
     }
 
-    public Integer getOrderType() {
-        return orderType;
+    public Long getPriceWater() {
+        return priceWater;
     }
 
-    public void setOrderType(Integer orderType) {
-        this.orderType = orderType;
+    public void setPriceWater(Long priceWater) {
+        this.priceWater = priceWater;
+    }
+
+    public Integer getCountWater() {
+        return countWater;
+    }
+
+    public void setCountWater(Integer countWater) {
+        this.countWater = countWater;
+    }
+
+    public Long getSummaryWater() {
+        return summaryWater;
+    }
+
+    public void setSummaryWater(Long summaryWater) {
+        this.summaryWater = summaryWater;
+    }
+
+    public Integer getCountOrg() {
+        return countOrg;
+    }
+
+    public void setCountOrg(Integer countOrg) {
+        this.countOrg = countOrg;
     }
 }

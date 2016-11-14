@@ -21,8 +21,8 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -32,7 +32,10 @@ import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -104,6 +107,30 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
         resetOrg();
+    }
+
+    public Object clear(){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+        localCalendar.setTime(new Date());
+        this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+
+        contractFilter.clear();
+        contragentFilter.clear();
+        region = null;
+        otherRegions = false;
+        filter = "Не выбрано";
+        htmlReport = null;
+        if(idOfOrgList != null) {
+            idOfOrgList.clear();
+        }
+        return null;
     }
 
     public void showCSVList(ActionEvent actionEvent){

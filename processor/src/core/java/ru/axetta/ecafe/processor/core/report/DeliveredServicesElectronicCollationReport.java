@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -59,7 +60,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
 
     private final static Logger logger = LoggerFactory.getLogger(DeliveredServicesElectronicCollationReport.class);
 
-    private List<DeliveredServicesItem> items;
+    private List<DeliveredServicesItem.DeliveredServicesData> data;
     private String htmlReport;
 
     private static final String ORG_NUM = "Номер ОУ";
@@ -73,8 +74,8 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
         DEFAULT_COLUMNS.add(GOOD_NAME);
     }
 
-    public List<DeliveredServicesItem> getItems() {
-        return items;
+    public List<DeliveredServicesItem.DeliveredServicesData> getData() {
+        return data;
     }
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
@@ -187,13 +188,22 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             parameterMap.put("nameOrg", nameOrg);
 
             Date generateEndTime = new Date();
-            List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
-                    contract);
+            DeliveredServicesItem.DeliveredServicesData data = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
+                    contract, parameterMap);
             ///Пробегаемся по items и смотрим - если у них всех один и тот же контракт - заполняем параметр contract
             String contractNumber = "______";
             String contractDate = "________";
             Set<Long> orgs = new HashSet<Long>();
-            for (DeliveredServicesItem item : items) {
+            for (DeliveredServicesItem item : data.getList153()) {
+                orgs.add(item.getIdoforg());
+            }
+            for (DeliveredServicesItem item : data.getList37()) {
+                orgs.add(item.getIdoforg());
+            }
+            for (DeliveredServicesItem item : data.getList14()) {
+                orgs.add(item.getIdoforg());
+            }
+            for (DeliveredServicesItem item : data.getList511()) {
                 orgs.add(item.getIdoforg());
             }
             if (orgs.size() > 0) {
@@ -212,8 +222,10 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             }
             parameterMap.put("contractNumber", contractNumber);
             parameterMap.put("contractDate", contractDate);
+            List<DeliveredServicesItem.DeliveredServicesData> result = new ArrayList<DeliveredServicesItem.DeliveredServicesData>();
+            result.add(data);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
+                    createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, result));
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
                 return new DeliveredServicesElectronicCollationReport(generateTime,
@@ -231,19 +243,19 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 return new DeliveredServicesElectronicCollationReport(generateTime,
-                        generateEndTime.getTime() - generateTime.getTime(), startTime, endTime, items)
+                        generateEndTime.getTime() - generateTime.getTime(), startTime, endTime, result)
                         .setHtmlReport(os.toString("UTF-8"));
             }
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
-                Map<String, Object> parameterMap, List<DeliveredServicesItem> items) throws Exception {
-            return new JRBeanCollectionDataSource(items);
+                Map<String, Object> parameterMap, List<DeliveredServicesItem.DeliveredServicesData> data) throws Exception {
+            return new JRBeanCollectionDataSource(data);
         }
 
 
-        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end,
-                Long contragent, Long contract) {
+        public DeliveredServicesItem.DeliveredServicesData findNotNullGoodsFullNameByOrg(Session session, Date start, Date end,
+                Long contragent, Long contract, Map<String, Object> parameterMap) {
             String contragentCondition = "";
             if (contragent != null) {
                 contragentCondition = "(cf_orgs.defaultsupplier=" + contragent + ") AND ";
@@ -313,8 +325,6 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 }
             }
 
-            List<DeliveredServicesItem> result = new ArrayList<DeliveredServicesItem>();
-
             /*//String typeCondition = " cf_orders.ordertype<>8 and ";
             String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10)) and "
                     + " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
@@ -362,7 +372,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 item.setLevel1(String.format("%02d", orderType).concat("@").concat(level1));
                 item.setLevel2(level2);
                 item.setLevel3(level3);
-                item.setLevel4(level4);
+                item.setNameOfGood(level4);
                 item.setCount(count);
                 item.setPrice(price);
                 item.setSummary(summary);
@@ -389,14 +399,23 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             queryTaloon.setParameter("start", start.getTime());
             queryTaloon.setParameter("end", end.getTime());
 
-            List resTaloon = queryTaloon.list();
-            for (Object entryTaloon : resTaloon) {
-                Object e[] = (Object[]) entryTaloon;
+            DeliveredServicesItem.DeliveredServicesData result = new DeliveredServicesItem.DeliveredServicesData();
+            Map<String, DeliveredServicesItem> headerMap = new TreeMap<String, DeliveredServicesItem>();
+
+            int waterCount = 0;
+            Long waterSummary = 0L;
+            Long summary37 = 0L;
+            Long summary511 = 0L;
+            Long summaryAll = 0L;
+
+            List res = queryTaloon.list();
+            for (Object entry : res) {
+                Object e[] = (Object[]) entry;
                 String officialname = (String) e[0];
                 String level1 = (String) e[1];
                 String level2 = (String) e[2];
                 String level3 = (String) e[3];
-                String level4 = (String) e[4];
+                String nameOfGood = (String) e[4];
                 int count = ((BigInteger) e[5]).intValue();
                 long price = ((BigInteger) e[6]).longValue();
                 long summary = ((BigInteger) e[7]).longValue();
@@ -409,16 +428,74 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 item.setLevel1(String.format("%02d", orderType).concat("@").concat(level1));
                 item.setLevel2(level2);
                 item.setLevel3(level3);
-                item.setLevel4(level4);
-                item.setCount(count);
-                item.setPrice(price);
-                item.setSummary(summary);
+                if(orderType.equals(0)) {
+                    item.setNameOfGood(nameOfGood);
+                    item.setCount(count);
+                    item.setPrice(price);
+                    item.setSummary(summary);
+                } else {
+                    item.setCountWater(0);
+                    item.setPriceWater(price);
+                    item.setSummaryWater(0L);
+                    waterCount += count;
+                    waterSummary += summary;
+                }
                 item.setOrgnum(orgNum);
                 item.setAddress(address);
                 item.setIdoforg(idoforg);
-                item.setOrderType(orderType);
-                result.add(item);
+
+                DeliveredServicesItem item1 = new DeliveredServicesItem(level1, level2, level3, nameOfGood,
+                        null, null, null, officialname, orgNum, address, idoforg, null, null, null);
+                if(level3.equals("1,5-3") || level3.equals("1.5-3")) {
+                    result.getList153().add(item);
+                    summary37 += summary;
+                    summaryAll += summary;
+                    result.getList37().add(item1);
+                    result.getList14().add(item1);
+                    result.getList511().add(item1);
+                } else if(level3.equals("3-7")) {
+                    result.getList37().add(item);
+                    summary37 += summary;
+                    summaryAll += summary;
+                    result.getList153().add(item1);
+                    result.getList14().add(item1);
+                    result.getList511().add(item1);
+                } else if(level3.equals("1-4")) {
+                    result.getList14().add(item);
+                    summary511 += summary;
+                    summaryAll += summary;
+                    result.getList153().add(item1);
+                    result.getList37().add(item1);
+                    result.getList511().add(item1);
+                } else if(level3.equals("5-11")) {
+                    result.getList511().add(item);
+                    summary511 += summary;
+                    summaryAll += summary;
+                    result.getList153().add(item1);
+                    result.getList37().add(item1);
+                    result.getList14().add(item1);
+                } else if(orderType.equals(1)) {
+                    result.getList153().add(item);
+                    result.getList37().add(item);
+                    result.getList14().add(item);
+                    result.getList511().add(item);
+                }
+                if(StringUtils.isNotEmpty(nameOfGood) && !headerMap.keySet().contains(nameOfGood)) {
+                    headerMap.put(nameOfGood, item);
+                }
+
             }
+
+            result.setHeaderList(new ArrayList<DeliveredServicesItem>(headerMap.values()));
+            result.setListTotal37(result.getHeaderList());
+            result.setListTotal511(result.getHeaderList());
+            result.setListTotalAll(result.getHeaderList());
+
+            parameterMap.put("waterCount", waterCount);
+            parameterMap.put("waterSummary", waterSummary);
+            parameterMap.put("summary37", summary37);
+            parameterMap.put("summary511", summary511);
+            parameterMap.put("summaryAll", summaryAll + waterSummary);
 
             return result;
         }
@@ -533,9 +610,9 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
     }
 
     public DeliveredServicesElectronicCollationReport(Date generateTime, long generateDuration, JasperPrint print,
-            Date startTime, Date endTime, List<DeliveredServicesItem> items, Long idOfOrg) {
+            Date startTime, Date endTime, List<DeliveredServicesItem.DeliveredServicesData> data, Long idOfOrg) {
         super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
-        this.items = items;
+        this.data = data;
     }
 
     public String getHtmlReport() {
@@ -548,8 +625,8 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
     }
 
     public DeliveredServicesElectronicCollationReport(Date generateTime, long generateDuration, Date startTime,
-            Date endTime, List<DeliveredServicesItem> items) {
-        this.items = items;
+            Date endTime, List<DeliveredServicesItem.DeliveredServicesData> data) {
+        this.data = data;
     }
 
 
