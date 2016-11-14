@@ -21,9 +21,11 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
 
     private final TempCardsOperations tempCardsOperations;
     private final List<ResTempCardOperation> resTempCardOperationList;
+    private final Long idOfOrgSync;
 
-    public TempCardOperationProcessor(Session persistenceSession, TempCardsOperations tempCardsOperations) {
+    public TempCardOperationProcessor(Session persistenceSession, TempCardsOperations tempCardsOperations, Long idOfOrgSync) {
         super(persistenceSession);
+        this.idOfOrgSync = idOfOrgSync;
         this.tempCardsOperations = tempCardsOperations;
         resTempCardOperationList = new ArrayList<ResTempCardOperation>();
     }
@@ -93,12 +95,21 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
     }
 
     private ResTempCardOperation registrVisitorOperation(TempCardOperation tempCardOperation, CardTemp cardTemp) {
+        Long idOfOrg;
+        if (cardTemp.getOrg() == null) {
+            idOfOrg = tempCardOperation.getIdOfOrg();
+        } else {
+            idOfOrg = cardTemp.getOrg().getIdOfOrg();
+        }
+        if(idOfOrg == null) {
+            idOfOrg = idOfOrgSync;
+        }
+
         Visitor visitor = DAOUtils.existVisitor(session, tempCardOperation.getIdOfVisitor());
         if(visitor==null){
-            final String message = String.format("%d не связан с организацией idOfOrg = %d",tempCardOperation.getIdOfClient(), tempCardOperation.getIdOfOrg());
+            final String message = String.format("%d не связан с организацией idOfOrg = %d",tempCardOperation.getIdOfClient(), idOfOrg);
             return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),5,message);
         } else {
-            Long idOfOrg = cardTemp.getOrg() == null ? tempCardOperation.getIdOfOrg() : cardTemp.getOrg().getIdOfOrg();
             CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), idOfOrg);
             if(cardTempOperation==null){
                 cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp, CardOperationStation

@@ -506,7 +506,7 @@ public class Processor implements SyncProcessor {
 
         try {
             if (request.getTempCardsOperations() != null) {
-                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations(), request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
@@ -1076,7 +1076,7 @@ public class Processor implements SyncProcessor {
         if (cardsOperations == null) return;
 
         try {
-            ResTempCardsOperations tempCardsOperations = processTempCardsOperations(cardsOperations);
+            ResTempCardsOperations tempCardsOperations = processTempCardsOperations(cardsOperations, request.getIdOfOrg());
             addToResponseSections(tempCardsOperations, responseSections);
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
@@ -2097,7 +2097,7 @@ public class Processor implements SyncProcessor {
 
         try {
             if (request.getTempCardsOperations() != null) {
-                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations(), request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
@@ -2211,7 +2211,7 @@ public class Processor implements SyncProcessor {
 
         try {
             if (request.getTempCardsOperations() != null) {
-                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations(), request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
@@ -2341,7 +2341,7 @@ public class Processor implements SyncProcessor {
 
         try {
             if (request.getTempCardsOperations() != null) {
-                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations(), request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
@@ -2508,7 +2508,7 @@ public class Processor implements SyncProcessor {
         return orgOwnerData;
     }
 
-    private ResTempCardsOperations processTempCardsOperations(TempCardsOperations tempCardsOperations)
+    private ResTempCardsOperations processTempCardsOperations(TempCardsOperations tempCardsOperations, Long idOfOrg)
             throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2516,7 +2516,7 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new TempCardOperationProcessor(persistenceSession, tempCardsOperations);
+            AbstractProcessor processor = new TempCardOperationProcessor(persistenceSession, tempCardsOperations, idOfOrg);
             resTempCardsOperations = (ResTempCardsOperations) processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;
