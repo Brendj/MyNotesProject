@@ -40,7 +40,6 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
     public ResReestrTaloonApproval process() throws Exception {
         ResReestrTaloonApproval result = new ResReestrTaloonApproval();
         List<ResTaloonApprovalItem> items = new ArrayList<ResTaloonApprovalItem>();
-        Integer soldedQty = 0;
         try {
             ResTaloonApprovalItem resItem;
             Long nextVersion = DAOUtils.nextVersionByTaloonApproval(session);
@@ -53,7 +52,12 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     String goodsGuid = item.getGoodsGuid();
                     if (goodsGuid == null) goodsGuid = "";
                     TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, date, name, goodsGuid);
-                    soldedQty = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name);
+                    Integer soldedQty = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name, goodsGuid);
+                    if(soldedQty == null || soldedQty == 0) {
+                        soldedQty = item.getSoldedQty();
+                    } else {
+                        item.setSoldedQty(soldedQty);
+                    }
                     Long price = item.getPrice();
                     Integer requestedQty = item.getRequestedQty();
                     Integer shippedQty = item.getShippedQty();

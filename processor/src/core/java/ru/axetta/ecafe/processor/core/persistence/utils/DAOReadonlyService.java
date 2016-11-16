@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -325,23 +326,38 @@ public class DAOReadonlyService {
         }
     }
 
-    public int findTaloonApprovalSoldedQty(Long idOfOrg, Date taloonDate, String taloonName) {
+    public Integer findTaloonApprovalSoldedQty(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid) {
         Date dateEnd = CalendarUtils.addOneDay(taloonDate);
         try {
+            String goodsJoin = "";
+            String goodsParam = "";
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                goodsJoin = "inner join cf_goods g on g.idofgood = od.idofgood ";
+                goodsParam = "and g.guid =:goodsGuid ";
+            }
             Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
-                    + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder "
+                    + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder " + goodsJoin
                     + "where od.idOfOrg= :idOfOrg "
                     + "and od.menuDetailName = :taloonName "
+                    + "and od.MenuType >= :complexMin "
+                    + "and od.MenuType <= :complexMax "
                     + "and o.orderDate >= :taloonDate "
-                    + "and o.orderDate < :dateEnd");
+                    + "and o.orderDate < :dateEnd "
+                    + goodsParam);
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonName", taloonName);
+            query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);
             query.setParameter("taloonDate", taloonDate.getTime());
             query.setParameter("dateEnd", dateEnd.getTime());
-            return ((BigInteger) query.getSingleResult()).intValue();
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                query.setParameter("goodsGuid", goodsGuid);
+            }
+            Object result = query.getSingleResult();
+            return result != null ? ((BigInteger) result).intValue() : 0;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return 0;
+            logger.error(e.getMessage(), e);
+            return null;
         }
     }
 
