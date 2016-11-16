@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
@@ -20,7 +22,10 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -234,44 +239,6 @@ public class SubscriptionFeedingService {
                     .getResultList();
             dayCount++;
         }
-        return res;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    // Возвращает комплексы, участвующие в АП, для данной орг-ии.
-    // isParant при ложном занчении вернет комплексы только для детей
-    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent) {
-        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
-        for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
-            idOfComplex.add(i);
-        }
-        if(!isParent){
-            Session session = entityManager.unwrap(Session.class);
-            Criteria criteria = session.createCriteria(ComplexRole.class);
-            String arrayOfFilterText = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
-            for (String filter : arrayOfFilterText.split(";")){
-                criteria.add(Restrictions.ilike("extendRoleName", filter, MatchMode.ANYWHERE));
-            }
-            //criteria.add(Restrictions.ilike("extendRoleName", "сотрудник", MatchMode.ANYWHERE));
-            criteria.setProjection(Projections.property("idOfRole"));
-            List list = criteria.list();
-            for (Object obj: list){
-                idOfComplex.remove(Integer.valueOf(obj.toString()));
-            }
-        }
-        final String sql;
-        sql = "select distinct ci from ComplexInfo ci "
-              + " where ci.org = :org and usedSubscriptionFeeding = 1 "
-              + " and menuDate >= :startDate and menuDate < :endDate "
-              + " and ci.idOfComplex in :idOfComplex";
-        Date endDate = today;
-        endDate = CalendarUtils.addDays(endDate, 7);
-        TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
-              ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
-              .setParameter("endDate", endDate).setParameter("idOfComplex", idOfComplex);
-        List<ComplexInfo> res = query.getResultList();
         return res;
     }
 

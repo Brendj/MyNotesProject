@@ -2293,7 +2293,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                   Session session, Transaction transaction) throws Exception {
-                processPaymentList(client, subBalanceNum, data, objectFactory, session, endDate, startDate);
+                processPaymentList(client, subBalanceNum, data, objectFactory, endDate, startDate);
             }
         });
 
@@ -2313,7 +2313,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
-                      processPaymentList(client, subBalanceNum, data, objectFactory, session, endDate, startDate);
+                      processPaymentList(client, subBalanceNum, data, objectFactory, endDate, startDate);
                   }
               });
 
@@ -2333,7 +2333,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
-                      processPaymentList(client, 1, data, objectFactory, session, endDate, startDate);
+                      processPaymentList(client, 1, data, objectFactory, endDate, startDate);
                   }
               });
 
@@ -2346,20 +2346,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private void processPaymentList(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-          Session session, Date endDate, Date startDate) throws Exception {
-        Date nextToEndDate = DateUtils.addDays(endDate, 1);
-        Criteria clientPaymentsCriteria = session.createCriteria(ClientPayment.class);
-        if (subBalanceNum != null && subBalanceNum.equals(1)) {
-            clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT));
-        } else {
-            clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
-        }
-        clientPaymentsCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
-        clientPaymentsCriteria.add(Restrictions.ge("createTime", startDate));
-        clientPaymentsCriteria.add(Restrictions.lt("createTime", nextToEndDate));
-        clientPaymentsCriteria = clientPaymentsCriteria.createCriteria("transaction");
-        clientPaymentsCriteria.add(Restrictions.eq("client", client));
-        List clientPaymentsList = clientPaymentsCriteria.list();
+          Date endDate, Date startDate) throws Exception {
+        List clientPaymentsList = DAOReadonlyService.getInstance().getPaymentsList(client, subBalanceNum, endDate, startDate);
         PaymentList paymentList = objectFactory.createPaymentList();
         int nRecs = 0;
         for (Object o : clientPaymentsList) {
@@ -6275,12 +6263,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             Org org = client.getOrg();
             transaction.commit();
-            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
-                  .getBean(SubscriptionFeedingService.class);
             final String groupName = client.getClientGroup().getGroupName();
             final boolean isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES
                   || ClientGroup.predefinedGroupNames().contains(groupName);
-            List<ComplexInfo> complexInfoList = sfService.findComplexesWithSubFeeding(org, isParent);
+            List<ComplexInfo> complexInfoList = DAOReadonlyService.getInstance().findComplexesWithSubFeeding(org, isParent);
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
             for (ComplexInfo ci : complexInfoList) {

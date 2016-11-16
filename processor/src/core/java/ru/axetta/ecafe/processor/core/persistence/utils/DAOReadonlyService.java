@@ -11,9 +11,12 @@ import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
@@ -28,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
@@ -311,7 +315,7 @@ public class DAOReadonlyService {
 
     public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid) {
         try {
-        Query query = entityManager.createQuery("SELECT taloon from TaloonApproval taloon "
+            Query query = entityManager.createQuery("SELECT taloon from TaloonApproval taloon "
                 + "where taloon.idOfOrg = :idOfOrg "
                 + "and taloon.taloonDate = :taloonDate "
                 + "and taloon.taloonName = :taloonName "
@@ -359,6 +363,50 @@ public class DAOReadonlyService {
             logger.error(e.getMessage(), e);
             return null;
         }
+    }
+
+    public List getPaymentsList(Client client, Integer subBalanceNum, Date endDate, Date startDate) {
+        Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
+                + "cp.createTime >= :startDate and cp.createTime < :endDate and tr.client.idOfClient = :idOfClient order by cp.createTime asc");
+        query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", nextToEndDate);
+        query.setParameter("idOfClient", client.getIdOfClient());
+        return query.getResultList();
+    }
+
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent) {
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
+        for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
+            idOfComplex.add(i);
+        }
+        if(!isParent){
+            Session session = entityManager.unwrap(Session.class);
+            Criteria criteria = session.createCriteria(ComplexRole.class);
+            String arrayOfFilterText = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
+            for (String filter : arrayOfFilterText.split(";")){
+                criteria.add(Restrictions.ilike("extendRoleName", filter, MatchMode.ANYWHERE));
+            }
+            criteria.setProjection(Projections.property("idOfRole"));
+            List list = criteria.list();
+            for (Object obj: list){
+                idOfComplex.remove(Integer.valueOf(obj.toString()));
+            }
+        }
+        final String sql;
+        sql = "select distinct ci from ComplexInfo ci "
+                + " where ci.org = :org and usedSubscriptionFeeding = 1 "
+                + " and menuDate >= :startDate and menuDate < :endDate "
+                + " and ci.idOfComplex in :idOfComplex";
+        Date endDate = today;
+        endDate = CalendarUtils.addDays(endDate, 7);
+        TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
+                ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
+                .setParameter("endDate", endDate).setParameter("idOfComplex", idOfComplex);
+        List<ComplexInfo> res = query.getResultList();
+        return res;
     }
 
 }
