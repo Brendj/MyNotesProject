@@ -31,6 +31,7 @@ public class ResTaloonApprovalItem {
     private String goodsName;
     private String goodsGuid;
     private Integer soldedQty;
+    private Integer ordersCount;
     private Integer requestedQty;
     private Integer shippedQty;
     private Long price;
@@ -52,17 +53,29 @@ public class ResTaloonApprovalItem {
         this.date = taloon.getTaloonDate();
         this.name = taloon.getTaloonName();
         this.goodsGuid = taloon.getGoodsGuid();
-        this.goodsName = taloon.getGoodsName();
+        this.goodsName = taloon.getGoodsName() == null ? "" : taloon.getGoodsName();
         this.soldedQty = taloon.getSoldedQty();
-        this.setRequestedQty(taloon.getRequestedQty());
-        this.setShippedQty(taloon.getShippedQty());
+        this.requestedQty = taloon.getRequestedQty() == null ? 0 : taloon.getRequestedQty();
+        this.shippedQty = taloon.getShippedQty() == null ? 0 : taloon.getShippedQty();
         this.price = taloon.getPrice();
         this.createdType = taloon.getCreatedType();
-        this.isppState = taloon.getIsppState();
-        this.ppState = taloon.getPpState();
+        this.isppState = taloon.getIsppState() == null ? TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED : taloon.getIsppState();
+        this.ppState = taloon.getPpState() == null ? TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED : taloon.getPpState();
         this.taloonNumber = taloon.getTaloonNumber();
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
+    }
+
+    public ResTaloonApprovalItem(TaloonApproval taloon, Integer ordersCount, Integer resCode) {
+        this.orgId = taloon.getIdOfOrg();
+        this.date = taloon.getTaloonDate();
+        this.name = taloon.getTaloonName();
+        this.goodsGuid = taloon.getGoodsGuid();
+        this.ordersCount = ordersCount;
+        this.taloonNumber = taloon.getTaloonNumber();
+        this.version = taloon.getVersion();
+        this.deletedState = taloon.getDeletedState();
+        this.resultCode = resCode;
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
@@ -76,17 +89,18 @@ public class ResTaloonApprovalItem {
         XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
         XMLUtils.setAttributeIfNotNull(element, "Name", name);
         XMLUtils.setAttributeIfNotNull(element, "SoldedQty", soldedQty);
-        XMLUtils.setAttributeIfNotNull(element, "RequestedQty", requestedQty == null ? 0 : requestedQty);
-        XMLUtils.setAttributeIfNotNull(element, "ShippedQty", shippedQty == null ? 0 : shippedQty);
+        XMLUtils.setAttributeIfNotNull(element, "OrdersCount", ordersCount);
+        XMLUtils.setAttributeIfNotNull(element, "RequestedQty", requestedQty);
+        XMLUtils.setAttributeIfNotNull(element, "ShippedQty", shippedQty);
         XMLUtils.setAttributeIfNotNull(element, "Price", price);
         XMLUtils.setAttributeIfNotNull(element, "TaloonNumber", taloonNumber);
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
-        XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName == null ? "" : this.goodsName);
+        XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
         XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
-        XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState == null ? TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal() : isppState.ordinal());
-        XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState == null ? TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal() : ppState.ordinal());
+        if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
+        if(ppState != null) XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState.ordinal());
         if (resultCode != null && resultCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
         }
@@ -141,6 +155,14 @@ public class ResTaloonApprovalItem {
 
     public void setSoldedQty(Integer soldedQty) {
         this.soldedQty = soldedQty;
+    }
+
+    public Integer getOrdersCount() {
+        return ordersCount;
+    }
+
+    public void setOrdersCount(Integer ordersCount) {
+        this.ordersCount = ordersCount;
     }
 
     public Long getPrice() {

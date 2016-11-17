@@ -52,11 +52,12 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     String goodsGuid = item.getGoodsGuid();
                     if (goodsGuid == null) goodsGuid = "";
                     TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, date, name, goodsGuid);
-                    Integer soldedQty = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name, goodsGuid);
-                    if(soldedQty == null || soldedQty == 0) {
-                        soldedQty = item.getSoldedQty();
+                    Integer ordersCount = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name, goodsGuid);
+                    Integer soldedQty = item.getSoldedQty();
+                    if(ordersCount == null || ordersCount == 0) {
+                        ordersCount = null;
                     } else {
-                        item.setSoldedQty(soldedQty);
+                        soldedQty = ordersCount;
                     }
                     Long price = item.getPrice();
                     Integer requestedQty = item.getRequestedQty();
@@ -70,7 +71,8 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
-                        taloon = new TaloonApproval(idOfOrg, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty, isppState, ppState,goodsName);
+                        taloon = new TaloonApproval(idOfOrg, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
+                                isppState, ppState, goodsName);
                     }
                     taloon.setSoldedQty(soldedQty);
                     taloon.setRequestedQty(requestedQty);
@@ -86,22 +88,13 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
 
                     session.saveOrUpdate(taloon);
 
-                    resItem = new ResTaloonApprovalItem(taloon);
-                    resItem.setResultCode(item.getResCode());
+                    resItem = new ResTaloonApprovalItem(taloon, ordersCount, item.getResCode());
                 } else {
                     resItem = new ResTaloonApprovalItem();
                     resItem.setOrgId(item.getOrgId());
                     resItem.setDate(item.getDate());
                     resItem.setName(item.getName());
-                    resItem.setGoodsName(item.getGoodsName());
                     resItem.setGoodsGuid(item.getGoodsGuid());
-                    resItem.setSoldedQty(item.getSoldedQty());
-                    resItem.setRequestedQty(item.getRequestedQty());
-                    resItem.setShippedQty(item.getShippedQty());
-                    resItem.setPrice(item.getPrice());
-                    resItem.setCreatedType(item.getCreatedType());
-                    resItem.setIsppState(item.getIsppState());
-                    resItem.setPpState(item.getPpState());
                     resItem.setTaloonNumber(item.getTaloonNumber());
                     resItem.setResultCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());
