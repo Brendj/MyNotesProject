@@ -338,6 +338,8 @@ public class DAOReadonlyService {
             if(StringUtils.isNotEmpty(goodsGuid)) {
                 goodsJoin = "inner join cf_goods g on g.idofgood = od.idofgood ";
                 goodsParam = "and g.guid =:goodsGuid ";
+            } else {
+                goodsParam = "and od.idofgood is null ";
             }
             Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
                     + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder " + goodsJoin
