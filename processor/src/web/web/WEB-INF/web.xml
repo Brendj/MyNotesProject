@@ -95,6 +95,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>SmsServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.SmsServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ProjectStateReportServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.ProjectStateReportServlet</servlet-class>
     </servlet>
@@ -155,6 +160,11 @@
     <servlet-mapping>
         <servlet-name>ImageServlet</servlet-name>
         <url-pattern>/image/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SmsServlet</servlet-name>
+        <url-pattern>/sms-state/</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

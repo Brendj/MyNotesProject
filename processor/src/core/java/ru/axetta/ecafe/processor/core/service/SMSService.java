@@ -54,13 +54,10 @@ public class SMSService {
 
     public void logQueue() {
         try {
-            int activeCount = ((ThreadPoolTaskExecutor)taskExecutor).getActiveCount();
-            int size = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().remainingCapacity();
-            int queue = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().size();
+            QueueState queueState = getQueueState();
             logger.info(String.format("Размеры очереди smsSendingTaskExecutor: выполняется потоков - %s, "+
-                    "доступно в очереди - %s, размер очереди - %s", activeCount, size, queue));
-        }
-        catch (Exception e) {
+                    "доступно в очереди - %s, размер очереди - %s", queueState.getActiveCount(), queueState.getSize(), queueState.getQueue()));
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -267,5 +264,48 @@ public class SMSService {
     public Boolean ignoreNotifyFlags() {
         ISmsService s = RuntimeContext.getInstance().getSmsService();
         return s.ignoreNotifyFlags();
+    }
+
+    public QueueState getQueueState() {
+        int activeCount = ((ThreadPoolTaskExecutor)taskExecutor).getActiveCount();
+        int size = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().remainingCapacity();
+        int queue = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().size();
+        return new QueueState(activeCount, size, queue);
+    }
+
+    public class QueueState {
+        private int activeCount;
+        private int size;
+        private int queue;
+
+        public QueueState(int activeCount, int size, int queue) {
+            this.activeCount = activeCount;
+            this.size = size;
+            this.queue = queue;
+        }
+
+        public int getActiveCount() {
+            return activeCount;
+        }
+
+        public void setActiveCount(int activeCount) {
+            this.activeCount = activeCount;
+        }
+
+        public int getSize() {
+            return size;
+        }
+
+        public void setSize(int size) {
+            this.size = size;
+        }
+
+        public int getQueue() {
+            return queue;
+        }
+
+        public void setQueue(int queue) {
+            this.queue = queue;
+        }
     }
 }

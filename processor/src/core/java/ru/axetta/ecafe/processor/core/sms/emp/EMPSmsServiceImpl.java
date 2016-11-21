@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -51,6 +52,8 @@ public class EMPSmsServiceImpl extends ISmsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPProcessor.class);
     //  services instances
     protected SubscriptionPortType subscriptionService;
+
+    private static CircularFifoBuffer buffer = new CircularFifoBuffer(100);
 
     /*  BASE AND IMPL */
     public EMPSmsServiceImpl() {
@@ -197,7 +200,10 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
         SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
         empProcessor.logRequest(eventParam);
+        Date timeBefore = new Date();
         SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
+        Date timeAfter = new Date();
+        buffer.add(timeAfter.getTime() - timeBefore.getTime());
         if (response.getErrorCode() != 0) {
             empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                     .getIdOfClient() + "] " + client.getMobile());
@@ -315,5 +321,9 @@ public class EMPSmsServiceImpl extends ISmsService {
     @Override
     public Boolean emailDisabled() {
         return true;
+    }
+
+    public static CircularFifoBuffer getBuffer() {
+        return buffer;
     }
 }
