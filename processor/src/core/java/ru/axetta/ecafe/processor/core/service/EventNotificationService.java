@@ -457,11 +457,10 @@ public class EventNotificationService {
             Object textObject = getTextObject(text, type, destClient, dataClient, direction, guardian, values);
             if(textObject != null) {
                 if (sendAsync) {
-                    smsService.sendSMSAsync(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
+                    smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                     result = true;
                 } else {
-                    //result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values);
-                    result = smsService.sendSMS(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
+                    result = smsService.sendSMS(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                 }
             }
         } catch (Exception e) {
@@ -478,7 +477,7 @@ public class EventNotificationService {
         try {
             Object textObject = getSummaryNotificationObject(type, destClient, dataClient, values);
             if (textObject != null) {
-                smsService.sendSMSAsync(destClient.getIdOfClient(), clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
+                smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                 result = true;
             }
         } catch (Exception e) {

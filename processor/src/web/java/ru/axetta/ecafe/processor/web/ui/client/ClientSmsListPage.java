@@ -292,7 +292,7 @@ public class ClientSmsListPage extends BasicWorkspacePage
             String text = String.format("Просьба пополнить счет карты. Баланс: %s р",
                     CurrencyStringUtils.copecksToRubles(currClient.getBalance()));
             try {
-                smsService.sendSMS(currClient.getIdOfClient(), ClientSms.TYPE_NEGATIVE_BALANCE, null, text, new String [] {}, new Date());
+                smsService.sendSMS(currClient, ClientSms.TYPE_NEGATIVE_BALANCE, null, text, new String [] {}, new Date());
             } catch (Exception e) {
                 logger.error(String.format("Failed to send SMS to client: %s", currClient), e);
             }

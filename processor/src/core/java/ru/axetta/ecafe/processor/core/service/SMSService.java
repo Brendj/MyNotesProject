@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
-import ru.axetta.ecafe.processor.core.sms.emp.type.EMPAbstractEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
 
@@ -65,43 +64,21 @@ public class SMSService {
             logger.error(e.getMessage());
         }
     }
-    /*@Async
-    public void sendSMSAsync(long idOfClient, EMPEventType empEvent) throws Exception {
-        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, empEvent);
-    }
 
-    public boolean sendSMS(long idOfClient, EMPEventType empEvent) throws Exception {
-        Client client = DAOService.getInstance().findClientById(idOfClient);
-        boolean sending = RuntimeContext.getAppContext().getBean(EMPProcessor.class).sendEvent(client, empEvent);
-        boolean result = registerClientSMSCharge(sending, client,
-                                                 "", client.getMobile(), empEvent.getType(), empEvent.buildText());
-        return result;
-    }*/
-
-    /*@Async
-    public void sendSMSAsync(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) throws Exception {
-        //RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, messageTargetId, textObject, values);
-    }
-
-    public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values) throws Exception {
-        //  pervious sendSMS located in SendSmsThreadWrapper.sendSMS
-    }
-    */
-
-    public boolean sendSMSAsync(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
+    public boolean sendSMSAsync(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
         RunnableSendSmsThreadWrapper wrapper = new RunnableSendSmsThreadWrapper
-                (transactionManager, em, idOfClient, messageType, messageTargetId, textObject, values, eventTime);
+                (transactionManager, em, client, messageType, messageTargetId, textObject, values, eventTime);
         taskExecutor.execute(wrapper);
         return true;
     }
 
-    public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
+    public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
         SendSmsThreadWrapper wrapper = new SendSmsThreadWrapper(transactionManager, em);
-        return wrapper.sendSMS(idOfClient, messageType, messageTargetId, textObject, values, eventTime);
+        return wrapper.sendSMS(client, messageType, messageTargetId, textObject, values, eventTime);
     }
 
     public static final class RunnableSendSmsThreadWrapper extends SendSmsThreadWrapper implements Runnable {
-        protected long idOfClient;
+        protected Client client;
         protected int messageType;
         protected Long messageTargetId;
         protected Object textObject;
@@ -113,10 +90,10 @@ public class SMSService {
         }
 
         public RunnableSendSmsThreadWrapper(org.springframework.transaction.PlatformTransactionManager transactionManager, javax.persistence.EntityManager em,
-                                            long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
+                                            Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
             super(transactionManager, em);
 
-            this.idOfClient = idOfClient;
+            this.client = client;
             this.messageType = messageType;
             this.messageTargetId = messageTargetId;
             this.textObject = textObject;
@@ -128,7 +105,7 @@ public class SMSService {
         @Override
         public void run() {
             try {
-                result = sendSMS(this.idOfClient, this.messageType, this.messageTargetId, this.textObject, this.values, this.eventTime);
+                result = sendSMS(this.client, this.messageType, this.messageTargetId, this.textObject, this.values, this.eventTime);
             } catch (Exception e) {
                 logger.error("Failed to send SMS", e);
                 result = false;
@@ -148,7 +125,7 @@ public class SMSService {
             this.em = em;
         }
 
-        public boolean sendSMS(long idOfClient, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
+        public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
             if(transactionManager == null) {
                 throw new IllegalStateException("Transaction manager is null");
             }
@@ -157,12 +134,11 @@ public class SMSService {
             }
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             TransactionStatus status = transactionManager.getTransaction(def);
-            Client client = null; String phoneNumber = null, sender = null;
+            String phoneNumber = null, sender = "";
 
             ISmsService smsService = RuntimeContext.getInstance().getSmsService();
 
             try {
-                client = em.find(Client.class, idOfClient);
                 if (client == null) {
                     throw new Exception ("Client doesn't exist");
                 }
@@ -174,7 +150,6 @@ public class SMSService {
                 if (!StringUtils.isNotEmpty(phoneNumber)) return false;
                 phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
                 if (StringUtils.length(phoneNumber) != 11) return false;
-                sender = StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
                 transactionManager.commit(status);
                 status = null;
             }
@@ -201,7 +176,7 @@ public class SMSService {
                 for (int i = 0; i < 3; i++) {
                     try {
                         if(smsService instanceof EMPSmsServiceImpl) {
-                            logger.info(String.format("Test sending sms: %s", ((EMPAbstractEventType)textObject).toFullString()));
+                            //logger.info(String.format("Test sending sms: %s", ((EMPAbstractEventType)textObject).toFullString()));
                             sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(sender, client, textObject);
                             boolean isSuccess = sendResponse.isSuccess();
                             if(sendResponse != null && !isSuccess) {
@@ -223,8 +198,6 @@ public class SMSService {
                             break;
                         }
                     } catch (Exception e) {
-                    /*logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
-                            new Object[]{sender, phoneNumber, textObject.toString(), e});*/
                         logger.error("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}",
                                 new Object[]{sender, phoneNumber, textObject.toString()}, e);
                     }
