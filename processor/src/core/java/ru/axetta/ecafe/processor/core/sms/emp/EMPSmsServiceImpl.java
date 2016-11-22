@@ -203,7 +203,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         Date timeBefore = new Date();
         SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
         Date timeAfter = new Date();
-        buffer.add(timeAfter.getTime() - timeBefore.getTime());
+        addResponseTime(timeAfter.getTime() - timeBefore.getTime());
         if (response.getErrorCode() != 0) {
             empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                     .getIdOfClient() + "] " + client.getMobile());
@@ -313,6 +313,10 @@ public class EMPSmsServiceImpl extends ISmsService {
         return sending;
     }
 
+    private synchronized void addResponseTime(long responseTime) {
+        buffer.add(responseTime);
+    }
+
     @Override
     public Boolean ignoreNotifyFlags() {
         return true;
@@ -323,7 +327,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         return true;
     }
 
-    public static CircularFifoBuffer getBuffer() {
+    public static synchronized CircularFifoBuffer getBuffer() {
         return buffer;
     }
 }

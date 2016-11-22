@@ -54,10 +54,8 @@ public class SmsServlet extends HttpServlet {
             out.println("<br/>");
             out.println("Размер очереди: " + queueState.getQueue());
             out.println("<br/>");
-            if(time > 0) {
-                out.println("Время ответа: " + responseTime + " мс.");
-                out.println("<br/>");
-            }
+            out.println("Время ответа: " + responseTime + " мс.");
+            out.println("<br/>");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
