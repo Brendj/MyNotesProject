@@ -34,14 +34,14 @@ public class SmsServlet extends HttpServlet {
             SMSService smsService = RuntimeContext.getAppContext().getBean(SMSService.class);
             SMSService.QueueState queueState = smsService.getQueueState();
 
-            int time = 0;
-            int size = 0;
+            long time = 0;
+            long size = 0;
             for(Object o : EMPSmsServiceImpl.getBuffer()) {
-                int i = ((Long) o).intValue();
+                long i = (Long) o;
                 time += i;
                 size++;
             }
-            int responseTime = 0;
+            long responseTime = 0;
             if(size > 0) {
                 responseTime = time / size;
             }
