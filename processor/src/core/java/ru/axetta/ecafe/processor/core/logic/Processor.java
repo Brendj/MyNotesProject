@@ -977,7 +977,6 @@ public class Processor implements SyncProcessor {
                 ResReestrTaloonApproval resReestrTaloonApproval = processReestrTaloonApproval(
                         reestrTaloonApprovalRequest);
                 addToResponseSections(resReestrTaloonApproval, responseSections);
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.REESTR_TALOON_APPROVAL);
             }
         } catch (Exception e) {
             String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
