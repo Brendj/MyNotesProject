@@ -434,13 +434,6 @@ public class ImportRegisterClientsService {
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
                     cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
 
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
-                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
-
-            if (!pupil.getGuardianInfoList().isEmpty()) {
-                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
-            }
-
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.AGE_TYPE_GROUP, pupil.getAgeTypeGroup(),
                     cl == null ? null : cl.getAgeTypeGroup() == null ? null : cl.getAgeTypeGroup(), updateClient);
 
