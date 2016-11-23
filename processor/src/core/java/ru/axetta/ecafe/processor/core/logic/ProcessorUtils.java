@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfLastProcessSectionsDates;
 import ru.axetta.ecafe.processor.core.persistence.LastProcessSectionsDates;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.bk.BKRegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -20,6 +21,7 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
@@ -29,11 +31,12 @@ import java.util.Date;
  * Date: 07.07.16
  * Time: 10:37
  */
+@Service
 public class ProcessorUtils {
     private static final Logger logger = LoggerFactory.getLogger(ProcessorUtils.class);
 
     @Async
-    private static void runRegularPayments(SyncRequest request) {
+    public void runRegularPayments(SyncRequest request) {
         try {
             long time = System.currentTimeMillis();
             logger.info("runRegularPayments run");
@@ -46,14 +49,27 @@ public class ProcessorUtils {
         }
     }
 
-    public static void runRegularPaymentsIfEnabled(SyncRequest request) {
-        if (RuntimeContext.getInstance().isMainNode() && RuntimeContext.getInstance().getSettingsConfig()
-                .isEcafeAutopaymentBkEnabled()) {
-            runRegularPayments(request);
+    @Async
+    public void createSyncHistoryException(SessionFactory sessionFactory, long idOfOrg, SyncHistory syncHistory, String s) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = sessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            DAOUtils.createSyncHistoryException(persistenceSession, idOfOrg, syncHistory, s);
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("createSyncHistoryException exception: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
     }
 
-    public static void saveLastProcessSectionDate(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType){
+    @Async
+    public void saveLastProcessSectionDate(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType){
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
@@ -78,7 +94,6 @@ public class ProcessorUtils {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
-
     }
 
     public static void refreshOrg(SessionFactory sessionFactory, Org org){
