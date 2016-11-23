@@ -39,4 +39,7 @@ ALTER TABLE CF_Clients ADD COLUMN ageTypeGroup character varying (128);
 ALTER TABLE CF_RegistryChange ADD COLUMN ageTypeGroupFrom character varying (128);
 
 --удаление неиспользуемого индекса
-DROP INDEX "cf_cf_registrychange_notificationId_idx"
+DROP INDEX "cf_cf_registrychange_notificationId_idx";
+
+--Идентификатор организации, в которой создали позицию
+ALTER TABLE cf_taloon_approval ADD COLUMN idoforgcreated bigint;

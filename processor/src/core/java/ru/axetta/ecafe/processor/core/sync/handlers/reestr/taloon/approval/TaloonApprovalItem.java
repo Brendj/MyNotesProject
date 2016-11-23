@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +30,7 @@ public class TaloonApprovalItem {
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
     private Long orgId;
+    private Long orgIdCreated;
     private Date date;
     private String name;
     private String goodsName;
@@ -50,6 +50,7 @@ public class TaloonApprovalItem {
 
     public static TaloonApprovalItem build(Node itemNode, Long orgOwner) {
         Long orgId = null;
+        Long orgIdCreated = null;
         Date date = null;
         String name = null;
         String goodsName = null;
@@ -75,8 +76,7 @@ public class TaloonApprovalItem {
                     errorMessage.append(String.format("Org with id=%s not found", orgId));
                 } else {
                     DAOService daoService = DAOService.getInstance();
-                    Set<Org> fOrgs = daoService.getFriendlyOrgs(orgOwner);
-                    if (!daoService.getInstance().isOrgFriendly(orgId, orgOwner)) {
+                    if (!daoService.isOrgFriendly(orgId, orgOwner)) {
                         errorMessage.append(String.format("Org id=%s is not friendly to Org id=%s", orgId, orgOwner));
                     }
                 }
@@ -86,6 +86,25 @@ public class TaloonApprovalItem {
         } else {
             errorMessage.append("Attribute OrgId not found");
         }
+
+        String strOrgIdCreated = XMLUtils.getAttributeValue(itemNode, "OrgIdCreated");
+        if(StringUtils.isNotEmpty(strOrgIdCreated)){
+            try {
+                orgIdCreated =  Long.parseLong(strOrgIdCreated);
+                Org o = DAOService.getInstance().getOrg(orgIdCreated);
+                if (o == null) {
+                    errorMessage.append(String.format("OrgCreated with id=%s not found", orgIdCreated));
+                } else {
+                    DAOService daoService = DAOService.getInstance();
+                    if (!daoService.isOrgFriendly(orgIdCreated, orgOwner)) {
+                        errorMessage.append(String.format("OrgCreated id=%s is not friendly to Org id=%s", orgIdCreated, orgOwner));
+                    }
+                }
+            } catch (NumberFormatException e){
+                errorMessage.append("NumberFormatException OrgIdCreated is not parsed");
+            }
+        }
+
         String strDate = XMLUtils.getAttributeValue(itemNode,"Date");
         if(StringUtils.isNotEmpty(strDate)){
             try {
@@ -191,7 +210,7 @@ public class TaloonApprovalItem {
             }
         }
 
-        return new TaloonApprovalItem(orgId, date, name,goodsName,goodsGuid, soldedQty, requestedQty, shippedQty, price,
+        return new TaloonApprovalItem(orgId, orgIdCreated, date, name,goodsName,goodsGuid, soldedQty, requestedQty, shippedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
                 taloonNumber, orgOwner, deletedState, errorMessage.toString());
     }
@@ -216,10 +235,11 @@ public class TaloonApprovalItem {
     }
 
 
-    private TaloonApprovalItem(Long orgId, Date date, String name,String goodsName,String goodsGuid, Integer soldedQty, Integer requestedQty, Integer shippedQty,
-            Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
+    private TaloonApprovalItem(Long orgId, Long orgIdCreated, Date date, String name,String goodsName,String goodsGuid, Integer soldedQty,
+            Integer requestedQty, Integer shippedQty, Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
             Long taloonNumber, Long orgOwnerId, Boolean deletedState, String errorMessage) {
         this.setOrgId(orgId);
+        this.setOrgIdCreated(orgIdCreated);
         this.setDate(date);
         this.setName(name);
         this.setSoldedQty(soldedQty);
@@ -248,6 +268,14 @@ public class TaloonApprovalItem {
 
     public void setOrgId(Long orgId) {
         this.orgId = orgId;
+    }
+
+    public Long getOrgIdCreated() {
+        return orgIdCreated;
+    }
+
+    public void setOrgIdCreated(Long orgIdCreated) {
+        this.orgIdCreated = orgIdCreated;
     }
 
     public Date getDate() {

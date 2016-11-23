@@ -26,6 +26,7 @@ import java.util.Date;
 public class ResTaloonApprovalItem {
 
     private Long orgId;
+    private Long orgIdCreated;
     private Date date;
     private String name;
     private String goodsName;
@@ -50,6 +51,7 @@ public class ResTaloonApprovalItem {
 
     public ResTaloonApprovalItem(TaloonApproval taloon) {
         this.orgId = taloon.getIdOfOrg();
+        this.orgIdCreated = taloon.getIdOfOrgCreated();
         this.date = taloon.getTaloonDate();
         this.name = taloon.getTaloonName();
         this.goodsGuid = taloon.getGoodsGuid();
@@ -68,6 +70,7 @@ public class ResTaloonApprovalItem {
 
     public ResTaloonApprovalItem(TaloonApproval taloon, Integer ordersCount, Integer resCode) {
         this.orgId = taloon.getIdOfOrg();
+        this.orgIdCreated = taloon.getIdOfOrgCreated();
         this.date = taloon.getTaloonDate();
         this.name = taloon.getTaloonName();
         this.goodsGuid = taloon.getGoodsGuid();
@@ -81,6 +84,7 @@ public class ResTaloonApprovalItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "OrgId", orgId);
+        XMLUtils.setAttributeIfNotNull(element, "OrgIdCreated", orgIdCreated);
         if (date != null) {
             XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToStringFullYear(date));
         }
@@ -131,6 +135,14 @@ public class ResTaloonApprovalItem {
 
     public void setOrgId(Long orgId) {
         this.orgId = orgId;
+    }
+
+    public Long getOrgIdCreated() {
+        return orgIdCreated;
+    }
+
+    public void setOrgIdCreated(Long orgIdCreated) {
+        this.orgIdCreated = orgIdCreated;
     }
 
     public Date getDate() {

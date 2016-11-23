@@ -22,6 +22,7 @@ public class TaloonApproval {
     private String goodsGuid;
 
     private Org org;
+    private Long idOfOrgCreated;
     private Integer soldedQty;
     private Integer requestedQty;
     private Integer shippedQty;
@@ -39,10 +40,11 @@ public class TaloonApproval {
         //for Hibernate only
     }
 
-    public TaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Integer soldedQty, Long price,
+    public TaloonApproval(Long idOfOrg, Long idOfOrgCreated, Date taloonDate, String taloonName, String goodsGuid, Integer soldedQty, Long price,
             TaloonCreatedTypeEnum createdType, Integer requestedQty, Integer shippedQty,
             TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,String goodsName) {
         this.idOfOrg = idOfOrg;
+        this.idOfOrgCreated = idOfOrgCreated;
         this.taloonDate = taloonDate;
         this.taloonName = taloonName;
         this.goodsGuid = goodsGuid;
@@ -70,6 +72,14 @@ public class TaloonApproval {
 
     public void setOrg(Org org) {
         this.org = org;
+    }
+
+    public Long getIdOfOrgCreated() {
+        return idOfOrgCreated;
+    }
+
+    public void setIdOfOrgCreated(Long idOfOrgCreated) {
+        this.idOfOrgCreated = idOfOrgCreated;
     }
 
     public Integer getSoldedQty() {

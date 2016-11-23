@@ -16,6 +16,7 @@
             </generator>
         </id>
         <property name="idOfOrg" column="IdOfOrg" type="long" not-null="true"/>
+        <property name="idOfOrgCreated" column="IdOfOrgCreated" type="long" not-null="false"/>
         <property name="taloonDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="taloonDate"/>
         <property name="taloonName" type="string" column="taloonName"/>
         <property name="goodsGuid" type="string" column="goodsGuid" />

@@ -47,6 +47,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
 
                 if (item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK)) {
                     Long idOfOrg = item.getOrgId();
+                    Long idOfOrgCreated = item.getOrgIdCreated();
                     Date date = item.getDate();
                     String name = item.getName();
                     String goodsGuid = item.getGoodsGuid();
@@ -71,7 +72,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     Long taloonNumber = item.getTaloonNumber();
 
                     if (taloon == null) {
-                        taloon = new TaloonApproval(idOfOrg, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
+                        taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
                                 isppState, ppState, goodsName);
                     }
                     taloon.setSoldedQty(soldedQty);
