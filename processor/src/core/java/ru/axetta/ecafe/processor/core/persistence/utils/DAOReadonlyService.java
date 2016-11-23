@@ -347,8 +347,8 @@ public class DAOReadonlyService {
                     + "and od.menuDetailName = :taloonName "
                     + "and od.MenuType >= :complexMin "
                     + "and od.MenuType <= :complexMax "
-                    + "and o.orderDate >= :taloonDate "
-                    + "and o.orderDate < :dateEnd "
+                    + "and o.createdDate >= :taloonDate "
+                    + "and o.createdDate < :dateEnd "
                     + goodsParam);
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonName", taloonName);
