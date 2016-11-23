@@ -207,11 +207,16 @@ public class ImportRegisterClientsService {
     }
 
     public void run() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
+        }
+
+        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
+
+        if (!isOn()) {
             return;
         }
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
-        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
         List<List<Org>> orgsPack = buildOrgsPack(orgs, MAX_THREADS);
 
         log("Start import register with " + MAX_THREADS + " threads", null);
@@ -281,7 +286,10 @@ public class ImportRegisterClientsService {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Session session = (Session) em.getDelegate();
-        Query q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
+        Query q = session.createSQLQuery("delete from cf_registrychange_guardians where createdDate<:minCreateDate");
+        q.setLong("minCreateDate", cal.getTimeInMillis());
+        q.executeUpdate();
+        q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
         q.setLong("minCreateDate", cal.getTimeInMillis());
         q.executeUpdate();
         q = session.createSQLQuery("delete from cf_registrychange_errors where createDate<:minCreateDate");
