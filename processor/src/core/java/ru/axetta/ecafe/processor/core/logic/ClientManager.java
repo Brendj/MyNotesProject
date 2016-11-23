@@ -75,6 +75,7 @@ public class ClientManager {
         BENEFIT_ON_ADMISSION,
         GUARDIANS_COUNT,
         GUARDIANS_COUNT_LIST,
+        AGE_TYPE_GROUP,
         SSOID
     }
 
@@ -117,7 +118,8 @@ public class ClientManager {
             new FieldProcessor.Def(34, false, false, "Льгота при поступлении", null, FieldId.BENEFIT_ON_ADMISSION, true),
             new FieldProcessor.Def(35, false, false, "Количество представителей", null, FieldId.GUARDIANS_COUNT, false),
             new FieldProcessor.Def(36, false, false, "Коллекция представителей", null, FieldId.GUARDIANS_COUNT_LIST, false),
-            new FieldProcessor.Def(37, false, false, "SSOID", null, FieldId.SSOID, true),
+            new FieldProcessor.Def(37, false, false, "Тип возрастной группы", null, FieldId.AGE_TYPE_GROUP, true),
+            new FieldProcessor.Def(38, false, false, "SSOID", null, FieldId.SSOID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -500,6 +502,10 @@ public class ClientManager {
                 client.setGuardiansCount(fieldConfig.getValue(FieldId.GUARDIANS_COUNT));
             }
 
+            if (fieldConfig.getValue(FieldId.AGE_TYPE_GROUP) != null) {
+                client.setAgeTypeGroup(fieldConfig.getValue(FieldId.AGE_TYPE_GROUP));
+            }
+
             client.setUpdateTime(new Date());
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -810,6 +816,10 @@ public class ClientManager {
             //token[35])
             if (fieldConfig.getValue(FieldId.GUARDIANS_COUNT) != null) {
                 client.setGuardiansCount(fieldConfig.getValue(FieldId.GUARDIANS_COUNT));
+            }
+
+            if (fieldConfig.getValue(FieldId.AGE_TYPE_GROUP) != null) {
+                client.setAgeTypeGroup(fieldConfig.getValue(FieldId.AGE_TYPE_GROUP));
             }
 
             if (fieldConfig.getValue(FieldId.SSOID) != null) {

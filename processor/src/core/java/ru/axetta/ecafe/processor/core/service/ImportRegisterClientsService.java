@@ -207,17 +207,11 @@ public class ImportRegisterClientsService {
     }
 
     public void run() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode()) {
+        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             return;
         }
-
-        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
-
-        if (!isOn()) {
-            return;
-        }
-
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
+        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
         List<List<Org>> orgsPack = buildOrgsPack(orgs, MAX_THREADS);
 
         log("Start import register with " + MAX_THREADS + " threads", null);
@@ -287,10 +281,7 @@ public class ImportRegisterClientsService {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Session session = (Session) em.getDelegate();
-        Query q = session.createSQLQuery("delete from cf_registrychange_guardians where createdDate<:minCreateDate");
-        q.setLong("minCreateDate", cal.getTimeInMillis());
-        q.executeUpdate();
-        q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
+        Query q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
         q.setLong("minCreateDate", cal.getTimeInMillis());
         q.executeUpdate();
         q = session.createSQLQuery("delete from cf_registrychange_errors where createDate<:minCreateDate");
@@ -435,6 +426,16 @@ public class ImportRegisterClientsService {
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
                     cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
 
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
+                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
+
+            if (!pupil.getGuardianInfoList().isEmpty()) {
+                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
+            }
+
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.AGE_TYPE_GROUP, pupil.getAgeTypeGroup(),
+                    cl == null ? null : cl.getAgeTypeGroup() == null ? null : cl.getAgeTypeGroup(), updateClient);
+
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
                         cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
@@ -475,12 +476,6 @@ public class ImportRegisterClientsService {
                 continue;
             }
 
-            doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
-                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
-
-            if (!pupil.getGuardianInfoList().isEmpty()) {
-                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
-            }
 
             try {
                 //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
@@ -614,6 +609,8 @@ public class ImportRegisterClientsService {
         String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
         String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, clientGuid, "Количество представителей");
         List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
+        String ageTypeGroup = trim(fieldConfig.getValue(ClientManager.FieldId.AGE_TYPE_GROUP), 128, clientGuid, "Тип возрастной группы");
+
         RegistryChange ch = new RegistryChange();
         ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
@@ -627,6 +624,7 @@ public class ImportRegisterClientsService {
         ch.setApplied(false);
         ch.setType(type);
         ch.setNotificationId(notificationId);
+        ch.setAgeTypeGroup(ageTypeGroup);
 
         if (clientGender != null) {
             if (clientGender.equals("Женский")) {
@@ -678,6 +676,7 @@ public class ImportRegisterClientsService {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
             ch.setBenefitOnAdmissionFrom(currentClient.getBenefitOnAdmission());
+            ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
@@ -695,6 +694,7 @@ public class ImportRegisterClientsService {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
             ch.setBenefitOnAdmissionFrom(currentClient.getBenefitOnAdmission());
+            ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         sess.save(ch);
     }
@@ -745,6 +745,7 @@ public class ImportRegisterClientsService {
             ch.setBirthDate(currentClient.getBirthDate().getTime());
         }
         ch.setBenefitOnAdmission(currentClient.getBenefitOnAdmission());
+        ch.setAgeTypeGroup(currentClient.getAgeTypeGroup());
         sess.save(ch);
     }
 
@@ -1042,17 +1043,13 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
-                    if (change.getGender() != null) {
-                        if (change.getGender().equals(0))
-                            createConfig.setValue(ClientManager.FieldId.GENDER, "f");
-                        if (change.getGender().equals(1))
-                            createConfig.setValue(ClientManager.FieldId.GENDER, "m");
-                    }
+                    createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                     createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
+                    createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
                     id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                             (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
                     change.setIdOfClient(id);
@@ -1073,7 +1070,8 @@ public class ImportRegisterClientsService {
                     addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(), change.getGroupName());
+                            .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(),
+                                    change.getGroupName());
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
                         ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
@@ -1113,6 +1111,7 @@ public class ImportRegisterClientsService {
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
                     modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
+                    modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
                     if (dbClient.getOrg().getIdOfOrg() != change.getIdOfOrg()) {
                         addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
                         dbClient.setOrg(newOrg1);
@@ -1380,6 +1379,7 @@ public class ImportRegisterClientsService {
         public String recordState;
         public String gender;
         public String guardiansCount;
+        public String ageTypeGroup;
 
         public List<GuardianInfo> guardianInfoList = new ArrayList<GuardianInfo>();
 
@@ -1491,6 +1491,14 @@ public class ImportRegisterClientsService {
             this.guardiansCount = guardiansCount;
         }
 
+        public String getAgeTypeGroup() {
+            return ageTypeGroup;
+        }
+
+        public void setAgeTypeGroup(String ageTypeGroup) {
+            this.ageTypeGroup = ageTypeGroup;
+        }
+
         public void copyFrom(ExpandedPupilInfo pi) {
             this.familyName = pi.familyName;
             this.firstName = pi.firstName;
@@ -1507,6 +1515,7 @@ public class ImportRegisterClientsService {
             this.enterGroup = pi.enterGroup;
             this.enterDate = pi.enterDate;
             this.leaveDate = pi.leaveDate;
+            this.ageTypeGroup = pi.ageTypeGroup;
         }
     }
 

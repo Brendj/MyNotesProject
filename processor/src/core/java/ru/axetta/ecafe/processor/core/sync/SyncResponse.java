@@ -352,6 +352,7 @@ public class SyncResponse {
             private final Integer gender;
             private final Date birthDate;
             private final String benefitOnAdmission;
+            private final String ageTypeGroup;
 
 
             public Item(Client client, int clientType) {
@@ -386,6 +387,7 @@ public class SyncResponse {
                 this.gender = client.getGender();
                 this.birthDate = client.getBirthDate();
                 this.benefitOnAdmission = client.getBenefitOnAdmission();
+                this.ageTypeGroup = client.getAgeTypeGroup();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -473,6 +475,10 @@ public class SyncResponse {
                 return gender;
             }
 
+            public String getAgeTypeGroup() {
+                return ageTypeGroup;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("OrgOwner", Long.toString(this.orgOwner));
@@ -522,6 +528,9 @@ public class SyncResponse {
                 }
                 if (this.benefitOnAdmission != null) {
                     element.setAttribute("BenefitOnAdmission", this.benefitOnAdmission);
+                }
+                if (this.ageTypeGroup != null) {
+                    element.setAttribute("AgeTypeGroup", this.ageTypeGroup);
                 }
                 return element;
             }

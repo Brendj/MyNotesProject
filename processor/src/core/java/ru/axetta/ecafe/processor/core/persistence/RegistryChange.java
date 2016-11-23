@@ -46,6 +46,10 @@ public class RegistryChange {
     protected Integer guardiansCount;
     protected Set<RegistryChangeGuardians> registryChangeGuardiansSet;
 
+    protected String ageTypeGroup;
+
+    protected String ageTypeGroupFrom;
+
     public static final int FULL_COMPARISON = 1;
     public static final int CHANGES_UPDATE = 2;
 
@@ -55,7 +59,7 @@ public class RegistryChange {
     public RegistryChange(Long idOfOrg, Long idOfMigrateOrgTo, Long idOfMigrateOrgFrom, Long createDate,
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
-            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId, Integer gender, Long birthDate, String benefitOnAdmission, Integer genderFrom, Long birthDateFrom, String benefitOnAdmissionFrom) {
+            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId, Integer gender, Long birthDate, String benefitOnAdmission, Integer genderFrom, Long birthDateFrom, String benefitOnAdmissionFrom, String ageTypeGroup, String ageTypeGroupFrom) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -82,6 +86,8 @@ public class RegistryChange {
         this.genderFrom = genderFrom;
         this.birthDateFrom = birthDateFrom;
         this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
+        this.ageTypeGroup = ageTypeGroup;
+        this.ageTypeGroupFrom = ageTypeGroupFrom;
     }
 
     public Long getIdOfOrg() {
@@ -306,5 +312,21 @@ public class RegistryChange {
 
     public void setRegistryChangeGuardiansSet(Set<RegistryChangeGuardians> registryChangeGuardiansSet) {
         this.registryChangeGuardiansSet = registryChangeGuardiansSet;
+    }
+
+    public String getAgeTypeGroup() {
+        return ageTypeGroup;
+    }
+
+    public void setAgeTypeGroup(String ageTypeGroup) {
+        this.ageTypeGroup = ageTypeGroup;
+    }
+
+    public String getAgeTypeGroupFrom() {
+        return ageTypeGroupFrom;
+    }
+
+    public void setAgeTypeGroupFrom(String ageTypeGroupFrom) {
+        this.ageTypeGroupFrom = ageTypeGroupFrom;
     }
 }

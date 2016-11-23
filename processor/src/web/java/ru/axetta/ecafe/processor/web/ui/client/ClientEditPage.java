@@ -252,6 +252,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Integer gender;
     private Date birthDate;
     private String benefitOnAdmission;
+    private String ageTypeGroup;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -550,6 +551,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getAgeTypeGroup() {
+        return ageTypeGroup;
+    }
+
+    public void setAgeTypeGroup(String ageTypeGroup) {
+        this.ageTypeGroup = ageTypeGroup;
     }
 
     public String getBenefitOnAdmission() {
@@ -1049,6 +1058,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
         client.setBenefitOnAdmission(this.benefitOnAdmission);
+        client.setAgeTypeGroup(this.ageTypeGroup);
 
         persistenceSession.update(client);
 
@@ -1171,6 +1181,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
         this.benefitOnAdmission = client.getBenefitOnAdmission();
+        this.ageTypeGroup = client.getAgeTypeGroup();
         removeListGuardianItems.clear();
         removeListWardItems.clear();
     }

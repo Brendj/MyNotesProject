@@ -123,6 +123,8 @@ public class Client {
 
     private String guardiansCount;
 
+    private String ageTypeGroup;
+
     protected Client() {
         // For Hibernate only
     }
@@ -950,6 +952,14 @@ public class Client {
 
     public void setGuardiansCount(String guardiansCount) {
         this.guardiansCount = guardiansCount;
+    }
+
+    public String getAgeTypeGroup() {
+        return ageTypeGroup;
+    }
+
+    public void setAgeTypeGroup(String ageTypeGroup) {
+        this.ageTypeGroup = ageTypeGroup;
     }
 
     @Override

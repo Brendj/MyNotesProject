@@ -578,6 +578,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         protected String benefitOnAdmissionFrom;
         protected String guardiansCount;
 
+        protected String ageTypeGroup;
+
+        protected String ageTypeGroupFrom;
+
         public WebRegistryChangeItem() {
             super();
             selected = false;
@@ -649,6 +653,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
             benefitOnAdmissionFrom = parent.getList().get(23).getFieldValueParam();
             guardiansCount = parent.getList().get(24).getFieldValueParam();
+
+            ageTypeGroup = parent.getList().get(25).getFieldValueParam();
+            ageTypeGroupFrom = parent.getList().get(26).getFieldValueParam();
         }
 
         public Long getIdOfMigrateOrgFrom() {
@@ -831,6 +838,22 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
         public void setGuardiansCount(String guardiansCount) {
             this.guardiansCount = guardiansCount;
+        }
+
+        public String getAgeTypeGroup() {
+            return ageTypeGroup;
+        }
+
+        public void setAgeTypeGroup(String ageTypeGroup) {
+            this.ageTypeGroup = ageTypeGroup;
+        }
+
+        public String getAgeTypeGroupFrom() {
+            return ageTypeGroupFrom;
+        }
+
+        public void setAgeTypeGroupFrom(String ageTypeGroupFrom) {
+            this.ageTypeGroupFrom = ageTypeGroupFrom;
         }
     }
 

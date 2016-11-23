@@ -296,6 +296,16 @@ public class ClientMskNSIService extends MskNSIService {
                     }
                 }
 
+                if (attr.getName().equals("Класс")) {
+                    for (GroupValue groupValue : attr.getGroupValue()) {
+                        for (Attribute attr1 : groupValue.getAttribute()) {
+                            if (attr1.getName().equals("Тип возрастной группы")) {
+                                pupilInfo.ageTypeGroup = attr1.getValue().get(0).getValue();
+                            }
+                        }
+                    }
+                }
+
                 pupilInfo.guardiansCount = String.valueOf(pupilInfo.getGuardianInfoList().size());
             }
 

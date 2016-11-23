@@ -199,6 +199,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Integer gender;
     private Date birthDate;
     private String benefitOnAdmission;
+    private String ageTypeGroup;
 
 
     public String getFax() {
@@ -252,6 +253,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setBenefitOnAdmission(String benefitOnAdmission) {
         this.benefitOnAdmission = benefitOnAdmission;
+    }
+
+    public String getAgeTypeGroup() {
+        return ageTypeGroup;
+    }
+
+    public void setAgeTypeGroup(String ageTypeGroup) {
+        this.ageTypeGroup = ageTypeGroup;
     }
 
     public String getSan() {
@@ -548,6 +557,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setBirthDate(this.birthDate);
         client.setGender(this.gender);
         client.setBenefitOnAdmission(this.benefitOnAdmission);
+        client.setAgeTypeGroup(this.ageTypeGroup);
         if (this.externalId==null || this.externalId==0) client.setExternalId(null);
         else client.setExternalId(this.externalId);
         if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);

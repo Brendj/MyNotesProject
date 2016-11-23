@@ -30,3 +30,10 @@ CREATE INDEX cf_discountchangehistory_idoforg_idx ON cf_discountchangehistory US
 CREATE INDEX cf_registrychange_guardians_createddate_idx ON cf_registrychange_guardians USING btree (createddate);
 
 CREATE INDEX cf_registrychange_guardians_idofregistrychange_idx ON cf_registrychange_guardians USING btree (idofregistrychange);
+
+-- Таблица разногласий добавили 1 поле
+ALTER TABLE CF_RegistryChange ADD COLUMN ageTypeGroup character varying (128);
+
+ALTER TABLE CF_Clients ADD COLUMN ageTypeGroup character varying (128);
+
+ALTER TABLE CF_RegistryChange ADD COLUMN ageTypeGroupFrom character varying (128);

@@ -90,6 +90,8 @@
         </a4j:commandButton>
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.ageTypeGroup}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.clientEditPage.balance}" maxlength="20"
                  converter="copeckSumConverter" styleClass="input-text" />

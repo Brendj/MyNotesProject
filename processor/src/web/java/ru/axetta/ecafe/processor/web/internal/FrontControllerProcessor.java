@@ -168,6 +168,12 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r24 = new RegistryChangeItemParam("guardiansCount", c.getGuardiansCount() == null ? "" : c.getGuardiansCount().toString());
                 registryChangeItemParams.add(r24);
 
+                RegistryChangeItemParam r25 = new RegistryChangeItemParam("ageTypeGroup", c.getAgeTypeGroup() == null ? "" : c.getAgeTypeGroup());
+                registryChangeItemParams.add(r25);
+
+                RegistryChangeItemParam r26 = new RegistryChangeItemParam("ageTypeGroupFrom", c.getAgeTypeGroupFrom() == null ? "" : c.getAgeTypeGroupFrom());
+                registryChangeItemParams.add(r26);
+
                 registryChangeItemV2.setList(registryChangeItemParams);
 
                 itemParams.add(registryChangeItemV2);

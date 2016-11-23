@@ -58,6 +58,9 @@
     <h:inputText value="#{mainPage.clientViewPage.clientGroupName}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Подгруппа" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.middleGroup}" readonly="true" styleClass="input-text" />
+    <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.ageTypeGroup}" maxlength="128" styleClass="input-text"
+                 readonly="true" />
     <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.balance}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />

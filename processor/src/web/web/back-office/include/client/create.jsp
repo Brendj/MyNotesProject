@@ -128,6 +128,8 @@
     <h:outputText escape="true" value="Дата рождения" styleClass="output-text" />
     <rich:calendar value="#{mainPage.clientCreatePage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" />
+    <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientCreatePage.ageTypeGroup}" maxlength="128" styleClass="input-text" />
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">

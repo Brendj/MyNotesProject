@@ -76,6 +76,8 @@
         <property name="birthDate" column="BirthDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
         <property name="benefitOnAdmission" column="BenefitOnAdmission" type="string" length="3000"/>
 
+        <property name="ageTypeGroup" column="AgeTypeGroup" type="string" length="128"/>
+
         <property name="limit" column="Limits" type="long" not-null="true"/>
         <property name="expenditureLimit" column="ExpenditureLimit" type="long" not-null="true"/>
         <property name="categoriesDiscounts" column="CategoriesDiscounts" type="string" not-null="true"/>

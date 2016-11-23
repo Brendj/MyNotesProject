@@ -123,6 +123,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Integer gender;
     private Date birthDate;
     private String benefitOnAdmission;
+    private String ageTypeGroup;
     private String photoURL;
 
 
@@ -331,6 +332,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.benefitOnAdmission = benefitOnAdmission;
     }
 
+    public String getAgeTypeGroup() {
+        return ageTypeGroup;
+    }
+
+    public void setAgeTypeGroup(String ageTypeGroup) {
+        this.ageTypeGroup = ageTypeGroup;
+    }
+
     public Date getBirthDate() {
         return birthDate;
     }
@@ -406,6 +415,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
         this.benefitOnAdmission = client.getBenefitOnAdmission();
+        this.ageTypeGroup = client.getAgeTypeGroup();
 
         // опекуны
         // (Kadyrov D) 23.12.2011
