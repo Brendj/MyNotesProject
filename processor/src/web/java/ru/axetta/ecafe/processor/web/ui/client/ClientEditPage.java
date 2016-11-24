@@ -22,8 +22,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -852,13 +850,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.contractPerson.copyTo(contractPerson);
         persistenceSession.update(contractPerson);
 
-        Set<Long> idOfFriendlyOrg = DAOUtils.getIdOfFriendlyOrg(persistenceSession, client.getOrg().getIdOfOrg());
-        Org org = null;
-        if (idOfFriendlyOrg.contains(this.org.getIdOfOrg())) {
-            org = (Org) persistenceSession.load(Org.class, client.getOrg().getIdOfOrg());
-        } else {
-            org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
-        }
+        Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
         if (isReplaceOrg) {
             clientMigration = new ClientMigration(client.getOrg());
