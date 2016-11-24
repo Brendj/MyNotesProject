@@ -27,7 +27,11 @@
                 <h:outputText escape="true" value="Наименование организации" styleClass="output-text" />
 
                 <h:inputText value="#{mainPage.orgListPage.orgFilter.officialName}" maxlength="64"
-                             styleClass="input-text" />
+                             styleClass="input-text" size="50" />
+
+                <h:outputText escape="true" value="Guid организации" styleClass="output-text" />
+                <h:inputText value="#{mainPage.orgListPage.orgFilter.guid}" maxlength="64"
+                         styleClass="input-text" size="50" />
 
                 <h:outputText escape="true" value="Тэг" styleClass="output-text" />
                 <h:inputText value="#{mainPage.orgListPage.orgFilter.tag}" maxlength="64"

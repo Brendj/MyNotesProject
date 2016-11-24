@@ -36,6 +36,7 @@ public class OrgFilter {
     private String city;
     private String district;
     private String location;
+    private String guid;
 
 
     /**
@@ -87,6 +88,9 @@ public class OrgFilter {
         if (StringUtils.isNotEmpty(location)) {
             criteria.add(Restrictions.like("location", location, MatchMode.ANYWHERE).ignoreCase());
         }
+        if (StringUtils.isNotEmpty(guid)) {
+            criteria.add(Restrictions.like("guid", guid, MatchMode.ANYWHERE).ignoreCase());
+        }
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
                 .add(Projections.property("shortName"),"shortName")
@@ -130,6 +134,7 @@ public class OrgFilter {
         this.officialName = null;
         this.idOfOrg = null;
         this.tag = null;
+        this.guid = null;
     }
 
     public String getOfficialName() {
@@ -146,6 +151,14 @@ public class OrgFilter {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getCity() {
