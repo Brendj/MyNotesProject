@@ -100,6 +100,7 @@ public class OrgFilter {
                 .add(Projections.property("tag"),"tag")
                 .add(Projections.property("city"),"city")
                 .add(Projections.property("district"),"district")
+                .add(Projections.property("shortAddress"),"shortAddress")
                 .add(Projections.property("location"),"location")
         );
 

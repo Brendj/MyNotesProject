@@ -86,6 +86,9 @@
                     <h:outputText value="Район" />
                 </rich:column>
                 <rich:column rowspan="2" headerClass="column-header">
+                    <h:outputText value="Адрес" />
+                </rich:column>
+                <rich:column rowspan="2" headerClass="column-header">
                     <h:outputText value="Локация" />
                 </rich:column>
                 <rich:column rowspan="2" headerClass="column-header">
@@ -138,6 +141,9 @@
         </rich:column>
         <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.district}" styleClass="output-text" />
+        </rich:column>
+        <rich:column styleClass="left-aligned-column">
+            <h:outputText escape="true" value="#{item.shortAddress}" styleClass="output-text" />
         </rich:column>
         <rich:column styleClass="left-aligned-column">
             <h:outputText escape="true" value="#{item.location}" styleClass="output-text" />

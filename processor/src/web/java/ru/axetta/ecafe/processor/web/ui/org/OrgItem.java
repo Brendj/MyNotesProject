@@ -23,6 +23,7 @@ public class OrgItem {
     private String tag;
     private String city;
     private String district;
+    private String shortAddress;
     private String location;
 
     public Long getIdOfOrg() {
@@ -103,6 +104,14 @@ public class OrgItem {
 
     public void setDistrict(String district) {
         this.district = district;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 
     public String getLocation() {
