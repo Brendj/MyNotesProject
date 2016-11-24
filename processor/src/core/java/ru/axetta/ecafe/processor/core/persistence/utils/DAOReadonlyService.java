@@ -349,6 +349,7 @@ public class DAOReadonlyService {
                     + "and od.MenuType <= :complexMax "
                     + "and o.createdDate >= :taloonDate "
                     + "and o.createdDate < :dateEnd "
+                    + "and o.state = :state "
                     + goodsParam);
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonName", taloonName);
@@ -356,6 +357,7 @@ public class DAOReadonlyService {
             query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);
             query.setParameter("taloonDate", taloonDate.getTime());
             query.setParameter("dateEnd", dateEnd.getTime());
+            query.setParameter("state", Order.STATE_COMMITED);
             if(StringUtils.isNotEmpty(goodsGuid)) {
                 query.setParameter("goodsGuid", goodsGuid);
             }
