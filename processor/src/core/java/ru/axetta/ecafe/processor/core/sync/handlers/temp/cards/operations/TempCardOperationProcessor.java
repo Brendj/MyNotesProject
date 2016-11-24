@@ -104,6 +104,10 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
         if(idOfOrg == null) {
             idOfOrg = idOfOrgSync;
         }
+        if(cardTemp.getOrg() == null) {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            cardTemp.setOrg(org);
+        }
 
         Visitor visitor = DAOUtils.existVisitor(session, tempCardOperation.getIdOfVisitor());
         if(visitor==null){
@@ -111,7 +115,7 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
             return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),5,message);
         } else {
             CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), idOfOrg);
-            if(cardTempOperation==null){
+            if(cardTempOperation == null) {
                 cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp, CardOperationStation
                         .values()[tempCardOperation.getOperationType()], tempCardOperation.getOperationDate(),visitor);
                 cardTemp.setVisitor(visitor);
