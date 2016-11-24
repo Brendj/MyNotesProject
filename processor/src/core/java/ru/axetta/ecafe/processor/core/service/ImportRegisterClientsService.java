@@ -943,8 +943,9 @@ public class ImportRegisterClientsService {
                         fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
                                 String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
                         if (performChanges) {
+                            String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                             ClientManager.registerClientTransactionFree(org.getIdOfOrg(),
-                                    (ClientManager.ClientFieldConfig) fieldConfig, true, session);
+                                    (ClientManager.ClientFieldConfig) fieldConfig, true, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
                         }
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
@@ -1040,6 +1041,7 @@ public class ImportRegisterClientsService {
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
+                    String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
                     String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
                     FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
@@ -1049,7 +1051,12 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
-                    createConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
+                    if (change.getGender() != null) {
+                        if (change.getGender().equals(0))
+                            createConfig.setValue(ClientManager.FieldId.GENDER, "f");
+                        if (change.getGender().equals(1))
+                            createConfig.setValue(ClientManager.FieldId.GENDER, "m");
+                    }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                     createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
@@ -1057,7 +1064,7 @@ public class ImportRegisterClientsService {
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
                     id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
-                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
+                            (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
                     change.setIdOfClient(id);
                     break;
                 case DELETE_OPERATION:
@@ -1069,6 +1076,23 @@ public class ImportRegisterClientsService {
                                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     }
                     dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+
+                    String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+                    String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
+                    if (deleteCommentsAdds != null && deleteCommentsAdds.length() > 0) {
+                        String comments = dbClient.getRemarks();
+                        if (comments==null) comments="";
+                        if (comments.indexOf("{%") > -1) {
+                            comments = comments.substring(0, comments.indexOf("{%")) + comments
+                                    .substring(comments.indexOf("%}") + 1);
+                        }
+                        comments += deleteCommentsAdds;
+                        if (comments.length() >= 1024) {
+                            comments = comments.replaceAll(MskNSIService.REPLACEMENT_REGEXP, "");
+                        }
+
+                        dbClient.setRemarks(comments);
+                    }
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:

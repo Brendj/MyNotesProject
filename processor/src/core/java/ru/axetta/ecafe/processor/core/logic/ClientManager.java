@@ -615,13 +615,13 @@ public class ClientManager {
     }
 
     public static long registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
-            boolean checkFullNameUnique, Session persistenceSession) throws Exception {
-        return registerClientTransactionFree (idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession, null);
+            boolean checkFullNameUnique, Session persistenceSession, String registerCommentsAdds) throws Exception {
+        return registerClientTransactionFree (idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession, null, registerCommentsAdds);
     }
 
     public static long registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
                                                       boolean checkFullNameUnique, Session persistenceSession,
-                                                    Transaction persistenceTransaction) throws Exception {
+                                                    Transaction persistenceTransaction, String registerCommentsAdds) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         try {
@@ -722,7 +722,7 @@ public class ClientManager {
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 717, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
+            logger.info("class : ClientManager, method : registerClientTransactionFree line : 724, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
             String fax = fieldConfig.getValue(FieldId.FAX);
             if (mobilePhone != null) {
@@ -738,7 +738,7 @@ public class ClientManager {
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 734, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
+            logger.info("class : ClientManager, method : registerClientTransactionFree line : 740, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
             client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
@@ -824,6 +824,10 @@ public class ClientManager {
 
             if (fieldConfig.getValue(FieldId.SSOID) != null) {
                 client.setSsoid(fieldConfig.getValue(FieldId.SSOID));
+            }
+
+            if (registerCommentsAdds != null && registerCommentsAdds.length() > 0) {
+                client.setRemarks(registerCommentsAdds);
             }
 
             logger.debug("save client");
@@ -1012,9 +1016,11 @@ public class ClientManager {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+
             logger.debug("registerClientTransactionFree");
             long idOfClient = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique,
-                    persistenceSession, persistenceTransaction);
+                    persistenceSession, persistenceTransaction, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
 
             persistenceTransaction.commit();
             persistenceTransaction = null;

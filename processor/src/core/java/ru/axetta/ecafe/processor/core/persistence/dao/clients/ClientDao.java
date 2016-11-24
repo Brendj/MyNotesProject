@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
@@ -34,7 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -214,8 +217,11 @@ public class ClientDao extends WritableJpaDao {
         if (clientInfo.getSsoid() != null) {
             createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
         }
+
+        String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+
         Long id = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
-                (ClientManager.ClientFieldConfig) createConfig, false, session);
+                (ClientManager.ClientFieldConfig) createConfig, false, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
 
         //Создаем опекунскую связь
         Long version = generateNewClientGuardianVersion(session);
