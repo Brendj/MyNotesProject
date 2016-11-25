@@ -646,10 +646,9 @@ public class DAOUtils {
         return cls;
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Long> findFriendlyOrgIds(Session session, Long orgId) {
         Query query = session
-                .createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg")
+                .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg=:idOfOrg")
                 .setParameter("idOfOrg", orgId);
         return (List<Long>) query.list();
     }

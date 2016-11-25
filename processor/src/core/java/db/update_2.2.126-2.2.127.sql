@@ -31,6 +31,9 @@ CREATE INDEX cf_registrychange_guardians_createddate_idx ON cf_registrychange_gu
 
 CREATE INDEX cf_registrychange_guardians_idofregistrychange_idx ON cf_registrychange_guardians USING btree (idofregistrychange);
 
+--для запроса в быстрой синхре по построению секции AccRegistryUpdate
+CREATE INDEX cf_orders_transaction_idx ON cf_orders USING btree (idoftransaction);
+
 -- Таблица разногласий добавили 1 поле
 ALTER TABLE CF_RegistryChange ADD COLUMN ageTypeGroup character varying (128);
 

@@ -59,7 +59,7 @@ public class DAOReadonlyService {
 
     public List<AccountTransactionExtended> getAccountTransactionsForOrgSinceTimeV2(Org org,
             Date fromDateTime, Date toDateTime) throws Exception {
-        String str_query = "select t.idOfTransaction, t.source, t.transactionDate, " +
+        /*String str_query = "select t.idOfTransaction, t.source, t.transactionDate, " +
                 "t.sourceType, t.transactionSum,  " +
                 "coalesce(t.transactionSubBalance1Sum, 0) as transactionSubBalance1Sum, coalesce(query.complexsum, 0) as complexsum, " +
                 "coalesce(query.discountsum, 0) as discountsum, coalesce(query.orderType, 0) as ordertype, t.idOfClient " +
@@ -72,13 +72,21 @@ public class DAOReadonlyService {
                 "group by oo.orderType, oo.idOfTransaction) as query " +
                 "on t.idOfTransaction = query.idOfTransaction " +
                 "where t.idOfOrg in (:orgs) AND t.transactionDate > :trans_begDate AND t.transactionDate <= :trans_endDate " +
+                "order by t.idOfClient";*/
+        String str_query = "select t.idOfTransaction, t.source, t.transactionDate, " +
+                "t.sourceType, t.transactionSum,  " +
+                "coalesce(t.transactionSubBalance1Sum, 0) as transactionSubBalance1Sum, coalesce(sum(dd.qty * dd.rprice), 0) as complexsum, " +
+                "coalesce(sum(dd.socDiscount), 0) as discountsum, coalesce(oo.orderType, 0) as ordertype, t.idOfClient " +
+                "from cf_transactions t left join cf_orders oo on t.idOfTransaction=oo.IdOfTransaction " +
+                "left join cf_orderdetails dd on oo.idOfOrder=dd.idOfOrder and oo.idOfOrg = dd.idOfOrg and dd.menuType between :menuMin and :menuMax " +
+                "where t.idOfOrg in (:orgs) AND t.transactionDate > :trans_begDate AND t.transactionDate <= :trans_endDate " +
+                "group by t.idOfTransaction, t.source, t.transactionDate, t.sourceType, t.transactionSum, t.transactionSubBalance1Sum, oo.orderType, t.idOfClient " +
                 "order by t.idOfClient";
         Session session = entityManager.unwrap(Session.class);
-        //org = (Org) session.merge(org);
         SQLQuery q = session.createSQLQuery(str_query);
         // заказы будем искать за последние 24 часа от времени запроса
-        q.setParameter("orders_begDate", CalendarUtils.addDays(toDateTime, -1).getTime());
-        q.setParameter("orders_endDate",toDateTime.getTime());
+        //q.setParameter("orders_begDate", CalendarUtils.addDays(toDateTime, -1).getTime());
+        //q.setParameter("orders_endDate",toDateTime.getTime());
         // транзакции будем искать строго от запрашиваемого времени
         q.setParameter("trans_begDate", fromDateTime.getTime());
         q.setParameter("trans_endDate", toDateTime.getTime());
