@@ -166,6 +166,12 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
+                                <h:outputText value="Тип возрастной группы" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.ageTypeGroup}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
                                 <h:outputText value="Перевод из школы" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.migrateFromOrgName}" />
@@ -193,12 +199,6 @@
                                 <h:outputText value="Предыдущий тип возрастной группы" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.ageTypeGroupFrom}" />
-                        </rich:column>
-                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
-                            <f:facet name="header">
-                                <h:outputText value="Тип возрастной группы" />
-                            </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.ageTypeGroup}" />
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
