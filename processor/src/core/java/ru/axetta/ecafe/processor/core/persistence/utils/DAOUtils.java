@@ -650,7 +650,11 @@ public class DAOUtils {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg=:idOfOrg")
                 .setParameter("idOfOrg", orgId);
-        return (List<Long>) query.list();
+        List<Long> result = new ArrayList<Long>();
+        for (Object o: query.list()) {
+            result.add(((BigInteger)o).longValue());
+        }
+        return result;
     }
     public static List<Org> findFriendlyOrgs(EntityManager em, Org organization) throws Exception {
         List<Long> orgIds = findFriendlyOrgIds((Session) em.getDelegate(), organization.getIdOfOrg());
