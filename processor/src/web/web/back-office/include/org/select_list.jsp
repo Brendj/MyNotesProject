@@ -46,7 +46,7 @@
         <a4j:jsFunction name="deselectAll" action="#{mainPage.clearOrgListSelectedItemsList}"
                         reRender="modalOrgListSelectorForm" />
 
-        <table class="borderless-grid" width="750">
+        <table class="borderless-grid" width="850">
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid columns="3" styleClass="borderless-grid">
@@ -110,6 +110,8 @@
                                                       itemDisabled="#{mainPage.orgListSelectPage.secondarySchoolFilterDisabled}" />
                                         <f:selectItem itemValue="2" itemLabel="Только поставщики"
                                                       itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}" />
+                                        <f:selectItem itemValue="6" itemLabel="Показать все организации"
+                                                      itemDisabled="#{mainPage.orgListSelectPage.allOrgsFilterDisabled}" />
                                     </h:selectOneRadio>
                                 </h:panelGrid>
                             </h:panelGrid>

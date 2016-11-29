@@ -54,6 +54,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
            3 - доступны только фильтры по ОУ, ДОУ, СОШ и по поставщикам
            4 - доступен только фильтр по ДОУ
            5 - доступен только фильтр по СОШ
+           6 - доступны все фильтры для всех поставщиков
         */
     protected int filterMode = 0;
     protected boolean allOrgFilterDisabled = false;
@@ -62,6 +63,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected boolean secondarySchoolFilterDisabled = false;
     protected boolean supplierFilterDisabled = false;
     protected boolean districtFilterDisabled = false;
+    protected boolean allOrgsFilterDisabled = false;
     protected List<OrgShortItem> items = Collections.emptyList();
     protected Long idOfContragent;
     protected Long idOfContract;
@@ -129,7 +131,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             }
             if (idOfSourceOrgSet.size() > 0) {
                 Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
-                if (supplierFilter == 1 || supplierFilter == 4 || supplierFilter == 5 || supplierFilter == 2) {
+                if (supplierFilter == 1 || supplierFilter == 4 || supplierFilter == 5 || supplierFilter == 2 || supplierFilter == 6) {
                     criterion = Restrictions.not(criterion);
                 }
                 if (supplierFilter != 2) {
@@ -185,6 +187,14 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.districtFilterDisabled = districtFilterDisabled;
     }
 
+    public boolean isAllOrgsFilterDisabled() {
+        return allOrgsFilterDisabled;
+    }
+
+    public void setAllOrgsFilterDisabled(boolean allOrgsFilterDisabled) {
+        this.allOrgsFilterDisabled = allOrgsFilterDisabled;
+    }
+
     public String getFilter() {
         return filter;
     }
@@ -225,27 +235,29 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.filterMode = filterMode;
         switch (filterMode) {
             case 1:
-                setOrgFilterModeParameters(true, false, true, true, true, false);
+                setOrgFilterModeParameters(true, false, true, true, true, false, false);
                 setSupplierFilter(1);
                 break;
             case 2:
-                setOrgFilterModeParameters(true, true, false, true, true, true);
+                setOrgFilterModeParameters(true, true, false, true, true, true, false);
                 setSupplierFilter(2);
                 break;
             case 3:
-                setOrgFilterModeParameters(true, false, false, false, false, false);
+                setOrgFilterModeParameters(true, false, false, false, false, false, false);
                 setSupplierFilter(1);
                 break;
             case 4:
-                setOrgFilterModeParameters(true, true, true, false, true, false);
+                setOrgFilterModeParameters(true, true, true, false, true, false, false);
                 setSupplierFilter(4);
                 break;
             case 5:
-                setOrgFilterModeParameters(true, true, true, true, false, false);
+                setOrgFilterModeParameters(true, true, true, true, false, false, false);
                 setSupplierFilter(5);
                 break;
+            case 6:
+                setOrgFilterModeParameters(false, false, false, false, false, false, false);
             default:
-                setOrgFilterModeParameters(false, false, false, false, false, false);
+                setOrgFilterModeParameters(false, false, false, false, false, false, false);
                 setSupplierFilter(0);
                 break;
         }
@@ -293,13 +305,14 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     protected void setOrgFilterModeParameters(boolean allOrgFilterDisabled, boolean schoolFilterDisabled,
             boolean supplierFilterDisabled, boolean primarySchoolFilterDisabled, boolean secondarySchoolFilterDisabled,
-            boolean districtFilterDisabled) {
+            boolean districtFilterDisabled, boolean allOrgsFilterDisabled) {
         this.allOrgFilterDisabled = allOrgFilterDisabled;
         this.schoolFilterDisabled = schoolFilterDisabled;
         this.supplierFilterDisabled = supplierFilterDisabled;
         this.primarySchoolFilterDisabled = primarySchoolFilterDisabled;
         this.secondarySchoolFilterDisabled = secondarySchoolFilterDisabled;
         this.districtFilterDisabled = districtFilterDisabled;
+        this.allOrgsFilterDisabled = allOrgsFilterDisabled;
     }
 
     public List<OrgShortItem> getItems() {
