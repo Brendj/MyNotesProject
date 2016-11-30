@@ -766,7 +766,7 @@
     <%--@elvariable id="supportSMSPage" type="ru.axetta.ecafe.processor.web.ui.service.SupportSMSPage"--%>
     <rich:panelMenuItem id="supportSMSMenuItem" binding="#{supportSMSPage.mainMenuComponent}" label="Отправка SMS"
                         action="#{supportSMSPage.show}" reRender="workspaceForm"
-                        rendered="#{mainPage.eligibleToServiceSupport}" />
+                        rendered="#{mainPage.eligibleToServiceSupport && !mainPage.SMSServiceEMP}" />
 
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"

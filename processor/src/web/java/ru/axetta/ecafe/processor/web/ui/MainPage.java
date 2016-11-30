@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
@@ -8595,6 +8596,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToServiceSupport() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_SERVICE_SUPPORT);
+    }
+
+    public boolean isSMSServiceEMP() {
+        return RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
     }
 
     public boolean isEligibleToServiceAdmin() throws Exception {
