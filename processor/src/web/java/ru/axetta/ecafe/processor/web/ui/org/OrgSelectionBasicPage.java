@@ -108,8 +108,10 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceMenuOrgList));
         }
 
-        if (!CollectionUtils.isEmpty(idOfSupplierList)) {
-            orgCriteria.add(Restrictions.in("defaultSupplier.idOfContragent", idOfSupplierList));
+        if (supplierFilter != 6) {
+            if (!CollectionUtils.isEmpty(idOfSupplierList)) {
+                orgCriteria.add(Restrictions.in("defaultSupplier.idOfContragent", idOfSupplierList));
+            }
         }
 
         if (idOfContract != null) {
@@ -118,7 +120,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             orgCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
         }
 
-        if (supplierFilter != 0) {
+        if (supplierFilter != 0 && supplierFilter != 6) {
             Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
             List menuExchangeRuleList = destMenuExchangeCriteria.list();
             HashSet<Long> idOfSourceOrgSet = new HashSet<Long>();
@@ -131,7 +133,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             }
             if (idOfSourceOrgSet.size() > 0) {
                 Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
-                if (supplierFilter == 1 || supplierFilter == 4 || supplierFilter == 5 || supplierFilter == 2 || supplierFilter == 6) {
+                if (supplierFilter == 1 || supplierFilter == 4 || supplierFilter == 5 || supplierFilter == 2) {
                     criterion = Restrictions.not(criterion);
                 }
                 if (supplierFilter != 2) {
