@@ -625,8 +625,8 @@ public class Processor implements SyncProcessor {
 
         try {
             if (request.getReestrTaloonApproval() != null) {
-                reestrTaloonApprovalData = processReestrTaloonApprovalData(request.getReestrTaloonApproval());
                 resReestrTaloonApproval = processReestrTaloonApproval(request.getReestrTaloonApproval());
+                reestrTaloonApprovalData = processReestrTaloonApprovalData(request.getReestrTaloonApproval());
             }
         } catch (Exception e) {
             String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
@@ -970,13 +970,13 @@ public class Processor implements SyncProcessor {
         try {
             ReestrTaloonApproval reestrTaloonApprovalRequest = request.getReestrTaloonApproval();
             if (reestrTaloonApprovalRequest != null) {
-                ReestrTaloonApprovalData reestrTaloonApprovalData = processReestrTaloonApprovalData(
-                        reestrTaloonApprovalRequest);
-                addToResponseSections(reestrTaloonApprovalData, responseSections);
-
                 ResReestrTaloonApproval resReestrTaloonApproval = processReestrTaloonApproval(
                         reestrTaloonApprovalRequest);
                 addToResponseSections(resReestrTaloonApproval, responseSections);
+
+                ReestrTaloonApprovalData reestrTaloonApprovalData = processReestrTaloonApprovalData(
+                        reestrTaloonApprovalRequest);
+                addToResponseSections(reestrTaloonApprovalData, responseSections);
             }
         } catch (Exception e) {
             String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
@@ -1735,8 +1735,8 @@ public class Processor implements SyncProcessor {
 
         try {
             if (request.getReestrTaloonApproval() != null) {
-                reestrTaloonApprovalData = processReestrTaloonApprovalData(request.getReestrTaloonApproval());
                 resReestrTaloonApproval = processReestrTaloonApproval(request.getReestrTaloonApproval());
+                reestrTaloonApprovalData = processReestrTaloonApprovalData(request.getReestrTaloonApproval());
             }
         } catch (Exception e) {
             String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
