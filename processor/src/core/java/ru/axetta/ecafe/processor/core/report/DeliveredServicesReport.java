@@ -322,7 +322,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                            + "sum(cf_orderdetails.qty) * (cf_orderdetails.rprice + cf_orderdetails.socdiscount) as sum, "
                            + "cf_orgs.shortaddress, "
                            + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg, "
-                           + "case cf_orders.orderType when 10 then 1 else 0 end as orderType "
+                           + "case cf_orders.orderType when 10 then 1 else 0 end as orderType, cf_orders.createddate "
                     + "from cf_orgs "
                     + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
@@ -330,7 +330,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                     + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
                     + typeCondition + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                     + " cf_orders.createddate between :start and :end  "
-                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, shortaddress "
+                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, shortaddress, cf_orders.createddate "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
             query.setParameter("start", start.getTime());
@@ -340,6 +340,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
             query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
 
             DeliveredServicesItem.DeliveredServicesData result = new DeliveredServicesItem.DeliveredServicesData();
+            List<DeliveredServicesItem> waterItems = new ArrayList<DeliveredServicesItem>();
             Map<String, DeliveredServicesItem> headerMap = new TreeMap<String, DeliveredServicesItem>();
 
             int waterCount = 0;
@@ -363,20 +364,19 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 String orgNum = (e[9] == null ? "" : (String) e[9]);
                 long idoforg = ((BigInteger) e[10]).longValue();
                 Integer orderType = (Integer) e[11];
+                Date createdDate = (new Date(((BigInteger)e[12]).longValue()));
                 DeliveredServicesItem item = new DeliveredServicesItem();
                 item.setOfficialname(officialname);
                 item.setLevel1(String.format("%02d", orderType).concat("@").concat(level1));
                 item.setLevel2(level2);
                 item.setLevel3(level3);
+                item.setCount(count);
+                item.setPrice(price);
+                item.setSummary(summary);
+                item.setCreatedDate(createdDate);
                 if(orderType.equals(0)) {
                     item.setNameOfGood(nameOfGood);
-                    item.setCount(count);
-                    item.setPrice(price);
-                    item.setSummary(summary);
                 } else {
-                    item.setCountWater(0);
-                    item.setPriceWater(price);
-                    item.setSummaryWater(0L);
                     waterCount += count;
                     waterSummary += summary;
                 }
@@ -385,7 +385,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 item.setIdoforg(idoforg);
 
                 DeliveredServicesItem item1 = new DeliveredServicesItem(level1, level2, level3, nameOfGood,
-                        null, null, null, officialname, orgNum, address, idoforg, null, null, null);
+                        null, null, null, officialname, orgNum, address, idoforg, createdDate);
                 if(level3.equals("1,5-3") || level3.equals("1.5-3")) {
                     result.getList153().add(item);
                     summary37 += summary;
@@ -415,15 +415,31 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                     result.getList37().add(item1);
                     result.getList14().add(item1);
                 } else if(orderType.equals(1)) {
-                    result.getList153().add(item);
-                    result.getList37().add(item);
-                    result.getList14().add(item);
-                    result.getList511().add(item);
+                    waterItems.add(item);
                 }
                 if(StringUtils.isNotEmpty(nameOfGood) && !headerMap.keySet().contains(nameOfGood)) {
                     headerMap.put(nameOfGood, item);
                 }
 
+            }
+
+            Map<Long, DeliveredServicesItem> mapForWater = new HashMap<Long, DeliveredServicesItem>();
+            for(DeliveredServicesItem item : waterItems) {
+                if(mapForWater.get(item.getIdoforg()) == null) {
+                    for(DeliveredServicesItem itemForWater : result.getList511()) {
+                        if(itemForWater.getIdoforg() == item.getIdoforg()) {
+                            mapForWater.put(itemForWater.getIdoforg(), itemForWater);
+                            break;
+                        }
+                    }
+                }
+                DeliveredServicesItem itemForWater = mapForWater.get(item.getIdoforg());
+                itemForWater.setCountWater(itemForWater.getCountWater() + item.getCount());
+                itemForWater.setSummaryWater(itemForWater.getSummaryWater() + item.getSummary());
+                if(item.getCreatedDate().after(itemForWater.getCreatedDate())) {
+                    itemForWater.setPriceWater(item.getPrice());
+                    itemForWater.setCreatedDate(item.getCreatedDate());
+                }
             }
 
             result.setHeaderList(new ArrayList<DeliveredServicesItem>(headerMap.values()));

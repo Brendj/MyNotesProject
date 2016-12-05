@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -103,13 +104,16 @@ public class DeliveredServicesItem {
     private Integer countWater;
     private Long summaryWater;
     private Integer countOrg;
+    private Date createdDate;
 
     public DeliveredServicesItem() {
+        this.priceWater = 0L;
+        this.countWater = 0;
+        this.summaryWater = 0L;
     }
 
     public DeliveredServicesItem(String level1, String level2, String level3, String nameOfGood, Long price,
-            Integer count, Long summary, String officialname, String orgnum, String address, long idoforg,
-            Long priceWater, Integer countWater, Long summaryWater) {
+            Integer count, Long summary, String officialname, String orgnum, String address, long idoforg, Date createdDate) {
         this.level1 = level1;
         this.level2 = level2;
         this.level3 = level3;
@@ -121,9 +125,10 @@ public class DeliveredServicesItem {
         this.orgnum = orgnum;
         this.address = address;
         this.idoforg = idoforg;
-        this.priceWater = priceWater;
-        this.countWater = countWater;
-        this.summaryWater = summaryWater;
+        this.priceWater = 0L;
+        this.countWater = 0;
+        this.summaryWater = 0L;
+        this.createdDate = createdDate;
     }
 
     public String getLevel1() {
@@ -244,5 +249,13 @@ public class DeliveredServicesItem {
 
     public void setCountOrg(Integer countOrg) {
         this.countOrg = countOrg;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 }

@@ -384,22 +384,25 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             }*/
 
             //Дополнительная инфа из таблицы cf_taloon_approval
-            String sqlTaloon = "SELECT cf_orgs.shortnameinfoservice, split_part(cft.taloonname, '/', 1) AS level1, "
-                    + "split_part(cft.taloonname, '/', 2) AS level2, "
-                    + "split_part(cft.taloonname, '/', 3) AS level3, "
-                    + "split_part(cft.taloonname, '/', 4) AS level4, sum(cft.soldedqty) AS cnt, "
+            String sqlTaloon = "SELECT cf_orgs.shortnameinfoservice, "
+                    + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 1) ELSE split_part(cft.goodsname, '/', 1) END AS level1, "
+                    + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 2) ELSE split_part(cft.goodsname, '/', 2) END AS level2, "
+                    + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 3) ELSE split_part(cft.goodsname, '/', 3) END AS level3, "
+                    + "CASE WHEN cft.goodsname IS NULL OR cft.goodsname = '' THEN split_part(cft.taloonname, '/', 4) ELSE split_part(cft.goodsname, '/', 4) END AS level4, "
+                    + "sum(cft.soldedqty) AS cnt, "
                     + "cft.price AS price, sum(cft.soldedqty) * cft.price AS sum, cf_orgs.shortaddress, "
                     + "substring(cf_orgs.officialname FROM '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
-                    + "cf_orgs.idoforg, CASE WHEN cft.taloonname LIKE '%вода%' THEN 1 ELSE 0 END AS orderType "
+                    + "cf_orgs.idoforg, CASE WHEN cft.taloonname ILIKE '%вода%' THEN 1 ELSE 0 END AS orderType, cft.taloondate "
                     + "FROM cf_taloon_approval cft JOIN cf_orgs ON cft.idoforg = cf_orgs.idoforg WHERE cft.deletedstate = FALSE  AND "
                     + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                     + "cft.taloondate BETWEEN :start AND :end"
-                    + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, price, shortaddress, cft.soldedqty, level1, level2, level3, level4, price, shortaddress, cft.taloonname";
+                    + " GROUP BY cf_orgs.idoforg, cf_orgs.officialname, price, shortaddress, cft.soldedqty, level1, level2, level3, level4, price, shortaddress, cft.taloonname, cft.taloondate";
             Query queryTaloon = session.createSQLQuery(sqlTaloon);
             queryTaloon.setParameter("start", start.getTime());
             queryTaloon.setParameter("end", end.getTime());
 
             DeliveredServicesItem.DeliveredServicesData result = new DeliveredServicesItem.DeliveredServicesData();
+            List<DeliveredServicesItem> waterItems = new ArrayList<DeliveredServicesItem>();
             Map<String, DeliveredServicesItem> headerMap = new TreeMap<String, DeliveredServicesItem>();
 
             int waterCount = 0;
@@ -423,20 +426,19 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 String orgNum = (e[9] == null ? "" : (String) e[9]);
                 long idoforg = ((BigInteger) e[10]).longValue();
                 Integer orderType = (Integer) e[11];
+                Date createdDate = (new Date(((BigInteger)e[12]).longValue()));
                 DeliveredServicesItem item = new DeliveredServicesItem();
                 item.setOfficialname(officialname);
                 item.setLevel1(String.format("%02d", orderType).concat("@").concat(level1));
                 item.setLevel2(level2);
                 item.setLevel3(level3);
+                item.setCount(count);
+                item.setPrice(price);
+                item.setSummary(summary);
+                item.setCreatedDate(createdDate);
                 if(orderType.equals(0)) {
                     item.setNameOfGood(nameOfGood);
-                    item.setCount(count);
-                    item.setPrice(price);
-                    item.setSummary(summary);
                 } else {
-                    item.setCountWater(0);
-                    item.setPriceWater(price);
-                    item.setSummaryWater(0L);
                     waterCount += count;
                     waterSummary += summary;
                 }
@@ -445,7 +447,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                 item.setIdoforg(idoforg);
 
                 DeliveredServicesItem item1 = new DeliveredServicesItem(level1, level2, level3, nameOfGood,
-                        null, null, null, officialname, orgNum, address, idoforg, null, null, null);
+                        null, null, null, officialname, orgNum, address, idoforg, createdDate);
                 if(level3.equals("1,5-3") || level3.equals("1.5-3")) {
                     result.getList153().add(item);
                     summary37 += summary;
@@ -475,15 +477,31 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                     result.getList37().add(item1);
                     result.getList14().add(item1);
                 } else if(orderType.equals(1)) {
-                    result.getList153().add(item);
-                    result.getList37().add(item);
-                    result.getList14().add(item);
-                    result.getList511().add(item);
+                    waterItems.add(item);
                 }
                 if(StringUtils.isNotEmpty(nameOfGood) && !headerMap.keySet().contains(nameOfGood)) {
                     headerMap.put(nameOfGood, item);
                 }
 
+            }
+
+            Map<Long, DeliveredServicesItem> mapForWater = new HashMap<Long, DeliveredServicesItem>();
+            for(DeliveredServicesItem item : waterItems) {
+                if(mapForWater.get(item.getIdoforg()) == null) {
+                    for(DeliveredServicesItem itemForWater : result.getList511()) {
+                        if(itemForWater.getIdoforg() == item.getIdoforg()) {
+                            mapForWater.put(itemForWater.getIdoforg(), itemForWater);
+                            break;
+                        }
+                    }
+                }
+                DeliveredServicesItem itemForWater = mapForWater.get(item.getIdoforg());
+                itemForWater.setCountWater(itemForWater.getCountWater() + item.getCount());
+                itemForWater.setSummaryWater(itemForWater.getSummaryWater() + item.getSummary());
+                if(item.getCreatedDate().after(itemForWater.getCreatedDate())) {
+                    itemForWater.setPriceWater(item.getPrice());
+                    itemForWater.setCreatedDate(item.getCreatedDate());
+                }
             }
 
             result.setHeaderList(new ArrayList<DeliveredServicesItem>(headerMap.values()));
