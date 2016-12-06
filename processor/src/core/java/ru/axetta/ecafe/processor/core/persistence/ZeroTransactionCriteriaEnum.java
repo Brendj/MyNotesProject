@@ -22,9 +22,7 @@ public enum ZeroTransactionCriteriaEnum {
     /*4*/ ZT_TYPE_DISCOUNTPLANLOWGRADE("Льготный план начальные классы"),
     /*5*/ ZT_TYPE_DISCOUNTPLANMIDDLEHIGHTGRADE("Льготный план старшие классы"),
     /*6*/ ZT_TYPE_PAYDABLEPLANCHILDREN("Платный план обучающиеся"),
-    /*7*/ ZT_TYPE_PAYDABLEPLANNOTCHILDREN("Платный план не обучающиеся"),
-    /*8*/ ZT_TYPE_BUFFETSUM("Уровень критерия продаж буфетной продукции (ежедневная сумма трат)"),
-    /*9*/ ZT_TYPE_BUFFETPERCENT("Уровень критерия продаж буфетной продукции (%)");
+    /*7*/ ZT_TYPE_PAYDABLEPLANNOTCHILDREN("Платный план не обучающиеся");
 
 
     private final String description;
