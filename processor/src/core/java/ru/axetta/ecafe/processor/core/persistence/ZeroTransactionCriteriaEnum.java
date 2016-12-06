@@ -18,7 +18,14 @@ public enum ZeroTransactionCriteriaEnum {
     /*0*/ ZT_TYPE_INOUT("Входы-выходы"),
     /*1*/ ZT_TYPE_DISCOUNTPLAN("Льготный план"),
     /*2*/ ZT_TYPE_PAYDABLEPLAN("Платный план"),
-    /*3*/ ZT_TYPE_BUFFET("Буфет");
+    /*3*/ ZT_TYPE_BUFFET("Буфет"),
+    /*4*/ ZT_TYPE_DISCOUNTPLANLOWGRADE("Льготный план начальные классы"),
+    /*5*/ ZT_TYPE_DISCOUNTPLANMIDDLEHIGHTGRADE("Льготный план старшие классы"),
+    /*6*/ ZT_TYPE_PAYDABLEPLANCHILDREN("Платный план обучающиеся"),
+    /*7*/ ZT_TYPE_PAYDABLEPLANNOTCHILDREN("Платный план не обучающиеся"),
+    /*8*/ ZT_TYPE_BUFFETSUM("Уровень критерия продаж буфетной продукции (ежедневная сумма трат)"),
+    /*9*/ ZT_TYPE_BUFFETPERCENT("Уровень критерия продаж буфетной продукции (%)");
+
 
     private final String description;
     static Map<Integer,ZeroTransactionCriteriaEnum> map = new HashMap<Integer,ZeroTransactionCriteriaEnum>();
