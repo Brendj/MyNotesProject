@@ -35,7 +35,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font size="9" isBold="true"/>
 					</textElement>
-					<text><![CDATA[ФИО1]]></text>
+					<text><![CDATA[ФИО]]></text>
 				</staticText>
 				<textField>
 					<reportElement uuid="3d1db738-6b77-4db7-b5f8-057d564ecf2a" style="table" stretchType="RelativeToTallestObject" x="167" y="56" width="2233" height="20"/>
@@ -308,7 +308,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="142" splitType="Stretch">
+		<band height="167" splitType="Stretch">
 			<textField>
 				<reportElement uuid="3bce0c11-2401-42a2-85f2-420c245ad964" x="0" y="42" width="2400" height="50"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -325,11 +325,25 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="eb276f87-f0db-4bf0-b09b-26e851928ea7" x="0" y="92" width="2400" height="50"/>
+				<reportElement uuid="eb276f87-f0db-4bf0-b09b-26e851928ea7" x="167" y="92" width="2233" height="50"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{shortAddress}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="a3085150-9f49-40c4-bed3-c15b2ff7a111" x="0" y="92" width="167" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Адреса корпусов:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="96f57463-5229-4de7-8462-3986c87a5ab2" x="0" y="142" width="507" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["В отчете представлена фиксация событий посещения любого здания ОО"]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
