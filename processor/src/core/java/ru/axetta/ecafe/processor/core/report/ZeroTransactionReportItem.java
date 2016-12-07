@@ -20,34 +20,65 @@ public class ZeroTransactionReportItem {
     private String district;
     private String address;
     private Date transactionDate;
+
     private Integer normInOut;
     private Integer factInOut;
     private String commentInOut;
-    private Integer normDiscount;
-    private Integer factDiscount;
-    private String commentDiscount;
-    private Integer normPaydable;
-    private Integer factPaydable;
-    private String commentPaydable;
+
+    private Integer normDiscountLowGrade;
+    private Integer factDiscountLowGrade;
+    private String commentDiscountLowGrade;
+
+    private Integer normDiscountMiddleEightGrade;
+    private Integer factDiscountMiddleEightGrade;
+    private String commentDiscountMiddleEightGrade;
+
+    private Integer normPaydableChildren;
+    private Integer factPaydableChildren;
+    private String commentPaydableChildren;
+
+    private Integer normPaydableNotChildren;
+    private Integer factPaydableNotChildren;
+    private String commentPaydableNotChildren;
+
+    private Integer normBuffet;
+    private Integer factBuffet;
+    private String commentBuffet;
+
+    private Integer goalSumBuffet;
 
     public ZeroTransactionReportItem(Integer num, Long idOfOrg, String orgShortName, String district, String address,
-            Date transactionDate, Integer normInOut, Integer factInOut, String commentOnOut, Integer normDiscount,
-            Integer factDiscount, String commentDiscount, Integer normPaydable, Integer factPaydable, String commentPaydable) {
-        this.setNum(num);
-        this.setIdOfOrg(idOfOrg);
-        this.setOrgShortName(orgShortName);
-        this.setDistrict(district);
-        this.setAddress(address);
-        this.setTransactionDate(transactionDate);
-        this.setNormInOut(normInOut);
-        this.setFactInOut(factInOut);
-        this.setCommentInOut(commentOnOut);
-        this.setNormDiscount(normDiscount);
-        this.setFactDiscount(factDiscount);
-        this.setCommentDiscount(commentDiscount);
-        this.setNormPaydable(normPaydable);
-        this.setFactPaydable(factPaydable);
-        this.setCommentPaydable(commentPaydable);
+            Date transactionDate, Integer normInOut, Integer factInOut, String commentInOut,
+            Integer normDiscountLowGrade, Integer factDiscountLowGrade, String commentDiscountLowGrade,
+            Integer normDiscountMiddleEightGrade, Integer factDiscountMiddleEightGrade,
+            String commentDiscountMiddleEightGrade, Integer normPaydableChildren, Integer factPaydableChildren,
+            String commentPaydableChildren, Integer normPaydableNotChildren, Integer factPaydableNotChildren,
+            String commentPaydableNotChildren, Integer normBuffet, Integer factBuffet, String commentBuffet, Integer goalSumBuffet) {
+        this.num = num;
+        this.idOfOrg = idOfOrg;
+        this.orgShortName = orgShortName;
+        this.district = district;
+        this.address = address;
+        this.transactionDate = transactionDate;
+        this.normInOut = normInOut;
+        this.factInOut = factInOut;
+        this.commentInOut = commentInOut;
+        this.normDiscountLowGrade = normDiscountLowGrade;
+        this.factDiscountLowGrade = factDiscountLowGrade;
+        this.commentDiscountLowGrade = commentDiscountLowGrade;
+        this.normDiscountMiddleEightGrade = normDiscountMiddleEightGrade;
+        this.factDiscountMiddleEightGrade = factDiscountMiddleEightGrade;
+        this.commentDiscountMiddleEightGrade = commentDiscountMiddleEightGrade;
+        this.normPaydableChildren = normPaydableChildren;
+        this.factPaydableChildren = factPaydableChildren;
+        this.commentPaydableChildren = commentPaydableChildren;
+        this.normPaydableNotChildren = normPaydableNotChildren;
+        this.factPaydableNotChildren = factPaydableNotChildren;
+        this.commentPaydableNotChildren = commentPaydableNotChildren;
+        this.normBuffet = normBuffet;
+        this.factBuffet = factBuffet;
+        this.commentBuffet = commentBuffet;
+        this.goalSumBuffet = goalSumBuffet;
     }
 
     public Integer getNum() {
@@ -122,51 +153,131 @@ public class ZeroTransactionReportItem {
         this.commentInOut = commentInOut;
     }
 
-    public Integer getNormDiscount() {
-        return normDiscount;
+    public Integer getNormDiscountLowGrade() {
+        return normDiscountLowGrade;
     }
 
-    public void setNormDiscount(Integer normDiscount) {
-        this.normDiscount = normDiscount;
+    public void setNormDiscountLowGrade(Integer normDiscountLowGrade) {
+        this.normDiscountLowGrade = normDiscountLowGrade;
     }
 
-    public Integer getFactDiscount() {
-        return factDiscount;
+    public Integer getFactDiscountLowGrade() {
+        return factDiscountLowGrade;
     }
 
-    public void setFactDiscount(Integer factDiscount) {
-        this.factDiscount = factDiscount;
+    public void setFactDiscountLowGrade(Integer factDiscountLowGrade) {
+        this.factDiscountLowGrade = factDiscountLowGrade;
     }
 
-    public String getCommentDiscount() {
-        return commentDiscount;
+    public String getCommentDiscountLowGrade() {
+        return commentDiscountLowGrade;
     }
 
-    public void setCommentDiscount(String commentDiscount) {
-        this.commentDiscount = commentDiscount;
+    public void setCommentDiscountLowGrade(String commentDiscountLowGrade) {
+        this.commentDiscountLowGrade = commentDiscountLowGrade;
     }
 
-    public Integer getNormPaydable() {
-        return normPaydable;
+    public Integer getNormDiscountMiddleEightGrade() {
+        return normDiscountMiddleEightGrade;
     }
 
-    public void setNormPaydable(Integer normPaydable) {
-        this.normPaydable = normPaydable;
+    public void setNormDiscountMiddleEightGrade(Integer normDiscountMiddleEightGrade) {
+        this.normDiscountMiddleEightGrade = normDiscountMiddleEightGrade;
     }
 
-    public Integer getFactPaydable() {
-        return factPaydable;
+    public Integer getFactDiscountMiddleEightGrade() {
+        return factDiscountMiddleEightGrade;
     }
 
-    public void setFactPaydable(Integer factPaydable) {
-        this.factPaydable = factPaydable;
+    public void setFactDiscountMiddleEightGrade(Integer factDiscountMiddleEightGrade) {
+        this.factDiscountMiddleEightGrade = factDiscountMiddleEightGrade;
     }
 
-    public String getCommentPaydable() {
-        return commentPaydable;
+    public String getCommentDiscountMiddleEightGrade() {
+        return commentDiscountMiddleEightGrade;
     }
 
-    public void setCommentPaydable(String commentPaydable) {
-        this.commentPaydable = commentPaydable;
+    public void setCommentDiscountMiddleEightGrade(String commentDiscountMiddleEightGrade) {
+        this.commentDiscountMiddleEightGrade = commentDiscountMiddleEightGrade;
+    }
+
+    public Integer getNormPaydableChildren() {
+        return normPaydableChildren;
+    }
+
+    public void setNormPaydableChildren(Integer normPaydableChildren) {
+        this.normPaydableChildren = normPaydableChildren;
+    }
+
+    public Integer getFactPaydableChildren() {
+        return factPaydableChildren;
+    }
+
+    public void setFactPaydableChildren(Integer factPaydableChildren) {
+        this.factPaydableChildren = factPaydableChildren;
+    }
+
+    public String getCommentPaydableChildren() {
+        return commentPaydableChildren;
+    }
+
+    public void setCommentPaydableChildren(String commentPaydableChildren) {
+        this.commentPaydableChildren = commentPaydableChildren;
+    }
+
+    public Integer getNormPaydableNotChildren() {
+        return normPaydableNotChildren;
+    }
+
+    public void setNormPaydableNotChildren(Integer normPaydableNotChildren) {
+        this.normPaydableNotChildren = normPaydableNotChildren;
+    }
+
+    public Integer getFactPaydableNotChildren() {
+        return factPaydableNotChildren;
+    }
+
+    public void setFactPaydableNotChildren(Integer factPaydableNotChildren) {
+        this.factPaydableNotChildren = factPaydableNotChildren;
+    }
+
+    public String getCommentPaydableNotChildren() {
+        return commentPaydableNotChildren;
+    }
+
+    public void setCommentPaydableNotChildren(String commentPaydableNotChildren) {
+        this.commentPaydableNotChildren = commentPaydableNotChildren;
+    }
+
+    public Integer getNormBuffet() {
+        return normBuffet;
+    }
+
+    public void setNormBuffet(Integer normBuffet) {
+        this.normBuffet = normBuffet;
+    }
+
+    public Integer getFactBuffet() {
+        return factBuffet;
+    }
+
+    public void setFactBuffet(Integer factBuffet) {
+        this.factBuffet = factBuffet;
+    }
+
+    public String getCommentBuffet() {
+        return commentBuffet;
+    }
+
+    public void setCommentBuffet(String commentBuffet) {
+        this.commentBuffet = commentBuffet;
+    }
+
+    public Integer getGoalSumBuffet() {
+        return goalSumBuffet;
+    }
+
+    public void setGoalSumBuffet(Integer goalSumBuffet) {
+        this.goalSumBuffet = goalSumBuffet;
     }
 }

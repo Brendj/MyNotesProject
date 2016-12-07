@@ -107,33 +107,65 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
             Integer normInOut = null;
             Integer factInOut = null;
             String commentInOut = "";
-            Integer normDiscount = null;
-            Integer factDiscount = null;
-            String commentDiscount = "";
-            Integer normPaydable = null;
-            Integer factPaydable = null;
-            String commentPaydable = "";
+
+            Integer normDiscountLowGrade = null;
+            Integer factDiscountLowGrade = null;
+            String commentDiscountLowGrade = "";
+
+            Integer normDiscountMiddleEightGrade = null;
+            Integer factDiscountMiddleEightGrade = null;
+            String commentDiscountMiddleEightGrade = "";
+
+            Integer normPaydableChildren = null;
+            Integer factPaydableChildren = null;
+            String commentPaydableChildren = "";
+
+            Integer normPaydableNotChildren = null;
+            Integer factPaydableNotChildren = null;
+            String commentPaydableNotChildren = "";
+
+            Integer normBuffet = null;
+            Integer factBuffet = null;
+            String commentBuffet = "";
+            Integer goalSumBuffet = null;
+
             switch (zt.getCompositeIdOfZeroTransaction().getIdOfCriteria()) {
                 case ZT_TYPE_INOUT:
                     normInOut = zt.getCriteriaLevel();
                     factInOut = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
                     commentInOut = zt.getComment();
                     break;
-                case ZT_TYPE_DISCOUNTPLAN:
-                    normDiscount = zt.getCriteriaLevel();
-                    factDiscount = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
-                    commentDiscount = zt.getComment();
+                case ZT_TYPE_DISCOUNTPLANLOWGRADE:
+                    normDiscountLowGrade = zt.getCriteriaLevel();
+                    factDiscountLowGrade = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
+                    commentDiscountLowGrade = zt.getComment();
                     break;
-                case ZT_TYPE_PAYDABLEPLAN:
-                    normPaydable = zt.getCriteriaLevel();
-                    factPaydable = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
-                    commentPaydable = zt.getComment();
+                case ZT_TYPE_DISCOUNTPLANMIDDLEHIGHTGRADE:
+                    normDiscountMiddleEightGrade = zt.getCriteriaLevel();
+                    factDiscountMiddleEightGrade = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
+                    commentDiscountMiddleEightGrade = zt.getComment();
+                    break;
+                case ZT_TYPE_PAYDABLEPLANCHILDREN:
+                    normPaydableChildren = zt.getCriteriaLevel();
+                    factPaydableChildren = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
+                    commentPaydableChildren = zt.getComment();
+                    break;
+                case ZT_TYPE_PAYDABLEPLANNOTCHILDREN:
+                    normPaydableNotChildren = zt.getCriteriaLevel();
+                    factPaydableNotChildren = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
+                    commentPaydableNotChildren = zt.getComment();
+                    break;
+                case ZT_TYPE_BUFFET:
+                    normBuffet = zt.getCriteriaLevel();
+                    factBuffet = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
+                    commentBuffet = zt.getComment();
                     break;
             }
             ZeroTransactionReportItem item = new ZeroTransactionReportItem(num, zt.getOrg().getIdOfOrg(), zt.getOrg().getShortNameInfoService(),
                     zt.getOrg().getDistrict(), zt.getOrg().getAddress(), zt.getCompositeIdOfZeroTransaction().getTransactionDate(),
-                    normInOut, factInOut, commentInOut, normDiscount, factDiscount, commentDiscount, normPaydable, factPaydable,
-                    commentPaydable);
+                    normInOut, factInOut, commentInOut, normDiscountLowGrade, factDiscountLowGrade, commentDiscountLowGrade, normDiscountMiddleEightGrade,
+                    factDiscountMiddleEightGrade, commentDiscountMiddleEightGrade, normPaydableChildren, factPaydableChildren, commentPaydableChildren,
+                    normPaydableNotChildren, factPaydableNotChildren, commentPaydableNotChildren, normBuffet, factBuffet, commentBuffet, goalSumBuffet);
             zeroTransactionReportItemList.add(item);
                     num++;
         }
