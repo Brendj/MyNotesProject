@@ -55,6 +55,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_GOOD_REQUEST_CHANGE = "goodRequestChange";
     public static String NOTIFICATION_SUMMARY_BY_DAY = "summaryByDay";
     public static String NOTIFICATION_SUMMARY_BY_WEEK = "summaryByWeek";
+    public static String NOTIFICATION_INFO_MAILING = "infoMailing";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -520,6 +521,32 @@ public class EventNotificationService {
         return empType;
     }
 
+    @Async
+    public boolean sendNotificationInfoMailingAsync(Client destClient, String[] values, Date eventTime) {
+        boolean result = false;
+        int clientSMSType = ClientSms.TYPE_INFO_MAILING_NOTIFICATION;
+        try {
+            Object textObject = getInfoMailingNotificationObject(destClient, values);
+            if (textObject != null) {
+                smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
+                result = true;
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to send summary notification to client with contract_id = %s.", destClient.getContractId());
+            logger.error(message, e);
+            return false;
+        }
+        return result;
+    }
+
+    private Object getInfoMailingNotificationObject(Client destClient, String[] values) {
+        EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.INFO_MAILING_EVENT, destClient);
+        for (int i = 0; i < values.length-1; i=i+2) {
+            empType.getParameters().put(values[i], values[i+1]);
+        }
+        return empType;
+    }
+
     public static final String[] attachToValues(String key, String val, String [] values) {
         if(val == null) {
             return values;
@@ -712,15 +739,6 @@ public class EventNotificationService {
 
             //  Устанавливаем дату
             String empDateStr = findValueInParams(new String [] {"empTime"}, values);
-            String dateStr = findValueInParams(new String [] {"date", "eventTime", "time"}, values);
-            /*if(dateStr != null && !StringUtils.isBlank(dateStr)) {
-                try {
-                    long ts = Date.parse(dateStr);
-                    empType.setTime(ts);
-                } catch (Exception e) {
-                    logger.debug("Failed to parse EMP date using simple date parser", e);
-                }
-            }*/
             if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {
                 try {
                     DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
@@ -730,28 +748,6 @@ public class EventNotificationService {
                     logger.error("Failed to parse EMP date", e);
                 }
             }
-            /*for(int i=0; i<values.length-1; i+=2) {
-                String name = values [i];
-                String val = values[i+1];
-                if(name.equals("empTime")) {
-                    try {
-                        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-                        Date eventDate = df.parse(val);
-                        empType.setTime(eventDate.getTime());
-                        break;
-                    } catch (Exception e) {
-                        logger.error("Failed to parse EMP date", e);
-                    }
-                }
-                if(name.equals("date") || name.equals("eventTime")) {
-                    try {
-                        long ts = Date.parse(val);
-                        empType.setTime(ts);
-                    } catch (Exception e) {
-                        logger.info("Failed to parse EMP date using simple date parser", e);
-                    }
-                }
-            }*/
 
             return empType;
         } else {

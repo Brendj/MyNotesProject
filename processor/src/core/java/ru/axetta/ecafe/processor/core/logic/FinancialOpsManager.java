@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
@@ -77,7 +78,8 @@ public class FinancialOpsManager {
             String textContents, Date serviceSendTime, Date eventTime, boolean isDelivered, Long idOfSourceOrg) throws Exception {
 
         Session session = em.unwrap(Session.class);
-        long priceOfSms = client.getOrg().getPriceOfSms();
+        //session.update(client);
+        long priceOfSms = DAOReadonlyService.getInstance().getOrgPriceOfSms(client.getOrg().getIdOfOrg()); //client.getOrg().getPriceOfSms();
         int paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         //Card card = DAOUtils.findActiveCard(em, client);
         Date currTime = new Date();

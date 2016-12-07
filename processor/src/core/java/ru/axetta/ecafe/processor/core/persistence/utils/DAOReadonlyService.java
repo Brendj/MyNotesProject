@@ -377,6 +377,17 @@ public class DAOReadonlyService {
         }
     }
 
+    public Long getOrgPriceOfSms(Long idOfOrg) {
+        try {
+            Query query = entityManager.createNativeQuery("select coalesce(o.priceOfSms, 0) from cf_orgs o where o.idOfOrg = :idOfOrg");
+            query.setParameter("idOfOrg", idOfOrg);
+            Object result = query.getSingleResult();
+            return result != null ? ((BigInteger) result).longValue() : 0L;
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
     public List getPaymentsList(Client client, Integer subBalanceNum, Date endDate, Date startDate) {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "

@@ -767,6 +767,9 @@
     <rich:panelMenuItem id="supportSMSMenuItem" binding="#{supportSMSPage.mainMenuComponent}" label="Отправка SMS"
                         action="#{supportSMSPage.show}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceSupport && !mainPage.SMSServiceEMP}" />
+    <rich:panelMenuItem id="supportInfoMailingMenuItem" binding="#{mainPage.supportInfoMailingPage.mainMenuComponent}"
+                        label="Информационная рассылка (ручной ввод)" action="#{mainPage.showSupportInfoMailingPage}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToServiceSupport && mainPage.infospamEnabled}" />
 
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"

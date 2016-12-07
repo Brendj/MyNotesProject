@@ -122,6 +122,10 @@ public class SMSService {
             this.em = em;
         }
 
+        private boolean ignoreMobileTest(int messageType) {
+            return messageType == ClientSms.TYPE_INFO_MAILING_NOTIFICATION;
+        }
+
         public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
             if(transactionManager == null) {
                 throw new IllegalStateException("Transaction manager is null");
@@ -144,9 +148,9 @@ public class SMSService {
                     if(!client.isNotifyViaSMS() && messageType!=ClientSms.TYPE_LINKING_TOKEN) return false;
                 }
                 phoneNumber = client.getMobile();
-                if (!StringUtils.isNotEmpty(phoneNumber)) return false;
+                if (!StringUtils.isNotEmpty(phoneNumber) && !ignoreMobileTest(messageType)) return false;
                 phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-                if (StringUtils.length(phoneNumber) != 11) return false;
+                if (StringUtils.length(phoneNumber) != 11 && !ignoreMobileTest(messageType)) return false;
                 transactionManager.commit(status);
                 status = null;
             }

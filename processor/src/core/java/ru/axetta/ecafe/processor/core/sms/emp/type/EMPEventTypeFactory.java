@@ -28,6 +28,7 @@ public class EMPEventTypeFactory {
     public static final int PAYMENT_REDUCED_EVENT     = 901240009;
     public static final int SUMMARY_DAILY_EVENT       = 901240010;
     public static final int SUMMARY_WEEKLY_EVENT      = 901240011;
+    public static final int INFO_MAILING_EVENT        = 901240056;
 
     public static final EMPEventType buildEvent(int type, Client client) {
         return buildEvent(type, client, Collections.EMPTY_MAP);
@@ -84,6 +85,9 @@ public class EMPEventTypeFactory {
                 break;
             case SUMMARY_WEEKLY_EVENT:
                 event = new EMPSummaryWeeklyEventType();
+                break;
+            case INFO_MAILING_EVENT:
+                event = new EMPInfoMailingEventType();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

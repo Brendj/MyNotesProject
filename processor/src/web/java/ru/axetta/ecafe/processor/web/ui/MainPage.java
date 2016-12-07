@@ -232,6 +232,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage serviceNewGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage serviceGroupPage = new BasicWorkspacePage();
     private final SupportEmailPage supportEmailPage = new SupportEmailPage();
+    private final SupportInfoMailingPage supportInfoMailingPage = new SupportInfoMailingPage();
     private final TestLogPage testLogPage = new TestLogPage();
     private final BuildSignKeysPage buildSignKeysPage = new BuildSignKeysPage();
     private final OrderRemovePage orderRemovePage = new OrderRemovePage();
@@ -4718,6 +4719,23 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public SupportInfoMailingPage getSupportInfoMailingPage() {
+        return supportInfoMailingPage;
+    }
+
+    public Object showSupportInfoMailingPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = supportInfoMailingPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill support info mailing page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отправки информационной рассылки: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public SupportEmailPage getSupportEmailPage() {
         return supportEmailPage;
     }
@@ -8600,6 +8618,10 @@ public class MainPage implements Serializable {
 
     public boolean isSMSServiceEMP() {
         return RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
+    }
+
+    public boolean isInfospamEnabled() {
+        return RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.info.enabled", "0").equals("1");
     }
 
     public boolean isEligibleToServiceAdmin() throws Exception {
