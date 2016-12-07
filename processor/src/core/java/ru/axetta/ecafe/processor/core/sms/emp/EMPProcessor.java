@@ -126,7 +126,6 @@ public class EMPProcessor {
     public boolean isAllowed() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
-        //String reqInstance = runtimeContext.getOptionValueString(Option.OPTION_EMP_PROCESSOR_INSTANCE);
         String reqInstance = getConfigSyncServiceNode();
         if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
                 .equals(reqInstance.trim())) {
@@ -257,6 +256,8 @@ public class EMPProcessor {
             String newNotifyViaEmail = null;
             String newNotifyViaSMS = null;
             String newNotifyViaPUSH = null;
+            String newMsisdn = null;
+            String oldMsisdn = null;
             ////
             for (ReceiveDataChangesResponse.Result.Entry.Attribute attr : attributes) {
                 for (String attrName : UPDATE_ATTRS) {
@@ -274,9 +275,9 @@ public class EMPProcessor {
                             logger.error("Failed to parse " + attrName + " value", e1);
                         }
                     }
-
                 }
-                //  logging
+                oldMsisdn = getOldMsisdn(oldMsisdn, attr);
+                newMsisdn = getNewMsisdn(newMsisdn, attr);
                 addEntryToLogString(attr, logStr);
             }
             for (ReceiveDataChangesResponse.Result.Entry.Identifier id : identifiers) {
@@ -293,46 +294,22 @@ public class EMPProcessor {
                     }
                 }
             }
-            if (!StringUtils.isBlank(ruleId) && NumberUtils.isNumber(ruleId)) {
+            if (!StringUtils.isBlank(ruleId) && NumberUtils.isNumber(ruleId) && StringUtils.isBlank(newMsisdn) && StringUtils.isBlank(oldMsisdn)) {
                 ru.axetta.ecafe.processor.core.persistence.Client client = DAOService.getInstance()
                         .getClientByContractId(NumberUtils.toLong(ruleId));
                 if (client != null) {
-                    //  Обновляем статистику
-                    /*statistics.addBinded();
-                    if (!StringUtils.isBlank(client.getSsoid()) && client.getSsoid()
-                            .equals(SSOID_REGISTERED_AND_WAITING_FOR_DATA)) {
-                        statistics.removeWaitBinding();
-                    } else {
-                        statistics.removeNotBinded();
-                    }*/
                     if(client.getMobile() == null || StringUtils.isBlank(client.getMobile())) {
-                        //logger.error(String.format("Внимание! При попытке синхронизации с ЕМП, у клиента %s [%s] не был обнаружен мобильный телефон. Синхронизацию по нему произвести невозможно.", ruleId, client.getIdOfClient()));
                         client.setSsoid("E: no mobile");
                         DAOService.getInstance().saveEntity(client);
                         changeSequence = e.getChangeSequence();
                         continue;
                     }
-                    List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(client.getMobile());
-                    String idsList = getClientIdsAsString(clients);
-                    log(synchDate + "Поступили изменения из ЕМП {SSOID: " + newSsoid + "}, {№ Контракта: " + ruleId +
-                        "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
-                        client.getMobile() + "] применяются изменения: "+logStr.toString());
-                    for (Client cl : clients) {
-                        //cl.setSsoid(null); // сбрасбываем SSOID чтобы инициировать импорт настроек через последующую привязку
-                        if (newSsoid!=null && !newSsoid.equals("")) cl.setSsoid(newSsoid);
-                        if (newEmail!=null) cl.setEmail(newEmail);
-                        if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
-                        if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
-                        if (newNotifyViaPUSH!=null) cl.setNotifyViaPUSH(newNotifyViaPUSH.equalsIgnoreCase("true"));
-                        DAOService.getInstance().saveEntity(cl);
-                    }
-                    /*log(synchDate + "Поступили изменения из ЕМП {SSOID: " + ssoid + "}, {№ Контракта: " + ruleId
-                            + "} для клиента [" + client.getIdOfClient() + "] " + client.getMobile());
-                    client.setSsoid(ssoid);
-                    DAOService.getInstance().saveEntity(client);*/
+                    updateByMobile(client.getMobile(), ruleId, synchDate, logStr, newSsoid, newEmail, newNotifyViaEmail, newNotifyViaSMS, newNotifyViaPUSH, null);
                 } else {
                     log(synchDate + "Полученное изменение из ЕМП не удалось связать (не найден клиент с л/c: "+ruleId+"): " + logStr.toString());
                 }
+            } else if (!StringUtils.isBlank(newMsisdn) || !StringUtils.isBlank(oldMsisdn)) {
+                updateByMobile(newMsisdn, ruleId, synchDate, logStr, newSsoid, newEmail, newNotifyViaEmail, newNotifyViaSMS, newNotifyViaPUSH, oldMsisdn);
             } else {
                 log(synchDate + "Полученное изменение из ЕМП не удалось связать: " + logStr.toString());
             }
@@ -349,6 +326,77 @@ public class EMPProcessor {
         processEnd.saveWithSuccess(true);
         //  Обновляем изменившуюся статистику
         //saveEMPStatistics(statistics);
+    }
+
+    private void updateByMobile(String mobile, String ruleId, String synchDate, StringBuilder logStr, String newSsoid,
+            String newEmail, String newNotifyViaEmail, String newNotifyViaSMS, String newNotifyViaPUSH, String oldMsisdn) {
+        List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(oldMsisdn != null ? oldMsisdn : mobile);
+        if (clients.size() > 0) {
+            String idsList = getClientIdsAsString(clients);
+            log(synchDate + "Поступили изменения из ЕМП {SSOID: " + newSsoid + "}, {№ Контракта: " + ruleId +
+                    "}. Для всех " + clients.size() + " клиентов [" + idsList + "] с подпиской на телефон данного клиента [" +
+                    mobile + "] применяются изменения: "+logStr.toString());
+            for (Client cl : clients) {
+                if (newSsoid!=null && !newSsoid.equals("")) cl.setSsoid(newSsoid);
+                if (newEmail!=null) cl.setEmail(newEmail);
+                if (newNotifyViaEmail!=null) cl.setNotifyViaEmail(newNotifyViaEmail.equalsIgnoreCase("true"));
+                if (newNotifyViaSMS!=null) cl.setNotifyViaSMS(newNotifyViaSMS.equalsIgnoreCase("true"));
+                if (newNotifyViaPUSH!=null) cl.setNotifyViaPUSH(newNotifyViaPUSH.equalsIgnoreCase("true"));
+                if ((oldMsisdn != null) && (mobile != null))
+                    cl.setMobile(mobile);
+                else if ((oldMsisdn != null) && (mobile == null)) {
+                    cl.setMobile("");
+                    cl.setSsoid("");
+                }
+                DAOService.getInstance().saveEntity(cl);
+            }
+        } else {
+            log(synchDate + "Полученное изменение из ЕМП не удалось связать (не найден клиент с телефоном: " + mobile + "): " + logStr.toString());
+        }
+    }
+
+    private String getOldMsisdn(String oldMsisdn, ReceiveDataChangesResponse.Result.Entry.Attribute attr) {
+        if (oldMsisdn == null) {
+            return getPreviousValue(attr);
+        } else {
+            return oldMsisdn;
+        }
+    }
+
+    private String getNewMsisdn(String newMsisdn, ReceiveDataChangesResponse.Result.Entry.Attribute attr) {
+        if (newMsisdn == null) {
+            return getValue(attr);
+        } else {
+            return newMsisdn;
+        }
+    }
+
+    private String getPreviousValue(ReceiveDataChangesResponse.Result.Entry.Attribute attr) {
+        try {
+            if (!StringUtils.isBlank(attr.getName()) &&
+                    attr.getName().equals(ATTRIBUTE_MOBILE_PHONE_NAME) &&
+                    attr.getPrevious() != null && attr.getPrevious().size() > 0 && attr.getPrevious().get(0) != null) {
+                return ((Element) attr.getPrevious().get(0)).getFirstChild().getTextContent();
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String getValue(ReceiveDataChangesResponse.Result.Entry.Attribute attr) {
+        try {
+            if (!StringUtils.isBlank(attr.getName()) &&
+                    attr.getName().equals(ATTRIBUTE_MOBILE_PHONE_NAME) &&
+                    attr.getValue() != null && attr.getValue().size() > 0 && attr.getValue().get(0) != null) {
+                return ((Element) attr.getValue().get(0)).getFirstChild().getTextContent();
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     protected Boolean bindClient(StoragePortType storage, ru.axetta.ecafe.processor.core.persistence.Client client,
