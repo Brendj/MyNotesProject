@@ -36,7 +36,7 @@ import java.util.*;
  * Time: 13:46
  * To change this template use File | Settings | File Templates.
  */
-public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
+public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob {
     /*
     * Параметры отчета для добавления в правила и шаблоны
     *
@@ -174,8 +174,12 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             List<String> daysOfMonth = new ArrayList<String>(31); // 1 Вс	2 Пн	3 Вт	4 Ср ...
             Org orgLoad = (Org) session.load(Org.class, org.getIdOfOrg());
+            StringBuilder sb = new StringBuilder();
+            for(Org org : orgLoad.getFriendlyOrg()) {
+                sb.append(org.getShortAddress()).append(", ");
+            }
             parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
-            parameterMap.put("shortAddress", orgLoad.getShortAddress());
+            parameterMap.put("shortAddress", sb.substring(0, sb.length() - 2));
             calendar.setTime(startTime);
 //            Calendar c = Calendar.getInstance();
 //            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
@@ -228,10 +232,9 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                     clientCriteria.add(Restrictions.ge("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
                 }
             }
-            List clientList = clientCriteria.list();
+            List<Client> clientList = clientCriteria.list();
 
-            for (Object obj: clientList){
-                Client client = (Client) obj;
+            for (Client client: clientList){
                 ReportItem reportItem = new ReportItem();
                 reportItem.setGroupName(client.getClientGroup().getGroupName());
                 reportItem.setFio(client.getPerson().getFullName());
