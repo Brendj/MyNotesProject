@@ -242,7 +242,9 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
         List<RegisterStampElectronicCollationReportItem> result = new ArrayList<RegisterStampElectronicCollationReportItem>();
 
-        String sql = "SELECT taloonName AS taloon_2, soldedQty, taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false AND (taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0 ORDER BY taloon_2";
+        String sql = "SELECT CASE WHEN goodsName IS NULL OR goodsName = '' THEN taloonName ELSE goodsName END AS taloon_2, "
+                + "soldedQty, taloonDate, taloonNumber FROM TaloonApproval WHERE  org.idOfOrg = :idOfOrg AND deletedState = false "
+                + "AND (taloonDate BETWEEN :startDate AND :endDate) AND soldedQty > 0 ORDER BY taloon_2";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startTime);
