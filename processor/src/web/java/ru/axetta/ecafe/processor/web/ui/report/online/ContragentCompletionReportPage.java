@@ -166,11 +166,15 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
             idOfOrgList = orgSortedList;
 
             transactionsWithoutOrgIsPresented = false;
-            for (Long idOrg : idOfOrgList) {
-                ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItem(idOrg,
+
+                List<ContragentCompletionItem> contragentCompletionItemList = contragentDAOService.generateReportItem(idOfOrgList,
+                        contragentList, this.startDate, this.endDate, defaultSupplier);
+                List<ContragentCompletionItem> contragentCompletionItemWithTransactionOrgIsNullList = contragentDAOService.generateReportItemWithTransactionOrgIsNull(idOfOrgList,
                         contragentList, this.startDate, this.endDate);
-                ContragentCompletionItem contragentCompletionItemWithTransactionOrgIsNull = contragentDAOService.generateReportItemWithTransactionOrgIsNull(idOrg,
-                        contragentList, this.startDate, this.endDate);
+
+            for (ContragentCompletionItem contragentCompletionItemWithTransactionOrgIsNull: contragentCompletionItemWithTransactionOrgIsNullList) {
+                for (ContragentCompletionItem contragentCompletionItem: contragentCompletionItemList) {
+
                 if (contragentCompletionItemWithTransactionOrgIsNull.getTotalSumByOrg() != 0L){
                     ContragentCompletionItem resultContragentCompletionItem = new ContragentCompletionItem(contragentList);
                     resultContragentCompletionItem.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
@@ -188,6 +192,7 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
                 this.contragentCompletionItems.add(contragentCompletionItem);
                 total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
                 total.appendToPaymentsCount(contragentCompletionItem.getPaymentsCount());
+                }
             }
             this.contragentCompletionItems.add(total);
             //if (transactionsWithoutOrgIsPresented) {

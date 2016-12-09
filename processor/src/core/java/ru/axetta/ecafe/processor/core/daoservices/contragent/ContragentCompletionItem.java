@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.daoservices.contragent;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,15 +45,18 @@ public class ContragentCompletionItem {
         paymentsCount = 0;
     }
 
-    public void setContragentPayItems(List list){
-        for (Object ob: list){
-            Object[] objects = (Object[]) ob;
-            Long id = (Long) objects[1];
-            Long value = (Long) objects[0];
-            paymentsCount += ((Long) objects[2]).intValue();
-            contragentPayItems.put(id, value);
-            totalSumByOrg+=value;
-        }
+    public void setContragentPayItems(Object[] objects) {
+        Long id = (Long) objects[1];
+        Long value = (Long) objects[0];
+        paymentsCount += ((Long) objects[2]).intValue();
+        contragentPayItems.put(id, value);
+        totalSumByOrg += value;
+        Org org = (Org) objects[3];
+        educationalId = org.getIdOfOrg();
+        educationalInstitutionName = org.getShortName();
+        educationalCity = org.getCity();
+        educationalLocation = org.getLocation();
+        educationalTags = org.getTag();
     }
 
     public Long getEducationalId() {

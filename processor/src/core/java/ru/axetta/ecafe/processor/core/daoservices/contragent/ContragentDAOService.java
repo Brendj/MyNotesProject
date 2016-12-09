@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -35,77 +36,87 @@ public class ContragentDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public ContragentCompletionItem generateReportItem(Long idOfOrg, List<Contragent> contragentList, Date startDate,
-            Date endDate) {
-        Org org = (Org) getSession().load(Org.class, idOfOrg);
+    public List<ContragentCompletionItem> generateReportItem(List<Long> idOfOrgList, List<Contragent> contragentList, Date startDate,
+            Date endDate, Contragent defaultSupplier) {
         Criteria criteriaIsNotNull = getSession().createCriteria(ClientPayment.class);
         criteriaIsNotNull.createAlias("transaction", "tr")
-                .add(Restrictions.isNotNull("tr.org"))
-                .add(Restrictions.eq("tr.org", org))
-                .createAlias("tr.client", "cl")
-                .createAlias("contragent", "c")
+
+                .createAlias("tr.client", "cl").createAlias("contragent", "c")
                 .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
 
-        criteriaIsNotNull.setProjection(Projections.projectionList()
-                .add(Projections.sum("paySum"))
-                .add(Projections.groupProperty("c.idOfContragent"))
-                .add(Projections.count("idOfClientPayment")));
+        if (!idOfOrgList.isEmpty()) {
+            criteriaIsNotNull.add(Restrictions.isNotNull("tr.org")).add(Restrictions.in("tr.org.idOfOrg", idOfOrgList));
+        }
+
+        criteriaIsNotNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment"))
+        .add(Projections.groupProperty("tr.org")));
         criteriaIsNotNull.add(Restrictions.between("createTime", startDate, endDate));
+        criteriaIsNotNull.add(Restrictions.eq("contragentReceiver", defaultSupplier));
         List list = criteriaIsNotNull.list();
 
-        ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
-        contragentCompletionItem.setContragentPayItems(list);
-        contragentCompletionItem.setEducationalId(org.getIdOfOrg());
-        contragentCompletionItem.setEducationalInstitutionName(org.getShortName());
-        contragentCompletionItem.setEducationalCity(org.getCity());
-        contragentCompletionItem.setEducationalLocation(org.getLocation());
-        contragentCompletionItem.setEducationalTags(org.getTag());
-        return contragentCompletionItem;
+        List<ContragentCompletionItem> contragentCompletionItemList = new ArrayList<ContragentCompletionItem>();
+
+        for (Object obj : list) {
+            Object[] vals = (Object[]) obj;
+            ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
+            contragentCompletionItem.setContragentPayItems(vals);
+
+            contragentCompletionItemList.add(contragentCompletionItem);
+        }
+        return contragentCompletionItemList;
     }
 
     @SuppressWarnings("unchecked")
-    public ContragentCompletionItem generateReportItemWithTransactionOrgIsNull(Long idOfOrg,
+    public List<ContragentCompletionItem> generateReportItemWithTransactionOrgIsNull(List<Long> idOfOrgList,
             List<Contragent> contragentList, Date startDate, Date endDate) {
-        Org org = (Org) getSession().load(Org.class, idOfOrg);
-        Criteria criteriaIsNull = getSession().createCriteria(ClientPayment.class);
-        criteriaIsNull.createAlias("transaction", "tr")
-                .add(Restrictions.isNull("tr.org"))
-                .createAlias("tr.client", "cl")
-                .add(Restrictions.eq("cl.org", org))
-                .createAlias("contragent", "c")
-                .add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
 
-        criteriaIsNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
-                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment")));
+        Criteria criteriaIsNull = getSession().createCriteria(ClientPayment.class);
+        criteriaIsNull.createAlias("transaction", "tr").add(Restrictions.isNull("tr.org"))
+                .createAlias("tr.client", "cl")
+                .createAlias("contragent", "c").add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
+        if (!idOfOrgList.isEmpty()) {
+            criteriaIsNull.add(Restrictions.in("cl.org.idOfOrg", idOfOrgList));
+        } criteriaIsNull.setProjection(Projections.projectionList().add(Projections.sum("paySum"))
+                .add(Projections.groupProperty("c.idOfContragent")).add(Projections.count("idOfClientPayment"))
+                .add(Projections.groupProperty("cl.org")));
         criteriaIsNull.add(Restrictions.between("createTime", startDate, endDate));
         List list = criteriaIsNull.list();
 
-        ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
-        contragentCompletionItem.setContragentPayItems(list);
-        contragentCompletionItem.setEducationalInstitutionName(org.getShortName());
-        contragentCompletionItem.setEducationalCity(org.getCity());
-        contragentCompletionItem.setEducationalLocation(org.getLocation());
-        contragentCompletionItem.setEducationalTags(org.getTag());
-        return contragentCompletionItem;
+        List<ContragentCompletionItem> contragentCompletionItemList = new ArrayList<ContragentCompletionItem>();
+
+        for (Object obj : list) {
+            Object[] vals = (Object[]) obj;
+            ContragentCompletionItem contragentCompletionItem = new ContragentCompletionItem(contragentList);
+            contragentCompletionItem.setContragentPayItems(vals);
+
+            contragentCompletionItemList.add(contragentCompletionItem);
+        }
+        return contragentCompletionItemList;
     }
 
-    @SuppressWarnings("unchecked")
+     @SuppressWarnings("unchecked")
     public List<ContragentCompletionReportItem> generateReportItems(List<Long> idOfOrgList, Date startDate,
-            Date endDate) {
+            Date endDate, Contragent defaultSupplier) {
         List<ContragentCompletionItem> contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
 
         ContragentCompletionItem total = new ContragentCompletionItem(getPayAgentContragent());
 
-        for (Long idOrg : idOfOrgList) {
-            ContragentCompletionItem contragentCompletionItem = generateReportItem(idOrg, getPayAgentContragent(),
-                    startDate, endDate);
-            ContragentCompletionItem contragentCompletionItemWithTransactionOrgIsNull = generateReportItemWithTransactionOrgIsNull(
-                    idOrg, getPayAgentContragent(), startDate, endDate);
-            contragentCompletionItems.add(contragentCompletionItem);
-            contragentCompletionItems.add(contragentCompletionItemWithTransactionOrgIsNull);
-            total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
-            total.addContragentPayItems(contragentCompletionItemWithTransactionOrgIsNull.getContragentPayItems());
-        }
+            List<ContragentCompletionItem> completionItemList = generateReportItem(idOfOrgList, getPayAgentContragent(),
+                    startDate, endDate, defaultSupplier);
+            List<ContragentCompletionItem> contragentCompletionItemWithTransactionOrgIsNullList = generateReportItemWithTransactionOrgIsNull(
+                    idOfOrgList, getPayAgentContragent(), startDate, endDate);
+
+         for (ContragentCompletionItem completionItem: completionItemList) {
+             contragentCompletionItems.add(completionItem);
+             total.addContragentPayItems(completionItem.getContragentPayItems());
+         }
+
+         for (ContragentCompletionItem contragentCompletionItemWithTransactionOrgIsNull : contragentCompletionItemWithTransactionOrgIsNullList) {
+             contragentCompletionItems.add(contragentCompletionItemWithTransactionOrgIsNull);
+             total.addContragentPayItems(contragentCompletionItemWithTransactionOrgIsNull.getContragentPayItems());
+         }
+
         contragentCompletionItems.add(total);
 
         List<ContragentCompletionReportItem> contragentCompletionReportItems = new ArrayList<ContragentCompletionReportItem>();

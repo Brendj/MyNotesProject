@@ -106,13 +106,13 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
             List<ContragentCompletionReportItem> list = new ArrayList<ContragentCompletionReportItem>();
             //list
             //При нулевых значениях, строиться отчет с нулевыми данными
-            List<Org> orgItems = null;
+            List<Org> orgItems = new ArrayList<Org>();
             List<Contragent> contragentList = contragentDAOService.getPayAgentContragent();
-            if (contragent != null) {
+            /*if (contragent != null) {
                 orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(contragent);
             } else {
                 orgItems = contragentDAOService.findAllDistributionOrganization();
-            }
+            }*/
 
             if (organizationType != null) {
                 List<Org> orgList = new ArrayList<Org>();
@@ -160,13 +160,10 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                         idOfOrgList.add(org.getIdOfOrg());
                     }
                 }
-            } else {
-                List<Long> listOrg = new ArrayList<Long>();
-                idOfOrgList = listOrg;
             }
 
             List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateReportItems(idOfOrgList,
-                    startTime, endTime);
+                    startTime, endTime, contragent);
             list.addAll(contragentCompletionReportItems);
             if(parameterMap.get("showNullValues") == "false") {
                 list = deleteAllNullPayments(list);
