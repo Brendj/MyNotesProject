@@ -47,6 +47,9 @@ public class ZeroTransactionReportItem {
 
     private Integer goalSumBuffet;
 
+    public ZeroTransactionReportItem() {
+    }
+
     public ZeroTransactionReportItem(Integer num, Long idOfOrg, String orgShortName, String district, String address,
             Date transactionDate, Integer normInOut, Integer factInOut, String commentInOut,
             Integer normDiscountLowGrade, Integer factDiscountLowGrade, String commentDiscountLowGrade,

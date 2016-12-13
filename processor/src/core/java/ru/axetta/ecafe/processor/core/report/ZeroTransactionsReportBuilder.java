@@ -22,6 +22,7 @@ import org.hibernate.Session;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -103,6 +104,35 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
         List<ZeroTransaction> list = query.list();
 
         int num = 1;
+
+        Query queryResult = session.createQuery(
+                "select zt.compositeIdOfZeroTransaction.idOfOrg, zt.compositeIdOfZeroTransaction.transactionDate "
+                        + "from ZeroTransaction zt where zt.compositeIdOfZeroTransaction.transactionDate "
+                        + "between :startDate AND :endDate "
+                        + "AND zt.compositeIdOfZeroTransaction.idOfOrg in :idOfOrgList "
+                        + "group by zt.compositeIdOfZeroTransaction.idOfOrg, zt.compositeIdOfZeroTransaction.transactionDate  "
+                        + "order by zt.compositeIdOfZeroTransaction.transactionDate, zt.compositeIdOfZeroTransaction.idOfOrg");
+        queryResult.setParameter("startDate", startDate);
+        queryResult.setParameter("endDate", endDate);
+        queryResult.setParameterList("idOfOrgList", idOfOrgList);
+
+        List listResult = queryResult.list();
+
+        for (Object obj : listResult) {
+            Object[] objects = (Object[]) obj;
+
+            Long idOfOrg = (Long) objects[0];
+            Date transactionDate = (Date) objects[1];
+
+            ZeroTransactionReportItem zeroTransactionReportItem = new ZeroTransactionReportItem();
+            zeroTransactionReportItem.setNum(num);
+            zeroTransactionReportItem.setIdOfOrg(idOfOrg);
+            zeroTransactionReportItem.setTransactionDate(transactionDate);
+
+            zeroTransactionReportItemList.add(zeroTransactionReportItem);
+            num++;
+        }
+
         for (ZeroTransaction zt : list) {
             Integer normInOut = null;
             Integer factInOut = null;
@@ -161,13 +191,59 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
                     commentBuffet = zt.getComment();
                     break;
             }
-            ZeroTransactionReportItem item = new ZeroTransactionReportItem(num, zt.getOrg().getIdOfOrg(), zt.getOrg().getShortNameInfoService(),
-                    zt.getOrg().getDistrict(), zt.getOrg().getAddress(), zt.getCompositeIdOfZeroTransaction().getTransactionDate(),
-                    normInOut, factInOut, commentInOut, normDiscountLowGrade, factDiscountLowGrade, commentDiscountLowGrade, normDiscountMiddleEightGrade,
-                    factDiscountMiddleEightGrade, commentDiscountMiddleEightGrade, normPaydableChildren, factPaydableChildren, commentPaydableChildren,
-                    normPaydableNotChildren, factPaydableNotChildren, commentPaydableNotChildren, normBuffet, factBuffet, commentBuffet, goalSumBuffet);
-            zeroTransactionReportItemList.add(item);
-                    num++;
+
+            for (int i = 0; i < zeroTransactionReportItemList.size(); i++) {
+
+                if ((zeroTransactionReportItemList.get(i).getIdOfOrg().equals(zt.getOrg().getIdOfOrg()))
+                        && (zeroTransactionReportItemList.get(i).getTransactionDate()
+                        .equals(zt.getCompositeIdOfZeroTransaction().getTransactionDate()))) {
+
+                    if (normInOut != null && factInOut != null) {
+                        zeroTransactionReportItemList.get(i).setNormInOut(normInOut);
+                        zeroTransactionReportItemList.get(i).setFactInOut(factInOut);
+                        zeroTransactionReportItemList.get(i).setCommentInOut(commentInOut);
+                    }
+
+                    if (normDiscountLowGrade != null && factDiscountLowGrade != null) {
+                        zeroTransactionReportItemList.get(i).setNormDiscountLowGrade(normDiscountLowGrade);
+                        zeroTransactionReportItemList.get(i).setFactDiscountLowGrade(factDiscountLowGrade);
+                        zeroTransactionReportItemList.get(i).setCommentDiscountLowGrade(commentDiscountLowGrade);
+                    }
+
+                    if (normDiscountMiddleEightGrade != null && factDiscountMiddleEightGrade != null) {
+                        zeroTransactionReportItemList.get(i).setNormDiscountMiddleEightGrade(
+                                normDiscountMiddleEightGrade);
+                        zeroTransactionReportItemList.get(i).setFactDiscountMiddleEightGrade(
+                                factDiscountMiddleEightGrade);
+                        zeroTransactionReportItemList.get(i).setCommentDiscountMiddleEightGrade(
+                                commentDiscountMiddleEightGrade);
+                    }
+
+                    if (normPaydableChildren != null && factPaydableChildren != null) {
+                        zeroTransactionReportItemList.get(i).setNormPaydableChildren(normPaydableChildren);
+                        zeroTransactionReportItemList.get(i).setFactPaydableChildren(factPaydableChildren);
+                        zeroTransactionReportItemList.get(i).setCommentPaydableChildren(commentPaydableChildren);
+                    }
+
+                    if (normPaydableNotChildren != null && factPaydableNotChildren != null) {
+                        zeroTransactionReportItemList.get(i).setNormPaydableNotChildren(normPaydableNotChildren);
+                        zeroTransactionReportItemList.get(i).setFactPaydableNotChildren(factPaydableNotChildren);
+                        zeroTransactionReportItemList.get(i).setCommentPaydableNotChildren(commentPaydableNotChildren);
+                    }
+
+                    if (normBuffet != null && factBuffet != null) {
+                        zeroTransactionReportItemList.get(i).setNormBuffet(normBuffet);
+                        zeroTransactionReportItemList.get(i).setFactBuffet(factBuffet);
+                        zeroTransactionReportItemList.get(i).setCommentBuffet(commentBuffet);
+                    }
+
+                    zeroTransactionReportItemList.get(i).setOrgShortName(zt.getOrg().getShortName());
+                    zeroTransactionReportItemList.get(i).setDistrict(zt.getOrg().getDistrict());
+                    zeroTransactionReportItemList.get(i).setAddress(zt.getOrg().getAddress());
+
+                    break;
+                }
+            }
         }
 
         return new JRBeanCollectionDataSource(zeroTransactionReportItemList);
