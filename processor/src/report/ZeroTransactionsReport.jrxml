@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ZeroTransactionsReport" pageWidth="2150" pageHeight="595" orientation="Landscape" columnWidth="2110" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="300db74b-afe9-4084-97db-23a78eab4b7f">
-	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="683"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="1.9487171000000019"/>
+	<property name="ireport.x" value="2758"/>
+	<property name="ireport.y" value="79"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date">
 		<parameterDescription><![CDATA[Конечная дата]]></parameterDescription>
@@ -796,7 +796,7 @@
 				<textFieldExpression><![CDATA[$F{normDiscountMiddleEightGrade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="d0f6f7f8-3fd2-4dbd-905d-adc76c4d5221" stretchType="RelativeToBandHeight" x="1594" y="1" width="49" height="23"/>
+				<reportElement uuid="d0f6f7f8-3fd2-4dbd-905d-adc76c4d5221" stretchType="RelativeToBandHeight" x="1594" y="0" width="49" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -808,7 +808,7 @@
 				<textFieldExpression><![CDATA[$F{factPaydableNotChildren}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3ca236be-2da4-4ef7-a56b-f7312c0def72" stretchType="RelativeToBandHeight" x="1643" y="1" width="141" height="23"/>
+				<reportElement uuid="3ca236be-2da4-4ef7-a56b-f7312c0def72" stretchType="RelativeToBandHeight" x="1643" y="0" width="141" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -820,7 +820,7 @@
 				<textFieldExpression><![CDATA[$F{commentPaydableNotChildren}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="7924c94a-79d6-4dac-9701-a8f09e3cce04" stretchType="RelativeToBandHeight" x="1545" y="1" width="49" height="23"/>
+				<reportElement uuid="7924c94a-79d6-4dac-9701-a8f09e3cce04" stretchType="RelativeToBandHeight" x="1545" y="0" width="49" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -832,7 +832,7 @@
 				<textFieldExpression><![CDATA[$F{normPaydableNotChildren}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="982a026f-5a9b-4693-8303-011863e6f957" x="1871" y="1" width="49" height="23"/>
+				<reportElement uuid="982a026f-5a9b-4693-8303-011863e6f957" stretchType="RelativeToBandHeight" x="1871" y="0" width="49" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -844,7 +844,7 @@
 				<textFieldExpression><![CDATA[$F{normBuffet}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="943e6d1c-40e9-4098-a6da-799adcea4c62" x="1920" y="1" width="49" height="23"/>
+				<reportElement uuid="943e6d1c-40e9-4098-a6da-799adcea4c62" stretchType="RelativeToBandHeight" x="1920" y="0" width="49" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -856,7 +856,7 @@
 				<textFieldExpression><![CDATA[$F{factBuffet}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="a599776e-89f6-46fc-b6d8-974141e52b93" x="1784" y="1" width="87" height="23"/>
+				<reportElement uuid="a599776e-89f6-46fc-b6d8-974141e52b93" stretchType="RelativeToBandHeight" x="1784" y="0" width="87" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -868,7 +868,7 @@
 				<textFieldExpression><![CDATA[$F{goalSumBuffet}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="fb7167da-4c0d-497d-9116-a6c14119d26c" x="1969" y="1" width="141" height="23"/>
+				<reportElement uuid="fb7167da-4c0d-497d-9116-a6c14119d26c" stretchType="RelativeToBandHeight" x="1969" y="0" width="141" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
