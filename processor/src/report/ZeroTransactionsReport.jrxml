@@ -831,7 +831,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{normPaydableNotChildren}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="982a026f-5a9b-4693-8303-011863e6f957" x="1871" y="1" width="49" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -843,7 +843,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{normBuffet}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="943e6d1c-40e9-4098-a6da-799adcea4c62" x="1920" y="1" width="49" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -855,7 +855,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{factBuffet}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="a599776e-89f6-46fc-b6d8-974141e52b93" x="1784" y="1" width="87" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
@@ -867,7 +867,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{goalSumBuffet}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="fb7167da-4c0d-497d-9116-a6c14119d26c" x="1969" y="1" width="141" height="23"/>
 				<box>
 					<pen lineWidth="0.5"/>
