@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
@@ -36,6 +37,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     private String passwordForSearch;
     private String orgsForGenerateGuardians;
     private List<Long> clientsIds = null;
+    private Date summaryDate;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -45,6 +47,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
                 e.printStackTrace();
             }
         }
+    }
+
+    public OtherActionsPage() {
+        super();
+        summaryDate = new Date();
     }
 
     public void rubBIExport() throws Exception {
@@ -199,6 +206,18 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
     }
 
+    public void runGenerateSummaryDownloadFile() {
+        summaryDate = CalendarUtils.addMinute(summaryDate, 60 * 12);
+        Date endDate = CalendarUtils.endOfDay(summaryDate);
+        Date startDate = CalendarUtils.truncateToDayOfMonth(summaryDate);
+        try {
+            RuntimeContext.getAppContext().getBean(SummaryDownloadMakerService.class).run(startDate, endDate);
+            printMessage("Файл сгенерирован.");
+        } catch (Exception e) {
+            printError(String.format("Не удалось сгенерировать файл. Текст ошибки: %s", e.getMessage()));
+        }
+    }
+
     private List<Long> getOrgs() throws Exception {
         if (orgsForGenerateGuardians.equals("ALL")) {
             return null;
@@ -273,5 +292,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void setOrgsForGenerateGuardians(String orgsForGenerateGuardians) {
         this.orgsForGenerateGuardians = orgsForGenerateGuardians;
+    }
+
+    public Date getSummaryDate() {
+        return summaryDate;
+    }
+
+    public void setSummaryDate(Date summaryDate) {
+        this.summaryDate = summaryDate;
     }
 }

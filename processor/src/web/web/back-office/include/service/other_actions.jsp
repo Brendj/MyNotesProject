@@ -72,6 +72,17 @@
         <h:outputText value="Список ид. организаций:"/>
         <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
     </rich:panel>
+
+    <rich:panel>
+        <a4j:commandButton value="Выгрузка данных по продажам" action="#{otherActionsPage.runGenerateSummaryDownloadFile}"
+                           title="Файл с выгрузкой за выбранную дату будет создан в папке, заданной в конфигурации"
+                           styleClass="command-button" /><br/>
+        <h:outputText value="Дата:"/>
+        <rich:calendar value="#{otherActionsPage.summaryDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" >
+            <a4j:support event="onchanged" />
+        </rich:calendar>
+    </rich:panel>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

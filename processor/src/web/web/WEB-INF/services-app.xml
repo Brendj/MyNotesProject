@@ -149,6 +149,12 @@
                         cron="0 0 17 * * ?"/>
     </task:scheduled-tasks>
 
+    <task:scheduler id="summaryDownloadMakerSchedule"/>
+    <task:scheduled-tasks scheduler="summaryDownloadMakerSchedule">
+        <task:scheduled ref="summaryDownloadMakerService" method="run"
+                        cron="0 35 1 * * ?"/>
+    </task:scheduled-tasks>
+
     <!-- Оповещение клиента об недостатке средств в субсчет для оплаты АП, срабатывает каждый день в 16 часов вечера -->
     <!--<task:scheduler id="subscriptionFeedingSchedule"/>-->
     <!--<task:scheduled-tasks scheduler="subscriptionFeedingSchedule">-->

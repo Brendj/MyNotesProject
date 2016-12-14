@@ -452,6 +452,13 @@
 
     <security-constraint>
         <web-resource-collection>
+            <web-resource-name>Restrict direct access to include-only JSPs</web-resource-name>
+            <url-pattern>/summary/download</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
             <web-resource-name>Restrict transport safety for client room</web-resource-name>
             <url-pattern>/client-room/index.jsp</url-pattern>
             <url-pattern>/client-room/inlinecabinet.jsp</url-pattern>
@@ -530,6 +537,16 @@
     <servlet-mapping>
         <servlet-name>ReportRepositoryDownloadServlet</servlet-name>
         <url-pattern>/repository/download</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SummaryDownloadServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.ui.report.summary.SummaryDownloadServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SummaryDownloadServlet</servlet-name>
+        <url-pattern>/summary/download</url-pattern>
     </servlet-mapping>
 
     <context-param>
