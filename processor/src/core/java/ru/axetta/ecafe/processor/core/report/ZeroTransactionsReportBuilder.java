@@ -189,6 +189,7 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
                     normBuffet = zt.getCriteriaLevel();
                     factBuffet = Math.round(zt.getActualLevel().floatValue() * 100 / zt.getTargetLevel().floatValue());
                     commentBuffet = zt.getComment();
+                    goalSumBuffet = zt.getTargetLevel();
                     break;
             }
 
@@ -235,6 +236,7 @@ public class ZeroTransactionsReportBuilder extends BasicReportForAllOrgJob.Build
                         zeroTransactionReportItemList.get(i).setNormBuffet(normBuffet);
                         zeroTransactionReportItemList.get(i).setFactBuffet(factBuffet);
                         zeroTransactionReportItemList.get(i).setCommentBuffet(commentBuffet);
+                        zeroTransactionReportItemList.get(i).setGoalSumBuffet(goalSumBuffet);
                     }
 
                     zeroTransactionReportItemList.get(i).setOrgShortName(zt.getOrg().getShortName());
