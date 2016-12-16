@@ -156,12 +156,17 @@ public class SupportInfoMailingPage extends BasicWorkspacePage {
     }
 
     private String[] generateInfoMailingNotificationParams() {
-        String sAgeBefore20 = ageCategory && ageBefore20 ? "1" : "0";
-        String sAge2125 = ageCategory && age2125 ? "1" : "0";
-        String sAge2630 = ageCategory && age2630 ? "1" : "0";
-        String sAge3135 = ageCategory && age3135 ? "1" : "0";
-        String sAge3645 = ageCategory && age3645 ? "1" : "0";
-        String sAgeOver46 = ageCategory && ageOver46 ? "1" : "0";
+        String sAgeBefore20, sAge2125, sAge2630, sAge3135, sAge3645, sAgeOver46;
+        if (!ageCategory) {
+            sAgeBefore20 = sAge2125 = sAge2630 = sAge3135 = sAge3645 = sAgeOver46 = "1";
+        } else {
+            sAgeBefore20 = ageBefore20 ? "1" : "0";
+            sAge2125 = age2125 ? "1" : "0";
+            sAge2630 = age2630 ? "1" : "0";
+            sAge3135 = age3135 ? "1" : "0";
+            sAge3645 = age3645 ? "1" : "0";
+            sAgeOver46 = ageOver46 ? "1" : "0";
+        }
         String sClientType = new Integer(guardianFilter).toString();
         String sGender = new Integer(genderFilter).toString();
         return new String[] {

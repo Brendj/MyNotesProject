@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPInfoMailingEventType;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
@@ -170,13 +171,17 @@ public class EMPSmsServiceImpl extends ISmsService {
         }
     }
 
+    private boolean ignoreMobileTest(EMPEventType event) {
+        return event instanceof EMPInfoMailingEventType;
+    }
+
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)
             throws EMPException {
         /*if(1 == 1) {
             updateStats(INCOME_STATS_ID, 10000);       //  TEST ONLY!!!!!!
             return null;                //  TEST ONLY!!!!!!
         }*/
-        if(event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn())) {
+        if(!ignoreMobileTest(event) && (event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn()))) {
             throw new EMPException(String.format("Failed to send EMP event for client [%s] - msisdn (mobile) is required", client.getIdOfClient()));
         }
         /*if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L/) {
@@ -201,6 +206,11 @@ public class EMPSmsServiceImpl extends ISmsService {
         SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
         empProcessor.logRequest(eventParam);
         Date timeBefore = new Date();
+        //Здесь можно включить логирование
+        //final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+        //final List<Handler> handlerChain = new ArrayList<Handler>();
+        //handlerChain.add(soapLoggingHandler);
+        //((BindingProvider) subscription).getBinding().setHandlerChain(handlerChain);
         SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
         Date timeAfter = new Date();
         addResponseTime(timeAfter.getTime() - timeBefore.getTime());
