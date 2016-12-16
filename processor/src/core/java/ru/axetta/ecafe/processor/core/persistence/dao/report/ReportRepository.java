@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -58,6 +59,10 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT = "Реестр талонов по абонементному питанию";
     private final String REPORT_DAILY_SALES_BY_GROUPS_REPORT = "DailySalesByGroupsReport";
     private final String REPORT_DAILY_SALES_BY_GROUPS_REPORT_SUBJECT = "Дневные продажи по категориям";
+    private final String REPORT_AUTO_ENTER_EVENTS= "AutoEnterEventByDaysReport";
+    private final String REPORT_AUTO_ENTER_EVENTS_SUBJECT = "Сводный отчет по посещению";
+    private final String REPORT_AUTO_ENTER_EVENTS_V2= "AutoEnterEventV2Report";
+    private final String REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT = "Детализированный отчет по посещению";
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
 
@@ -86,7 +91,11 @@ public class ReportRepository extends BaseJpaDao {
         } else if (reportType.equals(REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING)) {
             return getRegisterStampSubscriptionFeedingReport(parameters,
                     REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT);
-        }
+        } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS)) {
+            return getAutoEnterEventByDaysReport(parameters, REPORT_AUTO_ENTER_EVENTS_SUBJECT);
+        } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS_V2)) {
+        return getAutoEnterEventV2Report(parameters, REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT);
+    }
         return null;
     }
 
@@ -185,7 +194,38 @@ public class ReportRepository extends BaseJpaDao {
         return rawDataReport;
     }
 
+    private byte[] getAutoEnterEventByDaysReport(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildAutoEnterEventByDaysReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
 
+
+    private byte[] getAutoEnterEventV2Report(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildAutoEnterEventV2Report(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
 
     private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
         return deliveredServicesReport.getPrint().getPages() != null
@@ -297,6 +337,50 @@ public class ReportRepository extends BaseJpaDao {
         }
     }
 
+    private BasicJasperReport buildAutoEnterEventByDaysReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
+        AutoEnterEventByDaysReport.Builder builder = new AutoEnterEventByDaysReport.Builder(templateFilename);
+        try {
+            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
+            builder.setOrg(orgShortItem);
+            builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            if(reportParameters.getEnterEventType() != null) {
+                builder.getReportProperties().setProperty("enterEventType", RuleCondition.ENTEREVENT_TYPE_TEXT[Integer.parseInt(reportParameters.getEnterEventType())]);
+            }
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+    }
+
+    private BasicJasperReport buildAutoEnterEventV2Report(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventV2Report.class.getSimpleName() + ".jasper";
+        AutoEnterEventV2Report.Builder builder = new AutoEnterEventV2Report.Builder(templateFilename);
+        try {
+            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
+            builder.setOrg(orgShortItem);
+            builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+    }
 
     private AutoReportGenerator getAutoReportGenerator() {
         return RuntimeContext.getInstance().getAutoReportGenerator();
@@ -421,6 +505,7 @@ public class ReportRepository extends BaseJpaDao {
         private Long idOfContract;
         private String region;
         private String email;
+        private String enterEventType;
 
         public ReportParameters(List<ReportParameter> parameters) {
             this.parameters = parameters;
@@ -454,6 +539,10 @@ public class ReportRepository extends BaseJpaDao {
             return email;
         }
 
+        public String getEnterEventType() {
+            return enterEventType;
+        }
+
         public ReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
@@ -462,6 +551,7 @@ public class ReportRepository extends BaseJpaDao {
             idOfContract = null;
             region = null;
             email = null;
+            enterEventType = null;
             DateFormat safeDateFormat = dateFormat.get();
             for (ReportParameter parameter : parameters) {
                 if (parameter.getParameterName().equals("startDate")) {
@@ -486,6 +576,9 @@ public class ReportRepository extends BaseJpaDao {
                 }
                 if (parameter.getParameterName().equals("email")) {
                     email = parameter.getParameterValue();
+                }
+                if (parameter.getParameterName().equals("enterEventType")) {
+                    enterEventType = parameter.getParameterValue();
                 }
             }
             return this;
