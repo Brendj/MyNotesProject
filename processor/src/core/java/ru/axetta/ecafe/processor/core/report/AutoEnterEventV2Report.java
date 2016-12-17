@@ -183,7 +183,7 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
             for (StClass stClass : stClassList) {
                 if (stClass.getDataList() == null || stClass.getDataList().size() == 0) {
-                    logger.error("stClass.getDataList().size() = ", stClass.getDataList().size());
+                    logger.error("Data for AutoEnterEventV2Report not found. IdOfOrg = " + org.getIdOfOrg());
                 } else {
                     mapKeyModelList.add(new MapKeyModel(stClass.getDataList().get(0).getF04(),
                             stClass.getDataList().get(0).getF01()));
