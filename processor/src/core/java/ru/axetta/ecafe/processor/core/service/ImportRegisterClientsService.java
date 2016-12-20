@@ -1044,6 +1044,7 @@ public class ImportRegisterClientsService {
                     String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
                     String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+                    String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
                     FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
                     createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
                     createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
@@ -1051,6 +1052,7 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                     createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
+                    createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
                     if (change.getGender() != null) {
                         if (change.getGender().equals(0))
                             createConfig.setValue(ClientManager.FieldId.GENDER, "f");

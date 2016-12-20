@@ -206,6 +206,12 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
         }
 
+        Boolean notifyEmailIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_EMAIL);
+        if (notifyEmailIsNull) {
+            String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
+            fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
+        }
+
         try {
             long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique);
             return new LineResult(lineNo, 0, "Ok", idOfClient);

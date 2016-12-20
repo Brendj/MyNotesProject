@@ -402,6 +402,10 @@
             <h:selectBooleanCheckbox value="#{optionPage.smsFailureTestingMode}" styleClass="output-text" />
             <h:outputText escape="true" value="Включить PUSH-уведомления для создаваемых клиентов" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.notifyByPushNewClients}" styleClass="output-text" />
+            <h:outputText escape="true" value="Включить email-уведомления для создаваемых клиентов" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.notifyByEmailNewClients}" styleClass="output-text" />
+            <h:outputText escape="true" value="Включить флаги \"Оповещать о пополнениях\" и \"Оповещать о проходах\"" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableNotificationsOnBalancesAndEE}" styleClass="output-text" />
         </h:panelGrid>
     </rich:tab>
     <rich:tab label="Личный кабинет">

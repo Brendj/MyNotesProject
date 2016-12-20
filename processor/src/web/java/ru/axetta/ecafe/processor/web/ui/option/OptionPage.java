@@ -115,6 +115,8 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPPaymentsURL_v116;
     private String RNIPPaymentsWorkingVersion;
     private Boolean NotifyByPushNewClients;
+    private Boolean NotifyByEmailNewClients;
+    private Boolean enableNotificationsOnBalancesAndEE;
     private Integer DaysRestrictionPaymentDateImport;
     private String RNIPSenderCode;
     private String RNIPSenderName;
@@ -771,6 +773,22 @@ public class OptionPage extends BasicWorkspacePage {
         NotifyByPushNewClients = notifyByPushNewClients;
     }
 
+    public Boolean getNotifyByEmailNewClients() {
+        return NotifyByEmailNewClients;
+    }
+
+    public void setNotifyByEmailNewClients(Boolean notifyByEmailNewClients) {
+        NotifyByEmailNewClients = notifyByEmailNewClients;
+    }
+
+    public Boolean getEnableNotificationsOnBalancesAndEE() {
+        return enableNotificationsOnBalancesAndEE;
+    }
+
+    public void setEnableNotificationsOnBalancesAndEE(Boolean enableNotificationsOnBalancesAndEE) {
+        this.enableNotificationsOnBalancesAndEE = enableNotificationsOnBalancesAndEE;
+    }
+
     public Integer getDaysRestrictionPaymentDateImport() {
         return DaysRestrictionPaymentDateImport;
     }
@@ -872,6 +890,8 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPPaymentsURL_v116 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
         RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
         setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
+        setNotifyByEmailNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS));
+        setEnableNotificationsOnBalancesAndEE(runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE));
         DaysRestrictionPaymentDateImport = runtimeContext.getOptionValueInt((Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT));
         RNIPSenderCode = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE);
         RNIPSenderName = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME);
@@ -1009,6 +1029,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116, RNIPPaymentsURL_v116);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
+            runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS, getNotifyByEmailNewClients());
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE, getEnableNotificationsOnBalancesAndEE());
             runtimeContext.setOptionValue(Option.OPTION_DAYS_RESTRICTION_PAYMENT_DATE_IMPORT, getDaysRestrictionPaymentDateImport());
             runtimeContext.setOptionValue(Option.OPTION_SAVE_SYNC_CALC, reportOn);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_CODE, RNIPSenderCode);

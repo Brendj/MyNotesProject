@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
@@ -156,11 +157,18 @@ public class Client {
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
         this.canConfirmGroupPayment = false;
-        // При создании клиента проставляем ему настройки оповещений по умолчанию.
+        /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
             if (predefined.isEnabledAtDefault()) {
                 notificationSettings.add(new ClientNotificationSetting(this, predefined.getValue()));
             }
+        }*/
+        Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
+        if (enableNotifications) {
+            notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
+            notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
+        } else {
+            notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
         }
     }
 

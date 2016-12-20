@@ -860,6 +860,7 @@ public class FrontController extends HttpServlet {
 
         boolean isExistsOrgByIdAndTags; // = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+        String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
 
         ArrayList<RegisterClientResult> results = new ArrayList<RegisterClientResult>();
         String recIdStr = null;
@@ -902,7 +903,6 @@ public class FrontController extends HttpServlet {
                 String mobilePhone = getClientParamDescValueByName("mobilePhone", cd.getClientDescParams().getParam());
                 String email = getClientParamDescValueByName("email", cd.getClientDescParams().getParam());
                 String notifyBySms = getClientParamDescValueByName("notifyBySms", cd.getClientDescParams().getParam());
-                String notifyByEmail = getClientParamDescValueByName("notifyByEmail", cd.getClientDescParams().getParam());
                 String comments = getClientParamDescValueByName("comments", cd.getClientDescParams().getParam());
                 String cardNo = getClientParamDescValueByName("cardNo", cd.getClientDescParams().getParam());
                 String cardPrintedNo = getClientParamDescValueByName("cardPrintedNo", cd.getClientDescParams().getParam());
@@ -973,6 +973,7 @@ public class FrontController extends HttpServlet {
 
         boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+        String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
 
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
@@ -1002,7 +1003,7 @@ public class FrontController extends HttpServlet {
                 if (cd.email!=null) fc.setValue(ClientManager.FieldId.EMAIL, cd.email);
                 if (cd.group!=null) fc.setValue(ClientManager.FieldId.GROUP, cd.group);
                 fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, cd.notifyBySms?"1":"0");
-                fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, cd.notifyByEmail?"1":"0");
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
                 fc.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                 if (cd.comments!=null) fc.setValue(ClientManager.FieldId.COMMENTS, cd.comments);
                 if (cd.cardNo!=null) fc.setValue(ClientManager.FieldId.CARD_ID, cd.cardNo);

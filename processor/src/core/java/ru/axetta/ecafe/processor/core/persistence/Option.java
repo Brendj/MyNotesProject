@@ -128,7 +128,9 @@ public class Option {
             OPTION_SECURITY_TMP_BLOCK_ACC_TIME = 100078,
             OPTION_IMPORT_RNIP_USE_XADEST_ON=100079,
             OPTION_DISABLE_EMAIL_EDIT=100080,
-            OPTION_SVERKA_ENABLED=100081;
+            OPTION_SVERKA_ENABLED=100081,
+            OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS = 100082,
+            OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE = 100083;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -234,6 +236,8 @@ public class Option {
             OPTION_IMPORT_RNIP_USE_XADEST_ON, "0",
             OPTION_DISABLE_EMAIL_EDIT, "0",
             OPTION_SVERKA_ENABLED, "1",
+            OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS, "0",
+            OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE, "0",
 };
 
     private Long idOfOption;

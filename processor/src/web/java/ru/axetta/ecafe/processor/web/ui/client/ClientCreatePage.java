@@ -179,7 +179,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private String mobile;
     private String email;
     private String fax;
-    private Boolean notifyViaEmail = false;
+    private Boolean notifyViaEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS);
     private Boolean notifyViaSMS = true;
     private Boolean notifyViaPUSH = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS);
     private String remarks;
@@ -586,6 +586,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             }
             client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
         }
+
+
 
         persistenceSession.save(client);
 

@@ -949,8 +949,8 @@ public class ClientManager {
         Long limitGuardian = RuntimeContext.getInstance()
                 .getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
 
-        Client clientGuardianToSave = new Client(organization, personGuardian, contractGuardianPerson, 0, false,
-                false, false, contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
+        Client clientGuardianToSave = new Client(organization, personGuardian, contractGuardianPerson, 0, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS),
+                false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
                 RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
 
@@ -997,6 +997,13 @@ public class ClientManager {
         clientGuardian.setDisabled(true);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
+        Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
+        if (enableNotifications) {
+            Set<ClientGuardianNotificationSetting> settings = new HashSet<ClientGuardianNotificationSetting>();
+            settings.add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
+            settings.add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
+            clientGuardian.setNotificationSettings(settings);
+        }
         persistenceSession.persist(clientGuardian);
         persistenceSession.flush();
 
@@ -1303,12 +1310,18 @@ public class ClientManager {
     }
 
     public static List<NotificationSettingItem> getNotificationSettings() {
+        Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
         for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined.values()) {
             if (predefined.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                 continue;
             }
-            notificationSettings.add(new NotificationSettingItem(predefined));
+            if (predefined.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS) || predefined.equals(
+                    ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS)) {
+                notificationSettings.add(new NotificationSettingItem(predefined, enableNotifications));
+            } else {
+                notificationSettings.add(new NotificationSettingItem(predefined));
+            }
         }
         return notificationSettings;
     }
