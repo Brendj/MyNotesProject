@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,9 +23,9 @@ public class PaymentTextUtils {
 
     }
 
-    public static String buildTransferInfo(ClientPayment clientPayment) throws Exception {
+    public static String buildTransferInfo(Session session, ClientPayment clientPayment) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
-        Contragent contragent = clientPayment.getContragent();
+        Contragent contragent = (Contragent)session.merge(clientPayment.getContragent());
         if (null != contragent) {
             stringBuilder.append(contragent.getContragentName());
         }

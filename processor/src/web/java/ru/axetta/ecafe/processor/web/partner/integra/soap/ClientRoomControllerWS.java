@@ -2293,7 +2293,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                   Session session, Transaction transaction) throws Exception {
-                processPaymentList(client, subBalanceNum, data, objectFactory, endDate, startDate);
+                processPaymentList(session, client, subBalanceNum, data, objectFactory, endDate, startDate);
             }
         });
 
@@ -2313,7 +2313,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
-                      processPaymentList(client, subBalanceNum, data, objectFactory, endDate, startDate);
+                      processPaymentList(session, client, subBalanceNum, data, objectFactory, endDate, startDate);
                   }
               });
 
@@ -2333,7 +2333,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
-                      processPaymentList(client, 1, data, objectFactory, endDate, startDate);
+                      processPaymentList(session, client, 1, data, objectFactory, endDate, startDate);
                   }
               });
 
@@ -2345,7 +2345,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return paymentListResult;
     }
 
-    private void processPaymentList(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+    private void processPaymentList(Session session, Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
           Date endDate, Date startDate) throws Exception {
         List clientPaymentsList = DAOReadonlyService.getInstance().getPaymentsList(client, subBalanceNum, endDate, startDate);
         PaymentList paymentList = objectFactory.createPaymentList();
@@ -2356,7 +2356,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             ClientPayment cp = (ClientPayment) o;
             Payment payment = new Payment();
-            payment.setOrigin(PaymentTextUtils.buildTransferInfo(cp));
+            payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, cp));
             payment.setSum(cp.getPaySum());
             payment.setTime(toXmlDateTime(cp.getCreateTime()));
             paymentList.getP().add(payment);

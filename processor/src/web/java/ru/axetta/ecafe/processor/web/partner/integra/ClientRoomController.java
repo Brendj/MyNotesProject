@@ -226,7 +226,7 @@ public class ClientRoomController {
                     if (nRecs++>MAX_RECS) break;
                     ClientPayment cp = (ClientPayment)o;
                     Payment payment = new Payment();
-                    payment.setOrigin(PaymentTextUtils.buildTransferInfo(cp));
+                    payment.setOrigin(PaymentTextUtils.buildTransferInfo(session, cp));
                     payment.setSum(cp.getPaySum());
                     payment.setTime(toXmlDateTime(cp.getCreateTime()));
                     paymentList.getP().add(payment);
