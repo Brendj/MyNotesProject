@@ -915,7 +915,7 @@
     <a4j:support event="onclick" action="#{mainPage.showReportOnlineGroupPage}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="complexGroupMenu" binding="#{mainPage.complexGroupPage.mainMenuComponent}"
-                         label="Отчет по комплексам" rendered="#{mainPage.eligibleToViewComplexReports}">
+                         label="Отчеты по комплексам" rendered="#{mainPage.eligibleToViewComplexReports}">
         <a4j:support event="onclick" action="#{mainPage.showComplexGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="allComplexReportMenuItem" binding="#{mainPage.allComplexReportPage.mainMenuComponent}"
@@ -933,7 +933,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="discountsGroupMenu" binding="#{mainPage.discountGroupPage.mainMenuComponent}"
-                         label="Отчет по льготам" rendered="#{mainPage.eligibleToViewBenefitReports}">
+                         label="Отчетам по льготам" rendered="#{mainPage.eligibleToViewBenefitReports}">
         <a4j:support event="onclick" action="#{mainPage.showDiscountGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="allOrgsReportMenuItem"
@@ -955,7 +955,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="goodRequestsGroupMenu" binding="#{mainPage.goodRequestsGroupMenu.mainMenuComponent}"
-                         label="Отчет по заявкам" rendered="#{mainPage.eligibleToViewRequestReports}">
+                         label="Отчеты по заявкам" rendered="#{mainPage.eligibleToViewRequestReports}">
         <a4j:support event="onclick" action="#{mainPage.showGoodRequestsGroupMenu}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="goodRequestNewReportMenuItem" binding="#{mainPage.goodRequestsNewReportPage.mainMenuComponent}"
