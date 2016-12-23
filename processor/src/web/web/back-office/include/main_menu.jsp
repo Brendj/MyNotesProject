@@ -65,10 +65,6 @@
                             binding="#{mainPage.orgBalanceReportPage.mainMenuComponent}" label="Отчет по балансу"
                             action="#{mainPage.showOrgBalanceReportPage}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="generateOrgOrderReportMenuItem"
-                            binding="#{mainPage.orgOrderReportPage.mainMenuComponent}" label="Отчет по покупкам"
-                            action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
-
         <rich:panelMenuItem id="accessoriesView" binding="#{accessoriesListPage.mainMenuComponent}"
                             action="#{accessoriesListPage.show}" label="Оборудование корпусов"
                             reRender="workspaceForm" rendered="false" />
@@ -1228,6 +1224,11 @@
         <%--@elvariable id="ordersByManufacturerReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.OrdersByManufacturerReportPage"--%>
         <rich:panelMenuItem id="ordersByManufacturerReportMenuItem" binding="#{mainPage.ordersByManufacturerReportPage.mainMenuComponent}"
                             label="Сводный отчет по производителю" action="#{mainPage.showOrdersByManufacturerReportPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="orgOrderReportPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgOrderReportPage"--%>
+        <rich:panelMenuItem id="generateOrgOrderReportMenuItem"
+                            binding="#{mainPage.orgOrderReportPage.mainMenuComponent}" label="Отчет по покупкам"
+                            action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
