@@ -250,7 +250,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
             Criteria reportCrit = session.createCriteria(EnterEvent.class);
-            reportCrit.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
+            reportCrit.add(Restrictions.in("org.idOfOrg", ids));
             reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
             reportCrit.add(Restrictions.in("client.idOfClient", map.keySet()));
             reportCrit.add(Restrictions.between("evtDateTime", startTime, endTime));
