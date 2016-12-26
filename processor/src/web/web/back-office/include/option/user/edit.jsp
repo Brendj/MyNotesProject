@@ -123,6 +123,18 @@
             <h:outputText escape="true" value="#{item.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="Отчеты по картам" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.cardReportItems}" var="cardReportItems" rendered="#{mainPage.userCreatePage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{cardReportItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{cardReportItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{cardReportItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateUser}" reRender="workspaceTogglePanel"

@@ -1087,7 +1087,7 @@
                             reRender="workspaceForm" />
         <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{mainPage.typesOfCardReportPage.mainMenuComponent}"
                             label="Отчет по типам карт" action="#{mainPage.typesOfCardReportPage.show}"
-                            reRender="workspaceForm" />
+                            reRender="workspaceForm, #{mainPage.isEligibleToViewTypeOfCardReport}" />
 
         <rich:panelMenuItem id="zeroTransactionsReportMenuItem" binding="#{mainPage.zeroTransactionsReportPage.mainMenuComponent}"
                             label="Учет причин снижения объемов оказания услуг" action="#{mainPage.showZeroTransactionsReportPage}" reRender="workspaceForm" />
@@ -1251,7 +1251,7 @@
                         reRender="workspaceForm" />
     <rich:panelMenuItem id="interactiveCardDataMenuItem" binding="#{interactiveCardDataReportPage.mainMenuComponent}"
                         label="Отчет по обороту электронных карт" action="#{interactiveCardDataReportPage.show}"
-                        reRender="workspaceForm" />
+                        reRender="workspaceForm, #{mainPage.isEligibleToViewInteractiveCardDataReport}" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"

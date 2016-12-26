@@ -66,12 +66,61 @@ public class FunctionSelector {
         }
     }
 
+    public static class CardReportItem implements Comparable<CardReportItem> {
+
+        private boolean selected;
+        private final Long idOfFunction;
+        private final String functionName;
+        private final String functionDesc;
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public void setSelected(boolean selected) {
+            this.selected = selected;
+        }
+
+        public Long getIdOfFunction() {
+            return idOfFunction;
+        }
+
+        public String getFunctionName() {
+            return functionName;
+        }
+
+        public String getFunctionDesc() {
+            return functionDesc;
+        }
+
+        public CardReportItem(Function function) {
+            this.selected = false;
+            this.idOfFunction = function.getIdOfFunction();
+            this.functionName = function.getFunctionName();
+            this.functionDesc = Function.getFunctionDesc(functionName);
+        }
+
+        @Override
+        public int compareTo(CardReportItem o) {
+            int res = this.functionName.compareTo(o.functionName);
+            if (res == 0) {
+                res = this.idOfFunction.compareTo(o.idOfFunction);
+            }
+            return res;
+        }
+    }
+
     private List<Item> items = Collections.emptyList();
+    private List<CardReportItem> cardReportItems = Collections.emptyList();
     private static final String[] userFunctions = new String[] {"viewUser", "editUser", "deleteUser"};
     private static final String[] securityAdminFunctions = new String[] {"viewUser", "editUser", "deleteUser", "workOption"};
 
     public List<Item> getItems() {
         return items;
+    }
+
+    public List<CardReportItem> getCardReportItems() {
+        return cardReportItems;
     }
 
     public Set<Function> getSecurityAdminFunctions(Session session) {
@@ -128,13 +177,22 @@ public class FunctionSelector {
         allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями
         List allFunctions = allFunctionsCriteria.list();
         List<Item> items = new ArrayList<Item>(allFunctions.size());
+        List<CardReportItem> cardReportItems = new ArrayList<CardReportItem>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
-            items.add(item);
+            if (item.getFunctionName().equals("typeOfCardRprt") || item.getFunctionName()
+                    .equals("interactiveCardDataRprt")) {
+                CardReportItem cardReportItem = new CardReportItem(function);
+                cardReportItems.add(cardReportItem);
+            } else {
+                items.add(item);
+            }
         }
         this.items = items;
         Collections.sort(items);
+        this.cardReportItems = cardReportItems;
+        Collections.sort(cardReportItems);
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {

@@ -8754,6 +8754,14 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_VISITORDOGM_EDIT);
     }
 
+    public boolean isEligibleToViewTypeOfCardReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TYPE_OF_CARD_REPORT);
+    }
+
+    public boolean isEligibleToViewInteractiveCardDataReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT);
+    }
+
     public Object removeClient() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;

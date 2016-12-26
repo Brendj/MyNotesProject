@@ -100,6 +100,12 @@ public class Function {
     public static final String FUNC_VISITORDOGM_EDIT = "visitorDogmEdit";
     public static final String FUNCD_VISITORDOGM_EDIT= "Редактирование сотрудников";
 
+    //Отчеты по картам
+    public static final String FUNC_RESTRICT_TYPE_OF_CARD_REPORT = "typeOfCardRprt";
+    public static final String FUNCD_RESTRICT_TYPE_OF_CARD_REPORT = "Закрыть раздел 'Отчет по типам карт'";
+
+    public static final String FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "interactiveCardDataRprt";
+    public static final String FUNCD_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "Закрыть раздел 'Отчет по обороту электронных карт'";
 
     private Long idOfFunction;
     private String functionName;
