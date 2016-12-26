@@ -37,6 +37,8 @@ public class SummaryDownloadMakerService {
     public static final String FOLDER_PROPERTY = "ecafe.processor.download.summary.folder";
     public static final String SSLCERT_DN_PROPERTY = "ecafe.processor.download.summary.sslcert.DN";
     public static final String NODE = "ecafe.processor.download.summary.node";
+    public static final String USER = "ecafe.processor.download.summary.user";
+    public static final String PASSWORD = "ecafe.processor.download.summary.password";
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;

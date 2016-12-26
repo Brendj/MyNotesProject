@@ -3,6 +3,8 @@ package ru.axetta.ecafe.processor.web.ui.report.summary;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.service.SummaryDownloadMakerService;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.tomcat.util.buf.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.security.cert.X509Certificate;
+import java.nio.charset.Charset;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,24 +33,33 @@ public class SummaryDownloadServlet extends HttpServlet {
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String requiredDN = RuntimeContext.getInstance().getPropertiesValue(SummaryDownloadMakerService.SSLCERT_DN_PROPERTY, null);
-        if (requiredDN == null) {
+        String userName = RuntimeContext.getInstance().getPropertiesValue(SummaryDownloadMakerService.USER, null);
+        String password = RuntimeContext.getInstance().getPropertiesValue(SummaryDownloadMakerService.PASSWORD, null);
+        if (StringUtils.isEmpty(userName) || StringUtils.isEmpty(password)) {
+            logger.error("SummaryDownloadServlet empty username or password in config");
             response.sendError(400, "Unauthorized access");
             return;
         }
         boolean granted = false;
-        X509Certificate[] certificates = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-        if (certificates != null && certificates.length > 0) {
-            for (int n = 0; n < certificates.length; ++n) {
-                String dn = certificates[0].getSubjectDN().getName();
-                if (dn.equals(requiredDN)) {
+        try {
+            String authorization = request.getHeader("Authorization");
+            if (authorization != null && authorization.startsWith("Basic")) {
+                String base64Credentials = authorization.substring("Basic".length()).trim();
+                String credentials = new String(new Base64().decode(base64Credentials.getBytes()), Charset.forName("UTF-8"));
+                String[] values = credentials.trim().split(":",2);
+                if (userName.equals(values[0]) && password.equals(values[1])) {
                     granted = true;
-                    break;
+                } else {
+                    logger.error(String.format("SummaryDownloadServlet access forbidden. user=%s, pass=%s", values[0], values[1]));
                 }
             }
+        } catch (Exception e) {
+            logger.error("Error in SummaryDownloadServlet", e);
+            response.sendError(400, "Unauthorized access");
+            return;
         }
         if (!granted) {
-            response.sendError(400, "Unauthorized access");
+            response.sendError(400, "Unauthorized access.");
             return;
         }
 
@@ -70,7 +81,7 @@ public class SummaryDownloadServlet extends HttpServlet {
             return;
         }
 
-        response.setHeader("Content-Type", getServletContext().getMimeType(f.getName()));
+        response.setHeader("Content-Type", "application/csv");
         response.setHeader("Content-disposition", "inline;filename="+ URLEncoder.encode(f.getName(), "UTF-8"));
         ServletOutputStream out = response.getOutputStream();
         FileInputStream fis = new FileInputStream(f);
@@ -84,6 +95,9 @@ public class SummaryDownloadServlet extends HttpServlet {
         } finally {
             fis.close();
         }
+        out.flush();
+        out.close();
+        logger.error("SummaryDownloadServlet file transferred OK");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
