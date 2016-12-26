@@ -933,7 +933,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="discountsGroupMenu" binding="#{mainPage.discountGroupPage.mainMenuComponent}"
-                         label="Отчетам по льготам" rendered="#{mainPage.eligibleToViewBenefitReports}">
+                         label="Отчеты по льготам" rendered="#{mainPage.eligibleToViewBenefitReports}">
         <a4j:support event="onclick" action="#{mainPage.showDiscountGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="allOrgsReportMenuItem"
