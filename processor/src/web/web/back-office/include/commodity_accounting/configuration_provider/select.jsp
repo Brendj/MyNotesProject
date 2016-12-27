@@ -42,7 +42,7 @@
             <tr>
                 <td style="text-align: center;">
                     <rich:dataTable value="#{configurationProviderItemsPanel.configurationProviderList}" var="configurationProvider" rowKeyVar="row"
-                                    width="100%" align="center" id="modalСonfigurationProviderSelectorTable" rows="15"
+                                    width="100%" align="center" id="modalСonfigurationProviderSelectorTable" rows="20"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
@@ -62,18 +62,21 @@
                             </f:facet>
                             <h:outputText value="#{configurationProvider.name}"/>
                         </rich:column>
-                        <f:facet name="footer">
-                            <rich:datascroller for="modalСonfigurationProviderSelectorTable" renderIfSinglePage="false" maxPages="5"
-                                               fastControls="hide" stepControls="auto" boundaryControls="hide">
-                                <f:facet name="previous">
-                                    <h:graphicImage value="/images/16x16/left-arrow.png" />
-                                </f:facet>
-                                <f:facet name="next">
-                                    <h:graphicImage value="/images/16x16/right-arrow.png" />
-                                </f:facet>
-                            </rich:datascroller>
-                        </f:facet>
+
                     </rich:dataTable>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">
+                    <rich:datascroller for="modalСonfigurationProviderSelectorTable" renderIfSinglePage="false" maxPages="5" styleClass="data-table-footer"
+                                       fastControls="hide" stepControls="auto" boundaryControls="hide" reRender="configurationProviderModalForm">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png" />
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png" />
+                        </f:facet>
+                    </rich:datascroller>
                 </td>
             </tr>
             <tr>
