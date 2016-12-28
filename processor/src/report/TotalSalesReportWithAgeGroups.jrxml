@@ -76,6 +76,12 @@
 		<field name="count" class="java.lang.Boolean">
 			<fieldDescription><![CDATA[count]]></fieldDescription>
 		</field>
+		<field name="sumPay" class="java.lang.Long">
+			<fieldDescription><![CDATA[sumPay]]></fieldDescription>
+		</field>
+		<field name="sumDiscount" class="java.lang.Long">
+			<fieldDescription><![CDATA[sumDiscount]]></fieldDescription>
+		</field>
 	</subDataset>
 	<subDataset name="Table Dataset 2" uuid="27dbee13-bb62-40e7-836e-4173a60421e1">
 		<queryString>
@@ -142,7 +148,7 @@
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<crosstab>
-				<reportElement uuid="086925b8-9782-44e1-a6f8-630cdc1e0bce" x="0" y="38" width="802" height="111"/>
+				<reportElement uuid="086925b8-9782-44e1-a6f8-630cdc1e0bce" x="0" y="38" width="850" height="111"/>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="122f20f9-c69c-45b3-8977-e31e8d50953a">
@@ -348,25 +354,39 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="0995a243-2212-48cf-b2ca-10ffca270533" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="197" height="30"/>
+								<reportElement uuid="0995a243-2212-48cf-b2ca-10ffca270533" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="365" height="24"/>
 								<textElement verticalAlignment="Middle">
-									<font isBold="true"/>
+									<font size="9" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{type}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="8f85b305-2028-4f04-85e1-d3acf23ec656" style="border" x="0" y="30" width="110" height="30"/>
+								<reportElement uuid="8f85b305-2028-4f04-85e1-d3acf23ec656" style="border" x="0" y="24" width="110" height="36"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font isBold="true" isStrikeThrough="false"/>
+									<font size="9" isBold="true" isStrikeThrough="false"/>
 								</textElement>
 								<textFieldExpression><![CDATA["Кол-во уникальных покупателей"]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement uuid="ff8c8538-9d93-40ab-a081-e188f0f3d766" style="border" x="110" y="30" width="87" height="30"/>
+								<reportElement uuid="ff8c8538-9d93-40ab-a081-e188f0f3d766" style="border" x="110" y="24" width="87" height="36"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font isBold="true" isStrikeThrough="false"/>
+									<font size="9" isBold="true" isStrikeThrough="false"/>
 								</textElement>
 								<textFieldExpression><![CDATA["Сумма"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="2d1d3458-93e2-4a96-a3f3-941d7ac2b8f5" style="border" x="197" y="24" width="82" height="36"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="9" isBold="true" isStrikeThrough="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Сумма с учетом скидки"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="b7ea5da1-0b2f-45b8-8686-5492ccf9e4c5" style="border" x="279" y="24" width="86" height="36"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="9" isBold="true" isStrikeThrough="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Сумма скидки"]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabColumnHeader>
@@ -465,7 +485,43 @@
 				<measure name="LogicMeasureGroupNotSt" class="java.lang.Integer" calculation="Sum">
 					<measureExpression><![CDATA[(($F{count}) && $F{ageGroup} == "Прочие группы" )? $F{uniqueClientCount} : 0]]></measureExpression>
 				</measure>
-				<crosstabCell width="197" height="25">
+				<measure name="summPayMeasure" class="java.lang.Double">
+					<measureExpression><![CDATA[Double.valueOf($F{sumPay})/100]]></measureExpression>
+				</measure>
+				<measure name="summDiscountMeasure" class="java.lang.Double">
+					<measureExpression><![CDATA[Double.valueOf($F{sumDiscount})/100]]></measureExpression>
+				</measure>
+				<measure name="measureSummPay14Group" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "1 - 4 классы" ? Double.valueOf($F{sumPay})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummDiscount14Group" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "1 - 4 классы" ? Double.valueOf($F{sumDiscount})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummPay511Group" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "5 - 11 классы" ? Double.valueOf($F{sumPay})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummDiscount511Group" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "5 - 11 классы" ? Double.valueOf($F{sumDiscount})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummPayNotStGroup" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "Прочие группы" ? Double.valueOf($F{sumPay})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummDiscountNotStGroup" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "Прочие группы" ? Double.valueOf($F{sumDiscount})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummPayStGroup" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "Прочие группы обучающихся" ? Double.valueOf($F{sumPay})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummDiscountStGroup" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[$F{ageGroup} == "Прочие группы обучающихся" ? Double.valueOf($F{sumDiscount})/100 : 0]]></measureExpression>
+				</measure>
+				<measure name="measureSummPay1" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[Double.valueOf($F{sumPay})/100]]></measureExpression>
+				</measure>
+				<measure name="measureSummDiscount1" class="java.lang.Double" calculation="Sum">
+					<measureExpression><![CDATA[Double.valueOf($F{sumDiscount})/100]]></measureExpression>
+				</measure>
+				<crosstabCell width="365" height="25">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -479,9 +535,7 @@
 								<bottomPen lineWidth="0.5"/>
 								<rightPen lineWidth="0.5"/>
 							</box>
-							<textElement verticalAlignment="Middle">
-								<font size="9"/>
-							</textElement>
+							<textElement verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{summMeasure}]]></textFieldExpression>
 						</textField>
 						<textField pattern="###0">
@@ -493,14 +547,36 @@
 								<bottomPen lineWidth="0.5"/>
 								<rightPen lineWidth="0.5"/>
 							</box>
-							<textElement verticalAlignment="Middle">
-								<font size="9"/>
-							</textElement>
+							<textElement verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{uniqueClientCountMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="36def280-308b-4585-ba1b-be3c86b06210" style="Crosstab Data Text" x="197" y="0" width="82" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{summPayMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="d98c313b-2089-497c-ba9f-e5632198974c" style="Crosstab Data Text" x="279" y="0" width="86" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{summDiscountMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="197" height="26" rowTotalGroup="name">
+				<crosstabCell width="365" height="26" rowTotalGroup="name">
 					<cellContents backcolor="#FF0000" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -529,9 +605,33 @@
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureUniqueClientCount}]]></textFieldExpression>
 						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="661b2c18-b56a-45f9-96eb-41b532ec6a39" style="Crosstab Data Text" x="197" y="0" width="82" height="26"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummPay1}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="7f529922-a5d8-42c2-b3a5-145beb1a3f02" style="Crosstab Data Text" x="279" y="0" width="86" height="26"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummDiscount1}]]></textFieldExpression>
+						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="197" height="25" columnTotalGroup="type">
+				<crosstabCell width="207" height="25" columnTotalGroup="type">
 					<cellContents backcolor="#FFE6E6" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -566,7 +666,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="197" height="26" rowTotalGroup="name" columnTotalGroup="type">
+				<crosstabCell width="207" height="26" rowTotalGroup="name" columnTotalGroup="type">
 					<cellContents backcolor="#FF0000" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -597,7 +697,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="197" height="125" rowTotalGroup="date">
+				<crosstabCell width="365" height="125" rowTotalGroup="date">
 					<cellContents backcolor="#FFE6E6" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -722,9 +822,129 @@
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{measureSumm1}]]></textFieldExpression>
 						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="f0ff78ed-7c8e-4dc5-875c-8096b4603f40" style="Crosstab Data Text" x="197" y="25" width="82" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummPay511Group}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="828a66c3-8739-4dac-a38f-d7dc66e18803" style="Crosstab Data Text" x="197" y="75" width="82" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummPayStGroup}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="6501a2d7-7d96-4d2d-abfc-745d7e62aec4" style="Crosstab Data Text" x="197" y="100" width="82" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummPay1}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="ec1a7fbb-0a22-42ac-b00f-055ad28a63e0" style="Crosstab Data Text" x="197" y="0" width="82" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummPay14Group}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="f420fbd7-9813-4c9f-870f-3482b3f4beb9" style="Crosstab Data Text" x="197" y="50" width="82" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummPayNotStGroup}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="e0b9b2b1-c364-4950-8e27-2f9704415c40" style="Crosstab Data Text" x="279" y="25" width="86" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummDiscount511Group}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="bbbeaf3d-dbd1-4ee0-bf23-68cb67b1a5b7" style="Crosstab Data Text" x="279" y="75" width="86" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummDiscountStGroup}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="a6e9cacc-d434-4670-811a-49135a6680c1" style="Crosstab Data Text" x="279" y="100" width="86" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummDiscount1}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="64988b49-6d8e-4bf9-bcc8-2cbb3059e991" style="Crosstab Data Text" x="279" y="0" width="86" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummDiscount14Group}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00">
+							<reportElement uuid="c529855b-626d-4452-acb8-28809f5f4a50" style="Crosstab Data Text" x="279" y="50" width="86" height="25"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{measureSummDiscountNotStGroup}]]></textFieldExpression>
+						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="197" height="125" rowTotalGroup="date" columnTotalGroup="type">
+				<crosstabCell width="207" height="125" rowTotalGroup="date" columnTotalGroup="type">
 					<cellContents backcolor="#FFE6E6" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -871,10 +1091,10 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="ageGroup">
+				<crosstabCell width="365" height="0" rowTotalGroup="ageGroup">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="197" height="0" rowTotalGroup="ageGroup" columnTotalGroup="type">
+				<crosstabCell width="207" height="0" rowTotalGroup="ageGroup" columnTotalGroup="type">
 					<cellContents backcolor="#FFE6E6" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
