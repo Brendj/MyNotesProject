@@ -169,6 +169,7 @@ public class DAOService {
             for (Org org : cp.getOrgs()) {
                 org = entityManager.merge(org);
                 org.setConfigurationProvider(null);
+                org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                 org = entityManager.merge(org);
             }
         }
@@ -177,8 +178,9 @@ public class DAOService {
         if (!idOfOrgList.isEmpty()) {
             for (Long idOfOrg : idOfOrgList) {
                 Org org = entityManager.find(Org.class, idOfOrg);
-                if (org != null) {
+                if (org != null && !org.getConfigurationProvider().equals(configurationProvider)) {
                     org.setConfigurationProvider(configurationProvider);
+                    org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     entityManager.persist(org);
                 }
             }
@@ -1002,8 +1004,9 @@ public class DAOService {
             for (Long idOfOrg : idOfOrgList) {
                 //daoService.setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
                 Org org = entityManager.find(Org.class, idOfOrg);
-                if (org != null) {
+                if (org != null && !org.getConfigurationProvider().equals(currentConfigurationProvider)) {
                     org.setConfigurationProvider(currentConfigurationProvider);
+                    org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     entityManager.persist(org);
                 }
             }

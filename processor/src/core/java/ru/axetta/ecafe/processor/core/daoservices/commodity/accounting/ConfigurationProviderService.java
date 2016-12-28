@@ -1,14 +1,14 @@
 package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,12 +53,18 @@ public class ConfigurationProviderService {
             List<Org> orgs = query.getResultList();
             if(!orgs.equals(cp.getOrgs())){
                 for (Org org: cp.getOrgs()){
+                    if(!orgs.contains(org)) {
+                        org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
+                    }
                     org.setCommodityAccounting(false);
 //                    entityManager.persist(org);
                 }
                 cp.clearOrg();
                 cp.addOrg(orgs);
                 for (Org org: orgs){
+                    if(!cp.getOrgs().contains(org)) {
+                        org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
+                    }
                     if(!org.getSourceMenuOrgs().isEmpty()){
                         Org sourceOrg = org.getSourceMenuOrgs().iterator().next();
                         final boolean isProvider = !sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider()
@@ -79,6 +88,7 @@ public class ConfigurationProviderService {
                 for (Org org: cp.getOrgs()){
                     org.setConfigurationProvider(null);
                     org.setCommodityAccounting(false);
+                    org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     entityManager.persist(org);
                 }
             }
