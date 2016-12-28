@@ -2707,6 +2707,10 @@ public class SyncRequest {
         return this.<ClientsPhotos>findSection(ClientsPhotos.class);
     }
 
+    public DirectivesRequest getDirectivesRequest() {
+        return this.<DirectivesRequest>findSection(DirectivesRequest.class);
+    }
+
     public <T extends SectionRequest> T findSection(Class classT) {
         for (SectionRequest sectionRequest : sectionRequests) {
             if (sectionRequest.getClass() == classT) {

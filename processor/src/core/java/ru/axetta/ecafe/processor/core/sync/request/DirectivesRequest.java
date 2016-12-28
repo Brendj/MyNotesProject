@@ -15,6 +15,11 @@ import org.w3c.dom.Node;
 public class DirectivesRequest implements SectionRequest {
 
     public static final String SECTION_NAME = "DirectivesRequest";
+    private final Boolean tradeConfigChangedSuccess;
+
+    public DirectivesRequest(Node directivesRequestNode) throws Exception {
+        this.tradeConfigChangedSuccess = XMLUtils.getBooleanAttributeValue(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS");
+    }
 
     @Override
     public String getRequestSectionName() {
@@ -37,9 +42,13 @@ public class DirectivesRequest implements SectionRequest {
         public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
             Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
             if (sectionElement != null) {
-                return new DirectivesRequest();
+                return new DirectivesRequest(sectionElement);
             } else
                 return null;
         }
+    }
+
+    public Boolean getTradeConfigChangedSuccess() {
+        return tradeConfigChangedSuccess;
     }
 }

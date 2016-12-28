@@ -601,7 +601,7 @@ public class Processor implements SyncProcessor {
 
         try {
             ProcessorUtils.refreshOrg(persistenceSessionFactory, request.getOrg());
-            directiveElement = processFullSyncDirective(request.getOrg());
+            directiveElement = processFullSyncDirective(request.getDirectivesRequest(), request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
@@ -987,9 +987,9 @@ public class Processor implements SyncProcessor {
 
     private void fullProcessingDirectives(SyncRequest request, List<AbstractToElement> responseSections) {
         try {
-            SectionRequest section = request.findSection(DirectivesRequest.class);
-            if (section != null) {
-                DirectiveElement directiveElement = processFullSyncDirective(request.getOrg());
+            DirectivesRequest directivesRequest = request.getDirectivesRequest();
+            if (directivesRequest != null) {
+                DirectiveElement directiveElement = processFullSyncDirective(directivesRequest, request.getOrg());
                 addToResponseSections(directiveElement, responseSections);
             }
         } catch (Exception e) {
@@ -1667,7 +1667,7 @@ public class Processor implements SyncProcessor {
         }
 
         try {
-            directiveElement = processFullSyncDirective(request.getOrg());
+            directiveElement = processFullSyncDirective(request.getDirectivesRequest(), request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
@@ -2440,9 +2440,9 @@ public class Processor implements SyncProcessor {
         return directiveElement;
     }
 
-    private DirectiveElement processFullSyncDirective(Org org) throws Exception {
+    private DirectiveElement processFullSyncDirective(DirectivesRequest directivesRequest, Org org) throws Exception {
         DirectiveElement directiveElement = new DirectiveElement();
-        directiveElement.processForFullSync(org);
+        directiveElement.processForFullSync(directivesRequest, org);
         return directiveElement;
     }
 

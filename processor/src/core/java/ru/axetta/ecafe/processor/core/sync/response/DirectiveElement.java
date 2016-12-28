@@ -7,11 +7,14 @@ package ru.axetta.ecafe.processor.core.sync.response;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.TradeAccountConfigChange;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+import ru.axetta.ecafe.processor.core.sync.request.DirectivesRequest;
 
 import org.hibernate.Session;
 import org.w3c.dom.Document;
@@ -45,7 +48,7 @@ public class DirectiveElement implements AbstractToElement{
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
     }
 
-    public void processForFullSync(Org org) throws Exception {
+    public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {
 
         directiveItemList = new ArrayList<DirectiveItem>();
 
@@ -73,6 +76,15 @@ public class DirectiveElement implements AbstractToElement{
 
         Integer photoRegistryFlag = org.getPhotoRegistryDirective().getCode();
         directiveItemList.add(new DirectiveItem("IS_ALLOWED_PHOTO_REGISTRY", photoRegistryFlag.toString()));
+
+        if(directivesRequest.getTradeConfigChangedSuccess() != null && directivesRequest.getTradeConfigChangedSuccess()) {
+            org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.NOT_CHANGED);
+        } else {
+            Integer tradeAccountConfigChangedFlag = org.getTradeAccountConfigChangeDirective().getCode();
+            if(tradeAccountConfigChangedFlag.equals(TradeAccountConfigChange.CHANGED.getCode())) {
+                directiveItemList.add(new DirectiveItem("TRADE_ACCOUNT_CONFIG_CHANGED", tradeAccountConfigChangedFlag.toString()));
+            }
+        }
 
         Boolean disEditServicesInfoFlag = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         directiveItemList.add(new DirectiveItem("DISABLE_EDIT_INFORMATION_SERVICES_FOR_CLIENTS", disEditServicesInfoFlag ? "1":"0"));
@@ -106,6 +118,8 @@ public class DirectiveElement implements AbstractToElement{
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOService.getInstance().setFullSyncByOrg(org.getIdOfOrg(), false);
         }
+
+        OrgWritableRepository.getInstance().saveOrg(org);
     }
 
     public Element toElement(Document document) throws Exception {
