@@ -732,7 +732,8 @@ public class ReportDAOService {
             for (Long idOfOrg: idOfOrgList){
                 //daoService.setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
                 Org org = entityManager.find(Org.class, idOfOrg);
-                if (org != null && !org.getConfigurationProvider().equals(currentConfigurationProvider)) {
+                if (org != null && !org.getConfigurationProvider().getIdOfConfigurationProvider()
+                        .equals(currentConfigurationProvider.getIdOfConfigurationProvider())) {
                     org.setConfigurationProvider(currentConfigurationProvider);
                     org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     entityManager.persist(org);

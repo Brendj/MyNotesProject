@@ -178,7 +178,8 @@ public class DAOService {
         if (!idOfOrgList.isEmpty()) {
             for (Long idOfOrg : idOfOrgList) {
                 Org org = entityManager.find(Org.class, idOfOrg);
-                if (org != null && !org.getConfigurationProvider().equals(configurationProvider)) {
+                if (org != null && !org.getConfigurationProvider().getIdOfConfigurationProvider()
+                        .equals(configurationProvider.getIdOfConfigurationProvider())) {
                     org.setConfigurationProvider(configurationProvider);
                     org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     entityManager.persist(org);
@@ -1004,7 +1005,8 @@ public class DAOService {
             for (Long idOfOrg : idOfOrgList) {
                 //daoService.setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
                 Org org = entityManager.find(Org.class, idOfOrg);
-                if (org != null && !org.getConfigurationProvider().equals(currentConfigurationProvider)) {
+                if (org != null && !org.getConfigurationProvider().getIdOfConfigurationProvider()
+                        .equals(currentConfigurationProvider.getIdOfConfigurationProvider())) {
                     org.setConfigurationProvider(currentConfigurationProvider);
                     org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     entityManager.persist(org);
