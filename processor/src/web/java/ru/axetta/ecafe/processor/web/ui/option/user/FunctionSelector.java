@@ -110,8 +110,53 @@ public class FunctionSelector {
         }
     }
 
+    public static class OnlineReportItem implements Comparable<OnlineReportItem> {
+
+        private boolean selected;
+        private final Long idOfFunction;
+        private final String functionName;
+        private final String functionDesc;
+
+        public boolean isSelected() {
+            return selected;
+        }
+
+        public void setSelected(boolean selected) {
+            this.selected = selected;
+        }
+
+        public Long getIdOfFunction() {
+            return idOfFunction;
+        }
+
+        public String getFunctionName() {
+            return functionName;
+        }
+
+        public String getFunctionDesc() {
+            return functionDesc;
+        }
+
+        public OnlineReportItem(Function function) {
+            this.selected = false;
+            this.idOfFunction = function.getIdOfFunction();
+            this.functionName = function.getFunctionName();
+            this.functionDesc = Function.getFunctionDesc(functionName);
+        }
+
+        @Override
+        public int compareTo(OnlineReportItem o) {
+            int res = this.functionName.compareTo(o.functionName);
+            if (res == 0) {
+                res = this.idOfFunction.compareTo(o.idOfFunction);
+            }
+            return res;
+        }
+    }
+
     private List<Item> items = Collections.emptyList();
     private List<CardReportItem> cardReportItems = Collections.emptyList();
+    private List<OnlineReportItem> onlineReportItems = Collections.emptyList();
     private static final String[] userFunctions = new String[] {"viewUser", "editUser", "deleteUser"};
     private static final String[] securityAdminFunctions = new String[] {"viewUser", "editUser", "deleteUser", "workOption"};
 
@@ -121,6 +166,10 @@ public class FunctionSelector {
 
     public List<CardReportItem> getCardReportItems() {
         return cardReportItems;
+    }
+
+    public List<OnlineReportItem> getOnlineReportItems() {
+        return onlineReportItems;
     }
 
     public Set<Function> getSecurityAdminFunctions(Session session) {
@@ -178,6 +227,7 @@ public class FunctionSelector {
         List allFunctions = allFunctionsCriteria.list();
         List<Item> items = new ArrayList<Item>(allFunctions.size());
         List<CardReportItem> cardReportItems = new ArrayList<CardReportItem>();
+        List<OnlineReportItem> onlineReportItems = new ArrayList<OnlineReportItem>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
@@ -185,6 +235,20 @@ public class FunctionSelector {
                     .equals("interactiveCardDataRprt")) {
                 CardReportItem cardReportItem = new CardReportItem(function);
                 cardReportItems.add(cardReportItem);
+            } else if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
+                    || item.getFunctionName().equals("onlineRprtBenefit") || item.getFunctionName()
+                    .equals("onlineRprtRequest") || item.getFunctionName().equals("electronicReconciliationRprt")
+                    || item.getFunctionName().equals("onlineRprtMeals") || item.getFunctionName().equals("paidFood")
+                    || item.getFunctionName().equals("subscriptionFeeding") || item.getFunctionName()
+                    .equals("onlineRprtRefill") || item.getFunctionName().equals("onlineRprtActivity") || item
+                    .getFunctionName().equals("clientRprts") || item.getFunctionName().equals("statisticDifferences")
+                    || item.getFunctionName().equals("financialControl") || item.getFunctionName()
+                    .equals("informRprts") || item.getFunctionName().equals("salesRprt") || item.getFunctionName()
+                    .equals("enterEventRprt") || item.getFunctionName().equals("totalServicesRprt") || item
+                    .getFunctionName().equals("clientsBenefitsRprt") || item.getFunctionName()
+                    .equals("transactionsRprt")) {
+                OnlineReportItem onlineReportItem = new OnlineReportItem(function);
+                onlineReportItems.add(onlineReportItem);
             } else {
                 items.add(item);
             }
@@ -193,22 +257,42 @@ public class FunctionSelector {
         Collections.sort(items);
         this.cardReportItems = cardReportItems;
         Collections.sort(cardReportItems);
+        this.onlineReportItems = onlineReportItems;
+        Collections.sort(onlineReportItems);
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
         List<Item> items = new ArrayList<Item>();
+        List<CardReportItem> cardReportItems = new ArrayList<CardReportItem>();
+        List<OnlineReportItem> onlineReportItems = new ArrayList<OnlineReportItem>();
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
-            if (selectedFunctions!=null && selectedFunctions.contains(function)) {
+            CardReportItem cardReportItem = new CardReportItem(function);
+            OnlineReportItem onlineReportItem = new OnlineReportItem(function);
+            if (selectedFunctions != null && selectedFunctions.contains(function)) {
                 item.setSelected(true);
             }
             items.add(item);
+
+            if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                cardReportItem.setSelected(true);
+            }
+            cardReportItems.add(cardReportItem);
+
+            if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                onlineReportItem.setSelected(true);
+            }
+            onlineReportItem.setSelected(true);
         }
         this.items = items;
         Collections.sort(items);
+        this.cardReportItems = cardReportItems;
+        Collections.sort(cardReportItems);
+        this.onlineReportItems = onlineReportItems;
+        Collections.sort(onlineReportItems);
     }
 
     public Set<Function> getSelected(Session session) throws HibernateException {

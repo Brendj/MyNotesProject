@@ -55,8 +55,6 @@ public class Function {
     // baybikov
     public static final String FUNC_WORK_OPTION = "workOption";
     public static final String FUNCD_WORK_OPTION = "Редактирование настроек";
-    public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
-    public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
     public static final String FUNC_COUNT_CURRENT_POSITIONS = "countCP";
     public static final String FUNCD_COUNT_CURRENT_POSITIONS = "Рассчитать текущие позиции";
     public static final String FUNC_POS_VIEW = "posView";
@@ -81,18 +79,6 @@ public class Function {
     public static final String FUNCD_SUPPLIER = "Поставщик";
     public static final String FUNC_COMMODITY_ACCOUNTING = "commAcc";
     public static final String FUNCD_COMMODITY_ACCOUNTING = "Товарный учет";
-    public static final String FUNC_RESTRICT_ONLINE_REPORT_COMPLEX = "onlineRprtComplex";
-    public static final String FUNCD_RESTRICT_ONLINE_REPORT_COMPLEX = "Закрыть раздел 'Отчет по комплексам'";
-    public static final String FUNC_RESTRICT_ONLINE_REPORT_BENEFIT = "onlineRprtBenefit";
-    public static final String FUNCD_RESTRICT_ONLINE_REPORT_BENEFIT = "Закрыть раздел 'Отчет по льготам'";
-    public static final String FUNC_RESTRICT_ONLINE_REPORT_REQUEST = "onlineRprtRequest";
-    public static final String FUNCD_RESTRICT_ONLINE_REPORT_REQUEST = "Закрыть раздел 'Отчет по заявкам'";
-    public static final String FUNC_RESTRICT_ONLINE_REPORT_MEALS = "onlineRprtMeals";
-    public static final String FUNCD_RESTRICT_ONLINE_REPORT_MEALS = "Закрыть раздел 'Льготное питание'";
-    public static final String FUNC_RESTRICT_ONLINE_REPORT_REFILL = "onlineRprtRefill";
-    public static final String FUNCD_RESTRICT_ONLINE_REPORT_REFILL = "Закрыть раздел 'Отчеты по пополнениям'";
-    public static final String FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY = "onlineRprtActivity";
-    public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_CLIENTS = "onlineRprtClients";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_CLIENTS = "Закрыть раздел 'Отчеты по клиентам'";
     public static final String FUNC_SHOW_REPORTS_REPOSITORY = "showReportRepository";
@@ -102,10 +88,50 @@ public class Function {
 
     //Отчеты по картам
     public static final String FUNC_RESTRICT_TYPE_OF_CARD_REPORT = "typeOfCardRprt";
-    public static final String FUNCD_RESTRICT_TYPE_OF_CARD_REPORT = "Закрыть раздел 'Отчет по типам карт'";
-
+    public static final String FUNCD_RESTRICT_TYPE_OF_CARD_REPORT = "Закрыть 'Отчет по типам карт'";
     public static final String FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "interactiveCardDataRprt";
-    public static final String FUNCD_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "Закрыть раздел 'Отчет по обороту электронных карт'";
+    public static final String FUNCD_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "Закрыть 'Отчет по обороту электронных карт'";
+
+    //Онлайн отчеты
+    public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
+    public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_COMPLEX = "onlineRprtComplex";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_COMPLEX = "Закрыть раздел 'Отчет по комплексам'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_BENEFIT = "onlineRprtBenefit";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_BENEFIT = "Закрыть раздел 'Отчет по льготам'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_REQUEST = "onlineRprtRequest";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_REQUEST = "Закрыть раздел 'Отчет по заявкам'";
+    public static final String FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "electronicReconciliationRprt";
+    public static final String FUNCD_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "Закрыт подраздел 'Электронная сверка'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_MEALS = "onlineRprtMeals";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_MEALS = "Закрыть раздел 'Льготное питание'";
+    public static final String FUNC_RESTRICT_PAID_FOOD_REPORT = "paidFood";
+    public static final String FUNCD_RESTRICT_PAID_FOOD_REPORT = "Закрыть подраздел 'Платное питание'";
+    public static final String FUNC_RESTRICT_SUBSCRIPTION_FEEDING = "subscriptionFeeding";
+    public static final String FUNCD_RESTRICT_SUBSCRIPTION_FEEDING = "Закрыть подраздел Абонементное питание'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_REFILL = "onlineRprtRefill";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_REFILL = "Закрыть раздел 'Отчеты по пополнениям'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY = "onlineRprtActivity";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
+    public static final String FUNC_RESTRICT_CLIENT_REPORTS = "clientRprts";
+    public static final String FUNCD_RESTRICT_CLIENT_REPORTS = "Закрыть подраздел 'Отчеты по балансам'";
+    public static final String FUNC_RESTRICT_STATISTIC_DIFFERENCES = "statisticDifferences";
+    public static final String FUNCD_RESTRICT_STATISTIC_DIFFERENCES = "Закрыть подраздел 'Статистика по расхождениям данных'";
+    public static final String FUNC_RESTRICT_FINANCIAL_CONTROL = "financialControl";
+    public static final String FUNCD_RESTRICT_FINANCIAL_CONTROL = "Закрыть подраздел 'Отчеты для службы финансового контроля'";
+    public static final String FUNC_RESTRICT_INFORM_REPORTS = "informRprts";
+    public static final String FUNCD_RESTRICT_INFORM_REPORTS = "Закрыть подраздел 'Отчеты по информированию'";
+    public static final String FUNC_RESTRICT_SALES_REPORTS = "salesRprt";
+    public static final String FUNCD_RESTRICT_SALES_REPORTS = "Закрыть подраздел 'Отчеты по продажам'";
+    //"Закрыть подраздел 'Отчеты по картам'";
+    public static final String FUNC_RESTRICT_ENTER_EVENT_REPORT = "enterEventRprt";
+    public static final String FUNCD_RESTRICT_ENTER_EVENT_REPORT = "Закрыть 'Отчет по турникетам'";
+    public static final String FUNC_RESTRICT_TOTAL_SERVICES_REPORT = "totalServicesRprt";
+    public static final String FUNCD_RESTRICT_TOTAL_SERVICES_REPORT = "Закрыть 'Свод по услугам'";
+    public static final String FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT = "clientsBenefitsRprt";
+    public static final String FUNCD_RESTRICT_CLIENTS_BENEFITS_REPORT = "Закрыть 'Расчет комплексов по льготным правилам'";
+    public static final String FUNC_RESTRICT_TRANSACTIONS_REPORT = "transactionsRprt";
+    public static final String FUNCD_RESTRICT_TRANSACTIONS_REPORT = "Закрыть 'Отчеты по транзакциям'";
 
     private Long idOfFunction;
     private String functionName;
