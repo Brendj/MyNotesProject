@@ -366,7 +366,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 if(allOrder.getMenutype() == OrderDetail.TYPE_DISH_ITEM){//buffet
                     sumBuffet += handleOrders(totalListMap, allOrder, NAME_BUFFET, showAgeGroups);
                     sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, showAgeGroups); //Буфетная продукция + Платные комплексы
-                }else if(allOrder.getSocDiscount() == 0L){//Pay
+                }else if(allOrder.getSumPay() > 0L){//Pay
                     sumComplex += handleOrders(totalListMap, allOrder, NAME_COMPLEX, showAgeGroups);
                     sumBuffetPlusSumComplex += handleOrders(totalListMap, allOrder, TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, showAgeGroups); //Буфетная продукция + Платные комплексы
 
@@ -390,11 +390,23 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
 
             for (OrderItem allOrder : allOrdersPaid) {
                 if (!priceAndSumPaidHashMap.isEmpty()) {
-                    if (priceAndSumPaidHashMap.get(allOrder.getSum()) != null) {
+                    if (priceAndSumPaidHashMap.get(allOrder.getSum()) != null && allOrder.getSumDiscount() == 0L) {
                         Long sum = priceAndSumPaidHashMap.get(allOrder.getSum()).getSum();
                         sum += handleOrders(totalListMap, allOrder,
                                 priceAndSumPaidHashMap.get(allOrder.getSum()).getTitle(), showAgeGroups);
                         priceAndSumPaidHashMap.get(allOrder.getSum()).setSum(sum);
+                    }
+                    if (priceAndSumPaidHashMap.get(allOrder.getSumPay()) != null && allOrder.getSumDiscount() > 0) {
+                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSumPay()).getSum();
+                        sum += handleOrders(totalListMap, allOrder,
+                                priceAndSumPaidHashMap.get(allOrder.getSumPay()).getTitle(), showAgeGroups);
+                        priceAndSumPaidHashMap.get(allOrder.getSumPay()).setSum(sum);
+                    }
+                    if (priceAndSumPaidHashMap.get(allOrder.getSumDiscount()) != null && allOrder.getSumDiscount() > 0) {
+                        Long sum = priceAndSumPaidHashMap.get(allOrder.getSumDiscount()).getSum();
+                        sum += handleOrders(totalListMap, allOrder,
+                                priceAndSumPaidHashMap.get(allOrder.getSumDiscount()).getTitle(), showAgeGroups);
+                        priceAndSumPaidHashMap.get(allOrder.getSumDiscount()).setSum(sum);
                     }
                 }
             }
@@ -415,6 +427,8 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))
                         && totalSalesItem.getAgeGroup().equals(ageGroup)) {
                     totalSalesItem.setSum(totalSalesItem.getSum() + buffetOrder.getSum());
+                    totalSalesItem.setSumPay(totalSalesItem.getSumPay() + buffetOrder.getSumPay());
+                    totalSalesItem.setSumDiscount(totalSalesItem.getSumDiscount() + buffetOrder.getSumDiscount());
                     if(buffetOrder.getIdOfClient() != null && !totalSalesItem.getIdOfClientList().contains(buffetOrder.getIdOfClient())) {
                         totalSalesItem.getIdOfClientList().add(buffetOrder.getIdOfClient());
                         totalSalesItem.setUniqueClientCount(totalSalesItem.getIdOfClientList().size());
@@ -487,23 +501,23 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     for (String date : dates) {
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        NAME_BUFFET, ageGroup, false));
+                                        NAME_BUFFET, ageGroup, false, 0L, 0L));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        NAME_BEN, ageGroup, false));
+                                        NAME_BEN, ageGroup, false, 0L, 0L));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        NAME_COMPLEX, ageGroup, false));
+                                        NAME_COMPLEX, ageGroup, false, 0L, 0L));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX, ageGroup, true));
+                                        TOTAL_BUFFET_PLUS_NAME_COMPLEX, ageGroup, true, 0L, 0L));
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                        TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, ageGroup, true));
+                                        TOTAL_NAME_BUFFET_PLUS_NAME_COMPLEX, ageGroup, true, 0L, 0L));
                         for (String title : titleComplexes) {
                             totalSalesItemList
                                     .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
-                                            title, ageGroup, true));
+                                            title, ageGroup, true, 0L, 0L));
                         }
                     }
                 }

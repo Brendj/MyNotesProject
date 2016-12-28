@@ -24,9 +24,12 @@ public class TotalSalesItem {
     private String ageGroup;
     private List<Long> idOfClientList;
     private int uniqueClientCount;
+    private long sumPay;
+    private long sumDiscount;
 
 
-    public TotalSalesItem(String name,String disctrict , String date, long sum, String type, String ageGroup, Boolean count) {
+    public TotalSalesItem(String name,String disctrict , String date, long sum, String type, String ageGroup,
+            Boolean count, long sumPay, long sumDiscount) {
         this.name = name;
         this.disctrict = disctrict;
         this.date = date;
@@ -36,6 +39,8 @@ public class TotalSalesItem {
         this.idOfClientList = new ArrayList<Long>();
         this.uniqueClientCount = 0;
         this.count = count;
+        this.sumPay = sumPay;
+        this.sumDiscount = sumDiscount;
     }
 
     public String getName() {
@@ -112,5 +117,21 @@ public class TotalSalesItem {
 
     public void setCount(Boolean count) {
         this.count = count;
+    }
+
+    public long getSumPay() {
+        return sumPay;
+    }
+
+    public void setSumPay(long sumPay) {
+        this.sumPay = sumPay;
+    }
+
+    public long getSumDiscount() {
+        return sumDiscount;
+    }
+
+    public void setSumDiscount(long sumDiscount) {
+        this.sumDiscount = sumDiscount;
     }
 }

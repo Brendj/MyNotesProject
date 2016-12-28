@@ -20,6 +20,8 @@ public class OrderItem {
     public String groupName;
     private int qty;
     private long sum;
+    private long sumPay;
+    private long sumDiscount;
 
     private long createdDateEqualsOrderDate;
 
@@ -63,7 +65,8 @@ public class OrderItem {
         this.orderDate = orderDate;
         this.sum = sum;
     }
-    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype, int menuOrigin, Long idOfClient, String groupName, Long idOfClientGroup) {
+    public OrderItem(long idOfOrg, long orderDate, long sum, long socDiscount, int menutype, int menuOrigin, Long idOfClient, String groupName,
+            Long idOfClientGroup, long sumPay, long sumDiscount) {
         this.idOfOrg = idOfOrg;
         this.orderDate = orderDate;
         this.sum = sum;
@@ -73,6 +76,8 @@ public class OrderItem {
         this.idOfClient = idOfClient;
         this.groupName = groupName;
         this.idOfClientGroup = idOfClientGroup;
+        this.sumPay = sumPay;
+        this.sumDiscount = sumDiscount;
     }
 
     public OrderItem(long idOfOrg, long orderDate, long sum, String manufacturer) {
@@ -249,5 +254,21 @@ public class OrderItem {
 
     public void setIdOfClientGroup(Long idOfClientGroup) {
         this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public long getSumPay() {
+        return sumPay;
+    }
+
+    public void setSumPay(long sumPay) {
+        this.sumPay = sumPay;
+    }
+
+    public long getSumDiscount() {
+        return sumDiscount;
+    }
+
+    public void setSumDiscount(long sumDiscount) {
+        this.sumDiscount = sumDiscount;
     }
 }
