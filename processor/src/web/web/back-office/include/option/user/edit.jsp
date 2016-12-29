@@ -123,8 +123,8 @@
             <h:outputText escape="true" value="#{item.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text" />
         </rich:column>
@@ -135,8 +135,8 @@
             <h:outputText escape="true" value="#{onlineReportItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Отчеты по картам" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.cardReportItems}" var="cardReportItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Отчеты по картам" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.cardReportItems}" var="cardReportItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{cardReportItems.selected}" styleClass="output-text" />
         </rich:column>
