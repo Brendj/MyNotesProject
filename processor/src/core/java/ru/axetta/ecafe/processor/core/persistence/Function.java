@@ -86,12 +86,6 @@ public class Function {
     public static final String FUNC_VISITORDOGM_EDIT = "visitorDogmEdit";
     public static final String FUNCD_VISITORDOGM_EDIT= "Редактирование сотрудников";
 
-    //Отчеты по картам
-    public static final String FUNC_RESTRICT_TYPE_OF_CARD_REPORT = "typeOfCardRprt";
-    public static final String FUNCD_RESTRICT_TYPE_OF_CARD_REPORT = "Закрыть 'Отчет по типам карт'";
-    public static final String FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "interactiveCardDataRprt";
-    public static final String FUNCD_RESTRICT_INTERACTIVE_CARD_DATA_REPORT = "Закрыть 'Отчет по обороту электронных карт'";
-
     //Онлайн отчеты
     public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
     public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
@@ -123,7 +117,8 @@ public class Function {
     public static final String FUNCD_RESTRICT_INFORM_REPORTS = "Закрыть подраздел 'Отчеты по информированию'";
     public static final String FUNC_RESTRICT_SALES_REPORTS = "salesRprt";
     public static final String FUNCD_RESTRICT_SALES_REPORTS = "Закрыть подраздел 'Отчеты по продажам'";
-    //"Закрыть подраздел 'Отчеты по картам'";
+    public static final String FUNC_RESTRICT_CARD_REPORTS = "cardRprts";
+    public static final String FUNCD_RESTRICT_CARD_REPORTS = "Закрыть подраздел 'Отчеты по картам'";
     public static final String FUNC_RESTRICT_ENTER_EVENT_REPORT = "enterEventRprt";
     public static final String FUNCD_RESTRICT_ENTER_EVENT_REPORT = "Закрыть 'Отчет по турникетам'";
     public static final String FUNC_RESTRICT_TOTAL_SERVICES_REPORT = "totalServicesRprt";

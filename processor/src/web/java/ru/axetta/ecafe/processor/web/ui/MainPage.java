@@ -8754,14 +8754,6 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_VISITORDOGM_EDIT);
     }
 
-    public boolean isEligibleToViewTypeOfCardReport() throws Exception {
-        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TYPE_OF_CARD_REPORT);
-    }
-
-    public boolean isEligibleToViewInteractiveCardDataReport() throws Exception {
-        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT);
-    }
-
     public boolean isEligibleToViewElectronicReconciliationReport() throws  Exception {
         return  !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT);
     }
@@ -8791,11 +8783,15 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewSalesReport() throws Exception {
-        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SALES_REPORTS);
+        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SALES_REPORTS);
     }
 
     public boolean isEligibleToViewEnterEventReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT);
+    }
+
+    public boolean isEligibleToViewCardReports() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CARD_REPORTS);
     }
 
     public boolean isEligibleToViewTotalServicesReport() throws Exception {

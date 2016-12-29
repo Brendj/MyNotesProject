@@ -66,50 +66,6 @@ public class FunctionSelector {
         }
     }
 
-    public static class CardReportItem implements Comparable<CardReportItem> {
-
-        private boolean selected;
-        private final Long idOfFunction;
-        private final String functionName;
-        private final String functionDesc;
-
-        public boolean isSelected() {
-            return selected;
-        }
-
-        public void setSelected(boolean selected) {
-            this.selected = selected;
-        }
-
-        public Long getIdOfFunction() {
-            return idOfFunction;
-        }
-
-        public String getFunctionName() {
-            return functionName;
-        }
-
-        public String getFunctionDesc() {
-            return functionDesc;
-        }
-
-        public CardReportItem(Function function) {
-            this.selected = false;
-            this.idOfFunction = function.getIdOfFunction();
-            this.functionName = function.getFunctionName();
-            this.functionDesc = Function.getFunctionDesc(functionName);
-        }
-
-        @Override
-        public int compareTo(CardReportItem o) {
-            int res = this.functionName.compareTo(o.functionName);
-            if (res == 0) {
-                res = this.idOfFunction.compareTo(o.idOfFunction);
-            }
-            return res;
-        }
-    }
-
     public static class OnlineReportItem implements Comparable<OnlineReportItem> {
 
         private boolean selected;
@@ -155,17 +111,13 @@ public class FunctionSelector {
     }
 
     private List<Item> items = Collections.emptyList();
-    private List<CardReportItem> cardReportItems = Collections.emptyList();
     private List<OnlineReportItem> onlineReportItems = Collections.emptyList();
-    private static final String[] userFunctions = new String[] {"viewUser", "editUser", "deleteUser"};
-    private static final String[] securityAdminFunctions = new String[] {"viewUser", "editUser", "deleteUser", "workOption"};
+    private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
+    private static final String[] securityAdminFunctions = new String[]{
+            "viewUser", "editUser", "deleteUser", "workOption"};
 
     public List<Item> getItems() {
         return items;
-    }
-
-    public List<CardReportItem> getCardReportItems() {
-        return cardReportItems;
     }
 
     public List<OnlineReportItem> getOnlineReportItems() {
@@ -175,13 +127,13 @@ public class FunctionSelector {
     public Set<Function> getSecurityAdminFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions.in("functionName", securityAdminFunctions));
-        return new HashSet<Function>((List<Function>)allFunctionsCriteria.list());
+        return new HashSet<Function>((List<Function>) allFunctionsCriteria.list());
     }
 
     public Set<Function> getAdminFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions)));
-        return new HashSet<Function>((List<Function>)allFunctionsCriteria.list());
+        return new HashSet<Function>((List<Function>) allFunctionsCriteria.list());
     }
 
     public Set<Function> getMonitoringFunctions(Session session) {
@@ -190,7 +142,7 @@ public class FunctionSelector {
         Set<Function> monitoringFunctions = new HashSet<Function>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
-            if(function.getFunctionName().equalsIgnoreCase(Function.FUNC_MONITORING)){
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_MONITORING)) {
                 monitoringFunctions.add(function);
             }
         }
@@ -204,17 +156,16 @@ public class FunctionSelector {
         for (Object object : allFunctions) {
             Function function = (Function) object;
 
-            if(        function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_CLIENT_VIEW)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_VIEW)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_EDIT)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_RULE_VIEW)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_REPORT_EDIT)
-                    || function.getFunctionName().equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
-                    ){
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
+                    .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)) {
                 supplierFunctions.add(function);
             }
         }
@@ -223,30 +174,27 @@ public class FunctionSelector {
 
     public void fill(Session session) throws Exception {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
-        allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями
+        allFunctionsCriteria.add(Restrictions
+                .not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями
         List allFunctions = allFunctionsCriteria.list();
         List<Item> items = new ArrayList<Item>(allFunctions.size());
-        List<CardReportItem> cardReportItems = new ArrayList<CardReportItem>();
         List<OnlineReportItem> onlineReportItems = new ArrayList<OnlineReportItem>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
-            if (item.getFunctionName().equals("typeOfCardRprt") || item.getFunctionName()
-                    .equals("interactiveCardDataRprt")) {
-                CardReportItem cardReportItem = new CardReportItem(function);
-                cardReportItems.add(cardReportItem);
-            } else if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
+            if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
                     || item.getFunctionName().equals("onlineRprtBenefit") || item.getFunctionName()
                     .equals("onlineRprtRequest") || item.getFunctionName().equals("electronicReconciliationRprt")
                     || item.getFunctionName().equals("onlineRprtMeals") || item.getFunctionName().equals("paidFood")
                     || item.getFunctionName().equals("subscriptionFeeding") || item.getFunctionName()
                     .equals("onlineRprtRefill") || item.getFunctionName().equals("onlineRprtActivity") || item
                     .getFunctionName().equals("clientRprts") || item.getFunctionName().equals("statisticDifferences")
-                    || item.getFunctionName().equals("financialControl") || item.getFunctionName()
-                    .equals("informRprts") || item.getFunctionName().equals("salesRprt") || item.getFunctionName()
-                    .equals("enterEventRprt") || item.getFunctionName().equals("totalServicesRprt") || item
-                    .getFunctionName().equals("clientsBenefitsRprt") || item.getFunctionName()
-                    .equals("transactionsRprt")) {
+                    || item.getFunctionName().equals("financialControl") || item.getFunctionName().equals("informRprts")
+                    || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
+                    || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
+                    .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
+                    .getFunctionName().equals("typeOfCardRprt") || item.getFunctionName()
+                    .equals("interactiveCardDataRprt")) {
                 OnlineReportItem onlineReportItem = new OnlineReportItem(function);
                 onlineReportItems.add(onlineReportItem);
             } else {
@@ -255,31 +203,21 @@ public class FunctionSelector {
         }
         this.items = items;
         Collections.sort(items);
-        this.cardReportItems = cardReportItems;
-        Collections.sort(cardReportItems);
         this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
         List<Item> items = new ArrayList<Item>();
-        List<CardReportItem> cardReportItems = new ArrayList<CardReportItem>();
         List<OnlineReportItem> onlineReportItems = new ArrayList<OnlineReportItem>();
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
         for (Object object : allFunctions) {
             Function function = (Function) object;
             Item item = new Item(function);
-            CardReportItem cardReportItem = new CardReportItem(function);
             OnlineReportItem onlineReportItem = new OnlineReportItem(function);
 
-            if (cardReportItem.getFunctionName().equals("typeOfCardRprt") || cardReportItem.getFunctionName()
-                    .equals("interactiveCardDataRprt")) {
-                if (selectedFunctions != null && selectedFunctions.contains(function)) {
-                    cardReportItem.setSelected(true);
-                }
-                cardReportItems.add(cardReportItem);
-            } else if (onlineReportItem.getFunctionName().equals("onlineRprt") || onlineReportItem.getFunctionName()
+            if (onlineReportItem.getFunctionName().equals("onlineRprt") || onlineReportItem.getFunctionName()
                     .equals("onlineRprtComplex") || onlineReportItem.getFunctionName().equals("onlineRprtBenefit")
                     || onlineReportItem.getFunctionName().equals("onlineRprtRequest") || onlineReportItem
                     .getFunctionName().equals("electronicReconciliationRprt") || onlineReportItem.getFunctionName()
@@ -292,7 +230,9 @@ public class FunctionSelector {
                     .equals("informRprts") || onlineReportItem.getFunctionName().equals("salesRprt") || onlineReportItem
                     .getFunctionName().equals("enterEventRprt") || onlineReportItem.getFunctionName()
                     .equals("totalServicesRprt") || onlineReportItem.getFunctionName().equals("clientsBenefitsRprt")
-                    || onlineReportItem.getFunctionName().equals("transactionsRprt")) {
+                    || onlineReportItem.getFunctionName().equals("transactionsRprt") || onlineReportItem
+                    .getFunctionName().equals("typeOfCardRprt") || onlineReportItem.getFunctionName()
+                    .equals("interactiveCardDataRprt")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     onlineReportItem.setSelected(true);
                 }
@@ -306,8 +246,6 @@ public class FunctionSelector {
         }
         this.items = items;
         Collections.sort(items);
-        this.cardReportItems = cardReportItems;
-        Collections.sort(cardReportItems);
         this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
     }

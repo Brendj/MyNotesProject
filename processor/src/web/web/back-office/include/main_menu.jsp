@@ -1085,9 +1085,6 @@
                             binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
                             label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
                             reRender="workspaceForm" />
-        <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{mainPage.typesOfCardReportPage.mainMenuComponent}"
-                            label="Отчет по типам карт" action="#{mainPage.typesOfCardReportPage.show}"
-                            reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTypeOfCardReport}"/>
 
         <rich:panelMenuItem id="zeroTransactionsReportMenuItem" binding="#{mainPage.zeroTransactionsReportPage.mainMenuComponent}"
                             label="Учет причин снижения объемов оказания услуг" action="#{mainPage.showZeroTransactionsReportPage}" reRender="workspaceForm" />
@@ -1203,7 +1200,7 @@
     <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
     <rich:panelMenuGroup id="salesReportGroupMenu" binding="#{salesReportGroupPage.mainMenuComponent}"
                          label="Отчеты по продажам"
-                         rendered="#{salesReportGroupPage.eligibleToWorkCommodityAccounting}, #{mainPage.eligibleToViewSalesReport}">
+                         rendered="#{salesReportGroupPage.eligibleToWorkCommodityAccounting}">
         <a4j:support event="onclick" action="#{salesReportGroupPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="dailySalesByGroupsReportMenuItem" binding="#{dailySalesByGroupsReportPage.mainMenuComponent}"
@@ -1231,6 +1228,19 @@
                             action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="cardGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardGroupPage"--%>
+    <rich:panelMenuGroup id="cardGroupPageMenu" binding="#{cardGroupPage.mainMenuComponent}" label="Отчеты по картам"
+                         rendered="#{cardGroupPage.eligibleToWorkCard}">
+        <a4j:support event="onclick" action="#{cardGroupPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{mainPage.typesOfCardReportPage.mainMenuComponent}"
+                            label="Отчет по типам карт" action="#{mainPage.typesOfCardReportPage.show}"
+                            reRender="workspaceForm" />
+        <rich:panelMenuItem id="interactiveCardDataMenuItem"
+                            binding="#{interactiveCardDataReportPage.mainMenuComponent}"
+                            label="Отчет по обороту электронных карт" action="#{interactiveCardDataReportPage.show}"
+                            reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
@@ -1249,9 +1259,6 @@
     <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
                         label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
                         reRender="workspaceForm" rendered="#{mainPage.eligibleToViewTransactionsReport}" />
-    <rich:panelMenuItem id="interactiveCardDataMenuItem" binding="#{interactiveCardDataReportPage.mainMenuComponent}"
-                        label="Отчет по обороту электронных карт" action="#{interactiveCardDataReportPage.show}"
-                        reRender="workspaceForm" rendered="#{mainPage.eligibleToViewInteractiveCardDataReport}" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
