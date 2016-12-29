@@ -124,7 +124,7 @@
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userEditPage.isDefault}">
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text" />
         </rich:column>
@@ -136,7 +136,7 @@
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Отчеты по картам" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.cardReportItems}" var="cardReportItems" rendered="#{mainPage.userEditPage.isDefault}">
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.cardReportItems}" var="cardReportItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{cardReportItems.selected}" styleClass="output-text" />
         </rich:column>
