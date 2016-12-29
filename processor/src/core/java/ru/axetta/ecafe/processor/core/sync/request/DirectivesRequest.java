@@ -18,7 +18,7 @@ public class DirectivesRequest implements SectionRequest {
     private final Boolean tradeConfigChangedSuccess;
 
     public DirectivesRequest(Node directivesRequestNode) throws Exception {
-        this.tradeConfigChangedSuccess = XMLUtils.getBooleanAttributeValue(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS");
+        this.tradeConfigChangedSuccess = XMLUtils.findFirstChildElement(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
     }
 
     @Override
