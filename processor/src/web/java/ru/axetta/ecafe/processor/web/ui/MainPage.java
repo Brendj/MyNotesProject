@@ -8755,59 +8755,59 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewTypeOfCardReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TYPE_OF_CARD_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TYPE_OF_CARD_REPORT);
     }
 
     public boolean isEligibleToViewInteractiveCardDataReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_INTERACTIVE_CARD_DATA_REPORT);
     }
 
     public boolean isEligibleToViewElectronicReconciliationReport() throws  Exception {
-        return  getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT);
+        return  !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT);
     }
 
     public boolean isEligibleToViewPaidFoodReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_PAID_FOOD_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_PAID_FOOD_REPORT);
     }
 
     public boolean isEligibleToViewSubscriptionFeeding() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SUBSCRIPTION_FEEDING);
     }
 
     public boolean isEligibleToViewClientReports() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CLIENT_REPORTS);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CLIENT_REPORTS);
     }
 
     public boolean isEligibleToViewStatisticDifferences() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_STATISTIC_DIFFERENCES);
     }
 
     public boolean isEligibleToViewFinancialControl() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_FINANCIAL_CONTROL);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_FINANCIAL_CONTROL);
     }
 
     public boolean isEligibleToViewInformReports() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_INFORM_REPORTS);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_INFORM_REPORTS);
     }
 
     public boolean isEligibleToViewSalesReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SALES_REPORTS);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SALES_REPORTS);
     }
 
     public boolean isEligibleToViewEnterEventReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ENTER_EVENT_REPORT);
     }
 
     public boolean isEligibleToViewTotalServicesReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT);
     }
 
     public boolean isEligibleToViewClientsBenefitsReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CLIENTS_BENEFITS_REPORT);
     }
 
     public boolean isEligibleToViewTransactionsReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
     }
 
     public Object removeClient() {
