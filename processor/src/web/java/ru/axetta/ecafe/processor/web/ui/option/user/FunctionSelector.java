@@ -272,20 +272,37 @@ public class FunctionSelector {
             Item item = new Item(function);
             CardReportItem cardReportItem = new CardReportItem(function);
             OnlineReportItem onlineReportItem = new OnlineReportItem(function);
-            if (selectedFunctions != null && selectedFunctions.contains(function)) {
-                item.setSelected(true);
-            }
-            items.add(item);
 
-            if (selectedFunctions != null && selectedFunctions.contains(function)) {
-                cardReportItem.setSelected(true);
+            if (cardReportItem.getFunctionName().equals("typeOfCardRprt") || cardReportItem.getFunctionName()
+                    .equals("interactiveCardDataRprt")) {
+                if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                    cardReportItem.setSelected(true);
+                }
+                cardReportItems.add(cardReportItem);
+            } else if (onlineReportItem.getFunctionName().equals("onlineRprt") || onlineReportItem.getFunctionName()
+                    .equals("onlineRprtComplex") || onlineReportItem.getFunctionName().equals("onlineRprtBenefit")
+                    || onlineReportItem.getFunctionName().equals("onlineRprtRequest") || onlineReportItem
+                    .getFunctionName().equals("electronicReconciliationRprt") || onlineReportItem.getFunctionName()
+                    .equals("onlineRprtMeals") || onlineReportItem.getFunctionName().equals("paidFood")
+                    || onlineReportItem.getFunctionName().equals("subscriptionFeeding") || onlineReportItem
+                    .getFunctionName().equals("onlineRprtRefill") || onlineReportItem.getFunctionName()
+                    .equals("onlineRprtActivity") || onlineReportItem.getFunctionName().equals("clientRprts")
+                    || onlineReportItem.getFunctionName().equals("statisticDifferences") || onlineReportItem
+                    .getFunctionName().equals("financialControl") || onlineReportItem.getFunctionName()
+                    .equals("informRprts") || onlineReportItem.getFunctionName().equals("salesRprt") || onlineReportItem
+                    .getFunctionName().equals("enterEventRprt") || onlineReportItem.getFunctionName()
+                    .equals("totalServicesRprt") || onlineReportItem.getFunctionName().equals("clientsBenefitsRprt")
+                    || onlineReportItem.getFunctionName().equals("transactionsRprt")) {
+                if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                    onlineReportItem.setSelected(true);
+                }
+                onlineReportItems.add(onlineReportItem);
+            } else {
+                if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                    item.setSelected(true);
+                }
+                items.add(item);
             }
-            cardReportItems.add(cardReportItem);
-
-            if (selectedFunctions != null && selectedFunctions.contains(function)) {
-                onlineReportItem.setSelected(true);
-            }
-            onlineReportItem.setSelected(true);
         }
         this.items = items;
         Collections.sort(items);
