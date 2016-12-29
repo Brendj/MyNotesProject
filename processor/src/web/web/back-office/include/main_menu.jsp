@@ -1095,7 +1095,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
-                         label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientsReports}, #{mainPage.eligibleToViewClientReports}">
+                         label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientsReports}">
         <a4j:support event="onclick" action="#{mainPage.showClientReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="сlientBalanceByDayReportMenuItem" binding="#{mainPage.clientBalanceByDayReportPage.mainMenuComponent}"
                             label="Баланс клиентов на дату" action="#{mainPage.showClientBalanceByDayReportPage}" reRender="workspaceForm" />
@@ -1109,7 +1109,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
-                         label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewActivityReports}, #{mainPage.eligibleToViewInformReports}">
+                         label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewActivityReports}">
         <a4j:support event="onclick" action="#{mainPage.showInformReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="SentSmsReportPageMenuItem"
                             binding="#{sentSmsReportPage.mainMenuComponent}"
@@ -1131,7 +1131,7 @@
 
     <%--@elvariable id="statisticDifferencesGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticDifferencesGroupPage"--%>
     <rich:panelMenuGroup id="statisticDifferencesGroupMenu" binding="#{statisticDifferencesGroupPage.mainMenuComponent}"
-                     label="Статистика по расхождениям данных" rendered="#{statisticDifferencesGroupPage.eligibleToWorkCommodityAccounting}, #{mainPage.eligibleToViewStatisticDifferences}">
+                     label="Статистика по расхождениям данных" rendered="#{statisticDifferencesGroupPage.eligibleToWorkCommodityAccounting}">
         <a4j:support event="onclick" action="#{statisticDifferencesGroupPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
@@ -1175,7 +1175,7 @@
     <%--@elvariable id="financialControlPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FinancialControlPage"--%>
     <rich:panelMenuGroup id="financialControlMenu" binding="#{financialControlPage.mainMenuComponent}"
                          label="Отчеты для службы финансового контроля"
-                         rendered="#{financialControlPage.eligibleToWorkCommodityAccounting}, #{mainPage.eligibleToViewFinancialControl}">
+                         rendered="#{financialControlPage.eligibleToWorkCommodityAccounting}">
         <a4j:support event="onclick" action="#{financialControlPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="latePaymentReportMenuItem"
