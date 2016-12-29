@@ -135,6 +135,7 @@
             <h:outputText escape="true" value="#{onlineReportItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+</h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateUser}" reRender="workspaceTogglePanel"
                        styleClass="command-button" />
