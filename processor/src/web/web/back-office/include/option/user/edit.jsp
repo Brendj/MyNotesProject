@@ -135,19 +135,6 @@
             <h:outputText escape="true" value="#{onlineReportItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Отчеты по картам" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.cardReportItems}" var="cardReportItems" rendered="#{mainPage.userEditPage.isDefault}">
-        <rich:column>
-            <h:selectBooleanCheckbox value="#{cardReportItems.selected}" styleClass="output-text" />
-        </rich:column>
-        <rich:column>
-            <h:outputText escape="true" value="#{cardReportItems.functionName}" styleClass="output-text" />
-        </rich:column>
-        <rich:column>
-            <h:outputText escape="true" value="#{cardReportItems.functionDesc}" styleClass="output-text" />
-        </rich:column>
-    </rich:dataTable>
-</h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateUser}" reRender="workspaceTogglePanel"
                        styleClass="command-button" />
