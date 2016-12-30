@@ -8783,7 +8783,7 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewSalesReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SALES_REPORTS);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_SALES_REPORTS);
     }
 
     public boolean isEligibleToViewEnterEventReport() throws Exception {
@@ -8791,7 +8791,7 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewCardReports() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CARD_REPORTS);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CARD_REPORTS);
     }
 
     public boolean isEligibleToViewTotalServicesReport() throws Exception {

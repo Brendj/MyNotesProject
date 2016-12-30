@@ -972,7 +972,7 @@
     <rich:panelMenuGroup id="electronicReconciliationStatisticsReportGroupMenu"
                          binding="#{electronicReconciliationReportGroupPage.mainMenuComponent}"
                          label="Электронная сверка"
-                         rendered="#{electronicReconciliationReportGroupPage.eligibleToWorkCommodityAccounting}, #{mainPage.eligibleToViewElectronicReconciliationReport} ">
+                         rendered="#{mainPage.eligibleToViewElectronicReconciliationReport} ">
         <a4j:support event="onclick" action="#{electronicReconciliationReportGroupPage.show}"
                      reRender="workspaceForm" />
         <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier()}"
@@ -1095,7 +1095,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
-                         label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientsReports}">
+                         label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientReports}">
         <a4j:support event="onclick" action="#{mainPage.showClientReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="сlientBalanceByDayReportMenuItem" binding="#{mainPage.clientBalanceByDayReportPage.mainMenuComponent}"
                             label="Баланс клиентов на дату" action="#{mainPage.showClientBalanceByDayReportPage}" reRender="workspaceForm" />
@@ -1109,7 +1109,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
-                         label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewActivityReports}">
+                         label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewInformReports}">
         <a4j:support event="onclick" action="#{mainPage.showInformReportsGroupMenu}" reRender="workspaceForm" />
         <rich:panelMenuItem id="SentSmsReportPageMenuItem"
                             binding="#{sentSmsReportPage.mainMenuComponent}"
@@ -1131,7 +1131,7 @@
 
     <%--@elvariable id="statisticDifferencesGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticDifferencesGroupPage"--%>
     <rich:panelMenuGroup id="statisticDifferencesGroupMenu" binding="#{statisticDifferencesGroupPage.mainMenuComponent}"
-                     label="Статистика по расхождениям данных" rendered="#{statisticDifferencesGroupPage.eligibleToWorkCommodityAccounting}">
+                     label="Статистика по расхождениям данных" rendered="#{mainPage.eligibleToViewStatisticDifferences}">
         <a4j:support event="onclick" action="#{statisticDifferencesGroupPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
@@ -1175,7 +1175,7 @@
     <%--@elvariable id="financialControlPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FinancialControlPage"--%>
     <rich:panelMenuGroup id="financialControlMenu" binding="#{financialControlPage.mainMenuComponent}"
                          label="Отчеты для службы финансового контроля"
-                         rendered="#{financialControlPage.eligibleToWorkCommodityAccounting}">
+                         rendered="#{mainPage.eligibleToViewFinancialControl}">
         <a4j:support event="onclick" action="#{financialControlPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="latePaymentReportMenuItem"
@@ -1200,7 +1200,7 @@
     <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
     <rich:panelMenuGroup id="salesReportGroupMenu" binding="#{salesReportGroupPage.mainMenuComponent}"
                          label="Отчеты по продажам"
-                         rendered="#{salesReportGroupPage.eligibleToWorkCommodityAccounting}">
+                         rendered="#{mainPage.eligibleToViewSalesReport}">
         <a4j:support event="onclick" action="#{salesReportGroupPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="dailySalesByGroupsReportMenuItem" binding="#{dailySalesByGroupsReportPage.mainMenuComponent}"
@@ -1230,7 +1230,7 @@
 
     <%--@elvariable id="cardGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardGroupPage"--%>
     <rich:panelMenuGroup id="cardGroupPageMenu" binding="#{cardGroupPage.mainMenuComponent}" label="Отчеты по картам"
-                         rendered="#{cardGroupPage.eligibleToWorkCard}">
+                         rendered="#{mainPage.eligibleToViewCardReports}">
         <a4j:support event="onclick" action="#{cardGroupPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="typesOfCardReportMenuItem" binding="#{mainPage.typesOfCardReportPage.mainMenuComponent}"
                             label="Отчет по типам карт" action="#{mainPage.typesOfCardReportPage.show}"

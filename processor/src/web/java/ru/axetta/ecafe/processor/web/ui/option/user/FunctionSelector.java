@@ -193,8 +193,7 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("typeOfCardRprt") || item.getFunctionName()
-                    .equals("interactiveCardDataRprt")) {
+                    .getFunctionName().equals("cardRprts")) {
                 OnlineReportItem onlineReportItem = new OnlineReportItem(function);
                 onlineReportItems.add(onlineReportItem);
             } else {
@@ -230,9 +229,8 @@ public class FunctionSelector {
                     .equals("informRprts") || onlineReportItem.getFunctionName().equals("salesRprt") || onlineReportItem
                     .getFunctionName().equals("enterEventRprt") || onlineReportItem.getFunctionName()
                     .equals("totalServicesRprt") || onlineReportItem.getFunctionName().equals("clientsBenefitsRprt")
-                    || onlineReportItem.getFunctionName().equals("transactionsRprt") || onlineReportItem
-                    .getFunctionName().equals("typeOfCardRprt") || onlineReportItem.getFunctionName()
-                    .equals("interactiveCardDataRprt")) {
+                    || onlineReportItem.getFunctionName().equals("transactionsRprt") || onlineReportItem.getFunctionName()
+                    .equals("cardRprts")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     onlineReportItem.setSelected(true);
                 }
