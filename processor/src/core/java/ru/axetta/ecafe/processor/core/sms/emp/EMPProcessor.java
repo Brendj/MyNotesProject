@@ -272,7 +272,7 @@ public class EMPProcessor {
                             else if (attrName.equals(ATTRIBUTE_SMS_SEND)) newNotifyViaSMS = v;
                             else if (attrName.equals(ATTRIBUTE_PUSH_SEND)) newNotifyViaPUSH = v;
                         } catch (Exception e1) {
-                            logger.error("Failed to parse " + attrName + " value", e1);
+                            logger.error("Failed to parse " + attrName + " value");
                         }
                     }
                 }
