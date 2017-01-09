@@ -120,15 +120,15 @@ public class ClientsReport extends BasicReportForOrgJob {
             List<ClientsReportItem> resultRows = new LinkedList<ClientsReportItem>();
             Calendar c = Calendar.getInstance();
             Query query = session.createSQLQuery
-                   ("select cf_orders.CreatedDate, sum(cf_orders.rsum/100), trim(both ' ' from cf_persons.firstname), "
-                    + " trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.secondname) "
+                   ("select cf_orders.CreatedDate, sum(cf_orders.rsum/100), trim(both ' ' from cf_persons.firstname) as fn, "
+                    + " trim(both ' ' from cf_persons.surname) as sn, trim(both ' ' from cf_persons.secondname) as scn "
                     + "from cf_orders "
                     + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
                     + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
                     + "where cf_orders.state=0 and cf_orders.idoforg=:idOfOrg and cf_orders.CreatedDate>=:startTime "
                     + "AND cf_orders.CreatedDate<=:endTime AND (cf_orders.rsum > 0) "
                     + "group by cf_orders.CreatedDate, cf_persons.firstname, cf_persons.surname, cf_persons.secondname "
-                    + "order by trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.firstname), trim(both ' ' from cf_persons.secondname), cf_orders.CreatedDate");
+                    + "order by sn, fn, scn, cf_orders.CreatedDate");
                     /*("SELECT o.CreatedDate, sum(od.rPrice) AS SUM1, p.firstname, p.surname, p.secondname "
                     + "FROM CF_ORDERS o, CF_CLIENTS c, CF_PERSONS p, CF_ORDERDETAILS od "
                     + "WHERE (o.idOfOrg=:idOfOrg) AND (o.idofclient=c.idofclient) AND (p.idofperson=c.idofperson) AND od.idOfOrder=o.idOfOrder "
