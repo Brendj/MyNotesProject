@@ -41,7 +41,7 @@
 <h:panelGrid id="panelEdit" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Показать правила" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportJobEditPage.showRules}" styleClass="output-text">
-        <a4j:support event="onclick" reRender="panel"/>
+        <a4j:support event="onclick" reRender="panelEdit"/>
     </h:selectBooleanCheckbox>
 
     <h:outputText value="Список правил" styleClass="output-text" rendered="#{mainPage.reportJobEditPage.showRules}" />
