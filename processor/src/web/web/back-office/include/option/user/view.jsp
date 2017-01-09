@@ -30,6 +30,105 @@
             <h:outputText escape="true" value="#{item.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="Организации" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.organizationItems}" var="organizationItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{organizationItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{organizationItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Контрагенты" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.contragentItems}" var="contragentItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Клиенты" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.clientItems}" var="clientItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{clientItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{clientItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Сотрудники" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.contragentItems}" var="contragentItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Карты" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.cardItems}" var="cardItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{cardItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{cardItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Товарный учет" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.wayBillItems}" var="wayBillItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{wayBillItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{wayBillItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Сервис" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.serviceItems}" var="serviceItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{serviceItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{serviceItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Мониторинг" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.monitorItems}" var="monitorItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{monitorItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{monitorItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Репозиторий отчетов" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.repositoryItems}" var="repositoryItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{repositoryItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{repositoryItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Настройки" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.optionsItems}" var="optionsItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{optionsItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{optionsItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.onlineReportItems}" var="onlineReportItems">
+        <rich:column>
+            <h:outputText escape="true" value="#{onlineReportItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{onlineReportItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showUserEditPage}"

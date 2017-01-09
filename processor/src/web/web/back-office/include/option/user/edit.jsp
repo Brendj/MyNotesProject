@@ -123,6 +123,126 @@
             <h:outputText escape="true" value="#{item.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="Организации" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.organizationItems}" var="organizationItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{organizationItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{organizationItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Контрагенты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.contragentItems}" var="contragentItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{contragentItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Клиенты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.clientItems}" var="clientItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{clientItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{clientItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{clientItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Сотрудники" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.contragentItems}" var="contragentItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{contragentItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Карты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.cardItems}" var="cardItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{cardItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{cardItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{cardItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Товарный учет" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.wayBillItems}" var="wayBillItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{wayBillItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{wayBillItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{wayBillItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Сервис" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.serviceItems}" var="serviceItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{serviceItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{serviceItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{serviceItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Мониторинг" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.monitorItems}" var="monitorItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{monitorItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{monitorItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{monitorItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Репозиторий отчетов" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.repositoryItems}" var="repositoryItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{repositoryItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{repositoryItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{repositoryItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Настройки" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.optionsItems}" var="optionsItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{optionsItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{optionsItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{optionsItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
     <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
     <rich:dataTable value="#{mainPage.userEditPage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>

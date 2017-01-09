@@ -7,10 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,19 +49,148 @@ public class FunctionViewer {
     }
 
     private List<Item> items = Collections.emptyList();
+    private List<Item> onlineReportItems = Collections.emptyList();
+    private List<Item> organizationItems = Collections.emptyList();
+    private List<Item> contragentItems = Collections.emptyList();
+    private List<Item> clientItems = Collections.emptyList();
+    private List<Item> visitorItems = Collections.emptyList();
+    private List<Item> cardItems = Collections.emptyList();
+    private List<Item> wayBillItems = Collections.emptyList();
+    private List<Item> serviceItems = Collections.emptyList();
+    private List<Item> monitorItems = Collections.emptyList();
+    private List<Item> repositoryItems = Collections.emptyList();
+    private List<Item> optionsItems = Collections.emptyList();
 
     public List<Item> getItems() {
         return items;
     }
 
+    public List<Item> getOnlineReportItems() {
+        return onlineReportItems;
+    }
+
+    public List<Item> getOrganizationItems() {
+        return organizationItems;
+    }
+
+    public List<Item> getContragentItems() {
+        return contragentItems;
+    }
+
+    public List<Item> getClientItems() {
+        return clientItems;
+    }
+
+    public List<Item> getVisitorItems() {
+        return visitorItems;
+    }
+
+    public List<Item> getCardItems() {
+        return cardItems;
+    }
+
+    public List<Item> getWayBillItems() {
+        return wayBillItems;
+    }
+
+    public List<Item> getServiceItems() {
+        return serviceItems;
+    }
+
+    public List<Item> getMonitorItems() {
+        return monitorItems;
+    }
+
+    public List<Item> getRepositoryItems() {
+        return repositoryItems;
+    }
+
+    public List<Item> getOptionsItems() {
+        return optionsItems;
+    }
+
     public void fill(User user) throws Exception {
         List<Item> items = new LinkedList<Item>();
+        List<Item> onlineReportItems = new ArrayList<Item>();
+        List<Item> organizationItems = new ArrayList<Item>();
+        List<Item> contragentItems = new ArrayList<Item>();
+        List<Item> clientItems = new ArrayList<Item>();
+        List<Item> visitorItems = new ArrayList<Item>();
+        List<Item> cardItems = new ArrayList<Item>();
+        List<Item> wayBillItems = new ArrayList<Item>();
+        List<Item> serviceItems = new ArrayList<Item>();
+        List<Item> monitorItems = new ArrayList<Item>();
+        List<Item> repositoryItems = new ArrayList<Item>();
+        List<Item> optionsItems = new ArrayList<Item>();
         Set<Function> userFunctions = user.getFunctions();
         for (Function function : userFunctions) {
             Item item = new Item(function);
-            items.add(item);
+            if (item.getFunctionName().equals("orgEdit") || item.getFunctionName().equals("orgView")) {
+                organizationItems.add(item);
+            } else if (item.getFunctionName().equals("contraEdit") || item.getFunctionName().equals("contraView")
+                    || item.getFunctionName().equals("payProcess") || item.getFunctionName().equals("pmntEdit") || item
+                    .getFunctionName().equals("pmntView") || item.getFunctionName().equals("posEdit") || item
+                    .getFunctionName().equals("posView")) {
+                contragentItems.add(item);
+            } else if (item.getFunctionName().equals("clientDel") || item.getFunctionName().equals("clientEdit") || item
+                    .getFunctionName().equals("onlineRprtClients") || item.getFunctionName().equals("clientView")) {
+                clientItems.add(item);
+            } else if (item.getFunctionName().equals("visitorDogmEdit")) {
+                visitorItems.add(item);
+            } else if (item.getFunctionName().equals("cardEdit") || item.getFunctionName().equals("cardView")) {
+                cardItems.add(item);
+            } else if (item.getFunctionName().equals("commAcc")) {
+                wayBillItems.add(item);
+            } else if (item.getFunctionName().equals("servAdm") || item.getFunctionName().equals("servClnt") || item
+                    .getFunctionName().equals("servSupp")) {
+                serviceItems.add(item);
+            } else if (item.getFunctionName().equals("monitor")) {
+                monitorItems.add(item);
+            } else if (item.getFunctionName().equals("showReportRepository")) {
+                repositoryItems.add(item);
+            } else if (item.getFunctionName().equals("deleteUser") || item.getFunctionName().equals("editUser") || item
+                    .getFunctionName().equals("viewUser") || item.getFunctionName().equals("workOption") || item
+                    .getFunctionName().equals("catEdit") ||
+                    item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
+                    .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
+                    .getFunctionName().equals("reportView")) {
+                optionsItems.add(item);
+            } else if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
+                    || item.getFunctionName().equals("onlineRprtBenefit") || item.getFunctionName()
+                    .equals("onlineRprtRequest") || item.getFunctionName().equals("electronicReconciliationRprt")
+                    || item.getFunctionName().equals("onlineRprtMeals") || item.getFunctionName().equals("paidFood")
+                    || item.getFunctionName().equals("subscriptionFeeding") || item.getFunctionName()
+                    .equals("onlineRprtRefill") || item.getFunctionName().equals("onlineRprtActivity") || item
+                    .getFunctionName().equals("clientRprts") || item.getFunctionName().equals("statisticDifferences")
+                    || item.getFunctionName().equals("financialControl") || item.getFunctionName().equals("informRprts")
+                    || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
+                    || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
+                    .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
+                    .getFunctionName().equals("cardRprts")) {
+                onlineReportItems.add(item);
+            } else {
+                items.add(item);
+            }
         }
         Collections.sort(items);
         this.items = items;
+        this.onlineReportItems = onlineReportItems;
+        Collections.sort(onlineReportItems);
+        this.organizationItems = organizationItems;
+        Collections.sort(organizationItems);
+        this.contragentItems = contragentItems;
+        Collections.sort(contragentItems);
+        this.clientItems = clientItems;
+        Collections.sort(clientItems);
+        this.visitorItems = visitorItems;
+        this.cardItems = cardItems;
+        Collections.sort(cardItems);
+        this.wayBillItems = wayBillItems;
+        this.serviceItems = serviceItems;
+        Collections.sort(serviceItems);
+        this.monitorItems = monitorItems;
+        this.repositoryItems = repositoryItems;
+        this.optionsItems = optionsItems;
+        Collections.sort(optionsItems);
     }
 }
