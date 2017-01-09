@@ -496,11 +496,13 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
                     }
                 }
                 DeliveredServicesItem itemForWater = mapForWater.get(item.getIdoforg());
-                itemForWater.setCountWater(itemForWater.getCountWater() + item.getCount());
-                itemForWater.setSummaryWater(itemForWater.getSummaryWater() + item.getSummary());
-                if(item.getCreatedDate().after(itemForWater.getCreatedDate())) {
-                    itemForWater.setPriceWater(item.getPrice());
-                    itemForWater.setCreatedDate(item.getCreatedDate());
+                if(itemForWater != null) {
+                    itemForWater.setCountWater(itemForWater.getCountWater() + item.getCount());
+                    itemForWater.setSummaryWater(itemForWater.getSummaryWater() + item.getSummary());
+                    if (item.getCreatedDate().after(itemForWater.getCreatedDate())) {
+                        itemForWater.setPriceWater(item.getPrice());
+                        itemForWater.setCreatedDate(item.getCreatedDate());
+                    }
                 }
             }
 
@@ -512,7 +514,7 @@ public class DeliveredServicesElectronicCollationReport extends BasicReportForMa
             parameterMap.put("waterCount", waterCount);
             parameterMap.put("waterSummary", waterSummary);
             parameterMap.put("summary37", summary37);
-            parameterMap.put("summary511", summary511);
+            parameterMap.put("summary511", summary511 + waterSummary);
             parameterMap.put("summaryAll", summaryAll + waterSummary);
 
             return result;
