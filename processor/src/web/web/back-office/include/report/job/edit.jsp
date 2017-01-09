@@ -38,7 +38,7 @@
         </h:outputLink>
     </h:panelGrid>
 </h:panelGrid>
-<h:panelGrid id="panel" styleClass="borderless-grid" columns="2">
+<h:panelGrid id="panelEdit" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Показать правила" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportJobEditPage.showRules}" styleClass="output-text">
         <a4j:support event="onclick" reRender="panel"/>
