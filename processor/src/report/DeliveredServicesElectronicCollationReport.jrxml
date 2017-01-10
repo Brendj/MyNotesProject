@@ -3990,7 +3990,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure} + $V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="fd8bdf6a-dcb6-4aa9-9178-cd83f4c32a22" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="39"/>
@@ -4061,7 +4061,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure} + $V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="">
 							<reportElement uuid="cfecf503-bb74-4e91-b7cb-cdd11839305c" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>

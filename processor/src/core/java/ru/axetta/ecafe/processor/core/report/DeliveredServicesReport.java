@@ -437,7 +437,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 if(itemForWater != null) {
                     itemForWater.setCountWater(itemForWater.getCountWater() + item.getCount());
                     itemForWater.setSummaryWater(itemForWater.getSummaryWater() + item.getSummary());
-                    if (item.getCreatedDate().after(itemForWater.getCreatedDate())) {
+                    if (item.getCreatedDate().after(itemForWater.getCreatedDate()) || waterItems.size() < 2) {
                         itemForWater.setPriceWater(item.getPrice());
                         itemForWater.setCreatedDate(item.getCreatedDate());
                     }
