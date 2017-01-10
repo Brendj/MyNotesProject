@@ -118,8 +118,8 @@
             <h:outputText escape="true" value="#{organizationItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Контрагенты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.contragentItems}" var="contragentItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Контрагенты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.contragentItems}" var="contragentItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{contragentItems.selected}" styleClass="output-text" />
         </rich:column>
@@ -130,8 +130,8 @@
             <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Клиенты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.clientItems}" var="clientItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Клиенты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.clientItems}" var="clientItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{clientItems.selected}" styleClass="output-text" />
         </rich:column>
@@ -166,8 +166,8 @@
             <h:outputText escape="true" value="#{cardItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Товарный учет" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.wayBillItems}" var="wayBillItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Товарный учет" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.wayBillItems}" var="wayBillItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{wayBillItems.selected}" styleClass="output-text" />
         </rich:column>
@@ -226,8 +226,8 @@
             <h:outputText escape="true" value="#{optionsItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text" />
         </rich:column>

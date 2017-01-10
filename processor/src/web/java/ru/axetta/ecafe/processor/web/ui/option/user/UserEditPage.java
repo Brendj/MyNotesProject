@@ -365,6 +365,11 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return role.equals(User.DefaultRole.ADMIN_SECURITY);
     }
 
+    public Boolean getIsSupplier() {
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.SUPPLIER);
+    }
+
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {
