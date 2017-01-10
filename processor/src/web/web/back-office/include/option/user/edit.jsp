@@ -160,15 +160,15 @@
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Сотрудники" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.contragentItems}" var="contragentItems" rendered="#{mainPage.userEditPage.isDefault}">
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.visitorItems}" var="visitorItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>
-            <h:selectBooleanCheckbox value="#{contragentItems.selected}" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{visitorItems.selected}" styleClass="output-text" />
         </rich:column>
         <rich:column>
-            <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{visitorItems.functionName}" styleClass="output-text" />
         </rich:column>
         <rich:column>
-            <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{visitorItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Карты" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>

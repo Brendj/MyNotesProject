@@ -78,7 +78,7 @@ public class FunctionSelector {
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
-    private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
+    //private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
     private static final String[] securityAdminFunctions = new String[]{
             "viewUser", "editUser", "deleteUser", "workOption"};
 
@@ -138,7 +138,7 @@ public class FunctionSelector {
 
     public Set<Function> getAdminFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
-        allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions)));
+        //allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions)));
         return new HashSet<Function>((List<Function>) allFunctionsCriteria.list());
     }
 
@@ -180,8 +180,8 @@ public class FunctionSelector {
 
     public void fill(Session session) throws Exception {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
-        allFunctionsCriteria.add(Restrictions
-                .not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями
+        /*allFunctionsCriteria.add(Restrictions
+                .not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями*/
         List allFunctions = allFunctionsCriteria.list();
         List<Item> items = new ArrayList<Item>(allFunctions.size());
         List<Item> onlineReportItems = new ArrayList<Item>();
