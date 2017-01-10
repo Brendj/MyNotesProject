@@ -274,10 +274,26 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
             parts = objects[0].toString().split("/");
 
-            if(parts.length>0) pathPart1 = parts[0];
-            if(parts.length>1) pathPart2 = parts[1];
-            if(parts.length>2) pathPart3 = parts[2];
-            if(parts.length>3) pathPart4 = parts[3];
+            if(parts.length>0) {
+                pathPart1 = parts[0];
+            } else {
+                pathPart1 = "";
+            }
+            if(parts.length>1) {
+                pathPart2 = parts[1];
+            } else {
+                pathPart2 = "";
+            }
+            if(parts.length>2) {
+                pathPart3 = parts[2];
+            } else {
+                pathPart3 = "";
+            }
+            if(parts.length>3) {
+                pathPart4 = parts[3];
+            } else {
+                pathPart4 = "";
+            }
 
             qty = ((Integer) objects[1]).longValue();
 

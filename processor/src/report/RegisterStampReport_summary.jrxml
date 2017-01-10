@@ -35,7 +35,6 @@
 	<field name="date" class="java.lang.String"/>
 	<field name="number" class="java.lang.String"/>
 	<field name="dateTime" class="java.util.Date"/>
-	<field name="orderType" class="java.lang.Integer"/>
 	<title>
 		<band splitType="Stretch"/>
 	</title>
@@ -91,7 +90,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" positionType="Float" x="0" y="0" width="116" height="22"/>
+								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="116" height="22"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="11"/>
 								</textElement>
@@ -122,23 +121,6 @@
 						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<columnGroup name="group1" height="0">
-					<bucket class="java.lang.Integer">
-						<bucketExpression><![CDATA[$F{orderType}]]></bucketExpression>
-					</bucket>
-					<crosstabColumnHeader>
-						<cellContents>
-							<textField>
-								<reportElement uuid="5f2f0d93-2642-422e-8f8e-0b6214258af3" style="Crosstab Data Text" x="0" y="0" width="96" height="0"/>
-								<textElement/>
-								<textFieldExpression><![CDATA[$V{group1}]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabColumnHeader>
-					<crosstabTotalColumnHeader>
-						<cellContents/>
-					</crosstabTotalColumnHeader>
-				</columnGroup>
 				<columnGroup name="level1" height="22" headerPosition="Stretch">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{level1}]]></bucketExpression>
@@ -314,18 +296,6 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level4">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell columnTotalGroup="group1">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="group1">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="date" columnTotalGroup="group1">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="number" columnTotalGroup="group1">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>
