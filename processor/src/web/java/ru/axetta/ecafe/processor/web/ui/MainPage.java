@@ -408,6 +408,7 @@ public class MainPage implements Serializable {
     private final SalesReportGroupPage salesReportGroupPage = new SalesReportGroupPage();
     private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
     private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
+    private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -5941,6 +5942,10 @@ public class MainPage implements Serializable {
         return budgetFoodGroupMenu;
     }
 
+    public BasicWorkspacePage getElectronicReconciliationReportGroupMenu() {
+        return electronicReconciliationReportGroupMenu;
+    }
+
     public BasicWorkspacePage getPaidFoodGroupMenu() {
         return paidFoodGroupMenu;
     }
@@ -5977,6 +5982,12 @@ public class MainPage implements Serializable {
 
     public Object showBudgetFoodGroupMenu() {
         currentWorkspacePage = budgetFoodGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showElectronicReconciliationReportGroupMenu() {
+        currentWorkspacePage = electronicReconciliationReportGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
@@ -8755,7 +8766,7 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewElectronicReconciliationReport() throws  Exception {
-        return  !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT);
     }
 
     public boolean isEligibleToViewPaidFoodReport() throws Exception {

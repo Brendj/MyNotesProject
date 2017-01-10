@@ -100,7 +100,7 @@ public class Function {
     public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
     public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
     public static final String FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "electronicReconciliationRprt";
-    public static final String FUNCD_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "Закрыт подраздел 'Электронная сверка'";
+    public static final String FUNCD_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "Закрыть подраздел 'Электронная сверка'";
     public static final String FUNC_RESTRICT_PAID_FOOD_REPORT = "paidFood";
     public static final String FUNCD_RESTRICT_PAID_FOOD_REPORT = "Закрыть подраздел 'Платное питание'";
     public static final String FUNC_RESTRICT_SUBSCRIPTION_FEEDING = "subscriptionFeeding";

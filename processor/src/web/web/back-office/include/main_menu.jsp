@@ -968,12 +968,10 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-    <%--@elvariable id="electronicReconciliationReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ElectronicReconciliationReportGroupPage"--%>
     <rich:panelMenuGroup id="electronicReconciliationStatisticsReportGroupMenu"
-                         binding="#{electronicReconciliationReportGroupPage.mainMenuComponent}"
-                         label="Электронная сверка"
-                         rendered="#{mainPage.eligibleToViewElectronicReconciliationReport} ">
-        <a4j:support event="onclick" action="#{electronicReconciliationReportGroupPage.show}"
+                         binding="#{mainPage.electronicReconciliationReportGroupMenu.mainMenuComponent}"
+                         label="Электронная сверка" rendered="#{mainPage.eligibleToViewElectronicReconciliationReport}">
+        <a4j:support event="onclick" action="#{mainPage.showElectronicReconciliationReportGroupMenu}"
                      reRender="workspaceForm" />
         <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier()}"
                             binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
