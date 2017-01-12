@@ -25,10 +25,11 @@ public class SelectedOrgGroupPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session, Long idOfOrg) throws Exception {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        if (null == org) {
+
+        if (idOfOrg == null) {
             this.shortName = null;
         } else {
+        Org org = (Org) session.load(Org.class, idOfOrg);
             this.shortName = org.getShortName();
         }
     }

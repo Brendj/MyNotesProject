@@ -87,8 +87,12 @@ public class OrgOrderReportPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session, Long idOfOrg) throws HibernateException {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        this.shortName = org.getShortName();
+        if (idOfOrg == null) {
+            this.shortName = null;
+        } else {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            this.shortName = org.getShortName();
+        }
     }
 
     public void buildReport(Session session, Long idOfOrg) throws Exception {
