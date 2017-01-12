@@ -55,6 +55,8 @@ public class Function {
     // baybikov
     public static final String FUNC_WORK_OPTION = "workOption";
     public static final String FUNCD_WORK_OPTION = "Редактирование настроек";
+    public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
+    public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
     public static final String FUNC_COUNT_CURRENT_POSITIONS = "countCP";
     public static final String FUNCD_COUNT_CURRENT_POSITIONS = "Рассчитать текущие позиции";
     public static final String FUNC_POS_VIEW = "posView";
@@ -93,12 +95,10 @@ public class Function {
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_CLIENTS = "onlineRprtClients";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_CLIENTS = "Закрыть раздел 'Отчеты по клиентам'";
-    public static final String FUNC_VISITORDOGM_EDIT = "visitorDogmEdit";
-    public static final String FUNCD_VISITORDOGM_EDIT= "Редактирование сотрудников";
     public static final String FUNC_SHOW_REPORTS_REPOSITORY = "showReportRepository";
     public static final String FUNCD_SHOW_REPORTS_REPOSITORY = "Репозиторий отчетов";
-    public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
-    public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
+    public static final String FUNC_VISITORDOGM_EDIT = "visitorDogmEdit";
+    public static final String FUNCD_VISITORDOGM_EDIT= "Редактирование сотрудников";
     public static final String FUNC_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "electronicReconciliationRprt";
     public static final String FUNCD_RESTRICT_ELECTRONIC_RECONCILIATION_REPORT = "Закрыть подраздел 'Электронная сверка'";
     public static final String FUNC_RESTRICT_PAID_FOOD_REPORT = "paidFood";
