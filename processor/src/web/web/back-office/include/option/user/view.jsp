@@ -58,12 +58,12 @@
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Сотрудники" styleClass="output-text" />
-    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.contragentItems}" var="contragentItems">
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.visitorItems}" var="visitorItems">
         <rich:column>
-            <h:outputText escape="true" value="#{contragentItems.functionName}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{visitorItems.functionName}" styleClass="output-text" />
         </rich:column>
         <rich:column>
-            <h:outputText escape="true" value="#{contragentItems.functionDesc}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{visitorItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
     <h:outputText escape="true" value="Карты" styleClass="output-text" />
