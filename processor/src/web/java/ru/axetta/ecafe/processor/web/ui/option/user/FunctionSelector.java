@@ -398,6 +398,82 @@ public class FunctionSelector {
                 selectedFunctions.add(function);
             }
         }
+        for (Item item : onlineReportItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+        for (Item item : organizationItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : contragentItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : clientItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : visitorItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : cardItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : wayBillItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : serviceItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : monitorItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : repositoryItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : optionsItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
         return selectedFunctions;
     }
 }
