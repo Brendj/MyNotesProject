@@ -2102,15 +2102,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private PurchaseListWithDetailsResult processPurchaseListWithDetails(Long contractId, ObjectFactory objectFactory,
             Date startDate, Date endDate, Short mode) {
-        Session session = null;
-        Transaction transaction = null;
         PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
         PurchaseListWithDetailsExt purchaseListWithDetailsExt = objectFactory.createPurchaseListWithDetailsExt();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            Client client = findClientByContractId(session, contractId, result);
+            Client client = DAOReadonlyService.getInstance().findClientByContractId(contractId);
 
             if (client == null) {
                 return result;
@@ -2118,14 +2113,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             int nRecs = 0;
             Date nextToEndDate = DateUtils.addDays(endDate, 1);
-            Criteria ordersCriteria = session.createCriteria(Order.class);
-            ordersCriteria.add(Restrictions.eq("client", client));
-            ordersCriteria.add(Restrictions.ge("createTime", startDate));
-            ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+            List<Order> ordersList = DAOReadonlyService.getInstance().getClientOrdersByPeriod(client, startDate, nextToEndDate);
+            if (ordersList.size() == 0) {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+                return result;
+            }
+            List<OrderDetail> detailsList = DAOReadonlyService.getInstance().getOrderDetailsByOrders(ordersList);
 
-            ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
-            List ordersList = ordersCriteria.list();
+            Set<Long> orderOrgIds = getOrgsByOrders(ordersList);
+            Set<Long> menuIds = getIdOfMenusByOrderDetails(detailsList);
+            List<MenuDetail> menuDetails = DAOReadonlyService.getInstance().getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
 
+            Map<Long, Date> lastProcessMap = new HashMap<Long, Date>();
             for (Object o : ordersList) {
                 if (nRecs++ > MAX_RECS_getPurchaseList) {
                     break;
@@ -2138,28 +2139,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseWithDetailsExt.setDonation(order.getGrantSum());
                 purchaseWithDetailsExt.setSum(order.getRSum());
                 purchaseWithDetailsExt.setByCash(order.getSumByCash());
-                purchaseWithDetailsExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(order.getOrg().getIdOfOrg(),
-                        SectionType.PAYMENT_REGISTRY)));
+                purchaseWithDetailsExt.setLastUpdateDate(toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
                 if (order.getCard() == null) {
                     purchaseWithDetailsExt.setIdOfCard(null);
                 } else {
                     purchaseWithDetailsExt.setIdOfCard(order.getCard().getIdOfCard());
                 }
-                //было так: purchaseExt.setIdOfCard(order.getCard().getCardPrintedNo());
                 purchaseWithDetailsExt.setTime(toXmlDateTime(order.getCreateTime()));
                 if (mode!=null && mode == 1){
                     purchaseWithDetailsExt.setState(order.getState());
                 }
-                Set<OrderDetail> orderDetailSet = ((Order) o).getOrderDetails();
-                for (OrderDetail od : orderDetailSet) {
+                for (OrderDetail od : findDetailsByOrder(order, detailsList)) {
                     PurchaseWithDetailsElementExt purchaseWithDetailsElementExt = objectFactory.createPurchaseWithDetailsElementExt();
                     purchaseWithDetailsElementExt.setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                     purchaseWithDetailsElementExt.setAmount(od.getQty());
                     purchaseWithDetailsElementExt.setName(od.getMenuDetailName());
                     purchaseWithDetailsElementExt.setSum(od.getRPrice());
                     purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
-                    purchaseWithDetailsElementExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(order.getOrg().getIdOfOrg(),
-                            SectionType.PAYMENT_REGISTRY)));
+                    purchaseWithDetailsElementExt.setLastUpdateDate(toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
                     if (od.isComplex()) {
                         purchaseWithDetailsElementExt.setType(1);
                     } else if (od.isComplexItem()) {
@@ -2170,9 +2167,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     if (od.getIdOfMenuFromSync() != null) {
 
-                        //MenuDetail menuDetail = getMenuDetailConstitutionByOrder(session, od.getIdOfMenuFromSync(), ((Order) o).getOrg(), CalendarUtils.truncateToDayOfMonth(((Order) o).getCreateTime()));
-                        MenuDetail menuDetail = DAOReadonlyService.getInstance()
-                                .getMenuDetailConstitutionByOrder(od.getIdOfMenuFromSync(), ((Order) o).getOrg(), CalendarUtils.truncateToDayOfMonth(((Order) o).getCreateTime()));
+                        MenuDetail menuDetail = findMenuDetailByOrderDetail(od.getIdOfMenuFromSync(), menuDetails);
 
                         if (menuDetail != null) {
                             purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
@@ -2200,12 +2195,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseListWithDetailsExt.getP().add(purchaseWithDetailsExt);
             }
         } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
-        } finally {
-            HibernateUtils.close(session, logger);
         }
         result.resultCode = RC_OK;
         result.description = RC_OK_DESC;
@@ -2214,64 +2206,45 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    /*public MenuDetail getMenuDetailConstitutionByOrder(Session session, Long idOfMenuFromSync, Org orgFromOrder,
-            Date orderDate) {
+    private Date getLastPaymentRegistryDate(Long idOfOrg, Map<Long, Date> map) {
+        if (!map.containsKey(idOfOrg))
+            map.put(idOfOrg, OrgRepository.getInstance().getLastProcessSectionsDate(idOfOrg, SectionType.PAYMENT_REGISTRY));
+        return map.get(idOfOrg);
+    }
 
-        Date endDate  = CalendarUtils.addOneDay(orderDate);
+    private List<OrderDetail> findDetailsByOrder(Order order, List<OrderDetail> details) {
+        List<OrderDetail> list = new ArrayList<OrderDetail>();
+        for (OrderDetail detail : details) {
+            if (detail.getIdOfOrder().equals(order.getCompositeIdOfOrder().getIdOfOrder())
+                    && detail.getCompositeIdOfOrderDetail().getIdOfOrg().equals(order.getCompositeIdOfOrder().getIdOfOrg())) {
+                list.add(detail);
+            }
+        }
+        return list;
+    }
 
-        SQLQuery query = session.createSQLQuery(
-                "SELECT cfm.idofmenudetail AS idOfMenuDetail, cfm.menupath AS menuPath, "
-                        + "cfm.menudetailname AS menuDetailName, cfm.groupname AS groupName, "
-                        + "cfm.menudetailoutput AS menuDetailOutput, cfm.price AS price, "
-                        + "cfm.menuorigin AS menuOrigin, cfm.availablenow AS availableNow, "
-                        + "cfm.localidofmenu AS localIdOfMenu, cfm.protein AS protein, cfm.fat AS fat, "
-                        + "cfm.carbohydrates AS carbohydrates, cfm.calories AS calories, cfm.vitb1 AS vitB1, "
-                        + "cfm.vita AS vitA, cfm.vite AS vitE, cfm.vitc AS vitC,cfm.minca AS minCa, "
-                        + "cfm.minp AS minP, cfm.minmg AS minMg, cfm.minfe AS minFe, "
-                        + "cfm.flags AS flags, cfm.priority AS priority, cfm.vitb2 AS vitB2, "
-                        + "cfm.vitpp AS vitPp, cfm.idofmenufromsync AS idOfMenuFromSync "
-                        + "FROM cf_menudetails cfm LEFT JOIN cf_menu cm ON cm.idofmenu = cfm.idofmenu "
-                        + "WHERE cfm.idofmenufromsync = :idofmenufromsync "
-                        + "AND cm.idoforg = :idoforg "
-                        + "AND cm.menudate between :orderdate and :enddate "
-                        + "ORDER BY cfm.idofmenudetail DESC limit 1");
-        query.setParameter("idofmenufromsync", idOfMenuFromSync);
-        query.setParameter("idoforg", orgFromOrder);
-        query.setParameter("orderdate", orderDate.getTime());
-        query.setParameter("enddate", endDate.getTime());
+    private MenuDetail findMenuDetailByOrderDetail(Long idOfMenuFromSync,  List<MenuDetail> menuDetails) {
+        for (MenuDetail detail : menuDetails) {
+            if (idOfMenuFromSync.equals(detail.getIdOfMenuFromSync())) return detail;
+        }
+        return null;
+    }
 
-        query.addScalar("idOfMenuDetail", StandardBasicTypes.LONG);
-        query.addScalar("menuPath", StandardBasicTypes.STRING);
-        query.addScalar("menuDetailName");
-        query.addScalar("groupName");
-        query.addScalar("menuDetailOutput");
-        query.addScalar("price", StandardBasicTypes.LONG);
-        query.addScalar("menuOrigin", StandardBasicTypes.INTEGER);
-        query.addScalar("availableNow", StandardBasicTypes.INTEGER);
-        query.addScalar("localIdOfMenu", StandardBasicTypes.LONG);
-        query.addScalar("protein", StandardBasicTypes.DOUBLE);
-        query.addScalar("fat", StandardBasicTypes.DOUBLE);
-        query.addScalar("carbohydrates", StandardBasicTypes.DOUBLE);
-        query.addScalar("calories", StandardBasicTypes.DOUBLE);
-        query.addScalar("vitB1", StandardBasicTypes.DOUBLE);
-        query.addScalar("vitB2", StandardBasicTypes.DOUBLE);
-        query.addScalar("vitC", StandardBasicTypes.DOUBLE);
-        query.addScalar("vitA", StandardBasicTypes.DOUBLE);
-        query.addScalar("vitE", StandardBasicTypes.DOUBLE);
-        query.addScalar("minCa", StandardBasicTypes.DOUBLE);
-        query.addScalar("minP", StandardBasicTypes.DOUBLE);
-        query.addScalar("minMg", StandardBasicTypes.DOUBLE);
-        query.addScalar("minFe", StandardBasicTypes.DOUBLE);
-        query.addScalar("vitPp", StandardBasicTypes.DOUBLE);
-        query.addScalar("flags", StandardBasicTypes.INTEGER);
-        query.addScalar("priority", StandardBasicTypes.INTEGER);
+    private Set<Long> getOrgsByOrders(List<Order> ordersList) {
+        Set set = new HashSet<Long>();
+        for (Order order : ordersList) {
+            set.add(order.getCompositeIdOfOrder().getIdOfOrg());
+        }
+        return set;
+    }
 
-        query.setResultTransformer(Transformers.aliasToBean(MenuDetail.class));
-
-        MenuDetail menuDetail = (MenuDetail) query.uniqueResult();
-
-        return menuDetail;
-    }*/
+    private Set<Long> getIdOfMenusByOrderDetails(List<OrderDetail> detailsList) {
+        Set set = new HashSet<Long>();
+        for (OrderDetail detail : detailsList) {
+            set.add(detail.getIdOfMenuFromSync());
+        }
+        return set;
+    }
 
     @Override
     public PaymentListResult getPaymentList(Long contractId, final Date startDate, final Date endDate) {

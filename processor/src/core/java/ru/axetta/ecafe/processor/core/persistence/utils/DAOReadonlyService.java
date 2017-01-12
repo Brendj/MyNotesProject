@@ -159,6 +159,16 @@ public class DAOReadonlyService {
         return client;
     }
 
+    public Client findClientByContractId(Long contractId) throws Exception {
+        try {
+            Query query = entityManager.createQuery("select c from Client c where c.contractId = :contractId");
+            query.setParameter("contractId", contractId);
+            return (Client)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public Long getClientIdByContract(Long contractId) {
         try {
             Query query = entityManager
@@ -396,6 +406,36 @@ public class DAOReadonlyService {
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", nextToEndDate);
         query.setParameter("idOfClient", client.getIdOfClient());
+        return query.getResultList();
+    }
+
+    public List<Order> getClientOrdersByPeriod(Client client, Date startTime, Date endTime) {
+        Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
+                + ":startTime and :endTime order by createTime");
+        query.setParameter("client", client);
+        query.setParameter("startTime", startTime);
+        query.setParameter("endTime", endTime);
+        return query.getResultList();
+    }
+
+    public List<OrderDetail> getOrderDetailsByOrders(List<Order> orders) {
+        Query query = entityManager.createQuery("select detail from OrderDetail detail where detail.order in :orders");
+        query.setParameter("orders", orders);
+        return query.getResultList();
+    }
+
+    public List<MenuDetail> getMenuDetailsByOrderDetails(Set<Long> orgIds, Set<Long> menuIds, Date startDate, Date endDate) {
+        Date sDate = CalendarUtils.truncateToDayOfMonth(startDate);
+        Date eDate = CalendarUtils.addOneDay(CalendarUtils.truncateToDayOfMonth(endDate));
+
+        Query query = entityManager.createQuery("SELECT cfm FROM MenuDetail cfm left join cfm.menu cm "
+                        + "WHERE cfm.idOfMenuFromSync in :idOfMenus AND cm.org.idOfOrg in :orgIds "
+                        + "AND cm.menuDate between :startDate and :endDate ORDER BY cfm.idOfMenuDetail DESC");
+        query.setParameter("idOfMenus", menuIds);
+        query.setParameter("orgIds", orgIds);
+        query.setParameter("startDate", sDate);
+        query.setParameter("endDate", eDate);
+
         return query.getResultList();
     }
 
