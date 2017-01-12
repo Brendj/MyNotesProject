@@ -1506,23 +1506,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
               CLIENT_SUB_ID = 4;
 
         public Data process(Long contractId, Processor processor) {
+            return process(contractId, processor, null);
+        }
+
+        public Data process(Long contractId, Processor processor, HTTPDataHandler handler) {
 
             Boolean enableSubBalanceOperation = RuntimeContext.getInstance()
-                  .getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
+                    .getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
             if (enableSubBalanceOperation) {
                 String contractIdStr = String.valueOf(contractId);
                 int len = contractIdStr.length();
                 if (ContractIdGenerator.luhnTest(contractIdStr) || len < 2) {
-                    return process(contractId, CLIENT_ID_INTERNALID, processor);
+                    return process(contractId, CLIENT_ID_INTERNALID, processor, handler);
                 } else {
-                    return process(contractId, CLIENT_SUB_ID, processor);
+                    return process(contractId, CLIENT_SUB_ID, processor, handler);
                 }
             } else {
-                return process(contractId, CLIENT_ID_INTERNALID, processor);
+                return process(contractId, CLIENT_ID_INTERNALID, processor, handler);
             }
         }
 
-        public Data process(Object id, int clientIdType, Processor processor) {
+        public Data process(Object id, int clientIdType, Processor processor, HTTPDataHandler handler) {
             ObjectFactory objectFactory = new ObjectFactory();
             Data data = objectFactory.createData();
             Integer subBalanceNum = 0;
@@ -1570,6 +1574,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         data.setIdOfContract(client.getContractId());
                         data.setResultCode(RC_OK);
                         data.setDescription(RC_OK_DESC);
+                        if (handler != null) {
+                            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), new Date(System.currentTimeMillis()), handler.getData().getSsoId(),
+                                    client.getIdOfClient(), handler.getData().getOperationType());
+                        }
                     } catch (NullPointerException e) {
                         data.setResultCode(RC_CLIENT_NOT_FOUND);
                         data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
@@ -1656,8 +1664,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         HTTPData data1 = new HTTPData();
         HTTPDataHandler handler = new HTTPDataHandler(data1);
         authenticateRequest(null, handler);
-        Date date = new Date(System.currentTimeMillis());
-        //authenticateRequest(null);
 
         Data data = new ClientRequest()
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
@@ -1665,13 +1671,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processSummary(client, data, objectFactory, session);
                   }
-              });
+              }, handler);
 
-        if (data.getClientSummaryExt() != null) {
-            Long idOfClient = DAOService.getInstance().getClientByContractId(data.getClientSummaryExt().getContractId()).getIdOfClient();
-            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                idOfClient, handler.getData().getOperationType());
-        }
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
         clientSummaryResult.clientSummary = data.getClientSummaryExt();
         clientSummaryResult.resultCode = data.getResultCode();
@@ -1684,8 +1685,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         HTTPData data1 = new HTTPData();
         HTTPDataHandler handler = new HTTPDataHandler(data1);
         authenticateRequest(null, handler);
-        Date date = new Date(System.currentTimeMillis());
-        //authenticateRequest(null);
 
         Object idVal = null;
         if (idType == ClientRoomControllerWS.ClientRequest.CLIENT_ID_INTERNALID) {
@@ -1705,13 +1704,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                   Session session, Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory, session);
             }
-        });
+        }, handler);
 
-        if (data.getClientSummaryExt() != null) {
-            Long idOfClient = DAOService.getInstance().getClientByContractId(data.getClientSummaryExt().getContractId()).getIdOfClient();
-            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                idOfClient, handler.getData().getOperationType());
-        }
         ClientSummaryResult clientSummaryResult = new ClientSummaryResult();
         clientSummaryResult.clientSummary = data.getClientSummaryExt();
         clientSummaryResult.resultCode = data.getResultCode();
@@ -1970,7 +1964,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         }
 
-        authenticateRequest(clientContractId);
+        HTTPData httpData = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(httpData);
+        authenticateRequest(clientContractId, handler);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
@@ -1983,7 +1979,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                           OrderTypeEnumType.SUBSCRIPTION_FEEDING, mode);
                 }
             }
-        });
+        }, handler);
         PurchaseListResult purchaseListResult = new PurchaseListResult();
         purchaseListResult.purchaseList = data.getPurchaseListExt();
         purchaseListResult.resultCode = data.getResultCode();
@@ -1994,7 +1990,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PurchaseListResult getPurchaseList(String san, final Date startDate, final Date endDate, final Short mode) {
-        authenticateRequest(null);
+        HTTPData httpData = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(httpData);
+        authenticateRequest(null, handler);
 
         Data data = new ClientRequest()
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
@@ -2002,7 +2000,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processPurchaseList(client, data, objectFactory, session, endDate, startDate, null,mode);
                   }
-              });
+              }, handler);
 
         PurchaseListResult purchaseListResult = new PurchaseListResult();
         purchaseListResult.purchaseList = data.getPurchaseListExt();
@@ -2013,16 +2011,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PurchaseListResult getPurchaseSubscriptionFeedingList(String san, final Date startDate, final Date endDate, final Short mode) {
-        authenticateRequest(null);
+        HTTPData httpData = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(httpData);
+        authenticateRequest(null, handler);
 
         Data data = new ClientRequest()
               .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                   public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                         Session session, Transaction transaction) throws Exception {
                       processPurchaseList(client, data, objectFactory, session, endDate, startDate,
-                            OrderTypeEnumType.SUBSCRIPTION_FEEDING,mode);
+                            OrderTypeEnumType.SUBSCRIPTION_FEEDING, mode);
                   }
-              });
+              }, handler);
 
         PurchaseListResult purchaseListResult = new PurchaseListResult();
         purchaseListResult.purchaseList = data.getPurchaseListExt();
@@ -2095,13 +2095,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public PurchaseListWithDetailsResult getPurchaseListWithDetails(Long contractId, final Date startDate,
             final Date endDate, final Short mode) {
-        authenticateRequest(null);
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(null, handler);
         ObjectFactory objectFactory = new ObjectFactory();
-        return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode);
+        return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
     }
 
     private PurchaseListWithDetailsResult processPurchaseListWithDetails(Long contractId, ObjectFactory objectFactory,
-            Date startDate, Date endDate, Short mode) {
+            Date startDate, Date endDate, Short mode, HTTPDataHandler handler) {
         PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
         PurchaseListWithDetailsExt purchaseListWithDetailsExt = objectFactory.createPurchaseListWithDetailsExt();
         try {
@@ -2110,6 +2112,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client == null) {
                 return result;
             }
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), new Date(System.currentTimeMillis()),
+                    handler.getData().getSsoId(), client.getIdOfClient(), handler.getData().getOperationType());
 
             int nRecs = 0;
             Date nextToEndDate = DateUtils.addDays(endDate, 1);
@@ -2288,7 +2292,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processPaymentList(session, client, subBalanceNum, data, objectFactory, endDate, startDate);
                   }
-              });
+              }, null);
 
         PaymentListResult paymentListResult = new PaymentListResult();
         paymentListResult.paymentList = data.getPaymentList();
@@ -2308,7 +2312,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processPaymentList(session, client, 1, data, objectFactory, endDate, startDate);
                   }
-              });
+              }, null);
 
         PaymentListResult paymentListResult = new PaymentListResult();
         paymentListResult.paymentList = data.getPaymentList();
@@ -2365,7 +2369,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
                   }
-              });
+              }, null);
 
         MenuListResult menuListResult = new MenuListResult();
         if (data.getMenuListExt() != null) {
@@ -3150,7 +3154,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processCardList(client, data, objectFactory);
                   }
-              });
+              }, null);
 
         CardListResult cardListResult = new CardListResult();
         cardListResult.cardList = data.getCardList();
@@ -3258,7 +3262,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         Session session, Transaction transaction) throws Exception {
                       processEnterEventList(client, data, objectFactory, session, endDate, startDate, false);
                   }
-              });
+              }, null);
 
         EnterEventListResult enterEventListResult = new EnterEventListResult();
         enterEventListResult.enterEventList = data.getEnterEventList();
@@ -5124,9 +5128,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId, HTTPDataHandler handler) throws Error {
-        if (RuntimeContext.getInstance().isTestMode()){
+        /*if (RuntimeContext.getInstance().isTestMode()){
             return null;
-        }
+        }*/
         MessageContext jaxwsContext = context.getMessageContext();
         HttpServletRequest request = (HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
         String clientAddress = request.getRemoteAddr();
