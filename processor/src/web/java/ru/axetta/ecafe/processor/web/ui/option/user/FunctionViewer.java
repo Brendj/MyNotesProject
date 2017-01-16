@@ -48,7 +48,6 @@ public class FunctionViewer {
         }
     }
 
-    private List<Item> items = Collections.emptyList();
     private List<Item> onlineReportItems = Collections.emptyList();
     private List<Item> organizationItems = Collections.emptyList();
     private List<Item> contragentItems = Collections.emptyList();
@@ -60,10 +59,6 @@ public class FunctionViewer {
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
-
-    public List<Item> getItems() {
-        return items;
-    }
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
@@ -110,7 +105,6 @@ public class FunctionViewer {
     }
 
     public void fill(User user) throws Exception {
-        List<Item> items = new LinkedList<Item>();
         List<Item> onlineReportItems = new ArrayList<Item>();
         List<Item> organizationItems = new ArrayList<Item>();
         List<Item> contragentItems = new ArrayList<Item>();
@@ -166,14 +160,10 @@ public class FunctionViewer {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item.getFunctionName().equals("supplier")) {
                 onlineReportItems.add(item);
-            } else {
-                items.add(item);
             }
         }
-        Collections.sort(items);
-        this.items = items;
         this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
         this.organizationItems = organizationItems;
@@ -192,5 +182,12 @@ public class FunctionViewer {
         this.repositoryItems = repositoryItems;
         this.optionsItems = optionsItems;
         Collections.sort(optionsItems);
+    }
+
+    public boolean isEmpty(List<Item> itemList) {
+        if (itemList.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

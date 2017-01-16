@@ -111,18 +111,6 @@
         <f:selectItems value="#{mainPage.userEditPage.regions}" />
     </h:selectOneMenu>
 
-    <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.items}" var="item" rendered="#{mainPage.userEditPage.isDefault}">
-        <rich:column>
-            <h:selectBooleanCheckbox value="#{item.selected}" styleClass="output-text" />
-        </rich:column>
-        <rich:column>
-            <h:outputText escape="true" value="#{item.functionName}" styleClass="output-text" />
-        </rich:column>
-        <rich:column>
-            <h:outputText escape="true" value="#{item.functionDesc}" styleClass="output-text" />
-        </rich:column>
-    </rich:dataTable>
     <h:outputText escape="true" value="Организации" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault || mainPage.userEditPage.isSupplier}"/>
     <rich:dataTable value="#{mainPage.userEditPage.functionSelector.organizationItems}" var="organizationItems" rendered="#{mainPage.userEditPage.isDefault || mainPage.userEditPage.isSupplier}">
         <rich:column>

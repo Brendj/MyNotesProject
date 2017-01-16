@@ -66,7 +66,6 @@ public class FunctionSelector {
         }
     }
 
-    private List<Item> items = Collections.emptyList();
     private List<Item> onlineReportItems = Collections.emptyList();
     private List<Item> organizationItems = Collections.emptyList();
     private List<Item> contragentItems = Collections.emptyList();
@@ -81,10 +80,6 @@ public class FunctionSelector {
     //private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
     private static final String[] securityAdminFunctions = new String[]{
             "viewUser", "editUser", "deleteUser", "workOption"};
-
-    public List<Item> getItems() {
-        return items;
-    }
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
@@ -183,7 +178,6 @@ public class FunctionSelector {
         /*allFunctionsCriteria.add(Restrictions
                 .not(Restrictions.in("functionName", userFunctions))); //исключаем права на операции с пользователями*/
         List allFunctions = allFunctionsCriteria.list();
-        List<Item> items = new ArrayList<Item>(allFunctions.size());
         List<Item> onlineReportItems = new ArrayList<Item>();
         List<Item> organizationItems = new ArrayList<Item>();
         List<Item> contragentItems = new ArrayList<Item>();
@@ -238,14 +232,10 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item.getFunctionName().equals("supplier")) {
                 onlineReportItems.add(item);
-            } else {
-                items.add(item);
             }
         }
-        this.items = items;
-        Collections.sort(items);
         this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
         this.organizationItems = organizationItems;
@@ -267,7 +257,6 @@ public class FunctionSelector {
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
-        List<Item> items = new ArrayList<Item>();
         List<Item> onlineReportItems = new ArrayList<Item>();
         List<Item> organizationItems = new ArrayList<Item>();
         List<Item> contragentItems = new ArrayList<Item>();
@@ -356,20 +345,13 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item.getFunctionName().equals("supplier")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }
                 onlineReportItems.add(item);
-            } else {
-                if (selectedFunctions != null && selectedFunctions.contains(function)) {
-                    item.setSelected(true);
-                }
-                items.add(item);
             }
         }
-        this.items = items;
-        Collections.sort(items);
         this.onlineReportItems = onlineReportItems;
         Collections.sort(onlineReportItems);
         this.organizationItems = organizationItems;
@@ -392,12 +374,7 @@ public class FunctionSelector {
 
     public Set<Function> getSelected(Session session) throws HibernateException {
         Set<Function> selectedFunctions = new HashSet<Function>();
-        for (Item item : items) {
-            if (item.isSelected()) {
-                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
-                selectedFunctions.add(function);
-            }
-        }
+
         for (Item item : onlineReportItems) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
