@@ -118,7 +118,7 @@ public class User {
     public enum DefaultRole{
         DEFAULT(0,"настраиваемая роль"),
         ADMIN(1,"администратор"),
-        SUPPLIER(2,"отчетность поставщика питания"),
+        SUPPLIER(2,"Поставщик питания"),
         MONITORING(3,"мониторинг"),
         ADMIN_SECURITY(4, "администратор ИБ");
 
