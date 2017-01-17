@@ -94,8 +94,8 @@
         <f:selectItems value="#{mainPage.userCreatePage.regions}" />
     </h:selectOneMenu>
 
-    <h:outputText escape="true" value="Организации" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.organizationItems}" var="organizationItems" rendered="#{mainPage.userCreatePage.isDefault}">
+    <h:outputText escape="true" value="Организации" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.organizationItems}" var="organizationItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{organizationItems.selected}" styleClass="output-text" />
         </rich:column>
@@ -214,8 +214,8 @@
             <h:outputText escape="true" value="#{optionsItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}"/>
-    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier}">
+    <h:outputText escape="true" value="Онлайн отчеты" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}"/>
+    <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.onlineReportItems}" var="onlineReportItems" rendered="#{mainPage.userCreatePage.isDefault || mainPage.userCreatePage.isSupplier || mainPage.userCreatePage.isSupplierReport}">
         <rich:column>
             <h:selectBooleanCheckbox value="#{onlineReportItems.selected}" styleClass="output-text" />
         </rich:column>

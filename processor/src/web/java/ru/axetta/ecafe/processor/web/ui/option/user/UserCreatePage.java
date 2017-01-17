@@ -343,6 +343,11 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         return role.equals(User.DefaultRole.SUPPLIER);
     }
 
+    public Boolean getIsSupplierReport() {
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.SUPPLIER_REPORT);
+    }
+
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {
