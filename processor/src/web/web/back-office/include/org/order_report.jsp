@@ -10,6 +10,18 @@
 
 <h:panelGrid id="orgOrderReportGrid" binding="#{mainPage.orgOrderReportPage.pageComponent}"
              styleClass="borderless-grid">
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.orgOrderReportPage.filter}" readonly="true"
+                         styleClass="input-text long-field" style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
+        </h:panelGroup>
+    </h:panelGrid>
+
     <h:panelGrid styleClass="borderless-grid" columns="5">
         <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
         <rich:calendar value="#{mainPage.orgOrderReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -17,7 +29,7 @@
         <h:outputText escape="true" value="Конечная дата (не включая)" styleClass="output-text" />
         <rich:calendar value="#{mainPage.orgOrderReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgOrderReport}"
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.orgOrderReportPage.buildOrgOrderReport}"
                            reRender="workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
                            status="orgOrderReportGenerateStatus"/>
         <a4j:status id="orgOrderReportGenerateStatus">
@@ -27,8 +39,6 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Отчет по организации \"#{mainPage.orgOrderReportPage.shortName}\""
-                      styleClass="output-text" />
         <rich:dataTable id="orgOrderReportTable" value="#{mainPage.orgOrderReportPage.orgOrderReport.org.clientGroups}"
                         var="clientGroup"
                         columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">

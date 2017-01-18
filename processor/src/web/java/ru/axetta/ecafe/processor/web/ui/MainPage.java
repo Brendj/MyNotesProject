@@ -1515,7 +1515,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             selectedOrgGroupPage.fill(persistenceSession, selectedIdOfOrg);
-            orgOrderReportPage.fill(persistenceSession, selectedIdOfOrg);
+            orgOrderReportPage.fill(persistenceSession, orgOrderReportPage.getIdOfOrg());
             persistenceTransaction.commit();
             persistenceTransaction = null;
             selectedOrgGroupPage.showAndExpandMenuGroup();
@@ -1531,34 +1531,6 @@ public class MainPage implements Serializable {
 
         }
         updateSelectedMainMenu();
-        return null;
-    }
-
-    public Object buildOrgOrderReport() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            orgOrderReportPage.buildReport(persistenceSession, selectedIdOfOrg);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to build org order report", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
         return null;
     }
 
