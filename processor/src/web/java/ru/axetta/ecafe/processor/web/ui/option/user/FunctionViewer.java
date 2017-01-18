@@ -142,9 +142,7 @@ public class FunctionViewer {
                 monitorItems.add(item);
             } else if (item.getFunctionName().equals("showReportRepository")) {
                 repositoryItems.add(item);
-            } else if (item.getFunctionName().equals("deleteUser") || item.getFunctionName().equals("editUser") || item
-                    .getFunctionName().equals("viewUser") || item.getFunctionName().equals("workOption") || item
-                    .getFunctionName().equals("catEdit") ||
+            } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
                     .getFunctionName().equals("reportView")) {
