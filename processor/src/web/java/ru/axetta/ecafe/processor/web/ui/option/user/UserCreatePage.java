@@ -300,6 +300,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
                 user.setRoleName(role.toString());
             }
+            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+                user.setFunctions(functionSelector.getSupplierReportFunctions(session));
+                user.setRoleName(role.toString());
+            }
             user.setNeedChangePassword(needChangePassword);
             session.save(user);
             for (OrgItem orgItem : orgItems) {

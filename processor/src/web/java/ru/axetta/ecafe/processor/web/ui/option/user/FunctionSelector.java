@@ -154,23 +154,73 @@ public class FunctionSelector {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
         Set<Function> supplierFunctions = new HashSet<Function>();
+        Set<Item> selectedItems = new HashSet<Item>();
+
+        for (Item item: organizationItems) {
+            if (item.isSelected()) {
+                selectedItems.add(item);
+            }
+        }
+
+        for (Item item: contragentItems) {
+            if (item.isSelected()) {
+                selectedItems.add(item);
+            }
+        }
+
+        for (Item item: clientItems) {
+            if (item.isSelected()) {
+                selectedItems.add(item);
+            }
+        }
+
+        for (Item item: wayBillItems) {
+            if (item.isSelected()) {
+                selectedItems.add(item);
+            }
+        }
+
+        for (Item item: onlineReportItems) {
+            if (item.isSelected()) {
+                selectedItems.add(item);
+            }
+        }
+
         for (Object object : allFunctions) {
             Function function = (Function) object;
 
-            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_ORG_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_CONTRAGENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_CLIENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)) {
-                supplierFunctions.add(function);
+            for (Item item: selectedItems) {
+                if (function.getFunctionName().equals(item.getFunctionName())) {
+                    supplierFunctions.add(function);
+                }
             }
         }
         return supplierFunctions;
+    }
+
+    public Set<Function> getSupplierReportFunctions(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List allFunctions = allFunctionsCriteria.list();
+        Set<Function> supplierReportFunctions = new HashSet<Function>();
+
+        Set<Item> selectedItems = new HashSet<Item>();
+
+        for (Item item: onlineReportItems) {
+            if (item.isSelected()) {
+                selectedItems.add(item);
+            }
+        }
+
+        for (Object object : allFunctions) {
+            Function function = (Function) object;
+
+            for (Item item: selectedItems) {
+                if (function.getFunctionName().equals(item.getFunctionName())) {
+                    supplierReportFunctions.add(function);
+                }
+            }
+        }
+        return supplierReportFunctions;
     }
 
     public void fill(Session session) throws Exception {

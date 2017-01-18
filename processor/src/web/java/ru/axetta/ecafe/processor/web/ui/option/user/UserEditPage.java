@@ -192,6 +192,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(this.roleName);
             }
+            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+                user.setFunctions(functionSelector.getSupplierReportFunctions(session));
+                user.setRoleName(role.toString());
+            }
             if (region != null && region.length() > 0) {
                 user.setRegion(region);
             } else {
