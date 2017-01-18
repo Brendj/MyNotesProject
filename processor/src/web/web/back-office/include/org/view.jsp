@@ -7,6 +7,7 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%-- Панель просмотра организации --%>
 <h:panelGrid id="orgViewGrid" binding="#{mainPage.orgViewPage.pageComponent}" styleClass="borderless-grid" columns="2">
@@ -142,7 +143,15 @@
     <h:selectBooleanCheckbox readonly="true" disabled="true" value="#{mainPage.orgViewPage.mainBuidling}" styleClass="input-text" />
 
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
-    <h:outputText value="{#{mainPage.orgViewPage.friendlyFilterOrgs}}" styleClass="output-text"/>
+    <a4j:repeat value="#{mainPage.orgViewPage.friendlyOrganisation}" var="key">
+        <a4j:commandLink action="#{mainPage.showOrgViewPage}" reRender="mainMenu, workspaceForm" rendered="#{!mainPage.orgViewPage.isCurrentOrg(key.idOfOrg)}">
+            <h:outputText escape="true" value="#{key.shortName}" styleClass="#{mainPage.orgViewPage.getStyleClassLink(key.isMainBuilding())}" />
+            <f:setPropertyActionListener value="#{key.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+        </a4j:commandLink>
+        <h:outputText escape="true" value="#{key.shortName}" styleClass="#{mainPage.orgViewPage.getStyleClass(key.isMainBuilding())}"
+                      rendered="#{mainPage.orgViewPage.isCurrentOrg(key.idOfOrg)}"/>
+        <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
+    </a4j:repeat>
 
     <h:outputText escape="true" value="Список рассылки отчетов по питанию" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.mailingListReportsOnNutrition}" styleClass="input-text long-field" />

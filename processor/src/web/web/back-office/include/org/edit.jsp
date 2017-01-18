@@ -196,7 +196,16 @@
                 styleClass="command-link" style="width: 25px;" >
             <f:setPropertyActionListener value="#{mainPage.orgEditPage.idOfFriendlyOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
         </a4j:commandButton>
-        <h:outputText value="{#{mainPage.orgEditPage.friendlyFilterOrgs}}" styleClass="output-text"/>
+        <%--<h:outputText value="{#{mainPage.orgEditPage.friendlyFilterOrgs}}" styleClass="output-text"/>--%>
+        <a4j:repeat value="#{mainPage.orgEditPage.friendlyOrganisation}" var="key">
+            <a4j:commandLink action="#{mainPage.showOrgEditPage}" reRender="mainMenu, workspaceForm" rendered="#{!mainPage.orgEditPage.isCurrentOrg(key.idOfOrg)}">
+                <h:outputText escape="true" value="#{key.shortName}" styleClass="#{mainPage.orgEditPage.getStyleClassLink(key.isMainBuilding())}" />
+                <f:setPropertyActionListener value="#{key.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </a4j:commandLink>
+            <h:outputText escape="true" value="#{key.shortName}" styleClass="#{mainPage.orgEditPage.getStyleClass(key.isMainBuilding())}"
+                          rendered="#{mainPage.orgEditPage.isCurrentOrg(key.idOfOrg)}"/>
+            <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
+        </a4j:repeat>
     </h:panelGrid>
 
 

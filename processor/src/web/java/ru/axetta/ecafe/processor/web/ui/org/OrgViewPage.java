@@ -11,7 +11,10 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.hibernate.Session;
 
 import javax.faces.model.SelectItem;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,7 +60,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String configurationProviderName;
     private List<Long> idOfOrgList;
     private String filterOrgs = "Не выбрано";
-    private String friendlyFilterOrgs = "Не выбрано";
+    private List<Org> friendlyOrganisation = new ArrayList<Org>();
     private boolean mainBuidling;
     private String city;
     private String district;
@@ -193,15 +196,9 @@ public class OrgViewPage extends BasicWorkspacePage {
         } else {
            configurationProviderName = configurationProvider.getName();
         }
-        Set<Org> friendlyOrganisation = org.getFriendlyOrg();
-        friendlyFilterOrgs = "Не выбрано";
-        if(!(friendlyOrganisation==null || friendlyOrganisation.isEmpty())){
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Org friendlyOrg: org.getFriendlyOrg()){
-                stringBuilder.append(friendlyOrg.getShortName());
-                stringBuilder.append("; ");
-            }
-            friendlyFilterOrgs = stringBuilder.toString();
+        friendlyOrganisation.clear();
+        for (Org o : org.getFriendlyOrg()) {
+            friendlyOrganisation.add(o);
         }
         this.mainBuidling = org.isMainBuilding();
         this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
@@ -247,14 +244,6 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.interdistrictCouncilChief = org.getInterdistrictCouncilChief();
         this.securityLevel = org.getSecurityLevel().toString();
         this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
-    }
-
-    public String getFriendlyFilterOrgs() {
-        return friendlyFilterOrgs;
-    }
-
-    public void setFriendlyFilterOrgs(String friendlyFilterOrgs) {
-        this.friendlyFilterOrgs = friendlyFilterOrgs;
     }
 
     public String getFilterOrgs() {
@@ -595,5 +584,25 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setCoSupplierName(String coSupplierName) {
         this.coSupplierName = coSupplierName;
+    }
+
+    public List<Org> getFriendlyOrganisation() {
+        return friendlyOrganisation;
+    }
+
+    public void setFriendlyOrganisation(List<Org> friendlyOrganisation) {
+        this.friendlyOrganisation = friendlyOrganisation;
+    }
+
+    public String getStyleClass(Boolean mb) {
+        return mb ? "output-text-strong" : "output-text";
+    }
+
+    public String getStyleClassLink(Boolean mb) {
+        return mb ? "output-text-org-main" : "output-text-org";
+    }
+
+    public Boolean isCurrentOrg(Long idOrg) {
+        return idOfOrg.equals(idOrg);
     }
 }

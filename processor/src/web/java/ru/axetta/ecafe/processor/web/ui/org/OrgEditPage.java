@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
@@ -94,7 +95,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String filterCategoryOrg;
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private List<Long> friendlyIdOfOrgList = new ArrayList<Long>();
-    private String filterFriendlyOrgs = "Не выбрано";
+    private List<Org> friendlyOrganisation = new ArrayList<Org>();
 
     private boolean mainBuilding = true;
 
@@ -434,7 +435,6 @@ public class OrgEditPage extends BasicWorkspacePage
         select(org.getConfigurationProvider());
         friendlyIdOfOrgList.clear();
         idOfOrgList.clear();
-        filterFriendlyOrgs = "Не выбрано";
         if(!(org.getFriendlyOrg()==null || org.getFriendlyOrg().isEmpty())){
             StringBuilder stringBuilder = new StringBuilder();
             for (Org friendlyOrg: org.getFriendlyOrg()){
@@ -443,7 +443,10 @@ public class OrgEditPage extends BasicWorkspacePage
                 friendlyIdOfOrgList.add(friendlyOrg.getIdOfOrg());
                 idOfOrgList.add(friendlyOrg.getIdOfOrg());
             }
-            filterFriendlyOrgs = stringBuilder.toString();
+        }
+        friendlyOrganisation.clear();
+        for (Org o : org.getFriendlyOrg()) {
+            friendlyOrganisation.add(o);
         }
 
         this.btiUnom = org.getBtiUnom();
@@ -502,16 +505,12 @@ public class OrgEditPage extends BasicWorkspacePage
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
         if(null != orgMap) {
             idOfOrgList = new ArrayList<Long>();
-            StringBuilder stringBuilder = new StringBuilder();
+            friendlyOrganisation.clear();
             if(!orgMap.isEmpty()){
                 for(Long idOfOrg: orgMap.keySet()){
                     idOfOrgList.add(idOfOrg);
-                    stringBuilder.append(orgMap.get(idOfOrg));
-                    stringBuilder.append("; ");
+                    friendlyOrganisation.add(DAOReadonlyService.getInstance().findOrg(idOfOrg));
                 }
-                filterFriendlyOrgs = stringBuilder.toString();
-            } else {
-                filterFriendlyOrgs = "Не выбрано.";
             }
         }
     }
@@ -602,10 +601,6 @@ public class OrgEditPage extends BasicWorkspacePage
     public String getFilterCategoryOrg() {
         if (idOfCategoryOrgList.isEmpty()) return "Нет";
         return filterCategoryOrg;
-    }
-
-    public String getFriendlyFilterOrgs() {
-        return filterFriendlyOrgs;
     }
 
     public ConfigurationProvider getConfigurationProvider() {
@@ -1143,5 +1138,25 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setOneActiveCard(Boolean oneActiveCard) {
         this.oneActiveCard = oneActiveCard;
+    }
+
+    public List<Org> getFriendlyOrganisation() {
+        return friendlyOrganisation;
+    }
+
+    public void setFriendlyOrganisation(List<Org> friendlyOrganisation) {
+        this.friendlyOrganisation = friendlyOrganisation;
+    }
+
+    public String getStyleClass(Boolean mb) {
+        return mb ? "output-text-strong" : "output-text";
+    }
+
+    public String getStyleClassLink(Boolean mb) {
+        return mb ? "output-text-org-main" : "output-text-org";
+    }
+
+    public Boolean isCurrentOrg(Long idOrg) {
+        return idOfOrg.equals(idOrg);
     }
 }
