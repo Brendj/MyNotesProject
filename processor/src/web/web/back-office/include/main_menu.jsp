@@ -973,11 +973,11 @@
                          label="Электронная сверка" rendered="#{mainPage.eligibleToViewElectronicReconciliationReport}">
         <a4j:support event="onclick" action="#{mainPage.showElectronicReconciliationReportGroupMenu}"
                      reRender="workspaceForm" />
-        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier()}"
+        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
                             binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
                             label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
                             reRender="workspaceForm" />
-        <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier()}"
+        <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
                             binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
                             label="Статистика электронной сверки"
                             action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
