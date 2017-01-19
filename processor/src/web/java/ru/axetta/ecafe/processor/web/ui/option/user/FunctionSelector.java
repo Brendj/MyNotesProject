@@ -267,7 +267,7 @@ public class FunctionSelector {
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
-                    .getFunctionName().equals("reportView")) {
+                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
                 optionsItems.add(item);
             } else if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
                     || item.getFunctionName().equals("onlineRprtBenefit") || item.getFunctionName()
@@ -280,7 +280,7 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item.getFunctionName().equals("supplier")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP")) {
                 onlineReportItems.add(item);
             }
         }
@@ -375,7 +375,7 @@ public class FunctionSelector {
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
-                    .getFunctionName().equals("reportView")) {
+                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }
@@ -391,7 +391,7 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item.getFunctionName().equals("supplier")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }
