@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -33,10 +34,7 @@ import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,6 +54,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     protected static final int MILLIS_IN_DAY = 86400000;
     private String region;
     private Boolean otherRegions;
+    private Boolean withoutFriendly;
     private final String FILTER_INIT = "Не выбрано. Отчет будет построен по всем образовательным организациям города";
     private final String FILTER_SUPER = "Не выбрано";
 
@@ -109,6 +108,13 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         resetOrg();
     }
 
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+        super.completeOrgListSelection(orgMap);
+        if (emptyOrgs()) {
+            withoutFriendly = false;
+        }
+    }
+
     public Object clear(){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -155,7 +161,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             fixDates();
             DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar, idOfOrg, contragentFilter.getContragent().getIdOfContragent(),
-                    contractFilter.getContract().getIdOfContract(), region, otherRegions);
+                    contractFilter.getContract().getIdOfContract(), region, otherRegions, withoutFriendly);
 
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -208,7 +214,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         fixDates();
         this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar, idOfOrg,
                                                     contragentFilter.getContragent().getIdOfContragent(),
-                                                    contractFilter.getContract().getIdOfContract(), region, otherRegions);
+                                                    contractFilter.getContract().getIdOfContract(), region, otherRegions, withoutFriendly);
         htmlReport = deliveredServices.getHtmlReport();
     }
 
@@ -248,6 +254,10 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         return (contractFilter.getContract().getIdOfContract() == null) ? true : false;
     }
 
+    public boolean emptyOrgs() {
+        return ((idOfOrgList == null) || (idOfOrgList.isEmpty())) ? true : false;
+    }
+
     public void setRegion(String region) {
         this.region = region;
     }
@@ -274,5 +284,13 @@ public class DeliveredServicesReportPage extends OnlineReportPage
 
     public String getFILTER_SUPER() {
         return FILTER_SUPER;
+    }
+
+    public Boolean getWithoutFriendly() {
+        return withoutFriendly;
+    }
+
+    public void setWithoutFriendly(Boolean withoutFriendly) {
+        this.withoutFriendly = withoutFriendly;
     }
 }

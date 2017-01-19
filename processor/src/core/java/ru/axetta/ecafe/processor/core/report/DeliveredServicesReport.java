@@ -125,11 +125,11 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 idOfContragent = contragent.getIdOfContragent();
             }
 
-            return build(session, startTime, endTime, calendar, org.getIdOfOrg(), idOfContragent, idOfContract, region, getOtherRegions());
+            return build(session, startTime, endTime, calendar, org.getIdOfOrg(), idOfContragent, idOfContract, region, getOtherRegions(), false);
         }
 
         public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar,
-                Long orgId, Long contragent, Long contract, String region, Boolean otherRegions) throws Exception {
+                Long orgId, Long contragent, Long contract, String region, Boolean otherRegions, Boolean withoutFriendly) throws Exception {
             Date generateTime = new Date();
             this.otherRegions = otherRegions;
             this.region = region;
@@ -181,7 +181,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
 
             Date generateEndTime = new Date();
             DeliveredServicesItem.DeliveredServicesData data = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
-                    contract, parameterMap);
+                    contract, parameterMap, withoutFriendly);
             ///Пробегаемся по items и смотрим - если у них всех один и тот же контракт - заполняем параметр contract
             String contractNumber = "______";
             String contractDate = "________";
@@ -244,7 +244,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
 
 
         public DeliveredServicesItem.DeliveredServicesData findNotNullGoodsFullNameByOrg(Session session, Date start, Date end,
-                Long contragent, Long contract, Map<String, Object> parameterMap) {
+                Long contragent, Long contract, Map<String, Object> parameterMap, Boolean withoutFriendly) {
             String contragentCondition = "";
             if (contragent != null) {
                 contragentCondition = "(cf_orgs.defaultsupplier=" + contragent + ") AND ";
@@ -280,20 +280,21 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                 contractOrgsCondition = " cf_orgs.idoforg in (" + contractOrgsCondition + ") and ";
             }
             String orgCondition = "";
-            String in_str = "";
-            if (orgShortItemList != null) {
-                if(!orgShortItemList.isEmpty()) {
-                    for (OrgShortItem orgShortItem : orgShortItemList) {
+            if ((orgShortItemList != null) && (!orgShortItemList.isEmpty())) {
+                String in_str = "";
+                for (OrgShortItem orgShortItem : orgShortItemList) {
+                    if (withoutFriendly) {
+                        in_str += orgShortItem.getIdOfOrg().toString() + ",";
+                    } else {
                         Org o = (Org) session.load(Org.class, orgShortItem.getIdOfOrg());
-
                         for (Org fo : o.getFriendlyOrg()) {
                             in_str += fo.getIdOfOrg().toString() + ",";
                         }
                     }
-                    if (in_str.length() > 0) {
-                        in_str = in_str.substring(0, in_str.length() - 1);
-                        orgCondition = String.format(" cf_orgs.idoforg in (%s) and ", in_str);
-                    }
+                }
+                if (in_str.length() > 0) {
+                    in_str = in_str.substring(0, in_str.length() - 1);
+                    orgCondition = String.format(" cf_orgs.idoforg in (%s) and ", in_str);
                 }
             }
 
