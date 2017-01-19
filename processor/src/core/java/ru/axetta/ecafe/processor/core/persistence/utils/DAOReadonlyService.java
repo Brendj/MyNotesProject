@@ -361,7 +361,7 @@ public class DAOReadonlyService {
             }
             Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
                     + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder " + goodsJoin
-                    + "where od.idOfOrg= :idOfOrg "
+                    + "where od.socDiscount > 0 and od.rprice = 0 and od.idOfOrg= :idOfOrg "
                     + "and od.menuDetailName = :taloonName "
                     + "and od.MenuType >= :complexMin "
                     + "and od.MenuType <= :complexMax "
