@@ -255,7 +255,7 @@ public class ReportRepository extends BaseJpaDao {
             BasicJasperReport deliveredServicesReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
                             new GregorianCalendar(), reportParameters.getIdOfOrg(), reportParameters.getIdOfContragent(), reportParameters.getIdOfContract(),
-                            reportParameters.getRegion(), false);
+                            reportParameters.getRegion(), false, false);
             return deliveredServicesReport;
         } catch (EntityNotFoundException e) {
             logger.error("Not found organization to generate report");

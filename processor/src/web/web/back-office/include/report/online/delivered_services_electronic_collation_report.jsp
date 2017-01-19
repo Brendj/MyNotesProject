@@ -74,7 +74,7 @@
         <h:panelGroup>
             <a4j:commandButton value="..."
                                action="#{mainPage.deliveredServicesElectronicCollationReportPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
+                               reRender="modalOrgListSelectorPanel,withoutFriendlyBuildingggsCheckBox"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.deliveredServicesElectronicCollationReportPage.emptyRegion() || !mainPage.deliveredServicesReportPage.emptyContract()
                                || !mainPage.deliveredServicesElectronicCollationReportPage.emptyContragent()}"
@@ -90,6 +90,12 @@
             mainPage.deliveredServicesElectronicCollationReportPage.filter : mainPage.deliveredServicesElectronicCollationReportPage.FILTER_INIT}}"
                           id="orgDeliveredServicesOrgText" />
         </h:panelGroup>
+
+        <h:outputText escape="true" value="Формировать только по выбранным корпусам" styleClass="output-text" />
+        <h:selectBooleanCheckbox id="withoutFriendlyBuildingggsCheckBox" value="#{mainPage.deliveredServicesElectronicCollationReportPage.withoutFriendly}"
+                                 disabled="#{mainPage.deliveredServicesElectronicCollationReportPage.emptyOrgs()}" title="Формировать только по выбранным корпусам">
+            <a4j:support event="onchange" ajaxSingle="true" />
+        </h:selectBooleanCheckbox>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="4">
