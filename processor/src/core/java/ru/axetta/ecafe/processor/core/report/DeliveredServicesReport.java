@@ -328,7 +328,7 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
                     + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
+                    + "where cf_orderdetails.socdiscount>0  and cf_orderdetails.rprice=0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
                     + typeCondition + contragentCondition + contractOrgsCondition + orgCondition + districtCondition
                     + " cf_orders.createddate between :start and :end  "
                     + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orders.orderType, level1, level2, level3, level4, price, shortaddress, cf_orders.createddate "
@@ -457,6 +457,39 @@ public class DeliveredServicesReport extends BasicReportForMainBuildingOrgJob {
             parameterMap.put("summaryAll", summaryAll + waterSummary);
 
             return result;
+        }
+
+        /*
+            предварительный вариант фильтра пустых строк
+        */
+        private void sortResult(DeliveredServicesItem.DeliveredServicesData result) {
+            Set<Long> orgIdSet = new HashSet<Long>();
+            List<DeliveredServicesItem> resList = new ArrayList<DeliveredServicesItem>();
+            for(DeliveredServicesItem item : result.getList153()) {
+                if(item.getCount() != null) {
+                    orgIdSet.add(item.getIdoforg());
+                }
+            }
+            for(DeliveredServicesItem item : result.getList153()) {
+                if(orgIdSet.contains(item.getIdoforg())) {
+                    resList.add(item);
+                }
+            }
+            result.setList153(resList);
+
+            Set<Long> orgIdSet1 = new HashSet<Long>();
+            List<DeliveredServicesItem> resList1 = new ArrayList<DeliveredServicesItem>();
+            for(DeliveredServicesItem item : result.getList37()) {
+                if(item.getCount() != null) {
+                    orgIdSet1.add(item.getIdoforg());
+                }
+            }
+            for(DeliveredServicesItem item : result.getList37()) {
+                if(orgIdSet1.contains(item.getIdoforg())) {
+                    resList1.add(item);
+                }
+            }
+            result.setList37(resList1);
         }
 
         public String getRegion() {
