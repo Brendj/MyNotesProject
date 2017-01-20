@@ -6,3 +6,5 @@
 
 --Флаг изменения производственной конфигурации у организации
 ALTER TABLE cf_orgs ADD COLUMN tradeconfigchanged integer NOT NULL DEFAULT 0;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 200117) НЕ МЕНЯТЬ
