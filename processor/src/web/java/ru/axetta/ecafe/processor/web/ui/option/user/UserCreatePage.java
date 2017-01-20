@@ -272,6 +272,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
+            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+                user.setFunctions(functionSelector.getSupplierReportFunctions(session));
+                user.setRoleName(role.toString());
+                if (contragentItems.isEmpty()) {
+                    this.printError("Список контрагенотов пуст.");
+                    throw new RuntimeException("Contragent list is empty");
+                }
+            }
 
             User u = DAOUtils.findUser(session, userName);
             if (u != null) {
