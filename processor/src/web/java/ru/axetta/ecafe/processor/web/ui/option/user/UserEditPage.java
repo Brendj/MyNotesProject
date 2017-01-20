@@ -166,6 +166,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
+            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+                user.setFunctions(functionSelector.getSupplierReportFunctions(session));
+                user.setRoleName(role.toString());
+                if (contragentItems.isEmpty()) {
+                    this.printError("Список контрагенотов пуст.");
+                    throw new RuntimeException("Contragent list is empty");
+                }
+            }
             user.getContragents().clear();
             for (ContragentItem it : this.contragentItems) {
                 Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());

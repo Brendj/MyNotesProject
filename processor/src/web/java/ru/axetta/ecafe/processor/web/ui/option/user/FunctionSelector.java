@@ -170,6 +170,42 @@ public class FunctionSelector {
                 supplierFunctions.add(function);
             }
         }
+
+        for (Item item : onlineReportItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                supplierFunctions.add(function);
+            }
+        }
+
+        for (Item item : organizationItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                supplierFunctions.add(function);
+            }
+        }
+
+        for (Item item : contragentItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                supplierFunctions.add(function);
+            }
+        }
+
+        for (Item item : clientItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                supplierFunctions.add(function);
+            }
+        }
+
+        for (Item item : wayBillItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                supplierFunctions.add(function);
+            }
+        }
+
         return supplierFunctions;
     }
 
@@ -185,6 +221,14 @@ public class FunctionSelector {
                 supplierReportFunctions.add(function);
             }
         }
+
+        for (Item item : onlineReportItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                supplierReportFunctions.add(function);
+            }
+        }
+
         return supplierReportFunctions;
     }
 
