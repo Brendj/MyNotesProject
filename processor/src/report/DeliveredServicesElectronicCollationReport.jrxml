@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.2100000000000104"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="384"/>
+	<property name="ireport.y" value="288"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -1527,7 +1527,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="b1f36c68-9fa2-4f70-aff5-75dcd7c772a6" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1540,9 +1540,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="e6a37171-43de-47b3-85d7-96f082eb9f08" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1555,7 +1555,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -1643,7 +1643,7 @@
 							<bottomPen lineWidth="0.5"/>
 							<rightPen lineWidth="0.5"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="84af4a1a-9c31-456c-8006-8c36487575bf" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1656,7 +1656,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA["" + $V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="315ef694-1260-42d6-b939-dd03013708ad" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -1672,7 +1672,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="f9075323-fb73-4a72-9cef-4555f7348513" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1685,7 +1685,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -1709,7 +1709,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="f9de3ece-246b-4fff-8cca-501b5a2ac45a" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1722,7 +1722,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="f44a199d-495c-49da-adfa-7adb890899dc" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="39"/>
@@ -1738,7 +1738,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="d6cfc727-5eb6-4e28-8b39-4930973439d3" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1751,9 +1751,8 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="71a368f1-d71d-4096-af29-ed9292e52019" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1766,7 +1765,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -1779,7 +1777,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="3ccea539-6016-4df9-a850-8679a9b5bd16" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1792,9 +1790,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="49791651-7b66-4a98-ad4c-6ffab3277506" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1807,7 +1805,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="209b2b0a-2c84-4065-a488-42ee99c636ed" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -1823,7 +1820,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="21560252-a882-49dd-b8a4-f787f7fc5d43" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -1836,7 +1833,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -2283,7 +2279,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="cc48a64f-7099-4c0b-bf2b-32f4503634fc" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2296,9 +2292,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="0d616260-f5f5-4410-bd87-829ce56f88fd" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2311,7 +2307,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -2399,7 +2395,7 @@
 							<bottomPen lineWidth="0.5"/>
 							<rightPen lineWidth="0.5"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="67a36ddb-7fb6-4b1e-a5a6-e414101c9303" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2412,7 +2408,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA["" + $V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="6a1bb5a1-a599-4e98-8871-ac422f89dc4c" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -2428,7 +2424,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="1a49b9a0-4bff-4038-8af4-dfc7368bbe5a" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2441,7 +2437,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -2465,7 +2461,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="0c280bca-3b2f-4de4-8847-8290a3010268" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2478,7 +2474,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="ba8f1ebc-0e2a-456a-9ab1-8dbffc680fc1" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="39"/>
@@ -2494,7 +2490,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="a5abb6d7-9054-4d8d-845c-d5ade3a89383" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2507,9 +2503,8 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="510ca4ca-ae8d-404c-9df8-45062e2fd129" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2522,7 +2517,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -2535,7 +2529,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="d5a49106-2033-4dce-a30d-b49c65a2b64a" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2548,9 +2542,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="800d7bfd-e245-49f2-95b0-0d98be6c3485" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2563,7 +2557,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="1bf7e289-015c-4df8-a1fe-e42a561eb569" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -2579,7 +2572,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="e7e5c40e-f00d-42d4-ac8e-29436c3fb63f" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -2592,7 +2585,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3039,7 +3031,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="1264897d-f105-4ccc-ac09-25e1e3b56645" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3052,9 +3044,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="f297fb22-9cad-471d-815d-3a58753e377d" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3067,7 +3059,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3155,7 +3147,7 @@
 							<bottomPen lineWidth="0.5"/>
 							<rightPen lineWidth="0.5"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="038184d5-f5a0-4af4-806b-b39927490da9" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3168,7 +3160,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA["" + $V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="b2b7dd10-2a69-483f-bafc-ce2334b954ff" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -3184,7 +3176,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="d1e29a64-2c19-4283-83fd-4f5980679024" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3197,7 +3189,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3221,7 +3213,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="a17332a1-b2f0-49a1-9750-b2a54bd03c11" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3234,7 +3226,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="72bb4ec4-2233-489a-998f-893f133e911b" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="39"/>
@@ -3250,7 +3242,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="02af2415-e54b-43ae-8d5a-f1353b38d2db" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3263,9 +3255,8 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="97cc73f1-be82-4e5a-bbc4-bea00473a640" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3278,7 +3269,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3291,7 +3281,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="8d2f773f-c415-43b4-9755-0992058b717f" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3304,9 +3294,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="49291c0e-27ed-4283-9a39-cb54bfb975ec" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3319,7 +3309,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="ea207756-aea6-48a9-a890-961f62db4c4c" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -3335,7 +3324,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="7a27a020-6058-4f8f-8c53-e20672decd50" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3348,7 +3337,6 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[0]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3795,7 +3783,7 @@
 							</textElement>
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="c09fd521-9393-40c5-85d0-6b8015dec7ee" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3808,9 +3796,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="1be6dae1-ab2c-4a7c-a4aa-73c64eba4966" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3823,7 +3811,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3911,7 +3899,7 @@
 							<bottomPen lineWidth="0.5"/>
 							<rightPen lineWidth="0.5"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="c9291e71-11a1-4d5a-bdc1-c675d42c71dc" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3924,7 +3912,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA["" + $V{countMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countMeasure} == 0 ? null : $V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="bdd08198-5108-46a8-94a8-cbd31b5e1d87" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -3940,7 +3928,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="95955015-ec10-467e-8e38-c598dc81e4eb" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3953,7 +3941,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -3977,7 +3965,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="c5797c15-9ff6-4ad7-a046-27e877c3d7d5" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -3990,7 +3978,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure} + $V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[($V{summaryMeasure} + $V{summaryWaterMeasure}) == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure} + $V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="fd8bdf6a-dcb6-4aa9-9178-cd83f4c32a22" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="39"/>
@@ -4005,9 +3993,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{priceWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{priceWaterMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{priceWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 							<reportElement uuid="dfd4b431-43d7-407b-9460-010601427129" style="Crosstab Data Text" x="40" y="0" width="40" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4020,9 +4008,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{countWaterMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countWaterMeasure} == 0 ? null : $V{countWaterMeasure}]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="e138aa00-1c5f-4575-a44d-922ad72e2aac" style="Crosstab Data Text" x="80" y="0" width="64" height="39"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4035,7 +4023,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryWaterMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -4048,7 +4036,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="93e88369-bb33-44cb-a092-c60fa2c4bfe9" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4061,9 +4049,9 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure} + $V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[($V{summaryMeasure} + $V{summaryWaterMeasure}) == 0 ? null : java.math.BigDecimal.valueOf($V{summaryMeasure} + $V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="">
+						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="cfecf503-bb74-4e91-b7cb-cdd11839305c" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4076,7 +4064,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA["" + $V{countWaterMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{countWaterMeasure} == 0 ? null : $V{countWaterMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="3ab16f9c-f766-4298-8008-279acc56522f" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -4092,7 +4080,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="3c1692d9-fb11-409a-b6c5-9fcf21e378dd" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4105,7 +4093,7 @@
 								<font size="8"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryWaterMeasure} == 0 ? null : java.math.BigDecimal.valueOf($V{summaryWaterMeasure}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -4780,7 +4768,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="bd1fe429-aaac-4aa8-af9a-a63c49cfef84" style="Crosstab Data Text" mode="Transparent" x="144" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4793,9 +4781,9 @@
 								<font size="10" isBold="true"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($P{summaryAll}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$P{summaryAll} == 0 ? null : java.math.BigDecimal.valueOf($P{summaryAll}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="c63a1f9a-f870-407b-ae9c-beb4f2eba41e" style="Crosstab Data Text" mode="Transparent" x="80" y="0" width="64" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4808,7 +4796,7 @@
 								<font size="10" isBold="true"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($P{waterSummary}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$P{waterSummary} == 0 ? null : java.math.BigDecimal.valueOf($P{waterSummary}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
 							<reportElement uuid="283d081e-29c3-4ad7-aad1-95191895befc" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="40" height="39" backcolor="#CCFFFF"/>
@@ -4824,7 +4812,7 @@
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
 						</textField>
-						<textField isStretchWithOverflow="true" pattern="0">
+						<textField isStretchWithOverflow="true" pattern="0" isBlankWhenNull="true">
 							<reportElement uuid="e6e19c9e-7118-4168-9563-5ceb5ff18616" style="Crosstab Data Text" mode="Transparent" x="40" y="0" width="40" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -4837,7 +4825,7 @@
 								<font size="10" isBold="true"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$P{waterCount}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$P{waterCount} == 0 ? null : $P{waterCount}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -5506,7 +5494,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="81730378-fdb7-4fde-b5e0-cc1b5e16f678" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -5519,7 +5507,7 @@
 								<font isBold="true"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($P{summary37}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$P{summary37} == 0 ? null : java.math.BigDecimal.valueOf($P{summary37}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -6188,7 +6176,7 @@
 							<bottomPen lineWidth="0.0"/>
 							<rightPen lineWidth="0.0"/>
 						</box>
-						<textField isStretchWithOverflow="true" pattern="0.00">
+						<textField isStretchWithOverflow="true" pattern="0.00" isBlankWhenNull="true">
 							<reportElement uuid="56f82fd2-c485-467a-b5d8-f84273b00616" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="77" height="39" backcolor="#CCFFFF"/>
 							<box>
 								<pen lineWidth="0.5"/>
@@ -6201,7 +6189,7 @@
 								<font isBold="true"/>
 								<paragraph leftIndent="2" rightIndent="2" spacingBefore="2" spacingAfter="2"/>
 							</textElement>
-							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($P{summary511}).movePointLeft(2)]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$P{summary511} == 0 ? null : java.math.BigDecimal.valueOf($P{summary511}).movePointLeft(2)]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
