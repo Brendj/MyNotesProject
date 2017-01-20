@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -70,21 +71,35 @@ public class ProcessorUtils {
 
     @Async
     public void saveLastProcessSectionDate(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType){
+        saveLastProcessSectionCustomDate(sessionFactory, idOfOrg, sectionType, new Date());
+    }
+
+    public void saveLastProcessSectionCustomDate(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType, Date date) {
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = sessionFactory.openSession();
             persistenceTransaction = session.beginTransaction();
-            LastProcessSectionsDates lastProcessSectionsDate = DAOUtils.findLastProcessSectionsDate(session,
+            Query query = session.createQuery("update LastProcessSectionsDates p set p.date = :date where p.compositeIdOfLastProcessSectionsDates = :compositeId");
+            query.setParameter("date", date);
+            query.setParameter("compositeId", new CompositeIdOfLastProcessSectionsDates(idOfOrg, sectionType.getType()));
+            int result = query.executeUpdate();
+            if (result == 0) {
+                LastProcessSectionsDates lastProcessSectionsDate = new LastProcessSectionsDates(new CompositeIdOfLastProcessSectionsDates(idOfOrg,
+                        sectionType.getType()), date);
+                session.save(lastProcessSectionsDate);
+            }
+
+            /*LastProcessSectionsDates lastProcessSectionsDate = DAOUtils.findLastProcessSectionsDate(session,
                     new CompositeIdOfLastProcessSectionsDates(idOfOrg, sectionType.getType()));
             if (lastProcessSectionsDate == null){
                 lastProcessSectionsDate = new LastProcessSectionsDates(new CompositeIdOfLastProcessSectionsDates(idOfOrg,
-                        sectionType.getType()), new Date());
+                        sectionType.getType()), date);
                 session.save(lastProcessSectionsDate);
             } else {
-                lastProcessSectionsDate.setDate(new Date());
+                lastProcessSectionsDate.setDate(date);
                 session.update(lastProcessSectionsDate);
-            }
+            }*/
             session.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;

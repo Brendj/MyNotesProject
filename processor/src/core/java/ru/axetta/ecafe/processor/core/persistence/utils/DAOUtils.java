@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
@@ -1028,11 +1029,13 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
-    public static void changeClientBalance(Session session, Long idOfClient, long sum) {
+    public static void changeClientBalance(Session session, Long idOfClient, long sum, Long idOfOrg, Date transactionDate) {
         Query q = session.createQuery("UPDATE Client SET balance = balance + :charge WHERE idOfClient = :id")
                 .setParameter("charge", sum)
                 .setParameter("id", idOfClient);
         q.executeUpdate();
+        RuntimeContext.getAppContext().getBean(ProcessorUtils.class).saveLastProcessSectionCustomDate(
+                session.getSessionFactory(), idOfOrg, SectionType.LAST_TRANSACTION, transactionDate);
     }
 
     /**

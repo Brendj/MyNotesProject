@@ -49,7 +49,7 @@ public class ClientAccountManager {
             accountTransaction.setTransactionSubBalance1Sum(transactionSum-diff);
             accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
             session.save(accountTransaction);
-            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
             client.addBalanceNotForSave(transactionSum);
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum-diff, 1, client.getSubBalanceIsNull(1));
             client.addSubBalanceNotForSave(transactionSum-diff, 1);
@@ -59,7 +59,7 @@ public class ClientAccountManager {
             accountTransaction.setTransactionSubBalance1Sum(transactionSum);
             accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
             session.save(accountTransaction);
-            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
             client.addBalanceNotForSave(transactionSum);
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, 1, client.getSubBalanceIsNull(1));
             client.addSubBalanceNotForSave(transactionSum, 1);
@@ -79,7 +79,7 @@ public class ClientAccountManager {
         }
         accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
         client.addBalanceNotForSave(transactionSum);
         return accountTransaction;
     }
@@ -98,7 +98,7 @@ public class ClientAccountManager {
         }
         accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
         client.addBalanceNotForSave(transactionSum);
         if(subBalance>0){
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, subBalance, client.getSubBalanceIsNull(subBalance));
@@ -120,7 +120,7 @@ public class ClientAccountManager {
         }
         cancelTransaction.setBalanceAfterTransaction(client.getBalance() + (-transaction.getTransactionSum()));
         session.save(cancelTransaction);
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum());
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum(), client.getOrg().getIdOfOrg(), transactionTime);
         if(transaction.getTransactionSubBalance1Sum()!=null){
             DAOUtils.changeClientSubBalance1(session, client.getIdOfClient(), -transaction.getTransactionSubBalance1Sum(), false);
         }
@@ -139,7 +139,7 @@ public class ClientAccountManager {
         cancelTransaction.setBalanceAfterTransaction(client.getBalance() + (-transactionSum));
         session.save(cancelTransaction);
 
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transactionSum);
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
         if(subBalance>0){
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, subBalance, client.getSubBalanceIsNull(subBalance));
             client.addSubBalanceNotForSave(transactionSum, subBalance);

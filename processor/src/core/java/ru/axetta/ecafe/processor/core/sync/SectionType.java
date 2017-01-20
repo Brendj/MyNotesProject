@@ -32,7 +32,8 @@ public enum  SectionType {
     ZERO_TRANSACTIONS(19),
     SPECIAL_DATES(20),
     MIGRANTS(21),
-    RO(22);
+    RO(22),
+    LAST_TRANSACTION(23);
 
     private int type;
 

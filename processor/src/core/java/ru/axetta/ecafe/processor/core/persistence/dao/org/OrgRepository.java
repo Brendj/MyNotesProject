@@ -29,6 +29,7 @@ import java.util.List;
 public class OrgRepository extends AbstractJpaDao<Org> {
 
     private final static Logger logger = LoggerFactory.getLogger(OrgRepository.class);
+    private static final Long dateDiffForTransactionsSearch = 1000L * 60L * 5L; //5 минут
 
     public static OrgRepository getInstance() {
         return RuntimeContext.getAppContext().getBean(OrgRepository.class);
@@ -175,5 +176,24 @@ public class OrgRepository extends AbstractJpaDao<Org> {
             result = (LastProcessSectionsDates) query.getSingleResult();
         } catch (Exception ignore){}
         return result != null ? result.getDate() : null;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean transactionsExistByLastProcessSectionDates(List<Long> idOfOrgs, Date startDate, Date endDate)  {
+        if (endDate.getTime() - startDate.getTime() > dateDiffForTransactionsSearch) {
+            return true;
+        }
+        Query query = entityManager.createQuery(
+                "select count(*) from LastProcessSectionsDates l where l.compositeIdOfLastProcessSectionsDates.idOfOrg in :idOfOrgs "
+                        + "and l.compositeIdOfLastProcessSectionsDates.type = :sectionType and l.date between :startDate and :endDate");
+        query.setParameter("idOfOrgs", idOfOrgs);
+        query.setParameter("sectionType", SectionType.LAST_TRANSACTION.getType());
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        Long result = null;
+        try {
+            result = (Long) query.getSingleResult();
+        } catch (Exception ignore){}
+        return result == null ? true : result.intValue() > 0;
     }
 }
