@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
+import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
 
 /**
@@ -27,7 +28,7 @@ import javax.servlet.http.HttpServlet;
  */
 @Component
 @Scope("singleton")
-//@WebService(targetNamespace = "http://rstyle.com/nsi/delta/service", serviceName = "NSIDeltaSOAPService", portName = "NSIDeltaServicePort")
+@WebService(targetNamespace = "http://rstyle.com/nsi/delta/service", serviceName = "NSIDeltaSOAPService", portName = "NSIDeltaServicePort")
 public class NSIDeltaController extends HttpServlet implements NSIDeltaService {
 
 
