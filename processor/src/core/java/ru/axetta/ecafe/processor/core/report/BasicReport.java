@@ -4,21 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.DailyFileCreator;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -75,6 +69,9 @@ public class BasicReport {
                 File reportDocumentFile = createFile(filename, fileNameSuffix);
                 writeReportDocumentTo(report, reportDocumentFile);
                 return new ReportDocument(reportDocumentFile);
+            } catch (JRException e) {
+                logger.error("Failed to create jasperReport document file - error could occur during forming report data: " + e.getMessage());
+                throw e;
             } catch (Exception e) {
                 logger.error("Failed to create jasperReport document file", e);
                 throw e;
