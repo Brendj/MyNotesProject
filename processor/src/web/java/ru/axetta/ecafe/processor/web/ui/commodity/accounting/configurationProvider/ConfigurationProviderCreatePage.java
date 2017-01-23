@@ -109,7 +109,11 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
         Boolean result = false;
         try {
             User user = MainPage.getSessionInstance().getCurrentUser();
-            result = !user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification());
+            if (user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification())) {
+                result = true;
+            } else {
+                result = !user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification());
+            }
         } catch (Exception e) {
             getLogger().error("getEligibleToWorkConfigurationProviderList exception", e);
         }
