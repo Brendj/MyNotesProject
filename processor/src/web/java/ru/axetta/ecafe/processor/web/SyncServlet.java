@@ -158,8 +158,8 @@ public class SyncServlet extends HttpServlet {
             if (!verifySignature || bLogPackets) {
                 syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             } else {
-                String message = "Synchronization with %s - type: %s - packets not logged";
-                logger.info(String.format(message, request.getRemoteAddr(), syncType.toString()));
+                String message = "Synchronization with %s, addr %s - type: %s - packets not logged";
+                logger.info(String.format(message, idOfOrg, request.getRemoteAddr(), syncType.toString()));
             }
 
             // Verify XML signature
@@ -203,7 +203,7 @@ public class SyncServlet extends HttpServlet {
                 SyncRequest.Builder syncRequestBuilder = new SyncRequest.Builder();
                 syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync, request.getRemoteAddr());
             } catch (Exception e) {
-                logger.error("Failed to parse XML request", e);
+                logger.error(String.format("Failed to parse XML request. IdOfOrg=%s", idOfOrg), e);
                 String msg = String.format("Failed to parse XML request: %s", e.getMessage());
                 sendError(response, syncTime, msg, HttpServletResponse.SC_BAD_REQUEST);
                 removeSyncInProgress(idOfOrg);
@@ -217,7 +217,7 @@ public class SyncServlet extends HttpServlet {
                 syncResponse = processor.processSyncRequest(syncRequest);
                 syncRequest = null;
             } catch (Exception e) {
-                logger.error("Failed to process request", e);
+                logger.error(String.format("Failed to process request. IdOfOrg=%s", idOfOrg), e);
                 String message = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, message, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 removeSyncInProgress(idOfOrg);
@@ -231,7 +231,7 @@ public class SyncServlet extends HttpServlet {
                 syncResponse = null;
                 DigitalSignatureUtils.sign(runtimeContext.getSyncPrivateKey(), responseDocument);
             } catch (Exception e) {
-                logger.error("Failed to serialize response", e);
+                logger.error(String.format("Failed to serialize response. IdOfOrg=%s", idOfOrg), e);
                 String format = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, format, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 removeSyncInProgress(idOfOrg);
@@ -247,7 +247,7 @@ public class SyncServlet extends HttpServlet {
             try {
                 writeResponse(response, requestData.isCompressed, responseDocument);
             } catch (Exception e) {
-                logger.error("Failed to write response", e);
+                logger.error(String.format("Failed to write response. IdOfOrg=%s", idOfOrg), e);
                 removeSyncInProgress(idOfOrg);
                 throw new ServletException(e);
             }
