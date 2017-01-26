@@ -1038,6 +1038,7 @@ public class ImportRegisterClientsService {
                 dbClient = (Client)session.load(Client.class, change.getIdOfClient());
             }
             SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            boolean clientMigration = false;
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
@@ -1099,6 +1100,7 @@ public class ImportRegisterClientsService {
                     break;
                 case MOVE_OPERATION:
                     Org newOrg = (Org) session.load(Org.class, change.getIdOfMigrateOrgTo());
+                    clientMigration = true;
                     addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
@@ -1129,7 +1131,7 @@ public class ImportRegisterClientsService {
 
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
-                    if (dbClient.getOrg().getIdOfOrg() == change.getIdOfOrg()) {
+                    if (dbClient.getOrg().getIdOfOrg().equals(change.getIdOfOrg())) {
                         addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change); //если орг. не меняется, добавляем историю миграции внутри ОО
                     }
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
@@ -1144,7 +1146,7 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
                     modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
-                    if (!dbClient.getOrg().getIdOfOrg().equals(change.getIdOfOrg())) {
+                    if (!dbClient.getOrg().getIdOfOrg().equals(change.getIdOfOrg()) && !clientMigration) {
                         addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
                         dbClient.setOrg(newOrg1);
                     }
