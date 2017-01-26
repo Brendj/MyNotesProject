@@ -1144,7 +1144,7 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
                     modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
-                    if (dbClient.getOrg().getIdOfOrg() != change.getIdOfOrg()) {
+                    if (!dbClient.getOrg().getIdOfOrg().equals(change.getIdOfOrg())) {
                         addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
                         dbClient.setOrg(newOrg1);
                     }
