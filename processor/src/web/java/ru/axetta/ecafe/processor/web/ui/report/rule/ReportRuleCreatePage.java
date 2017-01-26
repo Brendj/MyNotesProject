@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -407,7 +408,8 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                                 conditionItem.getConditionArgument(), conditionItem.getConditionConstant()));
             }
         }
-        reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
+        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        reportHandleRule.setTemplateFileName(this.reportTemplateFileName.substring(reportPath.length()));
         reportHandleRule.setAllowManualReportRun(manualReportRun);
         reportHandleRule.setStoragePeriod(storagePeriod);
 

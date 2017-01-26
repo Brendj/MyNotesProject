@@ -14,13 +14,10 @@ import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
-import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
-import ru.axetta.ecafe.processor.core.report.ReportDAOService;
-import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.web.ui.report.rule.Hint;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleEditPage;
 
@@ -652,7 +649,8 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         //AutoReportGenerator.JobDetailCreator cr = RuntimeContext.getInstance().getAutoReportGenerator().getReportJobDetailCreator (ManualReportRunnerPage.class);
         BasicReportJob clearReport = ReportsFactory.craeteReportInstance(reportType);
-        BasicReportJob.Builder builder = clearReport.createBuilder(rule.getTemplateFileName());
+        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        BasicReportJob.Builder builder = clearReport.createBuilder(reportPath + rule.getTemplateFileName());
         //  Передаем все необходимые значение
         if (values.get("idOfContragent") != null) {
             List<String> idOfContragentList = values.get("idOfContragent");

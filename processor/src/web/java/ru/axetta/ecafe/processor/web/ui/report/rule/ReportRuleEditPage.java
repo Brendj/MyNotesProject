@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
@@ -263,7 +264,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
         reportHandleRule.setAllowManualReportRun (manualReportRun);
         reportHandleRule.setStoragePeriod(storagePeriod);
 
-        reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
+        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        reportHandleRule.setTemplateFileName(this.reportTemplateFileName.substring(reportPath.length()));
 
         String[] addressList = this.routeAddresses.split(ReportHandleRule.DELIMETER);
 

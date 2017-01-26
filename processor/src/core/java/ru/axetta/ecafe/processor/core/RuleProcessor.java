@@ -250,7 +250,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         }
                         if (basicReport instanceof BasicReportJob && currRule.getTemplateFileName() != null && !currRule
                                 .getTemplateFileName().isEmpty()) {
-                            ((BasicReportJob) basicReport).setTemplateFilename(currRule.getTemplateFileName());
+                            String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+                            ((BasicReportJob) basicReport).setTemplateFilename(reportPath + currRule.getTemplateFileName());
                         }
                         String subject = "";
                         Long idOfOrg = null;

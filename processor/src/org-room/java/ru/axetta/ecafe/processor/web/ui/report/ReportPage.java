@@ -8,7 +8,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -317,7 +320,8 @@ public class ReportPage extends BasicWorkspacePage {
         }
         //AutoReportGenerator.JobDetailCreator cr = RuntimeContext.getInstance().getAutoReportGenerator().getReportJobDetailCreator (ManualReportRunnerPage.class);
         BasicReportJob clearReport = ReportsFactory.craeteReportInstance(reportType);
-        BasicReportJob.Builder builder = clearReport.createBuilder(rule.getTemplateFileName());
+        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+        BasicReportJob.Builder builder = clearReport.createBuilder(reportPath + rule.getTemplateFileName());
         //  Передаем все необходимые значение
         if (contragent != null) {
             builder.setContragent(contragent);

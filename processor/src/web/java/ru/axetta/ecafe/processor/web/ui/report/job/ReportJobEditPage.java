@@ -190,15 +190,7 @@ public class ReportJobEditPage extends BasicWorkspacePage {
         criteriaJobRules.add(Restrictions.eq("schedulerJob", schedulerJob));
         List<JobRules> schedulerResult = criteriaJobRules.list();
 
-        String schedulerTypeString = "";
-
-        if (!schedulerResult.isEmpty()) {
-            String[] schedulerType = StringUtils
-                    .split(schedulerResult.get(0).getReportHandleRule().getTemplateFileName(), "\\|/");
-
-            String[] strArr = StringUtils.split(schedulerType[schedulerType.length - 1], ".");
-            schedulerTypeString = strArr[strArr.length - 2];
-        }
+        String schedulerTypeString = schedulerResult.get(0).getReportHandleRule().getTemplateFileName();
 
         Long counter = 0L;
         Integer counterInt = 0;
