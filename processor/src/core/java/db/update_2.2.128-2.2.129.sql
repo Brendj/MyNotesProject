@@ -12,3 +12,5 @@ as t FROM cf_reporthandlerules
 where trim(FROM substring(templatefilename, length(templatefilename) - position('\' in reverse(templatefilename)) + 2)) <> '') i
 WHERE i.idofreporthandlerule = r.idofreporthandlerule;
 
+--Удаление лишних записей с ИД старой ОО = ИД новой ОО в таблице перемещений между ОО
+DELETE FROM cf_clientmigrationhistory WHERE idoforg = idofoldorg;
