@@ -2404,7 +2404,7 @@ public class Processor implements SyncProcessor {
             OrgSyncWritableRepository orgSyncWritableRepository = OrgSyncWritableRepository.getInstance();
             orgSyncWritableRepository.updateAccRegistryDate(idOfOrg);
         } catch (Exception e) {
-            logger.error("Не удалось обновить время синхронизации, idOfOrg: " + idOfOrg);
+            logger.error("Не удалось обновить время синхронизации, idOfOrg: " + idOfOrg, e);
         }
     }
 
