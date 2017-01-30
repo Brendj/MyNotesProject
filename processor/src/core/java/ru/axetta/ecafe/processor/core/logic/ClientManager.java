@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -402,20 +403,7 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.COMMENTS) != null) {
                 client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
             }
-            if (registerCommentsAdds != null && registerCommentsAdds.length() > 0) {
-                String comments = client.getRemarks();
-                if (comments==null) comments="";
-                if (comments.indexOf("{%") > -1) {
-                    comments = comments.substring(0, comments.indexOf("{%")) + comments
-                            .substring(comments.indexOf("%}") + 1);
-                }
-                comments += registerCommentsAdds;
-                if (comments.length() >= 1024) {
-                    comments = comments.replaceAll(MskNSIService.REPLACEMENT_REGEXP, "");
-                }
-
-                client.setRemarks(comments);
-            }
+            ImportRegisterClientsService.commentsAddsDelete(client, registerCommentsAdds);
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
@@ -428,16 +416,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ClientGroup clientGroup = DAOUtils
-                                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
-                                        groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
-                        if (clientGroup == null) {
-                            clientGroup = DAOUtils.createClientGroup(persistenceSession, groupNamesToOrgs.getIdOfOrg(),
-                                    groupNamesToOrgs.getGroupName());
-                        }
-                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                        Org org1 = (Org) persistenceSession.load(Org.class, groupNamesToOrgs.getIdOfOrg());
-                        client.setOrg(org1);
+                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
@@ -614,12 +593,12 @@ public class ClientManager {
         }
     }
 
-    public static long registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
+    public static Client registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
             boolean checkFullNameUnique, Session persistenceSession, String registerCommentsAdds) throws Exception {
         return registerClientTransactionFree (idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession, null, registerCommentsAdds);
     }
 
-    public static long registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
+    public static Client registerClientTransactionFree (long idOfOrg, ClientFieldConfig fieldConfig,
                                                       boolean checkFullNameUnique, Session persistenceSession,
                                                     Transaction persistenceTransaction, String registerCommentsAdds) throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -759,16 +738,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ClientGroup clientGroup = DAOUtils
-                                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
-                                        groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
-                        if (clientGroup == null) {
-                            clientGroup = DAOUtils.createClientGroup(persistenceSession, groupNamesToOrgs.getIdOfOrg(),
-                                    groupNamesToOrgs.getGroupName());
-                        }
-                        client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                        Org org1 = (Org) persistenceSession.load(Org.class, groupNamesToOrgs.getIdOfOrg());
-                        client.setOrg(org1);
+                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
@@ -842,11 +812,11 @@ public class ClientManager {
             ///
 
             logger.debug("save clientMigration");
-            ClientMigration clientMigration = new ClientMigration(client, organization, contractDate);
+            ClientMigration clientMigration = new ClientMigration(client, client.getOrg(), contractDate);
 
             persistenceSession.save(clientMigration);
             logger.debug("return");
-            return idOfClient;
+            return client;
         } catch (Exception e) {
             throw e;
         }
@@ -1026,12 +996,12 @@ public class ClientManager {
             String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
             logger.debug("registerClientTransactionFree");
-            long idOfClient = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique,
+            Client client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique,
                     persistenceSession, persistenceTransaction, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return idOfClient;
+            return client.getIdOfClient();
         } catch (Exception e) {
             logger.error("Ошибка при создании клиента", e);
             throw new Exception("Ошибка: " + e.getMessage());

@@ -220,12 +220,12 @@ public class ClientDao extends WritableJpaDao {
 
         String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
-        Long id = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
+        Client clientId = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
                 (ClientManager.ClientFieldConfig) createConfig, false, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
 
         //Создаем опекунскую связь
         Long version = generateNewClientGuardianVersion(session);
-        ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), id, version, false, null, null);
+        ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(), version, false, null, null);
 
         //Очищаем данные клиента (ребенка)
         Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());

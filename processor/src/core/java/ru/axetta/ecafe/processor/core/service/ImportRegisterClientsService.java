@@ -1026,7 +1026,7 @@ public class ImportRegisterClientsService {
         Session session = null;
         Transaction transaction = null;
 
-        Long id = null;
+        Client afterSaveClient = null;
 
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
@@ -1038,7 +1038,7 @@ public class ImportRegisterClientsService {
                 dbClient = (Client)session.load(Client.class, change.getIdOfClient());
             }
             SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-            boolean clientMigration = false;
+
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
@@ -1066,9 +1066,11 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
-                    id = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
+                    afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                             (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
-                    change.setIdOfClient(id);
+                    change.setIdOfClient(afterSaveClient.getIdOfClient());
+                    change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
+
                     break;
                 case DELETE_OPERATION:
                     ClientGroup deletedClientGroup = DAOUtils
@@ -1082,41 +1084,20 @@ public class ImportRegisterClientsService {
 
                     String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
-                    if (deleteCommentsAdds != null && deleteCommentsAdds.length() > 0) {
-                        String comments = dbClient.getRemarks();
-                        if (comments==null) comments="";
-                        if (comments.indexOf("{%") > -1) {
-                            comments = comments.substring(0, comments.indexOf("{%")) + comments
-                                    .substring(comments.indexOf("%}") + 1);
-                        }
-                        comments += deleteCommentsAdds;
-                        if (comments.length() >= 1024) {
-                            comments = comments.replaceAll(MskNSIService.REPLACEMENT_REGEXP, "");
-                        }
-
-                        dbClient.setRemarks(comments);
-                    }
+                    commentsAddsDelete(dbClient, deleteCommentsAdds);
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:
                     Org newOrg = (Org) session.load(Org.class, change.getIdOfMigrateOrgTo());
-                    clientMigration = true;
-                    addClientMigrationEntry(session, dbClient.getOrg(), newOrg, dbClient, change);
+
+                    Org beforeMigrateOrg = dbClient.getOrg();
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(),
                                     change.getGroupName());
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
-                                groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
-                        if (clientGroup == null) {
-                            clientGroup = DAOUtils.createClientGroup(session, groupNamesToOrgs.getIdOfOrg(),
-                                    groupNamesToOrgs.getGroupName());
-                        }
-                        dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                        Org org = (Org) session.load(Org.class, groupNamesToOrgs.getIdOfOrg());
-                        dbClient.setOrg(org);
+                        clientGroupProcess(session, dbClient, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session, newOrg.getIdOfOrg(),
@@ -1128,12 +1109,13 @@ public class ImportRegisterClientsService {
                         dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                         dbClient.setOrg(newOrg);
                     }
-
+                    addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), dbClient, change);
+                    change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
+                    break;
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
-                    if (dbClient.getOrg().getIdOfOrg().equals(change.getIdOfOrg())) {
-                        addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change); //если орг. не меняется, добавляем историю миграции внутри ОО
-                    }
+                    Org beforeModifyOrg = dbClient.getOrg();
+
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                     modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
@@ -1146,14 +1128,19 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
                     modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
-                    if (!dbClient.getOrg().getIdOfOrg().equals(change.getIdOfOrg()) && !clientMigration) {
-                        addClientMigrationEntry(session, dbClient.getOrg(), newOrg1, dbClient, change); //орг. меняется - история миграции между ОО
-                        dbClient.setOrg(newOrg1);
-                    }
+
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
                             newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
                             dbClient, session, true);
 
+                    if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
+                        addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
+                                change); //орг. меняется - история миграции между ОО
+                    } else {
+                        addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient,
+                                change); //если орг. не меняется, добавляем историю миграции внутри ОО
+                    }
+                    change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
                     break;
                 default:
                     logger.error("Unknown update registry change operation " + change.getOperation());
@@ -1167,10 +1154,40 @@ public class ImportRegisterClientsService {
             HibernateUtils.close(session, logger);
         }
 
-        if (id != null) {
+        if (afterSaveClient != null) {
             saveClientGuardians(idOfRegistryChange);
         }
 
+    }
+
+    public static void clientGroupProcess(Session session, Client dbClient, GroupNamesToOrgs groupNamesToOrgs)
+            throws Exception {
+        ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
+                groupNamesToOrgs.getIdOfOrg(), groupNamesToOrgs.getGroupName());
+        if (clientGroup == null) {
+            clientGroup = DAOUtils.createClientGroup(session, groupNamesToOrgs.getIdOfOrg(),
+                    groupNamesToOrgs.getGroupName());
+        }
+        dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        Org org = (Org) session.load(Org.class, groupNamesToOrgs.getIdOfOrg());
+        dbClient.setOrg(org);
+    }
+
+    public static void commentsAddsDelete(Client dbClient, String deleteCommentsAdds) {
+        if (deleteCommentsAdds != null && deleteCommentsAdds.length() > 0) {
+            String comments = dbClient.getRemarks();
+            if (comments==null) comments="";
+            if (comments.indexOf("{%") > -1) {
+                comments = comments.substring(0, comments.indexOf("{%")) + comments
+                        .substring(comments.indexOf("%}") + 1);
+            }
+            comments += deleteCommentsAdds;
+            if (comments.length() >= 1024) {
+                comments = comments.replaceAll(MskNSIService.REPLACEMENT_REGEXP, "");
+            }
+
+            dbClient.setRemarks(comments);
+        }
     }
 
     private static void saveClientGuardians(Long idOfRegistryChange) throws Exception {

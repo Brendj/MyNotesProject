@@ -2531,11 +2531,18 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfMainOrg", idOfMainOrg));
         criteria.add(Restrictions.eq("groupName", groupName));
-        criteria.add(Restrictions.eq("isMiddleGroup", false));
 
         List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) criteria.list();
 
-        return list.size() == 1 ? list.get(0) : null;
+        GroupNamesToOrgs groupNamesToOrgs = null;
+
+        for (GroupNamesToOrgs namesToOrgs: list) {
+            if (namesToOrgs.getIsMiddleGroup() == null || namesToOrgs.getIsMiddleGroup() == false) {
+                groupNamesToOrgs = namesToOrgs;
+            }
+        }
+
+        return groupNamesToOrgs;
     }
 
     //Промежуточная группа
