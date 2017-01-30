@@ -281,6 +281,11 @@
             <%--<h:inputText value="#{settingEditPage.parserBySettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px"/>--%>
             <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.hoursForbidChange}"
                                     maxValue="72" step="3" minValue="3" showToolTip="true" />
+
+            <h:outputText escape="true" value="Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме" styleClass="output-text" />
+            <h:inputText value="#{settingEditPage.parserBySettingValue.daysToForbidChangeInPos}" styleClass="input-text" style="width: 207px"/>
+
+
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsEditReplacingMissingBeneficiariesSettingPanelGrid"

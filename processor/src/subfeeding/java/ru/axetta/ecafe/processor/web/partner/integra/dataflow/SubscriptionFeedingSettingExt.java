@@ -22,6 +22,8 @@ public class SubscriptionFeedingSettingExt{
     protected Integer dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
     @XmlAttribute(name = "sixWorkWeek")
     protected  Boolean sixWorkWeek; // Шестидневный план рабочих дней
+    @XmlAttribute(name = "daysToForbidChangeInPos")
+    protected Integer daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
 
     public Integer getDayRequest() {
         return dayRequest;
@@ -61,5 +63,13 @@ public class SubscriptionFeedingSettingExt{
 
     public void setSixWorkWeek(Boolean sixWorkWeek) {
         this.sixWorkWeek = sixWorkWeek;
+    }
+
+    public Integer getDaysToForbidChangeInPos() {
+        return daysToForbidChangeInPos;
+    }
+
+    public void setDaysToForbidChangeInPos(Integer daysToForbidChangeInPos) {
+        this.daysToForbidChangeInPos = daysToForbidChangeInPos;
     }
 }

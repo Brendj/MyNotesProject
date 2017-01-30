@@ -6441,6 +6441,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             settingExt.setDayRequest(parser.getDayRequest());
             settingExt.setEnableFeeding(parser.isEnableFeeding());
             settingExt.setSixWorkWeek(parser.isSixWorkWeek());
+            settingExt.setDaysToForbidChangeInPos(parser.getDaysToForbidChangeInPos());
             result.subscriptionFeedingSettingExt = settingExt;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -6505,6 +6506,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             settingExt.setDayRequest(parser.getDayRequest());
             settingExt.setEnableFeeding(parser.isEnableFeeding());
             settingExt.setSixWorkWeek(parser.isSixWorkWeek());
+            settingExt.setDaysToForbidChangeInPos(parser.getDaysToForbidChangeInPos());
             result.subscriptionFeedingSettingExt = settingExt;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;

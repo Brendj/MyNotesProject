@@ -16,6 +16,7 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
     //private int dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
     private int hoursForbidChange; // Количество часов, в течение которых запрещено редактировать заявки
+    private int daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     private boolean sixWorkWeek; // Шестидневный план рабочих дней
 
     public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
@@ -34,13 +35,14 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
         } else {
             this.sixWorkWeek = values[4].equals("1");
         }
+        this.daysToForbidChangeInPos = Integer.parseInt(values[5]);
     }
 
     @Override
     public String build() {
         //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
         return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (
-                sixWorkWeek ? 1 : 0) + ";";
+                sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";";
     }
 
     @Override
@@ -96,6 +98,14 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
 
     public void setHoursForbidChange(int hoursForbidChange) {
         this.hoursForbidChange = hoursForbidChange;
+    }
+
+    public int getDaysToForbidChangeInPos() {
+        return daysToForbidChangeInPos;
+    }
+
+    public void setDaysToForbidChangeInPos(int daysToForbidChangeInPos) {
+        this.daysToForbidChangeInPos = daysToForbidChangeInPos;
     }
 
     public boolean isSixWorkWeek() {
