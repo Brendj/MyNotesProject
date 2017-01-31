@@ -66,6 +66,15 @@ public class ClientMigration {
         this.registrationDate = registrationDate;
     }
 
+    public ClientMigration(Client client, Org org, Date registrationDate, String newGroupName) {
+        this.client = client;
+        this.balance = client.getBalance();
+        this.org = org;
+        this.setNewContragent(org.getDefaultSupplier());
+        this.registrationDate = registrationDate;
+        this.newGroupName = newGroupName;
+    }
+
     public Client getClient() {
         return client;
     }

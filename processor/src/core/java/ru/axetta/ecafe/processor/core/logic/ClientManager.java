@@ -727,11 +727,14 @@ public class ClientManager {
             //}
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
+            String newClientGroupName = null;
             logger.debug("set client Group");
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
                 //if (tokens.length >=22){
                 if (fieldConfig.getValue(ClientManager.FieldId.GROUP).length() > 0) {
                     String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
+
+                    newClientGroupName = clientGroupName;
 
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(persistenceSession, idOfOrg,
@@ -812,7 +815,12 @@ public class ClientManager {
             ///
 
             logger.debug("save clientMigration");
-            ClientMigration clientMigration = new ClientMigration(client, client.getOrg(), contractDate);
+            ClientMigration clientMigration;
+            if (newClientGroupName != null) {
+                clientMigration = new ClientMigration(client, client.getOrg(), contractDate, newClientGroupName);
+            } else {
+                clientMigration = new ClientMigration(client, client.getOrg(), contractDate);
+            }
 
             persistenceSession.save(clientMigration);
             logger.debug("return");
