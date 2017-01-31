@@ -185,6 +185,7 @@ public class Org implements Serializable {
         this.orgContractId.setOrg(this);
         updateTime = new Date();
         this.orgStructureVersion = orgStructureVersion;
+        this.tradeAccountConfigChangeDirective = TradeAccountConfigChange.NOT_CHANGED;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
