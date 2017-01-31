@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
@@ -25,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  * 
  */
-@XmlType(name = "Action", namespace = "")
+@XmlType(name = "Action", namespace = "http://rstyle.com/nsi/delta")
 @XmlEnum
 public enum Action {
 

@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +30,7 @@ import javax.persistence.PersistenceContext;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -43,6 +45,9 @@ import java.util.*;
 @Scope("singleton")
 public class NSIDeltaProcessor {
     private final static Logger logger = LoggerFactory.getLogger(NSIDeltaProcessor.class);
+
+    private final static int DAYS_DELTA_ACTUAL = 7;
+
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
@@ -70,6 +75,17 @@ public class NSIDeltaProcessor {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(ts));
         String synchDate = "[Синхронизация с Реестрами от " + date + " с UID " + delta.getUid() + "]: ";
 
+        try {
+            Date deltaDate = delta.getDate().toGregorianCalendar().getTime();
+            if (CalendarUtils.getDifferenceInDays(deltaDate, new Date()) > DAYS_DELTA_ACTUAL) {
+                ImportRegisterClientsService.log(synchDate + String.format("Дельта не принята по сроку давности %s", deltaDate), logBuffer);
+                return buildOKResponse();
+            }
+        } catch (Exception e) {
+            ImportRegisterClientsService.log(synchDate + "Не найдена секция date в дельте", logBuffer);
+            return buildFailureResponse("Not found delta date");
+        }
+
         //  парсинг
         ContainerDelta containerDelta = unmarshal(delta);
         if(containerDelta == null) {
@@ -92,9 +108,7 @@ public class NSIDeltaProcessor {
             return buildFailureResponse("Failed to proceed registry import " + nside.getMessage());
         }
         ImportRegisterClientsService.log(synchDate + "Загрузка изменений успешно завершена" + items.size(), logBuffer);
-        ReceiveNSIDeltaResponseType response = new ReceiveNSIDeltaResponseType();
-        response.setResult(ResultType.SUCCESS);
-        return response;
+        return buildOKResponse();
     }
 
     protected ReceiveNSIDeltaResponseType buildFailureResponse(String error) {
@@ -102,6 +116,12 @@ public class NSIDeltaProcessor {
         response.setResult(ResultType.FAILURE);
         List<String> errors = response.getErrorMessage();
         errors.add(error);
+        return response;
+    }
+
+    protected ReceiveNSIDeltaResponseType buildOKResponse() {
+        ReceiveNSIDeltaResponseType response = new ReceiveNSIDeltaResponseType();
+        response.setResult(ResultType.SUCCESS);
         return response;
     }
 
@@ -277,7 +297,29 @@ public class NSIDeltaProcessor {
         fieldConfig.setValue(ClientManager.FieldId.NAME, solveField(item.getFirstName(), cl != null ? cl.getPerson().getFirstName() : ""));
         fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, solveField(item.getSecondName(), cl != null ? cl.getPerson().getSecondName() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GROUP, solveField(item.getGroup(), cl != null && cl.getClientGroup() != null ? cl.getClientGroup().getGroupName() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.GENDER, solveField(item.getGender(), cl != null && cl.getGender() != null ? getGenderFromInteger(cl.getGender()) : ""));
+        fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, solveField(item.getBirthDate(), cl != null && cl.getBirthDate() != null ? getBirthDateFromDate(cl.getBirthDate()) : ""));
+        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, solveField(item.getBenefitOnAdmission(), cl != null ? cl.getBenefitOnAdmission() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, solveField(item.getAgeTypeGroup(), cl != null ? cl.getAgeTypeGroup() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, solveField(new Integer(item.getGuardians().size()).toString(), cl != null ? cl.getGuardiansCount() : ""));
+        if (item.getGuardians() != null && item.getGuardians().size() > 0 ) {
+            fieldConfig.setValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST, item.getGuardians());
+        }
         return fieldConfig;
+    }
+
+    private String getGenderFromInteger(Integer gender) {
+        if (gender.equals(0)) return "Женский";
+            else if (gender.equals(1)) return "Мужской";
+                else return null;
+    }
+
+    private String getBirthDateFromDate(Date birthDate) {
+        if (birthDate != null) {
+            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+            return timeFormat.format(birthDate);
+        }
+        return null;
     }
 
     protected String solveField(String value, String clientValue) {
@@ -298,6 +340,11 @@ public class NSIDeltaProcessor {
         protected String familyName, firstName, secondName, guid, group, orgGuid;
         protected int action;
         protected String notificationId;
+        protected String gender;
+        protected String birthDate;
+        protected String benefitOnAdmission;
+        protected String ageTypeGroup;
+        protected List<ImportRegisterClientsService.GuardianInfo> guardians;
 
         public DeltaItem(Item item) {
             this.notificationId = item.getNotificationId();
@@ -317,33 +364,66 @@ public class NSIDeltaProcessor {
                 else if(attributeName.endsWith("отчество")) {
                     secondName = getSingleValue(at);
                 }
-                /*else if(attributeName.endsWith("guid")) {
-                    guid = getSingleValue(at);
-                }*/
+                else if(attributeName.endsWith("пол")) {
+                    gender = getSingleValue(at);
+                }
+                else if (attributeName.endsWith("дата рождения")) {
+                    birthDate = getSingleValue(at);
+                }
+                else if (attributeName.endsWith("льгота при поступлении")) {
+                    benefitOnAdmission = getSingleValue(at);
+                }
+                else if (attributeName.endsWith("представители")) {
+                    guardians = new ArrayList<ImportRegisterClientsService.GuardianInfo>();
+                    for (GroupValue groupValue : at.getGroupValue()) {
+                        ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+
+                        for (Attribute attr1 : groupValue.getAttribute()) {
+                            if (attr1.getName().equals("Фамилия представителя")) {
+
+                                String famName = attr1.getValue().get(0).getValue();
+                                guardianInfo.setFamilyName(famName == null ? null : famName.trim());
+                            }
+                            if (attr1.getName().equals("Имя представителя")) {
+
+                                String fName = attr1.getValue().get(0).getValue();
+                                guardianInfo.setFirstName(fName == null ? null : fName.trim());
+                            }
+                            if (attr1.getName().equals("Отчество представителя")) {
+
+                                String sName = attr1.getValue().get(0).getValue();
+                                guardianInfo.setSecondName(sName == null ? null : sName.trim());
+                            }
+                            if (attr1.getName().equals("Кем приходится")) {
+                                guardianInfo.setRelationship(attr1.getValue().get(0).getValue());
+                            }
+                            if (attr1.getName().equals("Телефон представителя")) {
+                                guardianInfo.setPhoneNumber(attr1.getValue().get(0).getValue());
+                            }
+                            if (attr1.getName().equals("Адрес электронной почты")) {
+                                guardianInfo.setEmailAddress(attr1.getValue().get(0).getValue());
+                            }
+                        }
+                        guardians.add(guardianInfo);
+                    }
+                }
                 else if((group == null || StringUtils.isBlank(group)) &&
                         attributeName.endsWith("текущий класс или группа")) {
                     group = getSingleValue(at);
-                }
-                if (attributeName.endsWith("класс")) {
+                } else  if (attributeName.endsWith("класс")) {
                     List<GroupValue> groupValues = at.getGroupValue();
-                    boolean set = false;
                     for(GroupValue grpVal : groupValues) {
                         for(Attribute attr2 : grpVal.getAttribute()) {
                             if(attr2.getName().equals("Название")) {
                                 group = attr2.getValue().get(0).getValue();
-                                set = true;
-                                break;
+                            } else if (attr2.getName().equals("Тип возрастной группы")) {
+                                ageTypeGroup = attr2.getValue().get(0).getValue();
                             }
-                        }
-                        if(set) {
-                            break;
                         }
                     }
                 }
                 else if(attributeName.endsWith("класс/название")) {
                     group = getSingleValue(at);
-
-
                 }
                 else if(attributeName.endsWith("guid образовательного учреждения")) {
                     orgGuid = getSingleValue(at);
@@ -412,6 +492,26 @@ public class NSIDeltaProcessor {
                     ", orgGuid='" + orgGuid + '\'' +
                     ", action=" + action +
                     '}';
+        }
+
+        public String getGender() {
+            return gender;
+        }
+
+        public String getBirthDate() {
+            return birthDate;
+        }
+
+        public String getBenefitOnAdmission() {
+            return benefitOnAdmission;
+        }
+
+        public String getAgeTypeGroup() {
+            return ageTypeGroup;
+        }
+
+        public List<ImportRegisterClientsService.GuardianInfo> getGuardians() {
+            return guardians;
         }
     }
 }

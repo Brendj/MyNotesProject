@@ -1,17 +1,12 @@
-
 /*
  * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
 package generated.nsiws_delta;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -38,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Item", namespace = "", propOrder = {
+@XmlType(name = "Item", namespace = "http://rstyle.com/nsi/delta", propOrder = {
     "attribute"
 })
 public class Item {

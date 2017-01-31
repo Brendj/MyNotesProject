@@ -662,10 +662,11 @@ public class ImportRegisterClientsService {
             }
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        Date date = format.parse(clientBirthDate);
-
-        ch.setBirthDate(date.getTime());
+        if (clientBirthDate != null) {
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            Date date = format.parse(clientBirthDate);
+            ch.setBirthDate(date.getTime());
+    }
 
         if (operation == MOVE_OPERATION) {
             ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
