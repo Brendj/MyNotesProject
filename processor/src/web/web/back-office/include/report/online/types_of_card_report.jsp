@@ -39,6 +39,12 @@
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.typesOfCardReportPage.filter}}" />
         </h:panelGroup>
+        <h:outputText escape="true" value="Формировать по всем корпусам" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.typesOfCardReportPage.includeAllBuildings}"
+                                disabled="#{mainPage.typesOfCardReportPage.emptyOrgs()}"
+                                styleClass="output-text">
+            <a4j:support event="onchanged" reRender="typesOfCardReportPanel" />
+        </h:selectBooleanCheckbox>
         <h:outputText escape="true" value="Итоговые данные по округу" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.typesOfCardReportPage.includeSummaryByDistrict}"
                                  styleClass="output-text">

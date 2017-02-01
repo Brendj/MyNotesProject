@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(TypesOfCardReportPage.class);
 
     private Boolean includeSummaryByDistrict = false;
+    private Boolean includeAllBuildings = false;
 
     private String htmlReport = null;
 
@@ -160,6 +162,17 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         }
     }
 
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+        super.completeOrgListSelection(orgMap);
+        if (emptyOrgs()) {
+            includeAllBuildings = false;
+        }
+    }
+
+    public boolean emptyOrgs() {
+        return ((idOfOrgList == null) || (idOfOrgList.isEmpty())) ? true : false;
+    }
+
     public Boolean getIncludeSummaryByDistrict() {
         return includeSummaryByDistrict;
     }
@@ -167,6 +180,14 @@ public class TypesOfCardReportPage extends OnlineReportPage {
     public void setIncludeSummaryByDistrict(Boolean includeSummaryByDistrict) {
         htmlReport = null;
         this.includeSummaryByDistrict = includeSummaryByDistrict;
+    }
+
+    public Boolean getIncludeAllBuildings() {
+        return includeAllBuildings;
+    }
+
+    public void setIncludeAllBuildings(Boolean includeAllBuildings) {
+        this.includeAllBuildings = includeAllBuildings;
     }
 
     public String getHtmlReport() {
@@ -202,6 +223,10 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         if (includeSummaryByDistrict) {
             properties.setProperty(TypesOfCardReport.PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS,
                     includeSummaryByDistrict.toString());
+        }
+        if (includeAllBuildings) {
+            properties.setProperty(TypesOfCardReport.PARAM_INCLUDE_ALL_BUILDINGS,
+                    includeAllBuildings.toString());
         }
 
         if (clientFilter.getClientGroupId() != null) {

@@ -28,13 +28,16 @@ public class TypesOfCardSubreportItem {
     private Long skmBlockOrgCount;
     private Long clockActOrgCount;
     private Long clockBlockOrgCount;
+    private Long socActOrgCount;
+    private Long socBlockOrgCount;
 
     public TypesOfCardSubreportItem() {
     }
 
     public TypesOfCardSubreportItem(String orgName, String address, Long servActOrgCount, Long servBlockOrgCount,
             Long skuActOrgCount, Long skuBlockOrgCount, Long othActOrgCount, Long othBlockOrgCount, Long allActOrgCount,
-            Long allBlockOrgCount, Long skmActOrgCount, Long skmBlockOrgCount, Long clockActOrgCount, Long clockBlockOrgCount) {
+            Long allBlockOrgCount, Long skmActOrgCount, Long skmBlockOrgCount, Long clockActOrgCount, Long clockBlockOrgCount,
+            Long socActOrgCount, Long socBlockOrgCount) {
         this.orgName = orgName;
         this.address = address;
         this.servActOrgCount = servActOrgCount;
@@ -49,6 +52,8 @@ public class TypesOfCardSubreportItem {
         this.skmBlockOrgCount = skmBlockOrgCount;
         this.clockActOrgCount = clockActOrgCount;
         this.clockBlockOrgCount = clockBlockOrgCount;
+        this.socActOrgCount = socActOrgCount;
+        this.socBlockOrgCount = socBlockOrgCount;
     }
 
     public String getOrgName() {
@@ -161,5 +166,21 @@ public class TypesOfCardSubreportItem {
 
     public void setClockBlockOrgCount(Long clockBlockOrgCount) {
         this.clockBlockOrgCount = clockBlockOrgCount;
+    }
+
+    public Long getSocActOrgCount() {
+        return socActOrgCount;
+    }
+
+    public void setSocActOrgCount(Long socActOrgCount) {
+        this.socActOrgCount = socActOrgCount;
+    }
+
+    public Long getSocBlockOrgCount() {
+        return socBlockOrgCount;
+    }
+
+    public void setSocBlockOrgCount(Long socBlockOrgCount) {
+        this.socBlockOrgCount = socBlockOrgCount;
     }
 }

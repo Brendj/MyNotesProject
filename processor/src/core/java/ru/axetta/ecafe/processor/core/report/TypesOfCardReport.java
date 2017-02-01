@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgItem;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
@@ -52,6 +53,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
 
 
     public static final String PARAM_WITH_OUT_SUMMARY_BY_DISTRICTS = "includeSummaryByDistrict";
+    public static final String PARAM_INCLUDE_ALL_BUILDINGS = "includeAllBuildings";
     public static final String PARAM_CLIENT_GROUP = "clientGroup";
     public static final String PARAM_GROUP_NAME = "groupName";
 
@@ -128,6 +130,11 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             if (withOutSummaryByDistrictParam != null) {
                 withOutSummaryByDistrict = withOutSummaryByDistrictParam.trim().equalsIgnoreCase("true");
             }
+            String includeAllBuildingsParam = getReportProperties().getProperty(PARAM_INCLUDE_ALL_BUILDINGS);
+            boolean includeAllBuildings = false;
+            if (includeAllBuildingsParam != null) {
+                includeAllBuildings = includeAllBuildingsParam.trim().equalsIgnoreCase("true");
+            }
 
             String clientGroup = getReportProperties().getProperty(PARAM_CLIENT_GROUP);
             Long clientGroupId = Long.parseLong(clientGroup);
@@ -150,15 +157,32 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                 }
             }
 
-            List<Long> orgList = (orgsList == null || orgsList.size() == 0) ? getSupplierOrgList(session) : orgsList;
+            List<Long> orgList;
+            if (orgsList == null || orgsList.size() == 0) {
+                orgList = getSupplierOrgList(session);
+            } else if (!includeAllBuildings) {
+                orgList = orgsList;
+            } else {
+                Set<Long> orgSet = new HashSet<Long>();
+                for (Long id : orgsList) {
+                    Org o = (Org)session.load(Org.class, id);
+                    for (Org fo : o.getFriendlyOrg()) {
+                        orgSet.add(fo.getIdOfOrg());
+                    }
+                }
+                orgList = new ArrayList<Long>(orgSet);
+            }
             List<String> districtNames = service.loadDistrictNames(orgList);
 
             for (String district : districtNames) {
                 Long stateServiceAct = service.getStatByDistrictName(district, "1", ac, startTime, groupRestrict, orgList);
                 Long stateServiceActNot = service.getStatByDistrictName(district, "1", lc, startTime, groupRestrict, orgList);
 
-                Long stateScuAct = service.getStatByDistrictName(district, "3,8", ac, startTime, groupRestrict, orgList);
-                Long stateScuActNot = service.getStatByDistrictName(district, "3,8", lc, startTime, groupRestrict, orgList);
+                Long stateScuAct = service.getStatByDistrictName(district, "8", ac, startTime, groupRestrict, orgList);
+                Long stateScuActNot = service.getStatByDistrictName(district, "8", lc, startTime, groupRestrict, orgList);
+
+                Long stateSocAct = service.getStatByDistrictName(district, "3", ac, startTime, groupRestrict, orgList);
+                Long stateSocActNot = service.getStatByDistrictName(district, "3", lc, startTime, groupRestrict, orgList);
 
                 Long stateScmAct = service.getStatByDistrictName(district, "7", ac, startTime, groupRestrict, orgList);
                 Long stateScmActNot = service.getStatByDistrictName(district, "7", lc, startTime, groupRestrict, orgList);
@@ -169,19 +193,19 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                 Long stateOthAct = service.getStatByDistrictName(district, "0,2,4,5,6", ac, startTime, groupRestrict, orgList);
                 Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4,5,6", lc, startTime, groupRestrict, orgList);
 
-                Long sumStateAct = stateServiceAct + stateScuAct + stateOthAct + stateScmAct + stateClockAct;
-                Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot + stateScmActNot + stateClockActNot;
+                Long sumStateAct = stateServiceAct + stateScuAct + stateOthAct + stateScmAct + stateClockAct + stateSocAct;
+                Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot + stateScmActNot + stateClockActNot + stateSocActNot;
 
                 TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem(district, stateServiceAct,
                         stateServiceActNot, stateScuAct, stateOthActNot, stateOthAct, stateOthActNot, sumStateAct,
-                        sumStateNot, stateScmAct, stateScmActNot, stateClockAct, stateClockActNot);
+                        sumStateNot, stateScmAct, stateScmActNot, stateClockAct, stateClockActNot, stateSocAct, stateSocActNot);
 
                 if (!withOutSummaryByDistrict) {
 
                     //Лист по орг.
                     List<TypesOfCardSubreportItem> typesOfCardSubreportItemList = new ArrayList<TypesOfCardSubreportItem>();
 
-                    List<TypesOfCardOrgItem> idListByDistrict = service.getAllOrgsByDistrictName(district, getSupplierOrgList(session));
+                    List<TypesOfCardOrgItem> idListByDistrict = service.getAllOrgsByDistrictName(district, orgList);
 
                     for (TypesOfCardOrgItem typesOfCardOrgItem : idListByDistrict) {
 
@@ -191,9 +215,14 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "1", lc, startTime, groupRestrict);
 
                         Long stateScuActSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "3,8", ac, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "8", ac, startTime, groupRestrict);
                         Long stateScuActNotSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "3,8", lc, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "8", lc, startTime, groupRestrict);
+
+                        Long stateSocActSub = service
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "3", ac, startTime, groupRestrict);
+                        Long stateSocActNotSub = service
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "3", lc, startTime, groupRestrict);
 
                         Long stateScmActSub = service
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "7", ac, startTime, groupRestrict);
@@ -210,14 +239,14 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                         Long stateOthActNotSub = service
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0,2,4,5,6", lc, startTime, groupRestrict);
 
-                        Long sumStateActSub = stateServiceActSub + stateScuActSub + stateOthActSub + stateScmActSub + stateClockActSub;
-                        Long sumStateNotSub = stateServiceActNotSub + stateScuActNotSub + stateOthActNotSub + stateScmActNotSub + stateClockActNotSub;
+                        Long sumStateActSub = stateServiceActSub + stateScuActSub + stateOthActSub + stateScmActSub + stateClockActSub + stateScuActSub;
+                        Long sumStateNotSub = stateServiceActNotSub + stateScuActNotSub + stateOthActNotSub + stateScmActNotSub + stateClockActNotSub + stateScuActNotSub;
 
                         TypesOfCardSubreportItem typesOfCardSubreportItem = new TypesOfCardSubreportItem(
                                 typesOfCardOrgItem.getShortName(), typesOfCardOrgItem.getAddress(), stateServiceActSub,
-                                stateServiceActNotSub, stateScuActSub, stateOthActNotSub, stateOthActSub,
+                                stateServiceActNotSub, stateScuActSub, stateScuActNotSub, stateOthActSub,
                                 stateOthActNotSub, sumStateActSub, sumStateNotSub, stateScmAct, stateScmActNot,
-                                stateClockAct, stateClockActNot);
+                                stateClockAct, stateClockActNot, stateSocActSub, stateSocActNotSub);
                         typesOfCardSubreportItemList.add(typesOfCardSubreportItem);
                     }
                     //установка листа по округу

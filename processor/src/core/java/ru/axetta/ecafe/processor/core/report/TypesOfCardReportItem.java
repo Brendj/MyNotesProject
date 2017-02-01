@@ -31,11 +31,15 @@ public class TypesOfCardReportItem {
     private Long clockActCount;
     private Long clockBlockCount;
 
+    private Long socActCount;
+    private Long socBlockCount;
+
     private List<TypesOfCardSubreportItem> typesOfCardSubeportItems;
 
     public TypesOfCardReportItem(String region, Long servActCount, Long servBlockCount, Long skuActCount,
             Long skuBlockCount, Long othActCount, Long othBlockCount, Long allActCount, Long allBlockCount,
-            Long skmActCount, Long skmBlockCount, Long clockActCount, Long clockBlockCount) {
+            Long skmActCount, Long skmBlockCount, Long clockActCount, Long clockBlockCount,
+            Long socActCount, Long socBlockCount) {
         this.region = region;
         this.servActCount = servActCount;
         this.servBlockCount = servBlockCount;
@@ -49,6 +53,8 @@ public class TypesOfCardReportItem {
         this.skmBlockCount = skmBlockCount;
         this.clockActCount = clockActCount;
         this.clockBlockCount = clockBlockCount;
+        this.socActCount = socActCount;
+        this.socBlockCount = socBlockCount;
     }
 
     public TypesOfCardReportItem() {
@@ -164,5 +170,21 @@ public class TypesOfCardReportItem {
 
     public void setClockBlockCount(Long clockBlockCount) {
         this.clockBlockCount = clockBlockCount;
+    }
+
+    public Long getSocActCount() {
+        return socActCount;
+    }
+
+    public void setSocActCount(Long socActCount) {
+        this.socActCount = socActCount;
+    }
+
+    public Long getSocBlockCount() {
+        return socBlockCount;
+    }
+
+    public void setSocBlockCount(Long socBlockCount) {
+        this.socBlockCount = socBlockCount;
     }
 }
