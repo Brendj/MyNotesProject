@@ -21,8 +21,19 @@ public class TypesOfCardService extends AbstractDAOService {
 
     public List<String> loadDistrictNames() {
         List<String> result;
+        Query query = getSession().createSQLQuery("SELECT distinct district FROM cf_orgs order by district");
+        result = query.list();
+        return result;
+    }
+
+    public List<String> loadDistrictNames(List<Long> orgsList) {
+        if (orgsList == null || orgsList.size() == 0) {
+            return loadDistrictNames();
+        }
+        List<String> result;
         Query query = getSession().createSQLQuery(
-                "SELECT district FROM cf_orgs WHERE district IN (SELECT district FROM cf_orgs GROUP BY district) GROUP BY district");
+                "SELECT distinct district FROM cf_orgs where idoforg in (:ids) ORDER BY district");
+        query.setParameterList("ids", orgsList);
         result = query.list();
         return result;
     }

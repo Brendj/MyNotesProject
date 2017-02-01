@@ -27,6 +27,18 @@
             <f:selectItems value="#{mainPage.typesOfCardReportPage.clientFilter.clientGroupItems}" />
             <a4j:support event="onchange" reRender="typesOfCardReportPanel" />
         </h:selectOneMenu>
+        <h:outputText escape="true" value="Организация" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <a4j:commandButton value="..." action="#{mainPage.typesOfCardReportPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               style="width: 25px;">
+                <f:setPropertyActionListener value="#{mainPage.typesOfCardReportPage.getStringIdOfOrgList}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.typesOfCardReportPage.filter}}" />
+        </h:panelGroup>
         <h:outputText escape="true" value="Итоговые данные по округу" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.typesOfCardReportPage.includeSummaryByDistrict}"
                                  styleClass="output-text">

@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TypesOfCardReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 
 import org.hibernate.Session;
@@ -59,6 +60,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
         String subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         TypesOfCardReport.Builder builder = new TypesOfCardReport.Builder(templateFilename, subReportDir);
         builder.setReportProperties(buildProperties());
+        builder.setOrgsList(idOfOrgList);
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -120,6 +122,7 @@ public class TypesOfCardReportPage extends OnlineReportPage {
                 persistenceTransaction = persistenceSession.beginTransaction();
                 builder.setUserId(DAOUtils.findUser(persistenceSession,
                         FacesContext.getCurrentInstance().getExternalContext().getRemoteUser()).getIdOfUser());
+                builder.setOrgsList(idOfOrgList);
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -176,6 +179,11 @@ public class TypesOfCardReportPage extends OnlineReportPage {
 
     public void onShow() throws Exception {
         startDate = new Date();
+    }
+
+    public Object showOrgListSelectPage() {
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 
     private String checkIsExistFile() {
