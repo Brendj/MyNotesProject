@@ -24,13 +24,17 @@ public class TypesOfCardSubreportItem {
     private Long othBlockOrgCount;
     private Long allActOrgCount;
     private Long allBlockOrgCount;
+    private Long skmActOrgCount;
+    private Long skmBlockOrgCount;
+    private Long clockActOrgCount;
+    private Long clockBlockOrgCount;
 
     public TypesOfCardSubreportItem() {
     }
 
     public TypesOfCardSubreportItem(String orgName, String address, Long servActOrgCount, Long servBlockOrgCount,
             Long skuActOrgCount, Long skuBlockOrgCount, Long othActOrgCount, Long othBlockOrgCount, Long allActOrgCount,
-            Long allBlockOrgCount) {
+            Long allBlockOrgCount, Long skmActOrgCount, Long skmBlockOrgCount, Long clockActOrgCount, Long clockBlockOrgCount) {
         this.orgName = orgName;
         this.address = address;
         this.servActOrgCount = servActOrgCount;
@@ -41,6 +45,10 @@ public class TypesOfCardSubreportItem {
         this.othBlockOrgCount = othBlockOrgCount;
         this.allActOrgCount = allActOrgCount;
         this.allBlockOrgCount = allBlockOrgCount;
+        this.skmActOrgCount = skmActOrgCount;
+        this.skmBlockOrgCount = skmBlockOrgCount;
+        this.clockActOrgCount = clockActOrgCount;
+        this.clockBlockOrgCount = clockBlockOrgCount;
     }
 
     public String getOrgName() {
@@ -121,5 +129,37 @@ public class TypesOfCardSubreportItem {
 
     public void setAllBlockOrgCount(Long allBlockOrgCount) {
         this.allBlockOrgCount = allBlockOrgCount;
+    }
+
+    public Long getSkmActOrgCount() {
+        return skmActOrgCount;
+    }
+
+    public void setSkmActOrgCount(Long skmActOrgCount) {
+        this.skmActOrgCount = skmActOrgCount;
+    }
+
+    public Long getSkmBlockOrgCount() {
+        return skmBlockOrgCount;
+    }
+
+    public void setSkmBlockOrgCount(Long skmBlockOrgCount) {
+        this.skmBlockOrgCount = skmBlockOrgCount;
+    }
+
+    public Long getClockActOrgCount() {
+        return clockActOrgCount;
+    }
+
+    public void setClockActOrgCount(Long clockActOrgCount) {
+        this.clockActOrgCount = clockActOrgCount;
+    }
+
+    public Long getClockBlockOrgCount() {
+        return clockBlockOrgCount;
+    }
+
+    public void setClockBlockOrgCount(Long clockBlockOrgCount) {
+        this.clockBlockOrgCount = clockBlockOrgCount;
     }
 }

@@ -25,10 +25,17 @@ public class TypesOfCardReportItem {
     private Long allActCount;
     private Long allBlockCount;
 
+    private Long skmActCount;
+    private Long skmBlockCount;
+
+    private Long clockActCount;
+    private Long clockBlockCount;
+
     private List<TypesOfCardSubreportItem> typesOfCardSubeportItems;
 
     public TypesOfCardReportItem(String region, Long servActCount, Long servBlockCount, Long skuActCount,
-            Long skuBlockCount, Long othActCount, Long othBlockCount, Long allActCount, Long allBlockCount) {
+            Long skuBlockCount, Long othActCount, Long othBlockCount, Long allActCount, Long allBlockCount,
+            Long skmActCount, Long skmBlockCount, Long clockActCount, Long clockBlockCount) {
         this.region = region;
         this.servActCount = servActCount;
         this.servBlockCount = servBlockCount;
@@ -38,6 +45,10 @@ public class TypesOfCardReportItem {
         this.othBlockCount = othBlockCount;
         this.allActCount = allActCount;
         this.allBlockCount = allBlockCount;
+        this.skmActCount = skmActCount;
+        this.skmBlockCount = skmBlockCount;
+        this.clockActCount = clockActCount;
+        this.clockBlockCount = clockBlockCount;
     }
 
     public TypesOfCardReportItem() {
@@ -121,5 +132,37 @@ public class TypesOfCardReportItem {
 
     public void setTypesOfCardSubeportItems(List<TypesOfCardSubreportItem> typesOfCardSubeportItems) {
         this.typesOfCardSubeportItems = typesOfCardSubeportItems;
+    }
+
+    public Long getSkmActCount() {
+        return skmActCount;
+    }
+
+    public void setSkmActCount(Long skmActCount) {
+        this.skmActCount = skmActCount;
+    }
+
+    public Long getSkmBlockCount() {
+        return skmBlockCount;
+    }
+
+    public void setSkmBlockCount(Long skmBlockCount) {
+        this.skmBlockCount = skmBlockCount;
+    }
+
+    public Long getClockActCount() {
+        return clockActCount;
+    }
+
+    public void setClockActCount(Long clockActCount) {
+        this.clockActCount = clockActCount;
+    }
+
+    public Long getClockBlockCount() {
+        return clockBlockCount;
+    }
+
+    public void setClockBlockCount(Long clockBlockCount) {
+        this.clockBlockCount = clockBlockCount;
     }
 }
