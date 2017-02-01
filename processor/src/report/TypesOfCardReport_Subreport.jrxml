@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TypesOfCardReport_Subreport" pageWidth="1360" pageHeight="30" columnWidth="1360" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="24cc03e3-7575-470c-a1cf-5ecc9e047e01">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TypesOfCardReport_Subreport" pageWidth="1520" pageHeight="30" columnWidth="1520" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="24cc03e3-7575-470c-a1cf-5ecc9e047e01">
 	<property name="ireport.zoom" value="0.9090909090909095"/>
-	<property name="ireport.x" value="48"/>
+	<property name="ireport.x" value="194"/>
 	<property name="ireport.y" value="0"/>
 	<field name="orgName" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
@@ -17,6 +17,8 @@
 	<field name="skmBlockOrgCount" class="java.lang.Long"/>
 	<field name="clockActOrgCount" class="java.lang.Long"/>
 	<field name="clockBlockOrgCount" class="java.lang.Long"/>
+	<field name="socActOrgCount" class="java.lang.Long"/>
+	<field name="socBlockOrgCount" class="java.lang.Long"/>
 	<detail>
 		<band height="30" splitType="Prevent">
 			<textField>
@@ -76,7 +78,7 @@
 				<textFieldExpression><![CDATA[$F{servBlockOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="560" y="0" width="80" height="30"/>
+				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="720" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -90,7 +92,7 @@
 				<textFieldExpression><![CDATA[$F{skuActOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="640" y="0" width="80" height="30"/>
+				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="800" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -104,7 +106,7 @@
 				<textFieldExpression><![CDATA[$F{skuBlockOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1040" y="0" width="80" height="30"/>
+				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1200" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -118,7 +120,7 @@
 				<textFieldExpression><![CDATA[$F{othActOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1120" y="0" width="80" height="30"/>
+				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1280" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -132,7 +134,7 @@
 				<textFieldExpression><![CDATA[$F{othBlockOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1200" y="0" width="80" height="30"/>
+				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1360" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -146,7 +148,7 @@
 				<textFieldExpression><![CDATA[$F{allActOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1280" y="0" width="80" height="30"/>
+				<reportElement uuid="84cea196-c5c5-45ac-8a0a-24b75496da84" x="1440" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -160,7 +162,7 @@
 				<textFieldExpression><![CDATA[$F{allBlockOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="0af5ed6c-9abc-4f9f-8e5b-a98a2b770760" x="800" y="0" width="80" height="30"/>
+				<reportElement uuid="0af5ed6c-9abc-4f9f-8e5b-a98a2b770760" x="960" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -174,7 +176,7 @@
 				<textFieldExpression><![CDATA[$F{skmBlockOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="62912103-7312-444a-8756-1819e74538c5" x="720" y="0" width="80" height="30"/>
+				<reportElement uuid="62912103-7312-444a-8756-1819e74538c5" x="880" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -188,7 +190,7 @@
 				<textFieldExpression><![CDATA[$F{skmActOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="850be1b9-8bbd-4540-a652-58d6a27fd4ac" x="960" y="0" width="80" height="30"/>
+				<reportElement uuid="850be1b9-8bbd-4540-a652-58d6a27fd4ac" x="1120" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -202,7 +204,7 @@
 				<textFieldExpression><![CDATA[$F{clockBlockOrgCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="17447f7d-de9a-465f-adbe-71304f369fdc" x="880" y="0" width="80" height="30"/>
+				<reportElement uuid="17447f7d-de9a-465f-adbe-71304f369fdc" x="1040" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -214,6 +216,34 @@
 					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{clockActOrgCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="6ccabd5c-00bb-40b2-9d19-90de60e62192" x="560" y="0" width="80" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{socActOrgCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ffae6652-bb1e-467f-ae2b-365b6556a25e" x="640" y="0" width="80" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{socBlockOrgCount}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
