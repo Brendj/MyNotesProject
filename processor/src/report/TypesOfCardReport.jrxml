@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="typesOfCardReport" pageWidth="1240" pageHeight="30000" columnWidth="1200" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2618c0b2-68a3-472d-b832-de6de3dbb845">
-	<property name="ireport.zoom" value="1.6105100000000019"/>
-	<property name="ireport.x" value="837"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="typesOfCardReport" pageWidth="1400" pageHeight="30000" columnWidth="1360" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2618c0b2-68a3-472d-b832-de6de3dbb845">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="groupName" class="java.lang.String"/>
@@ -18,6 +18,10 @@
 	<field name="allActCount" class="java.lang.Long"/>
 	<field name="allBlockCount" class="java.lang.Long"/>
 	<field name="typesOfCardSubeportItems" class="java.util.List"/>
+	<field name="skmActCount" class="java.lang.Long"/>
+	<field name="skmBlockCount" class="java.lang.Long"/>
+	<field name="clockActCount" class="java.lang.Long"/>
+	<field name="clockBlockCount" class="java.lang.Long"/>
 	<variable name="servActContByDistrict" class="java.lang.Long" calculation="Sum">
 		<variableExpression><![CDATA[$F{servActCount}]]></variableExpression>
 	</variable>
@@ -42,10 +46,22 @@
 	<variable name="allBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
 		<variableExpression><![CDATA[$F{allBlockCount}]]></variableExpression>
 	</variable>
+	<variable name="skmActCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{skmActCount}]]></variableExpression>
+	</variable>
+	<variable name="skmBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{skmBlockCount}]]></variableExpression>
+	</variable>
+	<variable name="clockActCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{clockActCount}]]></variableExpression>
+	</variable>
+	<variable name="clockBlockCountByDistrict" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{clockBlockCount}]]></variableExpression>
+	</variable>
 	<title>
 		<band height="40" splitType="Stretch">
 			<textField>
-				<reportElement uuid="0f5ae126-8be3-41fc-b764-180bdeb632b1" x="0" y="0" width="1190" height="40"/>
+				<reportElement uuid="0f5ae126-8be3-41fc-b764-180bdeb632b1" x="0" y="0" width="1360" height="40"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -92,7 +108,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="44da4cb1-d7b8-48ac-995b-2da2abf32723" x="400" y="0" width="200" height="20"/>
+				<reportElement uuid="44da4cb1-d7b8-48ac-995b-2da2abf32723" x="400" y="0" width="160" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -101,10 +117,10 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Сервисной (белой)]]></text>
+				<text><![CDATA[Сервисная]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="114e27a2-2a8f-4a50-86bb-73556380a715" x="600" y="0" width="200" height="20"/>
+				<reportElement uuid="114e27a2-2a8f-4a50-86bb-73556380a715" x="560" y="0" width="160" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -116,7 +132,7 @@
 				<text><![CDATA[СКУ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="49956c4c-e5ec-49cf-8731-51615dbcfd3f" x="800" y="0" width="200" height="20"/>
+				<reportElement uuid="49956c4c-e5ec-49cf-8731-51615dbcfd3f" x="1040" y="0" width="160" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -128,7 +144,7 @@
 				<text><![CDATA[Прочее]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="baab358b-cd9e-4b68-a9a6-128699f1b1bf" x="1000" y="0" width="200" height="20"/>
+				<reportElement uuid="baab358b-cd9e-4b68-a9a6-128699f1b1bf" x="1200" y="0" width="160" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -140,7 +156,7 @@
 				<text><![CDATA[Всего]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="400" y="20" width="100" height="20"/>
+				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="400" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -152,7 +168,7 @@
 				<text><![CDATA[Активная]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="500" y="20" width="100" height="20"/>
+				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="480" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -164,7 +180,7 @@
 				<text><![CDATA[Заблокирована]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="600" y="20" width="100" height="20"/>
+				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="560" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -176,7 +192,7 @@
 				<text><![CDATA[Активная]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="700" y="20" width="100" height="20"/>
+				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="640" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -188,7 +204,7 @@
 				<text><![CDATA[Заблокирована]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="800" y="20" width="100" height="20"/>
+				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="1040" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -200,7 +216,7 @@
 				<text><![CDATA[Активная]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="900" y="20" width="100" height="20"/>
+				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="1120" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -212,7 +228,7 @@
 				<text><![CDATA[Заблокирована]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="1000" y="20" width="100" height="20"/>
+				<reportElement uuid="0ee80fa4-5d63-412f-aa37-29aef7d6391e" x="1200" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -224,7 +240,79 @@
 				<text><![CDATA[Активная]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="1100" y="20" width="100" height="20"/>
+				<reportElement uuid="e9eff2b3-e658-44ad-ae19-1d3eb85022a6" x="1280" y="20" width="80" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Заблокирована]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a9856f70-b842-48dd-998d-8aa39498819f" x="720" y="0" width="160" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[СКМ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="00b0abea-9d81-474a-90e2-8443ad32263e" x="880" y="0" width="160" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Браслет / Часы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e0418325-b292-4b2c-9109-3a46aad1e712" x="720" y="20" width="80" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Активная]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a1add0f4-eb29-422f-9625-f08c8ffb0f41" x="800" y="20" width="80" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Заблокирована]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="13797c61-5c73-499d-b533-753fb2afe8a7" x="880" y="20" width="80" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Активная]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ff92276e-3d5d-4204-ad38-d80c22ed6e4e" x="960" y="20" width="80" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -240,7 +328,7 @@
 	<detail>
 		<band height="60" splitType="Stretch">
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="400" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="400" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -252,7 +340,7 @@
 				<textFieldExpression><![CDATA[$F{servActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="500" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="480" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -264,7 +352,7 @@
 				<textFieldExpression><![CDATA[$F{servBlockCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="600" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="560" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -276,7 +364,7 @@
 				<textFieldExpression><![CDATA[$F{skuActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="700" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="640" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -288,7 +376,7 @@
 				<textFieldExpression><![CDATA[$F{skuBlockCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="800" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="1040" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -300,7 +388,7 @@
 				<textFieldExpression><![CDATA[$F{othActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="900" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="80903d87-0c46-4626-b694-71a21dd2ffb5" mode="Opaque" x="1120" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -326,7 +414,7 @@
 				<textFieldExpression><![CDATA[$F{region}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="ab4ea2a1-4004-4810-a691-5ab9fce1b6a7" mode="Opaque" x="1000" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="ab4ea2a1-4004-4810-a691-5ab9fce1b6a7" mode="Opaque" x="1200" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -338,7 +426,7 @@
 				<textFieldExpression><![CDATA[$F{allActCount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="0e554b23-1746-40c3-807b-b13081cf0bce" mode="Opaque" x="1100" y="0" width="100" height="30" backcolor="#99CCFF"/>
+				<reportElement uuid="0e554b23-1746-40c3-807b-b13081cf0bce" mode="Opaque" x="1280" y="0" width="80" height="30" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -350,10 +438,58 @@
 				<textFieldExpression><![CDATA[$F{allBlockCount}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="103fe8b4-cadc-4885-983e-f7d89d96ace7" x="0" y="30" width="1200" height="30"/>
+				<reportElement uuid="103fe8b4-cadc-4885-983e-f7d89d96ace7" x="0" y="30" width="1360" height="30"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{typesOfCardSubeportItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "TypesOfCardReport_Subreport.jasper"]]></subreportExpression>
 			</subreport>
+			<textField>
+				<reportElement uuid="4b7c9369-66a8-43fb-9087-dfa16a4266cb" mode="Opaque" x="800" y="0" width="80" height="30" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{skmBlockCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c4628f84-a1b0-4765-a0e8-851c848e11dc" mode="Opaque" x="720" y="0" width="80" height="30" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{skmActCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8a362b28-b88e-4a0d-bdec-0f077c5517c0" mode="Opaque" x="960" y="0" width="80" height="30" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{clockBlockCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2d4c0c75-6826-4332-8ea9-9e56ba8273e5" mode="Opaque" x="880" y="0" width="80" height="30" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{clockActCount}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<summary>
@@ -373,7 +509,7 @@
 				<text><![CDATA[Итого]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="872fe6d9-4d86-4682-a326-79f71f7132a0" mode="Opaque" x="400" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="872fe6d9-4d86-4682-a326-79f71f7132a0" mode="Opaque" x="400" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -385,7 +521,7 @@
 				<textFieldExpression><![CDATA[$V{servActContByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="4ea01468-d4b3-4579-9eb4-b52da3457fd5" mode="Opaque" x="500" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="4ea01468-d4b3-4579-9eb4-b52da3457fd5" mode="Opaque" x="480" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -397,7 +533,7 @@
 				<textFieldExpression><![CDATA[$V{servBlockCountByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="251d5970-a8e7-4a5f-85bc-73e84cab864f" mode="Opaque" x="600" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="251d5970-a8e7-4a5f-85bc-73e84cab864f" mode="Opaque" x="560" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -409,7 +545,7 @@
 				<textFieldExpression><![CDATA[$V{skuActCountByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="dfd61c75-9d50-4541-903d-5d20d10a150d" mode="Opaque" x="700" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="dfd61c75-9d50-4541-903d-5d20d10a150d" mode="Opaque" x="640" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -421,7 +557,7 @@
 				<textFieldExpression><![CDATA[$V{skuBlockCountByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="9b81953b-33f1-49aa-ae19-bef3c4a96029" mode="Opaque" x="800" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="9b81953b-33f1-49aa-ae19-bef3c4a96029" mode="Opaque" x="1040" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -433,7 +569,7 @@
 				<textFieldExpression><![CDATA[$V{othActCountByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="0f764402-c229-46d9-80c7-ba2304734106" mode="Opaque" x="900" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="0f764402-c229-46d9-80c7-ba2304734106" mode="Opaque" x="1120" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -445,7 +581,7 @@
 				<textFieldExpression><![CDATA[$V{othBlockCountByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="7c57f8b2-9dff-4caa-b874-dfb1cde2d119" mode="Opaque" x="1000" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="7c57f8b2-9dff-4caa-b874-dfb1cde2d119" mode="Opaque" x="1200" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -457,7 +593,7 @@
 				<textFieldExpression><![CDATA[$V{allActCountByDistrict}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a7de74b7-6e01-4d74-9933-3b23a053dde3" mode="Opaque" x="1100" y="0" width="100" height="20" backcolor="#99CCFF"/>
+				<reportElement uuid="a7de74b7-6e01-4d74-9933-3b23a053dde3" mode="Opaque" x="1280" y="0" width="80" height="20" backcolor="#99CCFF"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -467,6 +603,54 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$V{allBlockCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cede5c5a-f016-46fa-91f4-86804e6a1311" mode="Opaque" x="720" y="0" width="80" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{skmActCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ff4c0d93-5cc0-4705-994d-cd6b1d449dd0" mode="Opaque" x="800" y="0" width="80" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{skmBlockCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="51316b17-6299-4eae-91db-1742d6c3708f" mode="Opaque" x="880" y="0" width="80" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{clockActCountByDistrict}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="eeae5d1d-1703-47ed-b357-24f79f361717" mode="Opaque" x="960" y="0" width="80" height="20" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{clockBlockCountByDistrict}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
