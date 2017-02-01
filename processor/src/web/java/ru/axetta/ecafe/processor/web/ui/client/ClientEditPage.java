@@ -626,6 +626,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         this.clientGroupName = client.getClientGroup() == null ? "" : client.getClientGroup().getGroupName();
+        this.idOfClientGroup = client.getClientGroup() == null ? null : client.getClientGroup()
+                .getCompositeIdOfClientGroup().getIdOfClientGroup();
 
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
@@ -650,6 +652,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
         this.clientWardItems = loadWardsByClient(session, idOfClient);
+        this.changePassword = false;
 
         fill(client);
     }

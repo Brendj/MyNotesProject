@@ -542,6 +542,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.blockedUntilDate = user.getBlockedUntilDate();
         this.region = user.getRegion();
         this.needChangePassword = user.getNeedChangePassword();
+        this.changePassword = false;
         initRegions(session);
     }
 
