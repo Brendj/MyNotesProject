@@ -107,6 +107,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
             parameterMap.put("groupName", clientGroupName);
             parameterMap.put("SUBREPORT_DIR", subReportDir);
+            parameterMap.put("printDistrict", orgsList == null || orgsList.size() == 0);
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager
@@ -197,7 +198,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                 Long sumStateNot = stateServiceActNot + stateScuActNot + stateOthActNot + stateScmActNot + stateClockActNot + stateSocActNot;
 
                 TypesOfCardReportItem typesOfCardReportItem = new TypesOfCardReportItem(district, stateServiceAct,
-                        stateServiceActNot, stateScuAct, stateOthActNot, stateOthAct, stateOthActNot, sumStateAct,
+                        stateServiceActNot, stateScuAct, stateScuActNot, stateOthAct, stateOthActNot, sumStateAct,
                         sumStateNot, stateScmAct, stateScmActNot, stateClockAct, stateClockActNot, stateSocAct, stateSocActNot);
 
                 if (!withOutSummaryByDistrict) {
@@ -239,8 +240,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                         Long stateOthActNotSub = service
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0,2,4,5,6", lc, startTime, groupRestrict);
 
-                        Long sumStateActSub = stateServiceActSub + stateScuActSub + stateOthActSub + stateScmActSub + stateClockActSub + stateScuActSub;
-                        Long sumStateNotSub = stateServiceActNotSub + stateScuActNotSub + stateOthActNotSub + stateScmActNotSub + stateClockActNotSub + stateScuActNotSub;
+                        Long sumStateActSub = stateServiceActSub + stateScuActSub + stateOthActSub + stateScmActSub + stateClockActSub + stateSocActSub;
+                        Long sumStateNotSub = stateServiceActNotSub + stateScuActNotSub + stateOthActNotSub + stateScmActNotSub + stateClockActNotSub + stateSocActNotSub;
 
                         TypesOfCardSubreportItem typesOfCardSubreportItem = new TypesOfCardSubreportItem(
                                 typesOfCardOrgItem.getShortName(), typesOfCardOrgItem.getAddress(), stateServiceActSub,
