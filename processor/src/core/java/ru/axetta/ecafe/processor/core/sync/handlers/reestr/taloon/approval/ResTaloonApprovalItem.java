@@ -79,6 +79,7 @@ public class ResTaloonApprovalItem {
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
         this.resultCode = resCode;
+        this.price = taloon.getPrice();
     }
 
     public Element toElement(Document document, String elementName) throws Exception {

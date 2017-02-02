@@ -14,3 +14,10 @@ WHERE i.idofreporthandlerule = r.idofreporthandlerule;
 
 --Удаление лишних записей с ИД старой ОО = ИД новой ОО в таблице перемещений между ОО
 DELETE FROM cf_clientmigrationhistory WHERE idoforg = idofoldorg;
+
+--удаление индекса
+DROP INDEX cf_taloon_approval_idoforg_taloondate_taloonname_goodsguid_idx;
+
+--уник. индекс
+CREATE UNIQUE INDEX cf_taloon_approval_idoforg_taloondate_taloonname_goodsguid_idx ON cf_taloon_approval USING btree
+(idoforg, taloondate, taloonname, goodsguid, price);
