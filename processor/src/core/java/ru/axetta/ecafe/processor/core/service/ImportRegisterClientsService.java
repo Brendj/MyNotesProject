@@ -1040,6 +1040,8 @@ public class ImportRegisterClientsService {
             }
             SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
 
+            Boolean migration = false;
+
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
@@ -1089,6 +1091,7 @@ public class ImportRegisterClientsService {
                     session.save(dbClient);
                     break;
                 case MOVE_OPERATION:
+                    migration = true;
                     Org newOrg = (Org) session.load(Org.class, change.getIdOfMigrateOrgTo());
 
                     Org beforeMigrateOrg = dbClient.getOrg();
@@ -1112,7 +1115,6 @@ public class ImportRegisterClientsService {
                     }
                     addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
-                    break;
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
@@ -1134,12 +1136,14 @@ public class ImportRegisterClientsService {
                             newOrg1, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
                             dbClient, session, true);
 
-                    if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
-                        addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
-                                change); //орг. меняется - история миграции между ОО
-                    } else {
-                        addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient,
-                                change); //если орг. не меняется, добавляем историю миграции внутри ОО
+                    if (!migration) {
+                        if (!dbClient.getOrg().getIdOfOrg().equals(beforeModifyOrg.getIdOfOrg())) {
+                            addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
+                                    change); //орг. меняется - история миграции между ОО
+                        } else {
+                            addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient,
+                                    change); //если орг. не меняется, добавляем историю миграции внутри ОО
+                        }
                     }
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
                     break;
