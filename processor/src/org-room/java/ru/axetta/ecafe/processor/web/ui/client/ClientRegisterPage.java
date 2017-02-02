@@ -340,8 +340,10 @@ public class ClientRegisterPage extends BasicWorkspacePage {
         Long newIdOfClient = null;
         try {
             if (cl == null) {
-                newIdOfClient = ClientManager.registerClientTransactionFree(org.getIdOfOrg(),
-                        (ClientManager.ClientFieldConfig) fieldConfig, !checkFullname, session, null);
+                Client clientNew = ClientManager
+                        .registerClientTransactionFree(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
+                                !checkFullname, session, null);
+                newIdOfClient = clientNew.getIdOfClient();
             } else {
                 newIdOfClient = ClientManager
                         .modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org, "",
