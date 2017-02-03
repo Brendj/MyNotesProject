@@ -410,7 +410,8 @@ public class NSIDeltaProcessor {
                 else if((group == null || StringUtils.isBlank(group)) &&
                         attributeName.endsWith("текущий класс или группа")) {
                     group = getSingleValue(at);
-                } else  if (attributeName.endsWith("класс")) {
+                } else  if ((group == null || StringUtils.isBlank(group)) &&
+                        attributeName.endsWith("класс")) {
                     List<GroupValue> groupValues = at.getGroupValue();
                     for(GroupValue grpVal : groupValues) {
                         for(Attribute attr2 : grpVal.getAttribute()) {

@@ -225,7 +225,8 @@ public class ClientMskNSIService extends MskNSIService {
                         attr.getName().equals("Текущий класс или группа")) {
                     pupilInfo.group = attr.getValue().get(0).getValue();
                 }
-                if (attr.getName().equals("Класс")) {
+                if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
+                        attr.getName().equals("Класс")) {
                     List<GroupValue> groupValues = attr.getGroupValue();
                     boolean set = false;
                     for(GroupValue grpVal : groupValues) {
@@ -241,18 +242,9 @@ public class ClientMskNSIService extends MskNSIService {
                         }
                     }
                 }
-                /*if (attr.getName().equals("Дата зачисления")) {
-                    pupilInfo.created = attr.getValue().get(0).getValue();
-                }
-                if (attr.getName().equals("")) {
-                    pupilInfo.deleted = attr.getValue().get(0).getValue();
-                }*/
                 if (attr.getName().equals("GUID образовательного учреждения")) {
                     pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
                 }
-                /*if (attr.getName().equals("")) {
-                    pupilInfo.recordState = attr.getValue().get(0).getValue();
-                }*/
 
                 if (attr.getName().equals("Льгота при поступлении")) {
                     pupilInfo.benefitOnAdmission = attr.getValue().get(0).getValue();
