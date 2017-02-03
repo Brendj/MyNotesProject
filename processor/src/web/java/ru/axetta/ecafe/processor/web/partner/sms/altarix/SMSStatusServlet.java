@@ -194,6 +194,12 @@ public class SMSStatusServlet extends HttpServlet {
                     case EnterEvent.RE_EXIT:
                         passType = "Повторный выход";
                         break;
+                    case EnterEvent.QUERY_FOR_ENTER:
+                        passType = "Запрос на вход";
+                        break;
+                    case EnterEvent.QUERY_FOR_EXIT:
+                        passType = "Запрос на выход";
+                        break;
                     case EnterEvent.DETECTED_INSIDE:
                         passType = "Обнаружен на подносе карты внутри здания";
                         break;

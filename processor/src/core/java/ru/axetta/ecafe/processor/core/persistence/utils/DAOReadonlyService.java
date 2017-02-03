@@ -112,7 +112,7 @@ public class DAOReadonlyService {
         query.setParameter("endDate", endDate.getTime());
         query.setParameterList("passDirections",
                 Arrays.asList(EnterEvent.ENTRY, EnterEvent.EXIT, EnterEvent.PASSAGE_RUFUSAL, EnterEvent.RE_ENTRY,
-                        EnterEvent.RE_EXIT, EnterEvent.DETECTED_INSIDE, EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT));
+                        EnterEvent.RE_EXIT, EnterEvent.DETECTED_INSIDE, EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT, EnterEvent.QUERY_FOR_ENTER, EnterEvent.QUERY_FOR_EXIT));
         query.addScalar("idofclient", StandardBasicTypes.LONG);
         List result = query.list();
         if (result == null)

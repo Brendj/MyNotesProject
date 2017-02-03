@@ -47,6 +47,8 @@ public class EnterEvent {
     public static final int PASSAGE_RUFUSAL = 5; // отказ от прохода
     public static final int RE_ENTRY = 6; // повторный вход
     public static final int RE_EXIT = 7; // повторный выход
+    public static final int QUERY_FOR_ENTER = 8; // запрос на вход
+    public static final int QUERY_FOR_EXIT = 9; // запрос на выход
     public static final int DIRECTION_ENTER = 0;
     public static final int DIRECTION_EXIT = 1;
     public static final int DETECTED_INSIDE = 100; // обнаружен на подносе карты внутри здания

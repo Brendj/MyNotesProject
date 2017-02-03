@@ -73,6 +73,10 @@ public class ClientPassItem {
                 return "повторный вход";
             case EnterEvent.RE_EXIT:
                 return "повторный выход";
+            case EnterEvent.QUERY_FOR_ENTER:
+                return "запрос на вход";
+            case EnterEvent.QUERY_FOR_EXIT:
+                return "запрос на выход";
             case EnterEvent.DETECTED_INSIDE:
                 return "обнаружен на подносе карты внутри здания";
             case EnterEvent.CHECKED_BY_TEACHER_EXT:

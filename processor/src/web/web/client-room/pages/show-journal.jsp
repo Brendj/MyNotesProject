@@ -321,6 +321,8 @@
             directionMap.put(EnterEvent.PASSAGE_RUFUSAL, "отказ от прохода");
             directionMap.put(EnterEvent.RE_ENTRY, "повторный вход");
             directionMap.put(EnterEvent.RE_EXIT, "повторный выход");
+            directionMap.put(EnterEvent.QUERY_FOR_ENTER, "запрос на вход");
+            directionMap.put(EnterEvent.DIRECTION_EXIT, "запрос на выход");
 
             String[] daysOfWeek = new String[] {"Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"};
 

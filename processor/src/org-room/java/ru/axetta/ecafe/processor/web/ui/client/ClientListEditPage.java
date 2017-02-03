@@ -388,11 +388,13 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
                 passDirection.intValue() == EnterEvent.PASSAGE_IS_FORBIDDEN ||
                 passDirection.intValue() == EnterEvent.TURNSTILE_IS_BROKEN||
                 passDirection.intValue() == EnterEvent.PASSAGE_RUFUSAL  ||
-                passDirection.intValue() == EnterEvent.RE_EXIT) {
+                passDirection.intValue() == EnterEvent.RE_EXIT ||
+                passDirection.intValue() == EnterEvent.QUERY_FOR_ENTER) {
                 selectedClient.setIsInSchool(false);
             } else if (passDirection.intValue() == EnterEvent.ENTRY ||
                        passDirection.intValue() == EnterEvent.RE_ENTRY ||
-                       passDirection.intValue() == EnterEvent.EVENT_WITHOUT_PASSAGE) {
+                       passDirection.intValue() == EnterEvent.EVENT_WITHOUT_PASSAGE ||
+                       passDirection.intValue() == EnterEvent.QUERY_FOR_EXIT) {
                 selectedClient.setIsInSchool(true);
             }
         }
@@ -521,6 +523,12 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
                     break;
                 case EnterEvent.RE_EXIT:
                     eventName = "Повторный выход";
+                    break;
+                case EnterEvent.QUERY_FOR_ENTER:
+                    eventName = "Запрос на вход";
+                    break;
+                case EnterEvent.QUERY_FOR_EXIT:
+                    eventName = "Запрос на выход";
                     break;
             }
             ee.add(new SelectedClient.EnterEvents(new Date(eventDate), eventName));

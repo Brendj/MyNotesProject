@@ -35,6 +35,8 @@ public class CardEventOperationItem {
             case EnterEvent.PASSAGE_RUFUSAL: passDirection="отказ от прохода"; break;
             case EnterEvent.RE_ENTRY: passDirection="повторный вход";  break;
             case EnterEvent.RE_EXIT: passDirection="повторный выход"; break;
+            case EnterEvent.QUERY_FOR_ENTER: passDirection="запрос на вход"; break;
+            case EnterEvent.QUERY_FOR_EXIT: passDirection="запрос на выход"; break;
             case EnterEvent.DETECTED_INSIDE: passDirection="обнаружен на подносе карты внутри здания"; break;
             case EnterEvent.CHECKED_BY_TEACHER_EXT: passDirection="отмечен в классном журнале через внешнюю систему"; break;
             case EnterEvent.CHECKED_BY_TEACHER_INT: passDirection="отмечен учителем внутри здания"; break;
