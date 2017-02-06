@@ -106,7 +106,8 @@ public class TaloonApprovalVerification {
                 String taloonName = detail.getTaloonName();
                 String goodsGuid = detail.getGoodsGuid();
                 Long idOfOrg = detail.getIdOfOrg();
-                TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid);
+                Long price = detail.getPrice();
+                TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid, price);
                 if (taloon != null) {
                     taloon.setShippedQty(detail.getShippedQty());
                     taloon.setPpState(detail.getPpState());

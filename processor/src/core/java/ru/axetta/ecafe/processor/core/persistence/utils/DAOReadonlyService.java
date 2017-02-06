@@ -320,16 +320,18 @@ public class DAOReadonlyService {
         }
     }
 
-    public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid) {
+    public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
         try {
             Query query = entityManager.createQuery("SELECT taloon from TaloonApproval taloon "
                 + "where taloon.idOfOrg = :idOfOrg "
                 + "and taloon.taloonDate = :taloonDate "
                 + "and taloon.taloonName = :taloonName "
+                + "and taloon.price = :price "
                 + "and taloon.goodsGuid = :goodsGuid");
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonDate", taloonDate);
             query.setParameter("taloonName", taloonName);
+            query.setParameter("price", price);
             query.setParameter("goodsGuid", goodsGuid);
             return (TaloonApproval)query.getSingleResult();
         } catch (Exception e) {
