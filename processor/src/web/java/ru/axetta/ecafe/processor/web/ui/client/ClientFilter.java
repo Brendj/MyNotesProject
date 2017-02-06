@@ -17,7 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import java.util.List;
@@ -114,7 +117,7 @@ public class ClientFilter {
         }
 
         public Person buildPerson() {
-            Person person = new Person(firstName, surname, secondName);
+            Person person = new Person(firstName.trim(), surname.trim(), secondName.trim());
             person.setIdDocument(idDocument);
             return person;
         }
@@ -358,7 +361,7 @@ public class ClientFilter {
             criteria.add(Restrictions.ilike("email", email, MatchMode.ANYWHERE));
         }
         if (StringUtils.isNotEmpty(filterClientGUID)) {
-            criteria.add(Restrictions.eq("clientGUID", filterClientGUID));
+            criteria.add(Restrictions.eq("clientGUID", filterClientGUID.trim()));
         }
         criteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
         String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
