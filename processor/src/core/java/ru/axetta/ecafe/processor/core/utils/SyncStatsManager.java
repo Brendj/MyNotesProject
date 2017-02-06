@@ -234,7 +234,13 @@ public class SyncStatsManager {
         logger.info(syncDataListSize + " syncs completed after " + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                 .format(new Date(time)) + ".");
         for (SyncType syncType : syncTypesCount.keySet()) {
-            logger.info("Sync type " + syncType.toString() + " completed " + syncTypesCount.get(syncType) + " times.");
+            if(syncType == null) {
+                logger.info("Sync type null in showShortSyncData method.");
+            } else if(syncTypesCount.get(syncType) == null) {
+                logger.info("Sync type " + syncType.toString() + " has null value in syncTypesCount map.");
+            } else {
+                logger.info("Sync type " + syncType.toString() + " completed " + syncTypesCount.get(syncType) + " times.");
+            }
         }
 
         for (SyncData syncData : errList) {

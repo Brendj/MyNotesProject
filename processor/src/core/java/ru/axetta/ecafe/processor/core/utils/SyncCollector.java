@@ -52,7 +52,9 @@ public class SyncCollector {
                 if (endTime != null && startTime != null) {
                     sync.setDuration(endTime.getTime() - startTime.getTime());
                 }
-                syncList.add(sync);
+                if(sync.getSyncType() != null) {
+                    syncList.add(sync);
+                }
                 tempSyncs.remove(syncTime);
             }
         }
