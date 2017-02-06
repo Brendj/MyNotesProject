@@ -337,7 +337,7 @@ public class DAOReadonlyService {
         }
     }
 
-    public Integer findTaloonApprovalSoldedQty(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid) {
+    public Integer findTaloonApprovalSoldedQty(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
         Date dateEnd = CalendarUtils.addOneDay(taloonDate);
         try {
             String goodsJoin = "";
@@ -354,12 +354,14 @@ public class DAOReadonlyService {
                     + "and od.menuDetailName = :taloonName "
                     + "and od.MenuType >= :complexMin "
                     + "and od.MenuType <= :complexMax "
+                    + "and od.discount =:price "
                     + "and o.createdDate >= :taloonDate "
                     + "and o.createdDate < :dateEnd "
                     + "and o.state = :state "
                     + goodsParam);
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonName", taloonName);
+            query.setParameter("price", price);
             query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
             query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);
             query.setParameter("taloonDate", taloonDate.getTime());

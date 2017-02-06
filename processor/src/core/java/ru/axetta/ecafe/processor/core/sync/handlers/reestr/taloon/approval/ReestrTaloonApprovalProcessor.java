@@ -51,16 +51,17 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     Date date = item.getDate();
                     String name = item.getName();
                     String goodsGuid = item.getGoodsGuid();
+                    Long price = item.getPrice();
                     if (goodsGuid == null) goodsGuid = "";
                     TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, date, name, goodsGuid);
-                    Integer ordersCount = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name, goodsGuid);
+                    Integer ordersCount = DAOReadonlyService.getInstance().findTaloonApprovalSoldedQty(idOfOrg, date, name, goodsGuid, price);
                     Integer soldedQty = item.getSoldedQty();
                     if(ordersCount == null || ordersCount == 0 || soldedQty.equals(ordersCount)) {
                         ordersCount = null;
                     } else {
                         soldedQty = ordersCount;
                     }
-                    Long price = item.getPrice();
+
                     Integer requestedQty = item.getRequestedQty();
                     Integer shippedQty = item.getShippedQty();
                     TaloonCreatedTypeEnum createdType = item.getCreatedType();
