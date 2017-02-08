@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,21 +62,43 @@ public class AccountsRegistryHandler {
         // Добавляем карты перемещенных клиентов
         clientList.addAll(clientDao.findAllAllocatedClients(idOfOrg));
 
-        for (Client client : clientList) {
-            accountsRegistry.getAccountItems().add(new AccountItem(client));
-        }
+        //for (Client client : clientList) {
+        //    accountsRegistry.getAccountItems().add(new AccountItem(client));
+        //}
+        addCards(accountsRegistry, clientList);
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
-        /*List<Visitor> visitorsWithCardsByOrg = cardReadOnlyRepository.findVisitorsWithCardsByOrg(idOfOrgs);
-        for (Visitor visitor : visitorsWithCardsByOrg) {
-            accountsRegistry.getVisitorItems().add(new VisitorItem(visitor));
-        }*/
 
         List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrg);
         for (Card card : allFreeByOrg) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
         return accountsRegistry;
+    }
+
+    private void addCards(AccountsRegistry accountsRegistry, List<Client> clientList) {
+        List<Client> temp = new ArrayList<Client>();
+        int counter = 0;
+        for (Client client : clientList) {
+            temp.add(client);
+            counter++;
+            if (counter % 10 == 0) {
+                accountsRegistry.getAccountItems().addAll(getAccountItems(temp));
+                temp.clear();
+            }
+        }
+        if (temp.size() > 0) {
+            accountsRegistry.getAccountItems().addAll(getAccountItems(temp));
+        }
+    }
+
+    private List<AccountItem> getAccountItems(List<Client> clients) {
+        List<Card> cards = CardReadOnlyRepository.getInstance().findAllByClientList(clients);
+        List<AccountItem> result = new ArrayList<AccountItem>();
+        for (Client client : clients) {
+            result.add(new AccountItem(client, cards));
+        }
+        return result;
     }
 
     @Transactional

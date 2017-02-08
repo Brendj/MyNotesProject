@@ -71,6 +71,27 @@ public class AccountItem {
         }
     }
 
+    public AccountItem(Client client, List<Card> cards) {
+        this.id = client.getContractId();
+        this.idOfClient = client.getIdOfClient();
+        this.state = client.getContractState();
+        this.balance = client.getBalance();
+        if(client.getSubBalance1() != null){
+            this.sBalance1 = client.getSubBalance1();
+        }else {
+            this.sBalance1 = 0L;
+        }
+
+        this.overLimit = client.getLimit();
+        this.maxDailyLimit = client.getExpenditureLimit();
+        this.issueDate = client.getContractTime();
+        for (Card card : cards) {
+            if (card.getClient() != null && card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
+                cardsItems.add(new CardsItem(card, client));
+            }
+        }
+    }
+
 
     public long getId() {
         return id;

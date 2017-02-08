@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +66,16 @@ public class CardReadOnlyRepository extends BaseJpaDao {
     public List<Card> findAllByClient(Client client) {
         return entityManager.createQuery("from Card c where c.client.idOfClient=:client",Card.class)
                 .setParameter("client",client.getIdOfClient())
+                .getResultList();
+    }
+
+    public List<Card> findAllByClientList(List<Client> clients) {
+        List<Long> ids = new ArrayList<Long>();
+        for (Client cl : clients) {
+            ids.add(cl.getIdOfClient());
+        }
+        return entityManager.createQuery("from Card c where c.client.idOfClient in :clients",Card.class)
+                .setParameter("clients", ids)
                 .getResultList();
     }
 

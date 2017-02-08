@@ -3954,10 +3954,13 @@ public class Processor implements SyncProcessor {
             //persistenceSession.refresh(org);
             List<AccountTransactionExtended> accountTransactionList = null;
             try {
+                long time_delta = System.currentTimeMillis();
                 accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, fromDateTime,
                     currentDate);
-                /*accountTransactionList = getAccountTransactionsForOrgSinceTimeV2(persistenceSession, org, fromDateTime,
-                        currentDate);*/
+                time_delta = System.currentTimeMillis() - time_delta;
+                if (time_delta > 10L * 1000L) {
+                    logger.error(String.format("Transactions query time = %s ms. IdOfOrg = %s. Period = %3$td.%3$tm.%3$tY %3$tT - %4$td.%4$tm.%4$tY %4$tT", time_delta, org.getIdOfOrg(), fromDateTime, currentDate));
+                }
                 for (AccountTransactionExtended accountTransaction : accountTransactionList) {
                     accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
                 }
