@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TradeAccountConfigChange;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
@@ -78,7 +77,8 @@ public class DirectiveElement implements AbstractToElement{
         directiveItemList.add(new DirectiveItem("IS_ALLOWED_PHOTO_REGISTRY", photoRegistryFlag.toString()));
 
         if(directivesRequest.getTradeConfigChangedSuccess() != null && directivesRequest.getTradeConfigChangedSuccess()) {
-            org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.NOT_CHANGED);
+            //org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.NOT_CHANGED);
+            DAOService.getInstance().saveTradeAccountConfigChangeDirective(org.getIdOfOrg());
         } else {
             Integer tradeAccountConfigChangedFlag = org.getTradeAccountConfigChangeDirective().getCode();
             if(tradeAccountConfigChangedFlag.equals(TradeAccountConfigChange.CHANGED.getCode())) {
@@ -119,7 +119,7 @@ public class DirectiveElement implements AbstractToElement{
             DAOService.getInstance().setFullSyncByOrg(org.getIdOfOrg(), false);
         }
 
-        OrgWritableRepository.getInstance().saveOrg(org);
+        //OrgWritableRepository.getInstance().saveOrg(org);
     }
 
     public Element toElement(Document document) throws Exception {

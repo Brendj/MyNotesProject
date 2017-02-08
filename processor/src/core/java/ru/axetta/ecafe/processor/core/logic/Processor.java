@@ -600,7 +600,7 @@ public class Processor implements SyncProcessor {
         }
 
         try {
-            ProcessorUtils.refreshOrg(persistenceSessionFactory, request.getOrg());
+            //ProcessorUtils.refreshOrg(persistenceSessionFactory, request.getOrg());
             directiveElement = processFullSyncDirective(request.getDirectivesRequest(), request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -618,7 +618,6 @@ public class Processor implements SyncProcessor {
             processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNTS_REGISTRY);
             accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
                     .handlerFull(request, request.getIdOfOrg());
-            //accountsRegistry = new AccountsRegistryHandler().handlerFull(request,request.getIdOfOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
         }

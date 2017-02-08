@@ -2308,4 +2308,11 @@ public class DAOService {
         q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
         q.executeUpdate();
     }
+
+    public void saveTradeAccountConfigChangeDirective(Long idOfOrg) {
+        Query q = entityManager.createNativeQuery("update cf_orgs set tradeconfigchanged = :value where idOfOrg = :idOfOrg");
+        q.setParameter("value", TradeAccountConfigChange.NOT_CHANGED.getCode());
+        q.setParameter("idOfOrg", idOfOrg);
+        q.executeUpdate();
+    }
 }
