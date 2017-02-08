@@ -292,7 +292,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setCommodityAccounting(changeCommodityAccounting);
         if(changeCommodityAccounting){
-            if(!org.getConfigurationProvider().getIdOfConfigurationProvider().equals(configurationProvider.getIdOfConfigurationProvider())) {
+            if(!org.getConfigurationProvider().equals(configurationProvider)) {
                 org.setConfigurationProvider(configurationProvider);
                 org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
             }
