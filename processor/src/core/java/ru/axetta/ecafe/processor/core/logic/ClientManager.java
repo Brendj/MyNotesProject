@@ -1110,6 +1110,49 @@ public class ClientManager {
         return res;
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<Long> getAllocatedClientsIds(Session session, Long idOfDestinationOrg) {
+        Criteria cr = session.createCriteria(ClientAllocationRule.class);
+        cr.add(Restrictions.eq("destinationOrg.idOfOrg", idOfDestinationOrg));
+        cr.add(Restrictions.eq("tempClient", Boolean.TRUE));
+        List<ClientAllocationRule> list = cr.list();
+        List<ClientGroupsByRegExAndOrgItem> idOfClientGroupsList = new ArrayList<ClientGroupsByRegExAndOrgItem>();
+        for (ClientAllocationRule rule : list) {
+            Org clientOrg = rule.getSourceOrg();
+            final Set<Org> friendlyOrg = clientOrg.getFriendlyOrg();
+            List<Long> idOfOrgList = new ArrayList<Long>(friendlyOrg.size());
+            for (Org org : friendlyOrg) {
+                idOfOrgList.add(org.getIdOfOrg());
+            }
+            idOfClientGroupsList.addAll(findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter()));
+        }
+
+        return findClientsIdsByInOrgAndInGroups(session, idOfClientGroupsList);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Long> getAllocatedClientsIds(Long idOfDestinationOrg) {
+        List<Long> result = new ArrayList<Long>();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            result = getAllocatedClientsIds(persistenceSession, idOfDestinationOrg);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при нахождении id временных клиентов: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
     //public static List<Client> findMatchedAllocatedClients(Org clientOrg, String regExp) {
     //    List<Client> res = new ArrayList<Client>();
     //    for (Client client : clientOrg.getClients()) {
@@ -1196,6 +1239,24 @@ public class ClientManager {
             for (Object obj : list) {
                 Client client = (Client) obj;
                 res.add(client);
+            }
+        }
+        return res;
+    }
+
+    public static List<Long> findClientsIdsByInOrgAndInGroups(Session session, List<ClientGroupsByRegExAndOrgItem> idOfClientGroupList) {
+        List<Long> res = new ArrayList<Long>();
+
+        for (ClientGroupsByRegExAndOrgItem clientGroupsByRegExAndOrgItem : idOfClientGroupList) {
+
+            Criteria criteria = session.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("org.idOfOrg", clientGroupsByRegExAndOrgItem.getIdOfOrg()));
+            criteria.add(Restrictions.isNotNull("idOfClientGroup"));
+            criteria.add(Restrictions.eq("idOfClientGroup", clientGroupsByRegExAndOrgItem.getIdOfClientGroup()));
+            criteria.setProjection(Projections.property("idOfClient"));
+            List<Long> list = criteria.list();
+            if(list != null && list.size() > 0) {
+                res.addAll(list);
             }
         }
         return res;
