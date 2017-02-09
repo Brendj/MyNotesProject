@@ -246,8 +246,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                         TypesOfCardSubreportItem typesOfCardSubreportItem = new TypesOfCardSubreportItem(
                                 typesOfCardOrgItem.getShortName(), typesOfCardOrgItem.getAddress(), stateServiceActSub,
                                 stateServiceActNotSub, stateScuActSub, stateScuActNotSub, stateOthActSub,
-                                stateOthActNotSub, sumStateActSub, sumStateNotSub, stateScmAct, stateScmActNot,
-                                stateClockAct, stateClockActNot, stateSocActSub, stateSocActNotSub);
+                                stateOthActNotSub, sumStateActSub, sumStateNotSub, stateScmActSub, stateScmActNotSub,
+                                stateClockActSub, stateClockActNotSub, stateSocActSub, stateSocActNotSub);
                         typesOfCardSubreportItemList.add(typesOfCardSubreportItem);
                     }
                     //установка листа по округу
