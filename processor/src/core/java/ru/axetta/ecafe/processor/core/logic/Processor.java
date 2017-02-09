@@ -2450,12 +2450,13 @@ public class Processor implements SyncProcessor {
     private ResPaymentRegistry processSyncPaymentRegistry(Long idOfSync, Long idOfOrg, PaymentRegistry paymentRegistry,
             List<Long> errorClientIds) throws Exception {
         ResPaymentRegistry resPaymentRegistry = new ResPaymentRegistry();
+        List<Long> allocatedClients = ClientManager.getAllocatedClientsIds(idOfOrg);
         Iterator<Payment> payments = paymentRegistry.getPayments();
         while (payments.hasNext()) {
             Payment Payment = payments.next();
             ResPaymentRegistryItem resAcc;
             try {
-                resAcc = processSyncPaymentRegistryPayment(idOfSync, idOfOrg, Payment, errorClientIds);
+                resAcc = processSyncPaymentRegistryPayment(idOfSync, idOfOrg, Payment, errorClientIds, allocatedClients);
                 if (resAcc.getResult() != 0) {
                     logger.error("Failure in response payment registry: " + resAcc);
                 }
@@ -2982,7 +2983,7 @@ public class Processor implements SyncProcessor {
     }
 
     public ResPaymentRegistryItem processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg, Payment payment,
-            List<Long> errorClientIds) throws Exception {
+            List<Long> errorClientIds, List<Long> allocatedClients) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -3098,8 +3099,12 @@ public class Processor implements SyncProcessor {
                     Org clientOrg = client.getOrg();
                     if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet
                             .contains(clientOrg.getIdOfOrg())) {
+                        if(!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, client.getIdOfClient()).size() > 0)) {
+                            if(!allocatedClients.contains(client.getIdOfClient())) {
+                                errorClientIds.add(idOfClient);
+                            }
+                        }
                         //
-                        errorClientIds.add(idOfClient);
                         //return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
                         //        "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                         //        idOfOrg, payment.getIdOfOrder(), idOfClient));
@@ -3325,6 +3330,7 @@ public class Processor implements SyncProcessor {
             Iterator<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
                     .getPayments().iterator();
 
+            List<Long> allocatedClients = ClientManager.getAllocatedClientsIds(persistenceSession, idOfOrg);
             HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>();
             Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
@@ -3363,7 +3369,7 @@ public class Processor implements SyncProcessor {
                 }*/
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
-                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg);
+                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -3392,7 +3398,7 @@ public class Processor implements SyncProcessor {
     }
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
-            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg)
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg, List<Long> allocatedClients)
             throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
@@ -3404,10 +3410,12 @@ public class Processor implements SyncProcessor {
             Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 if(!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient()).size() > 0)){
-                    errorClientIds.add(client.getIdOfClient());
-                    throw new IllegalArgumentException("Client from another organization. idOfClient=" +
-                            client.getIdOfClient().toString() + ", idOfOrg=" + idOfOrg.toString() + ", clientParamItem=" +
-                            clientParamItem.toString());
+                    if(!allocatedClients.contains(clientParamItem.getIdOfClient())) {
+                        errorClientIds.add(client.getIdOfClient());
+                        throw new IllegalArgumentException("Client from another organization. idOfClient=" +
+                                client.getIdOfClient().toString() + ", idOfOrg=" + idOfOrg.toString() + ", clientParamItem=" +
+                                clientParamItem.toString());
+                    }
                 }
             } else {
             /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {

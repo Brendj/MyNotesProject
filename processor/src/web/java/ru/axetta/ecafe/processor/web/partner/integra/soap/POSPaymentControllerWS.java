@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
@@ -46,6 +47,7 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
         try {
             runtimeContext = RuntimeContext.getInstance();
             Processor coreProcessor = runtimeContext.getProcessor();
+            List<Long> allocatedClients = ClientManager.getAllocatedClientsIds(idOfOrg);
 
             final PosResPaymentRegistryItemList posResPaymentRegistryItemList = new PosResPaymentRegistryItemList();
             Iterator<PosPayment> payments = posPaymentList.iterator();
@@ -66,7 +68,7 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
                 ResPaymentRegistryItem resAcc;
                 final PosResPaymentRegistryItem e = new PosResPaymentRegistryItem();
                 try {
-                    resAcc = coreProcessor.processSyncPaymentRegistryPayment(null, idOfOrg, payment, null);
+                    resAcc = coreProcessor.processSyncPaymentRegistryPayment(null, idOfOrg, payment, null, allocatedClients);
                     if (resAcc.getResult() != 0) {
                         LOGGER.error("Failure in response payment registry: " + resAcc);
                     }
