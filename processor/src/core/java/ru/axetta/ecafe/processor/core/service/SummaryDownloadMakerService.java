@@ -81,7 +81,7 @@ public class SummaryDownloadMakerService {
             List list = query.getResultList();
             String complex = "";
             List<String> result = new ArrayList<String>();
-            result.add("Ид ОО;Название ОО;Наименование блюда;Комплекс;Код товара;Производитель;Группа меню;Вид производства;Выход порции;Количество;Сумма;Сумма скидки;Цена (за единицу) с учетом скидки;Скидка (на единицу)");
+            result.add("Ид ОО;Название ОО;Наименование блюда;Комплекс;Код товара;Производитель;Группа меню;Вид производства;Выход порции;Количество;Сумма;Сумма скидки;Цена (за единицу) с учетом скидки;Скидка (на единицу);Тип меню");
             for (Object o : list) {
                 Object row[] = (Object[]) o;
                 int menuType = (Integer) row[11];
@@ -117,8 +117,9 @@ public class SummaryDownloadMakerService {
                 else b.append(";");
                 Long discount = ((BigInteger) row[13]).longValue();
                 if (menuType < 100)
-                    b.append(CurrencyStringUtils.copecksToRubles(discount, 1));                 //Скидка на единицу
+                    b.append(CurrencyStringUtils.copecksToRubles(discount, 1)).append(";");                 //Скидка на единицу
                 else b.append(";");
+                b.append(menuType);                                                              //Тип меню
                 result.add(b.toString());
             }
             File file = new File(filename);
