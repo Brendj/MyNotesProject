@@ -353,7 +353,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 }
 
                 if (!priceAndSumHashMap.isEmpty()) {
-                    if (allOrder.getMenutype() != OrderDetail.TYPE_DISH_ITEM && allOrder.getSocDiscount() != 0L) {
+                    if (allOrder.getMenutype() != OrderDetail.TYPE_DISH_ITEM && allOrder.getSumPay() == 0L) {
                         if (priceAndSumHashMap.get(allOrder.getSum()) != null) {
                             Long sum = priceAndSumHashMap.get(allOrder.getSum()).getSum();
                             sum += handleOrders(totalListMap, allOrder,
