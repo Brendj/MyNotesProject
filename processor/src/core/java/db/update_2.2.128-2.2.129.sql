@@ -21,3 +21,7 @@ DROP INDEX cf_taloon_approval_idoforg_taloondate_taloonname_goodsguid_idx;
 --уник. индекс
 CREATE UNIQUE INDEX cf_taloon_approval_idoforg_taloondate_taloonname_goodsguid_idx ON cf_taloon_approval USING btree
 (idoforg, taloondate, taloonname, goodsguid, price);
+
+-- изменение полей ИД группы в ClientGroupMigrationHistory с long на Long (чтобы сохранять null вместо 0)
+UPDATE cf_clientgroup_migrationhistory SET oldgroupid = DEFAULT WHERE oldgroupid = 0;
+UPDATE cf_clientgroup_migrationhistory SET newgroupid = DEFAULT WHERE newgroupid = 0;

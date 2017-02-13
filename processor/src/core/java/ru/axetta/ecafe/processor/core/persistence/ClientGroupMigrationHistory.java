@@ -11,7 +11,7 @@ import java.util.Date;
  * Date: 01.12.14
  * Time: 14:09
  */
-public class ClientGroupMigrationHistory{
+public class ClientGroupMigrationHistory {
 
     public static final String MODIFY_IN_WEBAPP = "Изменено в веб.приложении. Пользователь: ";
     public static final String MODIFY_IN_ARM = "Изменено в АРМ.";
@@ -22,9 +22,9 @@ public class ClientGroupMigrationHistory{
     private Org org;
     private Client client;
 
-    private long oldGroupId;
+    private Long oldGroupId;
     private String oldGroupName;
-    private long newGroupId;
+    private Long newGroupId;
     private String newGroupName;
     private String comment;
 
@@ -71,11 +71,11 @@ public class ClientGroupMigrationHistory{
         this.client = client;
     }
 
-    public long getOldGroupId() {
+    public Long getOldGroupId() {
         return oldGroupId;
     }
 
-    public void setOldGroupId(long oldGroupId) {
+    public void setOldGroupId(Long oldGroupId) {
         this.oldGroupId = oldGroupId;
     }
 
@@ -87,11 +87,11 @@ public class ClientGroupMigrationHistory{
         this.oldGroupName = oldGroupName;
     }
 
-    public long getNewGroupId() {
+    public Long getNewGroupId() {
         return newGroupId;
     }
 
-    public void setNewGroupId(long newGroupId) {
+    public void setNewGroupId(Long newGroupId) {
         this.newGroupId = newGroupId;
     }
 

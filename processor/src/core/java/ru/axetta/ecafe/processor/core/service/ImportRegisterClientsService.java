@@ -1141,8 +1141,10 @@ public class ImportRegisterClientsService {
                             addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
                                     change); //орг. меняется - история миграции между ОО
                         } else {
-                            addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient,
-                                    change); //если орг. не меняется, добавляем историю миграции внутри ОО
+                            if(!change.getGroupName().equals(change.getGroupNameFrom())) {
+                                addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
+                                //если орг. не меняется, добавляем историю миграции внутри ОО
+                            }
                         }
                     }
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
@@ -1246,11 +1248,16 @@ public class ImportRegisterClientsService {
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
         ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
         migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY);
+        migration.setNewGroupName(change.getGroupName());
+        if(client.getIdOfClientGroup() != null) {
+            // в методе ClientManager.modifyClientTransactionFree в этом поле сохранен новый ИД группы
+            migration.setNewGroupId(client.getIdOfClientGroup());
+        }
         if (client.getClientGroup() != null) {
+            // так как сущность client еще не обновлена, то в поле clientGroup хранятся данные старой группы
             migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
             migration.setOldGroupName(client.getClientGroup().getGroupName());
         }
-        migration.setNewGroupName(change.getGroupName());
         session.save(migration);
     }
 
