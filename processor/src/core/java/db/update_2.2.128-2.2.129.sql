@@ -25,3 +25,6 @@ CREATE UNIQUE INDEX cf_taloon_approval_idoforg_taloondate_taloonname_goodsguid_i
 -- изменение полей ИД группы в ClientGroupMigrationHistory с long на Long (чтобы сохранять null вместо 0)
 UPDATE cf_clientgroup_migrationhistory SET oldgroupid = DEFAULT WHERE oldgroupid = 0;
 UPDATE cf_clientgroup_migrationhistory SET newgroupid = DEFAULT WHERE newgroupid = 0;
+
+--Удаление лишних записей с названием старой группы = названием новой группы в таблице перемещений между группами внутри ОО
+DELETE FROM cf_clientgroup_migrationhistory WHERE oldgroupname = newgroupname;
