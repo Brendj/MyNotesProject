@@ -1141,7 +1141,9 @@ public class ImportRegisterClientsService {
                             addClientMigrationEntry(session, beforeModifyOrg, dbClient.getOrg(), dbClient,
                                     change); //орг. меняется - история миграции между ОО
                         } else {
-                            if(!change.getGroupName().equals(change.getGroupNameFrom())) {
+                            if((change.getGroupName() == null && change.getGroupNameFrom() == null) ||
+                                    (change.getGroupName() != null && change.getGroupNameFrom() != null &&
+                                    !change.getGroupName().equals(change.getGroupNameFrom()))) {
                                 addClientGroupMigrationEntry(session, dbClient.getOrg(), dbClient, change);
                                 //если орг. не меняется, добавляем историю миграции внутри ОО
                             }
