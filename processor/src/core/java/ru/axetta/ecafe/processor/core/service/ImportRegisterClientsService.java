@@ -1238,7 +1238,7 @@ public class ImportRegisterClientsService {
     //@Transactional
     private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
-        migration.setComment(ClientMigration.MODIFY_IN_REGISTRY);
+        migration.setComment(ClientMigration.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
         if(client.getClientGroup() != null) {
             migration.setOldGroupName(client.getClientGroup().getGroupName());
         }
@@ -1249,7 +1249,7 @@ public class ImportRegisterClientsService {
     //@Transactional
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
         ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
-        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY);
+        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
         migration.setNewGroupName(change.getGroupName());
         if(client.getIdOfClientGroup() != null) {
             // в методе ClientManager.modifyClientTransactionFree в этом поле сохранен новый ИД группы

@@ -3408,6 +3408,9 @@ public class Processor implements SyncProcessor {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
+            if (clientParamItem.getVersion() != null && clientParamItem.getVersion() < client.getClientRegistryVersion()) {
+                return;
+            }
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 if(!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient()).size() > 0)){
                     if(!allocatedClients.contains(clientParamItem.getIdOfClient())) {
@@ -3522,7 +3525,7 @@ public class Processor implements SyncProcessor {
                         if (!clientGroup.getCompositeIdOfClientGroup().equals(client.getClientGroup().getCompositeIdOfClientGroup())) {
                             ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(),
                                     client);
-                            migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM);
+                            migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM.concat(String.format(" (ид. ОО=%s)", idOfOrg)));
                             migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
                             migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
 

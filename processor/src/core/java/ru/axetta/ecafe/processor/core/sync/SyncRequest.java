@@ -75,6 +75,10 @@ public class SyncRequest {
 
         public static class ClientParamItem {
 
+            public Long getVersion() {
+                return version;
+            }
+
             public static class Builder {
 
                 public Builder() {
@@ -117,6 +121,7 @@ public class SyncRequest {
                     String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
                     Integer gender = getIntegerValueNullSafe(namedNodeMap, "Gender");
                     Date birthDate = getDateValueNullSafe(namedNodeMap,"BirthDate");
+                    Long version = getLongValueNullSafe(namedNodeMap, "V");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -124,13 +129,7 @@ public class SyncRequest {
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
-                            gender,birthDate);
-                    /*return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
-                            categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
-                            fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
-                            notifyViaSMS == null ? null : notifyViaSMS.equals("1"), groupName,
-                            canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
-                            expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"));*/
+                            gender,birthDate, version);
                 }
 
 
@@ -151,18 +150,14 @@ public class SyncRequest {
             private final Boolean isUseLastEEModeForPlan;
             private final Date birthDate;
             private final Integer gender;
+            private final Long version;
 
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate) {
-            /*public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
-                    int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
-                    String address, String phone, String mobilePhone, String middleGroup, String fax, String email, String remarks,
-                    Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan) {*/
+                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -189,6 +184,7 @@ public class SyncRequest {
                 this.isUseLastEEModeForPlan = isUseLastEEModeForPlan;
                 this.gender = gender;
                 this.birthDate = birthDate;
+                this.version = version;
             }
 
             public long getIdOfClient() {
