@@ -28,3 +28,5 @@ UPDATE cf_clientgroup_migrationhistory SET newgroupid = DEFAULT WHERE newgroupid
 
 --Удаление лишних записей с названием старой группы = названием новой группы в таблице перемещений между группами внутри ОО
 DELETE FROM cf_clientgroup_migrationhistory WHERE oldgroupname = newgroupname;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 140217) НЕ МЕНЯТЬ
