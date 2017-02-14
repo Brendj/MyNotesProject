@@ -286,13 +286,20 @@ public class ImportRegisterClientsService {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Session session = (Session) em.getDelegate();
-        Query q = session.createSQLQuery("delete from cf_registrychange_guardians where createdDate<:minCreateDate");
-        q.setLong("minCreateDate", cal.getTimeInMillis());
-        q.executeUpdate();
-        q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
-        q.setLong("minCreateDate", cal.getTimeInMillis());
-        q.executeUpdate();
-        q = session.createSQLQuery("delete from cf_registrychange_errors where createDate<:minCreateDate");
+        Query q = session.createSQLQuery(
+                  "BEGIN WORK; "
+                + "LOCK TABLE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors IN SHARE MODE; "
+                + "CREATE TEMP TABLE cf_registrychange_guardians_backup ON COMMIT DROP AS "
+                + "      SELECT * FROM cf_registrychange_guardians WHERE createddate >= :minCreateDate; "
+                + "CREATE TEMP TABLE cf_registrychange_backup  ON COMMIT DROP AS "
+                + "      SELECT * FROM cf_registrychange WHERE createdate >= :minCreateDate; "
+                + "CREATE TEMP TABLE cf_registrychange_errors_backup  ON COMMIT DROP AS\n"
+                + "      SELECT * FROM cf_registrychange_errors WHERE createdate >= :minCreateDate; "
+                + "TRUNCATE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors; "
+                + "INSERT INTO cf_registrychange SELECT * FROM cf_registrychange_backup; "
+                + "INSERT INTO cf_registrychange_guardians SELECT * FROM cf_registrychange_guardians_backup; "
+                + "INSERT INTO cf_registrychange_errors SELECT * FROM cf_registrychange_errors_backup; "
+                + "COMMIT WORK;");
         q.setLong("minCreateDate", cal.getTimeInMillis());
         q.executeUpdate();
     }
