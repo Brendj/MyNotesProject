@@ -426,9 +426,11 @@ public class ClientManager {
                                     clientGroupName);
                         }
                         client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        client.setMiddleGroup(null);
                     }
                 } else {
                     client.setIdOfClientGroup(null);
+                    client.setMiddleGroup(null);
                 }
             }
             //tokens[22])
