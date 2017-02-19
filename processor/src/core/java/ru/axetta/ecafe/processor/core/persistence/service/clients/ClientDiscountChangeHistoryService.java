@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.service.clients;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.DiscountChange;
+import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDiscountChangeHistoryRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class ClientDiscountChangeHistoryService {
     @Autowired
     ClientDiscountChangeHistoryRepository repository;
 
-    public List<DiscountChange> findAll(Client client) {
+    public List<DiscountChangeHistory> findAll(Client client) {
         return repository.findAll(client);
     }
 

@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.DiscountChange;
+import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -174,10 +174,10 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
 
     public void saveClientDiscountChange(Session session, Client client, Integer discountMode,
             String categoriesDiscount) {
-        DiscountChange discountChange = new DiscountChange(client, null, discountMode, client.getDiscountMode(),
+        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
                 categoriesDiscount, client.getCategoriesDiscounts());
-        discountChange.setComment(DiscountChange.MODIFY_IN_SERVICE);
-        session.save(discountChange);
+        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_SERVICE);
+        session.save(discountChangeHistory);
     }
 
     public List<GroupControlBenefitsItems> getGroupControlBenefitsItemsList() {

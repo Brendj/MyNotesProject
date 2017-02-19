@@ -843,7 +843,7 @@
 </rich:dataTable>
 
 <h:outputText value="Изменение льгот:" />
-<rich:dataTable id="clientDiscountsChangeTable" var="dis" value="#{mainPage.clientOperationListPage.discountChanges}"
+<rich:dataTable id="clientDiscountsChangeTable" var="dis" value="#{mainPage.clientOperationListPage.discountChangeHistories}"
                 rowKeyVar="row" footerClass="data-table-footer" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
 

@@ -182,9 +182,9 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.GuardSan" column="IdOfGuardSan"/>
         </set>
 
-        <set name="discountChanges" lazy="true" cascade="all">
+        <set name="getDiscountChangeHistories" lazy="true" cascade="all">
             <key column="IdOfClient"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountChange"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory"/>
         </set>
     </class>
 </hibernate-mapping>

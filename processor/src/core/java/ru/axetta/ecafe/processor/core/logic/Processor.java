@@ -3584,10 +3584,10 @@ public class Processor implements SyncProcessor {
             // Если льготы изменились, то сохраняем историю
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet.equals(categoryDiscountOfClient))) {
                 Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-                DiscountChange discountChange = new DiscountChange(client, org, newClientDiscountMode,
+                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newClientDiscountMode,
                         oldClientDiscountMode, categoriesFromPacket, categoriesFromClient);
-                discountChange.setComment(DiscountChange.MODIFY_IN_ARM);
-                persistenceSession.save(discountChange);
+                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_ARM);
+                persistenceSession.save(discountChangeHistory);
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
 

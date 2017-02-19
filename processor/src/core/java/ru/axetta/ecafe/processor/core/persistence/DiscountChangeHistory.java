@@ -20,7 +20,7 @@ import java.util.List;
  * Date: 21.03.16
  * Time: 10:09
  */
-public class DiscountChange {
+public class DiscountChangeHistory {
 
     public static final String MODIFY_IN_WEBAPP = "Изменено в веб.приложении. Пользователь: ";
     public static final String MODIFY_IN_ARM = "Изменено в АРМ.";
@@ -36,15 +36,15 @@ public class DiscountChange {
     private String oldCategoriesDiscounts;
     private String comment;
 
-    public DiscountChange() {
+    public DiscountChangeHistory() {
     }
 
-    public DiscountChange(Client client) {
+    public DiscountChangeHistory(Client client) {
         this.registrationDate = new Date();
         this.client = client;
     }
 
-    public DiscountChange(Client client, Org org, Integer discountMode, Integer oldDiscountMode, String categoriesDiscounts,
+    public DiscountChangeHistory(Client client, Org org, Integer discountMode, Integer oldDiscountMode, String categoriesDiscounts,
             String oldCategoriesDiscounts) {
         this.registrationDate = new Date();
         this.client = client;
@@ -178,11 +178,11 @@ public class DiscountChange {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DiscountChange)) {
+        if (!(o instanceof DiscountChangeHistory)) {
             return false;
         }
 
-        DiscountChange that = (DiscountChange) o;
+        DiscountChangeHistory that = (DiscountChangeHistory) o;
 
         if (!idOfDiscountChange.equals(that.idOfDiscountChange)) {
             return false;

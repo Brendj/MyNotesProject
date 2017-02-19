@@ -48,7 +48,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<RegularPayment> regularPayments = new ArrayList<RegularPayment>();
     private List<ClientGroupMigrationHistory> clientGroupMigrationHistories = new ArrayList<ClientGroupMigrationHistory>();
     private List<ClientMigration> clientMigrations = new ArrayList<ClientMigration>();
-    private List<DiscountChange> discountChanges = new ArrayList<DiscountChange>();
+    private List<DiscountChangeHistory> discountChangeHistories = new ArrayList<DiscountChangeHistory>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -128,8 +128,8 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return clientMigrations;
     }
 
-    public List<DiscountChange> getDiscountChanges() {
-        return discountChanges;
+    public List<DiscountChangeHistory> getDiscountChangeHistories() {
+        return discountChangeHistories;
     }
 
     @SuppressWarnings("unchecked")
@@ -204,7 +204,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         ClientDiscountChangeHistoryService clientDiscountChangeService = RuntimeContext.getAppContext()
                 .getBean(ClientDiscountChangeHistoryService.class);
 
-        discountChanges = clientDiscountChangeService.findAll(client);
+        discountChangeHistories = clientDiscountChangeService.findAll(client);
     }
 
 }

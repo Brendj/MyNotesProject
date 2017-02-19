@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.DiscountChange" table="cf_discountchangehistory">
+    <class name="ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory" table="cf_discountchangehistory">
         <id name="idOfDiscountChange" column="idOfDiscountChange" type="long">
             <generator class="identity"/>
         </id>

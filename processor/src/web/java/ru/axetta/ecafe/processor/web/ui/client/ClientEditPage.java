@@ -1086,12 +1086,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     private void saveDiscountChange(Client client, Session persistenceSession) {
-        DiscountChange discountChange = new DiscountChange(client, null, discountMode, client.getDiscountMode(),
+        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
                 getCategoriesString(getCategoryDiscountSet()), getCategoriesString(client.getCategories()));
-        discountChange.setComment(
-                DiscountChange.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+        discountChangeHistory.setComment(
+                DiscountChangeHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                         .getExternalContext().getRemoteUser() + ".");
-        persistenceSession.save(discountChange);
+        persistenceSession.save(discountChangeHistory);
 
     }
 
