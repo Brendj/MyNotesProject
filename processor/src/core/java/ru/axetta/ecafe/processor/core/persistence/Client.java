@@ -116,7 +116,6 @@ public class Client {
     private Set<GoodComplaintBook> goodComplaintBookInternal;
     private Set<LibVisit> libVisitInternal;
     private Set<Circulation> circulationInternal;
-    private Set<DiscountChangeHistory> discountChangeHistories = new HashSet<DiscountChangeHistory>();
 
     private Integer gender;
     private Date birthDate;
@@ -920,14 +919,6 @@ public class Client {
 
     public void setSsoid(String ssoid) {
         this.ssoid = ssoid;
-    }
-
-    public Set<DiscountChangeHistory> getDiscountChangeHistories() {
-        return discountChangeHistories;
-    }
-
-    public void setDiscountChangeHistories(Set<DiscountChangeHistory> discountChangeHistories) {
-        this.discountChangeHistories = discountChangeHistories;
     }
 
     public Integer getGender() {
