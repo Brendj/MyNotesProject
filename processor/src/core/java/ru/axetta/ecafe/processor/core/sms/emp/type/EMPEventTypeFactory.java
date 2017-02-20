@@ -28,6 +28,7 @@ public class EMPEventTypeFactory {
     public static final int PAYMENT_REDUCED_EVENT     = 901240009;
     public static final int SUMMARY_DAILY_EVENT       = 901240010;
     public static final int SUMMARY_WEEKLY_EVENT      = 901240011;
+    public static final int LOW_BALANCE_EVENT         = 901240012;
     public static final int INFO_MAILING_EVENT        = 901240056;
 
     public static final EMPEventType buildEvent(int type, Client client) {
@@ -88,6 +89,9 @@ public class EMPEventTypeFactory {
                 break;
             case INFO_MAILING_EVENT:
                 event = new EMPInfoMailingEventType();
+                break;
+            case LOW_BALANCE_EVENT:
+                event = new EMPLowBalanceEventType();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

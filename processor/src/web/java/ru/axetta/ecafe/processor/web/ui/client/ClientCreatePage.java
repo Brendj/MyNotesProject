@@ -29,6 +29,14 @@ import java.util.*;
  */
 public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList {
 
+    public Long getBalanceToNotify() {
+        return balanceToNotify;
+    }
+
+    public void setBalanceToNotify(Long balanceToNotify) {
+        this.balanceToNotify = balanceToNotify;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -190,6 +198,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Integer contractState = 0;
     private Integer payForSMS = 1;
     private Long limit;
+    private Long balanceToNotify;
     private String san;
     private String guardsan;
     private Long externalId;
@@ -562,6 +571,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         else client.setExternalId(this.externalId);
         if (this.clientGUID==null || this.clientGUID.isEmpty()) client.setClientGUID(null);
         else client.setClientGUID(this.clientGUID);
+        client.setBalanceToNotify(this.balanceToNotify);
 
         if(null != discountMode) client.setDiscountMode(discountMode);
         if(discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size()==0){

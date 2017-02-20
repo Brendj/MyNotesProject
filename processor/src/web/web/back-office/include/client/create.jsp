@@ -70,6 +70,9 @@
     <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.limit}" maxlength="20" converter="copeckSumConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Порог снижения до отправки уведомления" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientCreatePage.balanceToNotify}" maxlength="20" converter="copeckSumConverter"
+                 styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.address}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />

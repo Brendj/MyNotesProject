@@ -80,7 +80,8 @@ public class ProcessorUtils {
         try {
             session = sessionFactory.openSession();
             persistenceTransaction = session.beginTransaction();
-            Query query = session.createQuery("update LastProcessSectionsDates p set p.date = :date where p.compositeIdOfLastProcessSectionsDates = :compositeId");
+            saveLastProcessSectionCustomDateTransactionFree(session, idOfOrg, sectionType, date);
+            /*Query query = session.createQuery("update LastProcessSectionsDates p set p.date = :date where p.compositeIdOfLastProcessSectionsDates = :compositeId");
             query.setParameter("date", date);
             query.setParameter("compositeId", new CompositeIdOfLastProcessSectionsDates(idOfOrg, sectionType.getType()));
             int result = query.executeUpdate();
@@ -88,19 +89,7 @@ public class ProcessorUtils {
                 LastProcessSectionsDates lastProcessSectionsDate = new LastProcessSectionsDates(new CompositeIdOfLastProcessSectionsDates(idOfOrg,
                         sectionType.getType()), date);
                 session.save(lastProcessSectionsDate);
-            }
-
-            /*LastProcessSectionsDates lastProcessSectionsDate = DAOUtils.findLastProcessSectionsDate(session,
-                    new CompositeIdOfLastProcessSectionsDates(idOfOrg, sectionType.getType()));
-            if (lastProcessSectionsDate == null){
-                lastProcessSectionsDate = new LastProcessSectionsDates(new CompositeIdOfLastProcessSectionsDates(idOfOrg,
-                        sectionType.getType()), date);
-                session.save(lastProcessSectionsDate);
-            } else {
-                lastProcessSectionsDate.setDate(date);
-                session.update(lastProcessSectionsDate);
             }*/
-            session.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -108,6 +97,18 @@ public class ProcessorUtils {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void saveLastProcessSectionCustomDateTransactionFree(Session session, Long idOfOrg, SectionType sectionType, Date date) {
+        Query query = session.createQuery("update LastProcessSectionsDates p set p.date = :date where p.compositeIdOfLastProcessSectionsDates = :compositeId");
+        query.setParameter("date", date);
+        query.setParameter("compositeId", new CompositeIdOfLastProcessSectionsDates(idOfOrg, sectionType.getType()));
+        int result = query.executeUpdate();
+        if (result == 0) {
+            LastProcessSectionsDates lastProcessSectionsDate = new LastProcessSectionsDates(new CompositeIdOfLastProcessSectionsDates(idOfOrg,
+                    sectionType.getType()), date);
+            session.persist(lastProcessSectionsDate);
         }
     }
 

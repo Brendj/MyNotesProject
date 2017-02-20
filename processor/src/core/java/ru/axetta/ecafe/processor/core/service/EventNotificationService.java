@@ -56,6 +56,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_SUMMARY_BY_DAY = "summaryByDay";
     public static String NOTIFICATION_SUMMARY_BY_WEEK = "summaryByWeek";
     public static String NOTIFICATION_INFO_MAILING = "infoMailing";
+    public static String NOTIFICATION_LOW_BALANCE = "lowBalance";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -160,7 +161,9 @@ public class EventNotificationService {
                     + "Сервис АП отключен. Причина: недостаточный баланс. "
                     + "<br/>\n<br/>\nС уважением,<br/>\nСлужба поддержки клиентов\n<br/><br/>\n"
                     + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
-                    + "</body>\n</html>"
+                    + "</body>\n</html>",
+            NOTIFICATION_LOW_BALANCE + "." + TYPE_SMS,
+            "[surname] [name] (л/с: [account]): баланс ниже [balanceToNotify] руб."
     };                       // короткое имя школы
 
     String getDefaultText(String name) {
@@ -450,6 +453,8 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS;
             } else if (type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
                 clientSMSType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
+            } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
+                clientSMSType = ClientSms.TYPE_LOW_BALANCE_NOTIFICATION;
             }
             else {
                 throw new Exception("No client SMS type defined for notification " + type);
@@ -724,17 +729,14 @@ public class EventNotificationService {
                 empType.getParameters().put("amountPrice", amountPrice);
                 empType.getParameters().put("amountLunch", amountLunch);
                 empType.getParameters().put("amount", amount);
-                /*if(findBooleanValueInParams(new String[]{"isBarOrder"}, values) ||
-                   findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
-                    if (amountPrice != null && amountPrice.length() > 0) {
-                        empType.getParameters().put("amountPrice", amountPrice);
-                        empType.getParameters().put("amount", amountPrice);
-                    }
-                    if (amountLunch != null && amountLunch.length() > 0) {
-                        empType.getParameters().put("amountLunch", amountLunch);
-                        empType.getParameters().put("amount", amountLunch);
-                    }
-                }*/
+            } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, destClient);
+                }
+                String balanceToNotify = findValueInParams(new String[]{"balanceToNotify"}, values);
+                empType.getParameters().put("balanceToNotify", balanceToNotify);
             }
 
             //  Устанавливаем дату

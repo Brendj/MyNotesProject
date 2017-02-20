@@ -49,8 +49,8 @@ public class ClientAccountManager {
             accountTransaction.setTransactionSubBalance1Sum(transactionSum-diff);
             accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
             session.save(accountTransaction);
-            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
-            client.addBalanceNotForSave(transactionSum);
+            DAOUtils.changeClientBalance(session, client, transactionSum, transactionTime);
+            //client.addBalanceNotForSave(transactionSum);
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum-diff, 1, client.getSubBalanceIsNull(1));
             client.addSubBalanceNotForSave(transactionSum-diff, 1);
         } else {
@@ -59,8 +59,8 @@ public class ClientAccountManager {
             accountTransaction.setTransactionSubBalance1Sum(transactionSum);
             accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
             session.save(accountTransaction);
-            DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
-            client.addBalanceNotForSave(transactionSum);
+            DAOUtils.changeClientBalance(session, client, transactionSum, transactionTime);
+            //client.addBalanceNotForSave(transactionSum);
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, 1, client.getSubBalanceIsNull(1));
             client.addSubBalanceNotForSave(transactionSum, 1);
         }
@@ -79,8 +79,8 @@ public class ClientAccountManager {
         }
         accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
-        client.addBalanceNotForSave(transactionSum);
+        DAOUtils.changeClientBalance(session, client, transactionSum, transactionTime);
+        //client.addBalanceNotForSave(transactionSum);
         return accountTransaction;
     }
 
@@ -98,8 +98,8 @@ public class ClientAccountManager {
         }
         accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum, client.getOrg().getIdOfOrg(), transactionTime);
-        client.addBalanceNotForSave(transactionSum);
+        DAOUtils.changeClientBalance(session, client, transactionSum, transactionTime);
+        //client.addBalanceNotForSave(transactionSum);
         if(subBalance>0){
             DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, subBalance, client.getSubBalanceIsNull(subBalance));
             client.addSubBalanceNotForSave(transactionSum, subBalance);
@@ -120,14 +120,14 @@ public class ClientAccountManager {
         }
         cancelTransaction.setBalanceAfterTransaction(client.getBalance() + (-transaction.getTransactionSum()));
         session.save(cancelTransaction);
-        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum(), client.getOrg().getIdOfOrg(), transactionTime);
+        DAOUtils.changeClientBalance(session, client, -transaction.getTransactionSum(), transactionTime);
         if(transaction.getTransactionSubBalance1Sum()!=null){
             DAOUtils.changeClientSubBalance1(session, client.getIdOfClient(), -transaction.getTransactionSubBalance1Sum(), false);
         }
         return cancelTransaction;
     }
 
-    public static AccountTransaction cancelAccountTransaction(Session session, AccountTransaction transaction,
+    /*public static AccountTransaction cancelAccountTransaction(Session session, AccountTransaction transaction,
             Date transactionTime, Integer subBalance) throws Exception {
         final Client client = transaction.getClient();
         final Long subBalanceNum = client.getContractId() * 100 + subBalance;
@@ -145,5 +145,5 @@ public class ClientAccountManager {
             client.addSubBalanceNotForSave(transactionSum, subBalance);
         }
         return cancelTransaction;
-    }
+    }*/
 }

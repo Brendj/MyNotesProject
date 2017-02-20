@@ -81,6 +81,9 @@
     <h:outputText escape="true" value="Лимит расходов" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.expenditureLimit}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Порог снижения до отправки уведомления" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.balanceToNotify}" readonly="true" converter="copeckSumConverter"
+                 styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.address}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />

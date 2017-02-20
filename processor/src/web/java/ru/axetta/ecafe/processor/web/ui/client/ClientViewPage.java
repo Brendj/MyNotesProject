@@ -29,6 +29,14 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadWardsByClie
  */
 public class ClientViewPage extends BasicWorkspacePage {
 
+    public Long getBalanceToNotify() {
+        return balanceToNotify;
+    }
+
+    public void setBalanceToNotify(Long balanceToNotify) {
+        this.balanceToNotify = balanceToNotify;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -125,7 +133,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String benefitOnAdmission;
     private String ageTypeGroup;
     private String photoURL;
-
+    private Long balanceToNotify;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -416,6 +424,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.birthDate = client.getBirthDate();
         this.benefitOnAdmission = client.getBenefitOnAdmission();
         this.ageTypeGroup = client.getAgeTypeGroup();
+        this.balanceToNotify = client.getBalanceToNotify();
 
         // опекуны
         // (Kadyrov D) 23.12.2011

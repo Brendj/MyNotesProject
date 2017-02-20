@@ -124,6 +124,7 @@ public class Client {
     private String guardiansCount;
 
     private String ageTypeGroup;
+    private Long balanceToNotify;
 
     protected Client() {
         // For Hibernate only
@@ -993,4 +994,11 @@ public class Client {
                 + expenditureLimit + ", categoriesDiscounts=" + categoriesDiscounts + '}';
     }
 
+    public Long getBalanceToNotify() {
+        return balanceToNotify;
+    }
+
+    public void setBalanceToNotify(Long balanceToNotify) {
+        this.balanceToNotify = balanceToNotify;
+    }
 }

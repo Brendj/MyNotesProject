@@ -54,6 +54,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         return fax;
     }
 
+    public Long getBalanceToNotify() {
+        return balanceToNotify;
+    }
+
+    public void setBalanceToNotify(Long balanceToNotify) {
+        this.balanceToNotify = balanceToNotify;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -251,6 +259,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Date birthDate;
     private String benefitOnAdmission;
     private String ageTypeGroup;
+    private Long balanceToNotify;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -897,6 +906,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
+        client.setBalanceToNotify(this.balanceToNotify);
         /* Добавление СНИЛС опекунов */
         /*Set<GuardSan> guardSans = new HashSet<GuardSan>();
         String gSanList [] = null;
@@ -1148,6 +1158,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.subBalance0 = this.balance - this.subBalance1;
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
+        this.balanceToNotify = client.getBalanceToNotify();
         this.freePayMaxCount = client.getFreePayMaxCount();
         this.san = client.getSan();
         Set<GuardSan> guardSans = client.getGuardSan();

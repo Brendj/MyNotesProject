@@ -1576,7 +1576,7 @@ public class Processor implements SyncProcessor {
                             throw new Exception("no license slots available");
                         }
                     }
-                    processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
+                    //processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
                     ResPaymentRegistry resPaymentRegistry = processSyncPaymentRegistry(null, request.getIdOfOrg(),
                             request.getPaymentRegistry(), errorClientIds);
                     addToResponseSections(resPaymentRegistry, responseSections);

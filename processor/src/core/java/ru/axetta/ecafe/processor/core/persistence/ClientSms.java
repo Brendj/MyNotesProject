@@ -30,7 +30,8 @@ public class ClientSms {
                                                               "Уведомление о нехватке средств на субсчете", // 9 - TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS
                                                               "Оповещение по итогам дня", // 10 - TYPE_SUMMARY_DAILY_NOTIFICATION
                                                               "Оповещение по итогам недели", // 11 - TYPE_SUMMARY_WEEKLY_NOTIFICATION
-                                                              "Информационная рассылка"};    // 12 - TYPE_INFO_MAILING_NOTIFICATION
+                                                              "Информационная рассылка",    // 12 - TYPE_INFO_MAILING_NOTIFICATION
+                                                              "Уведомление о снижении баланса"};  //13 - TYPE_LOW_BALANCE_NOTIFICATION
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
     public static final int TYPE_PAYMENT_REGISTERED = 3;
@@ -43,6 +44,7 @@ public class ClientSms {
     public static final int TYPE_SUMMARY_DAILY_NOTIFICATION = 10;
     public static final int TYPE_SUMMARY_WEEKLY_NOTIFICATION = 11;
     public static final int TYPE_INFO_MAILING_NOTIFICATION = 12;
+    public static final int TYPE_LOW_BALANCE_NOTIFICATION = 13;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;

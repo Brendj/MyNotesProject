@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -13,12 +15,14 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -38,7 +42,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.text.DateFormat;
 import java.util.*;
+
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
 /**
  * Created by IntelliJ IDEA.
@@ -1029,13 +1036,51 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
-    public static void changeClientBalance(Session session, Long idOfClient, long sum, Long idOfOrg, Date transactionDate) {
+    public static void changeClientBalance(Session session, Client client, long sum, Date transactionDate) {
         Query q = session.createQuery("UPDATE Client SET balance = balance + :charge WHERE idOfClient = :id")
                 .setParameter("charge", sum)
-                .setParameter("id", idOfClient);
+                .setParameter("id", client.getIdOfClient());
         q.executeUpdate();
-        RuntimeContext.getAppContext().getBean(ProcessorUtils.class).saveLastProcessSectionCustomDate(
-                session.getSessionFactory(), idOfOrg, SectionType.LAST_TRANSACTION, transactionDate);
+        client.addBalanceNotForSave(sum);
+        RuntimeContext.getAppContext().getBean(ProcessorUtils.class).saveLastProcessSectionCustomDateTransactionFree(
+                session, client.getOrg().getIdOfOrg(), SectionType.LAST_TRANSACTION, transactionDate);
+        if ((client.getBalanceToNotify() != null) && (client.getBalance() < client.getBalanceToNotify())) {
+            sendNotificationLowBalance(session, client, transactionDate);
+        }
+    }
+
+    private static void sendNotificationLowBalance(Session session, Client client, Date transactionDate) {
+        try {
+            String[] values = generateLowBalanceNotificationParams(client, transactionDate);
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                .sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_LOW_BALANCE,
+                        values, transactionDate);
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+
+            if (!(guardians == null || guardians.isEmpty())) {
+                for (Client destGuardian : guardians) {
+                    if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                        client.getIdOfClient(),
+                        ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_LOW_BALANCE
+                            .getValue())) {
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                            .sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_LOW_BALANCE,
+                                    values, transactionDate);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Can't send notification low balance. Client id=%s", client.getIdOfClient()), e);
+        }
+    }
+
+    private static String[] generateLowBalanceNotificationParams(Client client, Date trDate) {
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(trDate);
+        return new String[]{
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
+                ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
+                "firstName", client.getPerson().getFirstName(), "empTime", empTime, "balanceToNotify", CurrencyStringUtils.copecksToRubles(client.getBalanceToNotify())};
     }
 
     /**
