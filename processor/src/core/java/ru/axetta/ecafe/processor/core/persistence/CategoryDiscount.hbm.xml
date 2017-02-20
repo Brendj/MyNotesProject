@@ -45,5 +45,15 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"/>
         </set>
 
+        <set name="categoriesDiscountDSZN" table="CF_CategoryDiscounts_DSZN" inverse="true" lazy="false" fetch="select">
+            <key>
+                <column name="idOfCategoryDiscount" not-null="false" />
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN" />
+        </set>
+
+        <property name="blockedChange" column="blockedChange" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+
     </class>
 </hibernate-mapping>

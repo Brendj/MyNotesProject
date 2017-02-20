@@ -41,6 +41,7 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
     private Integer categoryType;
     private Integer organizationType;
     private Integer discountRate = 100;
+    private boolean blockedChange = false;
     private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
 
     public CategoryDiscountEnumTypeMenu getCategoryDiscountEnumTypeMenu() {
@@ -69,6 +70,14 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
 
     public void setOrganizationType(Integer organizationType) {
         this.organizationType = organizationType;
+    }
+
+    public boolean isBlockedChange() {
+        return blockedChange;
+    }
+
+    public void setBlockedChange(boolean blockedChange) {
+        this.blockedChange = blockedChange;
     }
 
     public SelectItem[] getOrganizationItems() {
@@ -150,7 +159,7 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
             TransactionStatus status = transactionManager.getTransaction(def);
             Date createdDate = new Date();
             CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, "", description,
-                    createdDate, createdDate);
+                    createdDate, createdDate, blockedChange);
             categoryDiscount.setCategoryType(CategoryDiscountEnumType.fromInteger(categoryType));
             categoryDiscount.setOrgType(organizationType);
             entityManager.persist(categoryDiscount);

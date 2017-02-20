@@ -1523,6 +1523,25 @@
                         label="Регистрация" action="#{categoryDiscountCreatePage.show}" reRender="workspaceForm" />
 
 </rich:panelMenuGroup>
+<rich:panelMenuGroup id="categoryDSZNGroupMenu" binding="#{mainPage.categoryDSZNGroupPage.mainMenuComponent}"
+                     label="Категории ДСЗН" rendered="#{mainPage.eligibleToViewCategory}">
+    <a4j:support event="onclick" action="#{mainPage.showCategoryDSZNGroupPage}" reRender="workspaceForm" />
+    <%--@elvariable id="categoryDiscountDSZNListPage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscountdszn.CategoryDiscounDSZNtListPage"--%>
+    <%--@elvariable id="categoryDiscountDSZNCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscountdszn.CategoryDiscountDSZNCreatePage"--%>
+    <%--@elvariable id="categoryDiscountDSZNEditPage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscountdszn.CategoryDiscountDSZNEditPage"--%>
+    <rich:panelMenuItem id="categoryDSZNListMenuItem" label="Список" binding="#{categoryDiscountDSZNListPage.mainMenuComponent}"
+                        action="#{categoryDiscountDSZNListPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="selectedCategoryDSZNGroupMenu" label="#{categoryDiscountDSZNEditPage.entityName}" rendered="false">
+        <rich:panelMenuItem id="editCategoryDSZNMenuItem" binding="#{categoryDiscountDSZNEditPage.mainMenuComponent}"
+                            label="Редактирование" action="#{categoryDiscountDSZNEditPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+    <rich:panelMenuItem id="categoryCreateDSZNMenuItem" binding="#{categoryDiscountDSZNCreatePage.mainMenuComponent}"
+                        label="Регистрация" action="#{categoryDiscountDSZNCreatePage.show}" reRender="workspaceForm" />
+
+</rich:panelMenuGroup>
+
 
 <rich:panelMenuGroup id="ruleGroupMenu" binding="#{mainPage.ruleGroupPage.mainMenuComponent}"
                      label="Правила соц. скидок" rendered="#{mainPage.eligibleToViewRule}">

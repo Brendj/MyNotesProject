@@ -857,7 +857,7 @@ public class RuntimeContext implements ApplicationContextAware {
             String description) {
         Date currentTime = new Date();
         CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules,
-                description, currentTime, currentTime);
+                description, currentTime, currentTime, false);
         categoryDiscount.setCategoryType(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         entityManager.persist(categoryDiscount);
         logger.info("Category with name \"" + categoryName + "\" created");

@@ -51,9 +51,6 @@
                                                          target="#{mainPage.categorySelectPage.selectedItem}" />
                         </a4j:support>
                         <rich:column headerClass="column-header">
-                            <h:selectBooleanCheckbox value="#{item.selected}"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.categoryName}" styleClass="output-text" />
                         </rich:column>
                         <f:facet name="footer">

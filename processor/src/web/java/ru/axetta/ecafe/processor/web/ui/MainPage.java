@@ -318,6 +318,7 @@ public class MainPage implements Serializable {
 
     // Category manipulation
     private final BasicWorkspacePage categoryGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage categoryDSZNGroupPage = new BasicWorkspacePage();
     private final ConfirmDeletePage confirmDeletePage = new ConfirmDeletePage();
 
     // Rule manipulation
@@ -8089,6 +8090,16 @@ public class MainPage implements Serializable {
 
     public Object showCategoryGroupPage() {
         currentWorkspacePage = categoryGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BasicWorkspacePage getCategoryDSZNGroupPage() {
+        return categoryDSZNGroupPage;
+    }
+
+    public Object showCategoryDSZNGroupPage() {
+        currentWorkspacePage = categoryDSZNGroupPage;
         updateSelectedMainMenu();
         return null;
     }

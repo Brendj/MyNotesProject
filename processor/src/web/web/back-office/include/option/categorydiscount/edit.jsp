@@ -33,6 +33,8 @@
     <h:selectOneMenu value="#{categoryDiscountEditPage.organizationType}" styleClass="input-text">
         <f:selectItems value="#{categoryDiscountEditPage.organizationItems}" />
     </h:selectOneMenu>
+    <h:outputText escape="true" value="Запрет изменения в АРМ" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{categoryDiscountEditPage.blockedChange}" styleClass="output-text"/>
     <h:outputText escape="true" value="Используется в правилах" styleClass="output-text" />
     <h:panelGroup>
         <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{categoryDiscountEditPage.filter}}" />

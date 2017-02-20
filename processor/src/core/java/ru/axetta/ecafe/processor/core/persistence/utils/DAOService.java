@@ -59,6 +59,12 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<CategoryDiscountDSZN> getCategoryDiscountDSZNList() {
+        TypedQuery<CategoryDiscountDSZN> q = entityManager
+                .createQuery("from CategoryDiscountDSZN order by code", CategoryDiscountDSZN.class);
+        return q.getResultList();
+    }
+
     public List<Contragent> getContragentsWithClassIds(List<Integer> classIds) {
         TypedQuery<Contragent> q = entityManager
                 .createQuery("from Contragent where classId in (:classIds)", Contragent.class);

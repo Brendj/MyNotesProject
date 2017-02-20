@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -1438,6 +1439,31 @@ public class DAOUtils {
         javax.persistence.Query q = entityManager.createQuery("from CategoryDiscount where idOfCategoryDiscount=:idOfCategoryDiscount");
         q.setParameter("idOfCategoryDiscount", idOfCategoryDiscount);
         return (CategoryDiscount)q.getSingleResult();
+    }
+
+    public static CategoryDiscountDSZN findCategoryDiscountDSZNById(EntityManager entityManager, int idOfCategoryDiscountDSZN) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where idOfCategoryDiscountDSZN=:idOfCategoryDiscountDSZN");
+        q.setParameter("idOfCategoryDiscountDSZN", idOfCategoryDiscountDSZN);
+        return (CategoryDiscountDSZN)q.getSingleResult();
+    }
+
+    public static boolean checkCategoryDiscountDSZNByCode(EntityManager entityManager, int code) {
+        javax.persistence.Query q = entityManager.createNativeQuery("SELECT count(1) from cf_categorydiscounts_dszn where code=:code");
+        q.setParameter("code", code);
+        return ((BigInteger)q.getSingleResult()).intValue() == 1;
+    }
+
+    public static long nextVersionByCategoryDiscountDSZN(EntityManager entityManager){
+        long version = 0L;
+        javax.persistence.Query query = entityManager.createNativeQuery("select cd.version from CF_CategoryDiscounts_DSZN as cd "
+                + "order by cd.version desc limit 1 for update");
+        try {
+            Object o = query.getSingleResult();
+            if(o!=null){
+                version = Long.valueOf(o.toString())+1;
+            }
+        } catch (NoResultException ignore) {}
+        return version;
     }
 
     public static void deleteCategoryDiscount(Session session, long id) {

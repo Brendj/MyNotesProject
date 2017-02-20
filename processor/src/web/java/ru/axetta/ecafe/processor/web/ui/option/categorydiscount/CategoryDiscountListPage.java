@@ -6,29 +6,22 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
-import org.hibernate.Criteria;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -37,13 +30,13 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
     @Autowired
     private DAOService service;
 
-    private List<CategoryDiscount> items = Collections.emptyList();
+    private List<CategoryDiscountItem> items = Collections.emptyList();
 
     public String getPageTitle() {
         return super.getPageTitle() + String.format(" (%d)", items.size());
     }
 
-    public List<CategoryDiscount> getItems() {
+    public List<CategoryDiscountItem> getItems() {
         return items;
     }
 
@@ -60,7 +53,6 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             DAOUtils.deleteCategoryDiscount(persistenceSession, confirmDeletePage.getEntityId());
-            //categoryListPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
@@ -85,8 +77,93 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
     }
 
     private void reload() {
-        items = service.getCategoryDiscountList();
+        List<CategoryDiscount> list = service.getCategoryDiscountList();
+        items = new ArrayList<CategoryDiscountItem>();
+        for(CategoryDiscount categoryDiscount : list) {
+            items.add(new CategoryDiscountItem(categoryDiscount));
+        }
     }
 
+    public static class CategoryDiscountItem {
+        private long idOfCategoryDiscount;
+        private String categoryName;
+        private String description;
+        private String organizationTypeString;
+        private String categoriesDSZN;
+        private boolean blockedChange;
+
+        public CategoryDiscountItem(CategoryDiscount categoryDiscount) {
+            this.idOfCategoryDiscount = categoryDiscount.getIdOfCategoryDiscount();
+            this.categoryName = categoryDiscount.getCategoryName();
+            this.description = categoryDiscount.getDescription();
+            this.organizationTypeString = categoryDiscount.getOrganizationTypeString();
+            if(categoryDiscount.getCategoriesDiscountDSZN() != null
+                    && categoryDiscount.getCategoriesDiscountDSZN().size() > 0) {
+                Map<Integer, String> map = new TreeMap<Integer, String>();
+                for (CategoryDiscountDSZN discountDSZN : categoryDiscount.getCategoriesDiscountDSZN()) {
+                    map.put(discountDSZN.getCode(), discountDSZN.getDescription());
+                }
+                StringBuilder sb = new StringBuilder();
+                for (Integer code : map.keySet()) {
+                    sb.append(code);
+                    sb.append(" - ");
+                    sb.append(map.get(code));
+                    sb.append("; ");
+                }
+                this.categoriesDSZN = sb.substring(0, sb.length() - 2);
+            } else {
+                this.categoriesDSZN = "";
+            }
+            this.blockedChange = categoryDiscount.getBlockedChange();
+        }
+
+        public long getIdOfCategoryDiscount() {
+            return idOfCategoryDiscount;
+        }
+
+        public void setIdOfCategoryDiscount(long idOfCategoryDiscount) {
+            this.idOfCategoryDiscount = idOfCategoryDiscount;
+        }
+
+        public String getCategoryName() {
+            return categoryName;
+        }
+
+        public void setCategoryName(String categoryName) {
+            this.categoryName = categoryName;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getOrganizationTypeString() {
+            return organizationTypeString;
+        }
+
+        public void setOrganizationTypeString(String organizationTypeString) {
+            this.organizationTypeString = organizationTypeString;
+        }
+
+        public String getCategoriesDSZN() {
+            return categoriesDSZN;
+        }
+
+        public void setCategoriesDSZN(String categoriesDSZN) {
+            this.categoriesDSZN = categoriesDSZN;
+        }
+
+        public boolean isBlockedChange() {
+            return blockedChange;
+        }
+
+        public void setBlockedChange(boolean blockedChange) {
+            this.blockedChange = blockedChange;
+        }
+    }
 
 }

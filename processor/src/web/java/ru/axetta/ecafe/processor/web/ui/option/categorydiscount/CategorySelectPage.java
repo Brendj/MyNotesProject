@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,26 +37,15 @@ public class CategorySelectPage extends BasicPage {
 
         private final Long idOfCategory;
         private final String categoryName;
-        private Boolean selected;
 
         public Item() {
             this.idOfCategory = null;
             this.categoryName = null;
-            this.selected = null;
         }
 
         public Item(CategoryDiscount category) {
             this.idOfCategory = category.getIdOfCategoryDiscount();
             this.categoryName = category.getCategoryName();
-            this.selected = false;
-        }
-
-        public Boolean getSelected() {
-            return selected;
-        }
-
-        public void setSelected(Boolean selected) {
-            this.selected = selected;
         }
 
         public Long getIdOfCategory() {
@@ -70,7 +60,6 @@ public class CategorySelectPage extends BasicPage {
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
     private List<Item> items = Collections.emptyList();
     private Item selectedItem = new Item();
-    private List<Item> selItems = Collections.emptyList();
     private String filter;
 
     public void pushCompleteHandler(CompleteHandler handler) {
@@ -79,31 +68,9 @@ public class CategorySelectPage extends BasicPage {
 
     public void completeCategorySelection(Session session) throws Exception {
         if (!completeHandlers.empty()) {
-           for (Item selectedItems: selItems) {
-               if(selectedItems.getSelected()){
-                   completeHandlers.peek().completeCategorySelection(session, selectedItems.getIdOfCategory());
-                   completeHandlers.pop();
-               }
-           }
+            completeHandlers.peek().completeCategorySelection(session, selectedItem.getIdOfCategory());
+            completeHandlers.pop();
         }
-    }
-
-    public String getSelectedItems(){
-         StringBuilder sb = new StringBuilder();
-         for (Item item: this.getSelItems()){
-             sb.append(item.getIdOfCategory());
-             sb.append(",");
-         }
-
-         return sb.toString();
-    }
-
-    public List<Item> getSelItems() {
-        return selItems;
-    }
-
-    public void setSelItems(List<Item> selItems) {
-        this.selItems = selItems;
     }
 
     public List<Item> getItems() {
@@ -120,7 +87,6 @@ public class CategorySelectPage extends BasicPage {
         } else {
             this.selectedItem = selected;
         }
-        selItems.add(this.selectedItem);
     }
 
     public String getFilter() {
@@ -147,6 +113,8 @@ public class CategorySelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("categoryName", filter, MatchMode.ANYWHERE));
         }
+        criteria.add(Restrictions.gt("idOfCategoryDiscount", 0L));
+        criteria.add(Restrictions.eq("categoryType", CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT));
         return criteria.list();
     }
 

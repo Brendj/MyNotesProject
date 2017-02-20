@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
-  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2017. Axetta LLC. All Rights Reserved.
   --%>
 
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
@@ -9,65 +9,49 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%-- Категории --%>
-<%--@elvariable id="categoryDiscountListPage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountListPage"--%>
-<h:panelGrid id="categoryListPanel" binding="#{categoryDiscountListPage.pageComponent}" styleClass="borderless-grid">
-    <rich:dataTable id="categoryTable" value="#{categoryDiscountListPage.items}" var="item" rows="20"
+<%--@elvariable id="categoryDiscountDSZNListPage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscountdszn.CategoryDiscountDSZNListPage"--%>
+<h:panelGrid id="categoryDSZNListPanel" binding="#{categoryDiscountDSZNListPage.pageComponent}" styleClass="borderless-grid">
+    <rich:dataTable id="categoryDSZNTable" value="#{categoryDiscountDSZNListPage.items}" var="item" rows="20"
                     columnClasses="left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" style="text-align:right">
             <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор" />
+                <h:outputText escape="true" value="Код льготы ДСЗН" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.idOfCategoryDiscount}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.code}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Наименование" />
-                </h:panelGroup>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{item.categoryName}" />
-        </rich:column>
-        <rich:column headerClass="center-aligned-column" style="text-align:left">
-            <f:facet name="header">
-                <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Описание" />
+                    <h:outputText styleClass="output-text" escape="true" value="Описание льготы ДСЗН" />
                 </h:panelGroup>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{item.description}" />
         </rich:column>
-        <rich:column headerClass="center-aligned-column" style="text-align:left" width="300">
+        <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Льготы ДСЗН" />
+                    <h:outputText styleClass="output-text" escape="true" value="ИД льготы ИСПП" />
                 </h:panelGroup>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{item.categoriesDSZN}" />
+            <h:outputText styleClass="output-text" value="#{item.idOfCategoryDiscount}" />
         </rich:column>
         <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Тип организации" />
+                    <h:outputText styleClass="output-text" escape="true" value="Наименование льготы ИСПП" />
                 </h:panelGroup>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{item.organizationTypeString}" />
-        </rich:column>
-        <rich:column headerClass="center-aligned-column" style="text-align:left">
-            <f:facet name="header">
-                <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Запрет изменения в АРМ" />
-                </h:panelGroup>
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{item.blockedChange}" styleClass="output-text" disabled="true"/>
+            <h:outputText styleClass="output-text" value="#{item.categoryName}" />
         </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                      style="text-align:center">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryDiscountDSZNEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item.idOfCategoryDiscount}" target="#{categoryDiscountEditPage.idOfCategoryDiscount}" />
+                <f:setPropertyActionListener value="#{item.idOfCategoryDiscountDSZN}" target="#{categoryDiscountDSZNEditPage.idOfCategoryDiscountDSZN}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
@@ -78,14 +62,14 @@
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
                              oncomplete="#{rich:component('confirmDeletePanel')}.show();">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{categoryDiscountListPage}"
+                <f:setPropertyActionListener value="#{categoryDiscountDSZNListPage}"
                                              target="#{confirmDeletePage.listener}" />
                 <f:setPropertyActionListener value="#{item.idOfCategoryDiscount }"
                                              target="#{confirmDeletePage.entityId}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="categoryTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="categoryDSZNTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -102,5 +86,4 @@
                        warnClass="warn-messages" />
     </h:panelGrid>
 
-    <!--h:commandButton value="Выгрузить в CSV" action="{mainPage.showCategoryCSVList}" styleClass="command-button" /-->
 </h:panelGrid>

@@ -24,8 +24,10 @@ public class CategoryDiscount {
     private String discountRules;
     private CategoryDiscountEnumType categoryType;
     private Integer orgType;
+    private Boolean blockedChange;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
+    private Set<CategoryDiscountDSZN> categoriesDiscountDSZN = new HashSet<CategoryDiscountDSZN>();
 
     public final static String SCHOOL_KINDERGARTEN_STRING = "ОУ + ДОУ";
     public final static Integer SCHOOL_KINDERGARTEN_ID = -1;
@@ -74,18 +76,26 @@ public class CategoryDiscount {
         this.discountRules = discountRules;
     }
 
+    public Boolean getBlockedChange() {
+        return blockedChange;
+    }
+
+    public void setBlockedChange(Boolean blockedChange) {
+        this.blockedChange = blockedChange;
+    }
 
     public CategoryDiscount() {
     }
 
     public CategoryDiscount(long idOfCategoryDiscount, String categoryName, String discountRules,String description, Date createdDate,
-            Date lastUpdate) {
+            Date lastUpdate, Boolean blockedChange) {
         this.idOfCategoryDiscount = idOfCategoryDiscount;
         this.categoryName = categoryName;
         this.description = description;
         this.createdDate = createdDate;
         this.lastUpdate = lastUpdate;
-        this.discountRules=discountRules;
+        this.discountRules = discountRules;
+        this.blockedChange = blockedChange;
     }
 
     public long getIdOfCategoryDiscount() {
@@ -127,7 +137,16 @@ public class CategoryDiscount {
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
-                /*
+
+    public Set<CategoryDiscountDSZN> getCategoriesDiscountDSZN() {
+        return categoriesDiscountDSZN;
+    }
+
+    public void setCategoriesDiscountDSZN(Set<CategoryDiscountDSZN> categoriesDiscountDSZN) {
+        this.categoriesDiscountDSZN = categoriesDiscountDSZN;
+    }
+
+    /*
     private Set<DiscountRule> getDiscountRulesInternal() {
         return discountRules;
     }
