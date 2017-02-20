@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN" table="CF_CategoryDiscounts_DSZN">
+        <id name="idOfCategoryDiscountDSZN" column="IdOfCategoryDiscountDSZN" type="integer">
+            <generator class="identity"/>
+        </id>
+        <property name="code" column="Code" type="integer" not-null="true" />
+        <property name="description" column="Description" type="string" length="512" not-null="true" />
+        <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount" lazy="false"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+    </class>
+</hibernate-mapping>
