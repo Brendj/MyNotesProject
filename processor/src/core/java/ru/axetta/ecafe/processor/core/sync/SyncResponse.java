@@ -353,6 +353,7 @@ public class SyncResponse {
             private final Date birthDate;
             private final String benefitOnAdmission;
             private final String ageTypeGroup;
+            private final Long balanceToNotify;
 
 
             public Item(Client client, int clientType) {
@@ -388,6 +389,7 @@ public class SyncResponse {
                 this.birthDate = client.getBirthDate();
                 this.benefitOnAdmission = client.getBenefitOnAdmission();
                 this.ageTypeGroup = client.getAgeTypeGroup();
+                this.balanceToNotify = client.getBalanceToNotify();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -532,6 +534,9 @@ public class SyncResponse {
                 if (this.ageTypeGroup != null) {
                     element.setAttribute("AgeTypeGroup", this.ageTypeGroup);
                 }
+                if (this.balanceToNotify != null) {
+                    element.setAttribute("BalanceToNotify", String.valueOf(this.balanceToNotify));
+                }
                 return element;
             }
 
@@ -542,8 +547,12 @@ public class SyncResponse {
                         + ", idDocument='" + idDocument + '\'' + ", address='" + address + '\'' + ", phone='" + phone
                         + '\'' + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", contractState="
                         + contractState + ", freePayMaxCount=" + freePayMaxCount + ", categoriesDiscounts='"
-                        + categoriesDiscounts + '\''+", clientGroup="+ clientGroup+'}';
+                        + categoriesDiscounts + '\''+", clientGroup="+ clientGroup+", balanceToNotify=" + balanceToNotify + '}';
 
+            }
+
+            public Long getBalanceToNotify() {
+                return balanceToNotify;
             }
         }
 

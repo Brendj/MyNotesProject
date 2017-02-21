@@ -3544,6 +3544,9 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getIsUseLastEEModeForPlan() != null) {
                     client.setUseLastEEModeForPlan(clientParamItem.getIsUseLastEEModeForPlan());
                 }
+                if (clientParamItem.getBalanceToNotify() != null) {
+                    client.setBalanceToNotify((clientParamItem.getBalanceToNotify()));
+                }
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
