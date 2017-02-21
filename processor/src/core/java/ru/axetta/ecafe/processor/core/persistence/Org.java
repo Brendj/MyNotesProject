@@ -112,6 +112,7 @@ public class Org implements Serializable {
     private Boolean commodityAccounting;
     private Boolean disableEditingClientsFromAISReestr;
     private Boolean usePaydableSubscriptionFeeding;
+    private Boolean variableFeeding;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
     private OrganizationStatus status;
@@ -1012,5 +1013,13 @@ public class Org implements Serializable {
 
     public void setOrgContractId(OrgContractId orgContractId) {
         this.orgContractId = orgContractId;
+    }
+
+    public Boolean getVariableFeeding() {
+        return variableFeeding;
+    }
+
+    public void setVariableFeeding(Boolean variableFeeding) {
+        this.variableFeeding = variableFeeding;
     }
 }

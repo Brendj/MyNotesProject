@@ -89,6 +89,10 @@
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
+        <property name="variableFeeding" column="VariableFeeding"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+
         <property name="type" column="OrganizationType">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationType</param>

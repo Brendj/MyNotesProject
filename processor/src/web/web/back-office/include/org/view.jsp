@@ -177,6 +177,9 @@
     <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.photoRegistry}"  styleClass="input-text" disabled="true"  />
 
+    <h:outputText escape="true" value="Включить вариативное питание" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.variableFeeding}"  styleClass="input-text" disabled="true"  />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

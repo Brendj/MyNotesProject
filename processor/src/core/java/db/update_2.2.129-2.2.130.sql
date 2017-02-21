@@ -25,3 +25,5 @@ CREATE TABLE cf_categorydiscounts_dszn
 --Блокировка изменения льгот ИСПП у клиентов в АРМ
 ALTER TABLE cf_categorydiscounts ADD COLUMN blockedchange integer NOT NULL DEFAULT 0;
 
+--Флаг включения вариативного питания на карточке организации
+alter table cf_orgs add column variablefeeding integer not null default 0;

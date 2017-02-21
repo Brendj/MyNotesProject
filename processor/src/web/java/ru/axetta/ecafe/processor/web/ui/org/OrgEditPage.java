@@ -88,6 +88,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private OrganizationSecurityLevel securityLevel;
 
     private Boolean photoRegistry;
+    private Boolean variableFeeding;
 
     private Integer refectoryType;
     private List<SelectItem> refectoryTypeComboMenuItems;
@@ -344,6 +345,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
         org.setPhotoRegistryDirective(photoD);
+        org.setVariableFeeding(variableFeeding);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -487,7 +489,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.oneActiveCard = org.getOneActiveCard();
         this.securityLevel = org.getSecurityLevel();
         this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
-
+        this.variableFeeding = org.getVariableFeeding();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1007,6 +1009,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setModeContragentSelect(String modeContragentSelect) {
         this.modeContragentSelect = modeContragentSelect;
+    }
+
+    public Boolean getVariableFeeding() {
+        return variableFeeding;
+    }
+
+    public void setVariableFeeding(Boolean variableFeeding) {
+        this.variableFeeding = variableFeeding;
     }
 
     public static class ContragentItem {

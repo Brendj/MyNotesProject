@@ -62,7 +62,8 @@ public class OrganizationStructure implements AbstractToElement{
             OrganizationStructureItem item = new OrganizationStructureItem(o.getIdOfOrg(), o.getType().ordinal(),
                     o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
-                    getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(), o.getOrgStructureVersion());
+                    getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(),
+                    o.getVariableFeeding(), o.getOrgStructureVersion());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
     }
@@ -90,10 +91,11 @@ public class OrganizationStructure implements AbstractToElement{
         private final String nCounty;
         private final Long version;
         private final Integer state;
+        private final Boolean variableFeeding;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
                 String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId,Long defaultSupplier, Boolean isFriendly,
-                String nCounty, Integer state, Long version) {
+                String nCounty, Integer state, Boolean variableFeeding, Long version) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -107,6 +109,7 @@ public class OrganizationStructure implements AbstractToElement{
             this.isFriendly = isFriendly;
             this.nCounty = nCounty;
             this.state = state;
+            this.variableFeeding = variableFeeding;
             this.version = version;
         }
 
@@ -130,6 +133,7 @@ public class OrganizationStructure implements AbstractToElement{
             element.setAttribute("Fr", isFriendly ? "1" : "0");
             element.setAttribute("NCounty", nCounty);
             element.setAttribute("State", Integer.toString(state));
+            element.setAttribute("VariableFeeding", variableFeeding ? "1" : "0");
             return element;
         }
 
