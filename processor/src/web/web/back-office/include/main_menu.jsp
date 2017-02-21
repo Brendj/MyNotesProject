@@ -564,6 +564,9 @@
     <rich:panelMenuItem id="createBasicGoodMenuItem" binding="#{basicGoodCreatePage.mainMenuComponent}"
                         label="Регистрация" action="#{basicGoodCreatePage.show}" reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="loadingElementsOfBasicGoodsMenuItem" binding="#{mainPage.loadingElementsOfBasicGoodsPage.mainMenuComponent}"
+                        label="Загрузка элементов Базовых Товаров из csv" action="#{mainPage.loadingElementsOfBasicGoodsPage.show}" reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 

@@ -2624,4 +2624,14 @@ public class DAOUtils {
         q.setParameter("idOfMainOrg", idOfMainOrg);
         q.executeUpdate();
     }
+
+    //Конфигурация провайдера
+    public static ConfigurationProvider findConfigurationProviderByName(Session session, String nameOfGood) {
+        Criteria criteria = session.createCriteria(ConfigurationProvider.class);
+        criteria.add(Restrictions.eq("name", nameOfGood));
+
+        ConfigurationProvider configurationProvider = (ConfigurationProvider) criteria.uniqueResult();
+
+        return configurationProvider;
+    }
 }

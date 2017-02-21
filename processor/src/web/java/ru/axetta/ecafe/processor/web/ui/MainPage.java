@@ -28,6 +28,7 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountListPage;
 import ru.axetta.ecafe.processor.web.ui.client.*;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.*;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.LoadingElementsOfBasicGoodsPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.event.*;
@@ -410,6 +411,8 @@ public class MainPage implements Serializable {
     private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
     private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
     private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
+
+    private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -3199,6 +3202,10 @@ public class MainPage implements Serializable {
         return "showGroupControlBenefitsCSVList";
     }
 
+    public String showLoadingElementsOfBasicGoodsCSVList() {
+        return "showLoadingElementsOfBasicGoodsCSVList";
+    }
+
     public String showGroupControlSubscriptionsCSVList() {
         return "showGroupControlSubscriptionsCSVList";
     }
@@ -4649,6 +4656,28 @@ public class MainPage implements Serializable {
         }
     }
 
+    public void basicGoodsLoadFileListener(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        try {
+            if (item.isTempFile()) {
+                ru.axetta.ecafe.processor.core.mail.File file = new ru.axetta.ecafe.processor.core.mail.File();
+                file.setFile(item.getFile());
+                file.setFileName(item.getFileName());
+                file.setContentType(item.getContentType());
+                loadingElementsOfBasicGoodsPage.setUploadItem(item);
+                loadingElementsOfBasicGoodsPage.getFiles().add(file);
+            } else {
+                throw new Exception("Invalid file");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load file", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(),
+                            null));
+        }
+    }
+
     public void groupControlBenefitsGenerate() throws Exception {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         BufferedReader bufferedReader = null;
@@ -4660,6 +4689,13 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         cancelCategoryBenefitsPage.cancelCategoryBenefitsGenerate(runtimeContext);
+    }
+
+    public void loadingElementsOfBasicGoodsGenerate() throws Exception {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        BufferedReader bufferedReader = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        loadingElementsOfBasicGoodsPage.loadingElementsOfBasicGoodsGenerate(loadingElementsOfBasicGoodsPage.getUploadItem(), runtimeContext);
     }
 
     public void reportTemplateLoadFileListener(UploadEvent event) {
@@ -5917,6 +5953,10 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getElectronicReconciliationReportGroupMenu() {
         return electronicReconciliationReportGroupMenu;
+    }
+
+    public LoadingElementsOfBasicGoodsPage getLoadingElementsOfBasicGoodsPage() {
+        return loadingElementsOfBasicGoodsPage;
     }
 
     public BasicWorkspacePage getPaidFoodGroupMenu() {

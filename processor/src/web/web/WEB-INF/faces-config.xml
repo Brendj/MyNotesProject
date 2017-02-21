@@ -329,6 +329,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showLoadingElementsOfBasicGoodsCSVList</from-outcome>
+            <to-view-id>/back-office/loading_elements_of_basic_goods_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showClientUpdateLoadResultCSVList</from-outcome>
             <to-view-id>/back-office/client_update_load_result_csv_list.jsp</to-view-id>
             <redirect/>
