@@ -27,3 +27,6 @@ ALTER TABLE cf_categorydiscounts ADD COLUMN blockedchange integer NOT NULL DEFAU
 
 --Флаг включения вариативного питания на карточке организации
 alter table cf_orgs add column variablefeeding integer not null default 0;
+
+--Флаг включения здание работает в летний период
+alter table cf_orgs add column isWorkInSummerTime integer not null default 0;

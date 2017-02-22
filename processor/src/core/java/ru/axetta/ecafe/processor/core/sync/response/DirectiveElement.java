@@ -86,6 +86,10 @@ public class DirectiveElement implements AbstractToElement{
             }
         }
 
+        if (directivesRequest.getIsWorkInSummerTime() != null) {
+            DAOService.getInstance().saveWorkInSummerTimeDirective(org.getIdOfOrg(), directivesRequest.getIsWorkInSummerTime());
+        }
+
         Boolean disEditServicesInfoFlag = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         directiveItemList.add(new DirectiveItem("DISABLE_EDIT_INFORMATION_SERVICES_FOR_CLIENTS", disEditServicesInfoFlag ? "1":"0"));
 

@@ -134,7 +134,7 @@ public class Org implements Serializable {
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
-
+    private Boolean isWorkInSummerTime;
 
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
@@ -1021,5 +1021,13 @@ public class Org implements Serializable {
 
     public void setVariableFeeding(Boolean variableFeeding) {
         this.variableFeeding = variableFeeding;
+    }
+
+    public Boolean getIsWorkInSummerTime() {
+        return isWorkInSummerTime;
+    }
+
+    public void setIsWorkInSummerTime(Boolean workInSummerTime) {
+        isWorkInSummerTime = workInSummerTime;
     }
 }

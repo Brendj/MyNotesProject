@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.request;
 
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
@@ -16,10 +17,20 @@ public class DirectivesRequest implements SectionRequest {
 
     public static final String SECTION_NAME = "DirectivesRequest";
     private final Boolean tradeConfigChangedSuccess;
+    private final Integer isWorkInSummerTime;
 
     public DirectivesRequest(Node directivesRequestNode) throws Exception {
-        this.tradeConfigChangedSuccess = XMLUtils.findFirstChildElement(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
+        this.tradeConfigChangedSuccess =
+                XMLUtils.findFirstChildElement(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
+        this.isWorkInSummerTime = null;
     }
+
+    public DirectivesRequest(Node directivesRequestNode, Integer isWorkInSummerTime) throws Exception {
+        this.tradeConfigChangedSuccess =
+                XMLUtils.findFirstChildElement(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
+        this.isWorkInSummerTime = isWorkInSummerTime;
+    }
+
 
     @Override
     public String getRequestSectionName() {
@@ -42,13 +53,29 @@ public class DirectivesRequest implements SectionRequest {
         public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
             Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
             if (sectionElement != null) {
+                Node isWorkInSummerTimeNode = XMLUtils.findFirstChildElement(sectionElement, "IS_WORK_IN_SUMMER_TIME");
+                NamedNodeMap attributes = isWorkInSummerTimeNode.getAttributes();
+                String value = attributes.getNamedItem("value").getTextContent();
+                if (value.equals("0")) {
+                    return new DirectivesRequest(sectionElement, 0);
+                }
+
+                if (value.equals("1")) {
+                    return new DirectivesRequest(sectionElement, 1);
+                }
+
                 return new DirectivesRequest(sectionElement);
-            } else
+            } else {
                 return null;
+            }
         }
     }
 
     public Boolean getTradeConfigChangedSuccess() {
         return tradeConfigChangedSuccess;
+    }
+
+    public Integer getIsWorkInSummerTime() {
+        return isWorkInSummerTime;
     }
 }

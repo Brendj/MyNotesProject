@@ -2321,4 +2321,11 @@ public class DAOService {
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
     }
+
+    public void saveWorkInSummerTimeDirective(Long idOfOrg, Integer value) {
+        Query q = entityManager.createNativeQuery("update cf_orgs set isWorkInSummerTime = :value where IdOfOrg = :idOfOrg");
+        q.setParameter("value", value);
+        q.setParameter("idOfOrg", idOfOrg);
+        q.executeUpdate();
+    }
 }

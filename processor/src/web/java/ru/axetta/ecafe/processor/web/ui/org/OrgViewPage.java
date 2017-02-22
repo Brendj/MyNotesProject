@@ -82,6 +82,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String securityLevel;
     private Boolean photoRegistry;
     private Boolean variableFeeding;
+    private Boolean isWorkInSummerTime;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -246,6 +247,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.securityLevel = org.getSecurityLevel().toString();
         this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
         this.variableFeeding = org.getVariableFeeding();
+        this.isWorkInSummerTime = org.getIsWorkInSummerTime();
     }
 
     public String getFilterOrgs() {
@@ -610,5 +612,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public Boolean getVariableFeeding() {
         return variableFeeding;
+    }
+
+    public Boolean getWorkInSummerTime() {
+        return isWorkInSummerTime;
+    }
+
+    public void setWorkInSummerTime(Boolean workInSummerTime) {
+        isWorkInSummerTime = workInSummerTime;
     }
 }
