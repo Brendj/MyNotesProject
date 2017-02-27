@@ -181,7 +181,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.variableFeeding}"  styleClass="input-text" disabled="true"  />
 
     <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.openDuringTheSummer}" styleClass="input-text" disabled="true" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
