@@ -133,7 +133,7 @@ public class OrganizationStructure implements AbstractToElement{
             element.setAttribute("Fr", isFriendly ? "1" : "0");
             element.setAttribute("NCounty", nCounty);
             element.setAttribute("State", Integer.toString(state));
-            element.setAttribute("VariableFeeding", variableFeeding ? "1" : "0");
+            element.setAttribute("UseVariableFeeding", variableFeeding ? "1" : "0");
             return element;
         }
 
