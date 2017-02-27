@@ -57,6 +57,9 @@ public class DirectiveElement implements AbstractToElement{
         Boolean usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         directiveItemList.add(new DirectiveItem("UsePaydableSubscriptionFeeding", usePaydableSubscriptionFeeding?"1":"0"));
 
+        Boolean useVariableDiscountFeeding = org.getVariableFeeding();
+        directiveItemList.add(new DirectiveItem("UseVariableDiscountFeeding", useVariableDiscountFeeding?"1":"0"));
+
         Boolean usePlanOrders = org.getUsePlanOrders();
         directiveItemList.add(new DirectiveItem("UsePlanOrders",usePlanOrders?"1":"0"));
 
