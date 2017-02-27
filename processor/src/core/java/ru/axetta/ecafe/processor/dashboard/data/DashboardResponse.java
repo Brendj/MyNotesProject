@@ -103,6 +103,8 @@ public class DashboardResponse {
         private Long numberOfClientsWithoutCard;
         //Long numberOfVendingOrders;
 
+        private String isWorkInSummerTime;
+
         public long getIdOfOrg() {
             return idOfOrg;
         }
@@ -246,6 +248,14 @@ public class DashboardResponse {
 
         public Long getNumberOfClientsWithoutCard() {
             return numberOfClientsWithoutCard;
+        }
+
+        public String getIsWorkInSummerTime() {
+            return isWorkInSummerTime;
+        }
+
+        public void setIsWorkInSummerTime(String isWorkInSummerTime) {
+            this.isWorkInSummerTime = isWorkInSummerTime;
         }
 
         public double getNumberOfStudentsWithEnterEventsPercent() {

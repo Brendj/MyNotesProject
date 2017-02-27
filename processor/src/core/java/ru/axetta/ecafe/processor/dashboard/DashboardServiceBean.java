@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.dashboard;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -188,7 +190,7 @@ public class DashboardServiceBean {
         def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
-            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.orgSync.lastSuccessfulBalanceSync FROM Org org WHERE 1 = 1";
+            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.orgSync.lastSuccessfulBalanceSync, org.isWorkInSummerTime FROM Org org WHERE 1 = 1";
             if (idOfOrg != null) {
                 queryText += " AND org.idOfOrg = :idOfOrg";
             }
@@ -220,6 +222,11 @@ public class DashboardServiceBean {
                 statItem.setOrgLocation((String) result[n++]);
                 statItem.setOrgTag((String) result[n++]);
                 statItem.setOrgNameNumber(Org.extractOrgNumberFromName(statItem.getOrgName()));
+                if ((Boolean) result[result.length - 1]) {
+                    statItem.setIsWorkInSummerTime("Да");
+                } else {
+                    statItem.setIsWorkInSummerTime("Нет");
+                }
                 //statItem.setLastSuccessfulBalanceSyncTime((Date) result[n++]);
             }
             ////
