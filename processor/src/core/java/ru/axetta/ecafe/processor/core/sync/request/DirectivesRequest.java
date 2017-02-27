@@ -54,14 +54,17 @@ public class DirectivesRequest implements SectionRequest {
             Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
             if (sectionElement != null) {
                 Node isWorkInSummerTimeNode = XMLUtils.findFirstChildElement(sectionElement, "IS_WORK_IN_SUMMER_TIME");
-                NamedNodeMap attributes = isWorkInSummerTimeNode.getAttributes();
-                String value = attributes.getNamedItem("value").getTextContent();
-                if (value.equals("0")) {
-                    return new DirectivesRequest(sectionElement, 0);
-                }
 
-                if (value.equals("1")) {
-                    return new DirectivesRequest(sectionElement, 1);
+                if (isWorkInSummerTimeNode != null) {
+                    NamedNodeMap attributes = isWorkInSummerTimeNode.getAttributes();
+                    String value = attributes.getNamedItem("value").getTextContent();
+                    if (value.equals("0")) {
+                        return new DirectivesRequest(sectionElement, 0);
+                    }
+
+                    if (value.equals("1")) {
+                        return new DirectivesRequest(sectionElement, 1);
+                    }
                 }
 
                 return new DirectivesRequest(sectionElement);
