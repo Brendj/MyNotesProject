@@ -1,7 +1,5 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding;
 
-import com.google.common.collect.Lists;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
@@ -10,7 +8,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -54,6 +51,7 @@ public class SubscriptionFeeding extends DistributedObject{
     private Staff staff;
     private String guidOfStaff;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
+    private SubscriptionFeedingType feedingType;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -69,6 +67,7 @@ public class SubscriptionFeeding extends DistributedObject{
         projectionList.add(Projections.property("wasSuspended"), "wasSuspended");
         projectionList.add(Projections.property("dateCreateService"), "dateCreateService");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
+        projectionList.add(Projections.property("feedingType"), "feedingType");
         criteria.setProjection(projectionList);
     }
 
@@ -124,6 +123,7 @@ public class SubscriptionFeeding extends DistributedObject{
         if (guidOfStaff != null) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
         }
+        XMLUtils.setAttributeIfNotNull(element, "Type", feedingType.ordinal());
     }
 
     @Override
@@ -175,6 +175,11 @@ public class SubscriptionFeeding extends DistributedObject{
             }
         }
 
+        Integer intType = XMLUtils.getIntegerAttributeValue(node, "Type");
+        if(intType != null){
+            setFeedingType(SubscriptionFeedingType.values()[intType]);
+        }
+
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
 
         setSendAll(SendToAssociatedOrgs.SendToSelf);
@@ -193,6 +198,7 @@ public class SubscriptionFeeding extends DistributedObject{
         setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
         setStaff(((SubscriptionFeeding) distributedObject).getStaff());
         setGuidOfStaff(((SubscriptionFeeding) distributedObject).getGuidOfStaff());
+        setFeedingType(((SubscriptionFeeding) distributedObject).getFeedingType());
     }
 
     @Override
@@ -310,5 +316,13 @@ public class SubscriptionFeeding extends DistributedObject{
                 "guid=" + guid +
                 "idOfClient=" + idOfClient +
                 '}';
+    }
+
+    public SubscriptionFeedingType getFeedingType() {
+        return feedingType;
+    }
+
+    public void setFeedingType(SubscriptionFeedingType subscriptionFeedingType) {
+        this.feedingType = subscriptionFeedingType;
     }
 }

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 
 import javax.xml.bind.annotation.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +34,8 @@ public class ComplexInfoExt {
     private Long currentPrice;
     @XmlAttribute(name = "usedSubscriptionFeeding")
     private int usedSubscriptionFeeding;
+    @XmlElement(name = "MenuDetail")
+    private List<MenuItemExt> menuItemExtList;
 
     public ComplexInfoExt() {
     }
@@ -94,5 +97,13 @@ public class ComplexInfoExt {
 
     public void setUsedSubscriptionFeeding(int usedSubscriptionFeeding) {
         this.usedSubscriptionFeeding = usedSubscriptionFeeding;
+    }
+
+    public List<MenuItemExt> getMenuItemExtList() {
+        return menuItemExtList;
+    }
+
+    public void setMenuItemExtList(List<MenuItemExt> menuItemExtList) {
+        this.menuItemExtList = menuItemExtList;
     }
 }

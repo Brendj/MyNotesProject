@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeedingType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.OrderPublication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
@@ -151,6 +152,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO = 550L;
     private static final Long RC_CLIENT_PHOTO_UNDER_REGISTRY = 560L;
     private static final Long RC_CLIENT_GUARDIAN_NOT_FOUND = 570L;
+    private static final Long RC_INVALID_OPERATION_VARIABLE_FEEDING = 580L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -181,6 +183,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_DOES_NOT_HAVE_NEW_PHOTO_DESC = "У клиента нет неподтвержденного фото";
     private static final String RC_CLIENT_PHOTO_UNDER_REGISTRY_DESC = "Фото клиента в процессе сверки";
     private static final String RC_CLIENT_GUARDIAN_NOT_FOUND_DESC = "Связка клиент-представитель не найдена";
+    private static final String RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC = "Подписку на вариативное питание приостановить нельзя";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -6239,16 +6242,53 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             Org org = client.getOrg();
-            transaction.commit();
+
             final String groupName = client.getClientGroup().getGroupName();
             final boolean isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES
                   || ClientGroup.predefinedGroupNames().contains(groupName);
             List<ComplexInfo> complexInfoList = DAOReadonlyService.getInstance().findComplexesWithSubFeeding(org, isParent);
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
+            ObjectFactory objectFactory = new ObjectFactory();
             for (ComplexInfo ci : complexInfoList) {
-                list.add(new ComplexInfoExt(ci));
+                List<Long> complexInfoDetailList = DAOService.getInstance().getMenuDetailsIdsByIdOfComplexInfo(ci.getIdOfComplexInfo());
+                List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
+                for (Long id : complexInfoDetailList) {
+                    Criteria criteriaMenuDetails = session.createCriteria(MenuDetail.class);
+                    criteriaMenuDetails.add(Restrictions.eq("idOfMenuDetail", id));
+
+                    MenuDetail menuDetail = (MenuDetail) criteriaMenuDetails.uniqueResult();
+
+                    MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                    menuItemExt.setGroup(menuDetail.getGroupName());
+                    menuItemExt.setName(menuDetail.getMenuDetailName());
+                    menuItemExt.setPrice(menuDetail.getPrice());
+                    menuItemExt.setCalories(menuDetail.getCalories());
+                    menuItemExt.setVitB1(menuDetail.getVitB1());
+                    menuItemExt.setVitB2(menuDetail.getVitB2());
+                    menuItemExt.setVitPp(menuDetail.getVitPp());
+                    menuItemExt.setVitC(menuDetail.getVitC());
+                    menuItemExt.setVitA(menuDetail.getVitA());
+                    menuItemExt.setVitE(menuDetail.getVitE());
+                    menuItemExt.setMinCa(menuDetail.getMinCa());
+                    menuItemExt.setMinP(menuDetail.getMinP());
+                    menuItemExt.setMinMg(menuDetail.getMinMg());
+                    menuItemExt.setMinFe(menuDetail.getMinFe());
+                    menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                    menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                    menuItemExt.setProtein(menuDetail.getProtein());
+                    menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                    menuItemExt.setFat(menuDetail.getFat());
+
+                    menuItemExtList.add(menuItemExt);
+                }
+                ComplexInfoExt complexInfoExt = new ComplexInfoExt(ci);
+                if (menuItemExtList != null) {
+                    complexInfoExt.setMenuItemExtList(menuItemExtList);
+                }
+                list.add(complexInfoExt);
             }
+            transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -7009,6 +7049,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             SubscriptionFeeding subscriptionFeeding =
                   SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, suspendDate);
+            if (subscriptionFeeding.getFeedingType().equals(SubscriptionFeedingType.VARIABLE_TYPE)) {
+                result.resultCode = RC_INVALID_OPERATION_VARIABLE_FEEDING;
+                result.description = RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC;
+                return result;
+            }
 
             DAOService daoService = DAOService.getInstance();
             List<ECafeSettings> settings = daoService

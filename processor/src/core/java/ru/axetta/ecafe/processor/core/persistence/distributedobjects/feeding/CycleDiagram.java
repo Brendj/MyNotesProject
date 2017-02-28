@@ -52,6 +52,7 @@ public class CycleDiagram extends DistributedObject{
     private Staff staff;
     private String guidOfStaff;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
+    private SubscriptionFeedingType feedingType;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -81,6 +82,7 @@ public class CycleDiagram extends DistributedObject{
         projectionList.add(Projections.property("saturdayPrice"), "saturdayPrice");
         projectionList.add(Projections.property("sundayPrice"), "sundayPrice");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
+        projectionList.add(Projections.property("feedingType"), "feedingType");
         criteria.setProjection(projectionList);
     }
 
@@ -164,6 +166,7 @@ public class CycleDiagram extends DistributedObject{
         if (guidOfStaff != null) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
         }
+        XMLUtils.setAttributeIfNotNull(element, "Type", feedingType.ordinal());
     }
 
     @Override
@@ -193,6 +196,11 @@ public class CycleDiagram extends DistributedObject{
             }
         } else {
             throw new DistributedObjectException("StateDiagram is not null");
+        }
+
+        Integer intType = XMLUtils.getIntegerAttributeValue(node, "Type");
+        if(intType != null){
+            setFeedingType(SubscriptionFeedingType.values()[intType]);
         }
 
         setMonday(XMLUtils.getStringAttributeValue(node, "Monday", 255));
@@ -229,6 +237,7 @@ public class CycleDiagram extends DistributedObject{
         setSunday(((CycleDiagram) distributedObject).getSunday());
         setStaff(((CycleDiagram) distributedObject).getStaff());
         setGuidOfStaff(((CycleDiagram) distributedObject).getGuidOfStaff());
+        setFeedingType(((CycleDiagram) distributedObject).getFeedingType());
     }
 
     @Override
@@ -406,5 +415,13 @@ public class CycleDiagram extends DistributedObject{
 
     public void setGuidOfStaff(String guidOfStaff) {
         this.guidOfStaff = guidOfStaff;
+    }
+
+    public SubscriptionFeedingType getFeedingType() {
+        return feedingType;
+    }
+
+    public void setFeedingType(SubscriptionFeedingType feedingType) {
+        this.feedingType = feedingType;
     }
 }
