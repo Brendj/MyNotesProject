@@ -7349,6 +7349,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 diagram.setSunday("");
                 diagram.setSundayPrice("0");
                 diagram.setStaff(null);
+                if (ArrayUtils.contains(orgs_VP_pilot, clientOrg.getIdOfOrg())) {
+                    diagram.setFeedingType(SubscriptionFeedingType.VARIABLE_TYPE);
+                } else {
+                    diagram.setFeedingType(SubscriptionFeedingType.ABON_TYPE);
+                }
                 session.save(diagram);
             } else {
                 // изменяем те что есть
