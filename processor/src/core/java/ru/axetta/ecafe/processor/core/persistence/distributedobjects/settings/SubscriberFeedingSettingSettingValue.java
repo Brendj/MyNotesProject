@@ -30,12 +30,18 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
         this.enableFeeding = values[2].equals("1");
         //this.dayForbidChange = Integer.parseInt(values[3]);
         this.hoursForbidChange = Integer.parseInt(values[3]);
+
         if (values.length < 5) {
             sixWorkWeek = false;
         } else {
             this.sixWorkWeek = values[4].equals("1");
         }
-        this.daysToForbidChangeInPos = Integer.parseInt(values[5]);
+
+        if (values.length < 6) {
+            this.daysToForbidChangeInPos = 0;
+        } else {
+            this.daysToForbidChangeInPos = Integer.parseInt(values[5]);
+        }
     }
 
     @Override
