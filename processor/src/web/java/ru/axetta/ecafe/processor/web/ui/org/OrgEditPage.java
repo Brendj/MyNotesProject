@@ -110,6 +110,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private Boolean payByCashier;
     private Boolean oneActiveCard;
+    private Boolean changesDSZN;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
     private SelectItem[] securityLevels = readSecurityLevels();
@@ -342,6 +343,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
+        org.setChangesDSZN(changesDSZN);
 
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
         org.setPhotoRegistryDirective(photoD);
@@ -1153,6 +1155,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setOneActiveCard(Boolean oneActiveCard) {
         this.oneActiveCard = oneActiveCard;
+    }
+
+    public Boolean getChangesDSZN() {
+        return changesDSZN;
+    }
+
+    public void setChangesDSZN(Boolean changesDSZN) {
+        this.changesDSZN = changesDSZN;
     }
 
     public List<Org> getFriendlyOrganisation() {

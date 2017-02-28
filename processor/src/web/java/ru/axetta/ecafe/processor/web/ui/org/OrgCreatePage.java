@@ -81,6 +81,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean payByCashier;
     private Boolean oneActiveCard;
     private Boolean photoRegistry;
+    private Boolean changesDSZN;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -523,7 +524,7 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
                 this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2, this.btiUnom,  this.btiUnad, this.uniqueAddressId,
-                this.introductionQueue, this.additionalIdBuilding, this.statusDetailing, version);
+                this.introductionQueue, this.additionalIdBuilding, this.statusDetailing, version, changesDSZN);
         org.setCity(city);
         org.setDistrict(district);
         org.setLocation(location);
@@ -703,5 +704,13 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setPhotoRegistry(Boolean photoRegistry) {
         this.photoRegistry = photoRegistry;
+    }
+
+    public Boolean getChangesDSZN() {
+        return changesDSZN;
+    }
+
+    public void setChangesDSZN(Boolean changesDSZN) {
+        this.changesDSZN = changesDSZN;
     }
 }

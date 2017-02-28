@@ -129,6 +129,7 @@ public class Org implements Serializable {
     private OrgContractId orgContractId;
     private Boolean payByCashier;
     private Boolean oneActiveCard;
+    private Boolean changesDSZN; // Получение из реестров льгот ДСЗН
     private Set<Card> cards = new HashSet<Card>();
     private Date updateTime;
 
@@ -141,7 +142,8 @@ public class Org implements Serializable {
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
             String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2,
-            Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing, Long orgStructureVersion) throws Exception {
+            Long btiUnom, Long btiUnad, Long uniqueAddressId, String introductionQueue, Long additionalIdBuilding, String statusDetailing, Long orgStructureVersion,
+            Boolean changesDSZN) throws Exception {
         this.shortName = shortName;
         this.shortNameInfoService = shortNameInfoService;
         this.officialName = officialName;
@@ -187,6 +189,7 @@ public class Org implements Serializable {
         updateTime = new Date();
         this.orgStructureVersion = orgStructureVersion;
         this.tradeAccountConfigChangeDirective = TradeAccountConfigChange.NOT_CHANGED;
+        this.changesDSZN = changesDSZN;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -911,6 +914,14 @@ public class Org implements Serializable {
 
     public void setOneActiveCard(Boolean oneActiveCard) {
         this.oneActiveCard = oneActiveCard;
+    }
+
+    public Boolean getChangesDSZN() {
+        return changesDSZN;
+    }
+
+    public void setChangesDSZN(Boolean changesDSZN) {
+        this.changesDSZN = changesDSZN;
     }
 
     public Set<Card> getCards() {

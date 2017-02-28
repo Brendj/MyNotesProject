@@ -185,6 +185,9 @@
         </a4j:commandButton>
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changesDSZN}"  styleClass="input-text"  />
+
     <h:outputText escape="true" value="Главный корпус" styleClass="output-text" />
     <h:selectBooleanCheckbox disabled="#{mainPage.orgEditPage.mainBuilding}" value="#{mainPage.orgEditPage.mainBuilding}" styleClass="input-text" />
 

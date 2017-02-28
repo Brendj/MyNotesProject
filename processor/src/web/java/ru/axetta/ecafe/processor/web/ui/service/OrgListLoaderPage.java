@@ -273,7 +273,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 Org org = new Org(shortName, shortNameInfoService, officialName, address, shortAddress, officialPerson, "",
                         "", contractTime, OrganizationType.SCHOOL, 0, 0L, "", 0L,
                         0L, defaultSupplier, "", "", "",
-                        "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/", version);
+                        "", "", "", btiUnom,  btiUnad, uniqueAddressId, introductionQueue, additionalId, "/", version, false);
                 org.setCity(city);
                 org.setDistrict(region);
                 org.setLocation("");

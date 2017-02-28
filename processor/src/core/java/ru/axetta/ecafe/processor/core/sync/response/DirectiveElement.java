@@ -73,6 +73,9 @@ public class DirectiveElement implements AbstractToElement{
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
 
+        Boolean changesDSZN = org.getChangesDSZN();
+        directiveItemList.add(new DirectiveItem("DISCOUNTS_BY_DSZN", changesDSZN ? "1" : "0"));
+
         Integer securityModeFlag = org.getSecurityLevel().getCode();
         directiveItemList.add(new DirectiveItem("IS_SECURITY_MODE_FLAG", securityModeFlag.toString()));
 

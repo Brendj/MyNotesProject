@@ -89,6 +89,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private Boolean payByCashier;
     private Boolean oneActiveCard;
+    private Boolean changesDSZN;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
@@ -240,6 +241,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
         this.payByCashier = org.getPayByCashier();
         this.oneActiveCard = org.getOneActiveCard();
+        this.changesDSZN = org.getChangesDSZN();
 
 
         this.interdistrictCouncil = org.getInterdistrictCouncil();
@@ -554,6 +556,10 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public Boolean getOneActiveCard() {
         return oneActiveCard;
+    }
+
+    public Boolean getChangesDSZN() {
+        return changesDSZN;
     }
 
     public String getInterdistrictCouncil() {

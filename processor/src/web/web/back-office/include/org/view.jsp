@@ -130,6 +130,9 @@
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text long-field" />
 
+    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.changesDSZN}"  styleClass="input-text" readonly="true" disabled="true"  />
+
     <h:outputText escape="true" value="Товарный учет" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.commodityAccountingParam?'Включен':'Выключен'}" styleClass="input-text" />
 

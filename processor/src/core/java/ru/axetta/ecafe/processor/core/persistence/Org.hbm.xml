@@ -227,6 +227,8 @@
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="oneActiveCard" column="OneActiveCard"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="changesDSZN" column="ChangesDSZN"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
 
         <set name="cards" inverse="true" cascade="all" lazy="true">
             <key column="IdOfOrg"/>

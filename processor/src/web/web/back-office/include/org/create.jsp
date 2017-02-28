@@ -145,6 +145,8 @@
             <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
         </a4j:commandButton>
     </h:panelGroup>
+    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.changesDSZN}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Пароль для единого входа" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.orgCreatePage.plainSsoPassword}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Подтверждение пароля для единого входа" styleClass="output-text" />
