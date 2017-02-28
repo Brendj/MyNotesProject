@@ -224,7 +224,7 @@ public class ImportRegisterOrgsService {
                 0L, defaultSupplier, orgRegistryChange.getInn(), "", "",
                 "", "", "",
                 orgRegistryChangeItem.getUnom(), orgRegistryChangeItem.getUnad(),
-                orgRegistryChangeItem.getUniqueAddressId(), "", additionalId, "/", 0L);
+                orgRegistryChangeItem.getUniqueAddressId(), "", additionalId, "/", 0L, false);
         org.setCity(orgRegistryChange.getCity());
         org.setDistrict(orgRegistryChange.getRegion());
         org.setLocation("");
