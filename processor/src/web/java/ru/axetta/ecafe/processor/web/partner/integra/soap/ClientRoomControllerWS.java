@@ -67,6 +67,7 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -192,6 +193,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SectionType.ACCOUNT_OPERATIONS_REGISTRY, SectionType.ACCOUNTS_REGISTRY, SectionType.ORGANIZATIONS_STRUCTURE, SectionType.CLIENT_REGISTRY));
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
+
+    private final long[] orgs_VP_pilot = {697, 748, 1830, 1831, 1832, 2499};
 
     private static final String QUERY_PUBLICATION_LIST =
             "select result.*, org.shortname from " +
@@ -6246,7 +6249,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             final String groupName = client.getClientGroup().getGroupName();
             final boolean isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES
                   || ClientGroup.predefinedGroupNames().contains(groupName);
-            List<ComplexInfo> complexInfoList = DAOReadonlyService.getInstance().findComplexesWithSubFeeding(org, isParent);
+            boolean vp = false;
+            if (ArrayUtils.contains(orgs_VP_pilot, org.getIdOfOrg())) {
+                vp = true;
+            }
+            List<ComplexInfo> complexInfoList = DAOReadonlyService.getInstance().findComplexesWithSubFeeding(org, isParent, vp);
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
             ObjectFactory objectFactory = new ObjectFactory();

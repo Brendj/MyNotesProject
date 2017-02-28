@@ -432,7 +432,7 @@ public class DAOReadonlyService {
         return query.getResultList();
     }
 
-    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent) {
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent, boolean vp) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
         for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
@@ -452,10 +452,17 @@ public class DAOReadonlyService {
             }
         }
         final String sql;
-        sql = "select distinct ci from ComplexInfo ci "
+        if (vp) {
+            sql = "select distinct ci from ComplexInfo ci "
+                    + " where ci.org = :org and modeFree = 1 "
+                    + " and menuDate >= :startDate and menuDate < :endDate "
+                    + " and ci.idOfComplex in :idOfComplex";
+        } else {
+            sql = "select distinct ci from ComplexInfo ci "
                 + " where ci.org = :org and usedSubscriptionFeeding = 1 "
                 + " and menuDate >= :startDate and menuDate < :endDate "
                 + " and ci.idOfComplex in :idOfComplex";
+        }
         Date endDate = today;
         endDate = CalendarUtils.addDays(endDate, 7);
         TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
