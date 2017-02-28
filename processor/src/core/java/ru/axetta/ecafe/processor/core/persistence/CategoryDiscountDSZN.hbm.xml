@@ -14,5 +14,7 @@
         <property name="description" column="Description" type="string" length="512" not-null="true" />
         <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount" column="IdOfCategoryDiscount" lazy="false"/>
         <property name="version" column="version" type="long" not-null="true"/>
+        <property name="deleted" column="deleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
     </class>
 </hibernate-mapping>

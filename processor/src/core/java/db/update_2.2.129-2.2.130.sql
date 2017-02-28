@@ -14,13 +14,15 @@ CREATE TABLE cf_categorydiscounts_dszn
   code INTEGER NOT NULL,
   description CHARACTER VARYING(512) NOT NULL DEFAULT '',
   idofcategorydiscount BIGINT,
-  blockedchange INTEGER NOT NULL DEFAULT 0,
   version BIGINT NOT NULL,
+  deleted INTEGER NOT NULL,
   CONSTRAINT cf_categorydiscounts_dszn_pk PRIMARY KEY (idofcategorydiscountdszn),
   CONSTRAINT cf_categorydiscounts_dszn_idofcategorydiscount_fk FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT cf_categorydiscounts_dszn_code UNIQUE (code)
+  REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+  CREATE UNIQUE INDEX cf_categorydiscounts_dszn_code_unique_idx
+  ON cf_categorydiscounts_dszn USING btree (code)
+  WHERE deleted = 0;
 
 --Блокировка изменения льгот ИСПП у клиентов в АРМ
 ALTER TABLE cf_categorydiscounts ADD COLUMN blockedchange integer NOT NULL DEFAULT 0;

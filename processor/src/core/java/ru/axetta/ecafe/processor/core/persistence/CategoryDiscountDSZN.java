@@ -16,6 +16,7 @@ public class CategoryDiscountDSZN {
     private String description;
     private CategoryDiscount categoryDiscount;
     private Long version;
+    private Boolean deleted;
 
     public CategoryDiscountDSZN() {
     }
@@ -25,6 +26,7 @@ public class CategoryDiscountDSZN {
         this.description = description;
         this.categoryDiscount = categoryDiscount;
         this.version = version;
+        this.deleted = false;
     }
 
     public int getIdOfCategoryDiscountDSZN() {
@@ -67,6 +69,14 @@ public class CategoryDiscountDSZN {
         this.version = version;
     }
 
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -93,6 +103,9 @@ public class CategoryDiscountDSZN {
                 "idOfCategoryDiscountDSZN=" + idOfCategoryDiscountDSZN +
                 ", code=" + code +
                 ", description='" + description + '\'' +
+                ", categoryDiscount=" + categoryDiscount +
+                ", version=" + version +
+                ", deleted=" + deleted +
                 '}';
     }
 }
