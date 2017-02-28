@@ -414,6 +414,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             this.code = code;
             this.description = description;
             this.version = version;
+            this.deleted = deleted;
         }
 
         public Integer getCode() {
