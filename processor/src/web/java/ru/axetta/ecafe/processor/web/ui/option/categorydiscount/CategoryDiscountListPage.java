@@ -101,7 +101,9 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
                     && categoryDiscount.getCategoriesDiscountDSZN().size() > 0) {
                 Map<Integer, String> map = new TreeMap<Integer, String>();
                 for (CategoryDiscountDSZN discountDSZN : categoryDiscount.getCategoriesDiscountDSZN()) {
-                    map.put(discountDSZN.getCode(), discountDSZN.getDescription());
+                    if(!discountDSZN.getDeleted()) {
+                        map.put(discountDSZN.getCode(), discountDSZN.getDescription());
+                    }
                 }
                 StringBuilder sb = new StringBuilder();
                 for (Integer code : map.keySet()) {

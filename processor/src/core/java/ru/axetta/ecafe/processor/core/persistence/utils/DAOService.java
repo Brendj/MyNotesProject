@@ -61,7 +61,7 @@ public class DAOService {
 
     public List<CategoryDiscountDSZN> getCategoryDiscountDSZNList() {
         TypedQuery<CategoryDiscountDSZN> q = entityManager
-                .createQuery("from CategoryDiscountDSZN order by code", CategoryDiscountDSZN.class);
+                .createQuery("from CategoryDiscountDSZN where deleted = false order by code", CategoryDiscountDSZN.class);
         return q.getResultList();
     }
 

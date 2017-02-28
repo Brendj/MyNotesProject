@@ -1448,7 +1448,7 @@ public class DAOUtils {
     }
 
     public static boolean checkCategoryDiscountDSZNByCode(EntityManager entityManager, int code) {
-        javax.persistence.Query q = entityManager.createNativeQuery("SELECT count(1) from cf_categorydiscounts_dszn where code=:code");
+        javax.persistence.Query q = entityManager.createNativeQuery("SELECT count(1) from cf_categorydiscounts_dszn where code=:code and deleted = 0");
         q.setParameter("code", code);
         return ((BigInteger)q.getSingleResult()).intValue() == 1;
     }
@@ -1497,6 +1497,13 @@ public class DAOUtils {
         }
 
         session.delete(categoryDiscount);
+    }
+
+    public static void deleteCategoryDiscountDSZN(Session session, Long id, Long nextVersion) {
+        CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN) session.load(CategoryDiscountDSZN.class, id.intValue());
+        categoryDiscountDSZN.setDeleted(true);
+        categoryDiscountDSZN.setVersion(nextVersion);
+        session.save(categoryDiscountDSZN);
     }
 
     @SuppressWarnings("unchecked")

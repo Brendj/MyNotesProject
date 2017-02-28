@@ -12,14 +12,14 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
-import org.hibernate.ObjectDeletedException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +27,8 @@ import java.util.List;
 @Component
 @Scope("session")
 public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     @Autowired
     private DAOService service;
@@ -53,19 +55,13 @@ public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements 
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            DAOUtils.deleteCategoryDiscount(persistenceSession, confirmDeletePage.getEntityId());
+            Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
+            DAOUtils.deleteCategoryDiscountDSZN(persistenceSession, confirmDeletePage.getEntityId(), nextVersion);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-
             reload();
-        } catch (ConstraintViolationException vce){
-            logAndPrintMessage(
-                    "Ошибка при удалении категории: имеются зарегистрированные Правила скидок или Клиенты привязанные к категории",
-                    vce);
-        } catch (ObjectDeletedException ode){
-            logAndPrintMessage("Ошибка при удалении категории: имеются зарегистрированные Правила скидок или Клиенты привязанные к категории", ode);
         } catch (Exception e) {
-            logAndPrintMessage("Ошибка при удалении категории ", e);
+            logAndPrintMessage("Ошибка при удалении категории ДСЗН ", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(persistenceSession, getLogger());

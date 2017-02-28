@@ -78,6 +78,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
             code = null;
             description = "";
             categoryName = "";
+            categoryDiscount = null;
             printMessage("Категория успешно создана");
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при создании категории", e);

@@ -64,7 +64,7 @@
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{categoryDiscountDSZNListPage}"
                                              target="#{confirmDeletePage.listener}" />
-                <f:setPropertyActionListener value="#{item.idOfCategoryDiscount }"
+                <f:setPropertyActionListener value="#{item.idOfCategoryDiscountDSZN }"
                                              target="#{confirmDeletePage.entityId}" />
             </a4j:commandLink>
         </rich:column>
