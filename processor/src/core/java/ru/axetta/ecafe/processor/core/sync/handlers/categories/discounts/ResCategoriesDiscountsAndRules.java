@@ -4,16 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -29,11 +27,13 @@ import java.util.Set;
 public class ResCategoriesDiscountsAndRules implements AbstractToElement{
     private final List<DiscountCategoryItem> dcis = new LinkedList<DiscountCategoryItem>();
     private final List<DiscountCategoryRuleItem> dcris = new LinkedList<DiscountCategoryRuleItem>();
+    private final List<CategoryDiscountDSZNItem> dcriDSZN = new LinkedList<CategoryDiscountDSZNItem>();
     private boolean existOrgWithEmptyCategoryOrgSet;
 
-    public void fillData(Session session, Long idOfOrg, boolean manyOrgs) {
+    public void fillData(Session session, Long idOfOrg, boolean manyOrgs, Long versionDSZN) {
         addDiscountRules(session, idOfOrg, manyOrgs);
         addCategoryDiscounts(session);
+        addCategoryDiscountsDSZN(session, versionDSZN);
     }
 
     private void addDiscountRules(Session session, Long idOfOrg, boolean manyOrgs) {
@@ -108,14 +108,28 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private void addCategoryDiscounts(Session session) {
         Criteria criteria = session.createCriteria(CategoryDiscount.class);
         List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
         for (CategoryDiscount categoryDiscount : categoryDiscounts) {
             DiscountCategoryItem dci = new DiscountCategoryItem(categoryDiscount.getIdOfCategoryDiscount(),
                     categoryDiscount.getCategoryName(), categoryDiscount.getCategoryType().getValue(),
-                    categoryDiscount.getDiscountRules(), categoryDiscount.getOrgType());
+                    categoryDiscount.getDiscountRules(), categoryDiscount.getOrgType(), categoryDiscount.getBlockedChange());
             addDCI(dci);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addCategoryDiscountsDSZN(Session session, Long versionDSZN) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.gt("version", versionDSZN));
+        List<CategoryDiscountDSZN> categoriesDiscountDSZN = (List<CategoryDiscountDSZN>) criteria.list();
+        for (CategoryDiscountDSZN discountDSZN : categoriesDiscountDSZN) {
+            CategoryDiscountDSZNItem c = new CategoryDiscountDSZNItem(discountDSZN.getCode(), discountDSZN.getDescription(),
+                    discountDSZN.getCategoryDiscount() != null ? discountDSZN.getCategoryDiscount().getIdOfCategoryDiscount() : null,
+                    discountDSZN.getVersion());
+            addDCIDSZN(c);
         }
     }
 
@@ -132,6 +146,10 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         this.dcis.add(dci);
     }
 
+    private void addDCIDSZN(CategoryDiscountDSZNItem c) {
+        this.dcriDSZN.add(c);
+    }
+
     private void addDCRI(DiscountCategoryRuleItem dcri) {
         this.dcris.add(dcri);
     }
@@ -143,6 +161,9 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         }
         for (DiscountCategoryRuleItem dcri : this.dcris) {
             element.appendChild(dcri.toElement(document));
+        }
+        for (CategoryDiscountDSZNItem dcriDSZN : this.dcriDSZN) {
+            element.appendChild(dcriDSZN.toElement(document));
         }
         return element;
     }
@@ -161,16 +182,17 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         private String categoryName;
         private Integer categoryType;
         private Integer orgType;
-
         private String discountRules;
+        private Boolean blockedChange;
 
         public DiscountCategoryItem(long idOfCategoryDiscount, String categoryName, Integer categoryType,
-                String discountRules, Integer organizationType) {
+                String discountRules, Integer organizationType, Boolean blockedChange) {
             this.idOfCategoryDiscount = idOfCategoryDiscount;
             this.categoryName = categoryName;
             this.discountRules = discountRules;
             this.categoryType = categoryType;
             this.orgType = organizationType;
+            this.blockedChange = blockedChange;
         }
 
         public long getIdOfCategoryDiscount() {
@@ -199,6 +221,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             element.setAttribute("CategoryName", this.categoryName);
             element.setAttribute("CategoryType", Integer.toString(this.categoryType));
             element.setAttribute("OrgType", Integer.toString(this.orgType));
+            element.setAttribute("BlockedChange", blockedChange ? "1" : "0");
             return element;
         }
 
@@ -375,6 +398,57 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
 
         public String getOrgIds() {
             return orgIds;
+        }
+    }
+
+    private static class CategoryDiscountDSZNItem {
+        private Integer code;
+        private String description;
+        private Long categoryDiscount;
+        private Long version;
+
+        public CategoryDiscountDSZNItem(Integer code, String description, Long categoryDiscount, Long version) {
+            this.code = code;
+            this.description = description;
+            this.categoryDiscount = categoryDiscount;
+            this.version = version;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public Long getCategoryDiscount() {
+            return categoryDiscount;
+        }
+
+        public Long getVersion() {
+            return version;
+        }
+
+        public Element toElement(Document document) throws Exception {
+            Element element = document.createElement("DCRI_DSZN");
+            element.setAttribute("Id", Integer.toString(this.code));
+            element.setAttribute("Name", this.description);
+            if(this.categoryDiscount != null) {
+                element.setAttribute("categoryDiscount", Long.toString(this.categoryDiscount));
+            }
+            element.setAttribute("Version",Long.toString(this.version));
+            return element;
+        }
+
+        @Override
+        public String toString() {
+            return "CategoryDiscountDSZNItem{" +
+                    "code=" + code +
+                    ", description='" + description + '\'' +
+                    ", categoryDiscount=" + categoryDiscount +
+                    ", version=" + version +
+                    '}';
         }
     }
 

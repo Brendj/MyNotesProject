@@ -153,7 +153,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r19 = new RegistryChangeItemParam("birthDate", c.getBirthDate() == null ? "" : dateTimeFormat.format(new Date(c.getBirthDate())));
                 registryChangeItemParams.add(r19);
 
-                RegistryChangeItemParam r20 = new RegistryChangeItemParam("benefitOnAdmission", c.getBenefitOnAdmission() == null ? "" : c.getBenefitOnAdmission());
+                RegistryChangeItemParam r20 = new RegistryChangeItemParam("newDiscounts", c.getNewDiscounts() == null ? "" : c.getNewDiscounts());
                 registryChangeItemParams.add(r20);
 
                 RegistryChangeItemParam r21 = new RegistryChangeItemParam("genderFrom", c.getGenderFrom() == null ? "" : c.getGenderFrom().toString());
@@ -162,7 +162,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r22 = new RegistryChangeItemParam("birthDateFrom", c.getBirthDateFrom() == null ? "" : c.getBirthDateFrom().toString());
                 registryChangeItemParams.add(r22);
 
-                RegistryChangeItemParam r23 = new RegistryChangeItemParam("benefitOnAdmissionFrom", c.getBenefitOnAdmissionFrom() == null ? "" : c.getBenefitOnAdmissionFrom());
+                RegistryChangeItemParam r23 = new RegistryChangeItemParam("oldDiscounts", c.getOldDiscounts()== null ? "" : c.getOldDiscounts());
                 registryChangeItemParams.add(r23);
 
                 RegistryChangeItemParam r24 = new RegistryChangeItemParam("guardiansCount", c.getGuardiansCount() == null ? "" : c.getGuardiansCount().toString());

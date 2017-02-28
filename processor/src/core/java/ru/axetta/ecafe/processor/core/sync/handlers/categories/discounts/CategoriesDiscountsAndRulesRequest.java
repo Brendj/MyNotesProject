@@ -16,19 +16,25 @@ public class CategoriesDiscountsAndRulesRequest implements SectionRequest {
     public static final String SECTION_NAME="CategoriesDiscountsAndRules";
     private static final String MANY_ORGS_FLAG="ManyOrgs";
     private final boolean isManyOrgs;
+    private final Long versionDSZN;
 
-    private CategoriesDiscountsAndRulesRequest(boolean isManyOrgs) {
-
+    private CategoriesDiscountsAndRulesRequest(boolean isManyOrgs, Long versionDSZN) {
         this.isManyOrgs = isManyOrgs;
+        this.versionDSZN = versionDSZN;
     }
 
     public boolean isManyOrgs() {
         return isManyOrgs;
     }
 
+    public Long getVersionDSZN() {
+        return versionDSZN;
+    }
+
     public static CategoriesDiscountsAndRulesRequest build(Node sectionNode) {
         Integer value = XMLUtils.getIntegerAttributeValue(sectionNode, MANY_ORGS_FLAG);
-        return new CategoriesDiscountsAndRulesRequest(value!=null && value == 1);
+        Long versionDSZN = XMLUtils.getLongAttributeValue(sectionNode, "DsznVersion");
+        return new CategoriesDiscountsAndRulesRequest((value!=null && value == 1), versionDSZN);
     }
 
     @Override

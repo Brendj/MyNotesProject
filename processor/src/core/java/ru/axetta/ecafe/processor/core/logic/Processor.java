@@ -4893,7 +4893,7 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             boolean isManyOrgs = categoriesAndDiscountsRequest != null && categoriesAndDiscountsRequest.isManyOrgs();
-            resCategoriesDiscountsAndRules.fillData(persistenceSession, idOfOrg, isManyOrgs);
+            resCategoriesDiscountsAndRules.fillData(persistenceSession, idOfOrg, isManyOrgs, categoriesAndDiscountsRequest.getVersionDSZN());
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
