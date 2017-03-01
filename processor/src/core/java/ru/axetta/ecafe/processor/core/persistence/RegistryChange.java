@@ -37,11 +37,13 @@ public class RegistryChange {
 
     protected Integer gender;
     protected Long birthDate;
-    protected String benefitOnAdmission;
+    protected String benefitDSZN;
+    protected String newDiscounts;
 
     protected Integer genderFrom;
     protected Long birthDateFrom;
-    protected String benefitOnAdmissionFrom;
+    protected String benefitDSZNFrom;
+    protected String oldDiscounts;
 
     protected Integer guardiansCount;
     protected Set<RegistryChangeGuardians> registryChangeGuardiansSet;
@@ -59,7 +61,9 @@ public class RegistryChange {
     public RegistryChange(Long idOfOrg, Long idOfMigrateOrgTo, Long idOfMigrateOrgFrom, Long createDate,
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
-            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId, Integer gender, Long birthDate, String benefitOnAdmission, Integer genderFrom, Long birthDateFrom, String benefitOnAdmissionFrom, String ageTypeGroup, String ageTypeGroupFrom) {
+            Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId,
+            Integer gender, Long birthDate, String benefitDSZN, Integer genderFrom, Long birthDateFrom,
+            String benefitDSZNFrom, String ageTypeGroup, String ageTypeGroupFrom) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -82,10 +86,10 @@ public class RegistryChange {
         this.notificationId = notificationId;
         this.gender = gender;
         this.birthDate = birthDate;
-        this.benefitOnAdmission = benefitOnAdmission;
+        this.benefitDSZN = benefitDSZN;
         this.genderFrom = genderFrom;
         this.birthDateFrom = birthDateFrom;
-        this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
+        this.benefitDSZNFrom = benefitDSZNFrom;
         this.ageTypeGroup = ageTypeGroup;
         this.ageTypeGroupFrom = ageTypeGroupFrom;
     }
@@ -266,12 +270,20 @@ public class RegistryChange {
         this.birthDate = birthDate;
     }
 
-    public String getBenefitOnAdmission() {
-        return benefitOnAdmission;
+    public String getBenefitDSZN() {
+        return benefitDSZN;
     }
 
-    public void setBenefitOnAdmission(String benefitOnAdmission) {
-        this.benefitOnAdmission = benefitOnAdmission;
+    public void setBenefitDSZN(String benefitDSZN) {
+        this.benefitDSZN = benefitDSZN;
+    }
+
+    public String getNewDiscounts() {
+        return newDiscounts;
+    }
+
+    public void setNewDiscounts(String newDiscounts) {
+        this.newDiscounts = newDiscounts;
     }
 
     public Integer getGenderFrom() {
@@ -290,12 +302,20 @@ public class RegistryChange {
         this.birthDateFrom = birthDateFrom;
     }
 
-    public String getBenefitOnAdmissionFrom() {
-        return benefitOnAdmissionFrom;
+    public String getBenefitDSZNFrom() {
+        return benefitDSZNFrom;
     }
 
-    public void setBenefitOnAdmissionFrom(String benefitOnAdmissionFrom) {
-        this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
+    public void setBenefitDSZNFrom(String benefitDSZNFrom) {
+        this.benefitDSZNFrom = benefitDSZNFrom;
+    }
+
+    public String getOldDiscounts() {
+        return oldDiscounts;
+    }
+
+    public void setOldDiscounts(String oldDiscounts) {
+        this.oldDiscounts = oldDiscounts;
     }
 
     public Integer getGuardiansCount() {

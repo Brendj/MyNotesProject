@@ -299,7 +299,7 @@ public class NSIDeltaProcessor {
         fieldConfig.setValue(ClientManager.FieldId.GROUP, solveField(item.getGroup(), cl != null && cl.getClientGroup() != null ? cl.getClientGroup().getGroupName() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GENDER, solveField(item.getGender(), cl != null && cl.getGender() != null ? getGenderFromInteger(cl.getGender()) : ""));
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, solveField(item.getBirthDate(), cl != null && cl.getBirthDate() != null ? getBirthDateFromDate(cl.getBirthDate()) : ""));
-        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, solveField(item.getBenefitOnAdmission(), cl != null ? cl.getBenefitOnAdmission() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, solveField(item.getBenefitDSZN(), cl != null ? cl.getCategoriesDiscountsDSZN() : ""));
         fieldConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, solveField(item.getAgeTypeGroup(), cl != null ? cl.getAgeTypeGroup() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, solveField(new Integer(item.getGuardians().size()).toString(), cl != null ? cl.getGuardiansCount() : ""));
         if (item.getGuardians() != null && item.getGuardians().size() > 0 ) {
@@ -342,7 +342,7 @@ public class NSIDeltaProcessor {
         protected String notificationId;
         protected String gender;
         protected String birthDate;
-        protected String benefitOnAdmission;
+        protected String benefitDSZN;
         protected String ageTypeGroup;
         protected List<ImportRegisterClientsService.GuardianInfo> guardians;
 
@@ -370,8 +370,22 @@ public class NSIDeltaProcessor {
                 else if (attributeName.endsWith("дата рождения")) {
                     birthDate = getSingleValue(at);
                 }
-                else if (attributeName.endsWith("льгота при поступлении")) {
-                    benefitOnAdmission = getSingleValue(at);
+                else if (attributeName.endsWith("льготы учащегося")) {
+                    List<Integer> benefits = new ArrayList<Integer>();
+                    for (GroupValue groupValue : at.getGroupValue()) {
+                        for (Attribute attr1 : groupValue.getAttribute()) {
+                            if (attr1.getName().equals("Льгота")) {
+                                String benefit = attr1.getValue().get(0).getValue();
+                                if(StringUtils.isNotEmpty(benefit)) {
+                                    benefits.add(Integer.valueOf(benefit));
+                                }
+                            }
+                        }
+
+                    }
+                    Collections.sort(benefits);
+                    benefitDSZN = StringUtils.join(benefits, ",");
+
                 }
                 else if (attributeName.endsWith("представители")) {
                     guardians = new ArrayList<ImportRegisterClientsService.GuardianInfo>();
@@ -503,8 +517,8 @@ public class NSIDeltaProcessor {
             return birthDate;
         }
 
-        public String getBenefitOnAdmission() {
-            return benefitOnAdmission;
+        public String getBenefitDSZN() {
+            return benefitDSZN;
         }
 
         public String getAgeTypeGroup() {

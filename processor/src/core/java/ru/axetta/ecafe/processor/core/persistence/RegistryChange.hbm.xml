@@ -36,10 +36,12 @@
         <property name="notificationId" column="NotificationId" type="string" length="15"/>
         <property name="gender" column="Gender" type="int"/>
         <property name="birthDate" column="BirthDate" type="long"/>
-        <property name="benefitOnAdmission" column="BenefitOnAdmission" type="string" length="3000"/>
+        <property name="benefitDSZN" column="BenefitDSZN" type="string" length="128"/>
+        <property name="newDiscounts" column="NewDiscounts" type="string" length="128"/>
         <property name="genderFrom" column="GenderFrom" type="int"/>
         <property name="birthDateFrom" column="BirthDateFrom" type="long"/>
-        <property name="benefitOnAdmissionFrom" column="BenefitOnAdmissionFrom" type="string" length="3000"/>
+        <property name="benefitDSZNFrom" column="BenefitDSZNFrom" type="string" length="128"/>
+        <property name="oldDiscounts" column="OldDiscounts" type="string" length="128"/>
         <property name="guardiansCount" column="GuardiansCount" type="int"/>
         <property name="ageTypeGroup" column="AgeTypeGroup" type="string" length="128"/>
         <property name="ageTypeGroupFrom" column="AgeTypeGroupFrom" type="string" length="128"/>

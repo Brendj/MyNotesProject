@@ -246,8 +246,21 @@ public class ClientMskNSIService extends MskNSIService {
                     pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
                 }
 
-                if (attr.getName().equals("Льгота при поступлении")) {
-                    pupilInfo.benefitOnAdmission = attr.getValue().get(0).getValue();
+                if (attr.getName().equals("Льготы учащегося")) {
+                    List<Integer> benefits = new ArrayList<Integer>();
+                    for (GroupValue groupValue : attr.getGroupValue()) {
+                        for (Attribute attr1 : groupValue.getAttribute()) {
+                            if (attr1.getName().equals("Льгота")) {
+                                String benefit = attr1.getValue().get(0).getValue();
+                                if(StringUtils.isNotEmpty(benefit)) {
+                                    benefits.add(Integer.valueOf(benefit));
+                                }
+                            }
+                        }
+
+                    }
+                    Collections.sort(benefits);
+                    pupilInfo.benefitDSZN = StringUtils.join(benefits, ",");
                 }
 
                 if (attr.getName().equals("Пол")) {

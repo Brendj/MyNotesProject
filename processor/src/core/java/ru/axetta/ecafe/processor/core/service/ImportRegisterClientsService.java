@@ -17,9 +17,11 @@ import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -434,8 +436,8 @@ public class ImportRegisterClientsService {
                         cl == null || cl.getGender() == null ? null : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
             }
 
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_ON_ADMISSION, pupil.getBenefitOnAdmission(),
-                    cl == null ? null : cl.getBenefitOnAdmission() == null ? null : cl.getBenefitOnAdmission(), updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN, pupil.getBenefitDSZN(),
+                    cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(), updateClient);
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
@@ -619,7 +621,7 @@ public class ImportRegisterClientsService {
         String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, clientGuid, "Фамилия ученика");
         String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 64, clientGuid, "Наименование группы");
         String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, clientGuid, "Пол");
-        String clientBenefitOnAdmission = trim(fieldConfig.getValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION), 3000, clientGuid, "Льгота при поступлении");
+        String clientBenefitDSZN = trim(fieldConfig.getValue(ClientManager.FieldId.BENEFIT_DSZN), 128, clientGuid, "Льгота учащегося");
         String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
         String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, clientGuid, "Количество представителей");
         List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
@@ -649,7 +651,8 @@ public class ImportRegisterClientsService {
             }
         }
 
-        ch.setBenefitOnAdmission(clientBenefitOnAdmission);
+        ch.setBenefitDSZN(clientBenefitDSZN);
+        ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN, currentClient.getCategoriesDiscounts()), ","));
 
         if (operation == CREATE_OPERATION) {
             if (guardiansCount != null) {
@@ -690,7 +693,8 @@ public class ImportRegisterClientsService {
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
-            ch.setBenefitOnAdmissionFrom(currentClient.getBenefitOnAdmission());
+            ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
+            ch.setOldDiscounts(currentClient.getCategoriesDiscounts());
             ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         if (operation == MODIFY_OPERATION) {
@@ -708,10 +712,51 @@ public class ImportRegisterClientsService {
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
-            ch.setBenefitOnAdmissionFrom(currentClient.getBenefitOnAdmission());
+            ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
+            ch.setOldDiscounts(currentClient.getCategoriesDiscounts());
             ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         sess.save(ch);
+    }
+
+    private static Set<Long> getCategoriesByDSZNCodes(Session session, String clientBenefitDSZN, String oldDiscounts) {
+        Set<Long> newDiscountsIds = new TreeSet<Long>();
+        List<Long> oldDiscountsIds = new ArrayList<Long>();
+        for(String o : oldDiscounts.split(",")) {
+            if(StringUtils.isNotEmpty(o)) {
+                oldDiscountsIds.add(Long.parseLong(o));
+            }
+        }
+        if(oldDiscountsIds.size() > 0) {
+            Collections.sort(oldDiscountsIds);
+            Criteria criteria = session.createCriteria(CategoryDiscount.class);
+            criteria.add(Restrictions.in("idOfCategoryDiscount", oldDiscountsIds));
+            List<CategoryDiscount> list = criteria.list();
+            for (CategoryDiscount categoryDiscount : list) {
+                if (!(categoryDiscount.getCategoriesDiscountDSZN().size() > 0)) {
+                    newDiscountsIds.add(categoryDiscount.getIdOfCategoryDiscount());
+                }
+            }
+        }
+
+        if(StringUtils.isNotEmpty(clientBenefitDSZN)) {
+            List<Integer> benefitsList = new ArrayList<Integer>();
+            for(String s : clientBenefitDSZN.split(",")) {
+                if(StringUtils.isNotEmpty(s)) {
+                    benefitsList.add(Integer.valueOf(s));
+                }
+            }
+            Criteria criteria1 = session.createCriteria(CategoryDiscountDSZN.class);
+            criteria1.add(Restrictions.in("code", benefitsList));
+            criteria1.add(Restrictions.ne("deleted", false));
+            List<CategoryDiscountDSZN> cdDSZN = criteria1.list();
+            for(CategoryDiscountDSZN discountDSZN : cdDSZN) {
+                if(discountDSZN.getCategoryDiscount() != null) {
+                    newDiscountsIds.add(discountDSZN.getCategoryDiscount().getIdOfCategoryDiscount());
+                }
+            }
+        }
+        return newDiscountsIds;
     }
 
     protected static String trim(String source, int maxLen, String clientGuid, String fieldName) {
@@ -759,7 +804,8 @@ public class ImportRegisterClientsService {
         if (currentClient.getBirthDate() != null) {
             ch.setBirthDate(currentClient.getBirthDate().getTime());
         }
-        ch.setBenefitOnAdmission(currentClient.getBenefitOnAdmission());
+        ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
+        ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
         ch.setAgeTypeGroup(currentClient.getAgeTypeGroup());
         sess.save(ch);
     }
@@ -1072,7 +1118,8 @@ public class ImportRegisterClientsService {
                     }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                    createConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
+                    createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
+                    createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
@@ -1136,7 +1183,8 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.BENEFIT_ON_ADMISSION, change.getBenefitOnAdmission());
+                    modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
+                    modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
 
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
@@ -1443,7 +1491,7 @@ public class ImportRegisterClientsService {
 
         public String familyName, firstName, secondName, guid, group, enterGroup, enterDate, leaveDate;
         public String birthDate;
-        public String benefitOnAdmission;
+        public String benefitDSZN;
 
         public boolean deleted;
         public boolean created;
@@ -1499,12 +1547,12 @@ public class ImportRegisterClientsService {
             this.birthDate = birthDate;
         }
 
-        public String getBenefitOnAdmission() {
-            return benefitOnAdmission;
+        public String getBenefitDSZN() {
+            return benefitDSZN;
         }
 
-        public void setBenefitOnAdmission(String benefitOnAdmission) {
-            this.benefitOnAdmission = benefitOnAdmission;
+        public void setBenefitDSZN(String benefitDSZN) {
+            this.benefitDSZN = benefitDSZN;
         }
 
         public String getRecordState() {
@@ -1578,7 +1626,7 @@ public class ImportRegisterClientsService {
             this.guid = pi.guid;
             this.group = pi.group;
             this.birthDate = pi.birthDate;
-            this.benefitOnAdmission = pi.benefitOnAdmission;
+            this.benefitDSZN = pi.benefitDSZN;
             this.deleted = pi.deleted;
             this.created = pi.created;
             this.guidOfOrg = pi.guidOfOrg;
