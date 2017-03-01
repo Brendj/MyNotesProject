@@ -574,8 +574,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         protected String genderFrom;
         protected String birthDate;
         protected String birthDateFrom;
-        protected String benefitOnAdmission;
-        protected String benefitOnAdmissionFrom;
+        protected String benefitDSZN;
+        protected String benefitDSZNFrom;
+        protected String newDiscounts;
+        protected String oldDiscounts;
         protected String guardiansCount;
 
         protected String ageTypeGroup;
@@ -630,7 +632,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 birthDate = parent.getList().get(19).getFieldValueParam().substring(0, 10);
             }
 
-            benefitOnAdmission = parent.getList().get(20).getFieldValueParam();
+            benefitDSZN = parent.getList().get(27).getFieldValueParam();
+            benefitDSZNFrom = parent.getList().get(28).getFieldValueParam();
+            newDiscounts = parent.getList().get(20).getFieldValueParam();
+            oldDiscounts = parent.getList().get(23).getFieldValueParam();
 
             if (parent.getList().get(21).getFieldValueParam().equals("")) {
                 genderFrom = "";
@@ -651,7 +656,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                         new Date(Long.parseLong(parent.getList().get(22).getFieldValueParam())));
             }
 
-            benefitOnAdmissionFrom = parent.getList().get(23).getFieldValueParam();
             guardiansCount = parent.getList().get(24).getFieldValueParam();
 
             ageTypeGroup = parent.getList().get(25).getFieldValueParam();
@@ -804,10 +808,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             return birthDate;
         }
 
-        public String getBenefitOnAdmission() {
-            return benefitOnAdmission;
-        }
-
         public String getBirthDateFrom() {
             return birthDateFrom;
         }
@@ -822,14 +822,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
         public void setGenderFrom(String genderFrom) {
             this.genderFrom = genderFrom;
-        }
-
-        public String getBenefitOnAdmissionFrom() {
-            return benefitOnAdmissionFrom;
-        }
-
-        public void setBenefitOnAdmissionFrom(String benefitOnAdmissionFrom) {
-            this.benefitOnAdmissionFrom = benefitOnAdmissionFrom;
         }
 
         public String getGuardiansCount() {
@@ -854,6 +846,38 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
         public void setAgeTypeGroupFrom(String ageTypeGroupFrom) {
             this.ageTypeGroupFrom = ageTypeGroupFrom;
+        }
+
+        public String getNewDiscounts() {
+            return newDiscounts;
+        }
+
+        public void setNewDiscounts(String newDiscounts) {
+            this.newDiscounts = newDiscounts;
+        }
+
+        public String getBenefitDSZNFrom() {
+            return benefitDSZNFrom;
+        }
+
+        public void setBenefitDSZNFrom(String benefitDSZNFrom) {
+            this.benefitDSZNFrom = benefitDSZNFrom;
+        }
+
+        public String getBenefitDSZN() {
+            return benefitDSZN;
+        }
+
+        public void setBenefitDSZN(String benefitDSZN) {
+            this.benefitDSZN = benefitDSZN;
+        }
+
+        public String getOldDiscounts() {
+            return oldDiscounts;
+        }
+
+        public void setOldDiscounts(String oldDiscounts) {
+            this.oldDiscounts = oldDiscounts;
         }
     }
 

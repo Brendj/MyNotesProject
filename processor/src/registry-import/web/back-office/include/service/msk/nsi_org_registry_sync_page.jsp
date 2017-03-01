@@ -184,15 +184,27 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
-                                <h:outputText value="Льгота при поступлении" />
+                                <h:outputText value="Льгота ИСПП" />
                             </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.benefitOnAdmission}" />
+                            <h:outputText styleClass="output-text" value="#{e.newDiscounts}" />
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
-                                <h:outputText value="Предыдущая Льгота при поступлении" />
+                                <h:outputText value="Предыдущая Льгота ИСПП" />
                             </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.benefitOnAdmissionFrom}" />
+                            <h:outputText styleClass="output-text" value="#{e.oldDiscounts}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Льгота ДСЗН" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.benefitDSZN}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Предыдущая Льгота ДСЗН" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.benefitDSZNFrom}" />
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
