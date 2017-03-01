@@ -3549,6 +3549,10 @@ public class Processor implements SyncProcessor {
                 }
             }
 
+            if (clientParamItem.getDisablePlanCreation() != null) {
+                client.setDisablePlanCreation(clientParamItem.getDisablePlanCreation());
+            }
+
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
             String categoriesFromClient = getCanonicalDiscounts(client.getCategoriesDiscounts());
 

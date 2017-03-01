@@ -351,7 +351,9 @@ public class SyncResponse {
             private final boolean isUseLastEEModeForPlan;
             private final Integer gender;
             private final Date birthDate;
-            private final String benefitOnAdmission;
+            private final String categoriesDiscountsDSZN;
+            private final Date lastDiscountsUpdate;
+            private final boolean disablePlanCreation;
             private final String ageTypeGroup;
             private final Long balanceToNotify;
 
@@ -387,7 +389,9 @@ public class SyncResponse {
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
                 this.gender = client.getGender();
                 this.birthDate = client.getBirthDate();
-                this.benefitOnAdmission = client.getBenefitOnAdmission();
+                this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
+                this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
+                this.disablePlanCreation = client.getDisablePlanCreation();
                 this.ageTypeGroup = client.getAgeTypeGroup();
                 this.balanceToNotify = client.getBalanceToNotify();
             }
@@ -465,8 +469,16 @@ public class SyncResponse {
                 return tempClient;
             }
 
-            public String getBenefitOnAdmission() {
-                return benefitOnAdmission;
+            public String getCategoriesDiscountsDSZN() {
+                return categoriesDiscountsDSZN;
+            }
+
+            public Date getLastDiscountsUpdate() {
+                return lastDiscountsUpdate;
+            }
+
+            public boolean isDisablePlanCreation() {
+                return disablePlanCreation;
             }
 
             public Date getBirthDate() {
@@ -479,6 +491,10 @@ public class SyncResponse {
 
             public String getAgeTypeGroup() {
                 return ageTypeGroup;
+            }
+
+            public Long getBalanceToNotify() {
+                return balanceToNotify;
             }
 
             public Element toElement(Document document) throws Exception {
@@ -528,9 +544,14 @@ public class SyncResponse {
                     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
                     element.setAttribute("BirthDate", timeFormat.format(this.birthDate));
                 }
-                if (this.benefitOnAdmission != null) {
-                    element.setAttribute("BenefitOnAdmission", this.benefitOnAdmission);
+                if (this.categoriesDiscountsDSZN != null) {
+                    element.setAttribute("CategoriesDiscountsDSZN", this.categoriesDiscountsDSZN);
                 }
+                if (this.lastDiscountsUpdate != null) {
+                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                    element.setAttribute("LastDiscountsUpdate", timeFormat.format(this.lastDiscountsUpdate));
+                }
+                element.setAttribute("DisablePlanCreation", this.disablePlanCreation?"1":"0");
                 if (this.ageTypeGroup != null) {
                     element.setAttribute("AgeTypeGroup", this.ageTypeGroup);
                 }
@@ -551,9 +572,6 @@ public class SyncResponse {
 
             }
 
-            public Long getBalanceToNotify() {
-                return balanceToNotify;
-            }
         }
 
         private final List<Item> items = new ArrayList<Item>();

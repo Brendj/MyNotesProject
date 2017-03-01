@@ -127,6 +127,7 @@ public class SyncRequest {
                     Date birthDate = getDateValueNullSafe(namedNodeMap,"BirthDate");
                     Long version = getLongValueNullSafe(namedNodeMap, "V");
                     Long balanceToNotify = getLongValueNullSafe(namedNodeMap, "BalanceToNotify");
+                    String disablePlanCreation = getStringValueNullSafe(namedNodeMap, "DisablePlanCreation");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -134,7 +135,7 @@ public class SyncRequest {
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
-                            gender,birthDate, version, balanceToNotify);
+                            gender,birthDate, version, balanceToNotify, disablePlanCreation == null ? null : disablePlanCreation.equals("1"));
                 }
 
 
@@ -157,13 +158,15 @@ public class SyncRequest {
             private final Integer gender;
             private final Long version;
             private final Long balanceToNotify;
+            private final Boolean disablePlanCreation;
 
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify) {
+                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
+                    Boolean disablePlanCreation) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -192,6 +195,7 @@ public class SyncRequest {
                 this.birthDate = birthDate;
                 this.version = version;
                 this.balanceToNotify = balanceToNotify;
+                this.disablePlanCreation = disablePlanCreation;
             }
 
             public long getIdOfClient() {
@@ -296,6 +300,10 @@ public class SyncRequest {
 
             public Integer getGender() {
                 return gender;
+            }
+
+            public Boolean getDisablePlanCreation() {
+                return disablePlanCreation;
             }
 
             @Override
