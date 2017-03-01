@@ -36,3 +36,18 @@ alter table cf_orgs add column isWorkInSummerTime integer not null default 0,
 alter table cf_subscriber_feeding add column FeedingType integer not null default 0;
 
 alter table cf_clients_cycle_diagrams add column FeedingType integer not null default 0;
+
+--Очищаем таблицы реестров и добавляем колонки для льгот
+--TRUNCATE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors; // todo раскоммитить при сборке
+ALTER TABLE cf_registrychange DROP COLUMN benefitOnAdmission,
+                              DROP COLUMN benefitOnAdmissionFrom,
+                              ADD COLUMN benefitDSZN character varying (128),
+                              ADD COLUMN benefitDSZNFrom character varying (128),
+                              ADD COLUMN newDiscounts character varying (128),
+                              ADD COLUMN oldDiscounts character varying (128);
+
+-- Колонки льгот для клиента - последняя льгота ДСЗН, время последнего обновления льготы ДСЗН, флаг исключения клиента из плана питания
+ALTER TABLE cf_clients DROP COLUMN benefitOnAdmission,
+                       ADD COLUMN categoriesDiscountsDSZN character varying (128) not null default '',
+                       ADD COLUMN lastDiscountsUpdate bigint,
+                       ADD COLUMN disablePlanCreation integer not null default 0;
