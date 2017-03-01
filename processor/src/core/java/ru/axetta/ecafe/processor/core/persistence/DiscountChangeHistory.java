@@ -25,6 +25,7 @@ public class DiscountChangeHistory {
     public static final String MODIFY_IN_WEBAPP = "Изменено в веб.приложении. Пользователь: ";
     public static final String MODIFY_IN_ARM = "Изменено в АРМ.";
     public static final String MODIFY_IN_SERVICE = "Изменено в Сервисе.";
+    public static final String MODIFY_IN_REGISTRY = "Изменено в Реестрах.";
 
     private Long idOfDiscountChange;
     private Date registrationDate;
