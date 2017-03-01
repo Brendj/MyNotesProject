@@ -1062,7 +1062,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
-        client.setBenefitOnAdmission(this.benefitOnAdmission);
+        client.setCategoriesDiscountsDSZN(this.benefitOnAdmission);
         client.setAgeTypeGroup(this.ageTypeGroup);
 
         persistenceSession.update(client);
@@ -1186,7 +1186,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
-        this.benefitOnAdmission = client.getBenefitOnAdmission();
+        this.benefitOnAdmission = client.getCategoriesDiscountsDSZN();
         this.ageTypeGroup = client.getAgeTypeGroup();
         removeListGuardianItems.clear();
         removeListWardItems.clear();

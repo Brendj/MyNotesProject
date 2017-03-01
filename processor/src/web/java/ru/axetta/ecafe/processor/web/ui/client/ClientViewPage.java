@@ -422,7 +422,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
-        this.benefitOnAdmission = client.getBenefitOnAdmission();
+        this.benefitOnAdmission = client.getCategoriesDiscountsDSZN();
         this.ageTypeGroup = client.getAgeTypeGroup();
         this.balanceToNotify = client.getBalanceToNotify();
 

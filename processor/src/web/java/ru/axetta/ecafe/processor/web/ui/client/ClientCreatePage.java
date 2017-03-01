@@ -565,7 +565,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setRemarks(this.remarks);
         client.setBirthDate(this.birthDate);
         client.setGender(this.gender);
-        client.setBenefitOnAdmission(this.benefitOnAdmission);
+        client.setCategoriesDiscountsDSZN(this.benefitOnAdmission);
         client.setAgeTypeGroup(this.ageTypeGroup);
         if (this.externalId==null || this.externalId==0) client.setExternalId(null);
         else client.setExternalId(this.externalId);

@@ -91,6 +91,9 @@ public class Client {
     private Long limit;
     private Long expenditureLimit;
     private String categoriesDiscounts;
+    private String categoriesDiscountsDSZN;
+    private Date lastDiscountsUpdate;
+    private Boolean disablePlanCreation;
     private String san;
     private Set<GuardSan> guardSan;
     private Long externalId;
@@ -119,7 +122,6 @@ public class Client {
 
     private Integer gender;
     private Date birthDate;
-    private String benefitOnAdmission;
 
     private String guardiansCount;
 
@@ -938,12 +940,28 @@ public class Client {
         this.birthDate = birthDate;
     }
 
-    public String getBenefitOnAdmission() {
-        return benefitOnAdmission;
+    public String getCategoriesDiscountsDSZN() {
+        return categoriesDiscountsDSZN;
     }
 
-    public void setBenefitOnAdmission(String benefitOnAdmission) {
-        this.benefitOnAdmission = benefitOnAdmission;
+    public void setCategoriesDiscountsDSZN(String benefitDSZN) {
+        this.categoriesDiscountsDSZN = benefitDSZN;
+    }
+
+    public Date getLastDiscountsUpdate() {
+        return lastDiscountsUpdate;
+    }
+
+    public void setLastDiscountsUpdate(Date lastDiscountsUpdate) {
+        this.lastDiscountsUpdate = lastDiscountsUpdate;
+    }
+
+    public Boolean getDisablePlanCreation() {
+        return disablePlanCreation;
+    }
+
+    public void setDisablePlanCreation(Boolean disablePlanCreation) {
+        this.disablePlanCreation = disablePlanCreation;
     }
 
     public String getGuardiansCount() {
