@@ -73,11 +73,12 @@ public class ClientManager {
         FAX,
         GENDER,
         BIRTH_DATE,
-        BENEFIT_ON_ADMISSION,
+        BENEFIT_DSZN,
         GUARDIANS_COUNT,
         GUARDIANS_COUNT_LIST,
         AGE_TYPE_GROUP,
-        SSOID
+        SSOID,
+        BENEFIT
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -116,11 +117,12 @@ public class ClientManager {
             new FieldProcessor.Def(31, false, false, "Факс", null, FieldId.FAX, true),
             new FieldProcessor.Def(32, false, false, "Пол", null, FieldId.GENDER, true),
             new FieldProcessor.Def(33, false, false, "Дата рождения", null, FieldId.BIRTH_DATE, true),
-            new FieldProcessor.Def(34, false, false, "Льгота при поступлении", null, FieldId.BENEFIT_ON_ADMISSION, true),
+            new FieldProcessor.Def(34, false, false, "Льгота учащегося", null, FieldId.BENEFIT_DSZN, true),
             new FieldProcessor.Def(35, false, false, "Количество представителей", null, FieldId.GUARDIANS_COUNT, false),
             new FieldProcessor.Def(36, false, false, "Коллекция представителей", null, FieldId.GUARDIANS_COUNT_LIST, false),
             new FieldProcessor.Def(37, false, false, "Тип возрастной группы", null, FieldId.AGE_TYPE_GROUP, true),
             new FieldProcessor.Def(38, false, false, "SSOID", null, FieldId.SSOID, true),
+            new FieldProcessor.Def(39, false, false, "Льгота учащегося ИСПП", null, FieldId.BENEFIT, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -473,9 +475,26 @@ public class ClientManager {
                 client.setBirthDate(date);
             }
 
-            //token[34])
-            if (fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION) != null) {
-                client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
+            //token[34]
+            if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
+                client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
+                client.setLastDiscountsUpdate(new Date());
+
+                String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
+                String oldDiscounts = client.getCategoriesDiscounts();
+
+                Integer oldDiscountMode = client.getDiscountMode();
+                Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+
+                client.setCategoriesDiscounts(newDiscounts);
+                client.setDiscountMode(newDiscountMode);
+
+                if(!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                    DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode,
+                            oldDiscountMode, newDiscounts, oldDiscounts);
+                    discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                    persistenceSession.save(discountChangeHistory);
+                }
             }
 
             //token[35])
@@ -784,8 +803,18 @@ public class ClientManager {
             }
 
             //token[34])
-            if (fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION) != null) {
-                client.setBenefitOnAdmission(fieldConfig.getValue(FieldId.BENEFIT_ON_ADMISSION));
+            if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
+                client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
+                client.setLastDiscountsUpdate(new Date());
+
+                String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
+                client.setCategoriesDiscounts(newDiscounts);
+                client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
+
+                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
+                        Client.DISCOUNT_MODE_NONE, newDiscounts, "");
+                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                persistenceSession.save(discountChangeHistory);
             }
 
             //token[35])
