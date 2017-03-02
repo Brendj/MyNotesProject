@@ -48,6 +48,11 @@
         <property name="inn" column="inn" type="string" length="32"/>
         <property name="innFrom" column="innfrom" type="string" length="32"/>
 
+        <property name="interdistrictCouncil" column="interdistrictcouncil" type="string" length="256"/>
+        <property name="interdistrictCouncilFrom" column="interdistrictcouncilfrom" type="string" length="256"/>
+        <property name="interdistrictCouncilChief" column="interdistrictcouncilchief" type="string" length="256"/>
+        <property name="interdistrictCouncilChiefFrom" column="interdistrictcouncilchieffrom" type="string" length="256"/>
+
         <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>
         <property name="additionalId" column="additionalid" type="long"/>

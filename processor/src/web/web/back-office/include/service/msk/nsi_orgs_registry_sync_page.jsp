@@ -88,7 +88,7 @@
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"
                                        rendered="#{NSIOrgsRegistrySynchPage.isRevisionLast()}"/>
                     <rich:separator />
-                    <a4j:commandButton value="Применить выбранные" action="#{NSIOrgsRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
+                    <a4j:commandButton value="Применить выбранные" action="#{NSIOrgsRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo,synchTableControl" status="updateStatus"
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
                 </h:panelGrid>
                 <h:panelGrid id="revisionInfo" columns="2">
@@ -263,9 +263,9 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
-                            <h:outputText value="Наименование ОО для поставщика" />
+                            <h:outputText value="Межрайонный совет ОО" />
                         </f:facet>
-                        <h:outputText value="#{org.shortNameSupplier}" escape="false" />
+                        <h:outputText value="#{org.interdistrictCouncil}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">

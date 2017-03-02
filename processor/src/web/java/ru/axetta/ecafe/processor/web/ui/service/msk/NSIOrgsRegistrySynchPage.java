@@ -300,6 +300,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
                     i.setApplied(success);
                     i.setSelected(false);
+                    if (success) {
+                        for (WebItem webItem : i.getOrgs()) {
+                            if (webItem.isSelected()){
+                                webItem.setApplied(true);
+                                webItem.setSelected(false);
+                            }
+                        }
+                    }
                 }
             }
         }

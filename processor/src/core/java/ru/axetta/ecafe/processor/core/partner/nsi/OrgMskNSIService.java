@@ -218,6 +218,8 @@ public class OrgMskNSIService extends MskNSIService {
                     item.setRegion(info.getRegion());
                     item.setGuid(info.getGuid());
                     item.setInn(info.getInn());
+                    item.setInterdistrictCouncil(info.getInterdistrictCouncil());
+                    item.setInterdistrictCouncilChief(info.getInterdistrictCouncilChief());
 
                     Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
                             item.getInn(), item.getUnom(), item.getUnad());

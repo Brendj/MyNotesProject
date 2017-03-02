@@ -190,6 +190,8 @@ public class Org implements Serializable {
         this.orgStructureVersion = orgStructureVersion;
         this.tradeAccountConfigChangeDirective = TradeAccountConfigChange.NOT_CHANGED;
         this.changesDSZN = changesDSZN;
+        this.variableFeeding = false;
+        this.isWorkInSummerTime = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");

@@ -330,35 +330,27 @@ public class ImportRegisterOrgsService {
             StringBuffer logBuffer) throws Exception {
         log(synchDate + "Сохранение организаций", logBuffer);
         long createDate = System.currentTimeMillis();
-        OrgRegistryChangeItem orgRegistryChangeItem = null;
-        boolean addChange = true;
+        boolean addChange;
         for(OrgInfo oi : orgs) {
             OrgRegistryChange orgRegistryChange = fillOrgRegistryChange(oi, createDate);
             if (orgRegistryChange == null){
                 continue;
             }
+            addChange = false;
             for (OrgInfo orgInfo : oi.getOrgInfos()) {
                 //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
-                if (safeCompare(oi.interdistrictCouncil, oi.interdistrictCouncilFrom) && safeCompare(oi.interdistrictCouncilChief, oi.interdistrictCouncilChiefFrom) &&
+                if (safeCompare(orgInfo.interdistrictCouncil, orgInfo.interdistrictCouncilFrom) && safeCompare(orgInfo.interdistrictCouncilChief, orgInfo.interdistrictCouncilChiefFrom) &&
                         safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
                         safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
                         safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom)) {
-                    addChange = false;
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
                         orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
                     }
-                    orgRegistryChangeItem = fillOrgRegistryChangeItem(orgRegistryChange, orgInfo, createDate);
+                    OrgRegistryChangeItem orgRegistryChangeItem = fillOrgRegistryChangeItem(orgRegistryChange, orgInfo, createDate);
                     orgRegistryChange.getOrgs().add(orgRegistryChangeItem);
                     addChange = true;
                 }
-                /*if(orgRegistryChange.getOrgs() == null){
-                    orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
-                }*/
-                /*if (addChange) {
-                    orgRegistryChangeItem = fillOrgRegistryChangeItem(orgRegistryChange, orgInfo, createDate);
-                    orgRegistryChange.getOrgs().add(orgRegistryChangeItem);
-                }*/
             }
             if (addChange) {
                 em.persist(orgRegistryChange);
