@@ -652,7 +652,8 @@ public class ImportRegisterClientsService {
         }
 
         ch.setBenefitDSZN(clientBenefitDSZN);
-        ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN, currentClient.getCategoriesDiscounts()), ","));
+        ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
+                currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
 
         if (operation == CREATE_OPERATION) {
             if (guardiansCount != null) {
