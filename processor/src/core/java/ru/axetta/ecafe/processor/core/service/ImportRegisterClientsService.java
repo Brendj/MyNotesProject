@@ -1490,6 +1490,8 @@ public class ImportRegisterClientsService {
     public static class ExpandedPupilInfo {
 
         public String familyName, firstName, secondName, guid, group, enterGroup, enterDate, leaveDate;
+        public String groupDeprecated; //сюда группу из секции "Текущий класс или группа", как резервный случай, если в секции "Класс" будет пусто
+        public String groupNewWay;     //сюда группу из секции "Класс"
         public String birthDate;
         public String benefitDSZN;
 
@@ -1636,6 +1638,14 @@ public class ImportRegisterClientsService {
             this.enterDate = pi.enterDate;
             this.leaveDate = pi.leaveDate;
             this.ageTypeGroup = pi.ageTypeGroup;
+        }
+
+        public String getGroupDeprecated() {
+            return groupDeprecated;
+        }
+
+        public String getGroupNewWay() {
+            return groupNewWay;
         }
     }
 

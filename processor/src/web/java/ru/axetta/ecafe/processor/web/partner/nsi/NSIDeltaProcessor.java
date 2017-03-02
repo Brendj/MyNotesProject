@@ -345,6 +345,7 @@ public class NSIDeltaProcessor {
         protected String benefitDSZN;
         protected String ageTypeGroup;
         protected List<ImportRegisterClientsService.GuardianInfo> guardians;
+        private String groupDeprecated, groupNewWay;
 
         public DeltaItem(Item item) {
             this.notificationId = item.getNotificationId();
@@ -421,7 +422,13 @@ public class NSIDeltaProcessor {
                         guardians.add(guardianInfo);
                     }
                 }
-                else if((group == null || StringUtils.isBlank(group)) &&
+                else if (attributeName.endsWith("текущий класс или группа")) {
+                    groupDeprecated = getSingleValue(at);
+                }
+                else if (attributeName.endsWith("класс")) {
+                    groupNewWay = getGroupFromClassAttribute(at);
+                }
+                /*else if((group == null || StringUtils.isBlank(group)) &&
                         attributeName.endsWith("текущий класс или группа")) {
                     group = getSingleValue(at);
                 } else  if ((group == null || StringUtils.isBlank(group)) &&
@@ -439,10 +446,64 @@ public class NSIDeltaProcessor {
                 }
                 else if(attributeName.endsWith("класс/название")) {
                     group = getSingleValue(at);
-                }
+                }*/
                 else if(attributeName.endsWith("guid образовательного учреждения")) {
                     orgGuid = getSingleValue(at);
                 }
+            }
+            group = !StringUtils.isEmpty(groupNewWay) ? groupNewWay : groupDeprecated;
+        }
+
+        private String getGroupFromClassAttribute(Attribute attr) {
+            //При изменениях нужно править аналогичный метод получения группы в ClientMskNSIService
+            try {
+                String group = null;
+                List<GroupValue> groupValues = attr.getGroupValue();
+                GroupValue lastYearGroupValue = null;
+                if (groupValues.size() > 1) {
+                    Integer year = null;
+                    //Пробегаемся по всем блокам <groupValue occurrence="0 .. N"> с целью найти блок с последним годом обучения
+                    for(GroupValue grpVal : groupValues) {
+                        for(Attribute attr2 : grpVal.getAttribute()) {
+                            if(attr2.getName().equals("Год обучения")) {
+                                String[] years = attr2.getValue().get(0).getValue().split("/");
+                                if (years.length > 0) {
+                                    String sYear = years[years.length-1];
+                                    if ((lastYearGroupValue == null) || (Integer.parseInt(sYear) > year)) {
+                                        lastYearGroupValue = grpVal;
+                                        year = Integer.parseInt(sYear);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    lastYearGroupValue = groupValues.get(0);
+                }
+                String parallel = null;
+                String letter = null;
+                String name = null;
+                if (lastYearGroupValue != null) {
+                    for(Attribute attr2 : lastYearGroupValue.getAttribute()) {
+                        if(attr2.getName().equals("Параллель")) {
+                            parallel = attr2.getValue().get(0).getValue();
+                        }
+                        if(attr2.getName().equals("Буква")) {
+                            letter = attr2.getValue().get(0).getValue();
+                        }
+                        if(attr2.getName().equals("Название")) {
+                            name = attr2.getValue().get(0).getValue();
+                        }
+                    }
+                    group = (parallel == null ? "" : parallel) + "-" + (letter == null ? "" : letter);
+                    if (group.startsWith("-")) {
+                        group = name;
+                    }
+                }
+                return group;
+            } catch (Exception e) {
+                logger.info("Error finding group from group attribute");
+                return null;
             }
         }
 

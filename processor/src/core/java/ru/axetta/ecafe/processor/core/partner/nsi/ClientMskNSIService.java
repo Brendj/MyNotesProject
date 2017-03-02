@@ -12,6 +12,8 @@ import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,7 @@ import java.util.*;
 @Scope("singleton")
 public class ClientMskNSIService extends MskNSIService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClientMskNSIService.class);
 
     private String getGroup(String currentGroup, String initialGroup) {
         String group = currentGroup;
@@ -221,11 +224,11 @@ public class ClientMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Дата рождения")) {
                     pupilInfo.birthDate = attr.getValue().get(0).getValue();
                 }
-                if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
+                /*if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
                         attr.getName().equals("Текущий класс или группа")) {
                     pupilInfo.group = attr.getValue().get(0).getValue();
-                }
-                if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
+                }*/
+                /*if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
                         attr.getName().equals("Класс")) {
                     List<GroupValue> groupValues = attr.getGroupValue();
                     boolean set = false;
@@ -241,7 +244,14 @@ public class ClientMskNSIService extends MskNSIService {
                             break;
                         }
                     }
+                }*/
+                if (attr.getName().equals("Текущий класс или группа")) {
+                    pupilInfo.groupDeprecated = attr.getValue().get(0).getValue();
                 }
+                if (attr.getName().equals("Класс")) {
+                    pupilInfo.groupNewWay = getGroupFromClassAttribute(attr);
+                }
+
                 if (attr.getName().equals("GUID образовательного учреждения")) {
                     pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
                 }
@@ -318,31 +328,64 @@ public class ClientMskNSIService extends MskNSIService {
             pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
             pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
             pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
+            pupilInfo.group = !StringUtils.isEmpty(pupilInfo.groupNewWay) ? pupilInfo.groupNewWay : pupilInfo.groupDeprecated;
             pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
 
             list.add(pupilInfo);
         }
-        /*for (QueryResult qr : queryResults) {
-            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
-            pupilInfo.familyName = qr.getQrValue().get(0);
-            pupilInfo.firstName = qr.getQrValue().get(1);
-            pupilInfo.secondName = qr.getQrValue().get(2);
-            pupilInfo.guid = qr.getQrValue().get(3);
-            pupilInfo.birthDate = qr.getQrValue().get(4);
-            pupilInfo.group = getGroup(qr.getQrValue().get(8), qr.getQrValue().get(5));
-            pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
-            pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
-            pupilInfo.guidOfOrg = qr.getQrValue().get(9);
-            pupilInfo.recordState = qr.getQrValue().get(10);
-
-            pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
-            pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
-            pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
-            pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
-            pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
-
-            list.add(pupilInfo);
-        }*/
         return list;
+    }
+
+    private String getGroupFromClassAttribute(Attribute attr) {
+        //При изменениях нужно править аналогичный метод получения группы в NSIDeltaProcessor
+        try {
+            String group = null;
+            List<GroupValue> groupValues = attr.getGroupValue();
+            GroupValue lastYearGroupValue = null;
+            if (groupValues.size() > 1) {
+                Integer year = null;
+                //Пробегаемся по всем блокам <groupValue occurrence="0 .. N"> с целью найти блок с последним годом обучения
+                for(GroupValue grpVal : groupValues) {
+                    for(Attribute attr2 : grpVal.getAttribute()) {
+                        if(attr2.getName().equals("Год обучения")) {
+                            String[] years = attr2.getValue().get(0).getValue().split("/");
+                            if (years.length > 0) {
+                                String sYear = years[years.length-1];
+                                if ((lastYearGroupValue == null) || (Integer.parseInt(sYear) > year)) {
+                                    lastYearGroupValue = grpVal;
+                                    year = Integer.parseInt(sYear);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                lastYearGroupValue = groupValues.get(0);
+            }
+            String parallel = null;
+            String letter = null;
+            String name = null;
+            if (lastYearGroupValue != null) {
+                for(Attribute attr2 : lastYearGroupValue.getAttribute()) {
+                    if(attr2.getName().equals("Параллель")) {
+                        parallel = attr2.getValue().get(0).getValue();
+                    }
+                    if(attr2.getName().equals("Буква")) {
+                        letter = attr2.getValue().get(0).getValue();
+                    }
+                    if(attr2.getName().equals("Название")) {
+                        name = attr2.getValue().get(0).getValue();
+                    }
+                }
+                group = (parallel == null ? "" : parallel) + "-" + (letter == null ? "" : letter);
+                if (group.startsWith("-")) {
+                    group = name;
+                }
+            }
+            return group;
+        } catch (Exception e) {
+            logger.info("Error finding group from group attribute");
+            return null;
+        }
     }
 }
