@@ -112,7 +112,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
                     sb.append(map.get(code));
                     sb.append("; ");
                 }
-                this.categoriesDSZN = sb.substring(0, sb.length() - 2);
+                this.categoriesDSZN = sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
             } else {
                 this.categoriesDSZN = "";
             }
