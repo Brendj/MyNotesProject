@@ -696,7 +696,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         public boolean getGroupChangeExists() {
-            return operation == ImportRegisterClientsService.MODIFY_OPERATION &&
+            return (operation == ImportRegisterClientsService.MODIFY_OPERATION ||operation == ImportRegisterClientsService.MOVE_OPERATION ) &&
                    !groupName.equals(groupNameFrom);
         }
         
