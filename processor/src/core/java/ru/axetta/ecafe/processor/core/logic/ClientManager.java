@@ -806,12 +806,16 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
                 client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
                 client.setLastDiscountsUpdate(new Date());
+            } else {
+                client.setCategoriesDiscountsDSZN("");
             }
 
             //token[39]
             if (fieldConfig.getValue(FieldId.BENEFIT) != null) {
                 client.setCategoriesDiscounts(fieldConfig.getValue(FieldId.BENEFIT));
                 client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
+            } else {
+                client.setCategoriesDiscounts("");
             }
 
             //token[35])
