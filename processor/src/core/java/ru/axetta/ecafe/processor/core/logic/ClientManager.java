@@ -802,19 +802,16 @@ public class ClientManager {
                 client.setBirthDate(date);
             }
 
-            //token[34])
+            //token[34]
             if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
                 client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
                 client.setLastDiscountsUpdate(new Date());
+            }
 
-                String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
-                client.setCategoriesDiscounts(newDiscounts);
+            //token[39]
+            if (fieldConfig.getValue(FieldId.BENEFIT) != null) {
+                client.setCategoriesDiscounts(fieldConfig.getValue(FieldId.BENEFIT));
                 client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
-
-                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
-                        Client.DISCOUNT_MODE_NONE, newDiscounts, "");
-                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                persistenceSession.save(discountChangeHistory);
             }
 
             //token[35])
@@ -851,6 +848,13 @@ public class ClientManager {
                 clientMigration = new ClientMigration(client, client.getOrg(), contractDate, newClientGroupName);
             } else {
                 clientMigration = new ClientMigration(client, client.getOrg(), contractDate);
+            }
+
+            if (fieldConfig.getValue(FieldId.BENEFIT) != null) {
+                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
+                        Client.DISCOUNT_MODE_NONE, fieldConfig.getValue(FieldId.BENEFIT), "");
+                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                persistenceSession.save(discountChangeHistory);
             }
 
             persistenceSession.save(clientMigration);
