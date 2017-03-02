@@ -749,7 +749,7 @@ public class ImportRegisterClientsService {
             }
             Criteria criteria1 = session.createCriteria(CategoryDiscountDSZN.class);
             criteria1.add(Restrictions.in("code", benefitsList));
-            criteria1.add(Restrictions.ne("deleted", false));
+            criteria1.add(Restrictions.eq("deleted", false));
             List<CategoryDiscountDSZN> cdDSZN = criteria1.list();
             for(CategoryDiscountDSZN discountDSZN : cdDSZN) {
                 if(discountDSZN.getCategoryDiscount() != null) {
