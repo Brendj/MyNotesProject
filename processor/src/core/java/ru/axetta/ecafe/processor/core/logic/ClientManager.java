@@ -718,7 +718,7 @@ public class ClientManager {
             logger.debug("create client");
             Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms,
                     notifyByPUSH, contractId, contractDate, contractState, password, payForSms, clientRegistryVersion,
-                    limit, expenditureLimit, "");
+                    limit, expenditureLimit, "", "");
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
@@ -969,7 +969,7 @@ public class ClientManager {
         Client clientGuardianToSave = new Client(organization, personGuardian, contractGuardianPerson, 0, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS),
                 false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
-                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
 
         ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(persistenceSession, organization.getIdOfOrg(),
                 "Родители");

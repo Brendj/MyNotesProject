@@ -553,7 +553,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         Client client = new Client(org, person, contractPerson, this.flags, this.notifyViaEmail, this.notifyViaSMS, this.notifyViaPUSH,
                 this.contractId, this.contractTime, this.contractState, this.plainPassword, this.payForSMS,
-                clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "");
+                clientRegistryVersion, this.limit, RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
 
         client.setAddress(this.address);
         client.setPhone(this.phone);

@@ -135,7 +135,7 @@ public class Client {
     public Client(Org org, Person person, Person contractPerson, int flags, boolean notifyViaEmail,
             boolean notifyViaSMS, boolean notifyViaPUSH, long contractId, Date contractTime, int contractState,
             String plainPassword, int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit,
-            String categoriesDiscounts) throws Exception {
+            String categoriesDiscounts, String categoriesDiscountsDSZN) throws Exception {
         this.org = org;
         this.person = person;
         this.contractPerson = contractPerson;
@@ -158,6 +158,7 @@ public class Client {
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
+        this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
         this.disablePlanCreation = false;
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
