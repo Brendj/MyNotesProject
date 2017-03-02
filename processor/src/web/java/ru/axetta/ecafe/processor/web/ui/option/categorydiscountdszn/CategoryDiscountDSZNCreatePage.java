@@ -67,13 +67,22 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
         if(code == null || code < 0) {
             printError("Неверный код ДСЗН");
             return null;
-        } else if(DAOUtils.checkCategoryDiscountDSZNByCode(entityManager, code)) {
-            printError("Категория льготы ДСЗН с таким кодом уже существует");
-            return null;
         }
         try {
             Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
-            CategoryDiscountDSZN categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, nextVersion);
+            CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNByCode(entityManager, code);
+            if(categoryDiscountDSZN != null) {
+                if(!categoryDiscountDSZN.getDeleted()) {
+                    printError("Категория льготы ДСЗН с таким кодом уже существует");
+                    return null;
+                }
+                categoryDiscountDSZN.setDeleted(false);
+                categoryDiscountDSZN.setDescription(description);
+                categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
+                categoryDiscountDSZN.setVersion(nextVersion);
+            } else {
+                categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, nextVersion);
+            }
             entityManager.persist(categoryDiscountDSZN);
             code = null;
             description = "";

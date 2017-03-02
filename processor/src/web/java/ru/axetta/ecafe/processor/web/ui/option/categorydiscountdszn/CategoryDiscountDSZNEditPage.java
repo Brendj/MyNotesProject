@@ -60,17 +60,8 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
             printError("Добавьте описание льготы ДСЗН");
             return null;
         }
-        if(code == null || code < 0) {
-            printError("Неверный код ДСЗН");
-            return null;
-        }
         Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
         CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNById(entityManager, idOfCategoryDiscountDSZN);
-        if(!categoryDiscountDSZN.getCode().equals(code) && DAOUtils.checkCategoryDiscountDSZNByCode(entityManager, code)) {
-            printError("Категория льготы ДСЗН с таким кодом уже существует");
-            return null;
-        }
-        categoryDiscountDSZN.setCode(code);
         categoryDiscountDSZN.setDescription(description);
         categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
         categoryDiscountDSZN.setVersion(nextVersion);

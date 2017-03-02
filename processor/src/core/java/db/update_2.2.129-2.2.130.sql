@@ -18,11 +18,9 @@ CREATE TABLE cf_categorydiscounts_dszn
   deleted INTEGER NOT NULL,
   CONSTRAINT cf_categorydiscounts_dszn_pk PRIMARY KEY (idofcategorydiscountdszn),
   CONSTRAINT cf_categorydiscounts_dszn_idofcategorydiscount_fk FOREIGN KEY (idofcategorydiscount)
-  REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+  REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_categorydiscounts_dszn_code UNIQUE (code)
 );
-  CREATE UNIQUE INDEX cf_categorydiscounts_dszn_code_unique_idx
-  ON cf_categorydiscounts_dszn USING btree (code)
-  WHERE deleted = 0;
 
 --Блокировка изменения льгот ИСПП у клиентов в АРМ
 ALTER TABLE cf_categorydiscounts ADD COLUMN blockedchange integer NOT NULL DEFAULT 0;

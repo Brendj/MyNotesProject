@@ -1486,6 +1486,10 @@
 
 </rich:panelMenuGroup>
 
+<rich:panelMenuGroup id="benefitsOptionsMenu" binding="#{mainPage.benefitsOptionsPage.mainMenuComponent}"
+                         label="Льготы" rendered="#{mainPage.eligibleToViewCategory || !mainPage.eligibleToViewUsers || mainPage.eligibleToViewRule}">
+    <a4j:support event="onclick" action="#{mainPage.showBenefitsOptionsPage}" reRender="workspaceForm" />
+
 <rich:panelMenuGroup id="categoryOrgGroupMenu" label="Категории организаций"
                      binding="#{mainPage.categoryOrgGroupPage.mainMenuComponent}" rendered="#{!mainPage.eligibleToViewUsers}">
 
@@ -1568,6 +1572,8 @@
     <%--@elvariable id="complexRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.ComplexRuleEditPage"--%>
     <rich:panelMenuItem id="complexRoleEditMenuItem" binding="#{complexRuleEditPage.mainMenuComponent}"
                         label="Роли комплексов" action="#{complexRuleEditPage.show}" reRender="workspaceForm" />
+
+</rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
 

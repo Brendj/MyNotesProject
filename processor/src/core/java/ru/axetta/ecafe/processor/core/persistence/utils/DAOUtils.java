@@ -1447,10 +1447,16 @@ public class DAOUtils {
         return (CategoryDiscountDSZN)q.getSingleResult();
     }
 
-    public static boolean checkCategoryDiscountDSZNByCode(EntityManager entityManager, int code) {
-        javax.persistence.Query q = entityManager.createNativeQuery("SELECT count(1) from cf_categorydiscounts_dszn where code=:code and deleted = 0");
+    public static CategoryDiscountDSZN findCategoryDiscountDSZNByCode(EntityManager entityManager, int code) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where code=:code");
         q.setParameter("code", code);
-        return ((BigInteger)q.getSingleResult()).intValue() == 1;
+        CategoryDiscountDSZN result;
+        try {
+            result = (CategoryDiscountDSZN) q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+        return result;
     }
 
     public static long nextVersionByCategoryDiscountDSZN(EntityManager entityManager){

@@ -166,6 +166,7 @@ public class MainPage implements Serializable {
     // Org manipulation
     private final BasicWorkspacePage orgGroupPage = new BasicWorkspacePage();
     //categories orgs
+    private final BasicWorkspacePage benefitsOptionsPage = new BasicWorkspacePage();
     private final BasicWorkspacePage categoryOrgGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage optionsGroupPage = new BasicWorkspacePage();
     private final OrgListPage orgListPage = new OrgListPage();
@@ -639,12 +640,22 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public BasicWorkspacePage getBenefitsOptionsPage() {
+        return benefitsOptionsPage;
+    }
+
     public BasicWorkspacePage getCategoryOrgGroupPage() {
         return categoryOrgGroupPage;
     }
 
     public BasicWorkspacePage getOptionsGroupPage() {
         return optionsGroupPage;
+    }
+
+    public Object showBenefitsOptionsPage() {
+        currentWorkspacePage = benefitsOptionsPage;
+        updateSelectedMainMenu();
+        return null;
     }
 
     public Object showCategoryOrgGroupPage() {
