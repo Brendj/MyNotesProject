@@ -25,8 +25,10 @@
         <property name="modeGrant" column="ModeGrant" type="int" not-null="true" update="true"/>
         <property name="modeOfAdd" column="ModeOfAdd" type="int" not-null="true" update="true"/>
         <property name="usedSubscriptionFeeding" column="UsedSubscriptionFeeding" type="int" update="true"/>
+        <property name="usedVariableFeeding" column="UsedVariableFeeding" type="int" update="true"/>
         <property name="useTrDiscount" column="UseTrDiscount" type="int" update="true" />
         <property name="modeVisible" column="ModeVisible" type="int" update="true" />
+        <property name="rootComplex" column="RootComplex" type="int" update="true"/>
         <many-to-one name="menuDetail" class="ru.axetta.ecafe.processor.core.persistence.MenuDetail" column="IdOfMenuDetail"
                      lazy="proxy"
                      update="false"/>

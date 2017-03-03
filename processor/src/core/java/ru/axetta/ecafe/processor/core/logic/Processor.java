@@ -4361,6 +4361,14 @@ public class Processor implements SyncProcessor {
             if (usedSubscriptionFeeding != null) {
                 complexInfo.setUsedSubscriptionFeeding(usedSubscriptionFeeding);
             }
+            Integer usedVariableFeeding = reqComplexInfo.getUsedVariableFeeding();
+            if (usedVariableFeeding != null) {
+                complexInfo.setUsedVariableFeeding(usedVariableFeeding);
+            }
+            Integer rootComplex = reqComplexInfo.getRootComplex();
+            if (rootComplex != null) {
+                complexInfo.setRootComplex(rootComplex);
+            }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {
                 MenuDetail menuDetailOptional = findMenuDetailByLocalId(persistenceSession, menu,

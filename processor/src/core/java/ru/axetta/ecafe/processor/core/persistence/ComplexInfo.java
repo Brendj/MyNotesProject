@@ -25,6 +25,8 @@ public class ComplexInfo {
     private Long currentPrice;
     private Good good;
     private Integer usedSubscriptionFeeding; //Признак использования комплекса в абонементном питании. 1 – может быть использован, 0 – не может быть использован
+    private Integer usedVariableFeeding; //Признак использования комплекса в вариативном питании. 1 – может быть использован, 0 – не может быть использован
+    private Integer rootComplex; //Идентификатор комплекса-родителя для связывания комплексов в группы
 
     protected ComplexInfo() {}
 
@@ -158,6 +160,22 @@ public class ComplexInfo {
 
     public void setUsedSubscriptionFeeding(Integer usedSubscriptionFeeding) {
         this.usedSubscriptionFeeding = usedSubscriptionFeeding;
+    }
+
+    public Integer getUsedVariableFeeding() {
+        return usedVariableFeeding;
+    }
+
+    public void setUsedVariableFeeding(Integer usedVariableFeeding) {
+        this.usedVariableFeeding = usedVariableFeeding;
+    }
+
+    public Integer getRootComplex() {
+        return rootComplex;
+    }
+
+    public void setRootComplex(Integer rootComplex) {
+        this.rootComplex = rootComplex;
     }
 
     @Override

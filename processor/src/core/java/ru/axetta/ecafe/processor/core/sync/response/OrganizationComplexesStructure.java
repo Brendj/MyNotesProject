@@ -217,6 +217,7 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         private static final String ATTR_APPLY_DISCOUNT = "d";
         private static final String ATTR_APPLY_GRANT = "g";
         private static final String ATTR_APPLY_SUBSCRIPTION_FEEDING = "sf";
+        private static final String ATTR_APPLY_VARIABLE_FEEDING = "vf";
         private static final String ATTR_CENTRALIZE_VISIBLE = "cv";
         private static final String ATTR_GOOD_GUID = "gGuid";
         private static final String ATTR_GOOD_NAME = "gsname";
@@ -237,6 +238,9 @@ public class OrganizationComplexesStructure implements AbstractToElement{
             element.setAttribute(ATTR_APPLY_DISCOUNT,Integer.toString(complexInfo.getModeFree()));
             element.setAttribute(ATTR_APPLY_GRANT,Integer.toString(complexInfo.getModeGrant()));
             element.setAttribute(ATTR_APPLY_SUBSCRIPTION_FEEDING,Integer.toString(complexInfo.getUsedSubscriptionFeeding()));
+            if (complexInfo.getUsedVariableFeeding() != null) {
+                element.setAttribute(ATTR_APPLY_VARIABLE_FEEDING,Integer.toString(complexInfo.getUsedVariableFeeding()));
+            }
             Integer mv = complexInfo.getModeVisible();
             if (mv == null) {
                 mv = 0;

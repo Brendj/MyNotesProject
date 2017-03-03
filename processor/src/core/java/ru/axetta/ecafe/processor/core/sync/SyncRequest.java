@@ -919,6 +919,18 @@ public class SyncRequest {
                             usedSubscriptionFeeding = Integer.parseInt(usedSubscriptionFeedingNode.getTextContent());
                         }
 
+                        Node usedVariableFeedingNode = namedNodeMap.getNamedItem("usedVariableFeeding");
+                        int usedVariableFeeding = 0;
+                        if (usedVariableFeedingNode != null) {
+                            usedVariableFeeding = Integer.parseInt(usedVariableFeedingNode.getTextContent());
+                        }
+
+                        Node rootComplexNode = namedNodeMap.getNamedItem("rootComplex");
+                        Integer rootComplex = null;
+                        if (rootComplexNode != null) {
+                            rootComplex = Integer.parseInt(rootComplexNode.getTextContent());
+                        }
+
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
@@ -956,7 +968,8 @@ public class SyncRequest {
                         }
                         return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
                                 usedSubscriptionFeeding, reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail,
-                                reqComplexInfoDiscountDetail, currentPrice, goodsGuid, modeVisible);
+                                reqComplexInfoDiscountDetail, currentPrice, goodsGuid, modeVisible, usedVariableFeeding,
+                                rootComplex);
                     }
 
                 }
@@ -967,6 +980,7 @@ public class SyncRequest {
                 private final int modeGrant;
                 private final int modeOfAdd;
                 private final int usedSubscriptionFeeding;
+                private final int usedVariableFeeding;
                 private final Integer useTrDiscount;
                 private final ReqMenuDetail reqMenuDetail;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
@@ -974,17 +988,19 @@ public class SyncRequest {
                 private final Long currentPrice;
                 private final String goodsGuid;
                 private final Integer modeVisible;
+                private final Integer rootComplex;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         int usedSubscriptionFeeding, List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
                         ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid,
-                        Integer modeVisible) {
+                        Integer modeVisible, int usedVariableFeeding, Integer rootComplex) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
                     this.modeGrant = modeGrant;
                     this.modeOfAdd = modeOfAdd;
                     this.usedSubscriptionFeeding = usedSubscriptionFeeding;
+                    this.usedVariableFeeding = usedVariableFeeding;
                     this.complexInfoDetails = complexInfoDetails;
                     this.useTrDiscount = useTrDiscount;
                     this.complexInfoDiscountDetail = complexInfoDiscountDetail;
@@ -992,6 +1008,7 @@ public class SyncRequest {
                     this.currentPrice = currentPrice;
                     this.goodsGuid = goodsGuid;
                     this.modeVisible = modeVisible;
+                    this.rootComplex = rootComplex;
                 }
 
                 public int getComplexId() {
@@ -1040,6 +1057,14 @@ public class SyncRequest {
 
                 public int getUsedSubscriptionFeeding() {
                     return usedSubscriptionFeeding;
+                }
+
+                public int getUsedVariableFeeding() {
+                    return usedVariableFeeding;
+                }
+
+                public Integer getRootComplex() {
+                    return rootComplex;
                 }
 
                 public Integer getModeVisible() {
