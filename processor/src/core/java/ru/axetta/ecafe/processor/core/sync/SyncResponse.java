@@ -548,7 +548,7 @@ public class SyncResponse {
                     element.setAttribute("CategoriesDiscountsDSZN", this.categoriesDiscountsDSZN);
                 }
                 if (this.lastDiscountsUpdate != null) {
-                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                     element.setAttribute("LastDiscountsUpdate", timeFormat.format(this.lastDiscountsUpdate));
                 }
                 element.setAttribute("DisablePlanCreation", this.disablePlanCreation?"1":"0");
