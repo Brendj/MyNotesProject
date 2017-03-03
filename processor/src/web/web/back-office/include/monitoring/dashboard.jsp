@@ -207,6 +207,12 @@
                      </f:facet>
                      <h:outputText value="#{item.orgTag}"/>
                  </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.orgTag}" width="120px">
+                     <f:facet name="header">
+                         <h:outputText value="Летний период" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.isWorkInSummerTime}"/>
+                 </rich:column>
                  <f:facet name="footer">
                      <rich:datascroller for="orgBasicStatsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                         stepControls="auto" boundaryControls="hide">
