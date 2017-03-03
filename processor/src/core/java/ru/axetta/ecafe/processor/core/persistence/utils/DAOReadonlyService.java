@@ -454,7 +454,7 @@ public class DAOReadonlyService {
         final String sql;
         if (vp) {
             sql = "select distinct ci from ComplexInfo ci "
-                    + " where ci.org = :org and modeFree = 1 "
+                    + " where ci.org = :org and usedVariableFeeding = 1 "
                     + " and menuDate >= :startDate and menuDate < :endDate "
                     + " and ci.idOfComplex in :idOfComplex";
         } else {
