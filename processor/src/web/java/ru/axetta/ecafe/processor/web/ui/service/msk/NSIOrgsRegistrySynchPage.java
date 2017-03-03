@@ -60,6 +60,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_ADDRESS, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INTERDISTRICT, "", ""));
 
         /*checked.put(ImportRegisterOrgsService.VALUE_GUID, true);
         checked.put(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, true);
@@ -482,6 +483,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getShortNameFrom());
                 item.setNewValue(orgForEdit.getShortNameReestr());
             }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_INTERDISTRICT)) {
+                item.setOldValue(orgForEdit.getInterdistrictCouncilFrom());
+                item.setNewValue(orgForEdit.getInterdistrictCouncilReestr());
+            }
         }
         return orgModifyChangeItems;
     }
@@ -897,6 +902,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getInterdistrictCouncil() {
             return getResultString(interdistrictCouncil, interdistrictCouncilFrom);
+        }
+
+        public String getInterdistrictCouncilReestr() {
+            return interdistrictCouncil;
         }
 
         public String getInterdistrictCouncilFrom() {

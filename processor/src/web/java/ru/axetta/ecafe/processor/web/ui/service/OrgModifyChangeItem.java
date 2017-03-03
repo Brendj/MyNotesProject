@@ -29,7 +29,7 @@ public class OrgModifyChangeItem {
     }
 
     public void setOldValue(String oldValue) {
-        this.oldValue = oldValue;
+        this.oldValue = oldValue == null ? "" : oldValue;
     }
 
     public String getNewValue() {
@@ -37,7 +37,7 @@ public class OrgModifyChangeItem {
     }
 
     public void setNewValue(String newValue) {
-        this.newValue = newValue;
+        this.newValue = newValue == null ? "" : newValue;
     }
 
     public String getValueName() {

@@ -53,6 +53,7 @@ public class ImportRegisterOrgsService {
     public static final String VALUE_UNOM = "УНОМ";
     public static final String VALUE_UNAD = "УНАД";
     public static final String VALUE_INN = "ИНН";
+    public static final String VALUE_INTERDISTRICT = "Межрайонный совет ОО";
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterOrgsService.class);
 
@@ -259,8 +260,6 @@ public class ImportRegisterOrgsService {
                         org.setBtiUnad(orgRegistryChangeItem.getUnad());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INN)))
                         org.setINN(orgRegistryChangeItem.getInn());
-                    org.setInterdistrictCouncil(orgRegistryChangeItem.getInterdistrictCouncil());
-                    org.setInterdistrictCouncilChief(orgRegistryChange.getInterdistrictCouncilChief());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
                         org.setGuid(orgRegistryChange.getGuid());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNIQUE_ADDRESS_ID))) {
@@ -275,6 +274,10 @@ public class ImportRegisterOrgsService {
                         org.setOfficialName(orgRegistryChange.getOfficialName());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_NAME)))
                         org.setShortNameInfoService(orgRegistryChange.getShortName());//Краткое наименование для инфосервиса
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INTERDISTRICT))) {
+                        org.setInterdistrictCouncil(orgRegistryChangeItem.getInterdistrictCouncil());
+                        org.setInterdistrictCouncilChief(orgRegistryChangeItem.getInterdistrictCouncilChief());
+                    }
 
                     orgRegistryChangeItem.setApplied(true);
                 }
