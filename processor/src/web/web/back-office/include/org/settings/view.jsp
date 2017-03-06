@@ -167,8 +167,18 @@
         <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.hoursForbidChange}" styleClass="input-text" style="width: 207px" />
 
+        <h:outputText escape="true" value="Шестидневный план рабочих дней" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{(settingViewPage.setting.splitSettingValue.sixWorkWeek?'Включен':'Выключен')}"
+                     styleClass="output-text" />
+
         <h:outputText escape="true" value="Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.daysToForbidChangeInPos}" styleClass="input-text" style="width: 207px"/>
+
+        <h:outputText escape="true" value="Количество дней, на которые создаются заявки вариативного питания" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.dayCreateVP}" styleClass="input-text" style="width: 207px"/>
+
+        <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки вариативного питания" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.hoursForbidVP}" styleClass="input-text" style="width: 207px" />
 
     </h:panelGrid>
 

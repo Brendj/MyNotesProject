@@ -18,6 +18,8 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private int hoursForbidChange; // Количество часов, в течение которых запрещено редактировать заявки
     private int daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     private boolean sixWorkWeek; // Шестидневный план рабочих дней
+    private int dayCreateVP; //Количество дней, на которые создаются заявки вариативного питания
+    private int hoursForbidVP; //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
 
     public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -42,13 +44,25 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
         } else {
             this.daysToForbidChangeInPos = Integer.parseInt(values[5]);
         }
+
+        if (values.length < 7) {
+            this.dayCreateVP = 0;
+        } else {
+            this.dayCreateVP = Integer.parseInt(values[6]);
+        }
+
+        if (values.length < 8) {
+            this.hoursForbidVP = 0;
+        } else {
+            this.hoursForbidVP = Integer.parseInt(values[7]);
+        }
     }
 
     @Override
     public String build() {
         //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
         return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (
-                sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";";
+                sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";" + dayCreateVP + ";" + hoursForbidVP + ";";
     }
 
     @Override
@@ -120,5 +134,21 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
 
     public void setSixWorkWeek(boolean sixWorkWeek) {
         this.sixWorkWeek = sixWorkWeek;
+    }
+
+    public int getDayCreateVP() {
+        return dayCreateVP;
+    }
+
+    public void setDayCreateVP(int dayCreateVP) {
+        this.dayCreateVP = dayCreateVP;
+    }
+
+    public int getHoursForbidVP() {
+        return hoursForbidVP;
+    }
+
+    public void setHoursForbidVP(int hoursForbidVP) {
+        this.hoursForbidVP = hoursForbidVP;
     }
 }

@@ -283,8 +283,21 @@
             <rich:inputNumberSlider inputClass="input-text" value="#{settingCreatePage.parserBySettingValue.hoursForbidChange}"
                                     maxValue="72" step="3" minValue="3" showToolTip="true" />
 
+            <h:outputText escape="true" value="Шестидневный план рабочих дней" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{settingCreatePage.parserBySettingValue.sixWorkWeek}">
+                <f:selectItem itemValue="true"/>
+                <f:selectItem itemValue="false"/>
+            </h:selectBooleanCheckbox>
+
             <h:outputText escape="true" value="Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме" styleClass="output-text" />
             <h:inputText value="#{settingCreatePage.parserBySettingValue.daysToForbidChangeInPos}" styleClass="input-text" style="width: 207px"/>
+
+            <h:outputText escape="true" value="Количество дней, на которые создаются заявки вариативного питания" styleClass="output-text" />
+            <h:inputText value="#{settingCreatePage.parserBySettingValue.dayCreateVP}" styleClass="input-text" style="width: 207px"/>
+
+            <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки вариативного питания" styleClass="output-text" />
+            <rich:inputNumberSlider inputClass="input-text" value="#{settingCreatePage.parserBySettingValue.hoursForbidVP}"
+                                    maxValue="72" step="3" minValue="3" showToolTip="true" />
 
         </h:panelGrid>
 
