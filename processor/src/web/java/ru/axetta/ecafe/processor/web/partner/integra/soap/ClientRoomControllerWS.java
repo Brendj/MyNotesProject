@@ -194,7 +194,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
 
-    private final long[] orgs_VP_pilot = {697, 748, 1830, 1831, 1832, 2499};
+    //private final Long[] orgs_VP_pilot = getVPOrgsList();
 
     private static final String QUERY_PUBLICATION_LIST =
             "select result.*, org.shortname from " +
@@ -6250,7 +6250,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             final boolean isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES
                   || ClientGroup.predefinedGroupNames().contains(groupName);
             boolean vp = false;
-            if (ArrayUtils.contains(orgs_VP_pilot, org.getIdOfOrg())) {
+            if (ArrayUtils.contains(getVPOrgsList(), org.getIdOfOrg())) {
                 vp = true;
             }
             List<ComplexInfo> complexInfoList = DAOReadonlyService.getInstance().findComplexesWithSubFeeding(org, isParent, vp);
@@ -7349,7 +7349,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 diagram.setSunday("");
                 diagram.setSundayPrice("0");
                 diagram.setStaff(null);
-                if (ArrayUtils.contains(orgs_VP_pilot, clientOrg.getIdOfOrg())) {
+                if (ArrayUtils.contains(getVPOrgsList(), clientOrg.getIdOfOrg())) {
                     diagram.setFeedingType(SubscriptionFeedingType.VARIABLE_TYPE);
                 } else {
                     diagram.setFeedingType(SubscriptionFeedingType.ABON_TYPE);
@@ -7702,5 +7702,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_INTERNAL_ERROR_DESC;
         }
         return result;
+    }
+
+    private Long[] getVPOrgsList() {
+        List<Long> result = new ArrayList<Long>();
+        String[] strs = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.vp.pilot.orgs", "697, 748, 1830, 1831, 1832, 2499").split(",");
+        for (String str : strs) {
+            result.add(Long.parseLong(str.trim()));
+        }
+        return result.toArray(new Long[result.size()]);
     }
 }
