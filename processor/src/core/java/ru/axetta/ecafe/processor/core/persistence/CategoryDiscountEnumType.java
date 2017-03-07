@@ -17,7 +17,9 @@ import java.util.Map;
 public enum CategoryDiscountEnumType {
 
     CATEGORY_WITH_DISCOUNT(0,"Льгота"),
-    FEE_CATEGORY(1,"Платное питание");
+    FEE_CATEGORY(1,"Платное питание"),
+    NOT_SPECIFIED(2, "Не определено"),  //этот элемент не показываем на странице создания и редактирвоания категории льгот
+    VARIABLE_CATEGORY(3,"Вариативное питание");
 
     private final Integer value;
     private final String description;

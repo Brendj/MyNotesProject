@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 
 import javax.faces.model.SelectItem;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,11 +23,12 @@ public class CategoryDiscountEnumTypeMenu {
 
     private static SelectItem[] readAllItems() {
         CategoryDiscountEnumType[] categoryDiscountEnumTypes = CategoryDiscountEnumType.values();
-        SelectItem[] items = new SelectItem[categoryDiscountEnumTypes.length];
-        for (int i = 0; i < items.length; ++i) {
-            items[i] = new SelectItem(i, categoryDiscountEnumTypes[i].toString());
+        List<SelectItem> list = new ArrayList<SelectItem>();
+        for (int i = 0; i < categoryDiscountEnumTypes.length; ++i) {
+            if (i != CategoryDiscountEnumType.NOT_SPECIFIED.getValue())
+                list.add(new SelectItem(categoryDiscountEnumTypes[i].getValue(), categoryDiscountEnumTypes[i].toString()));
         }
-        return items;
+        return list.toArray(new SelectItem[list.size()]);
     }
 
     public SelectItem[] getItems() {
