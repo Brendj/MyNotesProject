@@ -19,7 +19,7 @@ public enum SettingsIds {
     SalesReportPrinter(1,"Настройка принтера отчета по продажам"),
     CardBalanceReportPrinter(2,"Настройка принтера отчета по балансам карт"),
     AutoPlanPaymentSetting(3,"Настройка автооплаты льготного питания"),
-    SubscriberFeeding(4,"Настройки абонементного питания"),
+    SubscriberFeeding(4,"Настройки персонализированного питания"),
     ReplacingMissingBeneficiaries(5,"Режим замены отсутствующих льготников");
 
     private Integer id;
