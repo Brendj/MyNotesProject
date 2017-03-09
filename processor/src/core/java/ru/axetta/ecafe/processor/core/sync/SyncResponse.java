@@ -353,7 +353,7 @@ public class SyncResponse {
             private final Date birthDate;
             private final String categoriesDiscountsDSZN;
             private final Date lastDiscountsUpdate;
-            private final boolean disablePlanCreation;
+            private final Date disablePlanCreationDate;
             private final String ageTypeGroup;
             private final Long balanceToNotify;
 
@@ -391,7 +391,7 @@ public class SyncResponse {
                 this.birthDate = client.getBirthDate();
                 this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
                 this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
-                this.disablePlanCreation = client.getDisablePlanCreation();
+                this.disablePlanCreationDate = client.getDisablePlanCreationDate();
                 this.ageTypeGroup = client.getAgeTypeGroup();
                 this.balanceToNotify = client.getBalanceToNotify();
             }
@@ -477,8 +477,8 @@ public class SyncResponse {
                 return lastDiscountsUpdate;
             }
 
-            public boolean isDisablePlanCreation() {
-                return disablePlanCreation;
+            public Date getDisablePlanCreationDate() {
+                return disablePlanCreationDate;
             }
 
             public Date getBirthDate() {
@@ -551,7 +551,10 @@ public class SyncResponse {
                     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                     element.setAttribute("LastDiscountsUpdate", timeFormat.format(this.lastDiscountsUpdate));
                 }
-                element.setAttribute("DisablePlanCreation", this.disablePlanCreation?"1":"0");
+                if (this.disablePlanCreationDate != null) {
+                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    element.setAttribute("DisablePlanCreationDate", timeFormat.format(this.disablePlanCreationDate));
+                }
                 if (this.ageTypeGroup != null) {
                     element.setAttribute("AgeTypeGroup", this.ageTypeGroup);
                 }

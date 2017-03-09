@@ -93,7 +93,7 @@ public class Client {
     private String categoriesDiscounts;
     private String categoriesDiscountsDSZN;
     private Date lastDiscountsUpdate;
-    private Boolean disablePlanCreation;
+    private Date disablePlanCreationDate;
     private String san;
     private Set<GuardSan> guardSan;
     private Long externalId;
@@ -160,7 +160,7 @@ public class Client {
         this.categoriesDiscounts = categoriesDiscounts;
         this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
-        this.disablePlanCreation = false;
+        this.disablePlanCreationDate = null;
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
             if (predefined.isEnabledAtDefault()) {
@@ -958,12 +958,12 @@ public class Client {
         this.lastDiscountsUpdate = lastDiscountsUpdate;
     }
 
-    public Boolean getDisablePlanCreation() {
-        return disablePlanCreation;
+    public Date getDisablePlanCreationDate() {
+        return disablePlanCreationDate;
     }
 
-    public void setDisablePlanCreation(Boolean disablePlanCreation) {
-        this.disablePlanCreation = disablePlanCreation;
+    public void setDisablePlanCreationDate(Date disablePlanCreationDate) {
+        this.disablePlanCreationDate = disablePlanCreationDate;
     }
 
     public String getGuardiansCount() {

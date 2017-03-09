@@ -3427,6 +3427,7 @@ public class Processor implements SyncProcessor {
                 client.setFreePayCount(clientParamItem.getFreePayCount());
                 client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
                 client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
+                client.setDisablePlanCreationDate(clientParamItem.getDisablePlanCreationDate());
                 if (clientParamItem.getExpenditureLimit() != null) {
                     client.setExpenditureLimit(clientParamItem.getExpenditureLimit());
                 }
@@ -3547,10 +3548,6 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getBalanceToNotify() != null) {
                     client.setBalanceToNotify((clientParamItem.getBalanceToNotify()));
                 }
-            }
-
-            if (clientParamItem.getDisablePlanCreation() != null) {
-                client.setDisablePlanCreation(clientParamItem.getDisablePlanCreation());
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());

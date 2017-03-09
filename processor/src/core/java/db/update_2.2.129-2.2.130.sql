@@ -50,7 +50,7 @@ ALTER TABLE cf_registrychange DROP COLUMN benefitOnAdmission,
 ALTER TABLE cf_clients DROP COLUMN benefitOnAdmission,
                        ADD COLUMN categoriesDiscountsDSZN character varying (128) not null default '',
                        ADD COLUMN lastDiscountsUpdate bigint,
-                       ADD COLUMN disablePlanCreation integer not null default 0;
+                       ADD COLUMN disablePlanCreationDate bigint;
 
 alter table cf_complexinfo add column usedVariableFeeding integer,
                        add column rootComplex integer;

@@ -83,8 +83,8 @@
         <property name="categoriesDiscountsDSZN" column="CategoriesDiscountsDSZN" type="string" length="128" not-null="true"/>
         <property name="lastDiscountsUpdate" column="LastDiscountsUpdate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="disablePlanCreation" column="DisablePlanCreation" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
-                  not-null="true"/>
+        <property name="disablePlanCreationDate" column="DisablePlanCreationDate"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="san" column="San" type="string" length="11" not-null="false"/>
         <!--<property name="guardSan" column="GuardSan" type="string" length="64" not-null="false"/>-->
         <property name="externalId" column="ExternalId" type="long" not-null="false"/>
