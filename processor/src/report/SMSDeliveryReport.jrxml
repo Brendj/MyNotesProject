@@ -114,7 +114,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Отчет по времени доставки сообщений информирования]]></text>
+				<text><![CDATA[Отчет по быстрой синхронизации и времени доставки сообщений информирования]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="32" width="120" height="20"/>

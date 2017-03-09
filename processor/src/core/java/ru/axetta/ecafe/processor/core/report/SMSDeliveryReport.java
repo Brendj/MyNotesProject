@@ -55,7 +55,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
     *
     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
     */
-    public static final String REPORT_NAME = "Отчет по времени доставки сообщений информирования";
+    public static final String REPORT_NAME = "Отчет по быстрой синхронизации и времени доставки сообщений информирования";
     public static final String[] TEMPLATE_FILE_NAMES = {"SMSDeliveryReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{3};

@@ -1118,7 +1118,7 @@
                             action="#{sentSmsReportPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="OrgSmsDeliveryReportPageMenuItem"
                             binding="#{smsDeliveryReportPage.mainMenuComponent}"
-                            label="Отчет по времени доставки сообщений информирования"
+                            label="Отчет по быстрой синхронизации и времени доставки сообщений информирования"
                             action="#{smsDeliveryReportPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="OrgSmsStatsReportPageMenuItem"
                             binding="#{orgSmsStatsReportPage.mainMenuComponent}"
