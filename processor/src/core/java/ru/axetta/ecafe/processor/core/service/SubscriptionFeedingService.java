@@ -258,7 +258,6 @@ public class SubscriptionFeedingService {
                 .setParameter("org", org)
                 .setParameter("complexIds", complexIds)
                 .setParameter("date", date);
-        //List res = query.getResultList();
         return query.getResultList().size() > 1;
     }
 

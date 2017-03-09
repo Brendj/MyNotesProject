@@ -7330,7 +7330,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 for (int i = 1; i < 8; i++) {
                     complexesByDay = getCycleDiagramValueByDayOfWeek(i, cycleDiagram);
                     if (complexesByDay == null) continue;
-                    allOk = testIfComplexesBelongToOneRoot(complexesByDay, sfService, clientOrg, cycleDiagram.getDateActivationDiagram());
+                    allOk = allowCreateCycleDiagramByComplexesInDay(complexesByDay, sfService, clientOrg,
+                            cycleDiagram.getDateActivationDiagram());
                     if (!allOk) break;
                 }
                 if (!allOk) {
@@ -7429,12 +7430,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    private boolean testIfComplexesBelongToOneRoot(String complexesByDay, SubscriptionFeedingService sfService, Org org, Date date) {
+    private boolean allowCreateCycleDiagramByComplexesInDay(String complexesByDay, SubscriptionFeedingService sfService,
+            Org org, Date date) {
         List<Integer> complexIds = new ArrayList<Integer>();
         for (String s : complexesByDay.split(";")) {
             complexIds.add(Integer.parseInt(s));
         }
-        return !sfService.isMultipleRootComplexes(org, complexIds, date);
+        return complexIds.size() == 1 || sfService.isMultipleRootComplexes(org, complexIds, date);
     }
 
     @Override
