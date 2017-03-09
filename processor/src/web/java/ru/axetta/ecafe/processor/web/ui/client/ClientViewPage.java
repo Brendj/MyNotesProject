@@ -130,7 +130,9 @@ public class ClientViewPage extends BasicWorkspacePage {
     private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
-    private String benefitOnAdmission;
+    private String categoriesDiscountsDSZN;
+    private Date lastDiscountsUpdate;
+    private Date disablePlanCreationDate;
     private String ageTypeGroup;
     private String photoURL;
     private Long balanceToNotify;
@@ -332,12 +334,32 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.bankSubscriptions = bankSubscriptions;
     }
 
-    public String getBenefitOnAdmission() {
-        return benefitOnAdmission;
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 
-    public void setBenefitOnAdmission(String benefitOnAdmission) {
-        this.benefitOnAdmission = benefitOnAdmission;
+    public String getCategoriesDiscountsDSZN() {
+        return categoriesDiscountsDSZN;
+    }
+
+    public void setCategoriesDiscountsDSZN(String categoriesDiscountsDSZN) {
+        this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
+    }
+
+    public Date getLastDiscountsUpdate() {
+        return lastDiscountsUpdate;
+    }
+
+    public void setLastDiscountsUpdate(Date lastDiscountsUpdate) {
+        this.lastDiscountsUpdate = lastDiscountsUpdate;
+    }
+
+    public Date getDisablePlanCreationDate() {
+        return disablePlanCreationDate;
+    }
+
+    public void setDisablePlanCreationDate(Date disablePlanCreationDate) {
+        this.disablePlanCreationDate = disablePlanCreationDate;
     }
 
     public String getAgeTypeGroup() {
@@ -422,7 +444,9 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
-        this.benefitOnAdmission = client.getCategoriesDiscountsDSZN();
+        this.categoriesDiscountsDSZN = getCategoriesDiscountsDSZNDesc(session, client);
+        this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
+        this.disablePlanCreationDate = client.getDisablePlanCreationDate();
         this.ageTypeGroup = client.getAgeTypeGroup();
         this.balanceToNotify = client.getBalanceToNotify();
 
@@ -503,6 +527,35 @@ public class ClientViewPage extends BasicWorkspacePage {
 
 
 
+    }
+
+    private static String getCategoriesDiscountsDSZNDesc(Session session, Client client) {
+        String result = "";
+        String categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
+        if(categoriesDiscountsDSZN.length() > 0) {
+            List<Integer> cdDSZN = new ArrayList<Integer>();
+            for(String c : categoriesDiscountsDSZN.split(",")) {
+                cdDSZN.add(Integer.valueOf(c));
+            }
+            Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+            criteria.add(Restrictions.in("code", cdDSZN));
+            List<CategoryDiscountDSZN> list = criteria.list();
+            Map<Integer, String> map = new TreeMap<Integer, String>();
+            for (CategoryDiscountDSZN discountDSZN : list) {
+                if(!discountDSZN.getDeleted()) {
+                    map.put(discountDSZN.getCode(), discountDSZN.getDescription());
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            for (Integer code : map.keySet()) {
+                sb.append(code);
+                sb.append(" - ");
+                sb.append(map.get(code));
+                sb.append("; ");
+            }
+            result = sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
+        }
+        return result;
     }
 
     private List<ClientGuardianItem> clientGuardianItems;

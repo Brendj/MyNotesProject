@@ -257,7 +257,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Integer freePayMaxCount;
     private Integer gender;
     private Date birthDate;
-    private String benefitOnAdmission;
+    private String categoriesDiscountsDSZN;
+    private Date lastDiscountsUpdate;
+    private Date disablePlanCreationDate;
     private String ageTypeGroup;
     private Long balanceToNotify;
 
@@ -568,12 +570,28 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.ageTypeGroup = ageTypeGroup;
     }
 
-    public String getBenefitOnAdmission() {
-        return benefitOnAdmission;
+    public Date getDisablePlanCreationDate() {
+        return disablePlanCreationDate;
     }
 
-    public void setBenefitOnAdmission(String benefitOnAdmission) {
-        this.benefitOnAdmission = benefitOnAdmission;
+    public void setDisablePlanCreationDate(Date disablePlanCreationDate) {
+        this.disablePlanCreationDate = disablePlanCreationDate;
+    }
+
+    public Date getLastDiscountsUpdate() {
+        return lastDiscountsUpdate;
+    }
+
+    public void setLastDiscountsUpdate(Date lastDiscountsUpdate) {
+        this.lastDiscountsUpdate = lastDiscountsUpdate;
+    }
+
+    public String getCategoriesDiscountsDSZN() {
+        return categoriesDiscountsDSZN;
+    }
+
+    public void setCategoriesDiscountsDSZN(String categoriesDiscountsDSZN) {
+        this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
     }
 
     public Long getExternalId() {
@@ -598,11 +616,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
         List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
         categoryDiscounts = new ArrayList<CategoryDiscountItem>();
+        StringBuilder categoryDiscountsSB = new StringBuilder();
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscounts.add(new CategoryDiscountItem(
                     clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + ""),
                     categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName()));
+            if(clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + "")) {
+                categoryDiscountsSB.append(categoryDiscount.getCategoryName());
+                categoryDiscountsSB.append(";");
+            }
         }
+        this.filter = categoryDiscountsSB.length() > 2 ? categoryDiscountsSB.substring(0, categoryDiscountsSB.length() - 1) : categoryDiscountsSB.toString();
         Set<ClientNotificationSetting> settings = client.getNotificationSettings();
         notificationSettings = new ArrayList<NotificationSettingItem>();
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
@@ -1062,7 +1086,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
-        client.setCategoriesDiscountsDSZN(this.benefitOnAdmission);
         client.setAgeTypeGroup(this.ageTypeGroup);
 
         persistenceSession.update(client);
@@ -1173,20 +1196,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGUID = client.getClientGUID();
         this.discountMode = client.getDiscountMode();
         /* filter fill*/
-        StringBuilder categoriesFilter = new StringBuilder();
-        if (!client.getCategories().isEmpty()) {
-            for (CategoryDiscount categoryDiscount : client.getCategories()) {
-                categoriesFilter.append(categoryDiscount.getCategoryName());
-                categoriesFilter.append("; ");
-                this.categoryDiscountList.add(categoryDiscount);
-            }
-        } else {
-            categoriesFilter.append("Не выбрано");
-        }
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
-        this.benefitOnAdmission = client.getCategoriesDiscountsDSZN();
+        this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
+        this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
+        this.disablePlanCreationDate = client.getDisablePlanCreationDate();
         this.ageTypeGroup = client.getAgeTypeGroup();
         removeListGuardianItems.clear();
         removeListWardItems.clear();

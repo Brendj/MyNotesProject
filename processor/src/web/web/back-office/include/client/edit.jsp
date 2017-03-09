@@ -172,6 +172,15 @@
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Льготы ДСЗН" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientEditPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
+    <h:outputText escape="true" value="Дата последнего изменения льготы ДСЗН" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientEditPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"
+                  styleClass="output-text" />
+    <h:outputText escape="true" value="Дата исключения из плана питания" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientEditPage.disablePlanCreationDate}" escape="true" converter="timeConverter"
+                  styleClass="output-text" />
+
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
@@ -346,10 +355,6 @@
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientEditPage.remarks}" styleClass="input-text" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
-    <h:outputText escape="true" value="Льгота при поступлении" styleClass="output-text" />
-    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientEditPage.benefitOnAdmission}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"

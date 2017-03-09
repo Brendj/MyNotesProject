@@ -147,6 +147,15 @@
         </a4j:repeat>
     </h:panelGrid>
 
+    <h:outputText escape="true" value="Льготы ДСЗН" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientViewPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
+    <h:outputText escape="true" value="Дата последнего изменения льготы ДСЗН" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientViewPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"
+                 styleClass="output-text" />
+    <h:outputText escape="true" value="Дата исключения из плана питания" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientViewPage.disablePlanCreationDate}" escape="true" converter="timeConverter"
+                  styleClass="output-text" />
+
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.san}" maxlength="11" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
@@ -284,10 +293,6 @@
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea readonly="true" rows="5" cols="64" value="#{mainPage.clientViewPage.remarks}"
                      styleClass="input-text" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
-    <h:outputText escape="true" value="Льгота при поступлении" styleClass="output-text" />
-    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientViewPage.benefitOnAdmission}" styleClass="input-text" readonly="true"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showClientEditPage}"
