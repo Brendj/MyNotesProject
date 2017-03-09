@@ -58,7 +58,7 @@
                     <h:outputText styleClass="output-text" escape="true" value="Запрет изменения в АРМ" />
                 </h:panelGroup>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{item.blockedChange}" styleClass="output-text" disabled="true"/>
+            <h:selectBooleanCheckbox value="#{item.blockedToChange}" styleClass="output-text" disabled="true"/>
         </rich:column>
         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                      style="text-align:center">

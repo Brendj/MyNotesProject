@@ -52,7 +52,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     @Transactional
     public Object save() {
         if (categoryDiscount != null && (categoryDiscount.getIdOfCategoryDiscount() < 0
-                || categoryDiscount.getCategoryType().equals(CategoryDiscountEnumType.FEE_CATEGORY))) {
+                || !categoryDiscount.getCategoryType().equals(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT))) {
             printError("Неверная категория льготы ИСПП");
             return null;
         }

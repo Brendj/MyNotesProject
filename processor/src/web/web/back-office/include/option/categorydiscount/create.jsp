@@ -33,7 +33,7 @@
         <f:selectItems value="#{categoryDiscountCreatePage.organizationItems}" />
     </h:selectOneMenu>
     <h:outputText escape="true" value="Запрет изменения в АРМ" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{categoryDiscountCreatePage.blockedChange}" styleClass="output-text"/>
+    <h:selectBooleanCheckbox value="#{categoryDiscountCreatePage.blockedToChange}" styleClass="output-text"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryDiscountCreatePage.onSave}"

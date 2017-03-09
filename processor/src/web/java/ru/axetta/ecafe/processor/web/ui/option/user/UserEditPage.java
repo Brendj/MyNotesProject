@@ -286,7 +286,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return false;
     }
 
-    public void blockedChange(ValueChangeEvent e){
+    public void blockedToChange(ValueChangeEvent e){
         Boolean newBlockedValue = (Boolean)e.getNewValue();
         if(newBlockedValue) {
             blockedUntilDate = new Date(System.currentTimeMillis() + CalendarUtils.FIFTY_YEARS_MILLIS);

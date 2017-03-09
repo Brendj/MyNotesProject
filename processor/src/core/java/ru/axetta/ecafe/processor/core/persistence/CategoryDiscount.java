@@ -24,7 +24,7 @@ public class CategoryDiscount {
     private String discountRules;
     private CategoryDiscountEnumType categoryType;
     private Integer orgType;
-    private Boolean blockedChange;
+    private Boolean blockedToChange;
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
     private Set<CategoryDiscountDSZN> categoriesDiscountDSZN = new HashSet<CategoryDiscountDSZN>();
@@ -76,26 +76,26 @@ public class CategoryDiscount {
         this.discountRules = discountRules;
     }
 
-    public Boolean getBlockedChange() {
-        return blockedChange;
+    public Boolean getBlockedToChange() {
+        return blockedToChange;
     }
 
-    public void setBlockedChange(Boolean blockedChange) {
-        this.blockedChange = blockedChange;
+    public void setBlockedToChange(Boolean blockedToChange) {
+        this.blockedToChange = blockedToChange;
     }
 
     public CategoryDiscount() {
     }
 
     public CategoryDiscount(long idOfCategoryDiscount, String categoryName, String discountRules,String description, Date createdDate,
-            Date lastUpdate, Boolean blockedChange) {
+            Date lastUpdate, Boolean blockedToChange) {
         this.idOfCategoryDiscount = idOfCategoryDiscount;
         this.categoryName = categoryName;
         this.description = description;
         this.createdDate = createdDate;
         this.lastUpdate = lastUpdate;
         this.discountRules = discountRules;
-        this.blockedChange = blockedChange;
+        this.blockedToChange = blockedToChange;
     }
 
     public long getIdOfCategoryDiscount() {

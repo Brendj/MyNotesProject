@@ -90,7 +90,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         private String description;
         private String organizationTypeString;
         private String categoriesDSZN;
-        private boolean blockedChange;
+        private boolean blockedToChange;
 
         public CategoryDiscountItem(CategoryDiscount categoryDiscount) {
             this.idOfCategoryDiscount = categoryDiscount.getIdOfCategoryDiscount();
@@ -116,7 +116,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             } else {
                 this.categoriesDSZN = "";
             }
-            this.blockedChange = categoryDiscount.getBlockedChange();
+            this.blockedToChange = categoryDiscount.getBlockedToChange();
         }
 
         public long getIdOfCategoryDiscount() {
@@ -159,12 +159,12 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             this.categoriesDSZN = categoriesDSZN;
         }
 
-        public boolean isBlockedChange() {
-            return blockedChange;
+        public boolean isBlockedToChange() {
+            return blockedToChange;
         }
 
-        public void setBlockedChange(boolean blockedChange) {
-            this.blockedChange = blockedChange;
+        public void setBlockedToChange(boolean blockedToChange) {
+            this.blockedToChange = blockedToChange;
         }
     }
 

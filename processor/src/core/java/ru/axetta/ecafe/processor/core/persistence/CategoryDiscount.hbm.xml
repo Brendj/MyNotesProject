@@ -52,7 +52,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN" />
         </set>
 
-        <property name="blockedChange" column="blockedChange" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+        <property name="blockedToChange" column="blockedToChange" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
     </class>

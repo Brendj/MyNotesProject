@@ -115,7 +115,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         for (CategoryDiscount categoryDiscount : categoryDiscounts) {
             DiscountCategoryItem dci = new DiscountCategoryItem(categoryDiscount.getIdOfCategoryDiscount(),
                     categoryDiscount.getCategoryName(), categoryDiscount.getCategoryType().getValue(),
-                    categoryDiscount.getDiscountRules(), categoryDiscount.getOrgType(), categoryDiscount.getBlockedChange());
+                    categoryDiscount.getDiscountRules(), categoryDiscount.getOrgType(), categoryDiscount.getBlockedToChange());
             addDCI(dci);
         }
     }
@@ -186,16 +186,16 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         private Integer categoryType;
         private Integer orgType;
         private String discountRules;
-        private Boolean blockedChange;
+        private Boolean blockedToChange;
 
         public DiscountCategoryItem(long idOfCategoryDiscount, String categoryName, Integer categoryType,
-                String discountRules, Integer organizationType, Boolean blockedChange) {
+                String discountRules, Integer organizationType, Boolean blockedToChange) {
             this.idOfCategoryDiscount = idOfCategoryDiscount;
             this.categoryName = categoryName;
             this.discountRules = discountRules;
             this.categoryType = categoryType;
             this.orgType = organizationType;
-            this.blockedChange = blockedChange;
+            this.blockedToChange = blockedToChange;
         }
 
         public long getIdOfCategoryDiscount() {
@@ -224,7 +224,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             element.setAttribute("CategoryName", this.categoryName);
             element.setAttribute("CategoryType", Integer.toString(this.categoryType));
             element.setAttribute("OrgType", Integer.toString(this.orgType));
-            element.setAttribute("BlockedChange", blockedChange ? "1" : "0");
+            element.setAttribute("BlockedToChange", blockedToChange ? "1" : "0");
             return element;
         }
 

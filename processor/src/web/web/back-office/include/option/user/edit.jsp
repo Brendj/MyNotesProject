@@ -40,7 +40,7 @@
     <h:inputText value="#{mainPage.userEditPage.email}" maxlength="128" styleClass="input-text"/>
 
     <h:outputText escape="true" value="Заблокировать пользователя" styleClass="output-text" />
-    <h:selectBooleanCheckbox id="blockedFlag" value="#{mainPage.userEditPage.blocked}" valueChangeListener="#{mainPage.userEditPage.blockedChange}" >
+    <h:selectBooleanCheckbox id="blockedFlag" value="#{mainPage.userEditPage.blocked}" valueChangeListener="#{mainPage.userEditPage.blockedToChange}" >
        <a4j:support ajaxSingle="true" event="onchange" reRender="blockedUntilId"/>
     </h:selectBooleanCheckbox>
     <h:outputText escape="true" value="Дата окончания блокировки" styleClass="output-text" />

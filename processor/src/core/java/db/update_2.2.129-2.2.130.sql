@@ -23,7 +23,7 @@ CREATE TABLE cf_categorydiscounts_dszn
 );
 
 --Блокировка изменения льгот ИСПП у клиентов в АРМ
-ALTER TABLE cf_categorydiscounts ADD COLUMN blockedchange integer NOT NULL DEFAULT 0;
+ALTER TABLE cf_categorydiscounts ADD COLUMN blockedtochange integer NOT NULL DEFAULT 0;
 
 --Флаг включения здание работает в летний период + флаг включения вариативного питания
 -- + флаг сверки льгот ДСЗН с реестрами + расширение поля адреса
