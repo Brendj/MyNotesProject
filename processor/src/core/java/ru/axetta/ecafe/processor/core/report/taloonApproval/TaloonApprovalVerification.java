@@ -58,7 +58,7 @@ public class TaloonApprovalVerification {
                 }
 
                 TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
-                        new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail(taloon.getTaloonName(),
+                        new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail(taloon.getTaloonName(), taloon.getIdOfOrgCreated(),
                                 taloon.getSoldedQty(), taloon.getRequestedQty(), taloon.getShippedQty(), taloon.getPrice(),
                                 (taloon.getPrice() == null || taloon.getSoldedQty() == null) ? 0 : taloon.getPrice() * taloon.getSoldedQty(),
                                 taloon.getIsppState(),
@@ -72,7 +72,7 @@ public class TaloonApprovalVerification {
                 item.getDetails().add(detail);
             }
             TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
-                    new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Всего",
+                    new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Всего", null,
                             sdSoldedQty, sdRequestedQty, sdShippedQty, null,
                             sdSumma, null, null, null, d, true, null);
             item.getDetails().add(detail);
@@ -86,7 +86,7 @@ public class TaloonApprovalVerification {
         TaloonApprovalVerificationItem item = new TaloonApprovalVerificationItem();
         item.setTaloonDate(null);
         TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
-                new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Итого",
+                new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Итого", null,
                         tdSoldedQty, tdRequestedQty, tdShippedQty, null,
                         tdSumma, null, null, null, null, true, null);
         item.getDetails().add(detail);

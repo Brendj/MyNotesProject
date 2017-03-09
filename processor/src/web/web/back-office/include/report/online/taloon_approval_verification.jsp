@@ -70,6 +70,9 @@
                     <h:outputText escape="true" value="Дата оказания услуг" />
                 </rich:column>
                 <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Ид ОО" />
+                </rich:column>
+                <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Название" />
                 </rich:column>
                 <rich:column headerClass="column-header">
@@ -102,6 +105,9 @@
                        columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
             <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}">
                 <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{detail.idOfOrgCreated}" styleClass="output-text"/>
             </rich:column>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
