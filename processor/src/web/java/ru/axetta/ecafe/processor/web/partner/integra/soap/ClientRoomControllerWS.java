@@ -154,6 +154,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_PHOTO_UNDER_REGISTRY = 560L;
     private static final Long RC_CLIENT_GUARDIAN_NOT_FOUND = 570L;
     private static final Long RC_INVALID_OPERATION_VARIABLE_FEEDING = 580L;
+    private static final Long RC_ERROR_CREATE_VARIABLE_FEEDING = 590L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -185,6 +186,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_PHOTO_UNDER_REGISTRY_DESC = "Фото клиента в процессе сверки";
     private static final String RC_CLIENT_GUARDIAN_NOT_FOUND_DESC = "Связка клиент-представитель не найдена";
     private static final String RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC = "Подписку на вариативное питание приостановить нельзя";
+    private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один комплекс";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -7318,6 +7320,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             criteria.add(Restrictions.eq("dateActivationDiagram", cycleDiagram.getDateActivationDiagram()));
             List list = criteria.list();
             SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
+            boolean vp = false;
+            if (ArrayUtils.contains(getVPOrgsList(), clientOrg.getIdOfOrg())) {
+                vp = true;
+            }
+            if (vp) {
+                boolean allOk = true;
+                String complexesByDay;
+                for (int i = 1; i < 8; i++) {
+                    complexesByDay = getCycleDiagramValueByDayOfWeek(i, cycleDiagram);
+                    if (complexesByDay == null) continue;
+                    allOk = testIfComplexesBelongToOneRoot(complexesByDay, sfService, clientOrg, cycleDiagram.getDateActivationDiagram());
+                    if (!allOk) break;
+                }
+                if (!allOk) {
+                    result.resultCode = RC_ERROR_CREATE_VARIABLE_FEEDING;
+                    result.description = RC_ERROR_CREATE_VARIABLE_FEEDING_DESC;
+                    return result;
+                }
+            }
+            List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg, vp);
             if (list.isEmpty()) {
                 // создаем новую
                 CycleDiagram diagram = new CycleDiagram();
@@ -7333,7 +7355,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
                 diagram.setGlobalVersionOnCreate(version);
                 diagram.setGlobalVersion(version);
-                List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
                 diagram.setMonday(cycleDiagram.getMonday());
                 diagram.setMondayPrice(sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
                 diagram.setTuesday(cycleDiagram.getTuesday());
@@ -7349,11 +7370,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 diagram.setSunday("");
                 diagram.setSundayPrice("0");
                 diagram.setStaff(null);
-                if (ArrayUtils.contains(getVPOrgsList(), clientOrg.getIdOfOrg())) {
-                    diagram.setFeedingType(SubscriptionFeedingType.VARIABLE_TYPE);
-                } else {
-                    diagram.setFeedingType(SubscriptionFeedingType.ABON_TYPE);
-                }
+                diagram.setFeedingType(vp ? SubscriptionFeedingType.VARIABLE_TYPE : SubscriptionFeedingType.ABON_TYPE);
                 session.save(diagram);
             } else {
                 // изменяем те что есть
@@ -7367,7 +7384,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             .updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
                     //diagram.setGlobalVersionOnCreate(version);
                     diagram.setGlobalVersion(version);
-                    List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg);
                     diagram.setMonday(cycleDiagram.getMonday());
                     diagram.setMondayPrice(sfService.getPriceOfDay(cycleDiagram.getMonday(), availableComplexes));
                     diagram.setTuesday(cycleDiagram.getTuesday());
@@ -7398,6 +7414,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private String getCycleDiagramValueByDayOfWeek(int day, CycleDiagramExt cycleDiagram) {
+        switch (day) {
+            case 1: return cycleDiagram.getMonday();
+            case 2: return cycleDiagram.getTuesday();
+            case 3: return cycleDiagram.getWednesday();
+            case 4: return cycleDiagram.getThursday();
+            case 5: return cycleDiagram.getFriday();
+            case 6: return cycleDiagram.getSaturday();
+            case 7: return cycleDiagram.getSunday();
+            default: return null;
+        }
+    }
+
+    private boolean testIfComplexesBelongToOneRoot(String complexesByDay, SubscriptionFeedingService sfService, Org org, Date date) {
+        List<Integer> complexIds = new ArrayList<Integer>();
+        for (String s : complexesByDay.split(";")) {
+            complexIds.add(Integer.parseInt(s));
+        }
+        return !sfService.isMultipleRootComplexes(org, complexIds, date);
     }
 
     @Override

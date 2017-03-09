@@ -222,6 +222,7 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         private static final String ATTR_GOOD_GUID = "gGuid";
         private static final String ATTR_GOOD_NAME = "gsname";
         private static final String ATTR_GOOD_FULL_NAME = "gsfullname";
+        private static final String ATTR_ROOT_COMPLEX = "rootComplex";
 
         private final ComplexInfo complexInfo;
 
@@ -240,6 +241,9 @@ public class OrganizationComplexesStructure implements AbstractToElement{
             element.setAttribute(ATTR_APPLY_SUBSCRIPTION_FEEDING,Integer.toString(complexInfo.getUsedSubscriptionFeeding()));
             if (complexInfo.getUsedVariableFeeding() != null) {
                 element.setAttribute(ATTR_APPLY_VARIABLE_FEEDING,Integer.toString(complexInfo.getUsedVariableFeeding()));
+            }
+            if (complexInfo.getRootComplex() != null) {
+                element.setAttribute(ATTR_ROOT_COMPLEX,Integer.toString(complexInfo.getRootComplex()));
             }
             Integer mv = complexInfo.getModeVisible();
             if (mv == null) {

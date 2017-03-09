@@ -219,13 +219,21 @@ public class SubscriptionFeedingService {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    // Возвращает комплексы, участвующие в АП, для данной орг-ии.
-    public List<ComplexInfo> findComplexesWithSubFeeding(Org org) {
+    // Возвращает комплексы, участвующие в АП или ВП, для данной орг-ии.
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, boolean vp) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addOneDay(today);
-        TypedQuery<ComplexInfo> query = entityManager.createQuery("select distinct ci from ComplexInfo ci "
-                + "where ci.org = :org and usedSubscriptionFeeding = 1 and menuDate >= :startDate and menuDate < :endDate",
-                ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
+        String sql;
+        if (vp) {
+            sql = "select distinct ci from ComplexInfo ci "
+                    + "where ci.org = :org and usedVariableFeeding = 1 and menuDate >= :startDate and menuDate < :endDate";
+        } else {
+            sql = "select distinct ci from ComplexInfo ci "
+                    + "where ci.org = :org and usedSubscriptionFeeding = 1 and menuDate >= :startDate and menuDate < :endDate";
+        }
+        TypedQuery<ComplexInfo> query = entityManager.createQuery(sql, ComplexInfo.class)
+                .setParameter("org", org)
+                .setParameter("startDate", today)
                 .setParameter("endDate", tomorrow);
         List<ComplexInfo> res = query.getResultList();
         // Если комплексов на сегодня нет, то ищем их на каждый день в течение недели.
@@ -240,6 +248,18 @@ public class SubscriptionFeedingService {
             dayCount++;
         }
         return res;
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public boolean isMultipleRootComplexes(Org org, List<Integer> complexIds, Date date) {
+        TypedQuery<Integer> query = entityManager.createQuery("select distinct ci.rootComplex from ComplexInfo ci "
+                + "where ci.usedVariableFeeding = 1 and ci.org = :org "
+                + "and ci.idOfComplex in :complexIds and ci.menuDate >= :date", Integer.class)
+                .setParameter("org", org)
+                .setParameter("complexIds", complexIds)
+                .setParameter("date", date);
+        //List res = query.getResultList();
+        return query.getResultList().size() > 1;
     }
 
     @SuppressWarnings("unchecked")
@@ -647,7 +667,7 @@ public class SubscriptionFeedingService {
         Long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
         cd.setGlobalVersionOnCreate(version);
         cd.setGlobalVersion(version);
-        List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
+        List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org, false);
         cd.setMonday(monday);
         cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
         cd.setTuesday(tuesday);
@@ -719,7 +739,7 @@ public class SubscriptionFeedingService {
             String thursday, String friday, String saturday) {
         DAOService daoService = DAOService.getInstance();
         cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
-        List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
+        List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org, false);
         cd.setMonday(monday);
         cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
         cd.setTuesday(tuesday);
