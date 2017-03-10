@@ -24,6 +24,10 @@ public class SubscriptionFeedingSettingExt{
     protected Integer daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     @XmlAttribute(name = "sixWorkWeek")
     protected  Boolean sixWorkWeek; // Шестидневный план рабочих дней
+    @XmlAttribute(name = "dayCreateVP")
+    protected Integer dayCreateVP;  //Количество дней, на которые создаются заявки вариативного питания
+    @XmlAttribute(name = "hoursForbidVP")
+    protected Integer hoursForbidVP;  //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
 
     public Integer getDayRequest() {
         return dayRequest;
@@ -71,5 +75,21 @@ public class SubscriptionFeedingSettingExt{
 
     public void setSixWorkWeek(Boolean sixWorkWeek) {
         this.sixWorkWeek = sixWorkWeek;
+    }
+
+    public Integer getDayCreateVP() {
+        return dayCreateVP;
+    }
+
+    public void setDayCreateVP(Integer dayCreateVP) {
+        this.dayCreateVP = dayCreateVP;
+    }
+
+    public Integer getHoursForbidVP() {
+        return hoursForbidVP;
+    }
+
+    public void setHoursForbidVP(Integer hoursForbidVP) {
+        this.hoursForbidVP = hoursForbidVP;
     }
 }
