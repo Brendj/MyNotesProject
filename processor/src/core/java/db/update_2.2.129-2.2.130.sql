@@ -41,6 +41,7 @@ alter table cf_clients_cycle_diagrams add column FeedingType integer not null de
 --TRUNCATE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors; // todo раскоммитить при сборке
 ALTER TABLE cf_registrychange DROP COLUMN benefitOnAdmission,
                               DROP COLUMN benefitOnAdmissionFrom,
+                              ADD COLUMN checkBenefits integer not null default 0,
                               ADD COLUMN benefitDSZN character varying (128),
                               ADD COLUMN benefitDSZNFrom character varying (128),
                               ADD COLUMN newDiscounts character varying (128),

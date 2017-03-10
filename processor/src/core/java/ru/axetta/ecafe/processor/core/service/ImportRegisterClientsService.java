@@ -378,7 +378,7 @@ public class ImportRegisterClientsService {
                                 emptyIfNull(dbClient.getClientGroup() == null ? ""
                                         : dbClient.getClientGroup().getGroupName()), logBuffer);
                         addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                                RegistryChange.FULL_COMPARISON);
+                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                     }
                 } catch (Exception e) {
                     logError("Failed to delete client " + dbClient, e, logBuffer);
@@ -400,7 +400,7 @@ public class ImportRegisterClientsService {
                                     dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
                             logBuffer);
                     addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                            RegistryChange.FULL_COMPARISON);
+                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                 }
             }
         }
@@ -436,8 +436,11 @@ public class ImportRegisterClientsService {
                         cl == null || cl.getGender() == null ? null : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
             }
 
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN, pupil.getBenefitDSZN(),
-                    cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(), updateClient);
+            if(org.getChangesDSZN()) {
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN,
+                        pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
+                        updateClient);
+            }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
@@ -479,7 +482,7 @@ public class ImportRegisterClientsService {
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
                         + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
                 addClientChange(em, ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
-                        RegistryChange.FULL_COMPARISON);
+                        RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                 continue;
             }
             if (!updateClient) {
@@ -501,7 +504,7 @@ public class ImportRegisterClientsService {
                                 pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
                                 pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
-                                RegistryChange.FULL_COMPARISON);
+                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         logError("Ошибка добавления клиента", e, logBuffer);
@@ -518,7 +521,7 @@ public class ImportRegisterClientsService {
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
-                            RegistryChange.FULL_COMPARISON);
+                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                 }
             } catch (Exception e) {
                 logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
@@ -572,21 +575,21 @@ public class ImportRegisterClientsService {
     }
 
 
-    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation, int type)
+    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation, int type, Boolean checkBenefits)
             throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
-        addClientChange(ts, idOfOrg, fieldConfig, null, operation, type);
+        addClientChange(ts, idOfOrg, fieldConfig, null, operation, type, checkBenefits);
     }
 
 
     private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, Client currentClient,
-            int operation, int type) throws Exception {
-        addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation, type);
+            int operation, int type, Boolean checkBenefits) throws Exception {
+        addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation, type, checkBenefits);
     }
 
     public static void addClientChange(EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
-            FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type) throws Exception {
-        addClientChange(em, ts, idOfOrg, idOfMigrateOrg, fieldConfig, currentClient, operation, type, null);
+            FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type, Boolean checkBenefits) throws Exception {
+        addClientChange(em, ts, idOfOrg, idOfMigrateOrg, fieldConfig, currentClient, operation, type, null, checkBenefits);
     }
 
     public static boolean isRegistryChangeExist(String notificationId, Client client, int operation, Session session) {
@@ -603,7 +606,7 @@ public class ImportRegisterClientsService {
     }
 
     public static void addClientChange(EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
-            FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type, String notificationId)
+            FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type, String notificationId, Boolean checkBenefits)
             throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
         Session sess = (Session) em.getDelegate();
@@ -651,9 +654,16 @@ public class ImportRegisterClientsService {
             }
         }
 
-        ch.setBenefitDSZN(clientBenefitDSZN);
-        ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
-                currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
+        ch.setCheckBenefits(checkBenefits);
+        if(checkBenefits) {
+            ch.setBenefitDSZN(clientBenefitDSZN);
+            ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
+                    currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
+            if(currentClient != null) {
+                ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
+                ch.setOldDiscounts(currentClient.getCategoriesDiscounts());
+            }
+        }
 
         if (operation == CREATE_OPERATION) {
             if (guardiansCount != null) {
@@ -694,8 +704,6 @@ public class ImportRegisterClientsService {
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
-            ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-            ch.setOldDiscounts(currentClient.getCategoriesDiscounts());
             ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         if (operation == MODIFY_OPERATION) {
@@ -772,12 +780,12 @@ public class ImportRegisterClientsService {
     }
 
     public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
-            int type) throws Exception {
-        addClientChange(em, ts, idOfOrg, currentClient, operation, type, null);
+            int type, Boolean checkBenefits) throws Exception {
+        addClientChange(em, ts, idOfOrg, currentClient, operation, type, null, checkBenefits);
     }
 
     public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
-            int type, String notificationId) throws Exception {
+            int type, String notificationId, Boolean checkBenefits) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
         Session sess = (Session) em.getDelegate();
         if (currentClient != null) {
@@ -805,8 +813,11 @@ public class ImportRegisterClientsService {
         if (currentClient.getBirthDate() != null) {
             ch.setBirthDate(currentClient.getBirthDate().getTime());
         }
-        ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
-        ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
+        ch.setCheckBenefits(checkBenefits);
+        if(checkBenefits) {
+            ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
+            ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
+        }
         ch.setAgeTypeGroup(currentClient.getAgeTypeGroup());
         sess.save(ch);
     }
@@ -1119,6 +1130,7 @@ public class ImportRegisterClientsService {
                     }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
+                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
                     createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
                     createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
@@ -1184,8 +1196,11 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                    modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
+                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
+                    if(change.getCheckBenefits()) {
+                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
+                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
+                    }
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
 
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,

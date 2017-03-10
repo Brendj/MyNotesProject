@@ -153,7 +153,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r19 = new RegistryChangeItemParam("birthDate", c.getBirthDate() == null ? "" : dateTimeFormat.format(new Date(c.getBirthDate())));
                 registryChangeItemParams.add(r19);
 
-                RegistryChangeItemParam r20 = new RegistryChangeItemParam("newDiscounts", c.getNewDiscounts() == null ? "" : c.getNewDiscounts());
+                RegistryChangeItemParam r20 = new RegistryChangeItemParam("newDiscounts", c.getCheckBenefits() ? c.getNewDiscounts() == null ? "" : c.getNewDiscounts() : null);
                 registryChangeItemParams.add(r20);
 
                 RegistryChangeItemParam r21 = new RegistryChangeItemParam("genderFrom", c.getGenderFrom() == null ? "" : c.getGenderFrom().toString());
@@ -162,7 +162,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r22 = new RegistryChangeItemParam("birthDateFrom", c.getBirthDateFrom() == null ? "" : c.getBirthDateFrom().toString());
                 registryChangeItemParams.add(r22);
 
-                RegistryChangeItemParam r23 = new RegistryChangeItemParam("oldDiscounts", c.getOldDiscounts()== null ? "" : c.getOldDiscounts());
+                RegistryChangeItemParam r23 = new RegistryChangeItemParam("oldDiscounts", c.getCheckBenefits() ? c.getOldDiscounts()== null ? "" : c.getOldDiscounts() : null);
                 registryChangeItemParams.add(r23);
 
                 RegistryChangeItemParam r24 = new RegistryChangeItemParam("guardiansCount", c.getGuardiansCount() == null ? "" : c.getGuardiansCount().toString());
@@ -174,10 +174,10 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r26 = new RegistryChangeItemParam("ageTypeGroupFrom", c.getAgeTypeGroupFrom() == null ? "" : c.getAgeTypeGroupFrom());
                 registryChangeItemParams.add(r26);
 
-                RegistryChangeItemParam r27 = new RegistryChangeItemParam("benefitDSZN", c.getBenefitDSZN() == null ? "" : c.getBenefitDSZN());
+                RegistryChangeItemParam r27 = new RegistryChangeItemParam("benefitDSZN", c.getCheckBenefits() ? c.getBenefitDSZN() == null ? "" : c.getBenefitDSZN() : null);
                 registryChangeItemParams.add(r27);
 
-                RegistryChangeItemParam r28 = new RegistryChangeItemParam("benefitDSZNFrom", c.getBenefitDSZNFrom() == null ? "" : c.getBenefitDSZNFrom());
+                RegistryChangeItemParam r28 = new RegistryChangeItemParam("benefitDSZNFrom", c.getCheckBenefits() ? c.getBenefitDSZNFrom() == null ? "" : c.getBenefitDSZNFrom() : null);
                 registryChangeItemParams.add(r28);
 
                 registryChangeItemV2.setList(registryChangeItemParams);

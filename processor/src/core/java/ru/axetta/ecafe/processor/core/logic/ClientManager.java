@@ -78,7 +78,8 @@ public class ClientManager {
         GUARDIANS_COUNT_LIST,
         AGE_TYPE_GROUP,
         SSOID,
-        BENEFIT
+        BENEFIT,
+        CHECKBENEFITS
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -123,6 +124,7 @@ public class ClientManager {
             new FieldProcessor.Def(37, false, false, "Тип возрастной группы", null, FieldId.AGE_TYPE_GROUP, true),
             new FieldProcessor.Def(38, false, false, "SSOID", null, FieldId.SSOID, true),
             new FieldProcessor.Def(39, false, false, "Льгота учащегося ИСПП", null, FieldId.BENEFIT, true),
+            new FieldProcessor.Def(39, false, false, "Участие льгот в сверке", null, FieldId.CHECKBENEFITS, false),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -476,24 +478,26 @@ public class ClientManager {
             }
 
             //token[34]
-            if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
-                client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-                client.setLastDiscountsUpdate(new Date());
+            if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null && fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
+                if(Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS))) {
+                    client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
+                    client.setLastDiscountsUpdate(new Date());
 
-                String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
-                String oldDiscounts = client.getCategoriesDiscounts();
+                    String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
+                    String oldDiscounts = client.getCategoriesDiscounts();
 
-                Integer oldDiscountMode = client.getDiscountMode();
-                Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    Integer oldDiscountMode = client.getDiscountMode();
+                    Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
-                client.setCategoriesDiscounts(newDiscounts);
-                client.setDiscountMode(newDiscountMode);
+                    client.setCategoriesDiscounts(newDiscounts);
+                    client.setDiscountMode(newDiscountMode);
 
-                if(!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-                    DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode,
-                            oldDiscountMode, newDiscounts, oldDiscounts);
-                    discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                    persistenceSession.save(discountChangeHistory);
+                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org,
+                                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
+                        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                        persistenceSession.save(discountChangeHistory);
+                    }
                 }
             }
 
@@ -802,8 +806,13 @@ public class ClientManager {
                 client.setBirthDate(date);
             }
 
+            Boolean checkBenefits = false;
+            if (fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
+                checkBenefits = Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS));
+            }
+
             //token[34]
-            if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
+            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
                 client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
                 client.setLastDiscountsUpdate(new Date());
             } else {
@@ -811,7 +820,7 @@ public class ClientManager {
             }
 
             //token[39]
-            if (fieldConfig.getValue(FieldId.BENEFIT) != null) {
+            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT) != null) {
                 client.setCategoriesDiscounts(fieldConfig.getValue(FieldId.BENEFIT));
                 client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
             } else {
@@ -854,7 +863,7 @@ public class ClientManager {
                 clientMigration = new ClientMigration(client, client.getOrg(), contractDate);
             }
 
-            if (fieldConfig.getValue(FieldId.BENEFIT) != null) {
+            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT) != null) {
                 DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
                         Client.DISCOUNT_MODE_NONE, fieldConfig.getValue(FieldId.BENEFIT), "");
                 discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);

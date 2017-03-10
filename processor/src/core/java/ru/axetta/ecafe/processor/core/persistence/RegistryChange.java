@@ -37,11 +37,12 @@ public class RegistryChange {
 
     protected Integer gender;
     protected Long birthDate;
-    protected String benefitDSZN;
-    protected String newDiscounts;
-
     protected Integer genderFrom;
     protected Long birthDateFrom;
+
+    protected Boolean checkBenefits;
+    protected String benefitDSZN;
+    protected String newDiscounts;
     protected String benefitDSZNFrom;
     protected String oldDiscounts;
 
@@ -62,8 +63,8 @@ public class RegistryChange {
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
             Long idOfClient, Integer operation, Integer type, Boolean applied, String error, String notificationId,
-            Integer gender, Long birthDate, String benefitDSZN, Integer genderFrom, Long birthDateFrom,
-            String benefitDSZNFrom, String ageTypeGroup, String ageTypeGroupFrom) {
+            Integer gender, Long birthDate, Boolean checkBenefits, String benefitDSZN, String newDiscounts,
+            String benefitDSZNFrom, String oldDiscounts, Integer genderFrom, Long birthDateFrom, String ageTypeGroup, String ageTypeGroupFrom) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -86,10 +87,13 @@ public class RegistryChange {
         this.notificationId = notificationId;
         this.gender = gender;
         this.birthDate = birthDate;
-        this.benefitDSZN = benefitDSZN;
         this.genderFrom = genderFrom;
         this.birthDateFrom = birthDateFrom;
+        this.checkBenefits = checkBenefits;
+        this.benefitDSZN = benefitDSZN;
+        this.newDiscounts = newDiscounts;
         this.benefitDSZNFrom = benefitDSZNFrom;
+        this.oldDiscounts = oldDiscounts;
         this.ageTypeGroup = ageTypeGroup;
         this.ageTypeGroupFrom = ageTypeGroupFrom;
     }
@@ -270,22 +274,6 @@ public class RegistryChange {
         this.birthDate = birthDate;
     }
 
-    public String getBenefitDSZN() {
-        return benefitDSZN;
-    }
-
-    public void setBenefitDSZN(String benefitDSZN) {
-        this.benefitDSZN = benefitDSZN;
-    }
-
-    public String getNewDiscounts() {
-        return newDiscounts;
-    }
-
-    public void setNewDiscounts(String newDiscounts) {
-        this.newDiscounts = newDiscounts;
-    }
-
     public Integer getGenderFrom() {
         return genderFrom;
     }
@@ -300,6 +288,30 @@ public class RegistryChange {
 
     public void setBirthDateFrom(Long birthDateFrom) {
         this.birthDateFrom = birthDateFrom;
+    }
+
+    public Boolean getCheckBenefits() {
+        return checkBenefits;
+    }
+
+    public void setCheckBenefits(Boolean checkBenefits) {
+        this.checkBenefits = checkBenefits;
+    }
+
+    public String getBenefitDSZN() {
+        return benefitDSZN;
+    }
+
+    public void setBenefitDSZN(String benefitDSZN) {
+        this.benefitDSZN = benefitDSZN;
+    }
+
+    public String getNewDiscounts() {
+        return newDiscounts;
+    }
+
+    public void setNewDiscounts(String newDiscounts) {
+        this.newDiscounts = newDiscounts;
     }
 
     public String getBenefitDSZNFrom() {
