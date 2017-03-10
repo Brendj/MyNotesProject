@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -193,16 +194,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public boolean isCategoriesEmpty() {
         return categoryDiscounts.isEmpty();
-    }
-
-    private List<CategoryDiscount> categoryDiscountList = new ArrayList<CategoryDiscount>();
-
-    public List<CategoryDiscount> getCategoryDiscountList() {
-        return categoryDiscountList;
-    }
-
-    public void setCategoryDiscountList(List<CategoryDiscount> categoryDiscountList) {
-        this.categoryDiscountList = categoryDiscountList;
     }
 
     private String typeAddClient;
@@ -617,6 +608,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
         categoryDiscounts = new ArrayList<CategoryDiscountItem>();
         StringBuilder categoryDiscountsSB = new StringBuilder();
+        idOfCategoryList.clear();
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscounts.add(new CategoryDiscountItem(
                     clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + ""),
@@ -624,9 +616,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if(clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + "")) {
                 categoryDiscountsSB.append(categoryDiscount.getCategoryName());
                 categoryDiscountsSB.append(";");
+                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
             }
         }
-        this.filter = categoryDiscountsSB.length() > 2 ? categoryDiscountsSB.substring(0, categoryDiscountsSB.length() - 1) : categoryDiscountsSB.toString();
+        this.filter = categoryDiscountsSB.length() > 1 ? categoryDiscountsSB.substring(0, categoryDiscountsSB.length() - 1) : categoryDiscountsSB.toString();
         Set<ClientNotificationSetting> settings = client.getNotificationSettings();
         notificationSettings = new ArrayList<NotificationSettingItem>();
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
@@ -634,15 +627,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 continue;
             }
             notificationSettings.add(new NotificationSettingItem(predefined, settings));
-        }
-
-        idOfCategoryList.clear();
-        categoryDiscountList.clear();
-        if (!client.getCategories().isEmpty()) {
-            for (CategoryDiscount categoryDiscount : client.getCategories()) {
-                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-                this.categoryDiscountList.add(categoryDiscount);
-            }
         }
 
         this.selectItemList = new ArrayList<SelectItem>();
@@ -686,6 +670,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
         this.clientWardItems = loadWardsByClient(session, idOfClient);
         this.changePassword = false;
+        this.categoriesDiscountsDSZN = ClientViewPage.getCategoriesDiscountsDSZNDesc(session, client);
 
         fill(client);
     }
@@ -974,16 +959,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
         /* категори скидок */
-        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         StringBuilder clientCategories = new StringBuilder();
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
+            categoryCriteria.addOrder(Order.asc("idOfCategoryDiscount"));
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
-                this.categoryDiscountSet.add(categoryDiscount);
             }
         } else {
             /* очистить список если он не пуст */
@@ -996,8 +980,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
 
-        if (isDiscountsChanged(client)) {
-            saveDiscountChange(client, persistenceSession);
+        if (isDiscountsChanged(client, clientCategories.toString())) {
+            saveDiscountChange(client, persistenceSession, clientCategories.toString());
         }
 
         if (null != discountMode) {
@@ -1006,7 +990,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         client.setCategoriesDiscounts(
                 clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
-        client.setCategories(categoryDiscountSet.isEmpty() ? new HashSet<CategoryDiscount>() : categoryDiscountSet);
 
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
@@ -1087,6 +1070,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setGender(this.gender);
         client.setBirthDate(this.birthDate);
         client.setAgeTypeGroup(this.ageTypeGroup);
+        this.categoriesDiscountsDSZN = ClientViewPage.getCategoriesDiscountsDSZNDesc(persistenceSession, client);
 
         persistenceSession.update(client);
 
@@ -1107,34 +1091,20 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-    private boolean isDiscountsChanged(Client client) {
-        int a = client.getDiscountMode();
-        int b = discountMode;
+    private boolean isDiscountsChanged(Client client, String newCategoriesDiscounts) {
         boolean isDiscountModeChanged = !(client.getDiscountMode().equals(discountMode));
-        boolean isCategoryListChanged = !(client.getCategories().equals(getCategoryDiscountSet()));
-        Set<CategoryDiscount> old = client.getCategories();
-        Set<CategoryDiscount> newSet = getCategoryDiscountSet();
-        boolean isOld = old.equals(newSet);
+        boolean isCategoryListChanged = !(client.getCategoriesDiscounts().equals(newCategoriesDiscounts));
         return isDiscountModeChanged || isCategoryListChanged;
     }
 
-    private void saveDiscountChange(Client client, Session persistenceSession) {
+    private void saveDiscountChange(Client client, Session persistenceSession, String newCategoriesDiscounts) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
-                getCategoriesString(getCategoryDiscountSet()), getCategoriesString(client.getCategories()));
+                newCategoriesDiscounts, client.getCategoriesDiscounts());
         discountChangeHistory.setComment(
                 DiscountChangeHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                         .getExternalContext().getRemoteUser() + ".");
         persistenceSession.save(discountChangeHistory);
 
-    }
-
-    private String getCategoriesString(Set<CategoryDiscount> categoryDiscounts) {
-        StringBuilder clientCategories = new StringBuilder();
-        for (CategoryDiscount categoryDiscount : categoryDiscounts) {
-            clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
-            clientCategories.append(",");
-        }
-        return clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1);
     }
 
     public void removeClient(Session persistenceSession) throws Exception {
@@ -1199,7 +1169,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
-        this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
         this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
         this.disablePlanCreationDate = client.getDisablePlanCreationDate();
         this.ageTypeGroup = client.getAgeTypeGroup();
@@ -1213,7 +1182,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     private String filter = "Не выбрано";
     private List<Long> idOfCategoryList = new ArrayList<Long>();
-    private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
     private boolean newOrgHasCatDiscount = true;
 
     public String getFilter() {
@@ -1230,14 +1198,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setIdOfCategoryList(List<Long> idOfCategoryList) {
         this.idOfCategoryList = idOfCategoryList;
-    }
-
-    public Set<CategoryDiscount> getCategoryDiscountSet() {
-        return categoryDiscountSet;
-    }
-
-    public void setCategoryDiscountSet(Set<CategoryDiscount> categoryDiscountSet) {
-        this.categoryDiscountSet = categoryDiscountSet;
     }
 
     public boolean isNewOrgHasCatDiscount() {

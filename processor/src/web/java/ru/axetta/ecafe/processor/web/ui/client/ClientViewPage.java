@@ -75,18 +75,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
     }
 
-    private List<CategoryDiscount> categoriesDiscounts;
+    private String categoriesDiscounts;
 
-    public List<CategoryDiscount> getCategoriesDiscounts() {
+    public String getCategoriesDiscounts() {
         return categoriesDiscounts;
     }
 
-    public void setCategoriesDiscounts(List<CategoryDiscount> categoriesDiscounts) {
+    public void setCategoriesDiscounts(String categoriesDiscounts) {
         this.categoriesDiscounts = categoriesDiscounts;
-    }
-
-    public boolean isCategoryiesDiscounts(){
-        return categoriesDiscounts.isEmpty() ;
     }
 
     private Long idOfClient;
@@ -469,12 +465,22 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.middleGroup = client.getMiddleGroup();
 
         // Категории скидок
-        this.categoriesDiscounts=new LinkedList<CategoryDiscount>();
-        if(!client.getCategories().isEmpty()){
-            for(CategoryDiscount categoryDiscount: client.getCategories()){
-                String name=categoryDiscount.getCategoryName();
-                this.categoriesDiscounts.add(categoryDiscount);
+        List<Long> categoriesDiscountsIds = new ArrayList<Long>();
+        for(String cd : client.getCategoriesDiscounts().split(",")) {
+            categoriesDiscountsIds.add(Long.valueOf(cd));
+        }
+        if(categoriesDiscountsIds.size() > 0) {
+            Criteria criteria = session.createCriteria(CategoryDiscount.class);
+            criteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+            List<CategoryDiscount> cdList = criteria.list();
+            StringBuilder sb = new StringBuilder();
+            for(CategoryDiscount categoryDiscount : cdList) {
+                sb.append(categoryDiscount.getCategoryName());
+                sb.append(";");
             }
+            this.categoriesDiscounts = sb.length() > 1 ? sb.substring(0, sb.length() - 1) : sb.toString();
+        } else {
+            this.categoriesDiscounts = "Нет категорий";
         }
         Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
         bankSubscriptionCriteria.add(Restrictions.eq("client", client))
@@ -529,7 +535,7 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     }
 
-    private static String getCategoriesDiscountsDSZNDesc(Session session, Client client) {
+    public static String getCategoriesDiscountsDSZNDesc(Session session, Client client) {
         String result = "";
         String categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
         if(categoriesDiscountsDSZN.length() > 0) {

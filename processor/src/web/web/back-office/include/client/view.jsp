@@ -139,13 +139,7 @@
                  styleClass="input-text" />
 
     <h:outputText  escape="true" value="Категории" styleClass="output-text" />
-    <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Нет категорий" styleClass="output-text"
-                      rendered="#{mainPage.clientViewPage.categoryiesDiscounts}" />
-        <a4j:repeat value="#{mainPage.clientViewPage.categoriesDiscounts}" var="categoryDiscount">
-            <h:outputText escape="true" value="#{categoryDiscount.categoryName}" styleClass="output-text" /><br/>
-        </a4j:repeat>
-    </h:panelGrid>
+    <h:outputText value="#{mainPage.clientViewPage.categoriesDiscounts}" escape="true" styleClass="output-text" />
 
     <h:outputText escape="true" value="Льготы ДСЗН" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientViewPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
