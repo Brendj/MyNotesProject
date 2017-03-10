@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Ban
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -467,7 +468,9 @@ public class ClientViewPage extends BasicWorkspacePage {
         // Категории скидок
         List<Long> categoriesDiscountsIds = new ArrayList<Long>();
         for(String cd : client.getCategoriesDiscounts().split(",")) {
-            categoriesDiscountsIds.add(Long.valueOf(cd));
+            if(StringUtils.isNotEmpty(cd)) {
+                categoriesDiscountsIds.add(Long.valueOf(cd));
+            }
         }
         if(categoriesDiscountsIds.size() > 0) {
             Criteria criteria = session.createCriteria(CategoryDiscount.class);

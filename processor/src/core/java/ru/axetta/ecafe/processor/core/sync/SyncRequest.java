@@ -127,8 +127,12 @@ public class SyncRequest {
                     Date birthDate = getDateValueNullSafe(namedNodeMap,"BirthDate");
                     Long version = getLongValueNullSafe(namedNodeMap, "V");
                     Long balanceToNotify = getLongValueNullSafe(namedNodeMap, "BalanceToNotify");
-                    Date disablePlanCreationDate = loadContext.getTimeFormat()
-                            .parse(namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent());
+                    String disablePlanCreationDateSt = namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent();
+                    Date disablePlanCreationDate = null;
+                    if(StringUtils.isNotEmpty(disablePlanCreationDateSt)) {
+                        disablePlanCreationDate = loadContext.getTimeFormat()
+                                .parse(namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent());
+                    }
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
