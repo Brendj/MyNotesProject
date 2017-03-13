@@ -1509,6 +1509,7 @@ public class DAOUtils {
         CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN) session.load(CategoryDiscountDSZN.class, id.intValue());
         categoryDiscountDSZN.setDeleted(true);
         categoryDiscountDSZN.setVersion(nextVersion);
+        categoryDiscountDSZN.setCategoryDiscount(null);
         session.save(categoryDiscountDSZN);
     }
 
