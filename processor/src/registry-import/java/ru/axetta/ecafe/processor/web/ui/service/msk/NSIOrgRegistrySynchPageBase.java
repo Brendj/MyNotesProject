@@ -7,19 +7,25 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import generated.registry.manual_synch.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontControllerProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -64,6 +70,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private static Map<Integer, String> ACTION_FILTERS = new HashMap<Integer, String>();
     private long idOfSelectedError;
     List <WebRegistryChangeItem> items;
+    private Map<Long, CategoryDiscount> categoryMap;
+    private Map<Integer, CategoryDiscountDSZN> categoryDSZNMap;
     private String errorComment;
     private List<SelectItem> displayModes;
     private int displayMode;
@@ -363,6 +371,24 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 return;
             }
         }
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            categoryMap = ImportRegisterClientsService.getCategoriesMap(persistenceSession);
+            categoryDSZNMap = ImportRegisterClientsService.getCategoriesDSZNMap(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            errorMessages = e.getMessage();
+            return;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
         items = new ArrayList<WebRegistryChangeItem>();
         for (ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2 i : changedItems) {
             if (showOnlyClientGoups) {
@@ -632,10 +658,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 birthDate = parent.getList().get(19).getFieldValueParam().substring(0, 10);
             }
 
-            benefitDSZN = parent.getList().get(27).getFieldValueParam();
-            benefitDSZNFrom = parent.getList().get(28).getFieldValueParam();
-            newDiscounts = parent.getList().get(20).getFieldValueParam();
-            oldDiscounts = parent.getList().get(23).getFieldValueParam();
+            benefitDSZN = getCategoriesDSZNString(parent.getList().get(27).getFieldValueParam());
+            benefitDSZNFrom = getCategoriesDSZNString(parent.getList().get(28).getFieldValueParam());
+            newDiscounts = getCategoriesString(parent.getList().get(20).getFieldValueParam());
+            oldDiscounts = getCategoriesString(parent.getList().get(23).getFieldValueParam());
 
             if (parent.getList().get(21).getFieldValueParam().equals("")) {
                 genderFrom = "";
@@ -676,6 +702,50 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
         public void setSelected(boolean selected) {
             this.selected = selected;
+        }
+
+        private String getCategoriesDSZNString(String categoiesDSZN) {
+            if(StringUtils.isEmpty(categoiesDSZN)) {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            for(String c : categoiesDSZN.split(",")) {
+                if(StringUtils.isNotEmpty(c)) {
+                    int code = Integer.valueOf(c);
+                    if(categoryDSZNMap.get(code) != null) {
+                        sb.append(c);
+                        sb.append(" - ");
+                        sb.append(categoryDSZNMap.get(code).getDescription());
+                        sb.append("; ");
+                    } else {
+                        sb.append(c);
+                        sb.append("; ");
+                    }
+                }
+            }
+            return sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
+        }
+
+        private String getCategoriesString(String categoies) {
+            if(StringUtils.isEmpty(categoies)) {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            for(String c : categoies.split(",")) {
+                if(StringUtils.isNotEmpty(c)) {
+                    long id = Integer.valueOf(c);
+                    if(categoryMap.get(id) != null) {
+                        sb.append(c);
+                        sb.append(" - ");
+                        sb.append(categoryMap.get(id).getCategoryName());
+                        sb.append("; ");
+                    } else {
+                        sb.append(c);
+                        sb.append("; ");
+                    }
+                }
+            }
+            return sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
         }
 
         public boolean getFullnameChangeExists() {
