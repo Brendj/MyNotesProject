@@ -405,6 +405,8 @@ public class ImportRegisterClientsService {
             }
         }
 
+        Map<Long, CategoryDiscount> categoryMap = getCategoriesMap(session);
+        Map<Integer, CategoryDiscountDSZN> categoryDSZNMap = getCategoriesDSZNMap(session);
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
@@ -440,6 +442,10 @@ public class ImportRegisterClientsService {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN,
                         pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
                         updateClient);
+                if(!updateClient) {
+                    updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscounts(),
+                                    categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscountsDSZN());
+                }
             }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -528,6 +534,68 @@ public class ImportRegisterClientsService {
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
+    }
+
+    public static String getCategoriesString(String categoriesDSZN, String clientCategories,
+            Map<Long, CategoryDiscount> categoryMap, Map<Integer, CategoryDiscountDSZN> categoryDSZNMap) {
+        List<Long> categoriesList = new ArrayList<Long>();
+        for(String c : clientCategories.split(",")) {
+            if(StringUtils.isNotEmpty(c)) {
+                categoriesList.add(Long.valueOf(c));
+            }
+        }
+        List<Integer> categoriesDSZNList = new ArrayList<Integer>();
+        for(String c : categoriesDSZN.split(",")) {
+            if(StringUtils.isNotEmpty(c)) {
+                categoriesDSZNList.add(Integer.valueOf(c));
+            }
+        }
+
+        Set<Long> resultCategories = new TreeSet<Long>();
+        for(Long c : categoriesList) {
+            if(!(categoryMap.get(c).getCategoriesDiscountDSZN().size() > 0)) {
+                resultCategories.add(c);
+            }
+        }
+
+        for(Integer c : categoriesDSZNList) {
+            if(categoryDSZNMap.get(c).getCategoryDiscount() != null) {
+                resultCategories.add(categoryDSZNMap.get(c).getCategoryDiscount().getIdOfCategoryDiscount());
+            }
+        }
+
+        return StringUtils.join(resultCategories, ",");
+    }
+
+    public static boolean doCategoriesUpdate(String newCategories, String oldCategories) {
+        if(StringUtils.isEmpty(newCategories) && StringUtils.isEmpty(oldCategories)) {
+            return false;
+        }
+        Set<String> newCategoriesSet = new HashSet<String>(Arrays.asList(newCategories.split(",")));
+        Set<String> oldCategoriesSet = new HashSet<String>(Arrays.asList(oldCategories.split(",")));
+        return !newCategoriesSet.equals(oldCategoriesSet);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<Long, CategoryDiscount> getCategoriesMap(Session session) {
+        Map<Long, CategoryDiscount> result = new HashMap<Long, CategoryDiscount>();
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        List<CategoryDiscount> list = criteria.list();
+        for(CategoryDiscount categoryDiscount : list) {
+            result.put(categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount);
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<Integer, CategoryDiscountDSZN> getCategoriesDSZNMap(Session session) {
+        Map<Integer, CategoryDiscountDSZN> result = new HashMap<Integer, CategoryDiscountDSZN>();
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        List<CategoryDiscountDSZN> list = criteria.list();
+        for(CategoryDiscountDSZN categoryDiscountDSZN : list) {
+            result.put(categoryDiscountDSZN.getCode(), categoryDiscountDSZN);
+        }
+        return result;
     }
 
     public static long getLastUncommitedChange(EntityManager em) {

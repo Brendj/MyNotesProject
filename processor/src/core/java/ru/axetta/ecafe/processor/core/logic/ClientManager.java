@@ -497,6 +497,7 @@ public class ClientManager {
                                 newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
                         discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
                         persistenceSession.save(discountChangeHistory);
+                        client.setCategories(getCategoriesSet(persistenceSession, newDiscounts));
                     }
                 }
             }
@@ -520,6 +521,21 @@ public class ClientManager {
             logger.error("Ошибка при обновлении данных клиента", e);
             throw new Exception(e);
         }
+    }
+
+    public static Set<CategoryDiscount> getCategoriesSet(Session session, String categories) {
+        if(StringUtils.isEmpty(categories)) {
+            return new HashSet<CategoryDiscount>();
+        }
+        List<Long> list = new ArrayList<Long>();
+        for(String s : categories.split(",")){
+            if(StringUtils.isNotEmpty(s)) {
+                list.add(Long.valueOf(s));
+            }
+        }
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.in("idOfCategoryDiscount", list));
+        return new HashSet<CategoryDiscount>(criteria.list());
     }
     
     public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList) throws Exception {
@@ -868,6 +884,8 @@ public class ClientManager {
                         Client.DISCOUNT_MODE_NONE, fieldConfig.getValue(FieldId.BENEFIT), "");
                 discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
                 persistenceSession.save(discountChangeHistory);
+                client.setCategories(getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT)));
+                persistenceSession.update(client);
             }
 
             persistenceSession.save(clientMigration);
