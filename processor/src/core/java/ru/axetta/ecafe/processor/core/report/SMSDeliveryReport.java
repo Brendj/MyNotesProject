@@ -387,9 +387,11 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             }
 
             String stateCondition = "";
+            String stateConditionJoin = "";
 
             if(isActiveState){
                 stateCondition = " and " + " o.state = " + Org.ACTIVE_STATE;
+                stateConditionJoin = " left join cf_orgs o on sync1.idoforg = o.idoforg";
             }
 
             String sql =
@@ -400,7 +402,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     + "              from cf_synchistory_daily sync2 "
                     + "              where sync2.syncdate<sync1.syncdate and sync1.idoforg=sync2.idoforg "
                     + "              order by syncdate desc limit 1) t2 "
-                    + "      from cf_synchistory_daily sync1 "
+                    + "      from cf_synchistory_daily sync1 " + stateConditionJoin
                     + "      where sync1.syncdate>=:start and sync1.syncdate<:end " + orgCondition + stateCondition + " ) as history "
                     + "join cf_orgs o on history.idoforg=o.idoforg "
                     + " where t2 is not null "
