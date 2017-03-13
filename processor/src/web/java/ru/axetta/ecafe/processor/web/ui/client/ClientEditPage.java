@@ -960,6 +960,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         /* категори скидок */
         StringBuilder clientCategories = new StringBuilder();
+        Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
@@ -968,6 +969,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
+                categoryDiscountSet.add(categoryDiscount);
             }
         } else {
             /* очистить список если он не пуст */
@@ -990,6 +992,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         client.setCategoriesDiscounts(
                 clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
+        client.setCategories(categoryDiscountSet);
 
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
