@@ -38,7 +38,7 @@ alter table cf_subscriber_feeding add column FeedingType integer not null defaul
 alter table cf_clients_cycle_diagrams add column FeedingType integer not null default 0;
 
 --Очищаем таблицы реестров и добавляем колонки для льгот
---TRUNCATE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors; // todo раскоммитить при сборке
+TRUNCATE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors;
 ALTER TABLE cf_registrychange DROP COLUMN benefitOnAdmission,
                               DROP COLUMN benefitOnAdmissionFrom,
                               ADD COLUMN checkBenefits integer not null default 0,
@@ -55,3 +55,5 @@ ALTER TABLE cf_clients DROP COLUMN benefitOnAdmission,
 
 alter table cf_complexinfo add column usedVariableFeeding integer,
                        add column rootComplex integer;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 130317) НЕ МЕНЯТЬ
