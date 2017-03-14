@@ -735,12 +735,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 if(StringUtils.isNotEmpty(c)) {
                     long id = Integer.valueOf(c);
                     if(categoryMap.get(id) != null) {
-                        if(categoryMap.get(id).getCategoriesDiscountDSZN().size() > 0) {
-                            sb.append(c);
-                            sb.append(" - ");
-                            sb.append(categoryMap.get(id).getCategoryName());
-                            sb.append("; ");
-                        }
+                        sb.append(c);
+                        sb.append(" - ");
+                        sb.append(categoryMap.get(id).getCategoryName());
+                        sb.append("; ");
                     } else {
                         sb.append(c);
                         sb.append("; ");
