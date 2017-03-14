@@ -481,7 +481,6 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null && fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
                 if(Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS))) {
                     client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-                    client.setLastDiscountsUpdate(new Date());
 
                     String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
                     String oldDiscounts = client.getCategoriesDiscounts();
@@ -497,6 +496,7 @@ public class ClientManager {
                                 newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
                         discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
                         persistenceSession.save(discountChangeHistory);
+                        client.setLastDiscountsUpdate(new Date());
                         client.setCategories(getCategoriesSet(persistenceSession, newDiscounts));
                     }
                 }
@@ -830,7 +830,6 @@ public class ClientManager {
             //token[34]
             if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
                 client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-                client.setLastDiscountsUpdate(new Date());
             } else {
                 client.setCategoriesDiscountsDSZN("");
             }
@@ -885,6 +884,7 @@ public class ClientManager {
                 discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
                 persistenceSession.save(discountChangeHistory);
                 client.setCategories(getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT)));
+                client.setLastDiscountsUpdate(new Date());
                 persistenceSession.update(client);
             }
 

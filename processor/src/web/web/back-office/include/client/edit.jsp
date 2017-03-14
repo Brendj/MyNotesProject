@@ -174,7 +174,7 @@
 
     <h:outputText escape="true" value="Льготы ДСЗН" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
-    <h:outputText escape="true" value="Дата последнего изменения льготы ДСЗН" styleClass="output-text" />
+    <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"
                   styleClass="output-text" />
     <h:outputText escape="true" value="Дата исключения из плана питания" styleClass="output-text" />

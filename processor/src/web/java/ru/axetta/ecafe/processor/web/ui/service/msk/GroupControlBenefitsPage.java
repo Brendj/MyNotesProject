@@ -22,10 +22,7 @@ import javax.faces.event.ActionEvent;
 import javax.persistence.PersistenceException;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -204,6 +201,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                                 .updateClientRegistryVersion(persistenceSession);
 
                                         saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
+                                        client.setLastDiscountsUpdate(new Date());
                                         client.setDiscountMode(3);
                                         client.setCategories(clientCategoryDiscounts);
                                         client.setCategoriesDiscounts(categoryDiscounts);
@@ -224,6 +222,7 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                                 .updateClientRegistryVersion(persistenceSession);
 
                                         saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
+                                        client.setLastDiscountsUpdate(new Date());
                                         client.setDiscountMode(3);
                                         client.setCategoriesDiscounts(categoriesDiscounts);
                                         client.setCategories(categoryDiscountSet);

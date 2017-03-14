@@ -111,6 +111,7 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
 
                     // Сохраняем историю изменения льгот
                     saveClientDiscountChange(persistenceSession, client, 0, "");
+                    client.setLastDiscountsUpdate(new Date());
 
                     Set<CategoryDiscount> categoryDiscountSet = client.getCategories();
 

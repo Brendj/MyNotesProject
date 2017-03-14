@@ -3592,6 +3592,7 @@ public class Processor implements SyncProcessor {
                         oldClientDiscountMode, categoriesFromPacket, categoriesFromClient);
                 discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_ARM);
                 persistenceSession.save(discountChangeHistory);
+                client.setLastDiscountsUpdate(new Date());
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
 

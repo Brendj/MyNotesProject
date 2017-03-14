@@ -984,6 +984,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         if (isDiscountsChanged(client, clientCategories.toString())) {
             saveDiscountChange(client, persistenceSession, clientCategories.toString());
+            client.setLastDiscountsUpdate(new Date());
         }
 
         if (null != discountMode) {
