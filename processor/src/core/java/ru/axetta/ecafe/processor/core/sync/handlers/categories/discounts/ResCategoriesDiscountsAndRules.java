@@ -130,8 +130,9 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         criteria.add(Restrictions.gt("version", versionDSZN));
         List<CategoryDiscountDSZN> categoriesDiscountDSZN = (List<CategoryDiscountDSZN>) criteria.list();
         for (CategoryDiscountDSZN discountDSZN : categoriesDiscountDSZN) {
-            CategoryDiscountDSZNItem c = new CategoryDiscountDSZNItem(discountDSZN.getCode(), discountDSZN.getDescription(),
-                    discountDSZN.getVersion(), discountDSZN.getDeleted());
+            CategoryDiscountDSZNItem c = new CategoryDiscountDSZNItem(discountDSZN.getCode(),
+                    discountDSZN.getCategoryDiscount() != null ? discountDSZN.getCategoryDiscount().getIdOfCategoryDiscount() : null,
+                    discountDSZN.getDescription(), discountDSZN.getVersion(), discountDSZN.getDeleted());
             addDCIDSZN(c);
         }
     }
@@ -406,12 +407,15 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
 
     private static class CategoryDiscountDSZNItem {
         private Integer code;
+        private Long categoryId;
         private String description;
         private Long version;
         private Boolean deleted;
 
-        public CategoryDiscountDSZNItem(Integer code, String description, Long version, Boolean deleted) {
+        public CategoryDiscountDSZNItem(Integer code, Long categoryId, String description, Long version,
+                Boolean deleted) {
             this.code = code;
+            this.categoryId = categoryId;
             this.description = description;
             this.version = version;
             this.deleted = deleted;
@@ -419,6 +423,10 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
 
         public Integer getCode() {
             return code;
+        }
+
+        public Long getCategoryId() {
+            return categoryId;
         }
 
         public String getDescription() {
@@ -436,6 +444,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         public Element toElement(Document document) throws Exception {
             Element element = document.createElement("DCRI_DSZN");
             element.setAttribute("Code", Integer.toString(this.code));
+            element.setAttribute("CategoryId", this.categoryId != null ? Long.toString(this.categoryId) : "");
             element.setAttribute("Name", this.description);
             element.setAttribute("V", Long.toString(this.version));
             element.setAttribute("D", Boolean.toString(this.deleted));
