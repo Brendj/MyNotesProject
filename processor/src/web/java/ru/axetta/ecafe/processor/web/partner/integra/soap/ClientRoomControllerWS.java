@@ -155,6 +155,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_GUARDIAN_NOT_FOUND = 570L;
     private static final Long RC_INVALID_OPERATION_VARIABLE_FEEDING = 580L;
     private static final Long RC_ERROR_CREATE_VARIABLE_FEEDING = 590L;
+    private static final Long RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING = 600L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -187,6 +188,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_GUARDIAN_NOT_FOUND_DESC = "Связка клиент-представитель не найдена";
     private static final String RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC = "Подписку на вариативное питание приостановить нельзя";
     private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один вариант комплекса каждого вида рациона (завтрак, обед)";
+    private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -7327,6 +7329,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 vp = true;
             }
             if (vp) {
+                boolean sixWorkWeek = parser.isSixWorkWeek();
+                if (!allDaysWithData(sixWorkWeek, cycleDiagram)) {
+                    result.resultCode = RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING;
+                    result.description = RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC;
+                    return result;
+                }
                 boolean allOk = true;
                 String complexesByDay;
                 for (int i = 1; i < 8; i++) {
@@ -7417,6 +7425,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private boolean allDaysWithData(boolean sixWorkWeek, CycleDiagramExt cycleDiagram) {
+        return !(StringUtils.isEmpty(cycleDiagram.getMonday()) || StringUtils.isEmpty(cycleDiagram.getTuesday())
+                || StringUtils.isEmpty(cycleDiagram.getWednesday()) || StringUtils.isEmpty(cycleDiagram.getThursday())
+                || StringUtils.isEmpty(cycleDiagram.getFriday()) || (StringUtils.isEmpty(cycleDiagram.getSaturday()) && sixWorkWeek));
     }
 
     private String getCycleDiagramValueByDayOfWeek(int day, CycleDiagramExt cycleDiagram) {
