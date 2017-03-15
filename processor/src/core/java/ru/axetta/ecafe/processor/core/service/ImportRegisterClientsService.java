@@ -553,13 +553,13 @@ public class ImportRegisterClientsService {
 
         Set<Long> resultCategories = new TreeSet<Long>();
         for(Long c : categoriesList) {
-            if(!(categoryMap.get(c).getCategoriesDiscountDSZN().size() > 0)) {
+            if(categoryMap.get(c) != null && !(categoryMap.get(c).getCategoriesDiscountDSZN().size() > 0)) {
                 resultCategories.add(c);
             }
         }
 
         for(Integer c : categoriesDSZNList) {
-            if(categoryDSZNMap.get(c).getCategoryDiscount() != null) {
+            if(categoryDSZNMap.get(c) != null && categoryDSZNMap.get(c).getCategoryDiscount() != null) {
                 resultCategories.add(categoryDSZNMap.get(c).getCategoryDiscount().getIdOfCategoryDiscount());
             }
         }
