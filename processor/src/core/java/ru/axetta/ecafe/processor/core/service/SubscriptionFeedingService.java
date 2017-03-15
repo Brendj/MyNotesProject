@@ -251,14 +251,19 @@ public class SubscriptionFeedingService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public boolean isMultipleRootComplexes(Org org, List<Integer> complexIds, Date date) {
-        TypedQuery<Integer> query = entityManager.createQuery("select distinct ci.rootComplex from ComplexInfo ci "
+    public boolean allowCreateByRootComplexes(Org org, List<Integer> complexIds, Date date) {
+        Query query = entityManager.createQuery("select ci.rootComplex, count(distinct ci.idOfComplex) from ComplexInfo ci "
                 + "where ci.usedVariableFeeding = 1 and ci.org = :org "
-                + "and ci.idOfComplex in :complexIds and ci.menuDate >= :date", Integer.class)
+                + "and ci.idOfComplex in :complexIds and ci.menuDate >= :date group by ci.rootComplex")
                 .setParameter("org", org)
                 .setParameter("complexIds", complexIds)
                 .setParameter("date", date);
-        return query.getResultList().size() > 1;
+        List res = query.getResultList();
+        for (Object o : res) {
+            Object[] row = (Object[]) o;
+            if ((Long)row[1] > 1) return false;
+        }
+        return true;
     }
 
     @SuppressWarnings("unchecked")

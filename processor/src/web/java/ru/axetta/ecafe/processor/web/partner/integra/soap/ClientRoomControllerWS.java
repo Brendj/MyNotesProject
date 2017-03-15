@@ -7452,7 +7452,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         for (String s : complexesByDay.split(";")) {
             complexIds.add(Integer.parseInt(s));
         }
-        return complexIds.size() == 1 || sfService.isMultipleRootComplexes(org, complexIds, date);
+        return complexIds.size() == 1 || sfService.allowCreateByRootComplexes(org, complexIds, date);
     }
 
     @Override
