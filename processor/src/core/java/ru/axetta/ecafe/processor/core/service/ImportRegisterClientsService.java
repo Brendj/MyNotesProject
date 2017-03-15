@@ -729,7 +729,8 @@ public class ImportRegisterClientsService {
                     currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
             if(currentClient != null) {
                 ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-                ch.setOldDiscounts(currentClient.getCategoriesDiscounts());
+                ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
+                        StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
             }
         }
 
@@ -790,7 +791,8 @@ public class ImportRegisterClientsService {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
             ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-            ch.setOldDiscounts(currentClient.getCategoriesDiscounts());
+            ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
+                    StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
             ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         sess.save(ch);
