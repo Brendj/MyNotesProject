@@ -444,7 +444,7 @@ public class ImportRegisterClientsService {
                         updateClient);
                 if(!updateClient) {
                     updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscounts(),
-                                    categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscountsDSZN());
+                                    categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscounts());
                 }
             }
 
@@ -1201,8 +1201,10 @@ public class ImportRegisterClientsService {
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
                     createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
-                    createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                    createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
+                    if(change.getCheckBenefits()) {
+                        createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
+                        createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
+                    }
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
