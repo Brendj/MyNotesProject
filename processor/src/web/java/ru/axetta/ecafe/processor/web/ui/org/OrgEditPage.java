@@ -343,11 +343,6 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setPayByCashier(payByCashier);
         org.setOneActiveCard(oneActiveCard);
         org.setSecurityLevel(securityLevel);
-        if(!org.getChangesDSZN().equals(changesDSZN)) {
-            getLogger().info(String.format(
-                    "Флаг разрешения получения льгот из сверки изменен, ид ОО = %d, текущее значение = %s",
-                    org.getIdOfOrg(), changesDSZN.toString()));
-        }
         org.setChangesDSZN(changesDSZN);
 
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
@@ -463,6 +458,7 @@ public class OrgEditPage extends BasicWorkspacePage
             friendlyOrganisation.add(o);
         }
 
+        this.changesDSZN = org.getChangesDSZN();
         this.btiUnom = org.getBtiUnom();
         this.btiUnad = org.getBtiUnad();
         this.introductionQueue = org.getIntroductionQueue();
