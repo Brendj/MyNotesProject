@@ -496,7 +496,7 @@ public class NSIDeltaProcessor {
                         }
                     }
                     group = (parallel == null ? "" : parallel) + "-" + (letter == null ? "" : letter);
-                    if (group.startsWith("-")) {
+                    if (group.startsWith("-") || group.endsWith("-")) {
                         group = name;
                     }
                 }
