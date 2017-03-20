@@ -178,6 +178,8 @@ public class SubscriptionFeeding extends DistributedObject{
         Integer intType = XMLUtils.getIntegerAttributeValue(node, "Type");
         if(intType != null){
             setFeedingType(SubscriptionFeedingType.values()[intType]);
+        } else {
+            setFeedingType(SubscriptionFeedingType.ABON_TYPE);
         }
 
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);

@@ -201,6 +201,8 @@ public class CycleDiagram extends DistributedObject{
         Integer intType = XMLUtils.getIntegerAttributeValue(node, "Type");
         if(intType != null){
             setFeedingType(SubscriptionFeedingType.values()[intType]);
+        } else {
+            setFeedingType(SubscriptionFeedingType.ABON_TYPE);
         }
 
         setMonday(XMLUtils.getStringAttributeValue(node, "Monday", 255));

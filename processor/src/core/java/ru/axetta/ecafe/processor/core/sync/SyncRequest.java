@@ -127,7 +127,7 @@ public class SyncRequest {
                     Date birthDate = getDateValueNullSafe(namedNodeMap,"BirthDate");
                     Long version = getLongValueNullSafe(namedNodeMap, "V");
                     Long balanceToNotify = getLongValueNullSafe(namedNodeMap, "BalanceToNotify");
-                    String disablePlanCreationDateSt = namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent();
+                    String disablePlanCreationDateSt = getStringValueNullSafe(namedNodeMap, "DisablePlanCreationDate");
                     Date disablePlanCreationDate = null;
                     if(StringUtils.isNotEmpty(disablePlanCreationDateSt)) {
                         disablePlanCreationDate = loadContext.getTimeFormat()
