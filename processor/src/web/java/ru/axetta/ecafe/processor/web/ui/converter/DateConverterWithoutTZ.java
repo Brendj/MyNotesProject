@@ -4,20 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.ui.converter;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-
 import org.apache.commons.lang.StringUtils;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
-import javax.servlet.http.HttpSession;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 public class DateConverterWithoutTZ implements Converter {
 
