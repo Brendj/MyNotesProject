@@ -680,7 +680,7 @@
 							</reportElement>
 							<textElement/>
 						</textField>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement uuid="79540694-216f-43f7-b754-d2f3ae95a60b" style="Crosstab Data Text" x="0" y="0" width="70" height="15"/>
 							<textElement/>
 						</textField>
@@ -690,7 +690,7 @@
 							</reportElement>
 							<textElement/>
 						</textField>
-						<textField>
+						<textField isBlankWhenNull="true">
 							<reportElement uuid="0a9a2db4-c5f5-4bfe-8431-f7803bb65fd4" style="Crosstab Data Text" x="70" y="0" width="70" height="15"/>
 							<textElement/>
 						</textField>
