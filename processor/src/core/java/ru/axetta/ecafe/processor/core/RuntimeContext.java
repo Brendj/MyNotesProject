@@ -199,6 +199,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private AcquiropaySystemConfig acquiropaySystemConfig;
     static SessionFactory sessionFactory;
     static SessionFactory reportsSessionFactory;
+    static SessionFactory externalServicesSessionFactory;
     private RegularPaymentSubscriptionService regularPaymentSubscriptionService;
     boolean criticalErrors;
     Properties configProperties;
@@ -299,6 +300,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public Session createReportPersistenceSession() {
         return reportsSessionFactory.openSession();
+    }
+
+    public Session createExternalServicesPersistenceSession() {
+        return externalServicesSessionFactory.openSession();
     }
 
     //hibernate cache for processorPU
@@ -450,6 +455,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public static void setReportsSessionFactory(SessionFactory reportsSessionFactory) {
         RuntimeContext.reportsSessionFactory = reportsSessionFactory;
+    }
+
+    public static void setExternalServicesSessionFactory(SessionFactory externalServicesSessionFactory) {
+        RuntimeContext.externalServicesSessionFactory = externalServicesSessionFactory;
     }
 
     @PostConstruct

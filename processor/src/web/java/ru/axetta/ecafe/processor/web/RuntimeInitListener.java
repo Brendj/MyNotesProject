@@ -38,6 +38,9 @@ public class RuntimeInitListener implements ServletContextListener {
     @PersistenceUnit(unitName = "reportsPU")
     static SessionFactory reportsSessionFactory;
 
+    @PersistenceUnit(unitName = "externalServicesPU")
+    static SessionFactory externalServicesSessionFactory;
+
     public static SessionFactory getSessionFactory() {
         return sessionFactory;
     }
@@ -52,6 +55,7 @@ public class RuntimeInitListener implements ServletContextListener {
         String contextPath = servletContext.getRealPath(File.separator);
         RuntimeContext.setSessionFactory(sessionFactory);
         RuntimeContext.setReportsSessionFactory(reportsSessionFactory);
+        RuntimeContext.setExternalServicesSessionFactory(externalServicesSessionFactory);
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

@@ -28,6 +28,7 @@
     </bean>
     <alias name="entityManagerFactory" alias="processorPU"/>
     <alias name="entityManagerFactory" alias="reportsPU"/>
+    <alias name="entityManagerFactory" alias="externalServicesPU"/>
 
     <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
 
