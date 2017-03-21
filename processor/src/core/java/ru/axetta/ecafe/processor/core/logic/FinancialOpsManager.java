@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -28,8 +29,6 @@ import javax.persistence.PersistenceContext;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
 @Component
 @Scope("singleton")
@@ -334,24 +333,25 @@ public class FinancialOpsManager {
 
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(clientPayment.getCreateTime());
+        Person person = DAOReadExternalsService.getInstance().findPerson(client.getPerson().getIdOfPerson());
 
         String[] values = new String[]{
                 "paySum",CurrencyStringUtils.copecksToRubles(paySum),
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
                 "contractId",String.valueOf(client.getContractId()),
-                "surname",client.getPerson().getSurname(),
-                "firstName",client.getPerson().getFirstName(),
+                "surname",person.getSurname(),
+                "firstName",person.getFirstName(),
                 "empTime", empTime
         };
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
 
         eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
 
-        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+        List<Client> guardians = DAOReadExternalsService.getInstance().findGuardiansByClient(client.getIdOfClient(), null);
 
         if (!(guardians == null || guardians.isEmpty())) {
             for (Client destGuardian : guardians) {
-                if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                if (DAOReadExternalsService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
                         client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
                     eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
                 }
@@ -384,11 +384,11 @@ public class FinancialOpsManager {
         values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
         eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
 
-        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+        List<Client> guardians = DAOReadExternalsService.getInstance().findGuardiansByClient(client.getIdOfClient(), null);
 
         if (!(guardians == null || guardians.isEmpty())) {
             for (Client destGuardian : guardians) {
-                if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                if (DAOReadExternalsService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
                         client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
                     eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
                 }

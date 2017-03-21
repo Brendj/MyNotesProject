@@ -6,13 +6,12 @@ package ru.axetta.ecafe.processor.web.partner.way4;
 
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.utils.Base64;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
@@ -56,7 +55,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         long clientId = parseResult.getReqLongParam("PHONE");
         String bmId = parseResult.getParam("PCODE");
         if (bmId != null) {
-            Contragent c = RuntimeContext.getAppContext().getBean(DAOService.class).findContragentByClient(clientId);
+            Contragent c = DAOReadExternalsService.getInstance().findContragentByClient(clientId);
             if (c != null && !bmId.equals(c.getBMID())) {
                 throw new Exception(
                         String.format("Некорректный код поставщика (BMID), необходимо использовать %s", c.getBMID()));

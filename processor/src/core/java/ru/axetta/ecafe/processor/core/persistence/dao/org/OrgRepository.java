@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -30,6 +32,9 @@ public class OrgRepository extends AbstractJpaDao<Org> {
 
     private final static Logger logger = LoggerFactory.getLogger(OrgRepository.class);
     private static final Long dateDiffForTransactionsSearch = 1000L * 60L * 5L; //5 минут
+
+    @PersistenceContext(unitName = "externalServicesPU")
+    private EntityManager emExternalServices;
 
     public static OrgRepository getInstance() {
         return RuntimeContext.getAppContext().getBean(OrgRepository.class);
@@ -165,11 +170,7 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         for(SectionType sectionType : sectionTypes){
             types.add(sectionType.getType());
         }
-        //Org org = findOrgWithFriendlyOrgs(idOfOrg);
-        //List<Org> orgs = new ArrayList<Org>();
-        //orgs.add(org);
-        //orgs.addAll(org.getFriendlyOrg());
-        Query query = entityManager.createQuery(
+        Query query = emExternalServices.createQuery(
                 "select l from LastProcessSectionsDates l where l.compositeIdOfLastProcessSectionsDates.idOfOrg = :idOfOrg "
                         + "and l.compositeIdOfLastProcessSectionsDates.type in :types order by date desc ",
                 LastProcessSectionsDates.class);

@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 
-import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.ParameterMap;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -183,19 +182,13 @@ public class SecurityJournalBalance {
     }
 
     public static SecurityJournalBalance getSecurityJournalBalanceDataFromPayment(
-            PaymentRequest.PaymentRegistry.Payment payment) {
-        Client client;
+            PaymentRequest.PaymentRegistry.Payment payment, Client client) {
         SJBalanceSourceEnum source;
         String serverAddress;
         try {
             serverAddress = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
             serverAddress = null;
-        }
-        try {
-            client = DAOService.getInstance().getClientByContractId(payment.getContractId());
-        } catch (Exception e) {
-            client = null;
         }
         try {
             HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -206,7 +199,7 @@ public class SecurityJournalBalance {
             String request = httpServletRequest.getScheme() + "://" +
                     httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort() +
                     httpServletRequest.getRequestURI() + (parameters != null ? "?" + parameters : "");
-            String uri = ((RequestFacade)((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()).getRequestURI();
+            String uri = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRequestURI();
             if (uri.equals("/processor/sync")) {
                 source = SJBalanceSourceEnum.SJBALANCE_SOURCE_SYNC;
             } else if (uri.equals("/processor/payment-std")) {
@@ -218,6 +211,14 @@ public class SecurityJournalBalance {
                 }
             } else if (uri.equals("/processor/pay")) {
                 source = SJBalanceSourceEnum.SJBALANCE_SOURCE_PAY;
+            } else if (uri.equals("/processor/soap/payment")) {
+                source = SJBalanceSourceEnum.SJBALANCE_SOURCE_SOAP_PAYMENT;
+                try {
+                    request += " | " + ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getAttribute("soap");
+                    protocol = "soap";
+                } catch (Exception ignore) {}
+            } else if (uri.equals("/processor/payment-way4")) {
+                source = SJBalanceSourceEnum.SJ_BALANCE_SOURCE_WAY4;
             } else {
                 source = SJBalanceSourceEnum.SJBALANCE_SOURCE_UNKNOWN;
             }

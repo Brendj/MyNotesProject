@@ -6,23 +6,18 @@ package ru.axetta.ecafe.processor.web.partner.paystd;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentServlet;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.PaymentControllerWS;
-import ru.axetta.ecafe.processor.web.partner.sberbank_rt.SBRTOnlinePaymentRequestParser;
+import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
 
@@ -84,7 +79,8 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
         ((StdOnlinePaymentRequestParser) requestParser).setLinkConfig(linkConfig);
         ///
         if (linkConfig.checkSignature && linkConfig.partnerPublicKey == null) {
-            linkConfig.partnerPublicKey = DAOUtils.getContragentPublicKey(runtimeContext, linkConfig.idOfContragent);
+            linkConfig.partnerPublicKey = DigitalSignatureUtils.convertToPublicKey(
+                    DAOReadExternalsService.getInstance().getContragentPublicKeyString(linkConfig.idOfContragent));
         }
 
         return linkConfig.remoteAddressMask;

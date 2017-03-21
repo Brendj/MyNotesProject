@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -1060,10 +1059,9 @@ public class DAOUtils {
 
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
-                    if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
-                        client.getIdOfClient(),
-                        ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_LOW_BALANCE
-                            .getValue())) {
+                    if (DAOReadonlyService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                            client.getIdOfClient(),
+                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_LOW_BALANCE.getValue())) {
                         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_LOW_BALANCE,
                                     values, transactionDate);

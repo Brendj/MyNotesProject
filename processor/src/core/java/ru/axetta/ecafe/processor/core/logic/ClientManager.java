@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -1497,9 +1497,29 @@ public class ClientManager {
     }
 
     /*Является ли опекунская связь Опекун-Клиент активной и включен ли в ней нужный тип оповещения*/
-    public static Boolean allowedGuardianshipNotification(Long guardianId, Long clientId,
+    public static Boolean allowedGuardianshipNotification(Session session, Long guardianId, Long clientId,
             Long notifyType) throws Exception {
-        return DAOReadonlyService.getInstance().allowedGuardianshipNotification(guardianId, clientId, notifyType);
+        ClientGuardianNotificationSetting.Predefined predefined = ClientGuardianNotificationSetting.Predefined.parse(notifyType);
+        if (predefined == null) {
+            return true;
+        }
+        Query query = session
+                .createSQLQuery("select notifyType from cf_client_guardian_notificationsettings n " +
+                        "where idOfClientGuardian = (select idOfClientGuardian from cf_client_guardian cg " +
+                        "where cg.disabled = 0 and cg.IdOfChildren = :idOfChildren and cg.IdOfGuardian = :idOfGuardian and cg.deletedState = false)");
+        query.setParameter("idOfChildren", clientId);
+        query.setParameter("idOfGuardian", guardianId);
+        List resultList = query.list();
+        if (resultList.size() < 1 && predefined.isEnabledAtDefault()) {
+            return true;
+        }
+        for (Object o : resultList) {
+            BigInteger bi = (BigInteger) o;
+            if (bi.longValue() == predefined.getValue()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* Удалить список опекунов клиента */

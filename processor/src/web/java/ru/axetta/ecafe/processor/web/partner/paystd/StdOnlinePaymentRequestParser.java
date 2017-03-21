@@ -8,9 +8,9 @@ import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.util.ConversionUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
+import ru.axetta.ecafe.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +49,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         
         if (parseResult.getParam("CARDID")!=null) {
             Long cardId = Long.decode(parseResult.getReqParam("CARDID"));
-            Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getContractIdByCardNo(cardId);
+            Long clId = DAOReadExternalsService.getInstance().getContractIdByCardNo(cardId);
             if (clId == null) throw new CardNotFoundException("Card not found: "+cardId);
             clientId = clId;
         } else {

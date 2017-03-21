@@ -3267,7 +3267,7 @@ public class Processor implements SyncProcessor {
 
                     if (!(guardians == null || guardians.isEmpty())) {
                         for (Client destGuardian : guardians) {
-                            if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                            if (DAOReadonlyService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
                                     client.getIdOfClient(), getOrderNotificationType(values))) {
                                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                                         .sendNotificationAsync(destGuardian, client,
@@ -4782,7 +4782,7 @@ public class Processor implements SyncProcessor {
 
                                 if (!(guardians == null || guardians.isEmpty())) {
                                     for (Client destGuardian : guardians) {
-                                        if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                        if (DAOReadonlyService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
                                                 clientFromEnterEvent.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                                             notificationService
                                                     .sendNotificationAsync(destGuardian, clientFromEnterEvent,
@@ -4811,7 +4811,7 @@ public class Processor implements SyncProcessor {
                                                     .equals(guardianFromEnterEvent.getIdOfClient())) {
                                                 continue;
                                             }
-                                            if (ClientManager.allowedGuardianshipNotification(destGuardian.getIdOfClient(),
+                                            if (DAOReadonlyService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
                                                     clientFromEnterEvent.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                                                 notificationService
                                                         .sendNotificationAsync(destGuardian, clientFromEnterEvent,

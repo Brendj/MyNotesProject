@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -211,28 +212,8 @@ public class DAOReadonlyService {
      */
     //TODO - надо ли возвращать true, когда все флаги выключены, но forcesend в конфиге выставлена в 1 - ВОПРОС ??
     public Boolean allowedGuardianshipNotification(Long guardianId, Long clientId, Long notifyType) throws Exception {
-        ClientGuardianNotificationSetting.Predefined predefined = ClientGuardianNotificationSetting.Predefined.parse(notifyType);
-        if (predefined == null) {
-            return true;
-        }
         Session session = entityManager.unwrap(Session.class);
-        org.hibernate.Query query = session
-                .createSQLQuery("select notifyType from cf_client_guardian_notificationsettings n " +
-                        "where idOfClientGuardian = (select idOfClientGuardian from cf_client_guardian cg " +
-                        "where cg.disabled = 0 and cg.IdOfChildren = :idOfChildren and cg.IdOfGuardian = :idOfGuardian and cg.deletedState = false)");
-        query.setParameter("idOfChildren", clientId);
-        query.setParameter("idOfGuardian", guardianId);
-        List resultList = query.list();
-        if (resultList.size() < 1 && predefined.isEnabledAtDefault()) {
-            return true;
-        }
-        for (Object o : resultList) {
-            BigInteger bi = (BigInteger) o;
-            if (bi.longValue() == predefined.getValue()) {
-                return true;
-            }
-        }
-        return false;
+        return ClientManager.allowedGuardianshipNotification(session, guardianId, clientId, notifyType);
     }
 
     public List<ItemListByGuardMobile> extractClientItemListFromGuardByGuardMobile(String guardMobile) {
@@ -268,7 +249,7 @@ public class DAOReadonlyService {
         return clients;
     }
 
-    public List<Long> extractIDFromGuardByGuardMobile(String guardMobile) {
+    /*public List<Long> extractIDFromGuardByGuardMobile(String guardMobile) {
         Set<Long> result = new HashSet<Long>();
         String query = "select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
         Query q = entityManager.createQuery(query, Long.class);
@@ -294,7 +275,7 @@ public class DAOReadonlyService {
         }
 
         return new ArrayList<Long>(result);
-    }
+    }*/
 
     public MenuDetail getMenuDetailConstitutionByOrder(Long idOfMenuFromSync, Org orgFromOrder, Date orderDate) {
         Date endDate  = CalendarUtils.addOneDay(orderDate);

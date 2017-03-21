@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.payment;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,8 +75,8 @@ public class PaymentResponse {
                 private final String address;
 
                 public ClientInfo(Client client) {
-                    this.person = new PersonInfo(client.getPerson());
-                    this.contractPerson = new PersonInfo(client.getContractPerson());
+                    this.person = new PersonInfo(DAOReadExternalsService.getInstance().findPerson(client.getPerson().getIdOfPerson()));
+                    this.contractPerson = new PersonInfo(DAOReadExternalsService.getInstance().findPerson(client.getContractPerson().getIdOfPerson()));
                     this.address = client.getAddress();
                 }
 
