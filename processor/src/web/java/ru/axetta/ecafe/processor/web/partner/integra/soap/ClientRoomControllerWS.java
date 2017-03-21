@@ -45,6 +45,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -231,6 +232,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
               Transaction transaction) throws Exception {
+        }
+
+        public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession) throws Exception {
         }
     }
 
@@ -1515,6 +1519,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         final static int CLIENT_ID_INTERNALID = 0, CLIENT_ID_SAN = 1, CLIENT_ID_EXTERNAL_ID = 2, CLIENT_ID_GUID = 3,
               CLIENT_SUB_ID = 4;
 
+        public Data process(Client client, Session session, Processor processor) {
+            ObjectFactory objectFactory = new ObjectFactory();
+            Data data = objectFactory.createData();
+            try {
+                processor.process(client, data, objectFactory, session);
+            } catch (Exception e) {
+                logger.error("Failed to process client room controller request", e);
+                data.setResultCode(RC_INTERNAL_ERROR);
+                data.setDescription(e.toString());
+            }
+            return data;
+        }
+
         public Data process(Long contractId, Processor processor) {
             return process(contractId, processor, null);
         }
@@ -1544,7 +1561,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createExternalServicesPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
                 if (clientIdType == CLIENT_ID_INTERNALID) {
@@ -1593,7 +1610,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
                     }
                 }
-                persistenceSession.flush();
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
             } catch (Exception e) {
@@ -2350,24 +2366,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         data.setPaymentList(paymentList);
     }
-
-/*    @Override
-    public MenuListResult getMenuList(Long contractId, final Date startDate, final Date endDate) {
-        authenticateRequest(contractId);
-
-        Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
-                  Session session, Transaction transaction) throws Exception {
-                processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
-            }
-        });
-
-        MenuListResult menuListResult = new MenuListResult();
-        menuListResult.menuList = data.getMenuListExt();
-        menuListResult.resultCode = data.getResultCode();
-        menuListResult.description = data.getDescription();
-        return menuListResult;
-    }*/
 
     @Override
     public MenuListResult getMenuList(String san, final Date startDate, final Date endDate) {
@@ -3500,24 +3498,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
-    public ClientsData getClientsByGuardMobile(String mobile) {
+    public ClientsWithResultCode getClientsByGuardMobile(String mobile, Session session) {
 
-        ClientsData data = new ClientsData();
+        ClientsWithResultCode data = new ClientsWithResultCode();
         try {
-            List<Long> idOfClients = DAOReadonlyService.getInstance().extractIDFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile));
-            data.clientList = new ClientList();
+            List<Long> idOfClients = extractIDFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
             if (idOfClients.isEmpty()) {
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Клиент не найден";
             } else {
-                for (Long idOfClient : idOfClients) {
-                    Client cl = DAOReadonlyService.getInstance().findClientById(idOfClient);
-                    ClientItem clientItem = new ClientItem();
-                    clientItem.setContractId(cl.getContractId());
-                    clientItem.setSan(cl.getSan());
-                    data.clientList.getClients().add(clientItem);
-                }
-
+                data.setClients(findListOfClientsByListOfIds(idOfClients, session));
                 data.resultCode = RC_OK;
                 data.description = "OK";
             }
@@ -3527,6 +3517,45 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             data.description = e.toString();
         }
         return data;
+    }
+
+    public List<Long> extractIDFromGuardByGuardMobile(String guardMobile, Session session) {
+        Set<Long> result = new HashSet<Long>();
+        String query = "select client.idOfClient from cf_clients client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
+        Query q = session.createSQLQuery(query);
+        q.setParameter("guardMobile", guardMobile);
+        List<BigInteger> clients = q.list();
+
+        if (clients != null && !clients.isEmpty()){
+            for(BigInteger id : clients){
+                Long londId = id.longValue();
+                Query q2 = session.createQuery("select cg from ClientGuardian cg " +
+                        "where cg.idOfGuardian = :idOfGuardian and cg.deletedState = false");  //все дети текущего клиента
+                q2.setParameter("idOfGuardian", londId);
+                List<ClientGuardian> list = q2.list();
+                if (list != null && list.size() > 0) {
+                    for (ClientGuardian cg : list) {
+                        if (!cg.isDisabled()) {
+                            result.add(cg.getIdOfChildren());
+                        }
+                    }
+                } else {
+                    result.add(londId);
+                }
+            }
+        }
+
+        return new ArrayList<Long>(result);
+    }
+
+    public List<Client> findListOfClientsByListOfIds(List<Long> idsOfClient, Session session) throws Exception {
+        try {
+            Query query = session.createQuery("from Client c where c.idOfClient in (:list)");
+            query.setParameterList("list", idsOfClient);
+            return query.list();
+        } catch(Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -3860,80 +3889,42 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null, handler);
         Date date = new Date(System.currentTimeMillis());
 
-        ClientsData cd = getClientsByGuardMobile(guardMobile);
+        Session session = null;
+        try {
+            LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            ClientsWithResultCode cd = getClientsByGuardMobile(guardMobile, session);
 
-        LinkedList<ClientSummaryExt> clientSummaries = new LinkedList<ClientSummaryExt>();
-        if (cd != null && cd.clientList != null) {
-            for (ClientItem ci : cd.clientList.getClients()) {
-                ClientSummaryResult cs = getSummary(ci.getContractId());
-                if (cs.clientSummary != null) {
-                    clientSummaries.add(cs.clientSummary);
-                    Long idOfClient = DAOReadonlyService.getInstance().getClientIdByContract(cs.clientSummary.getContractId());
-                    handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                            idOfClient, handler.getData().getOperationType());
+            if (cd != null && cd.getClients() != null) {
+                for (Client cl : cd.getClients()) {
+                    Data dataProcess = new ClientRequest().process(cl, session, new Processor() {
+                        public void process(Client client, Data dataProcess, ObjectFactory objectFactory,
+                                Session session) throws Exception {
+                            processSummary(client, dataProcess, objectFactory, session);
+                        }
+                    });
+                    ClientSummaryResult cs = new ClientSummaryResult();
+                    cs.clientSummary = dataProcess.getClientSummaryExt();
+                    cs.resultCode = dataProcess.getResultCode();
+                    cs.description = dataProcess.getDescription();
+                    if (cs.clientSummary != null) {
+                        clientSummaries.add(cs.clientSummary);
+                        handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                                cl.getIdOfClient(), handler.getData().getOperationType());
+                    }
                 }
             }
+
+            ClientSummaryExtListResult clientSummaryExtListResult = new ClientSummaryExtListResult();
+            clientSummaryExtListResult.clientSummary = clientSummaries;
+            clientSummaryExtListResult.resultCode = cd.resultCode;
+            clientSummaryExtListResult.description = cd.description;
+
+            return clientSummaryExtListResult;
+        } finally {
+            HibernateUtils.close(session, logger);
         }
-
-        ClientSummaryExtListResult clientSummaryExtListResult = new ClientSummaryExtListResult();
-        clientSummaryExtListResult.clientSummary = clientSummaries;
-        clientSummaryExtListResult.resultCode = cd.resultCode;
-        clientSummaryExtListResult.description = cd.description;
-
-        return clientSummaryExtListResult;
     }
-
-/*    @Override
-    public ClientRepresentativesResult getClientRepresentatives(@WebParam(name = "contractId") String contractId) {
-        Long contractIdLong = Long.valueOf(contractId);
-        authenticateRequest(contractIdLong);
-
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        List<Client> representativeList = new ArrayList<Client>();
-        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
-
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            Client client = DAOUtils.findClientByContractId(persistenceSession, contractIdLong);
-            if (null != client){
-                representativeList = ClientManager.loadGuardiansByChildren(persistenceSession, client.getIdOfClient());
-            }
-
-        } catch (Exception e) {
-            logger.warn("Error", e);
-            clientRepresentativesResult.resultCode = 100l;
-            clientRepresentativesResult.description = "Внутренняя ошибка";
-        }
-
-        List<ClientRepresentative> clientRepresentativesList = new ArrayList<ClientRepresentative>();
-
-        for (Client aRepresentativeList : representativeList) {
-            ClientRepresentative clientRepresentative = new ClientRepresentative();
-            clientRepresentative.setId(aRepresentativeList.getContractId());
-            clientRepresentative.setName(aRepresentativeList.getPerson().getFullName());
-            clientRepresentativesList.add(clientRepresentative);
-        }
-
-        ClientRepresentativesResult clientRepresentativesResult = new ClientRepresentativesResult();
-//        clientRepresentativesResult.clientRepresentativesList = clientRepresentativesList;
-        clientRepresentativesResult.resultCode = 0l;
-        clientRepresentativesResult.cReps = new ClientRepresentativesList();
-        clientRepresentativesResult.cReps.getCRep().addAll(clientRepresentativesList);
-        if(clientRepresentativesResult.resultCode == null){
-            if(clientRepresentativesList.size() == 0 ){
-                clientRepresentativesResult.resultCode = 110l;
-                clientRepresentativesResult.description = "Лицевой счет не найден";
-            }else {
-                clientRepresentativesResult.resultCode = 0l;
-                clientRepresentativesResult.description = "OK";
-            }
-
-        }
-
-
-        return clientRepresentativesResult;
-    }*/
 
     @Override
     public ClientRepresentativesResult getClientRepresentatives(String contractId) {
@@ -5194,10 +5185,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         /////
         if (contractId != null && linkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH) {
-            DAOService daoService = DAOService.getInstance();
             Client client = null;
             try {
-                client = daoService.getClientByContractId(contractId);
+                client = DAOReadExternalsService.getInstance().findClient(null, contractId);
             } catch (Throwable e) {
             }
             if (client == null) {
