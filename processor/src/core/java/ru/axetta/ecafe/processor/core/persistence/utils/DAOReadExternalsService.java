@@ -9,8 +9,14 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -18,11 +24,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /***
  *
@@ -148,6 +154,93 @@ public class DAOReadExternalsService {
     public Boolean allowedGuardianshipNotification(Long guardianId, Long clientId, Long notifyType) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         return ClientManager.allowedGuardianshipNotification(session, guardianId, clientId, notifyType);
+    }
+
+    public List<Order> getClientOrdersByPeriod(Client client, Date startTime, Date endTime) {
+        Query query = entityManager.createQuery("select order from Order order where order.client = :client and order.createTime between "
+                + ":startTime and :endTime order by createTime");
+        query.setParameter("client", client);
+        query.setParameter("startTime", startTime);
+        query.setParameter("endTime", endTime);
+        return query.getResultList();
+    }
+
+    public List<OrderDetail> getOrderDetailsByOrders(List<Order> orders) {
+        Query query = entityManager.createQuery("select detail from OrderDetail detail where detail.order in :orders");
+        query.setParameter("orders", orders);
+        return query.getResultList();
+    }
+
+    public List<MenuDetail> getMenuDetailsByOrderDetails(Set<Long> orgIds, Set<Long> menuIds, Date startDate, Date endDate) {
+        Date sDate = CalendarUtils.truncateToDayOfMonth(startDate);
+        Date eDate = CalendarUtils.addOneDay(CalendarUtils.truncateToDayOfMonth(endDate));
+
+        Query query = entityManager.createQuery("SELECT cfm FROM MenuDetail cfm left join cfm.menu cm "
+                + "WHERE cfm.idOfMenuFromSync in :idOfMenus AND cm.org.idOfOrg in :orgIds "
+                + "AND cm.menuDate between :startDate and :endDate ORDER BY cfm.idOfMenuDetail DESC");
+        query.setParameter("idOfMenus", menuIds);
+        query.setParameter("orgIds", orgIds);
+        query.setParameter("startDate", sDate);
+        query.setParameter("endDate", eDate);
+
+        return query.getResultList();
+    }
+
+    public List getPaymentsList(Client client, Integer subBalanceNum, Date endDate, Date startDate) {
+        Date nextToEndDate = DateUtils.addDays(endDate, 1);
+        Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
+                + "cp.createTime >= :startDate and cp.createTime < :endDate and tr.client.idOfClient = :idOfClient order by cp.createTime asc");
+        query.setParameter("payType", subBalanceNum != null && subBalanceNum.equals(1) ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", nextToEndDate);
+        query.setParameter("idOfClient", client.getIdOfClient());
+        return query.getResultList();
+    }
+
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org, Boolean isParent, boolean vp) {
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        Set<Integer> idOfComplex = new HashSet<Integer>(DiscountRule.COMPLEX_COUNT);
+        for (int i=0; i< DiscountRule.COMPLEX_COUNT; i++){
+            idOfComplex.add(i);
+        }
+        if(!isParent){
+            Session session = entityManager.unwrap(Session.class);
+            Criteria criteria = session.createCriteria(ComplexRole.class);
+            String arrayOfFilterText = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
+            for (String filter : arrayOfFilterText.split(";")){
+                criteria.add(Restrictions.ilike("extendRoleName", filter, MatchMode.ANYWHERE));
+            }
+            criteria.setProjection(Projections.property("idOfRole"));
+            List list = criteria.list();
+            for (Object obj: list){
+                idOfComplex.remove(Integer.valueOf(obj.toString()));
+            }
+        }
+        final String sql;
+        if (vp) {
+            sql = "select distinct ci from ComplexInfo ci "
+                    + " where ci.org = :org and usedVariableFeeding = 1 "
+                    + " and menuDate >= :startDate and menuDate < :endDate "
+                    + " and ci.idOfComplex in :idOfComplex";
+        } else {
+            sql = "select distinct ci from ComplexInfo ci "
+                    + " where ci.org = :org and usedSubscriptionFeeding = 1 "
+                    + " and menuDate >= :startDate and menuDate < :endDate "
+                    + " and ci.idOfComplex in :idOfComplex";
+        }
+        Date endDate = today;
+        endDate = CalendarUtils.addDays(endDate, 7);
+        TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
+                ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
+                .setParameter("endDate", endDate).setParameter("idOfComplex", idOfComplex);
+        List<ComplexInfo> res = query.getResultList();
+        return res;
+    }
+
+    public List<MenuDetail> getMenuDetailsByIdOfComplexInfo(Long idOfComplexInfo) {
+        Query query = entityManager.createQuery("select md from ComplexInfoDetail cid join cid.menuDetail md where cid.complexInfo.idOfComplexInfo = :idOfComplexInfo")
+                .setParameter("idOfComplexInfo", idOfComplexInfo);
+        return query.getResultList();
     }
 
 }

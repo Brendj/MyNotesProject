@@ -19,7 +19,6 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.*;
@@ -2138,22 +2137,6 @@ public class DAOService {
         criteria.add(Restrictions.eq("idOfClient", idOfClient));
         Client client = (Client) criteria.uniqueResult();
         return client.getIdOfClientGroup();
-    }
-
-    public List<Long> getMenuDetailsIdsByIdOfComplexInfo(Long idOfComplexInfo) {
-        List<Long> result = new ArrayList<Long>();
-
-        Session session = entityManager.unwrap(Session.class);
-        SQLQuery query = session.createSQLQuery(
-                "SELECT idofmenudetail FROM cf_complexinfodetail cid WHERE cid.idofcomplexinfo = :idOfComplexInfo");
-        query.setParameter("idOfComplexInfo", idOfComplexInfo);
-        List idList = query.list();
-        for (Object id : idList) {
-
-            result.add(((BigInteger) id).longValue());
-        }
-
-        return result;
     }
 
     public List findClientPaymentsByPaymentId(Contragent contragent, String idOfPayment) throws Exception {

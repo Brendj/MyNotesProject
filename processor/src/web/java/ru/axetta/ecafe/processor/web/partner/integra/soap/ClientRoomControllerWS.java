@@ -2133,7 +2133,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
         PurchaseListWithDetailsExt purchaseListWithDetailsExt = objectFactory.createPurchaseListWithDetailsExt();
         try {
-            Client client = DAOReadonlyService.getInstance().findClientByContractId(contractId);
+            Client client = DAOReadExternalsService.getInstance().findClient(null, contractId);
 
             if (client == null) {
                 return result;
@@ -2143,18 +2143,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             int nRecs = 0;
             Date nextToEndDate = DateUtils.addDays(endDate, 1);
-            List<Order> ordersList = DAOReadonlyService.getInstance().getClientOrdersByPeriod(client, startDate, nextToEndDate);
+            List<Order> ordersList = DAOReadExternalsService.getInstance().getClientOrdersByPeriod(client, startDate, nextToEndDate);
             if (ordersList.size() == 0) {
                 result.resultCode = RC_OK;
                 result.description = RC_OK_DESC;
                 result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
                 return result;
             }
-            List<OrderDetail> detailsList = DAOReadonlyService.getInstance().getOrderDetailsByOrders(ordersList);
+            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
 
             Set<Long> orderOrgIds = getOrgsByOrders(ordersList);
             Set<Long> menuIds = getIdOfMenusByOrderDetails(detailsList);
-            List<MenuDetail> menuDetails = DAOReadonlyService.getInstance().getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
+            List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance().getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
 
             Map<Long, Date> lastProcessMap = new HashMap<Long, Date>();
             for (Object o : ordersList) {
@@ -2350,7 +2350,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void processPaymentList(Session session, Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
           Date endDate, Date startDate) throws Exception {
-        List clientPaymentsList = DAOReadonlyService.getInstance().getPaymentsList(client, subBalanceNum, endDate, startDate);
+        List clientPaymentsList = DAOReadExternalsService.getInstance().getPaymentsList(client, subBalanceNum, endDate, startDate);
         PaymentList paymentList = objectFactory.createPaymentList();
         int nRecs = 0;
         for (Object o : clientPaymentsList) {
@@ -2588,44 +2588,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
             for (ComplexInfo ci : complexInfoList) {
-
-                List<Long> complexInfoDetailList = daoService.getMenuDetailsIdsByIdOfComplexInfo(ci.getIdOfComplexInfo());
-
-                List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
-
-                for (Long id : complexInfoDetailList) {
-                    Criteria criteriaMenuDetails = session.createCriteria(MenuDetail.class);
-                    criteriaMenuDetails.add(Restrictions.eq("idOfMenuDetail", id));
-
-                    MenuDetail menuDetail = (MenuDetail) criteriaMenuDetails.uniqueResult();
-
-                    MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-                    menuItemExt.setGroup(menuDetail.getGroupName());
-                    menuItemExt.setName(menuDetail.getMenuDetailName());
-                    menuItemExt.setPrice(menuDetail.getPrice());
-                    menuItemExt.setCalories(menuDetail.getCalories());
-                    menuItemExt.setVitB1(menuDetail.getVitB1());
-                    menuItemExt.setVitB2(menuDetail.getVitB2());
-                    menuItemExt.setVitPp(menuDetail.getVitPp());
-                    menuItemExt.setVitC(menuDetail.getVitC());
-                    menuItemExt.setVitA(menuDetail.getVitA());
-                    menuItemExt.setVitE(menuDetail.getVitE());
-                    menuItemExt.setMinCa(menuDetail.getMinCa());
-                    menuItemExt.setMinP(menuDetail.getMinP());
-                    menuItemExt.setMinMg(menuDetail.getMinMg());
-                    menuItemExt.setMinFe(menuDetail.getMinFe());
-                    menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
-                    menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
-                    menuItemExt.setProtein(menuDetail.getProtein());
-                    menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
-                    menuItemExt.setFat(menuDetail.getFat());
-
-                    menuItemExtList.add(menuItemExt);
-                }
-
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
                 MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
                 menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
-
                 list.add(menuWithComplexesExt);
             }
             result.getMenuWithComplexesList().setList(list);
@@ -6232,7 +6197,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Transaction transaction = null;
         ComplexInfoResult result = new ComplexInfoResult();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             transaction = session.beginTransaction();
             Client client = findClient(session, contractId, san, result);
             if (client == null) {
@@ -6247,46 +6212,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (ArrayUtils.contains(getVPOrgsList(), org.getIdOfOrg())) {
                 vp = true;
             }
-            List<ComplexInfo> complexInfoList = DAOReadonlyService.getInstance().findComplexesWithSubFeeding(org, isParent, vp);
+            List<ComplexInfo> complexInfoList = DAOReadExternalsService.getInstance().findComplexesWithSubFeeding(org, isParent, vp);
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
             ObjectFactory objectFactory = new ObjectFactory();
             for (ComplexInfo ci : complexInfoList) {
-                List<Long> complexInfoDetailList = DAOService.getInstance().getMenuDetailsIdsByIdOfComplexInfo(ci.getIdOfComplexInfo());
-                List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
-                for (Long id : complexInfoDetailList) {
-                    Criteria criteriaMenuDetails = session.createCriteria(MenuDetail.class);
-                    criteriaMenuDetails.add(Restrictions.eq("idOfMenuDetail", id));
-
-                    MenuDetail menuDetail = (MenuDetail) criteriaMenuDetails.uniqueResult();
-
-                    MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-                    menuItemExt.setGroup(menuDetail.getGroupName());
-                    menuItemExt.setName(menuDetail.getMenuDetailName());
-                    menuItemExt.setPrice(menuDetail.getPrice());
-                    menuItemExt.setCalories(menuDetail.getCalories());
-                    menuItemExt.setVitB1(menuDetail.getVitB1());
-                    menuItemExt.setVitB2(menuDetail.getVitB2());
-                    menuItemExt.setVitPp(menuDetail.getVitPp());
-                    menuItemExt.setVitC(menuDetail.getVitC());
-                    menuItemExt.setVitA(menuDetail.getVitA());
-                    menuItemExt.setVitE(menuDetail.getVitE());
-                    menuItemExt.setMinCa(menuDetail.getMinCa());
-                    menuItemExt.setMinP(menuDetail.getMinP());
-                    menuItemExt.setMinMg(menuDetail.getMinMg());
-                    menuItemExt.setMinFe(menuDetail.getMinFe());
-                    menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
-                    menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
-                    menuItemExt.setProtein(menuDetail.getProtein());
-                    menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
-                    menuItemExt.setFat(menuDetail.getFat());
-
-                    menuItemExtList.add(menuItemExt);
-                }
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
                 ComplexInfoExt complexInfoExt = new ComplexInfoExt(ci);
-                if (menuItemExtList != null) {
-                    complexInfoExt.setMenuItemExtList(menuItemExtList);
-                }
+                complexInfoExt.setMenuItemExtList(menuItemExtList);
                 list.add(complexInfoExt);
             }
             transaction.commit();
@@ -6301,6 +6234,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private List<MenuItemExt> getMenuItemsExt (ObjectFactory objectFactory, Long idOfComplexInfo) {
+        List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
+        List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance().getMenuDetailsByIdOfComplexInfo(idOfComplexInfo);
+        for (MenuDetail menuDetail : menuDetails) {
+            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+            menuItemExt.setGroup(menuDetail.getGroupName());
+            menuItemExt.setName(menuDetail.getMenuDetailName());
+            menuItemExt.setPrice(menuDetail.getPrice());
+            menuItemExt.setCalories(menuDetail.getCalories());
+            menuItemExt.setVitB1(menuDetail.getVitB1());
+            menuItemExt.setVitB2(menuDetail.getVitB2());
+            menuItemExt.setVitPp(menuDetail.getVitPp());
+            menuItemExt.setVitC(menuDetail.getVitC());
+            menuItemExt.setVitA(menuDetail.getVitA());
+            menuItemExt.setVitE(menuDetail.getVitE());
+            menuItemExt.setMinCa(menuDetail.getMinCa());
+            menuItemExt.setMinP(menuDetail.getMinP());
+            menuItemExt.setMinMg(menuDetail.getMinMg());
+            menuItemExt.setMinFe(menuDetail.getMinFe());
+            menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+            menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+            menuItemExt.setProtein(menuDetail.getProtein());
+            menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+            menuItemExt.setFat(menuDetail.getFat());
+
+            menuItemExtList.add(menuItemExt);
+        }
+        return menuItemExtList;
     }
 
     private <T extends Result> Client findClient(Session session, Long contractId, String san, final T res)
