@@ -116,16 +116,6 @@ public class DAOReadExternalsService {
         }
     }
 
-    /*public List<Client> findListOfClientsByListOfIds(List<Long> idsOfClient) throws Exception {
-        try {
-            Query query = entityManager.createQuery("select c from Client c where idOfClient in :list");
-            query.setParameter("list", idsOfClient);
-            return query.getResultList();
-        } catch(Exception e) {
-            return null;
-        }
-    }*/
-
     public ContragentClientAccount findContragentClientAccount(CompositeIdOfContragentClientAccount compositeIdOfContragentClientAccount) {
         return entityManager.find(ContragentClientAccount.class, compositeIdOfContragentClientAccount);
     }
@@ -160,31 +150,4 @@ public class DAOReadExternalsService {
         return ClientManager.allowedGuardianshipNotification(session, guardianId, clientId, notifyType);
     }
 
-    /*public List<Long> extractIDFromGuardByGuardMobile(String guardMobile) {
-        Set<Long> result = new HashSet<Long>();
-        String query = "select client.idOfClient from Client client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
-        Query q = entityManager.createQuery(query, Long.class);
-        q.setParameter("guardMobile", guardMobile);
-        List<Long> clients = q.getResultList();
-
-        if (clients != null && !clients.isEmpty()){
-            for(Long id : clients){
-                Query q2 = entityManager.createQuery("select cg from ClientGuardian cg " +
-                        "where cg.idOfGuardian = :idOfGuardian and cg.deletedState = false", ClientGuardian.class);  //все дети текущего клиента
-                q2.setParameter("idOfGuardian", id);
-                List<ClientGuardian> list = q2.getResultList();
-                if (list != null && list.size() > 0) {
-                    for (ClientGuardian cg : list) {
-                        if (!cg.isDisabled()) {
-                            result.add(cg.getIdOfChildren());
-                        }
-                    }
-                } else {
-                    result.add(id);
-                }
-            }
-        }
-
-        return new ArrayList<Long>(result);
-    }*/
 }
