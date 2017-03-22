@@ -428,25 +428,6 @@ public class NSIDeltaProcessor {
                 else if (attributeName.endsWith("класс")) {
                     groupNewWay = getGroupFromClassAttribute(at);
                 }
-                /*else if((group == null || StringUtils.isBlank(group)) &&
-                        attributeName.endsWith("текущий класс или группа")) {
-                    group = getSingleValue(at);
-                } else  if ((group == null || StringUtils.isBlank(group)) &&
-                        attributeName.endsWith("класс")) {
-                    List<GroupValue> groupValues = at.getGroupValue();
-                    for(GroupValue grpVal : groupValues) {
-                        for(Attribute attr2 : grpVal.getAttribute()) {
-                            if(attr2.getName().equals("Название")) {
-                                group = attr2.getValue().get(0).getValue();
-                            } else if (attr2.getName().equals("Тип возрастной группы")) {
-                                ageTypeGroup = attr2.getValue().get(0).getValue();
-                            }
-                        }
-                    }
-                }
-                else if(attributeName.endsWith("класс/название")) {
-                    group = getSingleValue(at);
-                }*/
                 else if(attributeName.endsWith("guid образовательного учреждения")) {
                     orgGuid = getSingleValue(at);
                 }
@@ -480,24 +461,11 @@ public class NSIDeltaProcessor {
                 } else {
                     lastYearGroupValue = groupValues.get(0);
                 }
-                String parallel = null;
-                String letter = null;
-                String name = null;
                 if (lastYearGroupValue != null) {
                     for(Attribute attr2 : lastYearGroupValue.getAttribute()) {
-                        if(attr2.getName().equals("Параллель")) {
-                            parallel = attr2.getValue().get(0).getValue();
-                        }
-                        if(attr2.getName().equals("Буква")) {
-                            letter = attr2.getValue().get(0).getValue();
-                        }
                         if(attr2.getName().equals("Название")) {
-                            name = attr2.getValue().get(0).getValue();
+                            group = attr2.getValue().get(0).getValue();
                         }
-                    }
-                    group = (parallel == null ? "" : parallel) + "-" + (letter == null ? "" : letter);
-                    if (group.startsWith("-") || group.endsWith("-")) {
-                        group = name;
                     }
                 }
                 return group;

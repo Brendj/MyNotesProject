@@ -224,27 +224,6 @@ public class ClientMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Дата рождения")) {
                     pupilInfo.birthDate = attr.getValue().get(0).getValue();
                 }
-                /*if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
-                        attr.getName().equals("Текущий класс или группа")) {
-                    pupilInfo.group = attr.getValue().get(0).getValue();
-                }*/
-                /*if ((pupilInfo.group == null || StringUtils.isBlank(pupilInfo.group)) &&
-                        attr.getName().equals("Класс")) {
-                    List<GroupValue> groupValues = attr.getGroupValue();
-                    boolean set = false;
-                    for(GroupValue grpVal : groupValues) {
-                        for(Attribute attr2 : grpVal.getAttribute()) {
-                            if(attr2.getName().equals("Название")) {
-                                pupilInfo.group = attr2.getValue().get(0).getValue();
-                                set = true;
-                                break;
-                            }
-                        }
-                        if(set) {
-                            break;
-                        }
-                    }
-                }*/
                 if (attr.getName().equals("Текущий класс или группа")) {
                     pupilInfo.groupDeprecated = attr.getValue().get(0).getValue();
                 }
@@ -362,24 +341,11 @@ public class ClientMskNSIService extends MskNSIService {
             } else {
                 lastYearGroupValue = groupValues.get(0);
             }
-            String parallel = null;
-            String letter = null;
-            String name = null;
             if (lastYearGroupValue != null) {
                 for(Attribute attr2 : lastYearGroupValue.getAttribute()) {
-                    if(attr2.getName().equals("Параллель")) {
-                        parallel = attr2.getValue().get(0).getValue();
-                    }
-                    if(attr2.getName().equals("Буква")) {
-                        letter = attr2.getValue().get(0).getValue();
-                    }
                     if(attr2.getName().equals("Название")) {
-                        name = attr2.getValue().get(0).getValue();
+                        group = attr2.getValue().get(0).getValue();
                     }
-                }
-                group = (parallel == null ? "" : parallel) + "-" + (letter == null ? "" : letter);
-                if (group.startsWith("-") || group.endsWith("-")) {
-                    group = name;
                 }
             }
             return group;
