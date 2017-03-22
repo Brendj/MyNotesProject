@@ -961,7 +961,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
 
-        if (isDiscountsChanged(client, clientCategories.toString())) {
+        String newClientCategories = clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1);
+
+        if (isDiscountsChanged(client, newClientCategories)) {
             saveDiscountChange(client, persistenceSession, clientCategories.toString());
             client.setLastDiscountsUpdate(new Date());
         }
@@ -970,8 +972,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setDiscountMode(discountMode);
         }
 
-        client.setCategoriesDiscounts(
-                clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
+        client.setCategoriesDiscounts(newClientCategories);
         client.setCategories(categoryDiscountSet);
 
         /* настройки смс оповещений */
