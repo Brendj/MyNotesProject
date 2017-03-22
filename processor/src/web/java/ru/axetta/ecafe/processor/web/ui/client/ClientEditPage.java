@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -814,6 +815,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if((this.org.getIdOfOrg() == null && idOfOrg != null) ||
+                (this.org.getIdOfOrg() != null && idOfOrg == null) ||
+                (this.org.getIdOfOrg() != null && !this.org.getIdOfOrg().equals(idOfOrg))) {
+            this.clientGroupName = "";
+            this.idOfClientGroup = null;
+        }
         if (null != idOfOrg) {
             Long oldOrgId = this.org.getIdOfOrg();
             Org org = (Org) session.load(Org.class, idOfOrg);
@@ -985,39 +992,24 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         if (isReplaceOrg) {
-
-            ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory();
-            clientGroupMigrationHistory.setOrg(org);
-            clientGroupMigrationHistory.setClient(client);
-            clientGroupMigrationHistory.setRegistrationDate(new Date());
-            if (client.getIdOfClientGroup() != null) {
-                clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
-            }
             if (client.getClientGroup() != null) {
-                clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
                 clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
+            }
+
+            if(StringUtils.isEmpty(this.clientGroupName)) {
+                this.idOfClientGroup = ClientGroup.Predefined.CLIENT_DISPLACED.getValue();
+                this.clientGroupName = ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup();
             }
 
             ClientGroup clientGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
-                            ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
+                            this.clientGroupName);
             if (clientGroup == null) {
                 clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
-                if (clientGroup != null) {
-                    clientGroup.setGroupName(ClientGroup.Predefined.CLIENT_DISPLACED.getNameOfGroup());
-                }
-            }
-            getLogger().info(org.getShortName());
-            if (clientGroup == null) {
-                clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(),
-                        ClientGroup.Predefined.CLIENT_DISPLACED);
             }
 
-            clientGroupMigrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            clientGroupMigrationHistory.setNewGroupName(clientGroup.getGroupName());
-            clientMigration.setNewGroupName(clientGroup.getGroupName());
-            persistenceSession.save(clientGroupMigrationHistory);
+            clientMigration.setNewGroupName(this.clientGroupName);
 
             this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
             client.setIdOfClientGroup(this.idOfClientGroup);
