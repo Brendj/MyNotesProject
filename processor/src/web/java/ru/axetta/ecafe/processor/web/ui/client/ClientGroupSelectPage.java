@@ -70,6 +70,7 @@ public class ClientGroupSelectPage extends BasicPage {
     private List<Item> items = Collections.emptyList();
     private Item selectedItem = new Item();
     private String filter;
+    private Long idOfOrg;
 
     public void pushCompleteHandler(CompleteHandler handler) {
         completeHandlers.push(handler);
@@ -109,6 +110,14 @@ public class ClientGroupSelectPage extends BasicPage {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 
     public void fill(Session session, Long idOfOrg) throws Exception {

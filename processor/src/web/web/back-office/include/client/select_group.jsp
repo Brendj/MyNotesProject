@@ -36,14 +36,14 @@
                                      styleClass="input-text">
                             <a4j:support event="onkeyup" action="#{mainPage.updateClientGroupSelectPage}" requestDelay="1000"
                                          reRender="modalClientGroupSelectorClientGroupTable" >
-                                <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+                                <f:param name="idOfOrg" value="#{mainPage.clientGroupSelectPage.idOfOrg}" />
                             </a4j:support>
                         </h:inputText>
                         <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}"
                                          reRender="modalClientGroupSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.clientGroupSelectPage.filter}" />
-                            <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+                            <f:param name="idOfOrg" value="#{mainPage.clientGroupSelectPage.idOfOrg}" />
                             <a4j:support event="onclick" action="#{mainPage.clientGroupSelectPage.cancelFilter}"
                                          reRender="modalClientGroupSelectorForm" />
                         </a4j:commandLink>

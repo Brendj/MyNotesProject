@@ -76,6 +76,7 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientCreatePage.org.idOfOrg == null}">
             <f:param name="idOfOrg" value="#{mainPage.clientCreatePage.org.idOfOrg}" />
+            <f:setPropertyActionListener value="#{mainPage.clientEditPage.org.idOfOrg}" target="#{mainPage.clientGroupSelectPage.idOfOrg}" />
         </a4j:commandButton>
     </h:panelGroup>
 

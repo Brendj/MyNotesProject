@@ -85,8 +85,9 @@
                      style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" >
+                           styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientEditPage.org.idOfOrg == null}" >
             <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+            <f:setPropertyActionListener value="#{mainPage.clientEditPage.org.idOfOrg}" target="#{mainPage.clientGroupSelectPage.idOfOrg}" />
         </a4j:commandButton>
     </h:panelGroup>
 
