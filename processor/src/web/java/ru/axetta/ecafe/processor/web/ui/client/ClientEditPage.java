@@ -806,31 +806,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
         if (null != idOfClientGroup) {
-            ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory();
-            Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
-            Client client = (Client) session.load(Client.class, idOfClient);
-
-            clientGroupMigrationHistory.setOrg(org);
-            clientGroupMigrationHistory.setClient(client);
-            clientGroupMigrationHistory.setRegistrationDate(new Date());
-            if (client.getIdOfClientGroup() != null) {
-                clientGroupMigrationHistory.setOldGroupId(client.getIdOfClientGroup());
-            }
-            if (client.getClientGroup() != null) {
-                clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-            }
-
             this.idOfClientGroup = idOfClientGroup;
             this.clientGroupName = DAOUtils
                     .findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup))
                     .getGroupName();
-            clientGroupMigrationHistory.setNewGroupId(this.idOfClientGroup);
-            clientGroupMigrationHistory.setNewGroupName(this.clientGroupName);
-            clientGroupMigrationHistory.setComment(
-                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
-                            .getExternalContext().getRemoteUser());
-
-            session.save(clientGroupMigrationHistory);
         }
     }
 
@@ -1050,9 +1029,24 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
             persistenceSession.save(clientMigration);
         } else {
-            if (this.idOfClientGroup != null) {
-                client.setIdOfClientGroup(this.idOfClientGroup);
+            if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) ||
+                    (this.idOfClientGroup == null && client.getIdOfClientGroup() != null) ||
+                    (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
+                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
+                if (client.getClientGroup() != null) {
+                    clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                    clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+                }
+                clientGroupMigrationHistory.setNewGroupId(this.idOfClientGroup);
+                clientGroupMigrationHistory.setNewGroupName(this.clientGroupName);
+                clientGroupMigrationHistory.setComment(
+                        ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                                .getExternalContext().getRemoteUser());
+
+                persistenceSession.save(clientGroupMigrationHistory);
+
             }
+            client.setIdOfClientGroup(this.idOfClientGroup);
         }
 
         if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
