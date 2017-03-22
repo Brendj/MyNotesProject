@@ -12,8 +12,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -112,13 +112,13 @@ public class ClientGroupSelectPage extends BasicPage {
     }
 
     public void fill(Session session, Long idOfOrg) throws Exception {
-        List<Item> items = new LinkedList<Item>();
-        List clientGroups = retrieveClientGroups(session, idOfOrg);
-        for (Object object : clientGroups) {
-            Item item = new Item((ClientGroup) object);
-            if (filter == null) {
-                filter = "";
-            }
+        List<Item> items = new ArrayList<Item>();
+        if (filter == null) {
+            filter = "";
+        }
+        List<ClientGroup> clientGroups = retrieveClientGroups(session, idOfOrg);
+        for (ClientGroup clientGroup : clientGroups) {
+            Item item = new Item(clientGroup);
             if (!(item.getGroupName().isEmpty() || item.getGroupName() == null || filter.isEmpty())) {
                 if (item.getGroupName().toLowerCase().contains(filter.toLowerCase())) {
                     items.add(item);
@@ -131,7 +131,7 @@ public class ClientGroupSelectPage extends BasicPage {
         this.items = items;
     }
 
-    private List retrieveClientGroups(Session session, Long idOfOrg) throws HibernateException {
+    private List<ClientGroup> retrieveClientGroups(Session session, Long idOfOrg) throws HibernateException {
         Criteria criteria = session.createCriteria(ClientGroup.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         return criteria.list();

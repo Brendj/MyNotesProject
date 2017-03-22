@@ -34,8 +34,10 @@
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                         <h:inputText value="#{mainPage.clientGroupSelectPage.filter}" size="52" maxlength="128"
                                      styleClass="input-text">
-                            <a4j:support event="onkeyup" action="#{mainPage.updateClientGroupSelectPage}"
-                                         reRender="modalClientGroupSelectorClientGroupTable" />
+                            <a4j:support event="onkeyup" action="#{mainPage.updateClientGroupSelectPage}" requestDelay="1000"
+                                         reRender="modalClientGroupSelectorClientGroupTable" >
+                                <f:param name="idOfOrg" value="#{mainPage.clientEditPage.org.idOfOrg}" />
+                            </a4j:support>
                         </h:inputText>
                         <a4j:commandLink action="#{mainPage.updateClientGroupSelectPage}"
                                          reRender="modalClientGroupSelectorForm" styleClass="command-link">
