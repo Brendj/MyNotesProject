@@ -635,8 +635,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
         if(idOfClientGroup != null) {
             client.setIdOfClientGroup(idOfClientGroup);
+        } else {
+            client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
-
 
         persistenceSession.save(client);
 
