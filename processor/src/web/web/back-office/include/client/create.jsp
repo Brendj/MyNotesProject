@@ -152,10 +152,6 @@
     <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.remarks}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
-    <h:outputText escape="true" value="Льгота при поступлении" styleClass="output-text" />
-    <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientCreatePage.benefitOnAdmission}" styleClass="input-text" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать нового клиента" action="#{mainPage.createClient}"
                        reRender="clientCreatePanel" styleClass="command-button" />
 </h:panelGrid>

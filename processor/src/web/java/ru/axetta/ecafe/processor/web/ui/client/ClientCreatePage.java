@@ -212,7 +212,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
     private Integer gender;
     private Date birthDate;
-    private String benefitOnAdmission;
     private String ageTypeGroup;
 
 
@@ -259,14 +258,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
-    }
-
-    public String getBenefitOnAdmission() {
-        return benefitOnAdmission;
-    }
-
-    public void setBenefitOnAdmission(String benefitOnAdmission) {
-        this.benefitOnAdmission = benefitOnAdmission;
     }
 
     public String getAgeTypeGroup() {
@@ -601,7 +592,6 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         client.setRemarks(this.remarks);
         client.setBirthDate(this.birthDate);
         client.setGender(this.gender);
-        client.setCategoriesDiscountsDSZN(this.benefitOnAdmission);
         client.setAgeTypeGroup(this.ageTypeGroup);
         if (this.externalId==null || this.externalId==0) client.setExternalId(null);
         else client.setExternalId(this.externalId);
@@ -652,6 +642,49 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
             persistenceSession.save(clientGroupMigrationHistory);
         }
+
+        clean();
+    }
+
+    private void clean() {
+        this.org = new OrgItem();
+        this.person = new PersonItem();
+        this.contractPerson = new PersonItem();
+        this.selectItemList = new LinkedList<SelectItem>();
+        this.plainPassword = null;
+        this.plainPasswordConfirmation = null;
+        this.contractId = null;
+        this.autoContractId = true;
+        this.contractState = 0;
+        this.contractTime = new Date();
+        this.idOfClientGroup = null;
+        this.clientGroupName = null;
+        this.limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
+        this.balanceToNotify = null;
+        this.address = null;
+        this.phone = null;
+        this.mobile = null;
+        this.fax = null;
+        this.email = null;
+        this.notifyViaEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS);
+        this.notifyViaSMS = true;
+        this.notifyViaPUSH = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS);
+        this.payForSMS = 1;
+        this.discountMode = Client.DISCOUNT_MODE_NONE;
+        for (Integer i=0;i<Client.DISCOUNT_MODE_NAMES.length; i++){
+            this.selectItemList.add(new SelectItem(i,Client.DISCOUNT_MODE_NAMES[i]));
+        }
+        this.filter = "Не выбрано";
+        this.idOfCategoryList = new ArrayList<Long>();
+        this.categoryDiscountSet=new HashSet<CategoryDiscount>();
+        this.san = null;
+        this.guardsan = null;
+        this.externalId = null;
+        this.clientGUID = null;
+        this.gender = null;
+        this.birthDate = null;
+        this.ageTypeGroup = null;
+        this.remarks = null;
     }
 
     private String filter = "Не выбрано";
