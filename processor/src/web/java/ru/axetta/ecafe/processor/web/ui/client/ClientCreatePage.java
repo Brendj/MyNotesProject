@@ -17,6 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
@@ -27,7 +28,9 @@ import java.util.*;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, CategoryListSelectPage.CompleteHandlerList {
+public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
+        CategoryListSelectPage.CompleteHandlerList,
+        ClientGroupSelectPage.CompleteHandler {
 
     public Long getBalanceToNotify() {
         return balanceToNotify;
@@ -181,6 +184,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private OrgItem org = null;
     private PersonItem person = null;
     private PersonItem contractPerson = null;
+    private Long idOfClientGroup;
+    private String clientGroupName;
     private Integer flags = 0;
     private String address;
     private String phone;
@@ -331,6 +336,22 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
 
     public void setContractPerson(PersonItem contractPerson) {
         this.contractPerson = contractPerson;
+    }
+
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public String getClientGroupName() {
+        return clientGroupName;
+    }
+
+    public void setClientGroupName(String clientGroupName) {
+        this.clientGroupName = clientGroupName;
     }
 
     public Integer getFlags() {
@@ -518,7 +539,22 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         } */
     }
 
+    public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
+        if (null != idOfClientGroup) {
+            this.idOfClientGroup = idOfClientGroup;
+            this.clientGroupName = DAOUtils
+                    .findClientGroup(session, new CompositeIdOfClientGroup(this.org.idOfOrg, idOfClientGroup))
+                    .getGroupName();
+        }
+    }
+
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if((this.org.getIdOfOrg() == null && idOfOrg != null) ||
+           (this.org.getIdOfOrg() != null && idOfOrg == null) ||
+           (this.org.getIdOfOrg() != null && !this.org.getIdOfOrg().equals(idOfOrg))) {
+                this.clientGroupName = "";
+                this.idOfClientGroup = null;
+        }
         if (null != idOfOrg) {
             Org org = (Org) session.load(Org.class, idOfOrg);
             this.org = new OrgItem(org);
@@ -597,12 +633,24 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             client.setCategoriesDiscounts(clientCategories.substring(0, clientCategories.length()-1));
         }
 
+        if(idOfClientGroup != null) {
+            client.setIdOfClientGroup(idOfClientGroup);
+        }
 
 
         persistenceSession.save(client);
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
         persistenceSession.save(clientMigration);
+
+        if(client.getClientGroup() != null) {
+            ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
+            clientGroupMigrationHistory.setNewGroupId(client.getIdOfClientGroup());
+            clientGroupMigrationHistory.setNewGroupName(ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
+            clientGroupMigrationHistory.setComment(
+                    ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
+            persistenceSession.save(clientGroupMigrationHistory);
+        }
     }
 
     private String filter = "Не выбрано";

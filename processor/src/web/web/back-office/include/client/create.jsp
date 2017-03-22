@@ -67,6 +67,18 @@
         <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
         <h:inputText value="#{mainPage.clientCreatePage.person.idDocument}" maxlength="128" styleClass="input-text" />
     </h:panelGrid>
+
+    <h:outputText escape="true" value="Группа" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.clientCreatePage.clientGroupName}" readonly="true" styleClass="input-text"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showClientGroupSelectPage}" reRender="modalClientGroupSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientGroupSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientCreatePage.org.idOfOrg == null}">
+            <f:param name="idOfOrg" value="#{mainPage.clientCreatePage.org.idOfOrg}" />
+        </a4j:commandButton>
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.limit}" maxlength="20" converter="copeckSumConverter"
                  styleClass="input-text" />
