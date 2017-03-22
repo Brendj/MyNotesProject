@@ -3325,6 +3325,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<EnterEvent> enterEvents = enterEventCriteria.list();
         EnterEventList enterEventList = objectFactory.createEnterEventList();
         int nRecs = 0;
+
+        Map<Long, Date> lastUpdatePrecessSectionDate = new HashMap<Long, Date>();
+        Long localIdOfOrg;
+        Date localDate;
+        Map<Long, String> guardianSan = new HashMap<Long, String>();
+        Long localGuardianId;
+        String localSan;
+        for (EnterEvent enterEvent : enterEvents) {
+            if (nRecs++ > MAX_RECS_getEventsList) {
+                break;
+            }
+            localIdOfOrg = enterEvent.getOrg().getIdOfOrg();
+            localDate = lastUpdatePrecessSectionDate.get(localIdOfOrg);
+            if (localDate == null) {
+                lastUpdatePrecessSectionDate.put(localIdOfOrg,
+                        OrgRepository.getInstance().getLastProcessSectionsDate(localIdOfOrg, SectionType.ENTER_EVENTS));
+            }
+            localGuardianId = enterEvent.getGuardianId();
+            if (localGuardianId != null) {
+                localSan = guardianSan.get(localGuardianId);
+                if (localSan == null) {
+                    guardianSan.put(localGuardianId, DAOUtils.extractSanFromClient(session, localGuardianId));
+                }
+            }
+        }
+
         for (EnterEvent enterEvent : enterEvents) {
             if (nRecs++ > MAX_RECS_getEventsList) {
                 break;
@@ -3336,13 +3362,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setEnterName(enterEvent.getEnterName());
             enterEventItem.setDirection(enterEvent.getPassDirection());
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
-            enterEventItem.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(enterEvent.getOrg().getIdOfOrg(),
-                    SectionType.ENTER_EVENTS)));
+            enterEventItem.setLastUpdateDate(toXmlDateTime(lastUpdatePrecessSectionDate.get(enterEvent.getOrg().getIdOfOrg())));
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
-                //Client guardian = DAOUtils.findClient(session, guardianId);                                                session
-                //enterEventItem.setGuardianSan(guardian.getSan());
-                enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
+                enterEventItem.setGuardianSan(guardianSan.get(guardianId));
             }
             enterEventList.getE().add(enterEventItem);
         }
