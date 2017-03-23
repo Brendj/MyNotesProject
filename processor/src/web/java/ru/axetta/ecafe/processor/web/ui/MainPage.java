@@ -9,10 +9,7 @@ import net.sf.jasperreports.engine.JRException;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
-import ru.axetta.ecafe.processor.core.persistence.Function;
-import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
@@ -3053,12 +3050,17 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                clientCreatePage.createClient(persistenceSession);
+                Client client = clientCreatePage.createClient(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Клиент зарегистрирован успешно", null));
-            } catch (Exception e) {
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                String.format("Клиент зарегистрирован успешно, ид %d, номер лицевого счета %d",
+                                        client.getIdOfClient(), client.getContractId()), null));
+            } catch (IllegalArgumentException e) {
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Необходимо выбрать организацию!", null));
+            }catch (Exception e) {
                 logger.error("Failed to create client", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         "Ошибка при регистрации клиента: " + e.getMessage(), null));

@@ -564,8 +564,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     }
 
 
-    public void createClient(Session persistenceSession) throws Exception {
+    public Client createClient(Session persistenceSession) throws Exception {
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
+        if(this.org.getIdOfOrg() == null) {
+            throw new IllegalArgumentException();
+        }
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
             this.contractId = runtimeContext.getClientContractIdGenerator().generate(this.org.getIdOfOrg());
@@ -644,6 +647,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         }
 
         clean();
+
+        return (Client) persistenceSession.load(Client.class, client.getIdOfClient());
     }
 
     private void clean() {
