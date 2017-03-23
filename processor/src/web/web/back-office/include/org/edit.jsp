@@ -22,7 +22,7 @@
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.shortNameInfoService}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="128" styleClass="input-text long-field" />
+    <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="256" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Тэги" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.tag}" maxlength="256" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Город" styleClass="output-text" />
@@ -36,7 +36,7 @@
     <h:outputText escape="true" value="Долгота" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.longitude}" maxlength="12" styleClass="input-text" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="128" styleClass="input-text long-field" />
+    <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="256" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Короткий адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.shortAddress}" maxlength="128" styleClass="input-text long-field" />
 
