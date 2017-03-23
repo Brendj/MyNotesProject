@@ -77,6 +77,7 @@
                            styleClass="command-link" style="width: 25px;" disabled="#{mainPage.clientCreatePage.org.idOfOrg == null}">
             <f:param name="idOfOrg" value="#{mainPage.clientCreatePage.org.idOfOrg}" />
             <f:setPropertyActionListener value="#{mainPage.clientCreatePage.org.idOfOrg}" target="#{mainPage.clientGroupSelectPage.idOfOrg}" />
+            <f:setPropertyActionListener value="#{null}" target="#{mainPage.clientGroupSelectPage.filter}" />
         </a4j:commandButton>
     </h:panelGroup>
 
