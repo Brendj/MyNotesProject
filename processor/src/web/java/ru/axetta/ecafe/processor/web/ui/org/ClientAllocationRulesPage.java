@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,6 +44,8 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
     private List<ClientAllocationRuleItem> rules = new ArrayList<ClientAllocationRuleItem>();
     private String orgTypeSelected;
     private ClientAllocationRuleItem currentItem;
+
+    private static final int MAX_FILTER_GROUP_LENGTH = 1024;
 
     @Autowired
     private ClientAllocationRuleDao dao;
@@ -83,7 +84,11 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         for (int i = 0; i < rules.size(); i++) {
             ClientAllocationRuleItem item = rules.get(i);
             if (item.isEditable()) {
-                if (validateItem(item)) {
+                if (item.getGroupFilter() != null && item.getGroupFilter().length() > MAX_FILTER_GROUP_LENGTH) {
+                    this.printError(String.format(
+                            "Строка №%s, поле 'Фильтр Групп' - слишком длинное значение. Допустимый максимум - %s символа", i + 1, MAX_FILTER_GROUP_LENGTH));
+                    return null;
+                } else if (validateItem(item)) {
                     if (validateGroupFilter(item)) {
                         try {
                             session = RuntimeContext.getInstance().createPersistenceSession();
@@ -151,13 +156,6 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
             }
         }
         org = DAOUtils.findOrg(session, rule.getSourceOrg().getIdOfOrg());
-        //if (org.getFriendlyOrg().isEmpty()) {
-        //    clients.addAll(ClientManager.findMatchedAllocatedClients(org, rule.getGroupFilter()));
-        //} else {
-        //    for (Org frOrg : org.getFriendlyOrg()) {
-        //        clients.addAll(ClientManager.findMatchedAllocatedClients(frOrg, rule.getGroupFilter()));
-        //    }
-        //}
         final Set<Org> friendlyOrg = org.getFriendlyOrg();
         List<Long> idOfOrgList = new ArrayList<Long>(friendlyOrg.size());
         for (Org o : friendlyOrg) {

@@ -14,7 +14,7 @@
                      column="IdOfSourceOrg" not-null="true" lazy="false" cascade="none"/>
         <many-to-one name="destinationOrg" class="ru.axetta.ecafe.processor.core.persistence.Org"
                      column="IdOfDestinationOrg" not-null="true" lazy="false" cascade="none"/>
-        <property name="groupFilter" type="string" column="GroupFilter" length="255"/>
+        <property name="groupFilter" type="string" column="GroupFilter" length="1024"/>
         <property name="tempClient" type="boolean" column="IsTempClient" not-null="true"/>
     </class>
 </hibernate-mapping>
