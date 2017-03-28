@@ -44,11 +44,14 @@ public class SmsDeliveryCalculationService {
                                                       "0_sumDelayNightTs",
                                                       "0_lastSyncTs",
                                                       "0_maxDelayMorningTs",
-                                                      "0_sumDelayMorningTs"};
+                                                      "0_sumDelayMorningTs",
+                                                      "0_maxDelayMidnightTs",
+                                                      "0_sumDelayMidnightTs"};
 
     public static final int SUM_MIDDAY = 1;
     public static final int SUM_NIGHT = 3;
     public static final int SUM_MORNING = 6;
+    public static final int SUM_MIDNIGHT = 8;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -154,6 +157,6 @@ public class SmsDeliveryCalculationService {
     }
 
     public static boolean isSumType(int type) {
-        return ((type == SUM_MORNING) || (type == SUM_MIDDAY) || (type == SUM_NIGHT));
+        return ((type == SUM_MORNING) || (type == SUM_MIDDAY) || (type == SUM_NIGHT) || (type == SUM_MIDNIGHT));
     }
 }

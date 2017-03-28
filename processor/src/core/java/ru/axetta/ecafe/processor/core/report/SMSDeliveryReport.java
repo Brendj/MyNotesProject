@@ -537,6 +537,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
         public static final long MAX_DELAY = 120000L;
         protected static SMSDeliveryReportItem calcSmsSyncItem(SyncEntry entry, SMSDeliveryReportItem res, Integer uniqueId, DateComparisonConstants dateConstants) {
+            long maxDelayMidnight = 0L;
+            long sumDelayMidnight = 0L;
             long maxDelayMorning = 0L;
             long sumDelayMorning = 0L;
             long maxDelayMidday = 0L;
@@ -562,9 +564,12 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 }else if(isTimeBetween8h45mAnd16h00m(ts[0], dateConstants)) {
                     maxDelayMidday = Math.max(diff, maxDelayMidday);
                     sumDelayMidday += diff;
-                }else if(isTimeBetween16h00mAnd7h15m(ts[0], dateConstants)) {
+                }else if(isTimeBetween16h00mAnd0h00m(ts[0], dateConstants)) {
                     maxDelayNight = Math.max(diff, maxDelayNight);
                     sumDelayNight += diff;
+                }else if(isTimeBetween0h00mAnd7h15m(ts[0], dateConstants)) {
+                    maxDelayMidnight = Math.max(diff, maxDelayMidnight);
+                    sumDelayMidnight +=diff;
                 }
 
                 lastSync = Math.max(lastSync, ts[0]);
@@ -589,6 +594,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             res.addValue("0_lastSync", calcDate(lastSync));
             res.addValue("0_maxDelayMorning", calcTimeout(maxDelayMorning));
             res.addValue("0_sumDelayMorning", calcTimeout(sumDelayMorning));
+            res.addValue("0_maxDelayMidnight", calcTimeout(maxDelayMidnight));
+            res.addValue("0_sumDelayMidnight", calcTimeout(sumDelayMidnight));
 
             res.addValue(SmsDeliveryCalculationService.getDataTypeName(0), "" + maxDelayMidday);
             res.addValue(SmsDeliveryCalculationService.getDataTypeName(1), "" + sumDelayMidday);
@@ -597,6 +604,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             res.addValue(SmsDeliveryCalculationService.getDataTypeName(4), "" + lastSync);
             res.addValue(SmsDeliveryCalculationService.getDataTypeName(5), "" + maxDelayMorning);
             res.addValue(SmsDeliveryCalculationService.getDataTypeName(6), "" + sumDelayMorning);
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(7), "" + maxDelayMidnight);
+            res.addValue(SmsDeliveryCalculationService.getDataTypeName(8), "" + sumDelayMidnight);
 
             return res;
         }
@@ -623,9 +632,19 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
         }
 
-        private static boolean isTimeBetween16h00mAnd7h15m(long syncTime , DateComparisonConstants constants) {
+        /*private static boolean isTimeBetween16h00mAnd7h15m(long syncTime , DateComparisonConstants constants) {
             return (((syncTime >= constants.toDay16H00MinInMillis) && (syncTime < constants.secondDayStartInMillis)) ||
                     ((syncTime >= constants.todayStartInMillis) && (syncTime < constants.toDay7H15MinInMillis)));
+        }*/
+
+        private static boolean isTimeBetween16h00mAnd0h00m(long syncTime, DateComparisonConstants constants) {
+            return (((syncTime >= constants.toDay16H00MinInMillis) && (syncTime < constants.secondDayStartInMillis)) ||
+                    ((syncTime >= constants.todayStartInMillis) && (syncTime < constants.toDay0H00MinInMillis)));
+        }
+
+        private static boolean isTimeBetween0h00mAnd7h15m(long syncTime, DateComparisonConstants constants) {
+            return (((syncTime >= constants.toDay0H00MinInMillis) && (syncTime < constants.secondDayStartInMillis)) || (
+                    (syncTime >= constants.todayStartInMillis) && (syncTime < constants.toDay7H15MinInMillis)));
         }
 
         protected static SMSDeliveryReportItem calcSmsDeliveryitem(List<DeliveryEntry> items, SMSDeliveryReportItem res, Integer uniqueId) {
@@ -806,12 +825,14 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
     public static class DateComparisonConstants {
         private static final long DAY_MILLISECONDS = 86400000L;
 
+        private final Date toDay0Hours00Minutes;
         private final Date toDay7Hours15Minutes;
         private final Date toDay8Hours45Minutes;
         private final Date toDay16Hours00Minutes;
 
         public final long todayStartInMillis;
         public final long toDay7H15MinInMillis;
+        public final long toDay0H00MinInMillis;
         public final long toDay8H45MinInMillis;
         public final long toDay16H00MinInMillis;
         public final long secondDayStartInMillis;
@@ -822,6 +843,8 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
             Calendar calendar = new GregorianCalendar();
             calendar.setTimeInMillis(startDate.getTime());
+            CalendarUtils.setHoursAndMinutes(calendar, 0, 00);
+            toDay0Hours00Minutes = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 7, 15);
             toDay7Hours15Minutes = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 8, 45);
@@ -829,6 +852,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             CalendarUtils.setHoursAndMinutes(calendar, 16, 00);
             toDay16Hours00Minutes = calendar.getTime();
 
+            toDay0H00MinInMillis = toDay0Hours00Minutes.getTime();
             toDay7H15MinInMillis = toDay7Hours15Minutes.getTime();
             toDay8H45MinInMillis = toDay8Hours45Minutes.getTime();
             toDay16H00MinInMillis = toDay16Hours00Minutes.getTime();
