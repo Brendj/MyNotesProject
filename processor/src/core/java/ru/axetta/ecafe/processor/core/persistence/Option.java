@@ -130,7 +130,11 @@ public class Option {
             OPTION_DISABLE_EMAIL_EDIT=100080,
             OPTION_SVERKA_ENABLED=100081,
             OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS = 100082,
-            OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE = 100083;
+            OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE = 100083,
+            OPTION_REGIONS_FROM_NSI = 100084,
+            OPTION_FOUNDER_FROM_NSI = 100085,
+            OPTION_INDUSTRY_FROM_NSI = 100086,
+            OPTION_LAST_CHANGE_FROM_NSI = 100087;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -238,6 +242,11 @@ public class Option {
             OPTION_SVERKA_ENABLED, "1",
             OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS, "0",
             OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE, "0",
+            OPTION_REGIONS_FROM_NSI, "Восточный,Западный,Зеленоградский,Московская область,Новомосковский,Северный,"
+                    + "Северо-Восточный,Северо-Западный,Троицкий,Троицкий и Новомосковский,Центральный,Юго-Восточный,Юго-Западный,Южный",
+            OPTION_FOUNDER_FROM_NSI, "Департамент образования города Москвы",
+            OPTION_INDUSTRY_FROM_NSI, "",
+            OPTION_LAST_CHANGE_FROM_NSI, ""
 };
 
     private Long idOfOption;

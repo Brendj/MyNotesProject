@@ -830,6 +830,10 @@
                                 label="Сверка организаций" action="#{NSIOrgsRegistrySynchPage.show}"
                                 reRender="workspaceForm" />
 
+            <rich:panelMenuItem id="nsiOrgsRegistrySyncSettings" binding="#{NSIOrgsRegistrySynchSettingsPage.mainMenuComponent}"
+                                label="Параметры сверки" action="#{NSIOrgsRegistrySynchSettingsPage.show}"
+                                reRender="workspaceForm" />
+
             <rich:panelMenuItem id="nsiOrgsRegistryStat" binding="#{NSIOrgsRegistryStatPage.mainMenuComponent}"
                                 label="Статистика сверки" action="#{NSIOrgsRegistryStatPage.show}"
                                 reRender="workspaceForm" />

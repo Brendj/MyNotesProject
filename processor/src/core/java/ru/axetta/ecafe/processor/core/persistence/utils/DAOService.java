@@ -2038,7 +2038,7 @@ public class DAOService {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter) throws Exception {
-        return getOrgRegistryChanges(nameFilter,-1L,0L,false);
+        return getOrgRegistryChanges(nameFilter,"",-1L,0L,false);
     }
 
     public List<OrgRegistryChange> getOrgRegistryChangeByDate(long revisionDate) throws Exception {
@@ -2055,7 +2055,7 @@ public class DAOService {
         return query.getSingleResult();
     }
 
-    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, long revisionDate, long operationType,
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, String regionFilter, long revisionDate, long operationType,
             boolean hideApplied) throws Exception{
         if (revisionDate < 1L) {
             revisionDate = getLastOrgRegistryChangeRevision();
@@ -2067,6 +2067,9 @@ public class DAOService {
         if (nameFilter != null && nameFilter.length() > 0) {
             nameStatement = " and (lower(shortName||officialName) like lower('%" + nameFilter + "%')" +
                     " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
+        }
+        if (!StringUtils.isEmpty(regionFilter)) {
+            nameStatement += String.format(" and region = '%s'", regionFilter);
         }
         if (operationType > 0) {
             nameStatement += " and OperationType = " + operationType + " ";

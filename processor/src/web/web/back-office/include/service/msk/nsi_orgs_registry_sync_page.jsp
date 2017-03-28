@@ -47,18 +47,32 @@
         <h:selectOneMenu id="revisionDates" value="#{NSIOrgsRegistrySynchPage.selectedRevision}" style="width:350px;" >
             <f:selectItems value="#{NSIOrgsRegistrySynchPage.revisions}"/>
         </h:selectOneMenu>
-    </h:panelGrid>
-    <h:panelGrid columns="2" styleClass="borderless-grid">
+
         <h:outputText escape="true" value="Фильтр наименования ОО" styleClass="output-text" />
-        <h:inputText value="#{NSIOrgsRegistrySynchPage.nameFilter}" size="64" styleClass="input-text" />
-    </h:panelGrid>
-    <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:inputText value="#{NSIOrgsRegistrySynchPage.nameFilter}" style="width:350px;" styleClass="input-text" />
+
         <h:outputText escape="true" value="Тип операции" styleClass="output-text" />
         <h:selectOneMenu id="operationType" value="#{NSIOrgsRegistrySynchPage.selectedOperationType}" style="width:350px;" >
             <f:selectItems value="#{NSIOrgsRegistrySynchPage.operationTypes}"/>
         </h:selectOneMenu>
+
+        <h:outputText escape="true" value="Округ" styleClass="output-text" />
+        <h:selectOneMenu id="regionNSIOrgs" value="#{NSIOrgsRegistrySynchPage.selectedRegion}" style="width:350px;" >
+            <f:selectItems value="#{NSIOrgsRegistrySynchPage.regions}"/>
+        </h:selectOneMenu>
+
+        <h:outputText escape="true" value="Учредитель" styleClass="output-text" />
+        <h:selectOneMenu id="founderNSIList" value="#{NSIOrgsRegistrySynchPage.selectedFounder}" style="width:350px;" >
+            <f:selectItems value="#{NSIOrgsRegistrySynchPage.founders}"/>
+        </h:selectOneMenu>
+
+        <h:outputText escape="true" value="Отраслевое подчинение" styleClass="output-text" />
+        <h:selectOneMenu id="industryNSIList" value="#{NSIOrgsRegistrySynchPage.selectedIndustry}" style="width:350px;" >
+            <f:selectItems value="#{NSIOrgsRegistrySynchPage.industries}"/>
+        </h:selectOneMenu>
+
     </h:panelGrid>
-    <h:panelGrid columns="2" style="borderless-grid">
+    <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.hideApplied}"/>
         <h:outputText escape="true" value="Скрывать уже примененные изменения" styleClass="output-text" />
     </h:panelGrid>
@@ -94,8 +108,8 @@
                 <h:panelGrid id="revisionInfo" columns="2">
                     <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных зданий" styleClass="output-text"/></h:panelGroup>
                     <h:outputText value="#{NSIOrgsRegistrySynchPage.creationsCount}" styleClass="output-text" style="font-weight: bold;"/>
-                    <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество не обслуживаемых зданий" styleClass="output-text"/></h:panelGroup>
-                    <h:outputText value="#{NSIOrgsRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>
+                    <%--<h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество не обслуживаемых зданий" styleClass="output-text"/></h:panelGroup>
+                    <h:outputText value="#{NSIOrgsRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>--%>
                     <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных зданий" styleClass="output-text"/></h:panelGroup>
                     <h:outputText value="#{NSIOrgsRegistrySynchPage.modificationsCount}" styleClass="output-text" style="font-weight: bold;"/>
                     <rich:spacer width="10px" />

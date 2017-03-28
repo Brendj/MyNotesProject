@@ -10,10 +10,7 @@ import generated.nsiws2.com.rstyle.nsi.beans.Item;
 import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
-import ru.axetta.ecafe.processor.core.persistence.OrgSync;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
@@ -92,7 +89,17 @@ public class OrgMskNSIService extends MskNSIService {
         }
         return result;
     }
-    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, int importIteration) throws Exception {
+
+    public String getFounderFromOptions() {
+        String s = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_FOUNDER_FROM_NSI);
+        try {
+            return s.split("\\|")[0];
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, String region, String founder, String industry, int importIteration) throws Exception {
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
 
@@ -103,6 +110,36 @@ public class OrgMskNSIService extends MskNSIService {
             search.setAttributeType(TYPE_STRING);
             search.setAttributeValue("%" + orgName + "%");
             search.setAttributeOp("like");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  ограничение на округ
+        if(!StringUtils.isBlank(region)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Округ");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(region);
+            search.setAttributeOp("=");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  ограничение по учредителю
+        if(!StringUtils.isBlank(founder)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Учредитель");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(founder);
+            search.setAttributeOp("=");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+        //  ограничение по отраслевому подчинению
+        if(!StringUtils.isBlank(industry)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Отраслевое подчинение");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(industry);
+            search.setAttributeOp("=");
             searchPredicateInfo.addSearchPredicate(search);
         }
 
@@ -399,12 +436,12 @@ public class OrgMskNSIService extends MskNSIService {
 
 
     //Получения списка изменений из реестров с учетом имени, и ограничения на кол-во оргзаписей в ответе
-    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName) throws Exception {
+    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, String region, String founder, String industry) throws Exception {
         List<ImportRegisterOrgsService.OrgInfo> orgs = new ArrayList<ImportRegisterOrgsService.OrgInfo>();
         int importIteration = 1;
         while (true) {
             List<ImportRegisterOrgsService.OrgInfo> iterationOrgs = null;
-            iterationOrgs = getOrgs(orgName, importIteration);
+            iterationOrgs = getOrgs(orgName, region, founder, industry, importIteration);
             if (iterationOrgs.size() > 0) {
                 orgs.addAll(iterationOrgs);
             } else {
@@ -413,9 +450,9 @@ public class OrgMskNSIService extends MskNSIService {
             importIteration++;
             //break; /////////////////////////////Здесь можно ставить break для тестовых целей;
         }
-        if (StringUtils.isEmpty(orgName)) {
+        /*if (StringUtils.isEmpty(orgName)) {
             addDeletedOrgs(orgs);
-        }
+        }*/
         return orgs;
     }
 

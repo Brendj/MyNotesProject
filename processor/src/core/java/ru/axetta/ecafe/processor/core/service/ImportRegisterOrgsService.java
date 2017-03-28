@@ -68,7 +68,7 @@ public class ImportRegisterOrgsService {
         logger.info("Start import orgs from registry");
         StringBuffer logBuffer = new StringBuffer();
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry("", logBuffer);
+            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry("", "", "", "", logBuffer);
         } catch (Exception e) {
             logger.error("Failed to refresh orgs from registry", e);
         }
@@ -303,7 +303,7 @@ public class ImportRegisterOrgsService {
     }
 
     @Transactional
-    public StringBuffer syncOrgsWithRegistry(String orgName, StringBuffer logBuffer) throws Exception {
+    public StringBuffer syncOrgsWithRegistry(String orgName, String region, String founder, String industry, StringBuffer logBuffer) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Синхронизация с Реестрами от " + date + " по всем ОУ]: ";
         log(synchDate + "Производится синхронизация по всем организациям", logBuffer);
@@ -315,7 +315,7 @@ public class ImportRegisterOrgsService {
 
         //  Итеративно загружаем организации, используя ограничения
         try {
-            List<OrgInfo> orgs = nsiService.getOrgs(orgName);
+            List<OrgInfo> orgs = nsiService.getOrgs(orgName, region, founder, industry);
             log(synchDate + "Получено " + orgs.size() + " записей", logBuffer);
             saveOrgs(synchDate, date, System.currentTimeMillis(), orgs, logBuffer);
         } catch (Exception e) {

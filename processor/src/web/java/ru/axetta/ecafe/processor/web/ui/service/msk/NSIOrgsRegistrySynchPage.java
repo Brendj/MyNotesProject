@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChangeItem;
@@ -46,6 +47,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected Long selectedOperationType = 0L;
     protected Boolean hideApplied = true;
     private WebItem orgForEdit;
+    protected Integer selectedRegion = 0;
+    protected Integer selectedFounder = 0;
+    protected Integer selectedIndustry = 0;
 
     private final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
 
@@ -61,15 +65,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INTERDISTRICT, "", ""));
-
-        /*checked.put(ImportRegisterOrgsService.VALUE_GUID, true);
-        checked.put(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, true);
-        checked.put(ImportRegisterOrgsService.VALUE_INN, true);
-        checked.put(ImportRegisterOrgsService.VALUE_UNOM, true);
-        checked.put(ImportRegisterOrgsService.VALUE_UNAD, true);
-        checked.put(ImportRegisterOrgsService.VALUE_ADDRESS, true);
-        checked.put(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, true);
-        checked.put(ImportRegisterOrgsService.VALUE_SHORT_NAME, true);*/
     }
 
     public String getPageFilename() {
@@ -155,6 +150,28 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         return nameFilter;
     }
 
+    public String getRegionFilter() {
+        return getOptionFilter(Option.OPTION_REGIONS_FROM_NSI, selectedRegion, ",");
+    }
+
+    public String getFounderFilter() {
+        return getOptionFilter(Option.OPTION_FOUNDER_FROM_NSI, selectedFounder, "\n");
+    }
+
+    public String getIndustryFilter() {
+        return getOptionFilter(Option.OPTION_INDUSTRY_FROM_NSI, selectedIndustry, "\n");
+    }
+
+    private String getOptionFilter(int option, int selected, String delim) {
+        String str = RuntimeContext.getInstance().getOptionValueString(option);
+        if (selected == 0) {
+            return "";
+        } else {
+            String[] regions = str.split(delim);
+            return regions[selected-1];
+        }
+    }
+
     public void setNameFilter(String nameFilter) {
         this.nameFilter = nameFilter;
     }
@@ -172,8 +189,38 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         items.add(0, new SelectItem(0, "Все"));
         items.add(1, new SelectItem(OrgRegistryChange.CREATE_OPERATION, "Создание"));
         items.add(2, new SelectItem(OrgRegistryChange.MODIFY_OPERATION, "Изменение"));
-        items.add(3, new SelectItem(OrgRegistryChange.DELETE_OPERATION, "Отключение"));
+//        items.add(3, new SelectItem(OrgRegistryChange.DELETE_OPERATION, "Отключение"));
         return items;
+    }
+
+    public List<SelectItem> getRegions() {
+        return getSelectItemsList(Option.OPTION_REGIONS_FROM_NSI, ",");
+    }
+
+    public List<SelectItem> getIndustries() {
+        return getSelectItemsList(Option.OPTION_INDUSTRY_FROM_NSI, "\n");
+    }
+
+    public List<SelectItem> getSelectItemsList(int option, String delim) {
+        String options = RuntimeContext.getInstance().getOptionValueString(option);
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(0, new SelectItem(0, "Все"));
+        try {
+            String[] regions = options.split(delim);
+            int number = 1;
+            for (String st : regions) {
+                items.add(number, new SelectItem(number, st.trim()));
+                number++;
+            }
+        } catch (Exception e) {
+            getLogger().error("Error parse option string.", e);
+            printError("Не удается распарсить строку с перечислением настроек");
+        }
+        return items;
+    }
+
+    public List<SelectItem> getFounders() {
+        return getSelectItemsList(Option.OPTION_FOUNDER_FROM_NSI, "\n");
     }
 
     public List<SelectItem> getRevisions() {
@@ -255,7 +302,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     //Применяем фильтр
     public void doUpdate() {
         try {
-            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, selectedRevision, selectedOperationType, hideApplied);
+            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, getRegionFilter(), selectedRevision, selectedOperationType, hideApplied);
             putDbItems(dbItems);
         } catch (Exception e) {
             errorMessages = "Не удалось произвести загрузку организаций из Реестров: " + e.getMessage();
@@ -266,7 +313,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public void doRefresh() {
         StringBuffer logBuffer = new StringBuffer();
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry(nameFilter, logBuffer);
+            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry(nameFilter, getRegionFilter(),
+                    getFounderFilter(), getIndustryFilter(), logBuffer);
             loadRevisions();
             if(revisions != null || revisions.size() > 0) {
                 selectedRevision = revisions.get(0);
@@ -489,6 +537,30 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             }
         }
         return orgModifyChangeItems;
+    }
+
+    public Integer getSelectedRegion() {
+        return selectedRegion;
+    }
+
+    public void setSelectedRegion(Integer selectedRegion) {
+        this.selectedRegion = selectedRegion;
+    }
+
+    public Integer getSelectedFounder() {
+        return selectedFounder;
+    }
+
+    public void setSelectedFounder(Integer selectedFounder) {
+        this.selectedFounder = selectedFounder;
+    }
+
+    public Integer getSelectedIndustry() {
+        return selectedIndustry;
+    }
+
+    public void setSelectedIndustry(Integer selectedIndustry) {
+        this.selectedIndustry = selectedIndustry;
     }
 
     public class WebItem {
