@@ -299,11 +299,19 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             it = null;
             long commonSum = 0;
 
+            Object o[] = (Object[]) res.get(0);
+            long orgId = ((BigInteger) o[0]).longValue();
+
             for(Object entry : res) {
                 Object e[] = (Object[]) entry;
                 long idoforg = ((BigInteger) e[0]).longValue();
                 int dataType = (Integer) e[1];
                 long ts = ((BigDecimal) e[2]).longValue();
+
+                if (orgId != idoforg) {
+                    orgId = idoforg;
+                    commonSum = 0;
+                }
 
                 for(SMSDeliveryReportItem it2 : items) {
                     if(it2.getOrgId() == idoforg) {
@@ -318,7 +326,6 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
                 it.addValue("commonSum", calcTimeout(commonSum));
                 items.add(it);
-                commonSum = 0;
 
                 if (SmsDeliveryCalculationService.isSumType(dataType)) {
                     commonSum += ts;
