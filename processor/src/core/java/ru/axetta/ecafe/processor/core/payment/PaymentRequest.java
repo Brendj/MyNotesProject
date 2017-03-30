@@ -51,6 +51,10 @@ public class PaymentRequest {
 
         public static class Payment {
 
+            public List<Long> getAllowedTSPIds() {
+                return allowedTSPIds;
+            }
+
             public static class Builder {
 
                 private final DateFormat timeFormat;
@@ -98,6 +102,7 @@ public class PaymentRequest {
             private final int paymentMethod;
             private final String addPaymentMethod;
             private  String addIdOfPayment;
+            private final List<Long> allowedTSPIds;
 
             public Payment(String idOfPayment, Long contractId, Long clientId, Long tspContragentId, Date payTime, long sum, int paymentMethod,
                     String addPaymentMethod, String addIdOfPayment, boolean bResetBalance) {
@@ -112,10 +117,11 @@ public class PaymentRequest {
                 this.addIdOfPayment = addIdOfPayment;
                 this.checkOnly = false;
                 this.bResetBalance = bResetBalance;
+                allowedTSPIds = null;
             }
 
             public Payment(boolean checkOnly, String idOfPayment, Long contractId, Long clientId, Long tspContragentId, Date payTime, long sum,
-                    int paymentMethod, String addPaymentMethod, String addIdOfPayment, boolean bResetBalance) {
+                    int paymentMethod, String addPaymentMethod, String addIdOfPayment, boolean bResetBalance, List<Long> allowedTSPIds) {
                 this.checkOnly = checkOnly;
                 this.idOfPayment = idOfPayment;
                 this.contractId = contractId;
@@ -127,6 +133,7 @@ public class PaymentRequest {
                 this.addPaymentMethod = addPaymentMethod;
                 this.addIdOfPayment = addIdOfPayment;
                 this.bResetBalance = bResetBalance;
+                this.allowedTSPIds = allowedTSPIds;
             }
 
             public boolean isResetBalance() {

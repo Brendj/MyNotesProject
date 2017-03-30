@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 public class OnlinePaymentProcessor {
     private static final Logger logger = LoggerFactory.getLogger(OnlinePaymentProcessor.class);
@@ -46,7 +47,8 @@ public class OnlinePaymentProcessor {
                     request.getPaymentMethod(),
                     null,
                     request.getPaymentAdditionalId(),
-                    false);
+                    false,
+                    request.getAllowedTSPIds());
             //// обработать платеж
             PaymentResponse.ResPaymentRegistry.Item processResult = RuntimeContext.getInstance().getPaymentProcessor().processPayPaymentRegistryPayment(
                     request.getContragentId(), payment);
@@ -95,6 +97,7 @@ public class OnlinePaymentProcessor {
         private final boolean bCheckOnly;
         private Date payDate = null;
         private String bmId;
+        private List<Long> allowedTSPIds;
 
         public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId,
                 int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum,
@@ -104,7 +107,15 @@ public class OnlinePaymentProcessor {
             this.bmId = bmId;
         }
 
-        public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
+        public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId,
+                String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum, List<Long> allowedTSPIds) throws Exception {
+            this(protoVersion, bCheckOnly, contragentId, tspContragentId, paymentMethod, clientId,
+                    paymentId, paymentAdditionalId, sum, bNegativeSum);
+            this.allowedTSPIds = allowedTSPIds;
+        }
+
+        public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId,
+                String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
                 throws Exception {
             if (!bNegativeSum && sum<0) throw new Exception("Payment sum is negative: "+sum);
             this.protoVersion = protoVersion;
@@ -171,6 +182,10 @@ public class OnlinePaymentProcessor {
             return "PayRequest{" + "contragentId=" + contragentId + ", paymentMethod=" + paymentMethod + ", clientId="
                     + clientId + ", paymentId='" + paymentId + '\'' + ", paymentAdditionalId='" + paymentAdditionalId
                     + '\'' + ", sum=" + sum + ", bCheckOnly=" + bCheckOnly + ", BMID=" + bmId + '}';
+        }
+
+        public List<Long> getAllowedTSPIds() {
+            return allowedTSPIds;
         }
     }
 

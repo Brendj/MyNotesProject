@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 
 public class StdPayConfig {
@@ -32,6 +31,7 @@ public class StdPayConfig {
     private static final String BLOCKED_TERMINALS = ".blockTerminal";
     private static final String PARAM_USERNAME= ".username";
     private static final String PARAM_PASSWORD= ".password";
+    private static final String PARAM_ALLOWEDTSPIDS = ".allowedTSPIDS";
 
 
     public static final int AUTH_TYPE_NONE=0, AUTH_TYPE_SIGNATURE=1, AUTH_TYPE_CLIENT_CERT=2, AUTH_TYPE_BASIC=3;
@@ -48,6 +48,7 @@ public class StdPayConfig {
         public String adapter;
         public String[] blockedTerminals;
         public String username, password;
+        public ArrayList<Long> allowedTSPIds;
         //public boolean checkOnly;
     }
     LinkedList<LinkConfig> linkConfigs = new LinkedList<LinkConfig>();
@@ -62,6 +63,7 @@ public class StdPayConfig {
             String idOfContragentParam = paramBaseName + n + PARAM_ID_OF_CONGRAGENT;
             String checkSignatureParam = paramBaseName + n + PARAM_CHECK_SIGN;
             String screeningParam = paramBaseName + n + PARAM_SCREENING;
+            String allowedTSPIDSParam = paramBaseName + n + PARAM_ALLOWEDTSPIDS;
 
             String idOfAllowedClientOrgsParam = paramBaseName + n + PARAM_ALLOWED_CLIENT_ORGS;
             String authTypeParam = paramBaseName + n + PARAM_AUTH_TYPE;
@@ -80,6 +82,14 @@ public class StdPayConfig {
             }
             if (properties.containsKey(screeningParam)) {
                 linkConfig.screening = Boolean.parseBoolean(getRequiredParam(screeningParam, properties));
+            }
+            //allowedTSPIDS - список контрагентов, в чей адрес разрешен платеж через терминал от агента, найденного по PID
+            if (properties.containsKey(allowedTSPIDSParam)) {
+                String[] v = properties.getProperty(allowedTSPIDSParam).replaceAll("\\s", "").split(",");
+                linkConfig.allowedTSPIds = new ArrayList<Long>();
+                for (int i=0;i<v.length;++i) {
+                    if (v[i].length()>0) linkConfig.allowedTSPIds.add(Long.parseLong(v[i]));
+                }
             }
             /*if (properties.containsKey(checkOnlyParam)) {
                 linkConfig.checkOnly = Boolean.parseBoolean(getRequiredParam(checkOnlyParam, properties));

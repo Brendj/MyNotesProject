@@ -76,7 +76,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         if (sum==null) {
             return new OnlinePaymentProcessor.PayRequest(protoVersion, true,
                     contragentId, tspContragentId, paymentMethod, clientId,
-                    ""+opId, ""+termId, 0L, false);
+                    ""+opId, ""+termId, 0L, false, linkConfig.allowedTSPIds);
         } else {
             String time=parseResult.getReqParam("TIME");
             String paymentAdditionalId = termId+"/"+time;
@@ -84,7 +84,7 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
             boolean isRollback=parseResult.getParam("ROLLBACK")!=null && parseResult.getReqIntParam("ROLLBACK")==1;
             return new OnlinePaymentProcessor.PayRequest(protoVersion, false,
                     contragentId, tspContragentId, paymentMethod, clientId,
-                    ""+opId, paymentAdditionalId, parseResult.getReqLongParam("SUM"), isRollback);
+                    ""+opId, paymentAdditionalId, parseResult.getReqLongParam("SUM"), isRollback, linkConfig.allowedTSPIds);
         }
     }
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)

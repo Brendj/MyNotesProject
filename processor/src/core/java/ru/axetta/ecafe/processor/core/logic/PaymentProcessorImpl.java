@@ -212,18 +212,28 @@ public class PaymentProcessorImpl implements PaymentProcessor {
         HashMap<String, String> payAddInfo = new HashMap<String, String>();
         Contragent defaultTsp = DAOReadExternalsService.getInstance().getOrgDefaultSupplier(
                 client.getOrg().getIdOfOrg());
+        boolean tspError = false;
         if (payment.getTspContragentId() != null) {
             // если явно указан контрагент ТСП получатель, проверяем что он соответствует организации клиента
             if (defaultTsp == null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
-                SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
-                        "Merchant (TSP) contragent is prohibited for this client", null);
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
-                        PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
-                        String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
-                                PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(),
-                                payment.getTspContragentId(), payment.getContractId(), payment.getClientId()),
-                        null);
+                tspError = true;
             }
+        }
+        if (payment.getAllowedTSPIds() != null) {
+            //Проверка на вхождение поставщика клиента в список разрешенных поставщиков
+            if (!payment.getAllowedTSPIds().contains(defaultTsp.getIdOfContragent())) {
+                tspError = true;
+            }
+        }
+        if (tspError) {
+            SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
+                    "Merchant (TSP) contragent is prohibited for this client", null);
+            return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
+                    PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
+                    String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
+                            PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(),
+                            payment.getTspContragentId(), payment.getContractId(), payment.getClientId()),
+                    null);
         }
         if (defaultTsp != null) {
             paymentTspContragentId = defaultTsp.getIdOfContragent();
