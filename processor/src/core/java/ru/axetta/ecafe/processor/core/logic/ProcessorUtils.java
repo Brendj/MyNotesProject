@@ -112,6 +112,19 @@ public class ProcessorUtils {
         }
     }
 
+    public Date getLastProcessSectionDate(Session session, Long idOfOrg, SectionType sectionType) {
+        try {
+            Query query = session.createQuery("select s.date from LastProcessSectionsDates s "
+                    + "where s.compositeIdOfLastProcessSectionsDates.idOfOrg = :idOfOrg and s.compositeIdOfLastProcessSectionsDates.type = :type");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("type", sectionType.getType());
+            return (Date) query.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Error retrieving lastProcessSectionDate", e);
+            return null;
+        }
+    }
+
     public static void refreshOrg(SessionFactory sessionFactory, Org org){
         Session session = null;
         Transaction persistenceTransaction = null;

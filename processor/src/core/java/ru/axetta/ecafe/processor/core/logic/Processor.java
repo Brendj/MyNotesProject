@@ -107,6 +107,7 @@ public class Processor implements SyncProcessor {
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
+    private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.accRegistryUpdate.timeClient", 7) * 24 * 60 * 60 * 1000;
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
@@ -1171,7 +1172,6 @@ public class Processor implements SyncProcessor {
 
         boolean wasError = false;
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
             if (request.getProtoVersion() < 6) {
                 SyncResponse.AccIncRegistry accIncRegistry = getAccIncRegistry(request.getOrg(), accIncRegistryRequest.dateTime);
                 addToResponseSections(accIncRegistry, responseSections);
@@ -1179,6 +1179,7 @@ public class Processor implements SyncProcessor {
                 AccRegistryUpdate accRegistryUpdate = getAccRegistryUpdate(request.getOrg(), accIncRegistryRequest.dateTime);
                 addToResponseSections(accRegistryUpdate, responseSections);
             }
+            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
             if (request.getProtoVersion() < 6) {
@@ -2304,12 +2305,12 @@ public class Processor implements SyncProcessor {
         processPaymentRegistrySections(request, null, responseSections, bError, idOfPacket, errorClientIds);
 
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
             if (request.getProtoVersion() < 6) {
                 accIncRegistry = getAccIncRegistry(request.getOrg(), request.getAccIncRegistryRequest().dateTime);
             } else {
                 accRegistryUpdate = getAccRegistryUpdate(request.getOrg(), request.getAccIncRegistryRequest().dateTime);
             }
+            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
 
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -3970,12 +3971,14 @@ public class Processor implements SyncProcessor {
             //persistenceSession.refresh(org);
             List<AccountTransactionExtended> accountTransactionList = null;
             try {
+                Date dateStartDate = getQueryStartDate(persistenceSession, org.getIdOfOrg(), fromDateTime);
                 long time_delta = System.currentTimeMillis();
-                accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, fromDateTime,
+                accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, dateStartDate,
                     currentDate);
                 time_delta = System.currentTimeMillis() - time_delta;
                 if (time_delta > 10L * 1000L) {
-                    logger.error(String.format("Transactions query time = %s ms. IdOfOrg = %s. Period = %3$td.%3$tm.%3$tY %3$tT - %4$td.%4$tm.%4$tY %4$tT", time_delta, org.getIdOfOrg(), fromDateTime, currentDate));
+                    logger.error(String.format("Transactions query time = %s ms. IdOfOrg = %s. Period = %3$td.%3$tm.%3$tY %3$tT - %4$td.%4$tm.%4$tY %4$tT (date from packet = %5$td.%5$tm.%5$tY %5$tT)",
+                            time_delta, org.getIdOfOrg(), dateStartDate, currentDate, fromDateTime));
                 }
                 for (AccountTransactionExtended accountTransaction : accountTransactionList) {
                     accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
@@ -3991,6 +3994,17 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return accRegistryUpdate;
+    }
+
+    private Date getQueryStartDate(Session session, Long idOfOrg, Date fromDateTime) {
+        long difference = System.currentTimeMillis() - fromDateTime.getTime();
+        long timeInMillis = ACC_REGISTRY_TIME_CLIENT_IN_MILLIS;
+        if (difference > timeInMillis) {
+            Date d = processorUtils.getLastProcessSectionDate(session, idOfOrg, SectionType.ACC_INC_REGISTRY);
+            return d == null ? fromDateTime : d;
+        } else {
+            return fromDateTime;
+        }
     }
 
     private SyncResponse.AccIncRegistry getAccIncRegistry(Org org, Date fromDateTime) throws Exception {
