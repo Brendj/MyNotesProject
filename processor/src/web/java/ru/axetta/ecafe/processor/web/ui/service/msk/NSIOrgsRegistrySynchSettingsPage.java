@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -75,7 +76,9 @@ public class NSIOrgsRegistrySynchSettingsPage extends BasicWorkspacePage {
     }
 
     private String getLastChange() {
-        return DAOReadonlyService.getInstance().getUserFromSession().getUserName() + "|" + CalendarUtils.dateTimeToString(new Date());
+        User user = DAOReadonlyService.getInstance().getUserFromSession();
+        String username = user.getUserName();
+        return username + "|" + CalendarUtils.dateTimeToString(new Date());
     }
 
     public String getRegionsString() {

@@ -11,7 +11,7 @@
   --%>
 
 <%--@elvariable id="NSIOrgsRegistrySynchSettingsPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgsRegistrySynchSettingsPage"--%>
-<h:panelGrid id="NSIOrgsRegistrySynchSettingsPage" styleClass="borderless-grid" binding="#{NSIOrgsRegistrySynchSettingsPage.pageComponent}">
+<h:panelGrid id="idNSIOrgsRegistrySynchSettingsPage" styleClass="borderless-grid" binding="#{NSIOrgsRegistrySynchSettingsPage.pageComponent}">
 
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Список округов" styleClass="output-text" />
@@ -29,7 +29,13 @@
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages" warnClass="warn-messages" />
 
+    <a4j:status id="updateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+
     <a4j:commandButton value="Сохранить" action="#{NSIOrgsRegistrySynchSettingsPage.saveSettings}" status="updateStatus"
-                       reRender="NSIOrgsRegistrySynchSettingsPage"/>
+                       reRender="idNSIOrgsRegistrySynchSettingsPage"/>
 
 </h:panelGrid>
