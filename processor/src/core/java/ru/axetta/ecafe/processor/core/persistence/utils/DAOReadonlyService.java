@@ -125,7 +125,7 @@ public class DAOReadonlyService {
             User user = findUserById(idOfUser);
             return user;
         } catch (Exception e) {
-            //logger.error(String.format("Can't retrieve user from current Session. Message: %s", e.getMessage()));
+            logger.info(String.format("Can't retrieve user from current Session. Message: %s", e.getMessage()));
             return null;
         }
     }
