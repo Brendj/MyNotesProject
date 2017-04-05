@@ -28,7 +28,9 @@ create table cf_info_message_details
   SendDate bigint,
   CONSTRAINT cf_info_message_details_pk PRIMARY KEY (IdOfInfoMessage, IdOfOrg),
   CONSTRAINT cf_info_message_details_idoforg_fk FOREIGN KEY (idOfOrg)
-    REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+    REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_info_message_details_idofinfomessage_fk FOREIGN KEY (idOfInfoMessage)
+  REFERENCES cf_info_messages (idofinfomessage) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 --генератор для ключа таблицы сообщений
