@@ -711,6 +711,23 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<InfoMessage> getInfoMessagesSinceVersion(Session session, long idOfOrg, long version) throws Exception {
+        Query query = session.createQuery("select m from InfoMessage m join m.infoMessageDetails d "
+                + "where d.compositeIdOfInfoMessageDetail.idOfOrg = :idOfOrg and m.version > :version");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("version", version);
+        return query.list();
+    }
+
+    public static void setSendDateInfoMessage(Session session, Long idOfInfoMessage, Long idOfOrg) {
+        Query query = session.createQuery("update InfoMessageDetail set sendDate = :date "
+                + "where compositeIdOfInfoMessageDetail.idOfOrg = :idOfOrg and compositeIdOfInfoMessageDetail.idOfInfoMessage = :idOfInfoMessage");
+        query.setParameter("date", new Date());
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("idOfInfoMessage", idOfInfoMessage);
+        query.executeUpdate();
+    }
+
     public static Boolean allOrgRegistryChangeItemsApplied(Session session, Long idOfOrgRegistryChange) {
         Query q = session.createQuery("from OrgRegistryChangeItem where mainRegistry=:idOfOrgRegistryChange and applied=false");
         q.setParameter("idOfOrgRegistryChange", idOfOrgRegistryChange);
@@ -2376,6 +2393,28 @@ public class DAOUtils {
             version = currentMaxVersion + 1;
         }
         return version;
+    }
+
+    public static long nextVersionByInfoMessage(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select m.version from cf_info_messages as m order by m.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
+    public static Boolean needInfoMessageSync(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("select count(*) from cf_info_message_details where idoforg = :idOfOrg and senddate is null");
+        query.setParameter("idOfOrg", idOfOrg);
+        Object o = query.uniqueResult();
+        if (o != null) {
+            Long count = ((BigInteger)o).longValue();
+            return count > 0;
+        }
+        return false;
     }
 
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {

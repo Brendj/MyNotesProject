@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
@@ -355,6 +356,19 @@ public class DAOReadonlyService {
             logger.error(e.getMessage(), e);
             return null;
         }
+    }
+
+    public List getInfoMessageDetails(Long idOfInfoMessage) {
+        //Query query = entityManager.createQuery("select d from InfoMessageDetail d where d.compositeIdOfInfoMessageDetail.idOfInfoMessage = :idOfInfoMessage");
+        Session session = entityManager.unwrap(Session.class);
+        SQLQuery query = session.createSQLQuery("select d.idoforg as idOfOrg, o.shortname as orgShortName, d.senddate as sendDate "
+                + "from cf_info_message_details d join cf_orgs o on d.idoforg = o.idoforg where d.idofinfomessage = :idOfInfoMessage order by d.idoforg");
+        query.setParameter("idOfInfoMessage", idOfInfoMessage);
+        query.addScalar("idOfOrg");
+        query.addScalar("orgShortName");
+        query.addScalar("sendDate");
+        query.setResultTransformer(Transformers.aliasToBean(OrgDeliveryInfo.class));
+        return query.list();
     }
 
     public Long getOrgPriceOfSms(Long idOfOrg) {

@@ -862,6 +862,7 @@
         <rich:panelMenuItem id="groupControlSubscriptions" binding="#{mainPage.groupControlSubscriptionsPage.mainMenuComponent}" label="Групповое управление подписками"
                             action="#{mainPage.groupControlSubscriptionsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
+
     <rich:panelMenuGroup id="benefit" binding="#{mainPage.benefitPage.mainMenuComponent}" label="Льготы"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" action="#{mainPage.showBenefitGroupPage}" reRender="workspaceForm" />
@@ -872,6 +873,17 @@
 
         <rich:panelMenuItem id="cancelBenefits" binding="#{mainPage.cancelCategoryBenefitsPage.mainMenuComponent}" label="Отмена льготных категорий по всем учащимся"
                             action="#{mainPage.cancelCategoryBenefitsPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="infoMessageGroupMenu" label="Сообщения в АРМ администратора ОО"
+                         binding="#{mainPage.infoMessageGroupPage.mainMenuComponent}">
+        <a4j:support event="onclick" action="#{mainPage.showInfoMessageGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="infoMessageList" binding="#{mainPage.infoMessagePage.mainMenuComponent}"
+                            label="Список" action="#{mainPage.showInfoMessagePage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="infoMessageCreate" binding="#{mainPage.infoMessageCreatePage.mainMenuComponent}"
+                            label="Новое сообщение" action="#{mainPage.showInfoMessageCreatePage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
