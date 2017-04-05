@@ -240,6 +240,9 @@ public class MainPage implements Serializable {
     private final CancelCategoryBenefitsPage cancelCategoryBenefitsPage = new CancelCategoryBenefitsPage();
     private final SyncStatsPage syncStatsPage = new SyncStatsPage();
     private final RegistryLoadPage registryLoadPage = new RegistryLoadPage();
+    private final BasicWorkspacePage infoMessageGroupPage = new BasicWorkspacePage();
+    private final InfoMessagePage infoMessagePage = new InfoMessagePage();
+    private final InfoMessageCreatePage infoMessageCreatePage = new InfoMessageCreatePage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -9313,6 +9316,69 @@ public class MainPage implements Serializable {
 
     public ElectronicReconciliationStatisticsPage getElectronicReconciliationStatisticsPage() {
         return electronicReconciliationStatisticsPage;
+    }
+
+    public InfoMessagePage getInfoMessagePage() {
+        return infoMessagePage;
+    }
+
+    public Object showInfoMessagePage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            infoMessagePage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = infoMessagePage;
+        } catch (Exception e) {
+            logger.error("Failed to show info message page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отправки информационных сообщений: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showInfoMessageCreatePage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            infoMessageCreatePage.fill();
+            currentWorkspacePage = infoMessageCreatePage;
+        } catch (Exception e) {
+            logger.error("Failed to show info message page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы создания информационного сообщения: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showInfoMessageGroupPage() {
+        currentWorkspacePage = infoMessageGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BasicWorkspacePage getInfoMessageGroupPage() {
+        return infoMessageGroupPage;
+    }
+
+    public InfoMessageCreatePage getInfoMessageCreatePage() {
+        return infoMessageCreatePage;
     }
 
     /*public BasicBasketReportPage getBasicBasketReportPage() {

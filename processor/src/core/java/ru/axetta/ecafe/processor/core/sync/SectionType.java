@@ -33,7 +33,8 @@ public enum  SectionType {
     SPECIAL_DATES(20),
     MIGRANTS(21),
     RO(22),
-    LAST_TRANSACTION(23);
+    LAST_TRANSACTION(23),
+    INFO_MESSAGE(24);
 
     private int type;
 

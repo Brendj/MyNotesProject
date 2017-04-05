@@ -2523,6 +2523,7 @@ public class SyncRequest {
             builders.add(new DirectivesRequest.Builder());
             builders.add(new QuestionaryClientsRequest.Builder());
             builders.add(new GroupsOrganizationRequest.Builder(idOfOrg));
+            builders.add(new InfoMessageRequest.InfoMessageRequestBuilder());
             return builders;
         }
 
@@ -2698,6 +2699,10 @@ public class SyncRequest {
 
     public ClientGuardianRequest getClientGuardianRequest() {
         return this.<ClientGuardianRequest>findSection(ClientGuardianRequest.class);
+    }
+
+    public InfoMessageRequest getInfoMessageRequest() {
+        return this.<InfoMessageRequest>findSection(InfoMessageRequest.class);
     }
 
     public ClientGroupManagerRequest getClientGroupManagerRequest() {

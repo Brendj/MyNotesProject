@@ -164,6 +164,11 @@ public class Processor implements SyncProcessor {
                     response = buildMigrantsSyncResponse(request);
                     break;
                 }
+                case TYPE_INFO_MESSAGE:{
+                    //обработка информационных сообщений
+                    response = buildInfoMessageSyncResponse(request);
+                    break;
+                }
                 case TYPE_CONSTRUCTED:{
                     response = buildUnivercalConstructedSectionsSyncResponse(request, syncStartTime, syncResult);
                     break;
@@ -676,6 +681,9 @@ public class Processor implements SyncProcessor {
         //process groups organization
         fullProcessingGroupsOrganization(request,syncHistory,responseSections);
 
+        //info messages
+        processInfoMessageSections(request, responseSections);
+
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
                 accRegistry, resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry,
@@ -809,6 +817,9 @@ public class Processor implements SyncProcessor {
 
         //GroupsOrganization
         fullProcessingGroupsOrganization(request, syncHistory, responseSections);
+
+        //info messages
+        processInfoMessageSections(request, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -2001,6 +2012,37 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+    }
+
+    private SyncResponse buildInfoMessageSyncResponse(SyncRequest request) throws Exception {
+        Long idOfPacket = null;
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
+        processInfoMessageSections(request, responseSections);
+
+        // время окончания обработки
+        Date syncEndTime = new Date();
+
+        String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime,
+                responseSections);
+    }
+
+    private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
+        InfoMessageRequest infoMessageRequest = request.getInfoMessageRequest();
+        if (infoMessageRequest == null) return;
+
+        InfoMessageData infoMessageData = null;
+        try {
+            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.INFO_MESSAGE);
+            infoMessageData = getInfoMessageData(request.getOrg(), infoMessageRequest.getMaxVersion());
+        } catch (Exception e) {
+            String message = String.format("Failed to build organization structure, IdOfOrg == %s", request.getIdOfOrg());
+            infoMessageData = new InfoMessageData(new ResultOperation(100, String.format("Internal error: %s", e.getMessage())));
+            logger.error(message, e);
+        }
+        addToResponseSections(infoMessageData, responseSections);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -4170,6 +4212,29 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return organizationStructure;
+    }
+
+    private InfoMessageData getInfoMessageData(Org org, long version) throws Exception {
+        InfoMessageData infoMessageData = new InfoMessageData(null);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List<InfoMessage> list = DAOUtils.getInfoMessagesSinceVersion(persistenceSession, org.getIdOfOrg(), version);
+            List<InfoMessageItem> infoMessageItems = new ArrayList<InfoMessageItem>();
+            for (InfoMessage message : list) {
+                infoMessageItems.add(new InfoMessageItem(message));
+                DAOUtils.setSendDateInfoMessage(persistenceSession, message.getIdOfInfoMessage(), org.getIdOfOrg());
+            }
+            infoMessageData.setInfoMessageItems(infoMessageItems);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return infoMessageData;
     }
 
     private OrganizationComplexesStructure getOrganizationComplexesStructureData(Org org) throws Exception {

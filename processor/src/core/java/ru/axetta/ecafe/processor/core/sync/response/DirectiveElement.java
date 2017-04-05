@@ -45,6 +45,9 @@ public class DirectiveElement implements AbstractToElement{
 
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+
+        Boolean infoMessageSync = DAOUtils.needInfoMessageSync(session, org.getIdOfOrg());
+        directiveItemList.add(new DirectiveItem("InfoMessageSync",infoMessageSync?"1":"0"));
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {
