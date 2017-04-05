@@ -431,6 +431,14 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
+    public boolean setClientBalanceToNotify(Long contractId, long threshold) {
+        Query q = entityManager
+                .createQuery("update Client set balanceToNotify=:threshold where contractId=:contractId");
+        q.setParameter("threshold", threshold);
+        q.setParameter("contractId", contractId);
+        return q.executeUpdate() != 0;
+    }
+
     public Org getOrg(Long idOfOrg) {
         Query q = entityManager.createQuery("from Org where idOfOrg = :idOfOrg");
         q.setParameter("idOfOrg", idOfOrg);

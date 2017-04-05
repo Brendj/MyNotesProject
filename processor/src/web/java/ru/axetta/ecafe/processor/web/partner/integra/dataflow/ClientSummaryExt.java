@@ -117,6 +117,9 @@ public class ClientSummaryExt {
     @XmlAttribute(name = "LastUpdateDate")
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar lastUpdateDate;
+
+    @XmlAttribute(name = "ThresholdBalanceNotify")
+    protected Long thresholdBalanceNotify;
     /**
      *
      * Gets the value of the contractId property.
@@ -714,5 +717,13 @@ public class ClientSummaryExt {
 
     public void setOrgId(Long orgId) {
         this.orgId = orgId;
+    }
+
+    public Long getThresholdBalanceNotify() {
+        return thresholdBalanceNotify;
+    }
+
+    public void setThresholdBalanceNotify(Long thresholdBalanceNotify) {
+        this.thresholdBalanceNotify = thresholdBalanceNotify;
     }
 }

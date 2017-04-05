@@ -241,6 +241,9 @@ public interface ClientRoomController {
     @WebMethod
     Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit);
 
+    @WebMethod
+    Result changeThresholdBalanceNotify(@WebParam(name = "contractId") Long contractId, @WebParam(name = "threshold") long threshold);
+
     @WebMethod Result changePassword(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "base64passwordHash") String base64passwordHash);
 

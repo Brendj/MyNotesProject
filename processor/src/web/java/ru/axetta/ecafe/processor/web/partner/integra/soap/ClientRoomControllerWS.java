@@ -1759,6 +1759,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setStateOfContract(Client.CONTRACT_STATE_NAMES[client.getContractState()]);
         /*ограничения дневных затрат за день*/
         clientSummaryExt.setExpenditureLimit(client.getExpenditureLimit());
+        /*порог снижения баланса для отправки уведомления*/
+        clientSummaryExt.setThresholdBalanceNotify(client.getBalanceToNotify());
         /* ФИО Клиента */
         clientSummaryExt.setFirstName(client.getPerson().getFirstName());
         clientSummaryExt.setLastName(client.getPerson().getSurname());
@@ -4104,6 +4106,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Long idOfClient = DAOService.getInstance().getClientByContractId(contractId).getIdOfClient();
             handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                     idOfClient, handler.getData().getOperationType());
+        }
+        return r;
+    }
+
+    @Override
+    public Result changeThresholdBalanceNotify(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "threshold") long threshold) {
+        authenticateRequest(contractId);
+
+        Result r = new Result(RC_OK, RC_OK_DESC);
+        if (threshold < 0) {
+            r = new Result(RC_INVALID_DATA, "Значение порога не может быть меньше нуля");
+            return r;
+        }
+        if (!DAOService.getInstance().setClientBalanceToNotify(contractId, threshold)) {
+            r = new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
         }
         return r;
     }
