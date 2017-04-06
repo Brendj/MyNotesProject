@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -48,7 +46,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
     public static final String REPORT_NAME = "Отчет по активным клиентам";
     public static final String[] TEMPLATE_FILE_NAMES = {"ActiveClientsReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{32};
+    public static final int[] PARAM_HINTS = new int[]{3,32};
 
     public static final int TOTAL_COUNT_VALUE = 1;
     public static final int DISCOUNT_COUNT_VALUE = 2;
@@ -135,26 +133,19 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
         }
 
         public List<ActiveClientsItem> findActiveClients(Session session, Date start, Date end) {
-            Calendar startCal = new GregorianCalendar();
-            Calendar endCal = new GregorianCalendar();
-            startCal.setTimeInMillis(start.getTime());
-            endCal.setTimeInMillis(end.getTime());
-            startCal.set(Calendar.HOUR_OF_DAY, 0);
-            startCal.set(Calendar.MINUTE, 0);
-            startCal.set(Calendar.SECOND, 0);
-            endCal.set(Calendar.HOUR_OF_DAY, 0);
-            endCal.set(Calendar.MINUTE, 0);
-            endCal.set(Calendar.SECOND, 0);
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String orgRestriction = "";
 
-            if (!orgShortItemList.isEmpty()) {
+            if (orgShortItemList != null && !orgShortItemList.isEmpty()) {
                 orgRestriction = " and cf_orgs.idoforg in (";
                 for (int i = 0; i < orgShortItemList.size() - 1; i++) {
                     orgRestriction = orgRestriction + orgShortItemList.get(i).getIdOfOrg() + ", ";
                 }
                 orgRestriction = orgRestriction + orgShortItemList.get(orgShortItemList.size() - 1).getIdOfOrg();
                 orgRestriction = orgRestriction + ") ";
+            } else if (reportProperties.containsKey("idOfOrg")) {
+                //старт из ручного запуска
+                String orgs_str = (String)reportProperties.get("idOfOrg");
+                orgRestriction = String.format(" and cf_orgs.idoforg in (%s) ", orgs_str);
             }
 
             List<ActiveClientsItem> result = new ArrayList<ActiveClientsItem>();
@@ -169,13 +160,6 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                        + getClientsClause("totalClients")
                        + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
-                /*+ "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
-                + "       cf_orgs.district, count(totalClients.idofclient), " + TOTAL_COUNT_VALUE + " as valType "
-                + "from cf_orgs "
-                + "left join cf_clients as totalClients on cf_orgs.idoforg=totalClients.idoforg "
-                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
-                          + getClientsClause("totalClients")
-                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "*/
                 + "union all "
                 /* Бесплатники */
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
@@ -193,8 +177,8 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "       cf_orgs.district, count(distinct orders.idofclient), " + PAYMENT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and "
-                + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
-                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "                       orders.createddate between " + start.getTime() + " AND "
+                + "                                                  " + end.getTime() + " "
                 + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
                 + "left join cf_clientgroups on ordclients.idoforg=cf_clientgroups.idoforg and ordclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where orders.state = 0 and cf_orgs.district is not null and cf_orgs.district<>'' "
@@ -213,31 +197,14 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                         + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
-                /* Осуществление льготного питания за период */
-                /*+ "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
-                + "       cf_orgs.district, count(distinct orders.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
-                + "from cf_orgs "
-                + "join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and orders.socdiscount<>0 and "
-                + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
-                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
-                + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient and orders.idoforg=ordclients.idoforg "
-                + "left join cf_clientgroups on ordclients.idoforg=cf_clientgroups.idoforg and ordclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
-                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
-                         + getClientsClause("ordclients")
-                         + orgRestriction
-                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
-                + "union all "*/
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
                 //+ "       cf_orgs.district, count(distinct orders.idofclient) + count(distinct trans.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
                 + "       cf_orgs.district, count(distinct orders.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "join cf_clients as transclients on cf_orgs.idoforg=transclients.idoforg "
                 + "left join cf_orders as orders on transclients.idofclient=orders.idofclient and socdiscount<>0 and "
-                + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
-                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
-                //+ "left join cf_transactions as trans on transclients.idofclient=trans.idofclient and "
-                //+ "                        trans.transactiondate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
-                //+ "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "                       orders.createddate between " + start.getTime() + " and "
+                + "                                                  " + end.getTime() + " "
                 + "left join cf_clientgroups on transclients.idoforg=cf_clientgroups.idoforg and transclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where orders.state = 0 and cf_orgs.district is not null and cf_orgs.district<>'' "
                         + getClientsClause("transclients")
@@ -249,8 +216,8 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "       cf_orgs.district, count(distinct cf_enterevents.idofclient), " + ENTERS_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "join cf_enterevents on cf_enterevents.idoforg=cf_orgs.idoforg and "
-                + "     cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
-                + "                                        EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "     cf_enterevents.evtdatetime between " + start.getTime() + " AND "
+                + "                                        " + end.getTime() + " "
                 + "join cf_clients as entclients on cf_enterevents.idofclient=entclients.idofclient and cf_enterevents.idoforg=entclients.idoforg "
                 + "left join cf_clientgroups on entclients.idoforg=cf_clientgroups.idoforg and entclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "

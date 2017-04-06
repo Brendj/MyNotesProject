@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.131
+-- Пакет обновлений 2.2.132
 
 alter table cf_clientallocationrule alter column groupfilter type character varying(1024);
 
