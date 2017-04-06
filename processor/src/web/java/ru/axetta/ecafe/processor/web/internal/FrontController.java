@@ -946,7 +946,8 @@ public class FrontController extends HttpServlet {
                 if (gender!=null) fc.setValue(ClientManager.FieldId.GENDER, gender);
 
                 logger.debug("register client v2");
-                long idOfClient = ClientManager.registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness);
+                boolean noComment = true;
+                long idOfClient = ClientManager.registerClient(Long.parseLong(orgIdForClient), fc, checkFullNameUniqueness, noComment);
                 results.add(new RegisterClientResult(idOfClient, recId, true, null));
             } catch(Exception e) {
                 results.add(new RegisterClientResult(null, recId, false, e.getMessage()));
@@ -1013,7 +1014,7 @@ public class FrontController extends HttpServlet {
                 if (cd.cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, cd.cardIssued);
                 if (cd.snils!=null) fc.setValue(ClientManager.FieldId.SAN, cd.snils);
                 logger.debug("register client");
-                long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness);
+                long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness, false);
                 results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
             } catch (Exception e) {
                 results.add(new RegisterClientResult(null, cd.recId, false, e.getMessage()));

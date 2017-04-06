@@ -1055,7 +1055,7 @@ public class ClientManager {
     }
 
 
-    public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig, boolean checkFullNameUnique)
+    public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig, boolean checkFullNameUnique, boolean noComment)
             throws Exception {
         logger.debug("checkRequiredFields");
         fieldConfig.checkRequiredFields();
@@ -1070,8 +1070,16 @@ public class ClientManager {
             String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
             logger.debug("registerClientTransactionFree");
-            Client client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique,
-                    persistenceSession, persistenceTransaction, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+
+            Client client;
+
+            if (noComment) {
+                client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
+                        persistenceTransaction, null);
+            } else {
+                client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
+                        persistenceTransaction, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+            }
 
             persistenceTransaction.commit();
             persistenceTransaction = null;

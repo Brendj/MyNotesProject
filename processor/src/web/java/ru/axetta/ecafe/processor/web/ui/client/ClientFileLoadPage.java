@@ -213,7 +213,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
 
         try {
-            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique);
+            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, false);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
             return new LineResult(lineNo, -1, "Ошибка: "+e.getMessage(), -1L);

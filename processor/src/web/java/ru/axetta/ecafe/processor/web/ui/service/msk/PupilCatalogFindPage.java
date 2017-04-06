@@ -319,7 +319,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 if (i.getGroup() != null) {
                     fieldConfig.setValue(ClientManager.FieldId.GROUP, i.getGroup());
                 }
-                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true);
+                i.idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true, false);
                 ++nItems;
             }
             printMessage("Успешно зарегистрировано клиентов: " + nItems);
