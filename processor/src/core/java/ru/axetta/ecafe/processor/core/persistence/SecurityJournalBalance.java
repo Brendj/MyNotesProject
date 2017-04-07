@@ -205,8 +205,8 @@ public class SecurityJournalBalance {
             } else if (uri.equals("/processor/payment-std")) {
                 source = SJBalanceSourceEnum.SJBALANCE_SOURCE_STDPAY;
                 ParameterMap m = (ParameterMap)httpServletRequest.getParameterMap();
-                if (m.containsKey("termid")) {
-                    String[] term = (String[])m.get("termid");
+                if (m.containsKey("TERMID")) {
+                    String[] term = (String[])m.get("TERMID");
                     terminal = term[0];
                 }
             } else if (uri.equals("/processor/pay")) {
