@@ -48,11 +48,12 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
         idOfOrgList.clear();
         header = "";
         content = "";
+        filter = "Не выбрано";
     }
 
     public void doSave() {
         if (StringUtils.isEmpty(header) || StringUtils.isEmpty(content) || idOfOrgList.isEmpty()) {
-            printError("Все поля явлются обязательными и должны быть заполнены. Плюс необходимо выбрать хотя бы одну организацию.");
+            printError("Все поля явлются обязательными и должны быть заполнены. Необходимо выбрать хотя бы одну организацию.");
             return;
         }
         InfoMessage infoMessage = new InfoMessage();
@@ -79,6 +80,7 @@ public class InfoMessageCreatePage extends BasicWorkspacePage implements OrgList
             transaction.commit();
             transaction = null;
             printMessage("Сообщение создано");
+            fill();
         } catch (Exception e) {
             printError(String.format("Во время создания сообщения возникла ошибка. Текст ошибки: ", e.getMessage()));
             logger.error("Error creating info message", e);
