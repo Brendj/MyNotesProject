@@ -81,7 +81,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -2872,82 +2871,54 @@ public class Processor implements SyncProcessor {
         if (items.size() > 0) {
             resultClientGuardianVersion = getClientGuardiansResultVersion();
         }
-        for (ClientGuardianItem item : items) {
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            ClientGuardian clientGuardian = new ClientGuardian(item.getIdOfChildren(), item.getIdOfGuardian());
-            clientGuardian.setDisabled(item.getDisabled());
-            clientGuardian.setVersion(resultClientGuardianVersion);
-            clientGuardian.setDeletedState(item.isDeleted());
-            clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
-            if (item.getDeleteState() == 0) {
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            for (ClientGuardianItem item : items) {
+
+
                 try {
-                    persistenceSession = persistenceSessionFactory.openSession();
-                    persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
-                    criteria.add(Example.create(clientGuardian)
-                            .excludeProperty("disabled")
-                            .excludeProperty("version")
-                            .excludeProperty("relation")
-                            .excludeProperty("deleteDate")
-                            .excludeProperty("deletedState"));
+                    criteria.add(Restrictions.eq("idOfChildren", item.getIdOfChildren()));
+                    criteria.add(Restrictions.eq("idOfGuardian", item.getIdOfGuardian()));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if (dbClientGuardian == null) {
-                        clientGuardian = (ClientGuardian) persistenceSession.merge(clientGuardian);
-                    }
-                    if (dbClientGuardian == null) {
+                        ClientGuardian clientGuardian = new ClientGuardian(item.getIdOfChildren(), item.getIdOfGuardian());
+                        clientGuardian.setDisabled(item.getDisabled());
+                        clientGuardian.setVersion(resultClientGuardianVersion);
+                        clientGuardian.setDeletedState(item.isDeleted());
+                        clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.isDeleted()) {
+                            clientGuardian.delete(resultClientGuardianVersion);
+                        }
+                        persistenceSession.save(clientGuardian);
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
-                        dbClientGuardian.setDisabled(item.getDisabled());
-                        dbClientGuardian.setVersion(resultClientGuardianVersion);
+                        if (dbClientGuardian.getDeletedState() && !item.isDeleted()) {
+                            dbClientGuardian.restore(resultClientGuardianVersion);
+                        } else if (item.isDeleted()) {
+                            dbClientGuardian.delete(resultClientGuardianVersion);
+                        }
                         dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
-                        persistenceSession.saveOrUpdate(dbClientGuardian);
+                        dbClientGuardian.setVersion(resultClientGuardianVersion);
+                        persistenceSession.update(dbClientGuardian);
                         resultClientGuardian.addItem(dbClientGuardian, 0, null);
                     }
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
-                } catch (Exception ex) {
-                    String message = String
-                            .format("Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
-                                    clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
-                    logger.error(message, ex);
-                    resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
-                    processorUtils.createSyncHistoryException(persistenceSessionFactory, idOfOrg, syncHistory, message);
-                } finally {
-                    HibernateUtils.rollback(persistenceTransaction, logger);
-                    HibernateUtils.close(persistenceSession, logger);
-                }
-            } else {
-                try {
-                    persistenceSession = persistenceSessionFactory.openSession();
-                    persistenceTransaction = persistenceSession.beginTransaction();
-                    Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
-                    criteria.add(Example.create(clientGuardian)
-                            .excludeProperty("disabled")
-                            .excludeProperty("version")
-                            .excludeProperty("deletedState"));
-                    ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
-                    if (dbClientGuardian != null) {
-                        dbClientGuardian.delete(resultClientGuardianVersion);
-                        persistenceSession.update(dbClientGuardian);
-                        //persistenceSession.delete(dbClientGuardian);
-                    }
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
-                    final String resultMessage = (dbClientGuardian == null ? "Client guardian is removed" : null);
-                    resultClientGuardian.addItem(item, 0, resultMessage);
-                } catch (Exception ex) {
-                    String message = String
-                            .format("Delete Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
-                                    clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
-                    logger.error(message, ex);
-                    resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
-                    processorUtils.createSyncHistoryException(persistenceSessionFactory, idOfOrg, syncHistory, message);
-                } finally {
-                    HibernateUtils.rollback(persistenceTransaction, logger);
-                    HibernateUtils.close(persistenceSession, logger);
+                } catch(Exception e) {
+                    resultClientGuardian.addItem(item, 100, e.getMessage());
                 }
             }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception ex) {
+            logger.error("Error processing ClientsGuardian section: ", ex);
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, idOfOrg, syncHistory, "Internal error ClientsGuardian");
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return resultClientGuardian;
     }

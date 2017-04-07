@@ -87,6 +87,13 @@ public class ClientGuardian {
         this.setVersion(version);
     }
 
+    public void restore(Long version) {
+        this.setDeletedState(false);
+        this.setDisabled(false);
+        this.setDeleteDate(null);
+        this.setVersion(version);
+    }
+
     public Boolean isDisabled() {
         if (disabled == null) {
             return false;
