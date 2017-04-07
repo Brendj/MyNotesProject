@@ -2904,6 +2904,7 @@ public class Processor implements SyncProcessor {
                         }
                         dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
+                        dbClientGuardian.setDisabled(item.getDisabled());
                         persistenceSession.update(dbClientGuardian);
                         resultClientGuardian.addItem(dbClientGuardian, 0, null);
                     }
