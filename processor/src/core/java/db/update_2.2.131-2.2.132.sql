@@ -35,3 +35,5 @@ create table cf_info_message_details
 
 --генератор для ключа таблицы сообщений
 alter table CF_Generators add column IdOfInfoMessage bigint not null default 0;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 100417) НЕ МЕНЯТЬ
