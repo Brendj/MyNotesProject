@@ -251,6 +251,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Date birthDate;
     private String categoriesDiscountsDSZN;
     private Date lastDiscountsUpdate;
+    private Boolean disablePlanCreation;
     private Date disablePlanCreationDate;
     private String ageTypeGroup;
     private Long balanceToNotify;
@@ -560,6 +561,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setAgeTypeGroup(String ageTypeGroup) {
         this.ageTypeGroup = ageTypeGroup;
+    }
+
+    public Boolean getDisablePlanCreation() {
+        return disablePlanCreation;
+    }
+
+    public void setDisablePlanCreation(Boolean disablePlanCreation) {
+        this.disablePlanCreation = disablePlanCreation;
     }
 
     public Date getDisablePlanCreationDate() {
@@ -982,6 +991,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setCategoriesDiscounts(newClientCategories);
         client.setCategories(categoryDiscountSet);
 
+        if(this.disablePlanCreation && this.disablePlanCreationDate == null) {
+            client.setDisablePlanCreationDate(new Date());
+        }
+        if(!this.disablePlanCreation) {
+            client.setDisablePlanCreationDate(null);
+        }
+
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
             ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
@@ -1162,6 +1178,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.birthDate = client.getBirthDate();
         this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
         this.disablePlanCreationDate = client.getDisablePlanCreationDate();
+        this.disablePlanCreation = this.disablePlanCreationDate != null;
         this.ageTypeGroup = client.getAgeTypeGroup();
         removeListGuardianItems.clear();
         removeListWardItems.clear();

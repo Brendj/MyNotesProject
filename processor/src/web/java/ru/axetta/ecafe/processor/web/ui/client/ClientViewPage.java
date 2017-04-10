@@ -129,6 +129,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Date birthDate;
     private String categoriesDiscountsDSZN;
     private Date lastDiscountsUpdate;
+    private Boolean disablePlanCreation;
     private Date disablePlanCreationDate;
     private String ageTypeGroup;
     private String photoURL;
@@ -351,6 +352,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.lastDiscountsUpdate = lastDiscountsUpdate;
     }
 
+    public Boolean getDisablePlanCreation() {
+        return disablePlanCreation;
+    }
+
+    public void setDisablePlanCreation(Boolean disablePlanCreation) {
+        this.disablePlanCreation = disablePlanCreation;
+    }
+
     public Date getDisablePlanCreationDate() {
         return disablePlanCreationDate;
     }
@@ -444,6 +453,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.categoriesDiscountsDSZN = getCategoriesDiscountsDSZNDesc(session, client);
         this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
         this.disablePlanCreationDate = client.getDisablePlanCreationDate();
+        this.disablePlanCreation = this.disablePlanCreationDate != null;
         this.ageTypeGroup = client.getAgeTypeGroup();
         this.balanceToNotify = client.getBalanceToNotify();
 

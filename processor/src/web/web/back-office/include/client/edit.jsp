@@ -179,6 +179,8 @@
     <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"
                   styleClass="output-text" />
+    <h:outputText escape="true" value="Исключен из плана питания" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.disablePlanCreation}" styleClass="output-text" />
     <h:outputText escape="true" value="Дата исключения из плана питания" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.disablePlanCreationDate}" escape="true" converter="timeConverter"
                   styleClass="output-text" />
