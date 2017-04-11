@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -68,8 +65,11 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
     public Object save() {
         try {
             onSave();
+        } catch (IllegalArgumentException e) {
+            printError("Ошибка при сохранении производственной конфигурации: " + e.getMessage());
+            logger.error("Error create configuration provider: " + e.getMessage());
         } catch (Exception e) {
-            printError("Ошибка при созданиии производственной конфигурации.");
+            printError("Ошибка при сохранении производственной конфигурации: " + e.getMessage());
             logger.error("Error create configuration provider",e);
         }
         return null;

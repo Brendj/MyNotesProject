@@ -67,14 +67,15 @@ public class ConfigurationProviderService {
                     }
                     if(!org.getSourceMenuOrgs().isEmpty()){
                         Org sourceOrg = org.getSourceMenuOrgs().iterator().next();
-                        final boolean isProvider = !sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider()
+                        final boolean isProvider = sourceOrg.getConfigurationProvider() == null ||
+                                !sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider()
                                 .equals(cp.getIdOfConfigurationProvider());
                         if(sourceOrg.getConfigurationProvider()==null || isProvider){
                             final StringBuilder message = new StringBuilder("Организации - источника ")
                                     .append(" меню школы ")
                                     .append("'").append(org.getShortName()).append("'")
                                     .append(" не входит в текущую конфигурацию провайдера");
-                            throw new Exception(message.toString());
+                            throw new IllegalArgumentException(message.toString());
                         }
                     }
                     org.setFullSyncParam(true);

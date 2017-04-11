@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -17,13 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -88,8 +82,11 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
             currentConfigurationProvider = service.onSave(currentConfigurationProvider, mainPage.getCurrentUser(), idOfOrgList);
             selectedConfigurationProviderGroupPage.setSelectConfigurationProvider(currentConfigurationProvider);
             printMessage("Производственная конфигурация сохранена успешно.");
+        } catch (IllegalArgumentException e) {
+            printError("Ошибка при сохранении производственной конфигурации: " + e.getMessage());
+            logger.error("Error create configuration provider: " + e.getMessage());
         } catch (Exception e) {
-            printError("Ошибка при сохранении производственной конфигурации: "+e.getMessage());
+            printError("Ошибка при сохранении производственной конфигурации: " + e.getMessage());
             logger.error("Error create configuration provider",e);
         }
         return null;
