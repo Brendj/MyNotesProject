@@ -315,14 +315,14 @@
 								<textElement>
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[ Время от регистрации события до отправки в ЕМП]]></text>
+								<text><![CDATA[Время без обмена более 2 минут]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="0" y="0" width="780" height="20"/>
 								<textElement>
 									<font isBold="true"/>
 								</textElement>
-								<text><![CDATA[Время от регистрации события прохода до отправки в ЕМП]]></text>
+								<text><![CDATA[Время от регистрации события до отправки в ЕМП ]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa1ffa33" style="Crosstab Data Text" x="140" y="20" width="70" height="100"/>
