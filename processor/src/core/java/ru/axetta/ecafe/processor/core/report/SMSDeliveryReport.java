@@ -640,11 +640,10 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 reportItem.setDistrict(org.getDistrict());
                 reportItem.setShortNameInfoService(org.getShortNameInfoService());
                 reportItem.setShortAddress(org.getShortAddress());
-                if (moreThanTwoMinutes) {
-                    reportItem.setIntroductionQueue(org.getIntroductionQueue());
-                    //reportItem.setOrgStatus(org.getStatus().toString());
-                    reportItem.setOrgStatus(Org.STATE_NAMES[org.getState()]);
-                }
+                reportItem.setIntroductionQueue(org.getIntroductionQueue());
+                //reportItem.setOrgStatus(org.getStatus().toString());
+                reportItem.setOrgStatus(Org.STATE_NAMES[org.getState()]);
+
             }
         }
 

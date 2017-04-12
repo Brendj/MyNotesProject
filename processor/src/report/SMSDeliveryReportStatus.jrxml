@@ -374,6 +374,20 @@
 								<text><![CDATA[Дата и время последней быстрой синхронизации]]></text>
 							</staticText>
 							<staticText>
+								<reportElement uuid="311e23a5-9628-40dd-aca3-979781bf2719" style="Crosstab Data Text" x="780" y="0" width="100" height="120"/>
+								<textElement verticalAlignment="Top">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Статус ОО]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="977e23e2-9628-40dd-aca3-979781bf2719" style="Crosstab Data Text" x="880" y="0" width="100" height="120"/>
+								<textElement verticalAlignment="Top">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Очередь внедрения]]></text>
+							</staticText>
+							<staticText>
 								<reportElement uuid="85287b9c-884b-4ba1-90c1-3507b1eaabaf" style="Crosstab Data Text" x="0" y="20" width="70" height="100"/>
 								<textElement>
 									<font size="10" isBold="true"/>
@@ -424,7 +438,7 @@
 				<measure name="isEmptyValues" class="java.lang.Boolean">
 					<measureExpression><![CDATA[$F{isEmptyValues}]]></measureExpression>
 				</measure>
-				<crosstabCell width="780" height="30">
+				<crosstabCell width="980" height="30">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -540,6 +554,34 @@
 							</reportElement>
 							<textElement/>
 							<textFieldExpression><![CDATA[((java.util.Map) $V{values}).get("0_lastSync").toString()]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f175-8b18-1a1a-8959-029c9a036022" style="Crosstab Data Text" mode="Opaque" x="780" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{orgStatus}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f175-8b18-1a1a-8959-029c9a036022" style="Crosstab Data Text" x="780" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{orgStatus}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f571-8b81-1a1a-8959-029c9a036022" style="Crosstab Data Text" mode="Opaque" x="880" y="0" width="100" height="15" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{introductionQueue}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="dea8f571-8b81-1a1a-8959-029c9a036022" style="Crosstab Data Text" x="880" y="0" width="100" height="15">
+								<printWhenExpression><![CDATA[!$V{isEmptyValues}]]></printWhenExpression>
+							</reportElement>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{introductionQueue}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="90252c25-2e12-4380-894a-8422a5e1e478" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="70" height="15" backcolor="#CCCCCC">
