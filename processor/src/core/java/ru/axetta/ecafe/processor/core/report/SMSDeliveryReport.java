@@ -68,6 +68,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
     private Date endDate;
     private String htmlReport;
     public static final String IS_ACTIVE_STATE = "isActiveState";
+    public static final String MORE_THAN_TWO_MINUTES = "moreThanTwoMinutes";
 
     private static final String ORG_NUM = "Номер ОУ";
     private static final String ORG_NAME = "Наименование ОУ";
@@ -96,10 +97,11 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
-        private final String templateFilename;
+        private String templateFilename;
         private boolean exportToHTML = false;
         private IPrintWarn printer;
         private static boolean isActiveState = false;
+        private static boolean moreThanTwoMinutes = false;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -151,7 +153,14 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
             List<SMSDeliveryReportItem> items = findDeliveryEntries(session, startTime, endTime);
             JRDataSource dataSource = createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
+            moreThanTwoMinutes = Boolean.valueOf(reportProperties.getProperty(MORE_THAN_TWO_MINUTES, "false"));
+            JasperPrint jasperPrint;
+            if (moreThanTwoMinutes) {
+                jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
+            } else {
+                templateFilename = templateFilename.replace("SMSDeliveryReport.jasper","SMSDeliveryReportStatus.jasper");
+                jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
+            }
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
                 return new SMSDeliveryReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
@@ -185,10 +194,11 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 CalendarUtils.truncateToDayOfMonth(cal);
 
                 isActiveState = Boolean.valueOf(reportProperties.getProperty(IS_ACTIVE_STATE, "false"));
+                moreThanTwoMinutes = Boolean.valueOf(reportProperties.getProperty(MORE_THAN_TWO_MINUTES, "false"));
 
                 findConsolidated(items, session, start, end);
                 findExternal(items, session, start, end);
-                findOrgData(items, session);
+                findOrgData(items, session, moreThanTwoMinutes);
                 findEmptyRows(items);
 
                 return items;
@@ -535,9 +545,12 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                         }
                     }
                     boolean exists = mathcedItem != null;
-                    mathcedItem = calcSmsDeliveryitem(entryListByOrg, mathcedItem, exists ? null : items.size() + 1);
-                    if(!exists) {
-                        items.add(mathcedItem);
+                    if (moreThanTwoMinutes) {
+                        mathcedItem = calcSmsDeliveryitem(entryListByOrg, mathcedItem,
+                                exists ? null : items.size() + 1);
+                        if (!exists) {
+                            items.add(mathcedItem);
+                        }
                     }
                 }
             }
@@ -620,16 +633,18 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             return res;
         }
 
-        private void findOrgData(List<SMSDeliveryReportItem> items, Session session) {
+        private void findOrgData(List<SMSDeliveryReportItem> items, Session session, boolean moreThanTwoMinutes) {
             for(SMSDeliveryReportItem reportItem : items) {
                 Long orgId = reportItem.getOrgId();
                 Org org = (Org) session.get(Org.class, orgId);
                 reportItem.setDistrict(org.getDistrict());
                 reportItem.setShortNameInfoService(org.getShortNameInfoService());
                 reportItem.setShortAddress(org.getShortAddress());
-                reportItem.setIntroductionQueue(org.getIntroductionQueue());
-                //reportItem.setOrgStatus(org.getStatus().toString());
-                reportItem.setOrgStatus(Org.STATE_NAMES[org.getState()]);
+                if (moreThanTwoMinutes) {
+                    reportItem.setIntroductionQueue(org.getIntroductionQueue());
+                    //reportItem.setOrgStatus(org.getStatus().toString());
+                    reportItem.setOrgStatus(Org.STATE_NAMES[org.getState()]);
+                }
             }
         }
 

@@ -53,6 +53,7 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(SmsDeliveryReportPage.class);
     private SMSDeliveryReport report;
     private Boolean isActiveState = true;
+    private Boolean moreThanTwoMinutes = true;
 
     public SmsDeliveryReportPage() throws RuntimeContext.NotInitializedException {
         super();
@@ -104,6 +105,7 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
         this.report = new SMSDeliveryReport ();
         SMSDeliveryReport.Builder reportBuilder = new SMSDeliveryReport.Builder(printer);
         addStateFilter(reportBuilder);
+        addMoreThanTwoMinutesFilter(reportBuilder);
         addOrgFilter(reportBuilder);
 
         try {
@@ -131,6 +133,11 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
     protected void addStateFilter(SMSDeliveryReport.Builder builder) {
         Properties properties = builder.getReportProperties();
         properties.setProperty(SMSDeliveryReport.IS_ACTIVE_STATE, Boolean.toString(isActiveState));
+    }
+
+    protected void addMoreThanTwoMinutesFilter(SMSDeliveryReport.Builder builder) {
+        Properties properties = builder.getReportProperties();
+        properties.setProperty(SMSDeliveryReport.MORE_THAN_TWO_MINUTES, Boolean.toString(moreThanTwoMinutes));
     }
 
 
@@ -165,10 +172,20 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
         }
         try {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-            String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
+            String templateFilename;
+            if (moreThanTwoMinutes) {
+                templateFilename =
+                        autoReportGenerator.getReportsTemplateFilePath() + SMSDeliveryReport.class.getSimpleName() + ".jasper";
+            } else {
+                templateFilename =
+                        autoReportGenerator.getReportsTemplateFilePath() + "SMSDeliveryReportStatus" + ".jasper";
+            }
+
             SMSDeliveryReport.Builder builder = new SMSDeliveryReport.Builder(templateFilename);
+
             addOrgFilter(builder);
             addStateFilter(builder);
+            addMoreThanTwoMinutesFilter(builder);
             /*if(idOfOrg != null) {
                 builder.setOrg(new BasicReportJob.OrgShortItem(idOfOrg, filter, filter));
             }*/
@@ -220,5 +237,14 @@ public class SmsDeliveryReportPage extends OnlineReportPage {
 
     public void setIsActiveState(Boolean activeState) {
         isActiveState = activeState;
+    }
+
+
+    public Boolean getMoreThanTwoMinutes() {
+        return moreThanTwoMinutes;
+    }
+
+    public void setMoreThanTwoMinutes(Boolean moreThanTwoMinutes) {
+        this.moreThanTwoMinutes = moreThanTwoMinutes;
     }
 }

@@ -47,6 +47,10 @@
         <h:selectBooleanCheckbox value="#{smsDeliveryReportPage.isActiveState}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
+        <h:outputText escape="false" value="Время без обмена более 2 минут" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{smsDeliveryReportPage.moreThanTwoMinutes}" styleClass="output-text">
+        </h:selectBooleanCheckbox>
+
         <a4j:commandButton value="Генерировать отчет" action="#{smsDeliveryReportPage.buildReport}"
                            reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
