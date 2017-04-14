@@ -60,8 +60,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
 
     @Override
     public void onShow() throws Exception {
-        selectedConfigurationProviderGroupPage.show();
-        currentConfigurationProvider = selectedConfigurationProviderGroupPage.getSelectConfigurationProvider();
+        currentConfigurationProvider = service.reload(selectedConfigurationProviderGroupPage.getSelectConfigurationProvider());
         StringBuilder stringBuilder = new StringBuilder();
         MainPage mainPage = MainPage.getSessionInstance();
         mainPage.setOrgFilterOfSelectOrgListSelectPage("");

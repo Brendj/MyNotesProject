@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -17,6 +16,8 @@ import java.util.*;
 public class ConfigurationProvider {
     private Long idOfConfigurationProvider;
     private String name;
+    private Integer menuSyncCountDays;
+    private Long version;
     //private Set products;
     /* Пользователь бэк-оффиса котрый создал изменил конфигурацию */
     private User userCreate;
@@ -70,14 +71,6 @@ public class ConfigurationProvider {
     public void setName(String name) {
         this.name = name;
     }
-
-    //public Set getProducts() {
-    //    return products;
-    //}
-    //
-    //public void setProducts(Set products) {
-    //    this.products = products;
-    //}
 
     public Date getCreatedDate() {
         return createdDate;
@@ -137,5 +130,21 @@ public class ConfigurationProvider {
         int result = idOfConfigurationProvider.hashCode();
         result = 31 * result + name.hashCode();
         return result;
+    }
+
+    public Integer getMenuSyncCountDays() {
+        return menuSyncCountDays;
+    }
+
+    public void setMenuSyncCountDays(Integer menuSyncCountDays) {
+        this.menuSyncCountDays = menuSyncCountDays;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.menu;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 /**
@@ -19,6 +20,10 @@ public class MenuViewPage extends BasicWorkspacePage {
 
     public static Long getIdOfOrg() {
         return idOfOrg;
+    }
+
+    public static Integer getMenuDays() {
+        return DAOReadonlyService.getInstance().getMenuCountDays(idOfOrg);
     }
 
     public static void setIdOfOrg(Long idOfOrg) {

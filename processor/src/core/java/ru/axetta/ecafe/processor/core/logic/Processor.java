@@ -433,7 +433,9 @@ public class Processor implements SyncProcessor {
         }
 
         try {
-            organizationComplexesStructure = getOrganizationComplexesStructureData(request.getOrg());
+            final OrganizationComplexesStructureRequest organizationComplexesStructureRequest = request.getOrganizationComplexesStructureRequest();
+            organizationComplexesStructure = getOrganizationComplexesStructureData(request.getOrg(),
+                    organizationComplexesStructureRequest.getMaxVersion(), organizationComplexesStructureRequest.getMenuSyncCountDays());
         } catch (Exception e) {
             String message = String
                     .format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
@@ -1236,8 +1238,9 @@ public class Processor implements SyncProcessor {
 
         OrganizationComplexesStructure organizationComplexesStructure=null;
         try {
-            organizationComplexesStructure = getOrganizationComplexesStructureData(
-                    request.getOrg());
+            final OrganizationComplexesStructureRequest organizationComplexesStructureRequest = request.getOrganizationComplexesStructureRequest();
+            organizationComplexesStructure = getOrganizationComplexesStructureData(request.getOrg(),
+                    organizationComplexesStructureRequest.getMaxVersion(), organizationComplexesStructureRequest.getMenuSyncCountDays());
         } catch (Exception e) {
             String message = String
                     .format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
@@ -4209,14 +4212,14 @@ public class Processor implements SyncProcessor {
         return infoMessageData;
     }
 
-    private OrganizationComplexesStructure getOrganizationComplexesStructureData(Org org) throws Exception {
+    private OrganizationComplexesStructure getOrganizationComplexesStructureData(Org org, Long maxVersion, Integer menuSyncCountDays) throws Exception {
         OrganizationComplexesStructure organizationComplexesStructure = new OrganizationComplexesStructure();
         Session session = null;
         Transaction transaction = null;
         try {
             session = persistenceSessionFactory.openSession();
             transaction = session.beginTransaction();
-            organizationComplexesStructure.fillComplexesStructure(session, org.getIdOfOrg());
+            organizationComplexesStructure.fillComplexesStructureAndApplyChanges(session, org.getIdOfOrg(), maxVersion, menuSyncCountDays);
             transaction.commit();
             transaction = null;
         } finally {

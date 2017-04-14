@@ -15,6 +15,13 @@ import org.w3c.dom.Node;
 public class OrganizationComplexesStructureRequest implements SectionRequest {
 
     public static final String SECTION_NAME = "OrganizationComplexesStructureRequest";
+    private final Long maxVersion;
+    private final Integer menuSyncCountDays;
+
+    private OrganizationComplexesStructureRequest(Long maxVersion, Integer menuSyncCountDays) {
+        this.maxVersion = maxVersion;
+        this.menuSyncCountDays = menuSyncCountDays;
+    }
 
     @Override
     public String getRequestSectionName() {
@@ -24,6 +31,14 @@ public class OrganizationComplexesStructureRequest implements SectionRequest {
     @Override
     public String toString() {
         return getRequestSectionName();
+    }
+
+    public Long getMaxVersion() {
+        return maxVersion;
+    }
+
+    public Integer getMenuSyncCountDays() {
+        return menuSyncCountDays;
     }
 
     public static class Builder implements SectionRequestBuilder {
@@ -37,7 +52,9 @@ public class OrganizationComplexesStructureRequest implements SectionRequest {
         public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
             Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
             if (sectionElement != null) {
-                return new OrganizationComplexesStructureRequest();
+                Long maxVersion = XMLUtils.getLongAttributeValue(sectionElement, "V");
+                Integer menuSyncCountDays = XMLUtils.getIntegerAttributeValue(sectionElement, "menuSyncCountDays");
+                return new OrganizationComplexesStructureRequest(maxVersion, menuSyncCountDays);
             } else
                 return null;
         }

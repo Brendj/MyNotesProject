@@ -24,6 +24,7 @@
 <%@ page import="org.hibernate.Criteria" %>
 <%@ page import="org.hibernate.Session" %>
 <%@ page import="org.hibernate.Transaction" %>
+<%@ page import="org.hibernate.criterion.Order" %>
 <%@ page import="org.hibernate.criterion.Restrictions" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
@@ -100,7 +101,8 @@
         Date afterTomorrowDate = DateUtils.addDays(tomorrowDate, 1);
         utcCalendar.set(Calendar.DAY_OF_WEEK, utcCalendar.getFirstDayOfWeek());
         Date thisWeekStartDate = utcCalendar.getTime();
-        Date thisWeekEndDate = DateUtils.addDays(DateUtils.addWeeks(thisWeekStartDate, 1), -1);
+        Date thisWeekEndDate = MenuViewPage.getMenuDays() == null ? DateUtils.addDays(DateUtils.addWeeks(thisWeekStartDate, 1), -1)
+                : DateUtils.addDays(thisWeekStartDate, MenuViewPage.getMenuDays());
         Date nextWeekStartDate = DateUtils.addWeeks(thisWeekStartDate, 1);
         Date nextWeekEndDate = DateUtils.addDays(DateUtils.addWeeks(nextWeekStartDate, 1), -1);
         Date prevWeekStartDate = DateUtils.addWeeks(thisWeekStartDate, -1);
@@ -390,6 +392,7 @@
                 menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
                 menuCriteria.add(Restrictions.ge("menuDate", startDate));
                 menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
+                menuCriteria.addOrder(Order.asc("menuDate"));
 
                 List menus = menuCriteria.list();
                 for (Object currObject : menus) {
@@ -514,6 +517,7 @@
             complexInfoCriteria.add(Restrictions.eq("org.idOfOrg", MenuViewPage.getIdOfOrg()));
             complexInfoCriteria.add(Restrictions.ge("menuDate", startDate));
             complexInfoCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 2)));
+            complexInfoCriteria.addOrder(Order.asc("menuDate"));
             //  complexInfoCriteria.add(Restrictions.lt("menuDate", endDate));
 
             // HibernateUtils.addAscOrder(complexInfoCriteria,"menuDate");

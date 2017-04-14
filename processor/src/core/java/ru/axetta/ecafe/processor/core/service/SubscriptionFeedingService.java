@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeedingType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
@@ -451,23 +452,28 @@ public class SubscriptionFeedingService {
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму, действующую в определенный день.
-    public List<CycleDiagram> findCycleDiagramsByClient(Client client) {
+    public List<CycleDiagram> findCycleDiagramsByClient(Client client, Integer type) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(CycleDiagram.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}));
+        if (type != null) {
+            criteria.add(Restrictions.eq("feedingType", SubscriptionFeedingType.fromInteger(type)));
+        }
         return criteria.list();
     }
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму, действующую в определенный день.
-    public List<CycleDiagram> findCycleDiagramsByClient(Client client, Date startDate, Date endDate) {
+    public List<CycleDiagram> findCycleDiagramsByClient(Client client, Date startDate, Date endDate, Integer type) {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(CycleDiagram.class);
         criteria.add(Restrictions.eq("client", client));
-        //criteria.add(Restrictions.eq("deletedState", false));
+        if (type != null) {
+            criteria.add(Restrictions.eq("feedingType", SubscriptionFeedingType.fromInteger(type)));
+        }
         criteria.add(Restrictions.or(
                 Restrictions.between("createdDate", startDate, endDate),
                 Restrictions.between("lastUpdate", startDate, endDate)

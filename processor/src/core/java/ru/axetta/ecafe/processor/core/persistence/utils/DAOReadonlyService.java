@@ -99,6 +99,15 @@ public class DAOReadonlyService {
         return org;
     }
 
+    public Integer getMenuCountDays(Long idOfOrg) {
+        try {
+            Org org = entityManager.find(Org.class, idOfOrg);
+            return org.getConfigurationProvider().getMenuSyncCountDays();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public List<Long> getClientsIdsWhereHasEnterEvents(long idOfOrg, Date beginDate, Date endDate) {
         Session session = entityManager.unwrap(Session.class);
         SQLQuery query = session.createSQLQuery(" SELECT ee.idofclient " +

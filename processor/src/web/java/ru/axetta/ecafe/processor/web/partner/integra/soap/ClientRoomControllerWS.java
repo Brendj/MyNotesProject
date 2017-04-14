@@ -68,7 +68,6 @@ import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -189,7 +188,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_GUARDIAN_NOT_FOUND_DESC = "Связка клиент-представитель не найдена";
     private static final String RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC = "Подписку на вариативное питание приостановить нельзя";
     private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один вариант комплекса каждого вида рациона (завтрак, обед)";
-    private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы";
+    private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы в пределах недели";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -6222,18 +6221,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "contractId") Long contractId) {
+    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "type") Integer type) {
         authenticateRequest(contractId);
-        return findComplexesWithSubFeeding(contractId, null);
+        return findComplexesWithSubFeeding(contractId, null, type);
     }
 
     @Override
-    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "san") String san) {
+    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "san") String san,
+            @WebParam(name = "type") Integer type) {
         authenticateRequest(null);
-        return findComplexesWithSubFeeding(null, san);
+        return findComplexesWithSubFeeding(null, san, type);
     }
 
-    public ComplexInfoResult findComplexesWithSubFeeding(Long contractId, String san) {
+    public ComplexInfoResult findComplexesWithSubFeeding(Long contractId, String san, Integer type) {
         Session session = null;
         Transaction transaction = null;
         ComplexInfoResult result = new ComplexInfoResult();
@@ -6249,10 +6250,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             final String groupName = client.getClientGroup().getGroupName();
             final boolean isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES
                   || ClientGroup.predefinedGroupNames().contains(groupName);
-            boolean vp = false;
+            boolean vp = (type == null ? false : type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal()));
+            /*boolean vp = false;
             if (ArrayUtils.contains(getVPOrgsList(), org.getIdOfOrg())) {
                 vp = true;
-            }
+            }*/
             List<ComplexInfo> complexInfoList = DAOReadExternalsService.getInstance().findComplexesWithSubFeeding(org, isParent, vp);
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
@@ -6706,19 +6708,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
+          @WebParam(name = "type") Integer type) {
         authenticateRequest(contractId);
-        return getCycleDiagramHistoryList(contractId, null, startDate, endDate);
+        return getCycleDiagramHistoryList(contractId, null, startDate, endDate, type);
     }
 
     @Override
     public CycleDiagramList getCycleDiagramHistoryList(@WebParam(name = "san") String san,
-          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+          @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
+          @WebParam(name = "type") Integer type) {
         authenticateRequest(null);
-        return getCycleDiagramHistoryList(null, san, startDate, endDate);
+        return getCycleDiagramHistoryList(null, san, startDate, endDate, type);
     }
 
-    private CycleDiagramList getCycleDiagramHistoryList(Long contractId, String san, Date startDate, Date endDate) {
+    private CycleDiagramList getCycleDiagramHistoryList(Long contractId, String san, Date startDate, Date endDate, Integer type) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramList result = new CycleDiagramList();
@@ -6732,7 +6736,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
-            List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client, startDate, endDate);
+            List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client, startDate, endDate, type);
             for (CycleDiagram cycleDiagram : cycleDiagrams) {
                 result.cycleDiagramListExt.getC().add(new CycleDiagramOut(cycleDiagram));
             }
@@ -6751,18 +6755,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId) {
+    public CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "type") Integer type) {
         authenticateRequest(contractId);
-        return getCycleDiagramList(contractId, null);
+        return getCycleDiagramList(contractId, null, type);
     }
 
     @Override
-    public CycleDiagramList getCycleDiagramList(@WebParam(name = "san") String san) {
+    public CycleDiagramList getCycleDiagramList(@WebParam(name = "san") String san,
+            @WebParam(name = "type") Integer type) {
         authenticateRequest(null);
-        return getCycleDiagramList(null, san);
+        return getCycleDiagramList(null, san, type);
     }
 
-    private CycleDiagramList getCycleDiagramList(Long contractId, String san) {
+    private CycleDiagramList getCycleDiagramList(Long contractId, String san, Integer type) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramList result = new CycleDiagramList();
@@ -6777,7 +6783,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             transaction.commit();
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
-            List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client);
+            List<CycleDiagram> cycleDiagrams = service.findCycleDiagramsByClient(client, type);
             for (CycleDiagram cycleDiagram : cycleDiagrams) {
                 result.cycleDiagramListExt.getC().add(new CycleDiagramOut(cycleDiagram));
             }
@@ -7257,19 +7263,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result putCycleDiagram(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram, @WebParam(name = "type") Integer type) {
         authenticateRequest(contractId);
-        return putCycleDiagram(contractId, null, cycleDiagram);
+        return putCycleDiagram(contractId, null, cycleDiagram, type);
     }
 
     @Override
     public Result putCycleDiagram(@WebParam(name = "san") String san,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram) {
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram, @WebParam(name = "type") Integer type) {
         authenticateRequest(null);
-        return putCycleDiagram(null, san, cycleDiagram);
+        return putCycleDiagram(null, san, cycleDiagram, type);
     }
 
-    private Result putCycleDiagram(Long contractId, String san, CycleDiagramExt cycleDiagram) {
+    private Result putCycleDiagram(Long contractId, String san, CycleDiagramExt cycleDiagram, Integer type) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
@@ -7318,10 +7324,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             criteria.add(Restrictions.eq("dateActivationDiagram", cycleDiagram.getDateActivationDiagram()));
             List list = criteria.list();
             SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
-            boolean vp = false;
+            boolean vp = (type == null ? false : type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal()));
+            /* boolean vp = false;
             if (ArrayUtils.contains(getVPOrgsList(), clientOrg.getIdOfOrg())) {
                 vp = true;
-            }
+            }*/
             if (vp) {
                 boolean sixWorkWeek = parser.isSixWorkWeek();
                 if (!allDaysWithData(sixWorkWeek, cycleDiagram)) {
@@ -7330,12 +7337,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return result;
                 }
                 boolean allOk = true;
-                String complexesByDay;
+                String complexesByDayOfWeek;
                 for (int i = 1; i < 8; i++) {
-                    complexesByDay = getCycleDiagramValueByDayOfWeek(i, cycleDiagram);
-                    if (complexesByDay == null) continue;
-                    allOk = allowCreateCycleDiagramByComplexesInDay(complexesByDay, sfService, clientOrg,
-                            cycleDiagram.getDateActivationDiagram());
+                    complexesByDayOfWeek = getCycleDiagramValueByDayOfWeek(i, cycleDiagram);
+                    if (complexesByDayOfWeek == null) continue;
+                    String[] complexesByDayArray = complexesByDayOfWeek.split("\\|"); // разделитель в виде верт. черты - несколько недель
+                    for (String complexesByDay : complexesByDayArray) {
+                        allOk = allowCreateCycleDiagramByComplexesInDay(complexesByDay, sfService, clientOrg,
+                                cycleDiagram.getDateActivationDiagram()); //для каждой недели проверка на допустимое сочетание комплексов
+                        if (!allOk)
+                            break;
+                    }
                     if (!allOk) break;
                 }
                 if (!allOk) {
@@ -7422,9 +7434,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private boolean allDaysWithData(boolean sixWorkWeek, CycleDiagramExt cycleDiagram) {
+        int countInMonday = countSubstring(cycleDiagram.getMonday(), '|');
         return !(StringUtils.isEmpty(cycleDiagram.getMonday()) || StringUtils.isEmpty(cycleDiagram.getTuesday())
                 || StringUtils.isEmpty(cycleDiagram.getWednesday()) || StringUtils.isEmpty(cycleDiagram.getThursday())
-                || StringUtils.isEmpty(cycleDiagram.getFriday()) || (StringUtils.isEmpty(cycleDiagram.getSaturday()) && sixWorkWeek));
+                || StringUtils.isEmpty(cycleDiagram.getFriday()) || (StringUtils.isEmpty(cycleDiagram.getSaturday()) && sixWorkWeek))
+                &&
+                (countInMonday == countSubstring(cycleDiagram.getTuesday(), '|')
+                && countInMonday == countSubstring(cycleDiagram.getWednesday(), '|')
+                && countInMonday == countSubstring(cycleDiagram.getThursday(), '|')
+                && countInMonday == countSubstring(cycleDiagram.getFriday(), '|')
+                && (sixWorkWeek ? countInMonday == countSubstring(cycleDiagram.getSaturday(), '|') : true));
+    }
+
+    private int countSubstring(String source, char search) {
+        int result = 0;
+        try {
+            for (char ch : source.toCharArray()) {
+                if (search == ch)
+                    result++;
+            }
+        } catch(Exception ignore) {
+            return 0;
+        }
+        return result;
     }
 
     private String getCycleDiagramValueByDayOfWeek(int day, CycleDiagramExt cycleDiagram) {

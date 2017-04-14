@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -34,6 +35,13 @@ public class ConfigurationProviderService {
 
     @Transactional(rollbackFor = Exception.class)
     public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser, List<Long> idOfOrgList) throws Exception{
+        if (configurationProvider.getMenuSyncCountDays() != null && configurationProvider.getMenuSyncCountDays().equals(0)) {
+            configurationProvider.setMenuSyncCountDays(null);
+        }
+        if (configurationProvider.getMenuSyncCountDays() != null &&
+                (configurationProvider.getMenuSyncCountDays() < 7 || configurationProvider.getMenuSyncCountDays() > 31)) {
+            throw new Exception("Значение количества дней для выгрузки меню должно находиться в пределах 7 - 31 дней");
+        }
         ConfigurationProvider cp;
         if(configurationProvider.getIdOfConfigurationProvider()!=null){
             cp = entityManager.find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
@@ -45,6 +53,8 @@ public class ConfigurationProviderService {
         cp.setLastUpdate(new Date());
         cp.setUserEdit(currentUser);
         cp.setName(configurationProvider.getName());
+        cp.setMenuSyncCountDays(configurationProvider.getMenuSyncCountDays());
+        cp.setVersion(DAOUtils.nextVersionByConfigurationProvider(entityManager.unwrap(Session.class)));
 
 
         if(idOfOrgList!=null && !idOfOrgList.isEmpty()){
@@ -100,9 +110,10 @@ public class ConfigurationProviderService {
     }
 
     public ConfigurationProvider reload(ConfigurationProvider currentConfigurationProvider) {
-        currentConfigurationProvider = entityManager.merge(currentConfigurationProvider);
+        return entityManager.find(ConfigurationProvider.class, currentConfigurationProvider.getIdOfConfigurationProvider());
+        /*currentConfigurationProvider = entityManager.merge(currentConfigurationProvider);
         currentConfigurationProvider.getOrgs(); // Lazy load
-        return currentConfigurationProvider;
+        return currentConfigurationProvider;*/
     }
 
     @Transactional(readOnly = true)
@@ -143,6 +154,11 @@ public class ConfigurationProviderService {
     /* Public Static methods */
     public static ConfigurationProvider loadConfigurationProvider(Session session, Long idOfConfigurationProvider){
         return (ConfigurationProvider) session.load(ConfigurationProvider.class, idOfConfigurationProvider);
+    }
+
+    public static void updateWithVersion(Session session, ConfigurationProvider provider) {
+        provider.setVersion(DAOUtils.nextVersionByConfigurationProvider(session));
+        session.update(provider);
     }
 
     @SuppressWarnings("unchecked")

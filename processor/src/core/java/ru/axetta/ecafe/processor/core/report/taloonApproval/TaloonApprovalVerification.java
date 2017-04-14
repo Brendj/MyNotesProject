@@ -62,7 +62,7 @@ public class TaloonApprovalVerification {
                                 taloon.getSoldedQty(), taloon.getRequestedQty(), taloon.getShippedQty(), taloon.getPrice(),
                                 (taloon.getPrice() == null || taloon.getSoldedQty() == null) ? 0 : taloon.getPrice() * taloon.getSoldedQty(),
                                 taloon.getIsppState(),
-                                taloon.getPpState(), taloon.getIdOfOrg(), d, false, taloon.getGoodsGuid());
+                                taloon.getPpState(), taloon.getIdOfOrg(), d, false, taloon.getGoodsGuid(), taloon.getRemarks());
 
                 sdRequestedQty += taloon.getRequestedQty() == null ? 0 : taloon.getRequestedQty();
                 sdSoldedQty += taloon.getSoldedQty() == null ? 0 : taloon.getSoldedQty();
@@ -74,7 +74,7 @@ public class TaloonApprovalVerification {
             TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
                     new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Всего", null,
                             sdSoldedQty, sdRequestedQty, sdShippedQty, null,
-                            sdSumma, null, null, null, d, true, null);
+                            sdSumma, null, null, null, d, true, null, null);
             item.getDetails().add(detail);
             tdRequestedQty += sdRequestedQty;
             tdShippedQty += sdShippedQty;
@@ -88,7 +88,7 @@ public class TaloonApprovalVerification {
         TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail =
                 new TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail("Итого", null,
                         tdSoldedQty, tdRequestedQty, tdShippedQty, null,
-                        tdSumma, null, null, null, null, true, null);
+                        tdSumma, null, null, null, null, true, null, null);
         item.getDetails().add(detail);
         items.add(item);
 
@@ -109,15 +109,25 @@ public class TaloonApprovalVerification {
                 Long price = detail.getPrice();
                 TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid, price);
                 if (taloon != null) {
-                    taloon.setShippedQty(detail.getShippedQty());
-                    taloon.setPpState(detail.getPpState());
-                    Long nextVersion = DAOUtils.nextVersionByTaloonApproval(session);
-                    taloon.setVersion(nextVersion);
-                    session.update(taloon);
+                    if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) || !taloon.getPpState().equals(detail.getPpState())) {
+                        taloon.setRemarks(taloon.getRemarks().concat("\n").concat(String.format("Изменено в веб-приложении, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
+                                DAOReadonlyService.getInstance().getUserFromSession(), new Date())));
+                        taloon.setShippedQty(detail.getShippedQty());
+                        taloon.setPpState(detail.getPpState());
+                        Long nextVersion = DAOUtils.nextVersionByTaloonApproval(session);
+                        taloon.setVersion(nextVersion);
+                        session.update(taloon);
+                    }
                 }
             }
         }
         session.flush();
+    }
+
+    private boolean itemChangedNullSafe(Integer fromDB, Integer fromApp) {
+        Integer fromDB1 = (fromDB == null ? 0 : fromDB);
+        Integer fromApp1 = (fromApp == null ? 0 : fromApp);
+        return !fromDB1.equals(fromApp1);
     }
 
 }

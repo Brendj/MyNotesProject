@@ -35,6 +35,7 @@ public class TaloonApproval {
     private Long version;
     private Boolean deletedState;
     private String goodsName;
+    private String remarks;
 
     public TaloonApproval() {
         //for Hibernate only
@@ -230,5 +231,13 @@ public class TaloonApproval {
 
     public void setGoodsGuid(String goodsGuid) {
         this.goodsGuid = goodsGuid;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

@@ -12,21 +12,13 @@
         </id>
 
         <property name="name" column="NameOfConfigurationProvider" type="string" length="64" not-null="true"/>
+        <property name="menuSyncCountDays" column="MenuSyncCountDays" type="integer"/>
+        <property name="version" column="Version" type="long" not-null="true"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <!--<property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>-->
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
-        <!--<many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />-->
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
-
-
-       <!-- <set name="products" lazy="true" cascade="all">
-            <key>
-                <column name="idofconfigurationprovider"/>
-            </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product"/>
-        </set>-->
 
         <set name="orgInternal" lazy="true" cascade="all">
             <key>

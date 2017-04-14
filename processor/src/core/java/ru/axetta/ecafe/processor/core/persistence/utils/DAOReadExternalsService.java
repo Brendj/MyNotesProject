@@ -229,7 +229,9 @@ public class DAOReadExternalsService {
                     + " and ci.idOfComplex in :idOfComplex";
         }
         Date endDate = today;
-        endDate = CalendarUtils.addDays(endDate, 7);
+        Integer addDays = org.getConfigurationProvider().getMenuSyncCountDays();
+        if (addDays == null) addDays = 7;
+        endDate = CalendarUtils.addDays(endDate, addDays);
         TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
                 ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
                 .setParameter("endDate", endDate).setParameter("idOfComplex", idOfComplex);

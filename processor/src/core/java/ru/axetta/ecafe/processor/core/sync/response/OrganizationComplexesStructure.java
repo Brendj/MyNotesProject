@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.response;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -55,7 +56,7 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         return element;
     }
 
-    public void fillComplexesStructure(Session session, Long idOfOrg) {
+    public void fillComplexesStructureAndApplyChanges(Session session, Long idOfOrg, Long maxVersion, Integer menuSyncCountDays) {
         providerComplexesList.clear();
         Org org = (Org) session.load(Org.class, idOfOrg);
         Set<Org> friendlyOrgs = org.getFriendlyOrg();
@@ -64,6 +65,11 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         if (uniqueProviders.size() == 0)
             return;
         for (ConfigurationProvider configurationProvider : uniqueProviders) {
+            //здесь смотрим на версию и записываем menuSyncCountDays
+            if (maxVersion != null && maxVersion >= configurationProvider.getVersion()) {
+                configurationProvider.setMenuSyncCountDays(menuSyncCountDays);
+                ConfigurationProviderService.updateWithVersion(session, configurationProvider);
+            }
             ProviderComplexesItem providerComplexesItem = createProviderComplexesItem(session, friendlyOrgs,
                     configurationProvider);
             providerComplexesList.add(providerComplexesItem);
@@ -166,6 +172,8 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         private static final String PROVIDER_ELEMENT_NAME ="CFP";
         private static final String PROVIDER_ATTR_NAME="name";
         private static final String PROVIDER_ATTR_ID="id";
+        private static final String PROVIDER_ATTR_MENU_DAYS="menuSyncCountDays";
+        private static final String PROVIDER_ATTR_VERSION="V";
         private static final String PROVIDER_ATTR_ORGS="orgs";
         private static final String DATE_ELEMENT="Date";
         private static final String DATE_ATTR_VALUE="value";
@@ -186,6 +194,10 @@ public class OrganizationComplexesStructure implements AbstractToElement{
             Element element = document.createElement(PROVIDER_ELEMENT_NAME);
             element.setAttribute(PROVIDER_ATTR_NAME,configurationProvider.getName());
             element.setAttribute(PROVIDER_ATTR_ID,Long.toString(configurationProvider.getIdOfConfigurationProvider()));
+            if (configurationProvider.getMenuSyncCountDays() != null) {
+                element.setAttribute(PROVIDER_ATTR_MENU_DAYS, Integer.toString(configurationProvider.getMenuSyncCountDays()));
+            }
+            element.setAttribute(PROVIDER_ATTR_VERSION, Long.toString(configurationProvider.getVersion()));
             element.setAttribute(PROVIDER_ATTR_ORGS, StringUtils.join(getOrgIds(),','));
             for (Date date : complexesMap.keySet()) {
                 Element elementDate = document.createElement(DATE_ELEMENT);

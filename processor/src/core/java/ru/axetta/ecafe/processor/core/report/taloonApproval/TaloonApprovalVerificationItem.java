@@ -8,6 +8,8 @@ import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,12 +56,13 @@ public class TaloonApprovalVerificationItem {
         private Date taloonDate;
         private boolean summaryDay;
         private String goodsGuid;
+        private String remarks;
 
         public TaloonApprovalVerificationItemDetail() {}
 
         public TaloonApprovalVerificationItemDetail(String taloonName, Long idOfOrgCreated, Integer soldedQty, Integer requestedQty,
                 Integer shippedQty, Long price, Long summa, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-                Long idOfOrg, Date taloonDate, boolean summaryDay, String goodsGuid) {
+                Long idOfOrg, Date taloonDate, boolean summaryDay, String goodsGuid, String remarks) {
             this.setTaloonName(taloonName);
             this.setIdOfOrgCreated(idOfOrgCreated);
             this.setRequestedQty(requestedQty);
@@ -73,6 +76,7 @@ public class TaloonApprovalVerificationItem {
             this.setTaloonDate(taloonDate);
             this.setSummaryDay(summaryDay);
             this.setGoodsGuid(goodsGuid);
+            this.setRemarks(remarks);
         }
 
         public String getTaloonName() {
@@ -327,6 +331,18 @@ public class TaloonApprovalVerificationItem {
 
         public void setGoodsGuid(String goodsGuid) {
             this.goodsGuid = goodsGuid;
+        }
+
+        public String getRemarks() {
+            return remarks;
+        }
+
+        public void setRemarks(String remarks) {
+            this.remarks = remarks;
+        }
+
+        public Boolean getRemarksEmpty() {
+            return StringUtils.isEmpty(remarks);
         }
     }
 

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding;
 
+import java.util.HashMap;
+
 /**
  * Created with IntelliJ IDEA.
  * User: i.semenov
@@ -16,6 +18,17 @@ public enum SubscriptionFeedingType {
     VARIABLE_TYPE("Вариативное льготное питание");
 
     private String description;
+
+    static HashMap<Integer, SubscriptionFeedingType> subscriptionFeedingHashMap = new HashMap<Integer, SubscriptionFeedingType>();
+    static {
+        for (SubscriptionFeedingType subscriptionFeeding: SubscriptionFeedingType.values()){
+            subscriptionFeedingHashMap.put(subscriptionFeeding.ordinal(), subscriptionFeeding);
+        }
+    }
+
+    public static SubscriptionFeedingType fromInteger(int value){
+        return subscriptionFeedingHashMap.get(value);
+    }
 
     private SubscriptionFeedingType(String description) {
         this.description = description;

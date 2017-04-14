@@ -2713,6 +2713,10 @@ public class SyncRequest {
         return this.<ProhibitionMenuRequest>findSection(ProhibitionMenuRequest.class);
     }
 
+    public OrganizationComplexesStructureRequest getOrganizationComplexesStructureRequest() {
+        return this.<OrganizationComplexesStructureRequest>findSection(OrganizationComplexesStructureRequest.class);
+    }
+
     public OrganizationStructureRequest getOrganizationStructureRequest() {
         return this.<OrganizationStructureRequest>findSection(OrganizationStructureRequest.class);
     }

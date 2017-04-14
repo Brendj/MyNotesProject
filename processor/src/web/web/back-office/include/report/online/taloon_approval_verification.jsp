@@ -99,6 +99,9 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Статус ПП - отказ" />
                 </rich:column>
+                <rich:column>
+                    <h:outputText escape="true" value="История изменений"/>
+                </rich:column>
             </rich:columnGroup>
         </f:facet>
         <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey"
@@ -191,6 +194,11 @@
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/canceled.png" />
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column>
+                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{!detail.remarksEmpty}" onclick="alert('#{detail.remarks}'); return false;">
+                    <h:outputText title="#{detail.remarks}">...</h:outputText>
                 </a4j:commandLink>
             </rich:column>
         </rich:subTable>

@@ -75,6 +75,9 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     if (taloon == null) {
                         taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
                                 isppState, ppState, goodsName);
+                        taloon.setRemarks(String.format("Создано в синхронизации с orgId=%s, %2$td.%2$tm.%2$tY %2$tT", item.getOrgOwnerId(), new Date()));
+                    } else {
+                        taloon.setRemarks(taloon.getRemarks().concat("\n").concat(String.format("Изменено в синхронизации с orgId=%s, %2$td.%2$tm.%2$tY %2$tT", item.getOrgOwnerId(), new Date())));
                     }
                     taloon.setSoldedQty(soldedQty);
                     taloon.setRequestedQty(requestedQty);

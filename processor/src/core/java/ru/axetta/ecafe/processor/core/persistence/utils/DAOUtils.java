@@ -2321,6 +2321,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByConfigurationProvider(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select max(prov.version) from cf_provider_configurations as prov");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByTaloonApproval(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select t.version from cf_taloon_approval as t order by t.version desc limit 1 for update");
