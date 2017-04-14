@@ -25,7 +25,14 @@
 
 <h:panelGrid id="taloonApprovalVerificationPanelGrid" binding="#{mainPage.taloonApprovalVerificationPage.pageComponent}"
              styleClass="borderless-grid">
-
+    <rich:modalPanel id="taloonApprovalMessagePanel" autosized="true" minWidth="400">
+        <f:facet name="header">
+            <h:outputText value="История изменений записи" />
+        </f:facet>
+        <h:inputTextarea value="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow"/>
+        <rich:spacer height="20px" />
+        <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('taloonApprovalMessagePanel')" style="width: 180px;" ajaxSingle="true" />
+    </rich:modalPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup styleClass="borderless-div">
@@ -105,7 +112,8 @@
             </rich:columnGroup>
         </f:facet>
         <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey"
-                       columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+                       columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                       right-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
             <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}">
                 <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" />
             </rich:column>
@@ -197,9 +205,10 @@
                 </a4j:commandLink>
             </rich:column>
             <rich:column>
-                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{!detail.remarksEmpty}" onclick="alert('#{detail.remarks}'); return false;">
-                    <h:outputText title="#{detail.remarks}">...</h:outputText>
-                </a4j:commandLink>
+                <a4j:commandButton value="..." reRender="taloonApprovalVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}" ajaxSingle="true"
+                                   title="#{detail.remarks}" oncomplete="Richfaces.showModalPanel('taloonApprovalMessagePanel');">
+                    <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" />
+                </a4j:commandButton>
             </rich:column>
         </rich:subTable>
         <f:facet name="footer">

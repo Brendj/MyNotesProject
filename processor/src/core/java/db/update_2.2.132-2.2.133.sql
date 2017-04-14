@@ -9,4 +9,4 @@ alter table cf_provider_configurations add column menuSyncCountDays integer,
   add column version bigint not null default 0;
 
 --история изменений данных электронной сверки
-alter table cf_taloon_approval add column remarks character varying(1024);
+alter table cf_taloon_approval add column remarks text;

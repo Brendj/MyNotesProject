@@ -42,6 +42,7 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
     private TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail currentTaloonApprovalVerificationItemDetail;
     private TaloonApprovalVerificationItem currentTaloonApprovalVerificationItem;
     private String currentState;
+    private String remarksToShow;
 
     private static final Logger logger = LoggerFactory.getLogger(TaloonApprovalVerificationPage.class);
 
@@ -218,5 +219,13 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
     public void setCurrentTaloonApprovalVerificationItem(
             TaloonApprovalVerificationItem currentTaloonApprovalVerificationItem) {
         this.currentTaloonApprovalVerificationItem = currentTaloonApprovalVerificationItem;
+    }
+
+    public String getRemarksToShow() {
+        return remarksToShow;
+    }
+
+    public void setRemarksToShow(String remarksToShow) {
+        this.remarksToShow = remarksToShow;
     }
 }

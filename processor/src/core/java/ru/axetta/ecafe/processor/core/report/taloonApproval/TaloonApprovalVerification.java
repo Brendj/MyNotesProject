@@ -110,8 +110,9 @@ public class TaloonApprovalVerification {
                 TaloonApproval taloon = DAOReadonlyService.getInstance().findTaloonApproval(idOfOrg, taloonDate, taloonName, goodsGuid, price);
                 if (taloon != null) {
                     if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) || !taloon.getPpState().equals(detail.getPpState())) {
-                        taloon.setRemarks(taloon.getRemarks().concat("\n").concat(String.format("Изменено в веб-приложении, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
-                                DAOReadonlyService.getInstance().getUserFromSession(), new Date())));
+                        String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
+                        taloon.setRemarks(rem.concat("\n").concat(String.format("Изменено в веб-приложении, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
+                                DAOReadonlyService.getInstance().getUserFromSession().getUserName(), new Date())));
                         taloon.setShippedQty(detail.getShippedQty());
                         taloon.setPpState(detail.getPpState());
                         Long nextVersion = DAOUtils.nextVersionByTaloonApproval(session);
