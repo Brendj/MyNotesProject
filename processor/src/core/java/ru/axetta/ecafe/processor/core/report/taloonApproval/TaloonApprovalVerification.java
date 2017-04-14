@@ -111,7 +111,7 @@ public class TaloonApprovalVerification {
                 if (taloon != null) {
                     if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) || !taloon.getPpState().equals(detail.getPpState())) {
                         String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
-                        taloon.setRemarks(rem.concat("\n").concat(String.format("Изменено в веб-приложении, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
+                        taloon.setRemarks(rem.concat("\n").concat(String.format("Изменено в АРМ отчетности, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
                                 DAOReadonlyService.getInstance().getUserFromSession().getUserName(), new Date())));
                         taloon.setShippedQty(detail.getShippedQty());
                         taloon.setPpState(detail.getPpState());

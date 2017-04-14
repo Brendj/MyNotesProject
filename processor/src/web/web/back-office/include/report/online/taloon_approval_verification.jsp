@@ -29,7 +29,7 @@
         <f:facet name="header">
             <h:outputText value="История изменений записи" />
         </f:facet>
-        <h:inputTextarea value="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow"/>
+        <h:inputTextarea value="#{mainPage.taloonApprovalVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
         <rich:spacer height="20px" />
         <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('taloonApprovalMessagePanel')" style="width: 180px;" ajaxSingle="true" />
     </rich:modalPanel>
