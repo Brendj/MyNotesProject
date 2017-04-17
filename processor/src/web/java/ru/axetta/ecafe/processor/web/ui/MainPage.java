@@ -8858,7 +8858,7 @@ public class MainPage implements Serializable {
     }
 
     public boolean isEligibleToViewManualReport() throws Exception {
-        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_MANUAL_REPORT);
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_MANUAL_REPORT);
     }
 
     public Object removeClient() {
