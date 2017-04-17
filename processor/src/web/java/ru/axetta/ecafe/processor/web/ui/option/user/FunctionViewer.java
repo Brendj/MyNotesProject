@@ -145,7 +145,7 @@ public class FunctionViewer {
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
-                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
+                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier") || item.getFunctionName().equals("manualRprt")) {
                 optionsItems.add(item);
             } else if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
                     || item.getFunctionName().equals("onlineRprtBenefit") || item.getFunctionName()

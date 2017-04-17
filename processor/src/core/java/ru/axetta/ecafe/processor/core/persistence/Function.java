@@ -125,6 +125,8 @@ public class Function {
     public static final String FUNCD_RESTRICT_CLIENTS_BENEFITS_REPORT = "Закрыть 'Расчет комплексов по льготным правилам'";
     public static final String FUNC_RESTRICT_TRANSACTIONS_REPORT = "transactionsRprt";
     public static final String FUNCD_RESTRICT_TRANSACTIONS_REPORT = "Закрыть 'Отчеты по транзакциям'";
+    public static final String FUNC_RESTRICT_MANUAL_REPORT = "manualRprt";
+    public static final String FUNCD_RESTRICT_MANUAL_REPORT = "Закрыть 'Ручной запуск отчетов'";
 
     private Long idOfFunction;
     private String functionName;

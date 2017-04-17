@@ -1279,7 +1279,7 @@
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
-                        label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
+                        label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}" rendered="#{mainPage.eligibleToViewManualReport}"
                         reRender="workspaceForm" />
 
 </rich:panelMenuGroup>

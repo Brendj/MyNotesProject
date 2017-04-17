@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import generated.registry.manual_synch.Exception_Exception;
 import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -8854,6 +8855,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewTransactionsReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TRANSACTIONS_REPORT);
+    }
+
+    public boolean isEligibleToViewManualReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_MANUAL_REPORT);
     }
 
     public Object removeClient() {
