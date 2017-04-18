@@ -114,6 +114,7 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     resItem.setName(item.getName());
                     resItem.setGoodsGuid(item.getGoodsGuid());
                     resItem.setTaloonNumber(item.getTaloonNumber());
+                    resItem.setPrice(item.getPrice());
                     resItem.setResultCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());
                 }
