@@ -41,11 +41,13 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
         ResReestrTaloonApproval result = new ResReestrTaloonApproval();
         List<ResTaloonApprovalItem> items = new ArrayList<ResTaloonApprovalItem>();
         try {
-            ResTaloonApprovalItem resItem;
+            ResTaloonApprovalItem resItem = null;
             Long nextVersion = DAOUtils.nextVersionByTaloonApproval(session);
+            boolean errorFound = false;
             for (TaloonApprovalItem item : reestrTaloonApproval.getItems()) {
 
-                if (item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK)) {
+                errorFound = !item.getResCode().equals(TaloonApprovalItem.ERROR_CODE_ALL_OK);
+                if (!errorFound) {
                     Long idOfOrg = item.getOrgId();
                     Long idOfOrgCreated = item.getOrgIdCreated();
                     Date date = item.getDate();
@@ -71,31 +73,41 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
                     Long taloonNumber = item.getTaloonNumber();
-
-                    if (taloon == null) {
-                        taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
-                                isppState, ppState, goodsName);
-                        taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date()));
+                    Long versionFromClient = item.getVersion();
+                    if ((versionFromClient == null && taloon != null) || (versionFromClient != null && taloon != null && versionFromClient < taloon.getVersion())) {
+                        errorFound = true;
+                        item.setResCode(TaloonApprovalItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                        item.setErrorMessage("Record version conflict");
                     } else {
-                        String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
-                        taloon.setRemarks(rem.concat("\n").concat(String.format("Изменено в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
+
+                        if (taloon == null) {
+                            taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
+                                    isppState, ppState, goodsName);
+                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT",
+                                    orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date()));
+                        } else {
+                            String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
+                            taloon.setRemarks(rem.concat("\n").concat(String
+                                    .format("Изменено в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
+                        }
+                        taloon.setSoldedQty(soldedQty);
+                        taloon.setRequestedQty(requestedQty);
+                        taloon.setShippedQty(shippedQty);
+                        taloon.setPrice(price);
+                        taloon.setCreatedType(createdType);
+                        taloon.setIsppState(isppState);
+                        taloon.setPpState(ppState);
+                        taloon.setOrgOwner(orgOwner);
+                        taloon.setVersion(nextVersion);
+                        taloon.setDeletedState(deletedState);
+                        taloon.setTaloonNumber(taloonNumber);
+
+                        session.saveOrUpdate(taloon);
+
+                        resItem = new ResTaloonApprovalItem(taloon, ordersCount, item.getResCode());
                     }
-                    taloon.setSoldedQty(soldedQty);
-                    taloon.setRequestedQty(requestedQty);
-                    taloon.setShippedQty(shippedQty);
-                    taloon.setPrice(price);
-                    taloon.setCreatedType(createdType);
-                    taloon.setIsppState(isppState);
-                    taloon.setPpState(ppState);
-                    taloon.setOrgOwner(orgOwner);
-                    taloon.setVersion(nextVersion);
-                    taloon.setDeletedState(deletedState);
-                    taloon.setTaloonNumber(taloonNumber);
-
-                    session.saveOrUpdate(taloon);
-
-                    resItem = new ResTaloonApprovalItem(taloon, ordersCount, item.getResCode());
-                } else {
+                }
+                if (errorFound) {
                     resItem = new ResTaloonApprovalItem();
                     resItem.setOrgId(item.getOrgId());
                     resItem.setDate(item.getDate());

@@ -47,6 +47,7 @@ public class TaloonApprovalItem {
     private Boolean deletedState;
     private String errorMessage;
     private Integer resCode;
+    private Long version;
 
     public static TaloonApprovalItem build(Node itemNode, Long orgOwner) {
         Long orgId = null;
@@ -64,6 +65,7 @@ public class TaloonApprovalItem {
         Integer ppState = null;
         Boolean deletedState = false;
         Long taloonNumber = null;
+        Long version = null;
         StringBuilder errorMessage = new StringBuilder();
 
         //Три обязательных поля (orgId, date, name)- первичный ключ
@@ -122,6 +124,7 @@ public class TaloonApprovalItem {
 
         goodsName = XMLUtils.getAttributeValue(itemNode,"GoodsName");
         goodsGuid = XMLUtils.getAttributeValue(itemNode,"GoodsGuid");
+        version = XMLUtils.getLongAttributeValue(itemNode, "V");
 
         if (isOldQtyFormat(itemNode)){
             Integer qty = readIntegerValue(itemNode, "Qty", errorMessage);
@@ -212,7 +215,7 @@ public class TaloonApprovalItem {
 
         return new TaloonApprovalItem(orgId, orgIdCreated, date, name,goodsName,goodsGuid, soldedQty, requestedQty, shippedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
-                taloonNumber, orgOwner, deletedState, errorMessage.toString());
+                taloonNumber, orgOwner, deletedState, version, errorMessage.toString());
     }
 
     private static boolean isOldQtyFormat(Node itemNode) {
@@ -237,7 +240,7 @@ public class TaloonApprovalItem {
 
     private TaloonApprovalItem(Long orgId, Long orgIdCreated, Date date, String name,String goodsName,String goodsGuid, Integer soldedQty,
             Integer requestedQty, Integer shippedQty, Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-            Long taloonNumber, Long orgOwnerId, Boolean deletedState, String errorMessage) {
+            Long taloonNumber, Long orgOwnerId, Boolean deletedState, Long version, String errorMessage) {
         this.setOrgId(orgId);
         this.setOrgIdCreated(orgIdCreated);
         this.setDate(date);
@@ -254,6 +257,7 @@ public class TaloonApprovalItem {
         this.setDeletedState(deletedState);
         this.setGoodsName(goodsName);
         this.setGoodsGuid(goodsGuid);
+        this.version = version;
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
             this.setResCode(ERROR_CODE_ALL_OK);
@@ -404,5 +408,13 @@ public class TaloonApprovalItem {
 
     public void setPpState(TaloonPPStatesEnum ppState) {
         this.ppState = ppState;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }
