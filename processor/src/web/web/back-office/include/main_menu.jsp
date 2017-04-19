@@ -1029,8 +1029,8 @@
 
 
         <%--@elvariable id="totalBenefFeedReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalBenefFeedReportPage"--%>
-        <rich:panelMenuItem id="totalBenefFeedReportMenuItem" binding="#{totalBenefFeedReportPage.mainMenuComponent}"
-                            label="Сводный отчет по льготному питанию" action="#{totalBenefFeedReportPage.show}" reRender="workspaceForm" />
+        <%--<rich:panelMenuItem id="totalBenefFeedReportMenuItem" binding="#{totalBenefFeedReportPage.mainMenuComponent}"
+                            label="Сводный отчет по льготному питанию" action="#{totalBenefFeedReportPage.show}" reRender="workspaceForm" />--%>
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="paidFoodGroupMenu" binding="#{mainPage.paidFoodGroupMenu.mainMenuComponent}"
@@ -1207,11 +1207,11 @@
                             action="#{mainPage.showLatePaymentDetailedReportPage}"
                             reRender="workspaceForm"/>
 
-        <rich:panelMenuItem id="adjustmentPaymentReportMenuItem"
+        <%--<rich:panelMenuItem id="adjustmentPaymentReportMenuItem"
                             binding="#{mainPage.adjustmentPaymentReportPage.mainMenuComponent}"
                             label="Отчет по ручной корректировке оплаты льготного питания"
                             action="#{mainPage.showAdjustmentPaymentReportPage}"
-                            reRender="workspaceForm"/>
+                            reRender="workspaceForm"/>--%>
 
     </rich:panelMenuGroup>
     <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
