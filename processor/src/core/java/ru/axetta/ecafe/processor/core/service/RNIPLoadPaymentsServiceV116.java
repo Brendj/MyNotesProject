@@ -75,6 +75,9 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
     private static int MAX_REREQUESTS = 3; //максимальное число повторных запросов, если получено ReRequest = true
     private HashMap<Contragent, Integer> requests;
     private Integer reqs;
+    private final static ThreadLocal<String> messageId = new ThreadLocal<String>() {
+        @Override protected String initialValue() { return UUID.randomUUID().toString(); }
+    };
 
     @Override
     public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
@@ -89,8 +92,22 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
             case REQUEST_LOAD_PAYMENTS:
             case REQUEST_LOAD_PAYMENTS_MODIFIED:
                 requests = new HashMap<Contragent, Integer>();
-                reqs = 1;
-                return executeLoadPayments(requestType, contragent, updateDate, startDate, endDate);
+                int attempt = 1;
+                String uuid = UUID.randomUUID().toString();
+
+                List<MessageDataType> result = new ArrayList<MessageDataType>();
+                MessageDataType messageDataType = executeLoadPayments(requestType, contragent, updateDate, startDate, endDate, attempt, uuid);
+                result.add(messageDataType);
+                String error = checkError(messageDataType);
+                if (error != null) throw new Exception(String.format("RNIP v 1.16 check error: %s", error));
+                while (hasMore(messageDataType)) {
+                    attempt++;
+                    messageDataType = executeLoadPayments(requestType, contragent, updateDate, startDate, endDate, attempt, uuid);
+                    error = checkError(messageDataType);
+                    if (error != null) throw new Exception(String.format("RNIP v 1.16 check error: %s", error));
+                    result.add(messageDataType);
+                }
+                return result;
         }
         return null;
     }
@@ -128,11 +145,12 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
                 + ".xml", message.getBytes("UTF-8"));
     }
 
-    public MessageDataType executeLoadPayments(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public MessageDataType executeLoadPayments(int requestType, Contragent contragent, Date updateDate, Date startDate,
+            Date endDate, int attempt, String uuid) throws Exception {
         InitRNIP116Service();
 
-        //logger.info(String.format("Запрос на получение платежей их РНИП,. Попытка № %s в серии", reqs));
-        logger.info("Запрос на получение платежей из РНИП");
+        logger.info(String.format("Запрос на получение платежей их РНИП. Запрос № %s в серии", attempt));
+        //logger.info("Запрос на получение платежей из РНИП");
 
         String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
         String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
@@ -158,7 +176,6 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         recipient.setName("ИС_РНиП");
         messageType.setRecipient(recipient);
 
-        //messageType.setServiceName("0");
         messageType.setServiceName("105805771");
         messageType.setTypeCode(TypeCodeType.GFNC);
         messageType.setStatus(StatusType.REQUEST);
@@ -170,12 +187,8 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
 
         final RequestMessageType requestMessageType = mesOf.createRequestMessageType();
 
-        /*String ID = "N_4a0d84ca-1fc6-11e5-99c3-bcaec5d977ce";
-        if (idOfMessage != null) {
-            ID = idOfMessage;
-        }
-        //requestMessageType.setId(ID);*/
-        requestMessageType.setId(String.format("N_%s", UUID.randomUUID()));
+        //requestMessageType.setId(String.format("N_%s", UUID.randomUUID()));
+        requestMessageType.setId(String.format("N_%s", uuid));
         requestMessageType.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
         requestMessageType.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
 
@@ -224,6 +237,12 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
 
         filter.setConditions(conditions);
         dataRequest.setFilter(filter);
+
+        DataRequest.Paging paging = dataOf.createDataRequestPaging();
+        paging.setPageLength(100);
+        paging.setPageNumber(attempt);
+        dataRequest.setPaging(paging);
+
         requestMessageType.setRequestMessageData(mesDataOf.createExportRequest(dataRequest));
 
         appDataType.getAny().add(requestMessageType);
@@ -250,34 +269,38 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         InputSource is = new InputSource();
         JAXBContext jaxbContext = JAXBContext.newInstance(PaymentType.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-        Object o = ((MessageDataType)response).getAppData().getAny().get(0);
-        ResponseMessageType responseMessageType = (ResponseMessageType)((JAXBElement) o).getValue();
-        ExportPaymentsResponseType exportPaymentsResponseType = (ExportPaymentsResponseType)responseMessageType.getResponseMessageData().getValue();
-        List<ExportPaymentsResponseType.Payments.PaymentInfo> piList = exportPaymentsResponseType.getPayments().getPaymentInfo();
-        //exportPaymentsResponseType.getPayments().isHasMore() - есть вот такое еще. //todo вопрос - что такое hasMore=true в пакете с платежами ?
-
-        Date rnipDate = getRnipDate(responseMessageType.getTimestamp());
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-        for(ExportPaymentsResponseType.Payments.PaymentInfo pi : piList) {
-            String paymentInfoStr = new String(pi.getPaymentData(), "utf8").replaceAll("(\\r|\\n)", "");
 
-            Map map = null;
-            try {
-                StringReader reader = new StringReader(paymentInfoStr);
-                PaymentType payment = (PaymentType) unmarshaller.unmarshal(reader);
-                map = parsePayment(payment); //парсинг по формату 1.16
-            } catch (Exception e) {
-                logger.error(String.format("Cant parse payment %s", paymentInfoStr));
-            }
-            if (map != null && map.size() > 0) {
-                result.add(map);
-            } else {
-                is.setCharacterStream(new StringReader(paymentInfoStr));
-                Document doc = builderFactory.newDocumentBuilder().parse(is);
-                result.add(parsePayment(doc)); //парсинг по формату 1.15
-            }
+        List<MessageDataType> responseList = (List) response;
+        Date rnipDate = null;
 
+        for (MessageDataType responseItem : responseList) {
+            Object o = responseItem.getAppData().getAny().get(0);
+            ResponseMessageType responseMessageType = (ResponseMessageType) ((JAXBElement) o).getValue();
+            ExportPaymentsResponseType exportPaymentsResponseType = (ExportPaymentsResponseType) responseMessageType.getResponseMessageData().getValue();
+            List<ExportPaymentsResponseType.Payments.PaymentInfo> piList = exportPaymentsResponseType.getPayments().getPaymentInfo();
+
+            if (rnipDate == null) rnipDate = getRnipDate(responseMessageType.getTimestamp()); //берем дату рнип из первого запроса в серии, если их несколько по признаку hasMore
+            for (ExportPaymentsResponseType.Payments.PaymentInfo pi : piList) {
+                String paymentInfoStr = new String(pi.getPaymentData(), "utf8").replaceAll("(\\r|\\n)", "");
+
+                Map map = null;
+                try {
+                    StringReader reader = new StringReader(paymentInfoStr);
+                    PaymentType payment = (PaymentType) unmarshaller.unmarshal(reader);
+                    map = parsePayment(payment); //парсинг по формату 1.16
+                } catch (Exception e) {
+                    logger.error(String.format("Cant parse payment %s", paymentInfoStr));
+                }
+                if (map != null && map.size() > 0) {
+                    result.add(map);
+                } else {
+                    is.setCharacterStream(new StringReader(paymentInfoStr));
+                    Document doc = builderFactory.newDocumentBuilder().parse(is);
+                    result.add(parsePayment(doc)); //парсинг по формату 1.15
+                }
+
+            }
         }
 
         RNIPLoadPaymentsService.RNIPPaymentsResponse res = new RNIPLoadPaymentsService.RNIPPaymentsResponse(result, rnipDate);
@@ -638,23 +661,23 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         return null;*/
     }
 
-    private Boolean needReRequest116(MessageDataType response) {
-        //Если секция-контейнер для признака ReRequest найдена, то возвращаем значение ReRequest из response
-        //иначе возвращаем null
+    private boolean hasMore(MessageDataType response) {
         try {
             Object o = response.getAppData().getAny().get(0);
             ResponseMessageType responseMessageType = (ResponseMessageType)((JAXBElement) o).getValue();
             ExportPaymentsResponseType exportPaymentsResponseType = (ExportPaymentsResponseType)responseMessageType.getResponseMessageData().getValue();
-            return exportPaymentsResponseType.getPayments().isNeedReRequest();
+            return exportPaymentsResponseType.getPayments().isHasMore();
         }
         catch(Exception e) {
-            //Ошибка парсинга, не найдена секция с атрибутом ReRequest
-            return null;
+            return false;
         }
     }
 
     @Override
     public String checkError(Object response) {
+        if (response != null && response instanceof List) {
+            return null; //возвращаем ОК для вызовов где параметром передается List, т.к. для элементов проверка уже пройдена
+        }
         try {
             Object o = ((MessageDataType)response).getAppData().getAny().get(0);
             ResponseMessageType responseMessageType = (ResponseMessageType)((JAXBElement) o).getValue();
@@ -675,6 +698,10 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         catch (Exception e) {
             return "Error parsing response RNIP v1.16";
         }
+    }
+
+    private String checkError(MessageDataType messageDataType) {
+        return checkError((Object)messageDataType);
     }
 
     public void setEndpointAddress(BindingProvider bindingProvider, String endpointAddress) {
