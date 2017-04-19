@@ -576,47 +576,51 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 if(ts.length < 2 || ts[0] == null || ts[1] == null) {
                     continue;
                 }
-                long zeroDiff;
+               // long zeroDiff;
                 long diff = ts[0] - ts[1];
                 if(diff < MAX_DELAY) {
                     continue;
                 }
 
-                if (isTimeBetween7h15mAnd8h45m(ts[0], dateConstants)) {
+                if (isTimeBetween0h00mAnd7h15m(ts[0], dateConstants)) {
                     maxDelayMorning = Math.max(diff, maxDelayMorning);
                     sumDelayMorning += diff;
-                } else {
-                    zeroDiff = dateConstants.toDay8H45MinInMillis - dateConstants.toDay7H15MinInMillis;
-                    maxDelayMorning = Math.max(zeroDiff, maxDelayMorning);
-                    sumDelayMorning += zeroDiff;
                 }
 
-                if (isTimeBetween8h45mAnd16h00m(ts[0], dateConstants)) {
-                    maxDelayMidday = Math.max(diff, maxDelayMidday);
-                    sumDelayMidday += diff;
-                } else {
-                    zeroDiff = dateConstants.toDay16H00MinInMillis - dateConstants.toDay8H45MinInMillis;
-                    maxDelayMidday = Math.max(zeroDiff, maxDelayMidday);
-                    sumDelayMidday += zeroDiff;
-                }
-
-                if (isTimeBetween16h00mAnd0h00m(ts[0], dateConstants)) {
-                    maxDelayNight = Math.max(diff, maxDelayNight);
-                    sumDelayNight += diff;
-                } else {
-                    zeroDiff = dateConstants.toDay16H00MinInMillis - dateConstants.toDay0H00MinInMillis;
-                    maxDelayNight = Math.max(zeroDiff, maxDelayNight);
-                    sumDelayNight += zeroDiff;
-                }
-
-                if (isTimeBetween0h00mAnd7h15m(ts[0], dateConstants)) {
-                    maxDelayMidnight = Math.max(diff, maxDelayMidnight);
-                    sumDelayMidnight += diff;
-                } else {
+                /*else {
                     zeroDiff = dateConstants.toDay7H15MinInMillis - dateConstants.toDay0H00MinInMillis;
                     maxDelayMidnight = Math.max(zeroDiff, maxDelayMidnight);
-                    sumDelayMidnight += zeroDiff;
+                }*/
+
+                else if (isTimeBetween7h15mAnd8h45m(ts[0], dateConstants)) {
+                    maxDelayMidnight = Math.max(diff, maxDelayMidnight);
+                    sumDelayMidnight += diff;
                 }
+
+                /*else {
+                    zeroDiff = dateConstants.toDay8H45MinInMillis - dateConstants.toDay7H15MinInMillis;
+                    maxDelayMorning = Math.max(zeroDiff, maxDelayMorning);
+                }*/
+
+                else if (isTimeBetween8h45mAnd16h00m(ts[0], dateConstants)) {
+                    maxDelayMidday = Math.max(diff, maxDelayMidday);
+                    sumDelayMidday += diff;
+                }
+
+                /*else {
+                    zeroDiff = dateConstants.toDay16H00MinInMillis - dateConstants.toDay8H45MinInMillis;
+                    maxDelayMidday = Math.max(zeroDiff, maxDelayMidday);
+                }*/
+
+                else if (isTimeBetween16h00mAnd0h00m(ts[0], dateConstants)) {
+                    maxDelayNight = Math.max(diff, maxDelayNight);
+                    sumDelayNight += diff;
+                }
+
+                /*else {
+                    zeroDiff = dateConstants.toDay16H00MinInMillis - dateConstants.toDay0H00MinInMillis;
+                    maxDelayNight = Math.max(zeroDiff, maxDelayNight);
+                }*/
 
                 lastSync = Math.max(lastSync, ts[0]);
             }
