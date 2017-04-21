@@ -34,6 +34,10 @@ public class MenuWithComplexesExt {
     private Long currentPrice;
     @XmlAttribute(name = "usedSubscriptionFeeding")
     private int usedSubscriptionFeeding;
+    @XmlAttribute(name = "usedVariableFeeding")
+    private int usedVariableFeeding;
+    @XmlAttribute(name = "isDiscountComplex")
+    private int isDiscountComplex;
     @XmlElement(name = "MenuDetail")
     private List<MenuItemExt> menuItemExtList;
 
@@ -49,6 +53,10 @@ public class MenuWithComplexesExt {
         this.usedSubscriptionFeeding =
                 complexInfo.getUsedSubscriptionFeeding() == null || complexInfo.getUsedSubscriptionFeeding() == 0 ? 0
                         : 1;
+        this.usedVariableFeeding =
+                complexInfo.getUsedVariableFeeding() == null || complexInfo.getUsedVariableFeeding() == 0 ? 0
+                        : 1;
+        this.isDiscountComplex = complexInfo.getModeFree();
     }
 
     public Long getIdOfComplexInfo() {
@@ -105,5 +113,21 @@ public class MenuWithComplexesExt {
 
     public void setMenuItemExtList(List<MenuItemExt> menuItemExtList) {
         this.menuItemExtList = menuItemExtList;
+    }
+
+    public int getUsedVariableFeeding() {
+        return usedVariableFeeding;
+    }
+
+    public void setUsedVariableFeeding(int usedVariableFeeding) {
+        this.usedVariableFeeding = usedVariableFeeding;
+    }
+
+    public int getIsDiscountComplex() {
+        return isDiscountComplex;
+    }
+
+    public void setIsDiscountComplex(int isDiscountComplex) {
+        this.isDiscountComplex = isDiscountComplex;
     }
 }
