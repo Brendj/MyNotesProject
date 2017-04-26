@@ -521,7 +521,7 @@ public class FrontController extends HttpServlet {
                     clientByCard.getPerson().getFullName());
             result.add(clientByCardItem);
 
-            List<Client> childsList = ClientManager.findChildsByClient(persistenceSession, clientByCard.getIdOfClient());
+            List<Client> childsList = ClientManager.findChildsByClient(persistenceSession, clientByCard.getIdOfClient(), false);
             if(childsList.size() > 0) {
                 List<GuardianAndChildItem> childItemList = new ArrayList<GuardianAndChildItem>();
                 List<GuardianAndChildItem> guardiansItemList = new ArrayList<GuardianAndChildItem>();

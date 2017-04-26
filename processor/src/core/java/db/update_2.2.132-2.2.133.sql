@@ -10,3 +10,6 @@ alter table cf_provider_configurations add column menuSyncCountDays integer,
 
 --история изменений данных электронной сверки
 alter table cf_taloon_approval add column remarks text;
+
+--Поле источник создания клиента (МПГУ или иное)
+alter table cf_clients add column createdFrom integer not null default 0;

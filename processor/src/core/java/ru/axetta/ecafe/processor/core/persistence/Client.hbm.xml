@@ -90,6 +90,11 @@
         <property name="externalId" column="ExternalId" type="long" not-null="false"/>
         <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
         <property name="balanceToNotify" column="BalanceToNotify" type="long" not-null="false"/>
+        <property name="createdFrom" column="CreatedFrom">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
+            </type>
+        </property>
 
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>

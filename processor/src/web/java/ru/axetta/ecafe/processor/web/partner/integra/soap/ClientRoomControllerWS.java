@@ -97,6 +97,7 @@ import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -192,6 +193,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
+
+    private static final String COMMENT_MPGU_CREATE = "{Создано на mos.ru %s пользователем с номером телефона %s)}";
 
     private static final List<SectionType> typesForSummary = new ArrayList<SectionType>(Arrays.asList(SectionType.ACC_INC_REGISTRY,
             SectionType.ACCOUNT_OPERATIONS_REGISTRY, SectionType.ACCOUNTS_REGISTRY, SectionType.ORGANIZATIONS_STRUCTURE, SectionType.CLIENT_REGISTRY));
@@ -3956,6 +3959,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientRepresentative.setMobile(cl.getMobile());
                     clientRepresentative.setNotifyviaemail(cl.isNotifyViaEmail());
                     clientRepresentative.setNotifyviapush(cl.isNotifyViaPUSH());
+                    clientRepresentative.setCreatedWhere(cl.getCreatedFrom().getValue());
 
                     clientRepresentativesList.getRep().add(clientRepresentative);
                 }
@@ -6572,19 +6576,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "currentDay") Date currentDay) {
+          @WebParam(name = "currentDay") Date currentDay, @WebParam(name = "type") Integer type) {
         authenticateRequest(contractId);
-        return getCurrentSubscriptionFeeding(contractId, null, currentDay);
+        return getCurrentSubscriptionFeeding(contractId, null, currentDay, type);
     }
 
     @Override
     public SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "san") String san,
-          @WebParam(name = "currentDay") Date currentDay) {
+          @WebParam(name = "currentDay") Date currentDay, @WebParam(name = "type") Integer type) {
         authenticateRequest(null);
-        return getCurrentSubscriptionFeeding(null, san, currentDay);
+        return getCurrentSubscriptionFeeding(null, san, currentDay, type);
     }
 
-    private SubscriptionFeedingResult getCurrentSubscriptionFeeding(Long contractId, String san,  Date currentDay) {
+    private SubscriptionFeedingResult getCurrentSubscriptionFeeding(Long contractId, String san,  Date currentDay, Integer type) {
         Session session = null;
         Transaction transaction = null;
         SubscriptionFeedingResult result = new SubscriptionFeedingResult();
@@ -6599,7 +6603,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             transaction.commit();
             SubscriptionFeedingService service = SubscriptionFeedingService.getInstance();
-            SubscriptionFeeding sf = service.getCurrentSubscriptionFeedingByClientToDay(client, currentDay);
+            SubscriptionFeeding sf = service.getCurrentSubscriptionFeedingByClientToDay(session, client, currentDay, type);
             if(sf==null){
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
                 result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
@@ -6836,7 +6840,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             Date dateActivateSubs = CalendarUtils.truncateToDayOfMonth(dateActivateSubscription);
             SubscriptionFeeding subscriptionFeeding = SubscriptionFeedingService
-                    .getCurrentSubscriptionFeedingByClientToDay(session, client, dateActivateSubs);
+                    .getCurrentSubscriptionFeedingByClientToDay(session, client, dateActivateSubs, null);
             if (subscriptionFeeding == null) {
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
                 result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
@@ -7061,7 +7065,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             SubscriptionFeeding subscriptionFeeding =
-                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, suspendDate);
+                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, suspendDate, null);
             if (subscriptionFeeding.getFeedingType().equals(SubscriptionFeedingType.VARIABLE_TYPE)) {
                 result.resultCode = RC_INVALID_OPERATION_VARIABLE_FEEDING;
                 result.description = RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC;
@@ -7135,7 +7139,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             SubscriptionFeeding subscriptionFeeding =
-                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, activateDate);
+                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, activateDate, null);
             DAOService daoService = DAOService.getInstance();
             List<ECafeSettings> settings = daoService
                   .geteCafeSettingses(subscriptionFeeding.getOrgOwner(), SettingsIds.SubscriberFeeding, false);
@@ -7234,7 +7238,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             SubscriptionFeeding subscriptionFeeding =
-                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, new Date());
+                  SubscriptionFeedingService.getCurrentSubscriptionFeedingByClientToDay(session, client, new Date(), null);
             if(subscriptionFeeding==null){
                 result.resultCode = RC_SUBSCRIPTION_FEEDING_NOT_FOUND;
                 result.description = RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC;
@@ -7782,6 +7786,243 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         }
+        return result;
+    }
+
+    @Override
+    public Result addGuardian(@WebParam(name = "firstName") String firstName,
+            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
+            @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
+            @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile) {
+
+        authenticateRequest(null);
+
+        String mobilePhone = Client.checkAndConvertMobile(mobile);
+        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
+                || gender == null || childContractId == null) {
+            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+        }
+        if (StringUtils.isEmpty(mobilePhone)) {
+            return new Result(RC_INVALID_DATA, "Неверный формат мобильного телефона");
+        }
+
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+            String remark = String.format(COMMENT_MPGU_CREATE, dateString, creatorMobile);
+            Client client = findClient(session, childContractId, null, result);
+            if (client == null) {
+                return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
+
+            Org org = client.getOrg();
+            int count = 0;
+            Client guardian = null;
+            if (secondName == null) secondName = "";
+            List<Client> exClients = DAOUtils.findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, ClientCreatedFromType.MPGU);
+            for (Client cl : exClients) {
+                List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+                if (guardians.contains(cl)) {
+                    return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
+                }
+                if (mobilePhone.equals(cl.getMobile())) {
+                    count++;
+                    guardian = cl;
+                }
+            }
+            if (count > 1) {
+                return new Result(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+            }
+            if (guardian == null) {
+                guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
+                        surname, mobile, remark, gender, ClientCreatedFromType.MPGU, org);
+            }
+
+            ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+            if (clientGuardian == null) {
+                ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient());
+            } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()){
+                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                clientGuardian.restore(newGuardiansVersions);
+                session.update(clientGuardian);
+            }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    /*private void testClientsForGuardianMethods(List<Client> clients) throws IllegalArgumentException {
+        Long idO = null;
+        for (Client c : clients) {
+            if (idO == null) idO = c.getOrg().getIdOfOrg();
+            if (!idO.equals(c.getOrg().getIdOfOrg())) {
+                throw new IllegalArgumentException("Л/с опекаемых должны принадлежать одной организации");
+            }
+        }
+    }*/
+
+    /*Пока выключаем метод, т.к. не используется
+    @Override
+    public Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
+            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
+            @WebParam(name = "gender") Integer gender, @WebParam(name = "contracts") ListOfContracts contracts) {
+        authenticateRequest(contractId);
+
+        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || contracts == null
+                || gender == null || CollectionUtils.isEmpty(contracts.getContractIds())) {
+            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+        }
+
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+
+                Client client = findClientByContractId(session, contractId, result);
+                if (client == null) {
+                    result.resultCode = RC_CLIENT_NOT_FOUND;
+                    result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    return result;
+                }
+
+                String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+                String remarkChange = String.format(COMMENT_MPGU_CHANGE, dateString);
+
+                List<Client> clients = DAOUtils.findClientsByListOfContractId(session, contracts.getContractIds()); //список клиентов-опекаемых из входного параметра
+                testClientsForGuardianMethods(clients);
+                List<Client> children = ClientManager.findChildsByClient(session, client.getIdOfClient(), true);
+
+                boolean found;
+                for (Client clPar : clients) { //clPar - клиенты-опекаемые с л/с из входного параметра
+                    found = false;
+                    for (Client clDB : children) {  //clDB - клиенты-опекаемых, уже существующие у представителя client
+                        if (clPar.equals(clDB)) {
+                            found = true;
+                            ClientGuardian cg = DAOReadonlyService.getInstance().findClientGuardianByIdIncludeDisabled(session, clPar.getIdOfClient(), client.getIdOfClient(), true);
+                            if (cg.getDeletedState() || cg.isDisabled()) {
+                                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                                cg.restore(newGuardiansVersions);
+                                session.update(cg);
+                            }
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        //создание связки
+                        ClientManager.createClientGuardianInfoTransactionFree(session, client, null, false, clPar.getIdOfClient());
+                        children.add(clPar);
+                    }
+                }
+                for (Client clDB : children) {
+                    found = false;
+                    for (Client clPar : clients) {
+                        if (clDB.equals(clPar)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        ClientGuardian cg = DAOReadonlyService.getInstance().findClientGuardianById(session, clDB.getIdOfClient(), client.getIdOfClient());
+                        if (cg != null) {
+                            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                            cg.delete(newGuardiansVersions);
+                            session.update(cg);
+                        }
+                    }
+                }
+                FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
+                modifyConfig.setValue(ClientManager.FieldId.SURNAME, surname);
+                modifyConfig.setValue(ClientManager.FieldId.NAME, firstName);
+                modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+                modifyConfig.setValue(ClientManager.FieldId.GENDER, gender);
+                ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
+                        client.getOrg(), remarkChange, client, session, true);
+
+                transaction.commit();
+                transaction = null;
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+            }  catch (IllegalArgumentException e) {
+                return new Result(RC_INVALID_DATA, e.getMessage());
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+
+        return result;
+    }*/
+
+    @Override
+    public Result removeGuardian(@WebParam(name = "guardianContractId") Long guardianContractId,
+            @WebParam(name = "childContractId") Long childContractId) {
+        authenticateRequest(guardianContractId);
+
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client guardian = findClientByContractId(session, guardianContractId, result);
+            if (!guardian.getCreatedFrom().equals(ClientCreatedFromType.MPGU)) {
+                result.resultCode = RC_INVALID_DATA;
+                result.description = "Клиент был создан в другой системе. Удаление выбранного представителя невозможно";
+                return result;
+            }
+            Client child = findClientByContractId(session, childContractId, result);
+            if (guardian == null || child == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            ClientGuardian cg = DAOReadonlyService.getInstance().findClientGuardianById(session, child.getIdOfClient(), guardian.getIdOfClient());
+            if (cg != null) {
+                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+                cg.setDisabled(true);
+                cg.setVersion(newGuardiansVersions);
+                session.update(cg);
+            }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
         return result;
     }
 

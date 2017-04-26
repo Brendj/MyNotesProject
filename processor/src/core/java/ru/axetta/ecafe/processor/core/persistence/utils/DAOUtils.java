@@ -132,6 +132,12 @@ public class DAOUtils {
         return resultList.isEmpty() ? null : resultList.get(0);
     }
 
+    public static List<Client> findClientsByListOfContractId(Session persistenceSession, List<Long> contractIds) {
+        Criteria contractCriteria = persistenceSession.createCriteria(Client.class);
+        contractCriteria.add(Restrictions.in("contractId", contractIds));
+        return (List<Client>) contractCriteria.list();
+    }
+
     @SuppressWarnings("unchecked")
     public static Client findClientByMobile(Session session, String mobile) {
         Criteria mobileCriteria = session.createCriteria(Client.class);
@@ -771,31 +777,46 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,
-            String secondName) throws Exception {
+    public static List<Client> findClientsByFIO(Session persistenceSession, Set<Org> orgs, String firstName, String surname,
+            String secondName, ClientCreatedFromType createdFrom) throws Exception {
+        String secondNameCondition = StringUtils.isEmpty(secondName) ? "" :" and (upper(client.person.secondName) = :secondname) ";
+        String createdFromCondition = createdFrom == null ? "" : " and (client.createdFrom = :createdfrom) ";
         Query query = persistenceSession.createQuery(
-                "select 1 from Client client where (client.org = ?) and (upper(client.person.surname) = ?) and"
-                        + "(upper(client.person.firstName) = ?) and (upper(client.person.secondName) = ?)");
-        query.setParameter(0, organization);
-        query.setParameter(1, StringUtils.upperCase(surname));
-        query.setParameter(2, StringUtils.upperCase(firstName));
-        query.setParameter(3, StringUtils.upperCase(secondName));
-        query.setMaxResults(1);
-        return !query.list().isEmpty();
+                "select client from Client client where client.org in (:org) and (upper(client.person.surname) = :surname) and"
+                        + "(upper(client.person.firstName) = :firstname) " + secondNameCondition + createdFromCondition + " order by client.contractTime desc");
+        query.setParameterList("org", orgs);
+        query.setParameter("surname", StringUtils.upperCase(surname));
+        query.setParameter("firstname", StringUtils.upperCase(firstName));
+        if (!secondNameCondition.equals(""))
+            query.setParameter("secondname", StringUtils.upperCase(secondName));
+        if (createdFrom != null)
+            query.setParameter("createdfrom", createdFrom);
+        return query.list();
     }
 
-    public static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname)
+    /* Возвращаем ClientGuardian без учета признаков удаления и неактивности связки */
+    public static ClientGuardian findClientGuardian(Session session, long idOfChildren, long idOfGuardian) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        return (ClientGuardian)criteria.uniqueResult();
+    }
+
+    public static boolean existClient(Session persistenceSession, Org organization, String firstName, String secondName, String surname)
             throws Exception {
+        String secondNameCondition = StringUtils.isEmpty(secondName) ? "" : " and (upper(client.person.secondName) = ?) ";
         Query query = persistenceSession.createQuery(
                 "select 1 from Client client where (client.org = ?) and (upper(client.person.surname) = ?) and"
-                        + "(upper(client.person.firstName) = ?)");
+                        + "(upper(client.person.firstName) = ?)" + secondNameCondition);
         query.setParameter(0, organization);
         query.setParameter(1, StringUtils.upperCase(surname));
         query.setParameter(2, StringUtils.upperCase(firstName));
+        if (secondName != null) {
+            query.setParameter(3, StringUtils.upperCase(secondName));
+        }
         query.setMaxResults(1);
         return !query.list().isEmpty();
     }
-
 
     @SuppressWarnings("unchecked")
     public static List<Object[]> findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName, boolean dismissPredefinedGroups)

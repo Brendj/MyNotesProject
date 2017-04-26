@@ -178,11 +178,17 @@ public class DAOReadonlyService {
     }
 
     public ClientGuardian findClientGuardianById(Session session, long idOfChildren, long idOfGuardian) {
+        return findClientGuardianByIdIncludeDisabled(session, idOfChildren, idOfGuardian, false);
+    }
+
+    public ClientGuardian findClientGuardianByIdIncludeDisabled(Session session, long idOfChildren, long idOfGuardian, boolean includeDisabled) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        criteria.add(Restrictions.ne("deletedState", true));
-        criteria.add(Restrictions.eq("disabled", false));
+        if (!includeDisabled) {
+            criteria.add(Restrictions.ne("deletedState", true));
+            criteria.add(Restrictions.eq("disabled", false));
+        }
         return (ClientGuardian)criteria.uniqueResult();
     }
 

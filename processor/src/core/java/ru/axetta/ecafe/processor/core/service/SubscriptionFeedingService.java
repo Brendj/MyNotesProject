@@ -328,7 +328,7 @@ public class SubscriptionFeedingService {
         return criteria.list();
     }
 
-    public static SubscriptionFeeding getCurrentSubscriptionFeedingByClientToDay(Session session, Client c, Date currentDate) {
+    public static SubscriptionFeeding getCurrentSubscriptionFeedingByClientToDay(Session session, Client c, Date currentDate, Integer type) {
         DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class);
         subQuery.add(Restrictions.eq("client", c));
         subQuery.add(Restrictions.eq("deletedState", false));
@@ -341,6 +341,9 @@ public class SubscriptionFeedingService {
         Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
         criteria.add(Restrictions.eq("client", c));
         criteria.add(Restrictions.eq("deletedState", false));
+        if (type != null) {
+            criteria.add(Restrictions.eq("feedingType", SubscriptionFeedingType.fromInteger(type)));
+        }
         criteria.add(Subqueries.propertyEq("dateCreateService", subQuery));
         List list = criteria.list();
         ArrayList<SubscriptionFeeding> subscriptionFeedings = new ArrayList<SubscriptionFeeding>(list.size());
@@ -364,13 +367,6 @@ public class SubscriptionFeedingService {
             subscriptionFeeding = subscriptionFeedings.get(subscriptionFeedings.size()-1);
         }
         return subscriptionFeeding;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public SubscriptionFeeding getCurrentSubscriptionFeedingByClientToDay(Client c, Date currentDate) {
-        Session session = entityManager.unwrap(Session.class);
-        return getCurrentSubscriptionFeedingByClientToDay(session, c, currentDate);
     }
 
     @SuppressWarnings("unchecked")

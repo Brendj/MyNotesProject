@@ -898,7 +898,6 @@ public class ClientManager {
 
     public static void applyClientGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
             Long idOfOrg, Long idOfClientChild) throws Exception {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         try {
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
 
@@ -954,19 +953,19 @@ public class ClientManager {
                                 setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
 
                             } else {
-                                applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext,
+                                applyGuardians(registryChangeGuardians, persistenceSession,
                                         organization, idOfClientChild);
                             }
                         } else {
-                            applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext, organization,
+                            applyGuardians(registryChangeGuardians, persistenceSession, organization,
                                     idOfClientChild);
                         }
                     } else {
-                        applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext, organization,
+                        applyGuardians(registryChangeGuardians, persistenceSession, organization,
                                 idOfClientChild);
                     }
                 } else {
-                    applyGuardians(registryChangeGuardians, persistenceSession, runtimeContext, organization,
+                    applyGuardians(registryChangeGuardians, persistenceSession, organization,
                             idOfClientChild);
                 }
             }
@@ -975,70 +974,72 @@ public class ClientManager {
         }
     }
 
-    public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession, RuntimeContext runtimeContext, Org organization, Long idOfClientChild) throws Exception{
-        Person personGuardian = new Person(registryChangeGuardians.getFirstName(),
-                registryChangeGuardians.getFamilyName(), registryChangeGuardians.getSecondName());
+    public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
+            String mobile, String remark, Integer gender, ClientCreatedFromType createdFrom, Org org) throws Exception {
+        Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
-        persistenceSession.persist(personGuardian);
+        session.persist(personGuardian);
         Person contractGuardianPerson = new Person("", "", "");
         contractGuardianPerson.setIdDocument(null);
-        persistenceSession.persist(contractGuardianPerson);
+        session.persist(contractGuardianPerson);
 
         Date currentDate = new Date();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         Long contractIdGuardian = runtimeContext.getClientContractIdGenerator()
-                .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                .generateTransactionFree(org.getIdOfOrg(), session);
 
-        long clientRegistryVersionGuardian = DAOUtils.updateClientRegistryVersion(persistenceSession);
+        long clientRegistryVersionGuardian = DAOUtils.updateClientRegistryVersion(session);
         Long limitGuardian = RuntimeContext.getInstance()
                 .getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
 
-        Client clientGuardianToSave = new Client(organization, personGuardian, contractGuardianPerson, 0, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS),
+        Client clientGuardianToSave = new Client(org, personGuardian, contractGuardianPerson, 0, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS),
                 false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
                 RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
 
-        ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(persistenceSession, organization.getIdOfOrg(),
-                "Родители");
+        ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
 
         if (clientGroup != null) {
             clientGuardianToSave
                     .setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         }
 
-        String mobilePhoneGuardian = registryChangeGuardians.getPhoneNumber();
-
-        if (mobilePhoneGuardian != null) {
-            mobilePhoneGuardian = Client.checkAndConvertMobile(mobilePhoneGuardian);
-            if (mobilePhoneGuardian == null) {
+        if (mobile != null) {
+            mobile = Client.checkAndConvertMobile(mobile);
+            if (mobile == null) {
                 throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
             }
         }
+        clientGuardianToSave.setMobile(mobile);
 
-        clientGuardianToSave.setMobile(mobilePhoneGuardian);
+        if (gender != null) {
+            clientGuardianToSave.setGender(gender);
+        }
         logger.info("class : ClientManager, method : applyGuardians line : 959, idOfClient : " + clientGuardianToSave.getIdOfClient() + " mobile : " + clientGuardianToSave.getMobile());
         clientGuardianToSave.setAddress("");
-        //clientGuardianToSave.setEmail(registryChangeGuardians.getEmailAddress());
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
-        String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-        clientGuardianToSave.setRemarks(String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString));
-        persistenceSession.persist(clientGuardianToSave);
+        clientGuardianToSave.setRemarks(remark);
+        clientGuardianToSave.setCreatedFrom(createdFrom);
+        session.persist(clientGuardianToSave);
+        return clientGuardianToSave;
+    }
 
-        String relation = registryChangeGuardians.getRelationship();
-
+    public static void createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled, Long idOfClientChild) {
         ClientGuardianRelationType relationType = null;
-        for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
-            if (relation.equalsIgnoreCase(type.toString())) {
-                relationType = type;
+        if (relation != null) {
+            for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
+                if (relation.equalsIgnoreCase(type.toString())) {
+                    relationType = type;
+                }
             }
         }
 
         //сохранение связки представителя
-        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(persistenceSession);
-        ClientGuardian clientGuardian = new ClientGuardian(idOfClientChild,
-                clientGuardianToSave.getIdOfClient());
+        Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+        ClientGuardian clientGuardian = new ClientGuardian(idOfClientChild, guardian.getIdOfClient());
         clientGuardian.setVersion(newGuardiansVersions);
-        clientGuardian.setDisabled(true);
+        clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
         Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
@@ -1048,8 +1049,18 @@ public class ClientManager {
             settings.add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
             clientGuardian.setNotificationSettings(settings);
         }
-        persistenceSession.persist(clientGuardian);
-        persistenceSession.flush();
+        session.persist(clientGuardian);
+    }
+
+    public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession, Org organization, Long idOfClientChild) throws Exception{
+        String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+        String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
+        Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
+                registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
+                remark, null, ClientCreatedFromType.DEFAULT, organization);
+
+        persistenceSession.persist(guardian);
+        createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(), true, idOfClientChild);
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
@@ -1097,9 +1108,9 @@ public class ClientManager {
     public static boolean existClient(Session persistenceSession, Org organization, String firstName, String surname,
             String secondName) throws Exception {
         if (StringUtils.isEmpty(secondName)) {
-            return DAOUtils.existClient(persistenceSession, organization, firstName, surname);
+            return DAOUtils.existClient(persistenceSession, organization, firstName, null, surname);
         }
-        return DAOUtils.existClient(persistenceSession, organization, firstName, surname, secondName);
+        return DAOUtils.existClient(persistenceSession, organization, firstName, secondName, surname);
     }
 
 
@@ -1494,11 +1505,13 @@ public class ClientManager {
     }
 
     /* получить список опекаемых по опекуну */
-    public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDeleted) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        if (!includeDeleted) {
+            idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();

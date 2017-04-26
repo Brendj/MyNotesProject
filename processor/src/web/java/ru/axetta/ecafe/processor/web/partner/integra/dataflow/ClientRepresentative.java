@@ -51,6 +51,9 @@ public class ClientRepresentative {
     @XmlAttribute(name = "NotifyViaEmail")
     protected Boolean notifyviaemail;
 
+    @XmlAttribute(name = "CreatedWhere")
+    protected Integer createdWhere;
+
     public Long getId() {
         return id;
     }
@@ -97,5 +100,13 @@ public class ClientRepresentative {
 
     public void setNotifyviaemail(Boolean notifyviaemail) {
         this.notifyviaemail = notifyviaemail;
+    }
+
+    public Integer getCreatedWhere() {
+        return createdWhere;
+    }
+
+    public void setCreatedWhere(Integer createdWhere) {
+        this.createdWhere = createdWhere;
     }
 }

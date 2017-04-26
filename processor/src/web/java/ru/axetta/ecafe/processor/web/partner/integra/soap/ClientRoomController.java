@@ -397,11 +397,11 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getCurrentSubscriptionFeeding")
     SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "currentDay") Date currentDay);
+          @WebParam(name = "currentDay") Date currentDay, @WebParam(name = "type") Integer type);
 
     @WebMethod(operationName = "getCurrentSubscriptionFeedingBySan")
     SubscriptionFeedingResult getCurrentSubscriptionFeeding(@WebParam(name = "san") String san,
-          @WebParam(name = "currentDay") Date currentDay);
+          @WebParam(name = "currentDay") Date currentDay, @WebParam(name = "type") Integer type);
 
     /*@WebMethod(operationName = "activateSubscriptionFeeding")
     Result activateSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
@@ -489,4 +489,15 @@ public interface ClientRoomController {
 
     @WebMethod ClientGuidResult getClientGuidByContractId(@WebParam(name = "contractId") Long contractId);
 
+    @WebMethod Result addGuardian(@WebParam(name = "firstName") String firstName,
+            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
+            @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
+            @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile);
+
+    /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
+            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
+            @WebParam(name = "gender") Integer gender, @WebParam(name = "contracts") ListOfContracts contracts);*/
+
+    @WebMethod Result removeGuardian(@WebParam(name = "guardianContractId") Long contractId,
+            @WebParam(name = "childContractId") Long childContractId);
 }
