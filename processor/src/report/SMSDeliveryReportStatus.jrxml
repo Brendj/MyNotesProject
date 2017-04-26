@@ -322,42 +322,42 @@
 								<textElement>
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Максимальное время без обмена в период 07:15-08:45]]></text>
+								<text><![CDATA[Максимальное время без обмена в период 07:16-08:45]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="271d0b09-d9b1-4c16-bbab-92e1fa1ffa48" style="Crosstab Data Text" x="210" y="20" width="70" height="100"/>
 								<textElement>
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Общее время отсутствия обмена свыше 2-х минут в период 07:15-08:45]]></text>
+								<text><![CDATA[Общее время отсутствия обмена свыше 2-х минут в период 07:16-08:45]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="280" y="20" width="70" height="100"/>
 								<textElement>
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Максимальное время без обмена в период 08:45-16:00]]></text>
+								<text><![CDATA[Максимальное время без обмена в период 08:46-16:00]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="350" y="20" width="70" height="100"/>
 								<textElement>
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Общее время отсутствия обмена свыше 2-х минут в период 08:45-16:00]]></text>
+								<text><![CDATA[Общее время отсутствия обмена свыше 2-х минут в период 08:46-16:00]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="420" y="20" width="70" height="100"/>
 								<textElement>
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Максимальное время без обмена в период 16:00-00:00]]></text>
+								<text><![CDATA[Максимальное время без обмена в период 16:01-23:59]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d0b09-d9b1-4c16-bbab-92e1fa2efa57" style="Crosstab Data Text" x="490" y="20" width="70" height="100"/>
 								<textElement>
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Общее время без обмена свыше 2-х минут в период 16:00-00:00]]></text>
+								<text><![CDATA[Общее время без обмена свыше 2-х минут в период 16:01-23:59]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="265d1b09-d9b1-4c16-bbab-92e1fa2efb53" style="Crosstab Data Text" x="560" y="20" width="70" height="100"/>

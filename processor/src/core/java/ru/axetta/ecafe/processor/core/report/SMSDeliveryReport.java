@@ -201,6 +201,13 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 findOrgData(items, session, moreThanTwoMinutes);
                 findEmptyRows(items);
 
+                long diff = Math.abs(end.getTime() - start.getTime());
+                long diffDays = diff / (24 * 60 * 60 * 1000);
+
+                if (diffDays < 1) {
+                    dataZeroAllThePeriod(items);
+                }
+
                 return items;
             } catch (Exception e) {
                 logger.error("Failed to build SMSDelivery report", e);
@@ -213,6 +220,122 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 item.setIsEmptyValues();
             }
             return items;
+        }
+
+        private List<SMSDeliveryReportItem> dataZeroAllThePeriod(List<SMSDeliveryReportItem> items) {
+
+            for (SMSDeliveryReportItem item : items) {
+                Map<String, String> map = item.getValues();
+
+                Set<Map.Entry<String, String>> entries = map.entrySet();
+
+                for (Map.Entry<String, String> entry : entries) {
+                    if (entry.getKey().equals("0_maxDelayMidnight")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("7:15:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayMidnight")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("7:15:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_maxDelayMorning")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("1:29:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayMorning")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("1:29:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_maxDelayMidday")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("7:14:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayMidday")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("7:14:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_maxDelayNight")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("7:58:59");
+                        }
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayNight")) {
+                        if (entry.getValue().equals("0:00:00")) {
+                            entry.setValue("7:58:59");
+                        }
+                    }
+                }
+            }
+
+
+            collectingCommonSum(items);
+            return items;
+        }
+
+
+        private List<SMSDeliveryReportItem> collectingCommonSum(List<SMSDeliveryReportItem> items) {
+
+            long zeroDiffMidnight = 0;
+            long zeroDiffMorning = 0;
+            long zeroDiffMidday = 0;
+            long zeroDiffNight = 0;
+
+            long sumZeroDiff;
+
+            for (SMSDeliveryReportItem item : items) {
+                Map<String, String> map = item.getValues();
+
+                Set<Map.Entry<String, String>> entries = map.entrySet();
+
+                for (Map.Entry<String, String> entry : entries) {
+
+                    if (entry.getKey().equals("0_sumDelayMidnight")) {
+                        zeroDiffMidnight = parseSum(entry.getValue());
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayMorning")) {
+                        zeroDiffMorning = parseSum(entry.getValue());
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayMidday")) {
+                        zeroDiffMidday = parseSum(entry.getValue());
+                    }
+
+                    if (entry.getKey().equals("0_sumDelayNight")) {
+                        zeroDiffNight = parseSum(entry.getValue());
+                    }
+
+                    if (entry.getKey().equals("commonSum")) {
+                        sumZeroDiff = zeroDiffMidday + zeroDiffMidnight + zeroDiffMorning + zeroDiffNight;
+                        if (sumZeroDiff != 0) {
+                            entry.setValue(calcTimeout(sumZeroDiff));
+                        }
+                    }
+                }
+            }
+
+            return items;
+        }
+
+        public long parseSum(String commonSum) {
+            long commonSumConverted;
+            String[] arr = commonSum.split(":");
+            commonSumConverted = Integer.parseInt(arr[0]) * MILLIS_IN_HOUR + Integer.parseInt(arr[1]) * MILLIS_IN_MINUTE
+                    + Integer.parseInt(arr[2]) * MILLIS_IN_SECOND;
+            return commonSumConverted;
         }
 
         public List<SMSDeliveryReportItem> findDaily(List<SMSDeliveryReportItem> items, Session session, Date start, Date end) {
@@ -585,42 +708,16 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 if (isTimeBetween0h00mAnd7h15m(ts[0], dateConstants)) {
                     maxDelayMorning = Math.max(diff, maxDelayMorning);
                     sumDelayMorning += diff;
-                }
-
-                /*else {
-                    zeroDiff = dateConstants.toDay7H15MinInMillis - dateConstants.toDay0H00MinInMillis;
-                    maxDelayMidnight = Math.max(zeroDiff, maxDelayMidnight);
-                }*/
-
-                else if (isTimeBetween7h15mAnd8h45m(ts[0], dateConstants)) {
+                } else if (isTimeBetween7h16mAnd8h45m(ts[0], dateConstants)) {
                     maxDelayMidnight = Math.max(diff, maxDelayMidnight);
                     sumDelayMidnight += diff;
-                }
-
-                /*else {
-                    zeroDiff = dateConstants.toDay8H45MinInMillis - dateConstants.toDay7H15MinInMillis;
-                    maxDelayMorning = Math.max(zeroDiff, maxDelayMorning);
-                }*/
-
-                else if (isTimeBetween8h45mAnd16h00m(ts[0], dateConstants)) {
+                } else if (isTimeBetween8h46mAnd16h00m(ts[0], dateConstants)) {
                     maxDelayMidday = Math.max(diff, maxDelayMidday);
                     sumDelayMidday += diff;
-                }
-
-                /*else {
-                    zeroDiff = dateConstants.toDay16H00MinInMillis - dateConstants.toDay8H45MinInMillis;
-                    maxDelayMidday = Math.max(zeroDiff, maxDelayMidday);
-                }*/
-
-                else if (isTimeBetween16h00mAnd0h00m(ts[0], dateConstants)) {
+                } else if (isTimeBetween16h01mAnd23h59m59s(ts[0], dateConstants)) {
                     maxDelayNight = Math.max(diff, maxDelayNight);
                     sumDelayNight += diff;
                 }
-
-                /*else {
-                    zeroDiff = dateConstants.toDay16H00MinInMillis - dateConstants.toDay0H00MinInMillis;
-                    maxDelayNight = Math.max(zeroDiff, maxDelayNight);
-                }*/
 
                 lastSync = Math.max(lastSync, ts[0]);
             }
@@ -674,27 +771,23 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             }
         }
 
-        private static boolean isTimeBetween7h15mAnd8h45m(long syncTime , DateComparisonConstants constants) {
-            return ((syncTime >= constants.toDay7H15MinInMillis) && (syncTime < constants.toDay8H45MinInMillis));
-        }
-
-        private static boolean isTimeBetween8h45mAnd16h00m(long syncTime , DateComparisonConstants constants) {
-            return ((syncTime >= constants.toDay8H45MinInMillis) && (syncTime < constants.toDay16H00MinInMillis));
-
-        }
-
-        /*private static boolean isTimeBetween16h00mAnd7h15m(long syncTime , DateComparisonConstants constants) {
-            return (((syncTime >= constants.toDay16H00MinInMillis) && (syncTime < constants.secondDayStartInMillis)) ||
-                    ((syncTime >= constants.todayStartInMillis) && (syncTime < constants.toDay7H15MinInMillis)));
-        }*/
-
-        private static boolean isTimeBetween16h00mAnd0h00m(long syncTime, DateComparisonConstants constants) {
-            return (((syncTime >= constants.toDay16H00MinInMillis) && (syncTime < constants.toDay0H00MinInMillis)));
-        }
-
         private static boolean isTimeBetween0h00mAnd7h15m(long syncTime, DateComparisonConstants constants) {
             return (((syncTime >= constants.toDay0H00MinInMillis) && (syncTime < constants.toDay7H15MinInMillis)));
         }
+
+        private static boolean isTimeBetween7h16mAnd8h45m(long syncTime , DateComparisonConstants constants) {
+            return ((syncTime >= constants.toDay7H16MinInMillis) && (syncTime < constants.toDay8H45MinInMillis));
+        }
+
+        private static boolean isTimeBetween8h46mAnd16h00m(long syncTime , DateComparisonConstants constants) {
+            return ((syncTime >= constants.toDay8H46MinInMillis) && (syncTime < constants.toDay16H00MinInMillis));
+
+        }
+
+        private static boolean isTimeBetween16h01mAnd23h59m59s(long syncTime, DateComparisonConstants constants) {
+            return (((syncTime >= constants.toDay16H01MinInMillis) && (syncTime < constants.toDay23H59Min59SecInMillis)));
+        }
+
 
         protected static SMSDeliveryReportItem calcSmsDeliveryitem(List<DeliveryEntry> items, SMSDeliveryReportItem res, Integer uniqueId) {
             long minTime = Long.MAX_VALUE;
@@ -876,15 +969,24 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
 
         private final Date toDay0Hours00Minutes;
         private final Date toDay7Hours15Minutes;
+        private final Date toDay7Hours16Minutes;
         private final Date toDay8Hours45Minutes;
+        private final Date toDay8Hours46Minutes;
         private final Date toDay16Hours00Minutes;
+        private final Date toDay16Hours01Minutes;
+        private final Date toDay23Hours59Minutes59Seconds;
 
         public final long todayStartInMillis;
         public final long toDay7H15MinInMillis;
+        public final long toDay7H16MinInMillis;
         public final long toDay0H00MinInMillis;
         public final long toDay8H45MinInMillis;
+        public final long toDay8H46MinInMillis;
         public final long toDay16H00MinInMillis;
+        public final long toDay16H01MinInMillis;
+        public final long toDay23H59Min59SecInMillis;
         public final long secondDayStartInMillis;
+
 
         public DateComparisonConstants(Date startDate) {
             todayStartInMillis = startDate.getTime();
@@ -896,15 +998,28 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             toDay0Hours00Minutes = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 7, 15);
             toDay7Hours15Minutes = calendar.getTime();
+            CalendarUtils.setHoursAndMinutes(calendar, 7, 16);
+            toDay7Hours16Minutes = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 8, 45);
             toDay8Hours45Minutes = calendar.getTime();
+            CalendarUtils.setHoursAndMinutes(calendar, 8, 46);
+            toDay8Hours46Minutes = calendar.getTime();
             CalendarUtils.setHoursAndMinutes(calendar, 16, 00);
             toDay16Hours00Minutes = calendar.getTime();
+            CalendarUtils.setHoursAndMinutes(calendar, 16, 01);
+            toDay16Hours01Minutes = calendar.getTime();
+            CalendarUtils.setHoursAndMinutesAndSeconds(calendar, 23, 59, 59);
+            toDay23Hours59Minutes59Seconds = calendar.getTime();
+
 
             toDay0H00MinInMillis = toDay0Hours00Minutes.getTime();
             toDay7H15MinInMillis = toDay7Hours15Minutes.getTime();
+            toDay7H16MinInMillis = toDay7Hours16Minutes.getTime();
             toDay8H45MinInMillis = toDay8Hours45Minutes.getTime();
+            toDay8H46MinInMillis = toDay8Hours46Minutes.getTime();
             toDay16H00MinInMillis = toDay16Hours00Minutes.getTime();
+            toDay16H01MinInMillis = toDay16Hours01Minutes.getTime();
+            toDay23H59Min59SecInMillis = toDay23Hours59Minutes59Seconds.getTime();
         }
     }
 }

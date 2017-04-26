@@ -641,4 +641,12 @@ public class CalendarUtils {
         return calendar;
     }
 
+    public static Calendar setHoursAndMinutesAndSeconds(Calendar calendar, int hours, int minutes, int seconds) {
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, seconds);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
+    }
+
 }
