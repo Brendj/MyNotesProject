@@ -7975,7 +7975,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         return result;
-    }*/
+    }
 
     @Override
     public Result removeGuardian(@WebParam(name = "guardianContractId") Long guardianContractId,
@@ -8024,7 +8024,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         return result;
-    }
+    }*/
 
     private Long[] getVPOrgsList() {
         List<Long> result = new ArrayList<Long>();
