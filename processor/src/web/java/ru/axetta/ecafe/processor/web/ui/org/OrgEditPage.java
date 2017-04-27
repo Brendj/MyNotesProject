@@ -500,8 +500,8 @@ public class OrgEditPage extends BasicWorkspacePage
         if(menuExchangeSourceOrg!=null){
             Org org = DAOUtils.findOrg(session, menuExchangeSourceOrg);
             final Long idOfProvider = configurationProvider.getIdOfConfigurationProvider();
-            configurationProvider = ConfigurationProviderService.loadConfigurationProvider(session, idOfProvider);
-            if(!configurationProvider.getOrgs().contains(org)){
+            configurationProvider = idOfProvider == null ? null : ConfigurationProviderService.loadConfigurationProvider(session, idOfProvider);
+            if(configurationProvider == null || !configurationProvider.getOrgs().contains(org)){
                 final StringBuilder message = new StringBuilder("Организации - источника меню школы ")
                         .append("'").append(org.getShortName()).append("'")
                         .append(" не входит в текущую конфигурацию провайдера");
