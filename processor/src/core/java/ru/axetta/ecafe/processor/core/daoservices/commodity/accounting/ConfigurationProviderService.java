@@ -76,11 +76,17 @@ public class ConfigurationProviderService {
                         org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.CHANGED);
                     }
                     if(!org.getSourceMenuOrgs().isEmpty()){
-                        Org sourceOrg = org.getSourceMenuOrgs().iterator().next();
-                        final boolean isProvider = sourceOrg.getConfigurationProvider() == null ||
-                                !sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider()
-                                .equals(cp.getIdOfConfigurationProvider());
-                        if(sourceOrg.getConfigurationProvider()==null || isProvider){
+                        Set<Org> sourceOrgs = org.getSourceMenuOrgs();
+                        boolean isProvider = false;
+                        for(Org sourceOrg : sourceOrgs) {
+                            if(sourceOrg.getConfigurationProvider() != null) {
+                                isProvider = isProvider ||
+                                !sourceOrg.getConfigurationProvider().getIdOfConfigurationProvider().equals(cp.getIdOfConfigurationProvider());
+                            } else if(orgs.contains(sourceOrg)) {
+                                isProvider = true;
+                            }
+                        }
+                        if(!isProvider){
                             final StringBuilder message = new StringBuilder("Организации - источника ")
                                     .append(" меню школы ")
                                     .append("'").append(org.getShortName()).append("'")
