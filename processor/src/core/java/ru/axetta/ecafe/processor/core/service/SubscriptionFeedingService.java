@@ -335,6 +335,8 @@ public class SubscriptionFeedingService {
         subQuery.add(Restrictions.le("dateCreateService", currentDate));
         if (type != null) {
             subQuery.add(Restrictions.eq("feedingType", SubscriptionFeedingType.fromInteger(type)));
+        } else {
+            subQuery.add(Restrictions.eq("feedingType", SubscriptionFeedingType.ABON_TYPE));
         }
         subQuery.add(Restrictions.or(
               Restrictions.isNull("dateDeactivateService"),
@@ -346,6 +348,8 @@ public class SubscriptionFeedingService {
         criteria.add(Restrictions.eq("deletedState", false));
         if (type != null) {
             criteria.add(Restrictions.eq("feedingType", SubscriptionFeedingType.fromInteger(type)));
+        } else {
+            criteria.add(Restrictions.eq("feedingType", SubscriptionFeedingType.ABON_TYPE));
         }
         criteria.add(Subqueries.propertyEq("dateCreateService", subQuery));
         List list = criteria.list();
