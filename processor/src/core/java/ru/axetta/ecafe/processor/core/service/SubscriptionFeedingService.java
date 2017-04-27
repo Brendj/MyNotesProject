@@ -333,6 +333,7 @@ public class SubscriptionFeedingService {
         subQuery.add(Restrictions.eq("client", c));
         subQuery.add(Restrictions.eq("deletedState", false));
         subQuery.add(Restrictions.le("dateCreateService", currentDate));
+        subQuery.add(Restrictions.eq("feedingType", SubscriptionFeedingType.fromInteger(type)));
         subQuery.add(Restrictions.or(
               Restrictions.isNull("dateDeactivateService"),
               Restrictions.gt("dateDeactivateService", currentDate)
