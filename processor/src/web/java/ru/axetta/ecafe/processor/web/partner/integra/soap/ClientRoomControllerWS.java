@@ -7828,7 +7828,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<Client> exClients = DAOUtils.findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, mobilePhone);
             for (Client cl : exClients) {
                 if (cl.getClientGroup() == null
-                    || cl.getClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED) || cl.getClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING)) {
+                    || cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())
+                        || cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
                         continue;
                 }
                 if (guardians.contains(cl)) {
