@@ -778,19 +778,18 @@ public class DAOUtils {
     }
 
     public static List<Client> findClientsByFIO(Session persistenceSession, Set<Org> orgs, String firstName, String surname,
-            String secondName, ClientCreatedFromType createdFrom) throws Exception {
+            String secondName, String mobile) throws Exception {
         String secondNameCondition = StringUtils.isEmpty(secondName) ? "" :" and (upper(client.person.secondName) = :secondname) ";
-        String createdFromCondition = createdFrom == null ? "" : " and (client.createdFrom = :createdfrom) ";
+        //String createdFromCondition = createdFrom == null ? "" : " and (client.createdFrom = :createdfrom) ";
         Query query = persistenceSession.createQuery(
                 "select client from Client client where client.org in (:org) and (upper(client.person.surname) = :surname) and"
-                        + "(upper(client.person.firstName) = :firstname) " + secondNameCondition + createdFromCondition + " order by client.contractTime desc");
+                        + "(upper(client.person.firstName) = :firstname) " + secondNameCondition + " and mobile = :mobile order by client.contractTime desc");
         query.setParameterList("org", orgs);
         query.setParameter("surname", StringUtils.upperCase(surname));
         query.setParameter("firstname", StringUtils.upperCase(firstName));
         if (!secondNameCondition.equals(""))
             query.setParameter("secondname", StringUtils.upperCase(secondName));
-        if (createdFrom != null)
-            query.setParameter("createdfrom", createdFrom);
+        query.setParameter("mobile", mobile);
         return query.list();
     }
 

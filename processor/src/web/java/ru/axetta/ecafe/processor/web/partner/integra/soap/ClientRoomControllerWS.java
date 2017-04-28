@@ -7824,16 +7824,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             int count = 0;
             Client guardian = null;
             if (secondName == null) secondName = "";
-            List<Client> exClients = DAOUtils.findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, ClientCreatedFromType.MPGU);
+            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+            List<Client> exClients = DAOUtils.findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, mobilePhone);
             for (Client cl : exClients) {
-                List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+                if (cl.getClientGroup() == null
+                    || cl.getClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED) || cl.getClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING)) {
+                        continue;
+                }
                 if (guardians.contains(cl)) {
                     return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
                 }
-                if (mobilePhone.equals(cl.getMobile())) {
-                    count++;
-                    guardian = cl;
-                }
+                count++;
+                guardian = cl;
             }
             if (count > 1) {
                 return new Result(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
@@ -7850,6 +7852,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);
                 session.update(clientGuardian);
+            } else {
+                return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
             }
 
             transaction.commit();
