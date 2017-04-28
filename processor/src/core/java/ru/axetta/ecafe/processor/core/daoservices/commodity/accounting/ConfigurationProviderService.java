@@ -99,6 +99,12 @@ public class ConfigurationProviderService {
                     entityManager.persist(org);
                     entityManager.flush();
                 }
+                entityManager.persist(cp);
+                for(Org org : orgs) {
+                    if(!org.getType().equals(OrganizationType.SUPPLIER)) {
+                        org.setConfigurationProvider(cp);
+                    }
+                }
             }
         } else {
             if(!cp.getOrgs().isEmpty()){
@@ -110,8 +116,9 @@ public class ConfigurationProviderService {
                 }
             }
             cp.clearOrg();
+            entityManager.persist(cp);
         }
-        entityManager.persist(cp);
+        
         return configurationProvider;
     }
 
