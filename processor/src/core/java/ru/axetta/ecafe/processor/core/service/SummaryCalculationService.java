@@ -151,7 +151,19 @@ public class SummaryCalculationService {
             logger.info("Start summary calculation notification");
             final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                     EventNotificationService.class);
-            List<ClientEE> clients = generateNotificationParams(startDate, endDate, notyfyType);
+            List<ClientEE> clients = null;
+            long pause = 1000 * 60 * 15; //будет 3 попытки с паузой в 15 минут
+            for (int attempt = 0; attempt < 3; attempt++) {
+                try {
+                    logger.info(String.format("SummaryCalculationService attempt %s generate params", attempt));
+                    clients = generateNotificationParams(startDate, endDate, notyfyType);
+                    break;
+                } catch (Exception e) {
+                    logger.error("Error execute generateNotificationParams. Pause 15 min", e);
+                    Thread.sleep(pause);
+                }
+            }
+            if (clients == null) return;
 
             for (ClientEE clientEE : clients) {
                 if (clientEE.getNotInform()) continue;
