@@ -163,11 +163,6 @@ public class Processor implements SyncProcessor {
                     response = buildMigrantsSyncResponse(request);
                     break;
                 }
-                case TYPE_INFO_MESSAGE:{
-                    //обработка информационных сообщений
-                    response = buildInfoMessageSyncResponse(request);
-                    break;
-                }
                 case TYPE_CONSTRUCTED:{
                     response = buildUnivercalConstructedSectionsSyncResponse(request, syncStartTime, syncResult);
                     break;
@@ -2016,21 +2011,6 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
-    private SyncResponse buildInfoMessageSyncResponse(SyncRequest request) throws Exception {
-        Long idOfPacket = null;
-        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
-
-        processInfoMessageSections(request, responseSections);
-
-        // время окончания обработки
-        Date syncEndTime = new Date();
-
-        String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
-        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
-                request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime,
-                responseSections);
-    }
-
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
         InfoMessageRequest infoMessageRequest = request.getInfoMessageRequest();
         if (infoMessageRequest == null) return;
@@ -2347,6 +2327,9 @@ public class Processor implements SyncProcessor {
         processAccountOperationsRegistrySections(request, null, responseSections, bError);
 
         processPaymentRegistrySections(request, null, responseSections, bError, idOfPacket, errorClientIds);
+
+        //info messages
+        processInfoMessageSections(request, responseSections);
 
         try {
             if (request.getProtoVersion() < 6) {

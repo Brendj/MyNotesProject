@@ -2436,17 +2436,6 @@ public class DAOUtils {
         return version;
     }
 
-    public static Boolean needInfoMessageSync(Session session, Long idOfOrg) {
-        Query query = session.createSQLQuery("select count(*) from cf_info_message_details where idoforg = :idOfOrg and senddate is null");
-        query.setParameter("idOfOrg", idOfOrg);
-        Object o = query.uniqueResult();
-        if (o != null) {
-            Long count = ((BigInteger)o).longValue();
-            return count > 0;
-        }
-        return false;
-    }
-
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
