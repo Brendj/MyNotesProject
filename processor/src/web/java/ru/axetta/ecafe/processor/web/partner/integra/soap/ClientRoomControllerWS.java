@@ -7824,7 +7824,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             int count = 0;
             Client guardian = null;
             if (secondName == null) secondName = "";
-            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+            //List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
             List<Client> exClients = DAOUtils.findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, mobilePhone);
             for (Client cl : exClients) {
                 if (cl.getClientGroup() == null
@@ -7832,9 +7832,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         || cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
                         continue;
                 }
-                if (guardians.contains(cl)) {
+                /*if (guardians.contains(cl)) {
                     return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
-                }
+                }*/
                 count++;
                 guardian = cl;
             }
