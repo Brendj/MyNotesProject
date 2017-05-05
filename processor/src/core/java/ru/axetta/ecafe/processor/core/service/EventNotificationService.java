@@ -417,8 +417,13 @@ public class EventNotificationService {
         return sendSMS(destClient, dataClient, type, values, true, direction, guardian, eventTime);
     }
 
+    private boolean isLeavingGroup(Client client) {
+        return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())
+                || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue());
+    }
+
     public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Client guardian, Date eventTime) {
-        if (destClient.getMobile() == null || destClient.getMobile().length() == 0) {
+        if (destClient.getMobile() == null || destClient.getMobile().length() == 0 || isLeavingGroup(destClient)) {
             return false;
         }
         String text = getNotificationText(type, TYPE_SMS);
