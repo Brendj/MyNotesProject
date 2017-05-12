@@ -57,6 +57,13 @@ public class SMSService {
             QueueState queueState = getQueueState();
             logger.info(String.format("Размеры очереди smsSendingTaskExecutor: выполняется потоков - %s, "+
                     "доступно в очереди - %s, размер очереди - %s", queueState.getActiveCount(), queueState.getSize(), queueState.getQueue()));
+            ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor)RuntimeContext.getAppContext().getBean("executorWithPoolSizeRange");
+            if (ex != null) {
+                logger.info(String.format("Размеры очереди asyncThreadPoolTaskExecutor: выполняется потоков - %s, "+
+                        "доступно в очереди - %s, размер очереди - %s, выполнено задач - %s", ex.getActiveCount(),
+                        ex.getThreadPoolExecutor().getQueue().remainingCapacity(), ex.getThreadPoolExecutor().getQueue().size(),
+                        ex.getThreadPoolExecutor().getCompletedTaskCount()));
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
