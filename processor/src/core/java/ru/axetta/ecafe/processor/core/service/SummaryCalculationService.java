@@ -167,38 +167,44 @@ public class SummaryCalculationService {
 
             for (ClientEE clientEE : clients) {
                 if (clientEE.getNotInform()) continue;
-                String type = "";
-                int notificationType = 0;
-                if (notyfyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
-                    type = EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY;
-                    notificationType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
-                } else if (notyfyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
-                    type = EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK;
-                    notificationType = ClientSms.TYPE_SUMMARY_WEEKLY_NOTIFICATION;
-                }
-
-                //установка недостающих параметров date и
-                Date currentDate = new Date(System.currentTimeMillis());
-                clientEE.setValues(attachValue(clientEE.getValues(), VALUE_DATE, CalendarUtils.dateToString(currentDate)));
-
-                Client client = entityManager.find(Client.class, clientEE.getIdOfClient());
-                if (clientEE.getGuardians().size() == 0) {
-                    clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_NAME, ""));
-                    clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_SURNAME, ""));
-                    notificationService.sendNotificationSummary(client, null, type, clientEE.getValues(), new Date(System.currentTimeMillis()), notificationType);
-                } else {
-                    for (String ww : clientEE.getGuardians()) {
-                        String[] arr = ww.split("\\|");
-                        Client guardian = entityManager.find(Client.class, Long.parseLong(arr[0]));
-                        clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_NAME, arr[1]));
-                        clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_SURNAME, arr[2]));
-                        notificationService.sendNotificationSummary(guardian, client, type, clientEE.getValues(), new Date(System.currentTimeMillis()), notificationType);
+                try {
+                    String type = "";
+                    int notificationType = 0;
+                    if (notyfyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+                        type = EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY;
+                        notificationType = ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
+                    } else if (notyfyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+                        type = EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK;
+                        notificationType = ClientSms.TYPE_SUMMARY_WEEKLY_NOTIFICATION;
                     }
+
+                    //установка недостающих параметров date и
+                    Date currentDate = new Date(System.currentTimeMillis());
+                    clientEE.setValues(attachValue(clientEE.getValues(), VALUE_DATE, CalendarUtils.dateToString(currentDate)));
+
+                    Client client = entityManager.find(Client.class, clientEE.getIdOfClient());
+                    if (clientEE.getGuardians().size() == 0) {
+                        clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_NAME, ""));
+                        clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_SURNAME, ""));
+                        notificationService.sendNotificationSummary(client, null, type, clientEE.getValues(), new Date(System.currentTimeMillis()), notificationType);
+                    } else {
+                        for (String ww : clientEE.getGuardians()) {
+                            String[] arr = ww.split("\\|");
+                            Client guardian = entityManager.find(Client.class, Long.parseLong(arr[0]));
+                            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_NAME, arr[1]));
+                            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_GUARDIAN_SURNAME, arr[2]));
+                            notificationService.sendNotificationSummary(guardian, client, type, clientEE.getValues(),
+                                    new Date(System.currentTimeMillis()), notificationType);
+                        }
+                    }
+                } catch (Exception e) {
+                    //если ошибка по одному клиенту, не прерываем весь процесс
+                    logger.error("Error sending summary notification for client: ", e);
                 }
             }
             logger.info("End summary calculation notification");
         } catch(Exception e) {
-            logger.error("Error sending summary notification: ", e);
+            logger.error("Error process summary notification: ", e);
         }
     }
 
@@ -258,7 +264,7 @@ public class SummaryCalculationService {
                 + "coalesce(e.evtdatetime, -1) as evtdatetime, coalesce(e.passdirection, -1) as passdirection, "
                 + "coalesce(e.guardianid, -1) as guardianId, coalesce(e.childpasschecker, -1) as childpasschecker, "
                 + "coalesce(e.childpasscheckerid, -1) as childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
-                + "FROM cf_clientsnotificationsettings n inner join cf_clients c on c.idofclient = n.idofclient "
+                + "FROM cf_clientsnotificationsettings n inner join cf_clients c on c.idofclient = n.idofclient and n.notifytype = :notifyType "
                 + "INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
                 + "INNER JOIN cf_orgs o on c.idoforg = o.idoforg "
                 + "LEFT OUTER JOIN cf_enterevents e ON c.idofclient = e.idofclient "
