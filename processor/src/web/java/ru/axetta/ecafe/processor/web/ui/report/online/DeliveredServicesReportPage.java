@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
+import ru.axetta.ecafe.processor.core.report.DeliveredServicesReportBuilder;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
@@ -146,7 +147,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         try {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
-            DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
+            DeliveredServicesReportBuilder builder = new DeliveredServicesReportBuilder(templateFilename);
             if (idOfOrgList != null) {
                 List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
                 for(Long idOfOrg : idOfOrgList) {
@@ -199,7 +200,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     }
 
     public void buildReport(Session session) throws Exception {
-        DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
+        DeliveredServicesReportBuilder reportBuilder = new DeliveredServicesReportBuilder();
         if (idOfOrgList != null) {
             List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
             for(Long idOfOrg : idOfOrgList) {

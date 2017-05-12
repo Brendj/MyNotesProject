@@ -12,9 +12,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.DeliveredServicesElectronicCollationReport;
+import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
@@ -47,7 +45,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
         implements ContragentSelectPage.CompleteHandler,
         ContractSelectPage.CompleteHandler {
 
-    private DeliveredServicesElectronicCollationReport deliveredServices;
+    private DeliveredServicesReport deliveredServices;
     private String htmlReport;
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final ContractFilter contractFilter = new ContractFilter();
@@ -64,7 +62,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
         return "report/online/delivered_services_electronic_collation_report";
     }
 
-    public DeliveredServicesElectronicCollationReport getDeliveredServicesReport() {
+    public DeliveredServicesReport getDeliveredServicesReport() {
         return deliveredServices;
     }
 
@@ -152,7 +150,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
             String templateFilename =
                     autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class
                             .getSimpleName() + ".jasper";
-            DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(templateFilename);
+            DeliveredServicesElectronicCollationReportBuilder builder = new DeliveredServicesElectronicCollationReportBuilder(templateFilename);
             if (idOfOrgList != null) {
                 List<BasicReportJob.OrgShortItem> list = new ArrayList<BasicReportJob.OrgShortItem>();
                 for(Long idOfOrg : idOfOrgList) {
@@ -172,7 +170,7 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
                     contractFilter.getContract().getIdOfContract(), region, otherRegions);
 
 
-            DeliveredServicesElectronicCollationReport deliveredServicesElectronicCollationReport = builder
+            DeliveredServicesReport deliveredServicesElectronicCollationReport = builder
                     .build(session, startDate, endDate, localCalendar, idOfOrg,
                             contragentFilter.getContragent().getIdOfContragent(),
                             contractFilter.getContract().getIdOfContract(), region, otherRegions, withoutFriendly);
@@ -211,9 +209,9 @@ public class DeliveredServicesElectronicCollationReportPage extends OnlineReport
     }
 
     public void buildReport(Session session) throws Exception {
-        DeliveredServicesElectronicCollationReport.Builder reportBuilder = new DeliveredServicesElectronicCollationReport.Builder();
+        DeliveredServicesReportBuilder reportBuilder = new DeliveredServicesElectronicCollationReportBuilder();
 
-        b = reportBuilder.confirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
+        b = ((DeliveredServicesElectronicCollationReportBuilder)reportBuilder).confirmMessage(session, startDate, endDate, localCalendar, idOfOrg,
                 contragentFilter.getContragent().getIdOfContragent(),
                 contractFilter.getContract().getIdOfContract(), region, otherRegions);
 

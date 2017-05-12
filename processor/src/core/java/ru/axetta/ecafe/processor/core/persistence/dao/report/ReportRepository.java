@@ -248,7 +248,7 @@ public class ReportRepository extends BaseJpaDao {
         AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
         String templateFilename =
                 autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesElectronicCollationReport.class.getSimpleName() + ".jasper";
-        DeliveredServicesElectronicCollationReport.Builder builder = new DeliveredServicesElectronicCollationReport.Builder(
+        DeliveredServicesElectronicCollationReportBuilder builder = new DeliveredServicesElectronicCollationReportBuilder(
                 templateFilename);
         builder.setOrg(reportParameters.getIdOfOrg());
         try {
@@ -268,7 +268,7 @@ public class ReportRepository extends BaseJpaDao {
         AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
         String templateFilename =
                 autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
-        DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(
+        DeliveredServicesReportBuilder builder = new DeliveredServicesReportBuilder(
                 templateFilename);
         builder.setOrg(reportParameters.getIdOfOrg());
         try {

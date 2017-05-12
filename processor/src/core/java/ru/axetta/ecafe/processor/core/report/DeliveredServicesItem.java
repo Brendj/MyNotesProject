@@ -23,6 +23,10 @@ public class DeliveredServicesItem {
         private List<DeliveredServicesItem> listTotal37 = new ArrayList<DeliveredServicesItem>();
         private List<DeliveredServicesItem> listTotal511 = new ArrayList<DeliveredServicesItem>();
         private List<DeliveredServicesItem> listTotalAll = new ArrayList<DeliveredServicesItem>();
+        private Boolean list153Empty;
+        private Boolean list37Empty;
+        private Boolean list14Empty;
+        private Boolean list511Empty;
 
         public List<DeliveredServicesItem> getHeaderList() {
             return headerList;
@@ -86,6 +90,38 @@ public class DeliveredServicesItem {
 
         public void setListTotalAll(List<DeliveredServicesItem> listTotalAll) {
             this.listTotalAll = listTotalAll;
+        }
+
+        public Boolean getList153Empty() {
+            return list153Empty;
+        }
+
+        public void setList153Empty(Boolean list153Empty) {
+            this.list153Empty = list153Empty;
+        }
+
+        public Boolean getList37Empty() {
+            return list37Empty;
+        }
+
+        public void setList37Empty(Boolean list37Empty) {
+            this.list37Empty = list37Empty;
+        }
+
+        public Boolean getList14Empty() {
+            return list14Empty;
+        }
+
+        public void setList14Empty(Boolean list14Empty) {
+            this.list14Empty = list14Empty;
+        }
+
+        public Boolean getList511Empty() {
+            return list511Empty;
+        }
+
+        public void setList511Empty(Boolean list511Empty) {
+            this.list511Empty = list511Empty;
         }
     }
 
