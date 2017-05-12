@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Org" table="CF_Orgs" optimistic-lock="version">
-        <cache usage="transactional"/>
+        <!--<cache usage="transactional"/>-->
         <id name="idOfOrg" column="IdOfOrg" type="long">
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
@@ -199,7 +199,7 @@
         </many-to-one>
 
         <set name="friendlyOrg" table="cf_friendly_organization" lazy="true">
-            <cache usage="transactional"/>
+            <!--<cache usage="transactional"/>-->
             <key column="currentOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="friendlyOrg"/>
         </set>

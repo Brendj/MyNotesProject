@@ -58,6 +58,7 @@ public class SyncServlet extends HttpServlet {
     private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
     private static final List<String[]> restrictedFullSyncPeriods =
             getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
+    //private static final AtomicLong threadCounter = new AtomicLong();
 
     static class RequestData {
         public boolean isCompressed;
@@ -65,6 +66,7 @@ public class SyncServlet extends HttpServlet {
     }
 
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //Thread.currentThread().setName("SyncServlet-" + threadCounter.addAndGet(1));
         RuntimeContext runtimeContext = null;
         Long syncTime = new Date().getTime();
         SyncCollector.registerSyncStart(syncTime);

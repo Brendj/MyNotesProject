@@ -116,6 +116,10 @@
     </task:scheduled-tasks>
     <task:scheduler id="biDataExportSchedule" pool-size="5"/>-->
 
+    <task:scheduler id="threadDump" pool-size="5"/>
+    <task:scheduled-tasks scheduler="threadDump">
+        <task:scheduled ref="threadDumpService" method="run" fixed-delay="60000"/>
+    </task:scheduled-tasks>
 
     <task:scheduler id="importRegisterClientsSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="importRegisterClientsSchedule">

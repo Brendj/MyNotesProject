@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2017. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ThreadDump" table="CF_threaddumps">
+        <id name="idOfThreadDump" column="IdOfThreadDump" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="node" column="Node" type="string" length="20"/>
+        <property name="dateTime" column="dateTime" not-null="true" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="totalCPUTime" column="TotalCPUTime" type="long"/>
+        <property name="duration" column="Duration" type="long"/>
+        <property name="problemStacks" column="ProblemStacks" type="string"/>
+        <property name="dumpStack" column="DumpStack" type="string"/>
+    </class>
+</hibernate-mapping>
+
+

@@ -13,3 +13,18 @@ alter table cf_taloon_approval add column remarks text;
 
 --Поле источник создания клиента (МПГУ или иное)
 alter table cf_clients add column createdFrom integer not null default 0;
+
+--Таблица для хранения дампов стеков
+CREATE TABLE cf_threaddumps
+(
+  idofthreaddump bigserial NOT NULL,
+  datetime bigint NOT NULL,
+  node character varying(20),
+  totalcputime bigint,
+  duration bigint,
+  problemstacks text,
+  dumpstack text,
+  CONSTRAINT cf_threaddumps_pkey PRIMARY KEY (idofthreaddump)
+);
+
+CREATE INDEX cf_threaddumps_datetime_idx ON cf_threaddumps USING btree (datetime);
