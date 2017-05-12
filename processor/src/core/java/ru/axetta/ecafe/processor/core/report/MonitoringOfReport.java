@@ -57,14 +57,14 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         public Builder() {
             String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
                     .getReportsTemplateFilePath();
-            templateFilename = reportsTemplateFilePath + MigrantsReport.class.getSimpleName() + ".jasper";
+            templateFilename = reportsTemplateFilePath + MonitoringOfReport.class.getSimpleName() + ".jasper";
         }
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
+            parameterMap.put("beginDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("reportName", REPORT_NAME);
 
@@ -85,8 +85,9 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList)
                 throws Exception {
 
-            MonitoringOfReportService service = new MonitoringOfReportService(session);
-            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, idOfOrgList));
+            MonitoringOfReportService service = new MonitoringOfReportService();
+
+            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrgList));
         }
     }
 

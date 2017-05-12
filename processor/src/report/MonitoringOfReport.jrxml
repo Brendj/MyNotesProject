@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" language="groovy" pageWidth="2000" pageHeight="842" columnWidth="1960" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="2000" pageHeight="30000" columnWidth="1960" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.6830134553650707"/>
-	<property name="ireport.x" value="406"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<parameter name="beginDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
 	<field name="orgNum" class="java.lang.String"/>
 	<field name="shortName" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
@@ -11,7 +13,7 @@
 	<field name="district" class="java.lang.String"/>
 	<field name="typeOfBuilding" class="java.lang.String"/>
 	<field name="introductionQueue" class="java.lang.String"/>
-	<field name="studentsInTheDatabase" class="java.lang.String"/>
+	<field name="studentsInDatabase" class="java.lang.String"/>
 	<field name="studentsWithMaps" class="java.lang.String"/>
 	<field name="parents" class="java.lang.String"/>
 	<field name="pedagogicalComposition" class="java.lang.String"/>
@@ -21,10 +23,10 @@
 			<textField>
 				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="1960" height="79"/>
 				<textElement verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="24" isBold="true"/>
 					<paragraph leftIndent="50"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Мониторинг"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Мониторинг с " + $P{beginDate} + " по " + $P{endDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -32,6 +34,12 @@
 		<band height="50">
 			<staticText>
 				<reportElement uuid="730b4437-fe06-4d2f-918a-7d5fa07b0d1c" x="0" y="0" width="50" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -39,6 +47,12 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="69b0ff7d-7f51-4c0d-ac6c-b4bbfde102c7" x="50" y="0" width="150" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -46,6 +60,12 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" x="200" y="0" width="150" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -53,6 +73,12 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="64d56469-fb0c-426d-b585-72a6bff211e7" x="350" y="0" width="50" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -60,6 +86,12 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" x="400" y="0" width="100" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -67,55 +99,103 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" x="500" y="0" width="100" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Округ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" x="600" y="0" width="100" height="50"/>
+				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" x="600" y="0" width="150" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Тип здания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="10a6849d-4b87-456f-9722-14e887ce2379" x="700" y="0" width="100" height="50"/>
+				<reportElement uuid="10a6849d-4b87-456f-9722-14e887ce2379" x="750" y="0" width="100" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Очередь]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="fad07077-a767-4a5d-a841-3a757544f30b" x="800" y="0" width="100" height="50"/>
+				<reportElement uuid="fad07077-a767-4a5d-a841-3a757544f30b" x="850" y="0" width="70" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Учащихся в базе]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1bc17b47-f1ea-40c6-882a-99860c874d51" x="1000" y="0" width="100" height="50"/>
+				<reportElement uuid="1bc17b47-f1ea-40c6-882a-99860c874d51" x="990" y="0" width="70" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Родители]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5c374888-f022-4141-849e-b8db9616ae24" x="1100" y="0" width="130" height="50"/>
+				<reportElement uuid="5c374888-f022-4141-849e-b8db9616ae24" x="1060" y="0" width="110" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Пед.состав и администрация ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5f5ee610-a666-46d5-8412-6a09666ecaa7" x="1230" y="0" width="130" height="50"/>
+				<reportElement uuid="5f5ee610-a666-46d5-8412-6a09666ecaa7" x="1170" y="0" width="110" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Иные сотрудники ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01d83222-e4c5-437a-bd0f-cbbaba061618" x="900" y="0" width="100" height="50"/>
+				<reportElement uuid="01d83222-e4c5-437a-bd0f-cbbaba061618" x="920" y="0" width="70" height="50"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
@@ -125,68 +205,146 @@
 	</columnHeader>
 	<detail>
 		<band height="25" splitType="Stretch">
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="fe55e602-4fe3-41c7-98d5-226fe0ef2380" x="0" y="0" width="50" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgNum}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="6588f785-71ec-44e9-a94c-d8ac970a34dd" x="50" y="0" width="150" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" x="200" y="0" width="150" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" x="350" y="0" width="50" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="51a59e17-ad29-4f12-a57c-b92682e854f6" x="400" y="0" width="100" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" x="500" y="0" width="100" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" x="600" y="0" width="100" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" x="600" y="0" width="150" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{typeOfBuilding}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="e13e74a2-48a0-4653-9d25-e4156de827e1" x="700" y="0" width="100" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="e13e74a2-48a0-4653-9d25-e4156de827e1" x="750" y="0" width="100" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{introductionQueue}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" x="800" y="0" width="100" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" x="850" y="0" width="70" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{studentsInTheDatabase}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{studentsInDatabase}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" x="900" y="0" width="100" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" x="920" y="0" width="70" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{studentsWithMaps}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" x="1000" y="0" width="100" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" x="990" y="0" width="70" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{parents}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" x="1100" y="0" width="130" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" x="1060" y="0" width="110" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{pedagogicalComposition}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" x="1230" y="0" width="130" height="25"/>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" x="1170" y="0" width="110" height="25"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{otherEmployees}]]></textFieldExpression>
 			</textField>

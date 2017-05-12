@@ -78,7 +78,7 @@
                         display: none;
                     }
                 </style>
-                <div class="htmlReportContent"> ${mainPage.migrantsReportPage.htmlReport} </div>
+                <div class="htmlReportContent"> ${mainPage.monitoringOfReportPage.htmlReport} </div>
             </f:verbatim>
             <h:outputText escape="true" value="Подготовка отчета завершена успешно" styleClass="output-text" />
         </c:if>
