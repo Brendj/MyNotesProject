@@ -361,7 +361,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING);
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
-                + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
+                + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, details.menuDetailName as fullName "
                 + " , details.RPrice as price"
                 + " from OrderDetail details "
                 + " left join details.good good left join details.order ord left join ord.org o "
