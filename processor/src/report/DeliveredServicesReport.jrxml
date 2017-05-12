@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.2100000000000104"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="288"/>
+	<property name="ireport.y" value="276"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -110,6 +110,10 @@
 	<field name="list37" class="java.util.List"/>
 	<field name="list14" class="java.util.List"/>
 	<field name="list511" class="java.util.List"/>
+	<field name="list153Empty" class="java.lang.Boolean"/>
+	<field name="list37Empty" class="java.lang.Boolean"/>
+	<field name="list14Empty" class="java.lang.Boolean"/>
+	<field name="list511Empty" class="java.lang.Boolean"/>
 	<variable name="startDateStr" class="java.lang.String">
 		<initialValueExpression><![CDATA[new java.text.SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
 	</variable>
@@ -1092,7 +1096,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="b7f024eb-f1c7-4de5-a223-d238b8afc290" positionType="Float" mode="Transparent" x="0" y="78" width="802" height="39"/>
+				<reportElement uuid="b7f024eb-f1c7-4de5-a223-d238b8afc290" positionType="Float" mode="Transparent" x="0" y="78" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list153Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="a6905019-910a-431f-b81b-8c57b0881bd7">
@@ -1844,7 +1850,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="090f71e7-abb8-41f2-bb41-0cb1d948b9f8" positionType="Float" mode="Transparent" x="0" y="156" width="802" height="39"/>
+				<reportElement uuid="090f71e7-abb8-41f2-bb41-0cb1d948b9f8" positionType="Float" mode="Transparent" x="0" y="156" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list37Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="eb629205-fb90-4791-a71a-235ad84fa982">
@@ -2596,7 +2604,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="2fd28fbb-4bec-416d-8c2e-b8d3a1cce94c" positionType="Float" mode="Transparent" x="0" y="273" width="802" height="39"/>
+				<reportElement uuid="2fd28fbb-4bec-416d-8c2e-b8d3a1cce94c" positionType="Float" mode="Transparent" x="0" y="273" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list14Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="7b6d7ffc-862f-48a3-9699-1e9cdad76281">
@@ -3348,7 +3358,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="39c76a18-09fb-4f8d-a399-1051776a46d3" positionType="Float" mode="Transparent" x="0" y="351" width="802" height="39"/>
+				<reportElement uuid="39c76a18-09fb-4f8d-a399-1051776a46d3" positionType="Float" mode="Transparent" x="0" y="351" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list511Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabDataset>
 					<dataset>
 						<datasetRun subDataset="Table Dataset 1" uuid="0d78628e-339b-4f06-b7d8-5f0ed3144543">
@@ -4837,7 +4849,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="aee6220e-aced-472c-b6d1-a5bf686fb5fc" positionType="Float" mode="Transparent" x="0" y="195" width="802" height="39"/>
+				<reportElement uuid="aee6220e-aced-472c-b6d1-a5bf686fb5fc" positionType="Float" mode="Transparent" x="0" y="195" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list153Empty} && !$F{list37Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabParameter name="summary37" class="java.lang.Long">
 					<parameterValueExpression><![CDATA[$P{summary37}]]></parameterValueExpression>
 				</crosstabParameter>
@@ -5519,7 +5533,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="61ffa75f-6f9a-4019-b378-49a1cbdf8fd1" positionType="Float" mode="Transparent" x="0" y="390" width="802" height="39"/>
+				<reportElement uuid="61ffa75f-6f9a-4019-b378-49a1cbdf8fd1" positionType="Float" mode="Transparent" x="0" y="390" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list14Empty} && !$F{list511Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabParameter name="summary511" class="java.lang.Long">
 					<parameterValueExpression><![CDATA[$P{summary511}]]></parameterValueExpression>
 				</crosstabParameter>
@@ -6201,7 +6217,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="95cd6932-6611-4128-9a5d-78f764db18f0" positionType="Float" mode="Transparent" x="0" y="39" width="802" height="39"/>
+				<reportElement uuid="95cd6932-6611-4128-9a5d-78f764db18f0" positionType="Float" mode="Transparent" x="0" y="39" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list153Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabParameter name="summary37" class="java.lang.Long">
 					<parameterValueExpression><![CDATA[$P{summary37}]]></parameterValueExpression>
 				</crosstabParameter>
@@ -6882,7 +6900,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="bbf4359d-2fa9-44d8-9453-678e682948fa" positionType="Float" mode="Transparent" x="0" y="117" width="802" height="39"/>
+				<reportElement uuid="bbf4359d-2fa9-44d8-9453-678e682948fa" positionType="Float" mode="Transparent" x="0" y="117" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list37Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabParameter name="summary37" class="java.lang.Long">
 					<parameterValueExpression><![CDATA[$P{summary37}]]></parameterValueExpression>
 				</crosstabParameter>
@@ -7563,7 +7583,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="93b9b4d8-fa85-41d5-b7e0-a02ae6971e1d" positionType="Float" mode="Transparent" x="0" y="234" width="802" height="39"/>
+				<reportElement uuid="93b9b4d8-fa85-41d5-b7e0-a02ae6971e1d" positionType="Float" mode="Transparent" x="0" y="234" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list14Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabParameter name="summary37" class="java.lang.Long">
 					<parameterValueExpression><![CDATA[$P{summary37}]]></parameterValueExpression>
 				</crosstabParameter>
@@ -8244,7 +8266,9 @@
 				</crosstabCell>
 			</crosstab>
 			<crosstab isRepeatRowHeaders="false">
-				<reportElement uuid="db64c566-a412-4bf0-8c27-b3db7f4f3da2" positionType="Float" mode="Transparent" x="0" y="312" width="802" height="39"/>
+				<reportElement uuid="db64c566-a412-4bf0-8c27-b3db7f4f3da2" positionType="Float" mode="Transparent" x="0" y="312" width="802" height="39">
+					<printWhenExpression><![CDATA[!$F{list511Empty}]]></printWhenExpression>
+				</reportElement>
 				<crosstabParameter name="summary37" class="java.lang.Long">
 					<parameterValueExpression><![CDATA[$P{summary37}]]></parameterValueExpression>
 				</crosstabParameter>
