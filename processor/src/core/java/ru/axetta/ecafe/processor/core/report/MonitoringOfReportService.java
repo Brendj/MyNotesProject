@@ -41,11 +41,11 @@ public class MonitoringOfReportService {
             reportItem.setTypeOfBuilding(org.getType().toString());
             reportItem.setIntroductionQueue(org.getIntroductionQueue());
 
-            reportItem.setStudentsInDatabase("");
+            reportItem.setStudentsInDatabase(allPeoples(org, session));
             reportItem.setStudentsWithMaps("");
             reportItem.setParents(parents(org, session));
             reportItem.setPedagogicalComposition(pedagogicalComposition(org, session));
-            reportItem.setOtherEmployees("");
+            reportItem.setOtherEmployees(otherEmloyees(org, session));
 
             reportItemList.add(reportItem);
         }
@@ -67,6 +67,28 @@ public class MonitoringOfReportService {
 
         Query query = session.createSQLQuery("SELECT count(*) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
                 + "WHERE cfc.idoforg = :idoforg AND (cfcl.groupname LIKE '%Пед. состав%' OR cfcl.groupname LIKE '%Администрация%') ");
+        query.setParameter("idoforg", org.getIdOfOrg());
+
+        String result = String.valueOf(query.uniqueResult());
+
+        return result;
+    }
+
+    public String allPeoples(Org org, Session session) {
+        Query query = session.createSQLQuery("SELECT count(*)"
+                + "FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
+                + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup < 1100000000");
+        query.setParameter("idoforg", org.getIdOfOrg());
+
+        String result = String.valueOf(query.uniqueResult());
+
+        return result;
+    }
+
+    public String otherEmloyees(Org org, Session session) {
+        Query query = session.createSQLQuery("SELECT count(*)"
+                        + "FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
+                + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup in (1100000050, 1100000020, 1100000040)");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
