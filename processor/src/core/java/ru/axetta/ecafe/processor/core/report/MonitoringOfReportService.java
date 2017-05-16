@@ -55,8 +55,7 @@ public class MonitoringOfReportService {
     public String parents(Org org, Session session) {
 
         Query query = session.createSQLQuery(
-                "SELECT count(*) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                        + "WHERE cfc.idoforg = :idoforg AND cfcl.groupname LIKE '%Родители%'");
+                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc WHERE cfc.idoforg = :idoforg AND cfc.IdOfClientGroup = 1100000030");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -67,8 +66,8 @@ public class MonitoringOfReportService {
     public String pedagogicalComposition(Org org, Session session) {
 
         Query query = session.createSQLQuery(
-                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                        + "WHERE cfc.idoforg = :idoforg AND (cfcl.groupname LIKE '%Пед. состав%' OR cfcl.groupname LIKE '%Администрация%') ");
+                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc "
+                        + "WHERE cfc.idoforg = :idoforg AND cfc.IdOfClientGroup in (1100000000, 1100000010)");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -78,8 +77,7 @@ public class MonitoringOfReportService {
 
     public String allPeoples(Org org, Session session) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT(cfc.idofclient)) "
-                + "FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup < 1100000000");
+                + "FROM cf_clients cfc WHERE cfc.idoforg = :idoforg AND cfc.idofclientgroup < 1100000000");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -89,8 +87,8 @@ public class MonitoringOfReportService {
 
     public String otherEmloyees(Org org, Session session) {
         Query query = session.createSQLQuery(
-                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                        + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup IN (1100000050, 1100000020, 1100000040)");
+                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc "
+                        + "WHERE cfc.idoforg = :idoforg AND cfc.idofclientgroup IN (1100000050, 1100000020, 1100000040)");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -101,7 +99,7 @@ public class MonitoringOfReportService {
     public String studentsWithMaps(Org org, Session session) {
         Query query = session.createSQLQuery(
                 "SELECT count(DISTINCT(cfca.idofclient ))  FROM cf_clients cfc LEFT JOIN cf_cards cfca ON cfc.idofclient = cfca.idofclient "
-                        + "LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup < 1100000000");
+                        + " WHERE cfc.idoforg = :idoforg AND cfc.idofclientgroup < 1100000000");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
