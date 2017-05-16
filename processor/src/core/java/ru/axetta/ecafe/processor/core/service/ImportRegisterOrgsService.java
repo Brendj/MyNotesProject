@@ -356,6 +356,14 @@ public class ImportRegisterOrgsService {
                 }
             }
             if (addChange) {
+                boolean onlyAdd = true;
+                for (OrgRegistryChangeItem item : orgRegistryChange.getOrgs()) {
+                    if (item.getOperationType().equals(OrgRegistryChange.MODIFY_OPERATION)) {
+                        onlyAdd = false;
+                        break;
+                    }
+                }
+                if (onlyAdd) orgRegistryChange.setOperationType(OrgRegistryChange.CREATE_OPERATION);
                 em.persist(orgRegistryChange);
             }
         }
