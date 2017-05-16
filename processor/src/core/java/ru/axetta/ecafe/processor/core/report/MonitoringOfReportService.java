@@ -29,7 +29,7 @@ public class MonitoringOfReportService {
     public List<ReportItem> getOrgData(Session session, List<Long> idOfOrgList) {
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
 
-        for (Long idOfOrg: idOfOrgList) {
+        for (Long idOfOrg : idOfOrgList) {
             Org org = (Org) session.load(Org.class, idOfOrg);
             ReportItem reportItem = new ReportItem();
             reportItem.setOrgNum(org.getOrgNumberInName());
@@ -42,7 +42,7 @@ public class MonitoringOfReportService {
             reportItem.setIntroductionQueue(org.getIntroductionQueue());
 
             reportItem.setStudentsInDatabase(allPeoples(org, session));
-            reportItem.setStudentsWithMaps("");
+            reportItem.setStudentsWithMaps(studentsWithMaps(org, session));
             reportItem.setParents(parents(org, session));
             reportItem.setPedagogicalComposition(pedagogicalComposition(org, session));
             reportItem.setOtherEmployees(otherEmloyees(org, session));
@@ -54,8 +54,9 @@ public class MonitoringOfReportService {
 
     public String parents(Org org, Session session) {
 
-        Query query = session.createSQLQuery("SELECT count(*) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                + "WHERE cfc.idoforg = :idoforg AND cfcl.groupname LIKE '%Родители%'");
+        Query query = session.createSQLQuery(
+                "SELECT count(*) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
+                        + "WHERE cfc.idoforg = :idoforg AND cfcl.groupname LIKE '%Родители%'");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -65,8 +66,9 @@ public class MonitoringOfReportService {
 
     public String pedagogicalComposition(Org org, Session session) {
 
-        Query query = session.createSQLQuery("SELECT count(*) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                + "WHERE cfc.idoforg = :idoforg AND (cfcl.groupname LIKE '%Пед. состав%' OR cfcl.groupname LIKE '%Администрация%') ");
+        Query query = session.createSQLQuery(
+                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
+                        + "WHERE cfc.idoforg = :idoforg AND (cfcl.groupname LIKE '%Пед. состав%' OR cfcl.groupname LIKE '%Администрация%') ");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -75,7 +77,7 @@ public class MonitoringOfReportService {
     }
 
     public String allPeoples(Org org, Session session) {
-        Query query = session.createSQLQuery("SELECT count(*)"
+        Query query = session.createSQLQuery("SELECT count(DISTINCT(cfc.idofclient)) "
                 + "FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
                 + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup < 1100000000");
         query.setParameter("idoforg", org.getIdOfOrg());
@@ -86,9 +88,9 @@ public class MonitoringOfReportService {
     }
 
     public String otherEmloyees(Org org, Session session) {
-        Query query = session.createSQLQuery("SELECT count(*)"
-                        + "FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
-                + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup in (1100000050, 1100000020, 1100000040)");
+        Query query = session.createSQLQuery(
+                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg "
+                        + "WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup IN (1100000050, 1100000020, 1100000040)");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -96,7 +98,16 @@ public class MonitoringOfReportService {
         return result;
     }
 
+    public String studentsWithMaps(Org org, Session session) {
+        Query query = session.createSQLQuery(
+                "SELECT count(DISTINCT(cfca.idofclient ))  FROM cf_clients cfc LEFT JOIN cf_cards cfca ON cfc.idofclient = cfca.idofclient "
+                        + "LEFT JOIN cf_clientgroups cfcl ON cfc.idoforg = cfcl.idoforg WHERE cfc.idoforg = :idoforg AND cfcl.idofclientgroup < 1100000000");
+        query.setParameter("idoforg", org.getIdOfOrg());
 
+        String result = String.valueOf(query.uniqueResult());
+
+        return result;
+    }
 
     public static class ReportItem {
 
