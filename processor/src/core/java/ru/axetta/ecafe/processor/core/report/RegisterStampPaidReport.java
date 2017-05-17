@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampPaidReportItem;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
@@ -92,7 +93,8 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
 
-            List<GoodItem1> allGoods = service.findAllGoodsPaid(org.getIdOfOrg(), startTime, endTime);
+            List<GoodItem1> allGoods = service.findAllGoodsByOrderType(org.getIdOfOrg(), startTime, endTime,
+                    OrderTypeEnumType.PAY_PLAN);
             Map<Date, Long> numbers = service.findAllRegistryTalonsPaid(org.getIdOfOrg(), startTime, endTime);
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -111,8 +113,8 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
                 } else {
                     for (GoodItem1 goodItem : allGoods) {
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
-                        Long val = service.buildRegisterStampBodyValuePaid(org.getIdOfOrg(), calendar.getTime(),
-                                goodItem.getFullName(), withOutActDiscrepancies);
+                        Long val = service.buildRegisterStampBodyValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
+                                goodItem.getFullName(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN);
                         RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem,val,date,number, time);
                         RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
                         result.add(item);

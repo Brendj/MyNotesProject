@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
@@ -74,52 +75,23 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public Long buildRegisterStampBodyValuePaid(Long idOfOrg, Date start, String fullname,
-            boolean includeActDiscrepancies) {
+    public Long buildRegisterStampBodyValueByOrderType(Long idOfOrg, Date start, String fullname,
+            boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType) {
         String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 " and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
-                " cforder.idoforg=:idoforg and good.fullname like '" + fullname + "' and " +
+                " cforder.idoforg=:idoforg and case good.fullname when '' then orderdetail.MenuDetailName else good.fullname end like '" + fullname + "' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " (cforder.ordertype=3 or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
                 : " and orderdetail.qty>=0 ") + " )) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate", start.getTime());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(start);
-        calendar.add(Calendar.DATE, 1);
-        long endTime = calendar.getTimeInMillis() - 1;
-        query.setParameter("endDate", endTime);
-        List list = query.list();
-        if (list == null || list.isEmpty() || list.get(0) == null) {
-            return 0L;
-        } else {
-            return new Long(list.get(0).toString());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public Long buildRegisterStampBodyValueSubscriptionFeeding(Long idOfOrg, Date start, String fullname,
-            boolean includeActDiscrepancies) {
-        String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
-                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
-                " and orderdetail.idoforder = cforder.idoforder" +
-                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
-                " cforder.idoforg=:idoforg and good.fullname like '" + fullname + "' and " +
-                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " (cforder.ordertype=7 or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
-                : " and orderdetail.qty>=0 ") + " )) ";
-        Query query = getSession().createSQLQuery(sql);
-        query.setParameter("idoforg", idOfOrg);
-        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("startDate", start.getTime());
+        query.setParameter("orderType", orderTypeEnumType.ordinal());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
         calendar.add(Calendar.DATE, 1);
@@ -331,51 +303,33 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return orderTypeEnumTypeSet;
     }
 
-    /* получаем список всех товаров для платного питания */
+    /* получаем список всех товаров по типу заказа */
     @SuppressWarnings("unchecked")
-    public List<GoodItem1> findAllGoodsPaid(Long idOfOrg, Date startTime, Date endTime){
-        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.PAY_PLAN);
-        String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
-                + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
-                + " , details.RPrice as price"
-                + " from OrderDetail details "
-                + " left join details.good good left join details.order ord left join ord.org o "
-                + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
-                + " ord.createTime between :startDate and :endDate and "
-                + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
-        Query query = getSession().createQuery(sql);
+    public List<GoodItem1> findAllGoodsByOrderType(Long idOfOrg, Date startTime, Date endTime, OrderTypeEnumType orderTypeEnumType){
+        Set<Integer> orderTypeEnumTypeSet = new HashSet<Integer>();
+        orderTypeEnumTypeSet.add(orderTypeEnumType.ordinal());
+        String sql = "SELECT DISTINCT good1_.IdOfGood AS globalId, "
+                + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 3) ELSE split_part(good1_.FullName, '/', 3) END AS pathPart3, "
+                + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 4) ELSE split_part(good1_.FullName, '/', 4) END AS pathPart4, "
+                + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 2) ELSE split_part(good1_.FullName, '/', 2) END AS pathPart2, "
+                + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 1) ELSE split_part(good1_.FullName, '/', 1) END AS pathPart1, "
+                + "orderdetai0_.MenuDetailName AS fullName, orderdetai0_.rPrice AS price "
+                + "FROM CF_OrderDetails orderdetai0_ LEFT OUTER JOIN cf_goods good1_ ON orderdetai0_.IdOfGood=good1_.IdOfGood "
+                + "LEFT OUTER JOIN CF_Orders order2_ ON orderdetai0_.IdOfOrg=order2_.IdOfOrg AND orderdetai0_.IdOfOrder=order2_.IdOfOrder "
+                + "LEFT OUTER JOIN CF_Orgs org3_ ON order2_.IdOfOrg=org3_.IdOfOrg "
+                + "WHERE order2_.State=0 AND orderdetai0_.State=0 AND (order2_.OrderType IN (:orderType)) "
+                + "AND (orderdetai0_.IdOfGood IS NOT NULL) AND org3_.IdOfOrg=:idOfOrg "
+                + "AND (order2_.CreatedDate BETWEEN :startDate AND :endDate) AND orderdetai0_.MenuType>=:mintype AND orderdetai0_.MenuType<=:maxtype ORDER BY fullName";
+        SQLQuery query = getSession().createSQLQuery(sql);
         query.setParameterList("orderType",orderTypeEnumTypeSet);
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("startDate",startTime);
-        query.setParameter("endDate", endTime);
+        query.setParameter("startDate",startTime.getTime());
+        query.setParameter("endDate", endTime.getTime());
         query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
-        return  (List<GoodItem1>) query.list();
-    }
-
-    /* получаем список всех товаров для абонементного питания питания */
-    @SuppressWarnings("unchecked")
-    public List<GoodItem1> findAllGoodsSubscriptionFeeding(Long idOfOrg, Date startTime, Date endTime){
-        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING);
-        String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
-                + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, details.menuDetailName as fullName "
-                + " , details.RPrice as price"
-                + " from OrderDetail details "
-                + " left join details.good good left join details.order ord left join ord.org o "
-                + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
-                + " ord.createTime between :startDate and :endDate and "
-                + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
-        Query query = getSession().createQuery(sql);
-        query.setParameterList("orderType",orderTypeEnumTypeSet);
-        query.setParameter("idOfOrg",idOfOrg);
-        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("startDate",startTime);
-        query.setParameter("endDate", endTime);
-        query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
+        query.addScalar("globalId").addScalar("pathPart3").addScalar("pathPart4").addScalar("pathPart2")
+                .addScalar("pathPart1").addScalar("fullName").addScalar("price");
         return  (List<GoodItem1>) query.list();
     }
 

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.order.items;
 
+import java.math.BigInteger;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -32,8 +34,8 @@ public class GoodItem1 implements Comparable<GoodItem1>{
         return globalId;
     }
 
-    public void setGlobalId(Long globalId) {
-        this.globalId = globalId;
+    public void setGlobalId(BigInteger globalId) {
+        this.globalId = globalId.longValue();
     }
 
     public String getPathPart1() {
@@ -80,8 +82,8 @@ public class GoodItem1 implements Comparable<GoodItem1>{
         return price;
     }
 
-    public void setPrice(Long price) {
-        this.price = price;
+    public void setPrice(BigInteger price) {
+        this.price = price.longValue();
     }
 
     @Override
