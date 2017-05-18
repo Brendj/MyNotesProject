@@ -68,7 +68,7 @@
     <task:annotation-driven executor="executorWithPoolSizeRange"/>
     <task:executor id="executorWithPoolSizeRange"
                    pool-size="5-100"
-                   queue-capacity="10000"
+                   queue-capacity="20000"
                    keep-alive="120"/>
     <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
     <tx:annotation-driven transaction-manager="txManagerReports" proxy-target-class="true"/>
