@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class MonitoringOfReportService {
 
-    public List<ReportItem> buildReportItems(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) {
+    public List<ReportItem> buildReportItems(Session session, Date startTime, List<Long> idOfOrgList) {
         List<ReportItem> reportItemList = getOrgData(session, idOfOrgList);
 
         return reportItemList;
@@ -123,12 +123,15 @@ public class MonitoringOfReportService {
         public String pedagogicalComposition;
         public String otherEmployees;
 
+        public MonitoringOfItem monitoringOfItems;
+
         public ReportItem() {
         }
 
         public ReportItem(String orgNum, String shortName, String address, String idOfOrg, String code, String district,
                 String typeOfBuilding, String introductionQueue, String studentsInDatabase, String studentsWithMaps,
-                String parents, String pedagogicalComposition, String otherEmployees) {
+                String parents, String pedagogicalComposition, String otherEmployees,
+                MonitoringOfItem monitoringOfItems) {
             this.orgNum = orgNum;
             this.shortName = shortName;
             this.address = address;
@@ -142,6 +145,7 @@ public class MonitoringOfReportService {
             this.parents = parents;
             this.pedagogicalComposition = pedagogicalComposition;
             this.otherEmployees = otherEmployees;
+            this.monitoringOfItems = monitoringOfItems;
         }
 
         public String getOrgNum() {
@@ -247,9 +251,157 @@ public class MonitoringOfReportService {
         public void setOtherEmployees(String otherEmployees) {
             this.otherEmployees = otherEmployees;
         }
+
+        public MonitoringOfItem getMonitoringOfItems() {
+            return monitoringOfItems;
+        }
+
+        public void setMonitoringOfItems(MonitoringOfItem monitoringOfItems) {
+            this.monitoringOfItems = monitoringOfItems;
+        }
     }
 
     public static class MonitoringOfItem {
 
+        private Date sDate;
+        private Long numberOfPassesStudents;
+        private Long numberOfPassesEmployees;
+        private Long numberOfPassesGuardians;
+        private Long summaryOfPasses;
+
+        private Long numberOfLgotnoe;
+        private Long numberOfReserve;
+        private Long numberOfBuffetStudent;
+        private Long numberOfBuffetGuardians;
+        private Long numberOfSubFeedStudents;
+        private Long numberOfSubFeedGuardians;
+        private Long numberOfPaidStudents;
+        private Long numberOfPaidGuardians;
+
+        public MonitoringOfItem() {
+        }
+
+        public MonitoringOfItem(Date sDate, Long numberOfPassesStudents, Long numberOfPassesEmployees,
+                Long numberOfPassesGuardians, Long summaryOfPasses, Long numberOfLgotnoe, Long numberOfReserve,
+                Long numberOfBuffetStudent, Long numberOfBuffetGuardians, Long numberOfSubFeedStudents,
+                Long numberOfSubFeedGuardians, Long numberOfPaidStudents, Long numberOfPaidGuardians) {
+            this.sDate = sDate;
+            this.numberOfPassesStudents = numberOfPassesStudents;
+            this.numberOfPassesEmployees = numberOfPassesEmployees;
+            this.numberOfPassesGuardians = numberOfPassesGuardians;
+            this.summaryOfPasses = summaryOfPasses;
+            this.numberOfLgotnoe = numberOfLgotnoe;
+            this.numberOfReserve = numberOfReserve;
+            this.numberOfBuffetStudent = numberOfBuffetStudent;
+            this.numberOfBuffetGuardians = numberOfBuffetGuardians;
+            this.numberOfSubFeedStudents = numberOfSubFeedStudents;
+            this.numberOfSubFeedGuardians = numberOfSubFeedGuardians;
+            this.numberOfPaidStudents = numberOfPaidStudents;
+            this.numberOfPaidGuardians = numberOfPaidGuardians;
+        }
+
+        public Date getsDate() {
+            return sDate;
+        }
+
+        public void setsDate(Date sDate) {
+            this.sDate = sDate;
+        }
+
+        public Long getNumberOfPassesStudents() {
+            return numberOfPassesStudents;
+        }
+
+        public void setNumberOfPassesStudents(Long numberOfPassesStudents) {
+            this.numberOfPassesStudents = numberOfPassesStudents;
+        }
+
+        public Long getNumberOfPassesEmployees() {
+            return numberOfPassesEmployees;
+        }
+
+        public void setNumberOfPassesEmployees(Long numberOfPassesEmployees) {
+            this.numberOfPassesEmployees = numberOfPassesEmployees;
+        }
+
+        public Long getNumberOfPassesGuardians() {
+            return numberOfPassesGuardians;
+        }
+
+        public void setNumberOfPassesGuardians(Long numberOfPassesGuardians) {
+            this.numberOfPassesGuardians = numberOfPassesGuardians;
+        }
+
+        public Long getSummaryOfPasses() {
+            return summaryOfPasses;
+        }
+
+        public void setSummaryOfPasses(Long summaryOfPasses) {
+            this.summaryOfPasses = summaryOfPasses;
+        }
+
+        public Long getNumberOfLgotnoe() {
+            return numberOfLgotnoe;
+        }
+
+        public void setNumberOfLgotnoe(Long numberOfLgotnoe) {
+            this.numberOfLgotnoe = numberOfLgotnoe;
+        }
+
+        public Long getNumberOfReserve() {
+            return numberOfReserve;
+        }
+
+        public void setNumberOfReserve(Long numberOfReserve) {
+            this.numberOfReserve = numberOfReserve;
+        }
+
+        public Long getNumberOfBuffetStudent() {
+            return numberOfBuffetStudent;
+        }
+
+        public void setNumberOfBuffetStudent(Long numberOfBuffetStudent) {
+            this.numberOfBuffetStudent = numberOfBuffetStudent;
+        }
+
+        public Long getNumberOfBuffetGuardians() {
+            return numberOfBuffetGuardians;
+        }
+
+        public void setNumberOfBuffetGuardians(Long numberOfBuffetGuardians) {
+            this.numberOfBuffetGuardians = numberOfBuffetGuardians;
+        }
+
+        public Long getNumberOfSubFeedStudents() {
+            return numberOfSubFeedStudents;
+        }
+
+        public void setNumberOfSubFeedStudents(Long numberOfSubFeedStudents) {
+            this.numberOfSubFeedStudents = numberOfSubFeedStudents;
+        }
+
+        public Long getNumberOfSubFeedGuardians() {
+            return numberOfSubFeedGuardians;
+        }
+
+        public void setNumberOfSubFeedGuardians(Long numberOfSubFeedGuardians) {
+            this.numberOfSubFeedGuardians = numberOfSubFeedGuardians;
+        }
+
+        public Long getNumberOfPaidStudents() {
+            return numberOfPaidStudents;
+        }
+
+        public void setNumberOfPaidStudents(Long numberOfPaidStudents) {
+            this.numberOfPaidStudents = numberOfPaidStudents;
+        }
+
+        public Long getNumberOfPaidGuardians() {
+            return numberOfPaidGuardians;
+        }
+
+        public void setNumberOfPaidGuardians(Long numberOfPaidGuardians) {
+            this.numberOfPaidGuardians = numberOfPaidGuardians;
+        }
     }
 }

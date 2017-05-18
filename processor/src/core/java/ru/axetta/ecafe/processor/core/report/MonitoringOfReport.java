@@ -65,7 +65,6 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("beginDate", CalendarUtils.dateShortToStringFullYear(startTime));
-            parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("reportName", REPORT_NAME);
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
@@ -75,24 +74,23 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList);
+            JRDataSource dataSource = createDataSource(session, startTime, idOfOrgList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
-            return new MonitoringOfReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
+            return new MonitoringOfReport(generateTime, generateDuration, jasperPrint, startTime, null);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList)
+        private JRDataSource createDataSource(Session session, Date startTime, List<Long> idOfOrgList)
                 throws Exception {
 
             MonitoringOfReportService service = new MonitoringOfReportService();
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrgList));
+            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, idOfOrgList));
         }
     }
 
-    public MonitoringOfReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime) {
+    public MonitoringOfReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
     }
 

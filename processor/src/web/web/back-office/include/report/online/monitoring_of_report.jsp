@@ -34,34 +34,16 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.monitoringOfReportPage.filter}}" />
         </h:panelGroup>
 
-        <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+        <h:outputText styleClass="output-text" escape="true" value="Дата" />
         <rich:calendar value="#{mainPage.monitoringOfReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDateCalendar,monitoringOfReportPanelGrid"
-                         actionListener="#{mainPage.monitoringOfReportPage.onReportPeriodChanged}" />
-        </rich:calendar>
-
-        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
-        <h:selectOneMenu id="endDatePeriodSelect" value="#{mainPage.monitoringOfReportPage.periodTypeMenu.periodType}"
-                         styleClass="input-text" style="width: 250px;">
-            <f:converter converterId="periodTypeConverter" />
-            <f:selectItems value="#{mainPage.monitoringOfReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar,monitoringOfReportPanelGrid"
-                         actionListener="#{mainPage.monitoringOfReportPage.onReportPeriodChanged}" />
-        </h:selectOneMenu>
-        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.monitoringOfReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDatePeriodSelect,monitoringOfReportPanelGrid"
-                         actionListener="#{mainPage.monitoringOfReportPage.onEndDateSpecified}" />
-        </rich:calendar>
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.monitoringOfReportPage.buildReportHTML}"
-                           reRender="migrantsReportTable"
-                           styleClass="command-button" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.monitoringOfReportPage.exportToXLS}" styleClass="command-button" />
+                           reRender="migrantsReportTable" styleClass="command-button" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.monitoringOfReportPage.exportToXLS}"
+                         styleClass="command-button" />
         <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
