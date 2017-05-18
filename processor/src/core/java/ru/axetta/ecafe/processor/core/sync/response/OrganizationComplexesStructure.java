@@ -70,18 +70,18 @@ public class OrganizationComplexesStructure implements AbstractToElement{
                 configurationProvider.setMenuSyncCountDays(menuSyncCountDays);
                 ConfigurationProviderService.updateWithVersion(session, configurationProvider);
             }
-            ProviderComplexesItem providerComplexesItem = createProviderComplexesItem(session, friendlyOrgs,
+            ProviderComplexesItem providerComplexesItem = createProviderComplexesItem(session, idOfOrg, friendlyOrgs,
                     configurationProvider);
             providerComplexesList.add(providerComplexesItem);
         }
     }
 
-    private ProviderComplexesItem createProviderComplexesItem(Session session, Set<Org> friendlyOrgs,
+    private ProviderComplexesItem createProviderComplexesItem(Session session, Long idOfOrgSync, Set<Org> friendlyOrgs,
             ConfigurationProvider configurationProvider) {
         Map<Date, Set<ComplexInfo>> complexesMap = new HashMap<Date, Set<ComplexInfo>>();
         Date searchDate = new Date();
         Set<Org> orgsWithConfiguration = selectOrgsWithConfiguration(configurationProvider, friendlyOrgs);
-        Set<ComplexInfo> complexes = findUniqueComplexes(session, orgsWithConfiguration,searchDate);
+        Set<ComplexInfo> complexes = findUniqueComplexes(session, idOfOrgSync, orgsWithConfiguration,searchDate);
         complexesMap.put(searchDate,complexes);
         return new ProviderComplexesItem(configurationProvider,complexesMap,orgsWithConfiguration);
     }
@@ -120,9 +120,9 @@ public class OrganizationComplexesStructure implements AbstractToElement{
     }
 
 
-    private Set<ComplexInfo> findUniqueComplexes(Session session, Set<Org> orgs, Date searchDate) {
+    private Set<ComplexInfo> findUniqueComplexes(Session session, Long idOfOrgSync, Set<Org> orgs, Date searchDate) {
         List complexes = findComplexesForOrgs(session, orgs,searchDate);
-        Set<ComplexInfo> resultComplexes = filterOnlyUniqueComplexes(complexes);
+        Set<ComplexInfo> resultComplexes = filterOnlyUniqueComplexes(complexes, idOfOrgSync);
         return resultComplexes;
     }
 
@@ -141,12 +141,21 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         return query.list();
     }
 
-    private Set<ComplexInfo> filterOnlyUniqueComplexes(List<ComplexInfo> complexes) {
+    private Set<ComplexInfo> filterOnlyUniqueComplexes(List<ComplexInfo> complexes, Long idOfOrgSync) {
         Set<ComplexInfo> result = new HashSet<ComplexInfo>();
         for (ComplexInfo complexInfo : complexes) {
             if (!containComplexInResult(result,complexInfo)){
                  result.add(complexInfo);
             }
+        }
+        Map<Integer, ComplexInfo> map = new HashMap<Integer, ComplexInfo>();
+        for (Iterator<ComplexInfo> iterator = result.iterator(); iterator.hasNext();) {
+            ComplexInfo complexInfo = iterator.next();
+            ComplexInfo ci = map.get(complexInfo.getIdOfComplex());
+            if (ci == null || idOfOrgSync.equals(complexInfo.getOrg().getIdOfOrg()))
+                map.put(complexInfo.getIdOfComplex(), complexInfo);
+            else
+                iterator.remove();
         }
         return result;
     }

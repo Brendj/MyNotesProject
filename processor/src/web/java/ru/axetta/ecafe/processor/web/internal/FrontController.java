@@ -412,7 +412,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
             return visitorItem;
         } catch (Exception e) {
-            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            logger.info("Ошибка при регистрацию посетителя и временной карты посетителя", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -437,7 +437,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            logger.info("Ошибка при регистрацию посетителя и временной карты посетителя", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -729,7 +729,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
             return idOfVisitor;
         } catch (Exception e) {
-            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            logger.info("Ошибка при регистрацию посетителя и временной карты посетителя", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
