@@ -28,3 +28,5 @@ CREATE TABLE cf_threaddumps
 );
 
 CREATE INDEX cf_threaddumps_datetime_idx ON cf_threaddumps USING btree (datetime);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 190517) НЕ МЕНЯТЬ
