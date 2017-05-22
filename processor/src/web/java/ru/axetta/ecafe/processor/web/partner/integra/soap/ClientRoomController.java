@@ -233,7 +233,7 @@ public interface ClientRoomController {
           @WebParam(name = "state") boolean state);
 
     @WebMethod Result changeMobilePhone(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "mobilePhone") String mobilePhone);
+          @WebParam(name = "mobilePhone") String mobilePhone, @WebParam(name = "dateConfirm") Date dateConfirm);
 
     @WebMethod
     Result changeEmail(@WebParam(name = "contractId") Long contractId, @WebParam(name = "email") String email);

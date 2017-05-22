@@ -355,6 +355,11 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.useLastEEModeForPlan}"
                              styleClass="output-text" />
 
+    <h:outputText escape="true" value="Дата и время подтверждения номера телефона" styleClass="output-text"
+                  rendered="#{!mainPage.clientEditPage.isLastConfirmMobileEmpty()}" />
+    <h:inputText value="#{mainPage.clientEditPage.lastConfirmMobile}" readonly="true" converter="timeConverter"
+                 styleClass="input-text" rendered="#{!mainPage.clientEditPage.isLastConfirmMobileEmpty()}" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

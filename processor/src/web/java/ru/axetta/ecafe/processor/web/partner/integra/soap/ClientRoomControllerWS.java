@@ -1835,6 +1835,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setOrgId(client.getOrg().getIdOfOrg());
         clientSummaryExt.setOrgType(client.getOrg().getType());
 
+        clientSummaryExt.setLastConfirmMobile(toXmlDateTime(client.getLastConfirmMobile()));
+
         data.setClientSummaryExt(clientSummaryExt);
     }
 
@@ -4056,7 +4058,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result changeMobilePhone(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "mobilePhone") String mobilePhone) {
+          @WebParam(name = "mobilePhone") String mobilePhone, @WebParam(name = "dateConfirm") Date dateConfirm) {
         authenticateRequest(contractId);
 
         Result r = new Result();
@@ -4068,7 +4070,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r.description = "Неверный формат телефона";
             return r;
         }
-        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone)) {
+        if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm)) {
             r.resultCode = RC_CLIENT_NOT_FOUND;
             r.description = RC_CLIENT_NOT_FOUND_DESC;
         }
@@ -5638,7 +5640,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 r.description = "Неверный формат телефона";
                 return r;
             }
-            if (!daoService.setClientMobilePhone(contractId, mobilePhone)) {
+            if (!daoService.setClientMobilePhone(contractId, mobilePhone, null)) {
                 r.resultCode = RC_CLIENT_NOT_FOUND;
                 r.description = RC_CLIENT_NOT_FOUND_DESC;
             }

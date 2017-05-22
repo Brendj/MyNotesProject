@@ -385,10 +385,11 @@ public class DAOService {
         return q.executeUpdate() != 0;
     }
 
-    public boolean setClientMobilePhone(Long contractId, String mobile) {
-        Query q = entityManager.createQuery("update Client set mobile=:mobile where contractId=:contractId");
+    public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm) {
+        Query q = entityManager.createQuery("update Client set mobile=:mobile, lastConfirmMobile = :lastConfirmMobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
         q.setParameter("contractId", contractId);
+        q.setParameter("lastConfirmMobile", dateConfirm);
         logger.info("class : DAOService, method : setClientMobilePhone line : 382, contractId : " + contractId + " mobile : " + mobile);
         return q.executeUpdate() != 0;
     }

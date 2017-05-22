@@ -255,6 +255,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Date disablePlanCreationDate;
     private String ageTypeGroup;
     private Long balanceToNotify;
+    private Date lastConfirmMobile;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -658,24 +659,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
-        //if(isParent(clientGroupName)){
-        //    criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
-        //} else {
-        //}
-        List results = criteria.list();
-        //clientGuardianItems = new ArrayList<ClientGuardianItem>();
-        //for (Object o: results){
-        //    ClientGuardian clientGuardian = (ClientGuardian) o;
-        //    Client cl = null;
-        //    //if(isParent(clientGroupName)){
-        //    //    cl = DAOUtils.findClient(session, clientGuardian.getIdOfChildren());
-        //    //} else {
-        //    //}
-        //    cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
-        //    if(cl != null){
-        //        clientGuardianItems.add(new ClientGuardianItem(cl));
-        //    }
-        //}
 
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
         this.clientWardItems = loadWardsByClient(session, idOfClient);
@@ -911,30 +894,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
         client.setBalanceToNotify(this.balanceToNotify);
-        /* Добавление СНИЛС опекунов */
-        /*Set<GuardSan> guardSans = new HashSet<GuardSan>();
-        String gSanList [] = null;
-        if (guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_1) > -1) {
-            gSanList = guardsan.split(ClientGuardSanRebuildService.DELIMETER_1);
-        } else if (guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_2) > -1) {
-            gSanList = guardsan.split(ClientGuardSanRebuildService.DELIMETER_2);
-        } else {
-            gSanList = new String [] { guardsan };
-        }
-        for (String gSan : gSanList) {
-            gSan = ClientGuardSanRebuildService.clearGuardSan(gSan);
-            if (gSan.length() < 1) {
-                continue;
-            }
-            GuardSan obj = new GuardSan(client, gSan);
-            guardSans.add(obj);
-        }*/
-        /*Set <GuardSan> guardSans = client.getGuardSan();
-        guardSans.removeAll(guardSans);*/
         ClientGuardSanRebuildService.getInstance().removeGuardSan(idOfClient);
-        Set<GuardSan> newGuardSans = ClientGuardSanRebuildService.getInstance().addGuardSan(idOfClient, guardsan);
-        /*guardSans.addAll(newGuardSans);
-        client.setGuardSan(guardSans);*/
+
         if (this.externalId == null || this.externalId == 0) {
             client.setExternalId(null);
         } else {
@@ -1182,6 +1143,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.ageTypeGroup = client.getAgeTypeGroup();
         removeListGuardianItems.clear();
         removeListWardItems.clear();
+        this.lastConfirmMobile = client.getLastConfirmMobile();
     }
 
     public String getIdOfCategoryListString() {
@@ -1214,6 +1176,18 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setNewOrgHasCatDiscount(boolean newOrgHasCatDiscount) {
         this.newOrgHasCatDiscount = newOrgHasCatDiscount;
+    }
+
+    public Date getLastConfirmMobile() {
+        return lastConfirmMobile;
+    }
+
+    public void setLastConfirmMobile(Date lastConfirmMobile) {
+        this.lastConfirmMobile = lastConfirmMobile;
+    }
+
+    public boolean isLastConfirmMobileEmpty() {
+        return getLastConfirmMobile() == null;
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {

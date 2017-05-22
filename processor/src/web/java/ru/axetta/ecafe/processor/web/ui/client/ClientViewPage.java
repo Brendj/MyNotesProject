@@ -134,6 +134,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String ageTypeGroup;
     private String photoURL;
     private Long balanceToNotify;
+    private Date lastConfirmMobile;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -456,6 +457,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.disablePlanCreation = this.disablePlanCreationDate != null;
         this.ageTypeGroup = client.getAgeTypeGroup();
         this.balanceToNotify = client.getBalanceToNotify();
+        this.lastConfirmMobile = client.getLastConfirmMobile();
 
         // опекуны
         // (Kadyrov D) 23.12.2011
@@ -588,5 +590,18 @@ public class ClientViewPage extends BasicWorkspacePage {
     public List<ClientGuardianItem> getClientWardItems() {
         return clientWardItems;
     }
+
+    public Date getLastConfirmMobile() {
+        return lastConfirmMobile;
+    }
+
+    public void setLastConfirmMobile(Date lastConfirmMobile) {
+        this.lastConfirmMobile = lastConfirmMobile;
+    }
+
+    public boolean isLastConfirmMobileEmpty() {
+        return getLastConfirmMobile() == null;
+    }
+
 
 }

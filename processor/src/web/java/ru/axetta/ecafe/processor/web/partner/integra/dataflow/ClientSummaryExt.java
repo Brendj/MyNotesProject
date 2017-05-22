@@ -120,6 +120,9 @@ public class ClientSummaryExt {
 
     @XmlAttribute(name = "ThresholdBalanceNotify")
     protected Long thresholdBalanceNotify;
+
+    @XmlAttribute(name = "LastConfirmMobile")
+    private XMLGregorianCalendar lastConfirmMobile;
     /**
      *
      * Gets the value of the contractId property.
@@ -725,5 +728,13 @@ public class ClientSummaryExt {
 
     public void setThresholdBalanceNotify(Long thresholdBalanceNotify) {
         this.thresholdBalanceNotify = thresholdBalanceNotify;
+    }
+
+    public XMLGregorianCalendar getLastConfirmMobile() {
+        return lastConfirmMobile;
+    }
+
+    public void setLastConfirmMobile(XMLGregorianCalendar lastConfirmMobile) {
+        this.lastConfirmMobile = lastConfirmMobile;
     }
 }

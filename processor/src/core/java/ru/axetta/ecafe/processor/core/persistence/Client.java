@@ -128,6 +128,7 @@ public class Client {
     private String ageTypeGroup;
     private Long balanceToNotify;
     private ClientCreatedFromType createdFrom;
+    private Date lastConfirmMobile;
 
     protected Client() {
         // For Hibernate only
@@ -1031,4 +1032,13 @@ public class Client {
     public void setCreatedFrom(ClientCreatedFromType createdFrom) {
         this.createdFrom = createdFrom;
     }
+
+    public Date getLastConfirmMobile() {
+        return lastConfirmMobile;
+    }
+
+    public void setLastConfirmMobile(Date lastConfirmMobile) {
+        this.lastConfirmMobile = lastConfirmMobile;
+    }
+
 }
