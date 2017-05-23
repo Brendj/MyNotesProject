@@ -6,3 +6,5 @@
 
 --Новое поле для даты подтверждения телефона клиента
 alter table cf_clients add column lastConfirmMobile bigint;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 230517) НЕ МЕНЯТЬ
