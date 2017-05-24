@@ -70,6 +70,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Integer refectoryType;
     private Boolean commodityAccountingParam;
     private Boolean usePlanOrders;
+    private Boolean usePaydableSubscriptionFeeding;
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private String refectoryTypeStringRepresentation;
@@ -173,6 +174,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.guid = org.getGuid();
         this.commodityAccountingParam = org.getCommodityAccounting();
         this.usePlanOrders = org.getUsePlanOrders();
+        this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.categoryOrg= new LinkedList<CategoryOrg>();
         if(!org.getCategories().isEmpty()){
            for (CategoryOrg co: org.getCategories()){
@@ -626,5 +628,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setWorkInSummerTime(Boolean workInSummerTime) {
         isWorkInSummerTime = workInSummerTime;
+    }
+
+    public Boolean getUsePaydableSubscriptionFeeding() {
+        return usePaydableSubscriptionFeeding;
+    }
+
+    public void setUsePaydableSubscriptionFeeding(Boolean usePaydableSubscriptionFeeding) {
+        this.usePaydableSubscriptionFeeding = usePaydableSubscriptionFeeding;
     }
 }

@@ -6,13 +6,12 @@ package ru.axetta.ecafe.processor.web.ui.org.accessories;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Accessory;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.OrgInventory;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
-import org.hibernate.SQLQuery;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +19,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +42,8 @@ public class AccessoriesListPage extends OnlineReportPage {
     protected List<Accessory> accessories;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
+    protected OrgInventoryItem orgInventoryItem;
+    private OrgInventory orgInventory;
 
 
     public List<Accessory> getAccessories() {
@@ -137,13 +134,41 @@ public class AccessoriesListPage extends OnlineReportPage {
             a = (Accessory) session.merge(a);
             session.flush();
             session.evict(a);
-            /*if(a.getIdOfAccessory() == null) {
-                a = (Accessory) session.merge(a);
-            } else {
-                session.save(a);
-            }*/
         }
+
+        //Сохранение количественных показателей
+        if (orgInventoryItem.isEmpty() && orgInventory == null) return;
+        OrgInventory inventory;
+        if (orgInventory == null) {
+            inventory = new OrgInventory();
+            inventory.setIdOfOrg(MainPage.getSessionInstance().getSelectedIdOfOrg());
+            fillOrgInventory(inventory,
+                    orgInventoryItem.getAmount_armadmin(), orgInventoryItem.getAmount_armcontroller(), orgInventoryItem.getAmount_armoperator(),
+                    orgInventoryItem.getAmount_armlibrary(), orgInventoryItem.getAmount_turnstiles(), orgInventoryItem.getAmount_elocks(),
+                    orgInventoryItem.getAmount_ereaders(), orgInventoryItem.getAmount_infopanels(), orgInventoryItem.getAmount_infokiosks());
+            session.save(inventory);
+        } else {
+            fillOrgInventory(orgInventory,
+                    orgInventoryItem.getAmount_armadmin(), orgInventoryItem.getAmount_armcontroller(), orgInventoryItem.getAmount_armoperator(),
+                    orgInventoryItem.getAmount_armlibrary(), orgInventoryItem.getAmount_turnstiles(), orgInventoryItem.getAmount_elocks(),
+                    orgInventoryItem.getAmount_ereaders(), orgInventoryItem.getAmount_infopanels(), orgInventoryItem.getAmount_infokiosks());
+            session.update(orgInventory);
         }
+    }
+
+    private void fillOrgInventory(OrgInventory inventory, String amount_armadmin, String amount_armcontroller, String amount_armoperator,
+            String amount_armlibrary, String amount_turnstiles, String amount_elocks,
+            String amount_ereaders, String amount_infopanels, String amount_infokiosks) {
+        inventory.setAmount_armadmin(StringUtils.isEmpty(amount_armadmin) ? null : new Integer(amount_armadmin));
+        inventory.setAmount_armcontroller(StringUtils.isEmpty(amount_armcontroller) ? null : new Integer(amount_armcontroller));
+        inventory.setAmount_armoperator(StringUtils.isEmpty(amount_armoperator) ? null : new Integer(amount_armoperator));
+        inventory.setAmount_armlibrary(StringUtils.isEmpty(amount_armlibrary) ? null : new Integer(amount_armlibrary));
+        inventory.setAmount_turnstiles(StringUtils.isEmpty(amount_turnstiles) ? null : new Integer(amount_turnstiles));
+        inventory.setAmount_elocks(StringUtils.isEmpty(amount_elocks) ? null : new Integer(amount_elocks));
+        inventory.setAmount_ereaders(StringUtils.isEmpty(amount_ereaders) ? null : new Integer(amount_ereaders));
+        inventory.setAmount_infopanels(StringUtils.isEmpty(amount_infopanels) ? null : new Integer(amount_infopanels));
+        inventory.setAmount_infokiosks(StringUtils.isEmpty(amount_infokiosks) ? null : new Integer(amount_infokiosks));
+    }
 
     public void update() {
         RuntimeContext.getAppContext().getBean(AccessoriesListPage.class).updateAccessories();
@@ -160,11 +185,18 @@ public class AccessoriesListPage extends OnlineReportPage {
         try {
             session = (Session) entityManager.getDelegate();
             accessories = loadAccessories(session);
+            orgInventoryItem = loadOrgInventoryItem(session);
         } catch (Exception e) {
             logger.error("Failed to load clients data", e);
         } finally {
             //HibernateUtils.close(session, logger);
         }
+    }
+
+    protected OrgInventoryItem loadOrgInventoryItem(Session session) {
+        Long selectedIdOfOrg = MainPage.getSessionInstance().getSelectedIdOfOrg();
+        orgInventory = DAOUtils.getOrgInventory(session, selectedIdOfOrg);
+        return new OrgInventoryItem(orgInventory);
     }
 
     protected List<Accessory> loadAccessories(Session session) throws Exception {
@@ -188,5 +220,21 @@ public class AccessoriesListPage extends OnlineReportPage {
 
     public String getPageFilename() {
         return "org/accessories/list";
+    }
+
+    public OrgInventoryItem getOrgInventoryItem() {
+        return orgInventoryItem;
+    }
+
+    public void setOrgInventoryItem(OrgInventoryItem orgInventoryItem) {
+        this.orgInventoryItem = orgInventoryItem;
+    }
+
+    public OrgInventory getOrgInventory() {
+        return orgInventory;
+    }
+
+    public void setOrgInventory(OrgInventory orgInventory) {
+        this.orgInventory = orgInventory;
     }
 }

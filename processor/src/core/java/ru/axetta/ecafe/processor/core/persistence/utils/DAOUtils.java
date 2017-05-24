@@ -2521,6 +2521,13 @@ public class DAOUtils {
         return (List<Accessory>)query.list();
     }
 
+    public static OrgInventory getOrgInventory(Session session, Long idOfOrg) {
+        String q = "from OrgInventory a where a.idOfOrg=:idOfOrg";
+        org.hibernate.Query query = session.createQuery(q);
+        query.setParameter("idOfOrg", idOfOrg);
+        return (OrgInventory) query.uniqueResult();
+    }
+
     public static List<Long> complementIdOfOrgSet(Session session, List<Long> idOfOrgList) {
         Set<Long> idOfOrgSet = new HashSet<Long>();
         Set<FriendlyOrganizationsInfoModel> organizationsInfoModelSet = OrgUtils.getMainBuildingAndFriendlyOrgsList(
