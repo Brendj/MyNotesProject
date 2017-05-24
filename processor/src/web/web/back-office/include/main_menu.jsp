@@ -66,7 +66,7 @@
                             action="#{mainPage.showOrgBalanceReportPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="accessoriesView" binding="#{accessoriesListPage.mainMenuComponent}"
-                            action="#{accessoriesListPage.show}" label="Оборудование корпусов"
+                            action="#{accessoriesListPage.show}" label="Оборудование корпуса"
                             reRender="workspaceForm" rendered="false" />
 
     </rich:panelMenuGroup>
