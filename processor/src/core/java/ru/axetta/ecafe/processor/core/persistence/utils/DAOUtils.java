@@ -645,9 +645,9 @@ public class DAOUtils {
             }
             orgsClause += "client.org = :org" + (i + 1);
         }
-        orgsClause += ") " + " and not (client.idOfClientGroup >= " +
+        orgsClause += ") " + " and (not (client.idOfClientGroup >= " +
                 ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and client.idOfClientGroup < " +
-                ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ")";
+                ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ") or client.idOfClientGroup is null)";
 
         javax.persistence.Query query = em.createQuery(
                 "from Client client " + orgsClause);
