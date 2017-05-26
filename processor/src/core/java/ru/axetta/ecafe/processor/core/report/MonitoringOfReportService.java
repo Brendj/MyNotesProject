@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -16,17 +16,123 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by almaz anvarov on 04.05.2017.
+ * Created by anvarov on 04.05.2017.
  */
 public class MonitoringOfReportService {
 
     public List<ReportItem> buildReportItems(Session session, Date startTime, List<Long> idOfOrgList) {
-        List<ReportItem> reportItemList = getOrgData(session, idOfOrgList);
+
+        List<DatePeriods> datePeriodsList = new ArrayList<DatePeriods>();
+
+        int dayOfWeek = CalendarUtils.getDayOfWeek(startTime);
+
+        if (dayOfWeek == 2) {
+            DatePeriods datePeriods = new DatePeriods(startTime, CalendarUtils.addOneDay(startTime));
+            datePeriodsList.add(datePeriods);
+        } else if (dayOfWeek == 3) {
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
+            datePeriodsList.add(datePeriods);
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -1), CalendarUtils.addOneDay(startTime));
+            datePeriodsList.add(datePeriod);
+        } else if (dayOfWeek == 4) {
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2), CalendarUtils.addDays(startTime, -1));
+            datePeriodsList.add(datePeriodss);
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -2), startTime);
+            datePeriodsList.add(datePeriods);
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -2), CalendarUtils.addOneDay(startTime));
+            datePeriodsList.add(datePeriod);
+        } else if (dayOfWeek == 5) {
+            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -3), CalendarUtils.addDays(startTime, -2));
+            datePeriodsList.add(datePeriodsss);
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -3), CalendarUtils.addDays(startTime, -1));
+            datePeriodsList.add(datePeriodss);
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -3), startTime);
+            datePeriodsList.add(datePeriod);
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -3), CalendarUtils.addOneDay(startTime));
+            datePeriodsList.add(datePeriods);
+        } else if (dayOfWeek == 6) {
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addDays(startTime, -3));
+            datePeriodsList.add(datePeriod);
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addDays(startTime, -2));
+            datePeriodsList.add(datePeriods);
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addDays(startTime, -1));
+            datePeriodsList.add(datePeriodss);
+            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -4), startTime);
+            datePeriodsList.add(datePeriodsss);
+            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addOneDay(startTime));
+            datePeriodsList.add(datePeriodssss);
+        }
+
+        List<ReportItem> reportItemList = getOrgData(session, idOfOrgList, datePeriodsList);
 
         return reportItemList;
     }
 
-    public List<ReportItem> getOrgData(Session session, List<Long> idOfOrgList) {
+    public List<MonitoringOfItem> getMonitoringOfItems(Session session, DatePeriods datePeriod, Long idOfOrg) {
+        List<MonitoringOfItem> monitoringOfItemList = new ArrayList<MonitoringOfItem>();
+
+        MonitoringOfItem monitoringOfItem = new MonitoringOfItem();
+        monitoringOfItem.setsDate(datePeriod.getStartDate());
+        monitoringOfItem
+                .setNumberOfPassesStudents(generateNumberOfPassesStudents(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem
+                .setNumberOfPassesEmployees(generateNumberOfPassesEmployees(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem
+                .setNumberOfPassesGuardians(generateNumberOfPassesGuardians(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+
+        monitoringOfItem.setSummaryOfPasses(
+                monitoringOfItem.getNumberOfPassesStudents() + monitoringOfItem.getNumberOfPassesEmployees()
+                        + monitoringOfItem.getNumberOfPassesGuardians());
+
+        monitoringOfItemList.add(monitoringOfItem);
+
+        return monitoringOfItemList;
+    }
+
+    public Long generateNumberOfPassesStudents(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup < 1100000000 "
+                        + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long generateNumberOfPassesEmployees(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup IN (1100000000, 1100000010) "
+                        + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long generateNumberOfPassesGuardians(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup = 1100000030 "
+                        + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+
+    public List<ReportItem> getOrgData(Session session, List<Long> idOfOrgList, List<DatePeriods> datePeriodsList) {
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
 
         for (Long idOfOrg : idOfOrgList) {
@@ -47,6 +153,36 @@ public class MonitoringOfReportService {
             reportItem.setPedagogicalComposition(pedagogicalComposition(org, session));
             reportItem.setOtherEmployees(otherEmloyees(org, session));
 
+            if (datePeriodsList.size() == 1) {
+                reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
+            }
+
+            if (datePeriodsList.size() == 2) {
+                reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
+                reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
+            }
+
+            if (datePeriodsList.size() == 3) {
+                reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
+                reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
+                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+            }
+
+            if (datePeriodsList.size() == 4) {
+                reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
+                reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
+                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+                reportItem.setMonitoringOfItemsThursday(getMonitoringOfItems(session, datePeriodsList.get(3), idOfOrg));
+            }
+
+            if (datePeriodsList.size() == 5) {
+                reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
+                reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
+                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+                reportItem.setMonitoringOfItemsThursday(getMonitoringOfItems(session, datePeriodsList.get(3), idOfOrg));
+                reportItem.setMonitoringOfItemsFriday(getMonitoringOfItems(session, datePeriodsList.get(4), idOfOrg));
+            }
+
             reportItemList.add(reportItem);
         }
         return reportItemList;
@@ -65,9 +201,8 @@ public class MonitoringOfReportService {
 
     public String pedagogicalComposition(Org org, Session session) {
 
-        Query query = session.createSQLQuery(
-                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc "
-                        + "WHERE cfc.idoforg = :idoforg AND cfc.IdOfClientGroup in (1100000000, 1100000010)");
+        Query query = session.createSQLQuery("SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc "
+                + "WHERE cfc.idoforg = :idoforg AND cfc.IdOfClientGroup IN (1100000000, 1100000010)");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -86,9 +221,8 @@ public class MonitoringOfReportService {
     }
 
     public String otherEmloyees(Org org, Session session) {
-        Query query = session.createSQLQuery(
-                "SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc "
-                        + "WHERE cfc.idoforg = :idoforg AND cfc.idofclientgroup IN (1100000050, 1100000020, 1100000040)");
+        Query query = session.createSQLQuery("SELECT count(DISTINCT(cfc.idofclient)) FROM cf_clients cfc "
+                + "WHERE cfc.idoforg = :idoforg AND cfc.idofclientgroup IN (1100000050, 1100000020, 1100000040)");
         query.setParameter("idoforg", org.getIdOfOrg());
 
         String result = String.valueOf(query.uniqueResult());
@@ -123,7 +257,11 @@ public class MonitoringOfReportService {
         public String pedagogicalComposition;
         public String otherEmployees;
 
-        public MonitoringOfItem monitoringOfItems;
+        public List<MonitoringOfItem> monitoringOfItemsMonday;
+        public List<MonitoringOfItem> monitoringOfItemsTuesday;
+        public List<MonitoringOfItem> monitoringOfItemsWednesday;
+        public List<MonitoringOfItem> monitoringOfItemsThursday;
+        public List<MonitoringOfItem> monitoringOfItemsFriday;
 
         public ReportItem() {
         }
@@ -131,7 +269,9 @@ public class MonitoringOfReportService {
         public ReportItem(String orgNum, String shortName, String address, String idOfOrg, String code, String district,
                 String typeOfBuilding, String introductionQueue, String studentsInDatabase, String studentsWithMaps,
                 String parents, String pedagogicalComposition, String otherEmployees,
-                MonitoringOfItem monitoringOfItems) {
+                List<MonitoringOfItem> monitoringOfItemsMonday, List<MonitoringOfItem> monitoringOfItemsTuesday,
+                List<MonitoringOfItem> monitoringOfItemsWednesday, List<MonitoringOfItem> monitoringOfItemsThursday,
+                List<MonitoringOfItem> monitoringOfItemsFriday) {
             this.orgNum = orgNum;
             this.shortName = shortName;
             this.address = address;
@@ -145,7 +285,11 @@ public class MonitoringOfReportService {
             this.parents = parents;
             this.pedagogicalComposition = pedagogicalComposition;
             this.otherEmployees = otherEmployees;
-            this.monitoringOfItems = monitoringOfItems;
+            this.monitoringOfItemsMonday = monitoringOfItemsMonday;
+            this.monitoringOfItemsTuesday = monitoringOfItemsTuesday;
+            this.monitoringOfItemsWednesday = monitoringOfItemsWednesday;
+            this.monitoringOfItemsThursday = monitoringOfItemsThursday;
+            this.monitoringOfItemsFriday = monitoringOfItemsFriday;
         }
 
         public String getOrgNum() {
@@ -252,12 +396,44 @@ public class MonitoringOfReportService {
             this.otherEmployees = otherEmployees;
         }
 
-        public MonitoringOfItem getMonitoringOfItems() {
-            return monitoringOfItems;
+        public List<MonitoringOfItem> getMonitoringOfItemsMonday() {
+            return monitoringOfItemsMonday;
         }
 
-        public void setMonitoringOfItems(MonitoringOfItem monitoringOfItems) {
-            this.monitoringOfItems = monitoringOfItems;
+        public void setMonitoringOfItemsMonday(List<MonitoringOfItem> monitoringOfItemsMonday) {
+            this.monitoringOfItemsMonday = monitoringOfItemsMonday;
+        }
+
+        public List<MonitoringOfItem> getMonitoringOfItemsTuesday() {
+            return monitoringOfItemsTuesday;
+        }
+
+        public void setMonitoringOfItemsTuesday(List<MonitoringOfItem> monitoringOfItemsTuesday) {
+            this.monitoringOfItemsTuesday = monitoringOfItemsTuesday;
+        }
+
+        public List<MonitoringOfItem> getMonitoringOfItemsWednesday() {
+            return monitoringOfItemsWednesday;
+        }
+
+        public void setMonitoringOfItemsWednesday(List<MonitoringOfItem> monitoringOfItemsWednesday) {
+            this.monitoringOfItemsWednesday = monitoringOfItemsWednesday;
+        }
+
+        public List<MonitoringOfItem> getMonitoringOfItemsThursday() {
+            return monitoringOfItemsThursday;
+        }
+
+        public void setMonitoringOfItemsThursday(List<MonitoringOfItem> monitoringOfItemsThursday) {
+            this.monitoringOfItemsThursday = monitoringOfItemsThursday;
+        }
+
+        public List<MonitoringOfItem> getMonitoringOfItemsFriday() {
+            return monitoringOfItemsFriday;
+        }
+
+        public void setMonitoringOfItemsFriday(List<MonitoringOfItem> monitoringOfItemsFriday) {
+            this.monitoringOfItemsFriday = monitoringOfItemsFriday;
         }
     }
 
@@ -402,6 +578,36 @@ public class MonitoringOfReportService {
 
         public void setNumberOfPaidGuardians(Long numberOfPaidGuardians) {
             this.numberOfPaidGuardians = numberOfPaidGuardians;
+        }
+    }
+
+    public static class DatePeriods {
+
+        private Date startDate;
+        private Date endDate;
+
+        public DatePeriods() {
+        }
+
+        public DatePeriods(Date startDate, Date endDate) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public void setStartDate(Date startDate) {
+            this.startDate = startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
         }
     }
 }

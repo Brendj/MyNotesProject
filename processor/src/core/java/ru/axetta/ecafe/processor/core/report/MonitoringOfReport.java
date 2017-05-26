@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -38,7 +39,9 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
         */
     public static final String REPORT_NAME = "Мониторинг";
-    public static final String[] TEMPLATE_FILE_NAMES = {"MonitoringOfReport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {
+            "MonitoringOfReportMonday.jasper", "MonitoringOfReportTuesday.jasper", "MonitoringOfReportWednesday.jasper",
+            "MonitoringOfReportThursday.jasper", "MonitoringOfReportFriday.jasper", "MonitoringOfSubReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
@@ -48,23 +51,63 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
-        private final String templateFilename;
+        private String templateFilename;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
 
         public Builder() {
-            String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
-                    .getReportsTemplateFilePath();
-            templateFilename = reportsTemplateFilePath + MonitoringOfReport.class.getSimpleName() + ".jasper";
+
         }
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
+                    .getReportsTemplateFilePath();
+
+            int dayOfWeek = CalendarUtils.getDayOfWeek(startTime);
+
+            Date dateMonday = new Date();
+            Date dateTuesday = new Date();
+            Date dateWednesday = new Date();
+            Date dateThursday = new Date();
+            Date dateFriday = new Date();
+
+            if (dayOfWeek == 2) {
+                templateFilename = reportsTemplateFilePath + "MonitoringOfReportMonday" + ".jasper";
+                dateMonday = startTime;
+            } else if (dayOfWeek == 3) {
+                templateFilename = reportsTemplateFilePath + "MonitoringOfReportTuesday" + ".jasper";
+                dateMonday = CalendarUtils.addDays(startTime, -1);
+                dateTuesday = startTime;
+            } else if (dayOfWeek == 4) {
+                templateFilename = reportsTemplateFilePath + "MonitoringOfReportWednesday" + ".jasper";
+                dateMonday = CalendarUtils.addDays(startTime, -2);
+                dateThursday = CalendarUtils.addDays(startTime, -1);
+                dateWednesday = startTime;
+            } else if (dayOfWeek == 5) {
+                templateFilename = reportsTemplateFilePath + "MonitoringOfReportThursday" + ".jasper";
+                dateMonday = CalendarUtils.addDays(startTime, -3);
+                dateTuesday = CalendarUtils.addDays(startTime, -2);
+                dateWednesday = CalendarUtils.addDays(startTime, -1);
+                dateThursday = startTime;
+            } else if (dayOfWeek == 6) {
+                templateFilename = reportsTemplateFilePath + "MonitoringOfReportFriday" + ".jasper";
+                dateMonday = CalendarUtils.addDays(startTime, -4);
+                dateTuesday = CalendarUtils.addDays(startTime, -3);
+                dateWednesday = CalendarUtils.addDays(startTime, -2);
+                dateThursday = CalendarUtils.addDays(startTime, -1);
+                dateFriday = startTime;
+            }
+
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("beginDate", CalendarUtils.dateShortToStringFullYear(startTime));
+            parameterMap.put("dateMonday", CalendarUtils.dateShortToStringFullYear(dateMonday));
+            parameterMap.put("dateTuesday", CalendarUtils.dateShortToStringFullYear(dateTuesday));
+            parameterMap.put("dateWednesday", CalendarUtils.dateShortToStringFullYear(dateWednesday));
+            parameterMap.put("dateThursday", CalendarUtils.dateShortToStringFullYear(dateThursday));
+            parameterMap.put("dateFriday", CalendarUtils.dateShortToStringFullYear(dateFriday));
             parameterMap.put("reportName", REPORT_NAME);
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
@@ -90,7 +133,8 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         }
     }
 
-    public MonitoringOfReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime) {
+    public MonitoringOfReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
     }
 
