@@ -52,6 +52,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private String templateFilename;
+        private String subReportDir;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -65,6 +66,8 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
                     .getReportsTemplateFilePath();
+
+            subReportDir = reportsTemplateFilePath;
 
             int dayOfWeek = CalendarUtils.getDayOfWeek(startTime);
 
@@ -109,6 +112,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             parameterMap.put("dateThursday", CalendarUtils.dateShortToStringFullYear(dateThursday));
             parameterMap.put("dateFriday", CalendarUtils.dateShortToStringFullYear(dateFriday));
             parameterMap.put("reportName", REPORT_NAME);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
