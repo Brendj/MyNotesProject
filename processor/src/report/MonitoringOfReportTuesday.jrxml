@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="2760" pageHeight="30000" columnWidth="2720" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3010" pageHeight="30000" columnWidth="2970" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.6830134553650707"/>
-	<property name="ireport.x" value="445"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -26,7 +26,7 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="2720" height="79"/>
+				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="2970" height="79"/>
 				<textElement verticalAlignment="Middle">
 					<font size="24" isBold="true"/>
 					<paragraph leftIndent="50"/>
@@ -64,7 +64,7 @@
 				<text><![CDATA[Наименование в ЕКИС]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" x="200" y="0" width="150" height="135"/>
+				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" x="200" y="0" width="400" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -77,7 +77,7 @@
 				<text><![CDATA[Адрес в ЕКИС]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="64d56469-fb0c-426d-b585-72a6bff211e7" x="350" y="0" width="50" height="135"/>
+				<reportElement uuid="64d56469-fb0c-426d-b585-72a6bff211e7" x="600" y="0" width="50" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -90,7 +90,7 @@
 				<text><![CDATA[ИД ИСПП]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" x="400" y="0" width="100" height="135"/>
+				<reportElement uuid="01581337-696e-4237-827f-bd0a5cda8eac" x="650" y="0" width="100" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -103,7 +103,7 @@
 				<text><![CDATA[Код ЕКИС]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" x="500" y="0" width="100" height="135"/>
+				<reportElement uuid="a1ab9285-5c36-4aa4-873d-3c5dff080e6e" x="750" y="0" width="100" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -116,7 +116,7 @@
 				<text><![CDATA[Округ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" x="600" y="0" width="150" height="135"/>
+				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" x="850" y="0" width="150" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -129,7 +129,7 @@
 				<text><![CDATA[Тип здания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="10a6849d-4b87-456f-9722-14e887ce2379" x="750" y="0" width="100" height="135"/>
+				<reportElement uuid="10a6849d-4b87-456f-9722-14e887ce2379" x="1000" y="0" width="100" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -142,7 +142,7 @@
 				<text><![CDATA[Очередь]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="fad07077-a767-4a5d-a841-3a757544f30b" x="850" y="0" width="70" height="135"/>
+				<reportElement uuid="fad07077-a767-4a5d-a841-3a757544f30b" x="1100" y="0" width="70" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -155,7 +155,7 @@
 				<text><![CDATA[Учащихся в базе]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1bc17b47-f1ea-40c6-882a-99860c874d51" x="990" y="0" width="70" height="135"/>
+				<reportElement uuid="1bc17b47-f1ea-40c6-882a-99860c874d51" x="1240" y="0" width="70" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -168,7 +168,7 @@
 				<text><![CDATA[Родители]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5c374888-f022-4141-849e-b8db9616ae24" x="1060" y="0" width="110" height="135"/>
+				<reportElement uuid="5c374888-f022-4141-849e-b8db9616ae24" x="1310" y="0" width="110" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -181,7 +181,7 @@
 				<text><![CDATA[Пед.состав и администрация ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5f5ee610-a666-46d5-8412-6a09666ecaa7" x="1170" y="0" width="110" height="135"/>
+				<reportElement uuid="5f5ee610-a666-46d5-8412-6a09666ecaa7" x="1420" y="0" width="110" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -194,7 +194,7 @@
 				<text><![CDATA[Иные сотрудники ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01d83222-e4c5-437a-bd0f-cbbaba061618" x="920" y="0" width="70" height="135"/>
+				<reportElement uuid="01d83222-e4c5-437a-bd0f-cbbaba061618" x="1170" y="0" width="70" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -207,7 +207,7 @@
 				<text><![CDATA[Учащихся с картами]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" x="1280" y="0" width="720" height="25"/>
+				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" x="1530" y="0" width="720" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -219,7 +219,7 @@
 				<textFieldExpression><![CDATA[$P{dateMonday}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="94d61009-4628-48a2-8f2f-b93096942664" x="1520" y="25" width="60" height="110"/>
+				<reportElement uuid="94d61009-4628-48a2-8f2f-b93096942664" x="1770" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -235,7 +235,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="1640" y="25" width="60" height="110"/>
+				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="1890" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -251,7 +251,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="18fffc5d-6f75-424f-a1d7-157a4164e75e" x="1400" y="25" width="60" height="110"/>
+				<reportElement uuid="18fffc5d-6f75-424f-a1d7-157a4164e75e" x="1650" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -267,7 +267,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a56cc968-f85b-42c3-a8fd-53ecff2efad2" x="1340" y="25" width="60" height="110"/>
+				<reportElement uuid="a56cc968-f85b-42c3-a8fd-53ecff2efad2" x="1590" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -283,7 +283,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3ff711a8-9149-4e1c-b227-0b5182786545" x="1280" y="25" width="60" height="110"/>
+				<reportElement uuid="3ff711a8-9149-4e1c-b227-0b5182786545" x="1530" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -299,7 +299,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="1940" y="25" width="60" height="110"/>
+				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2190" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -315,7 +315,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2e201f1-75eb-431b-8baf-b767e710de28" x="1580" y="25" width="60" height="110"/>
+				<reportElement uuid="d2e201f1-75eb-431b-8baf-b767e710de28" x="1830" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -331,7 +331,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2f9154bb-07c5-4f96-9be9-323a59db3b94" x="1460" y="25" width="60" height="110"/>
+				<reportElement uuid="2f9154bb-07c5-4f96-9be9-323a59db3b94" x="1710" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -347,7 +347,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="1760" y="25" width="60" height="110"/>
+				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2010" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -363,7 +363,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="1700" y="25" width="60" height="110"/>
+				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="1950" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -379,7 +379,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="1880" y="25" width="60" height="110"/>
+				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2130" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -395,7 +395,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="1820" y="25" width="60" height="110"/>
+				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="2070" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -411,7 +411,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f01f97d4-0188-49d5-a7bc-b7100255859a" x="2660" y="25" width="60" height="110"/>
+				<reportElement uuid="f01f97d4-0188-49d5-a7bc-b7100255859a" x="2910" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -427,7 +427,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ed1d5045-0268-4b91-a9d7-736fe72e22ea" x="2420" y="25" width="60" height="110"/>
+				<reportElement uuid="ed1d5045-0268-4b91-a9d7-736fe72e22ea" x="2670" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -443,7 +443,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1d6ad6a4-6448-4683-8911-b48dba0a3673" x="2480" y="25" width="60" height="110"/>
+				<reportElement uuid="1d6ad6a4-6448-4683-8911-b48dba0a3673" x="2730" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -459,7 +459,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a104daae-54f2-41c3-a52b-828b692326e0" x="2120" y="25" width="60" height="110"/>
+				<reportElement uuid="a104daae-54f2-41c3-a52b-828b692326e0" x="2370" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -475,7 +475,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f04eaeaf-7541-41f7-b8dc-50fe44ca7cd8" x="2540" y="25" width="60" height="110"/>
+				<reportElement uuid="f04eaeaf-7541-41f7-b8dc-50fe44ca7cd8" x="2790" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -491,7 +491,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="73ea81cd-b8e5-4cb0-8035-c35d04b474bd" x="2600" y="25" width="60" height="110"/>
+				<reportElement uuid="73ea81cd-b8e5-4cb0-8035-c35d04b474bd" x="2850" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -507,7 +507,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ffc4453f-9871-4a1a-9819-8e4baae8ae65" x="2300" y="25" width="60" height="110"/>
+				<reportElement uuid="ffc4453f-9871-4a1a-9819-8e4baae8ae65" x="2550" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -523,7 +523,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b0797b39-4fd5-49d1-988d-c9053c114304" x="2060" y="25" width="60" height="110"/>
+				<reportElement uuid="b0797b39-4fd5-49d1-988d-c9053c114304" x="2310" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -539,7 +539,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="8e3b4461-7320-4812-869c-5f79962ef5d1" x="2240" y="25" width="60" height="110"/>
+				<reportElement uuid="8e3b4461-7320-4812-869c-5f79962ef5d1" x="2490" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -555,7 +555,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4a750a90-98ea-44cf-8d18-859fe5f514a9" x="2000" y="25" width="60" height="110"/>
+				<reportElement uuid="4a750a90-98ea-44cf-8d18-859fe5f514a9" x="2250" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -571,7 +571,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="57b40707-3d06-4ad7-ad17-8db3fc115b02" x="2180" y="25" width="60" height="110"/>
+				<reportElement uuid="57b40707-3d06-4ad7-ad17-8db3fc115b02" x="2430" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -587,7 +587,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="920939ac-1624-4637-a207-152dd94e34a6" x="2360" y="25" width="60" height="110"/>
+				<reportElement uuid="920939ac-1624-4637-a207-152dd94e34a6" x="2610" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -603,7 +603,7 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="9690d7a0-6815-409b-9655-f62a2d17eace" x="2000" y="0" width="720" height="25"/>
+				<reportElement uuid="9690d7a0-6815-409b-9655-f62a2d17eace" x="2250" y="0" width="720" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -641,7 +641,7 @@
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" x="200" y="0" width="150" height="25"/>
+				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" x="200" y="0" width="400" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -652,7 +652,7 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" x="350" y="0" width="50" height="25"/>
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" x="600" y="0" width="50" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -663,7 +663,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="51a59e17-ad29-4f12-a57c-b92682e854f6" x="400" y="0" width="100" height="25"/>
+				<reportElement uuid="51a59e17-ad29-4f12-a57c-b92682e854f6" x="650" y="0" width="100" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -674,7 +674,7 @@
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" x="500" y="0" width="100" height="25"/>
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" x="750" y="0" width="100" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -685,7 +685,7 @@
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" x="600" y="0" width="150" height="25"/>
+				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" x="850" y="0" width="150" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -696,7 +696,7 @@
 				<textFieldExpression><![CDATA[$F{typeOfBuilding}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="e13e74a2-48a0-4653-9d25-e4156de827e1" x="750" y="0" width="100" height="25"/>
+				<reportElement uuid="e13e74a2-48a0-4653-9d25-e4156de827e1" x="1000" y="0" width="100" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -707,7 +707,7 @@
 				<textFieldExpression><![CDATA[$F{introductionQueue}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" x="850" y="0" width="70" height="25"/>
+				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" x="1100" y="0" width="70" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -718,7 +718,7 @@
 				<textFieldExpression><![CDATA[$F{studentsInDatabase}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" x="920" y="0" width="70" height="25"/>
+				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" x="1170" y="0" width="70" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -729,7 +729,7 @@
 				<textFieldExpression><![CDATA[$F{studentsWithMaps}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" x="990" y="0" width="70" height="25"/>
+				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" x="1240" y="0" width="70" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -740,7 +740,7 @@
 				<textFieldExpression><![CDATA[$F{parents}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" x="1060" y="0" width="110" height="25"/>
+				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" x="1310" y="0" width="110" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -751,7 +751,7 @@
 				<textFieldExpression><![CDATA[$F{pedagogicalComposition}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" x="1170" y="0" width="110" height="25"/>
+				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" x="1420" y="0" width="110" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -762,12 +762,12 @@
 				<textFieldExpression><![CDATA[$F{otherEmployees}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" x="1280" y="0" width="720" height="25"/>
+				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" x="1530" y="0" width="720" height="25"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsMonday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="26ad9157-69ea-4a09-88a5-2ed59d2a31a1" x="2000" y="0" width="720" height="25"/>
+				<reportElement uuid="26ad9157-69ea-4a09-88a5-2ed59d2a31a1" x="2250" y="0" width="720" height="25"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsTuesday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>

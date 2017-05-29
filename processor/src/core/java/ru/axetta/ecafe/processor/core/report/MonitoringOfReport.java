@@ -41,7 +41,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public static final String REPORT_NAME = "Мониторинг";
     public static final String[] TEMPLATE_FILE_NAMES = {
             "MonitoringOfReportMonday.jasper", "MonitoringOfReportTuesday.jasper", "MonitoringOfReportWednesday.jasper",
-            "MonitoringOfReportThursday.jasper", "MonitoringOfReportFriday.jasper", "MonitoringOfSubReport.jasper"};
+            "MonitoringOfReportThursday.jasper", "MonitoringOfReportFriday.jasper", "MonitoringOfReportSaturday.jasper", "MonitoringOfSubReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
@@ -76,6 +76,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             Date dateWednesday = new Date();
             Date dateThursday = new Date();
             Date dateFriday = new Date();
+            Date dateSaturday = new Date();
 
             if (dayOfWeek == 2) {
                 templateFilename = reportsTemplateFilePath + "MonitoringOfReportMonday" + ".jasper";
@@ -102,6 +103,14 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 dateWednesday = CalendarUtils.addDays(startTime, -2);
                 dateThursday = CalendarUtils.addDays(startTime, -1);
                 dateFriday = startTime;
+            } else if (dayOfWeek == 7) {
+                templateFilename = reportsTemplateFilePath + "MonitoringOfReportSaturday" + ".jasper";
+                dateMonday = CalendarUtils.addDays(startTime, -5);
+                dateTuesday = CalendarUtils.addDays(startTime, -4);
+                dateWednesday = CalendarUtils.addDays(startTime, -3);
+                dateThursday = CalendarUtils.addDays(startTime, -2);
+                dateFriday = CalendarUtils.addDays(startTime, -1);
+                dateSaturday = startTime;
             }
 
             Date generateTime = new Date();
@@ -111,6 +120,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             parameterMap.put("dateWednesday", CalendarUtils.dateShortToStringFullYear(dateWednesday));
             parameterMap.put("dateThursday", CalendarUtils.dateShortToStringFullYear(dateThursday));
             parameterMap.put("dateFriday", CalendarUtils.dateShortToStringFullYear(dateFriday));
+            parameterMap.put("dateSaturday", CalendarUtils.dateShortToStringFullYear(dateSaturday));
             parameterMap.put("reportName", REPORT_NAME);
             parameterMap.put("SUBREPORT_DIR", subReportDir);
 

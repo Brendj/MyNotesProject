@@ -201,11 +201,17 @@ public class MonitoringOfReportPage extends OnlineReportPage {
              templateShortFileName = "MonitoringOfReportThursday" + suffix;
         } else if (dayOfWeek == 6) {
              templateShortFileName = "MonitoringOfReportFriday" + suffix;
+        } else if (dayOfWeek == 7) {
+            templateShortFileName = "MonitoringOfReportSaturday" + suffix;
         }
 
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if (!(new File(templateFilename)).exists()) {
-            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            if (templateShortFileName != null) {
+                printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            } else {
+                printError(String.format("Отчет строиться на все дни недели кроме 'Воскресенья'"));
+            }
             return null;
         }
         return templateFilename;
