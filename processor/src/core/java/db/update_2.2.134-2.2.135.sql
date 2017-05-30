@@ -25,3 +25,11 @@ create table cf_org_inventory
 
 CREATE INDEX cf_org_inventory_idoforg_idx ON cf_org_inventory USING btree (idoforg);
 
+ALTER TABLE cf_transactions ADD COLUMN sendtoexternal boolean NOT NULL DEFAULT TRUE;
+ALTER TABLE cf_orderdetails ADD COLUMN sendtoexternal boolean NOT NULL DEFAULT TRUE;
+
+CREATE INDEX cf_transactions_sendtoexternal_idx ON cf_transactions USING btree (sendtoexternal);
+CREATE INDEX cf_orderdetails_sendtoexternal_idx ON cf_orderdetails USING btree (sendtoexternal);
+
+ALTER TABLE cf_orgs ADD COLUMN registryurl VARCHAR(256) DEFAULT '';
+

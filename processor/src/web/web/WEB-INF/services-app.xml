@@ -89,6 +89,7 @@
         <task:scheduled ref="syncStatsManager" method="shortDataLog" cron="0 0/10 * * * ?"/>
         <task:scheduled ref="syncStatsManager" method="processLogData" cron="0 0 1 * * ?"/>
         <task:scheduled ref="migrantsManager" method="checkOverdueMigrants" cron="0 0 1 * * ?"/>
+        <task:scheduled ref="mealManager" method="sendData" cron="0 * * * * ?"/>
         <task:scheduled ref="SMSResendingService" method="executeResending" fixed-delay="60000"/>
         <!--EP-320 <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup"
                         fixed-delay="60000"/> -->
@@ -126,6 +127,10 @@
         <task:scheduled ref="importRegisterClientsService" method="run" cron="0 0 4 ? * *"/>
     </task:scheduled-tasks>
 
+    <task:scheduler id="importRegisterSpbClientsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="importRegisterSpbClientsSchedule">
+        <task:scheduled ref="importRegisterSpbClientsService" method="run" cron="0 0 4 ? * *"/>
+    </task:scheduled-tasks>
 
     <task:scheduler id="importRegisterOrgsSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="importRegisterOrgsSchedule">

@@ -52,6 +52,7 @@
             <key column="IdOfTransaction"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SubscriptionFee"/>
         </set>
+        <property name="sendToExternal" column="SendToExternal" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
     </class>
 </hibernate-mapping>
 

@@ -132,6 +132,7 @@ public class Org implements Serializable {
     private Boolean changesDSZN; // Получение из реестров льгот ДСЗН
     private Set<Card> cards = new HashSet<Card>();
     private Date updateTime;
+    private String registryUrl;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -956,6 +957,14 @@ public class Org implements Serializable {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getRegistryUrl() {
+        return registryUrl;
+    }
+
+    public void setRegistryUrl(String registryUrl) {
+        this.registryUrl = registryUrl;
     }
 
     @Override

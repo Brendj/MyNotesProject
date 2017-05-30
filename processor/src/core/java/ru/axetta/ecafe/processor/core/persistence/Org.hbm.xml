@@ -234,6 +234,7 @@
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
         </set>
+        <property name="registryUrl" column="registryUrl" type="string" length="256"/>
 
         <property name="interdistrictCouncil" column="interdistrictCouncil" type="string" length="256"/>
         <property name="interdistrictCouncilChief" column="interdistrictCouncilChief" type="string" length="256"/>

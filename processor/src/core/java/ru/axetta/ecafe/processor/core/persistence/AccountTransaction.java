@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
+import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 
 import java.util.Collections;
 import java.util.Date;
@@ -60,6 +61,7 @@ public class AccountTransaction {
     private Set<ClientSms> clientSms = new HashSet<ClientSms>();
     private Set<SubscriptionFee> subscriptionFees = new HashSet<SubscriptionFee>();
     private Org org;
+    private boolean sendToExternal;
 
     protected AccountTransaction() {
         // For Hibernate only
@@ -75,6 +77,7 @@ public class AccountTransaction {
         this.source = source;
         this.sourceType = sourceType;
         this.transactionTime = transactionTime;
+        this.sendToExternal = sourceType != CLIENT_ORDER_TRANSACTION_SOURCE_TYPE && !MealManager.isSendToExternal;
     }
 
     public Long getIdOfTransaction() {
@@ -277,6 +280,14 @@ public class AccountTransaction {
 
     public void setOrg(Org org) {
         this.org = org;
+    }
+
+    public boolean isSendToExternal() {
+        return sendToExternal;
+    }
+
+    public void setSendToExternal(boolean sendToExternal) {
+        this.sendToExternal = sendToExternal;
     }
 
     @Override
