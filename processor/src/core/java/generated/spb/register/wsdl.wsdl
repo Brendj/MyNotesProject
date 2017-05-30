@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="ScudService" targetNamespace="http://85.143.161.170:8080/webservice/food_benefits_full/wsdl" xmlns="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:tns="http://85.143.161.170:8080/webservice/food_benefits_full/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    
+    <documentation>              
+        Передача информации о льготах на питание
+    </documentation>    
+    
+    <types>
+        <xs:schema targetNamespace="http://85.143.161.170:8080/webservice/food_benefits_full/wsdl" xmlns:tns="http://85.143.161.170:8080/webservice/food_benefits_full/wsdl">
+            
+            <xs:element name="login">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[a-zA-Z0-9\-_]{4,}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            
+            <xs:element name="password">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[a-zA-Z0-9]{6,}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+
+            <xs:complexType name="benefit">
+                <xs:annotation>
+                    <xs:documentation>
+			code - код льготы
+			adate - дата начала действия льготы
+			bdate - дата окончания действия льготы
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+			<xs:element name="code" type="xs:string"/>
+			<xs:element name="adate" type="xs:string"/>
+			<xs:element name="bdate" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="event">
+                <xs:annotation>
+                    <xs:documentation>
+			direction может принимать значения IN, OUT, DATA
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+			<xs:element name="directionType" type="xs:string" minOccurs="1" maxOccurs="5"/>
+                </xs:sequence>
+            </xs:complexType>
+            
+            <xs:complexType name="pupil">
+                <xs:annotation>
+                    <xs:documentation>
+			suid - ID ученика (bigint64)
+			class - передается строковое имя класса (номер параллели, пробел, суффикс); для сотрудников передается СОТР; для сопровождающих передается РДТЛ; для выбывших учеников поле пусто
+                        dob - дата рождения
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+			<xs:element name="suid" type="xs:string"/>
+			<xs:element name="surname" type="xs:string"/>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="patronymic" type="xs:string"/>
+			<xs:element name="class" type="xs:string"/>
+			<xs:element name="dob" type="xs:string"/>
+			<xs:element name="portal" type="xs:string" minOccurs="0"/>
+			<xs:element name="event" type="tns:event"/>
+			<xs:element name="benefit" type="tns:benefit" minOccurs="0"/>
+                </xs:sequence>
+            </xs:complexType>
+                     
+            <xs:complexType name="pupils">
+                <xs:annotation>
+                    <xs:documentation>
+                        Список учащихся
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="pupil" type="tns:pupil" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="school">
+                <xs:annotation>
+                    <xs:documentation>
+                        Конкретная ОО
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+			<xs:element name="school_id" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="pupils" type="tns:pupils" minOccurs="1" maxOccurs="1"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="schools">
+                <xs:annotation>
+                    <xs:documentation>
+                        Список ОО
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="school" type="tns:school" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:complexType name="query_school">
+                <xs:annotation>
+                    <xs:documentation>
+			Атрибут id заполните любым значением
+                    </xs:documentation>
+                </xs:annotation>
+		<xs:attribute name="id" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            </xs:complexType>
+            
+            <xs:element name="query">
+                <xs:annotation>
+                    <xs:documentation>
+                        Идентификатор школы
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="school" type="tns:query_school" minOccurs="1" maxOccurs="1"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+            
+        </xs:schema>
+    </types>
+    
+    <message name="pushDataRequest">
+        <part name="query" element="tns:query"/>
+    </message>
+    
+    <message name="pushResponse">
+        <part name="result" element="tns:schools"/>
+    </message>
+    
+    <message name="packageHeader">
+        <part name="login" element="tns:login"/>
+        <part name="password" element="tns:password"/>
+    </message>
+    
+    <portType name="queryPersonPort">
+        <documentation>
+            Запрос информации о льготах на питание
+        </documentation>
+        <operation name="pushData">
+            <input message="tns:pushDataRequest"/>
+            <output message="tns:pushResponse"/>
+        </operation>
+    </portType>
+    
+    <binding name="queryPersonBinding" type="tns:queryPersonPort">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="pushData">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:header message="tns:packageHeader" part="login" use="literal"/>
+                <soap:header message="tns:packageHeader" part="password" use="literal"/>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="PersonWebService">
+        <documentation>Служба данных о льготах питания</documentation>
+        <port name="queryPersonPort" binding="tns:queryPersonBinding">
+            <soap:address location="http://85.143.161.170:8080/webservice/food_benefits_full/execute"/>
+        </port>
+    </service>    
+    
+</definitions>

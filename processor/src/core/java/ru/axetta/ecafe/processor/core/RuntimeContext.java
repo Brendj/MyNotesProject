@@ -144,6 +144,12 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String IMAGE_CONFIG = PROCESSOR_PARAM_BASE + ".image";
     public static final String IMAGE_DIRECTORY = IMAGE_CONFIG + ".path";
     public static final String IMAGE_VALIDATION = IMAGE_CONFIG + ".validation";
+    public static final String REGISTRY = PROCESSOR_PARAM_BASE + ".registry";
+    public static final String REGISTRY_LOGIN = REGISTRY + ".login";
+    public static final String REGISTRY_PASSWORD = REGISTRY + ".password";
+    public static final String MEAL = PROCESSOR_PARAM_BASE + ".meal";
+    public static final String MEAL_LOGIN = MEAL + ".login";
+    public static final String MEAL_PASSWORD = MEAL + ".password";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
@@ -187,6 +193,13 @@ public class RuntimeContext implements ApplicationContextAware {
     private ContractIdGenerator clientContractIdGenerator;
     private CardManager cardManager;
     private OrderCancelProcessor orderCancelProcessor;
+
+    private RegistryType registryType;
+    private String registryLogin;
+    private String registryPassword;
+
+    private String mealLogin;
+    private String mealPassword;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -277,6 +290,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public String getPayformGroupUrl() {
         return payformGroupUrl;
+    }
+
+    public RegistryType getRegistryType() {
+        return registryType;
     }
 
     public Session createPersistenceSession() throws Exception {
@@ -387,6 +404,23 @@ public class RuntimeContext implements ApplicationContextAware {
     public AcquiropaySystemConfig getAcquiropaySystemConfig() {
         return acquiropaySystemConfig;
     }
+
+    public String getRegistryLogin() {
+        return registryLogin;
+    }
+
+    public String getRegistryPassword() {
+        return registryPassword;
+    }
+
+    public String getMealPassword() {
+        return mealPassword;
+    }
+
+    public String getMealLogin() {
+        return mealLogin;
+    }
+
     ///////////////////////////////////////////////////////////
 
 
@@ -535,6 +569,18 @@ public class RuntimeContext implements ApplicationContextAware {
                 postman = createPostman(properties, sessionFactory);
             }
 
+            String registryType = properties.getProperty(RuntimeContext.REGISTRY, "msk");
+            if(registryType.equals(RegistryType.MSK.getName())) {
+                this.registryType = RegistryType.MSK;
+            } else if(registryType.equals(RegistryType.SPB.getName())) {
+                this.registryType = RegistryType.SPB;
+            }
+
+            this.registryLogin = properties.getProperty(REGISTRY_LOGIN);
+            this.registryPassword = properties.getProperty(REGISTRY_PASSWORD);
+
+            this.mealLogin = properties.getProperty(MEAL_LOGIN);
+            this.mealPassword = properties.getProperty(MEAL_PASSWORD);
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;
@@ -1674,6 +1720,29 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public void setSettingsConfig(SettingsConfig settingsConfig) {
         this.settingsConfig = settingsConfig;
+    }
+
+    public static enum RegistryType {
+        MSK("msk"),
+        SPB("spb");
+
+        private String name;
+
+        RegistryType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static boolean isMsk() {
+            return RuntimeContext.getInstance().getRegistryType().equals(MSK);
+        }
+
+        public static boolean isSpb() {
+            return RuntimeContext.getInstance().getRegistryType().equals(SPB);
+        }
     }
 }
 
