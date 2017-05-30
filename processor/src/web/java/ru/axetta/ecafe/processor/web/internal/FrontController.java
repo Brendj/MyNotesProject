@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
@@ -86,12 +87,22 @@ public class FrontController extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
         Integer af = actionFilter;
-        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
-           actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
-           actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
-           actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
-            af = null;
+        if(RuntimeContext.RegistryType.isMsk()) {
+            if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+                af = null;
+            }
+        } else if(RuntimeContext.RegistryType.isSpb()) {
+            if(actionFilter != ImportRegisterSpbClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MOVE_OPERATION) {
+                af = null;
+            }
         }
+
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                                             loadRegistryChangeItems(idOfOrg, revisionDate, af, nameFilter);
     }
@@ -106,11 +117,20 @@ public class FrontController extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
         Integer af = actionFilter;
-        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
-                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
-                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
-                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
-            af = null;
+        if(RuntimeContext.RegistryType.isMsk()) {
+            if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+                af = null;
+            }
+        } else if(RuntimeContext.RegistryType.isSpb()) {
+            if(actionFilter != ImportRegisterSpbClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MOVE_OPERATION) {
+                af = null;
+            }
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeItemsV2(idOfOrg, revisionDate, af, nameFilter);
@@ -126,11 +146,20 @@ public class FrontController extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
         Integer af = actionFilter;
-        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
-                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
-                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
-                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
-            af = null;
+        if(RuntimeContext.RegistryType.isMsk()) {
+            if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+                af = null;
+            }
+        } else if(RuntimeContext.RegistryType.isSpb()) {
+            if(actionFilter != ImportRegisterSpbClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MOVE_OPERATION) {
+                af = null;
+            }
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeItems(idOfOrg, revisionDate, af, nameFilter);
@@ -146,11 +175,20 @@ public class FrontController extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
         Integer af = actionFilter;
-        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
-                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
-                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
-                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
-            af = null;
+        if(RuntimeContext.RegistryType.isMsk()) {
+            if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+                af = null;
+            }
+        } else if(RuntimeContext.RegistryType.isSpb()) {
+            if(actionFilter != ImportRegisterSpbClientsService.CREATE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.DELETE_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MODIFY_OPERATION &&
+                    actionFilter != ImportRegisterSpbClientsService.MOVE_OPERATION) {
+                af = null;
+            }
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeItemsV2(idOfOrg, revisionDate, af, nameFilter);
@@ -215,8 +253,13 @@ public class FrontController extends HttpServlet {
 
         try {
             if(changesList != null && changesList.size() > 0) {
-                RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(changesList.get(0));
-                checkRequestValidity(change.getIdOfOrg());
+                if(RuntimeContext.RegistryType.isMsk()) {
+                    RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(changesList.get(0));
+                    checkRequestValidity(change.getIdOfOrg());
+                } else if(RuntimeContext.RegistryType.isSpb()) {
+                    RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).getRegistryChange(changesList.get(0));
+                    checkRequestValidity(change.getIdOfOrg());
+                }
             }
         } catch (Exception e) {
             logger.error("Failed to pass auth", e);
@@ -326,7 +369,12 @@ public class FrontController extends HttpServlet {
     public String commentRegistryChangeError(@WebParam(name = "idOfRegistryChangeError") long idOfRegistryChangeError,
                                              @WebParam(name = "comment") String comment,
                                              @WebParam(name = "author") String author) {
-        RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+        RegistryChangeError e = null;
+        if(RuntimeContext.RegistryType.isMsk()) {
+            e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+        } else if(RuntimeContext.RegistryType.isSpb()) {
+            e = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+        }
         try {
             checkRequestValidity(e.getIdOfOrg());
         } catch (FrontControllerException fce) {

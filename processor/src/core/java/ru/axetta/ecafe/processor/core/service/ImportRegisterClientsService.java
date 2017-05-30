@@ -209,7 +209,7 @@ public class ImportRegisterClientsService {
     }
 
     public void run() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode()) {
+        if (!RuntimeContext.getInstance().isMainNode() || !RuntimeContext.RegistryType.isMsk()) {
             return;
         }
 

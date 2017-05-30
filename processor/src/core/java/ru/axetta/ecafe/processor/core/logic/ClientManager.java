@@ -725,7 +725,19 @@ public class ClientManager {
             long contractId;
             if (StringUtils.equals(contractIdText, "AUTO")) {
                 logger.debug("generate ContractId");
-                contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                if(RuntimeContext.RegistryType.isMsk()) {
+                    contractId = runtimeContext.getClientContractIdGenerator()
+                            .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                } else if(RuntimeContext.RegistryType.isSpb()) {
+                    try {
+                        String c = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
+                        contractId = Long.parseLong(c);
+                    } catch (Exception e) {
+                        throw new Exception("Неправильный формат идентификатор клиента", e);
+                    }
+                } else {
+                    throw new Exception("Неправильный формат идентификатор клиента");
+                }
             } else {
                 contractId = Long.parseLong(contractIdText);
             }
@@ -795,6 +807,7 @@ public class ClientManager {
                     client.setIdOfClientGroup(null);
                 }
             }
+
             if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID) != null) {
                 String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
                 if (clientGUID.isEmpty()) {
@@ -835,7 +848,7 @@ public class ClientManager {
             }
 
             //token[39]
-            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT) != null) {
+            if (checkBenefits && StringUtils.isNotEmpty(fieldConfig.getValue(FieldId.BENEFIT))) {
                 client.setCategoriesDiscounts(fieldConfig.getValue(FieldId.BENEFIT));
                 client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
             } else {
@@ -878,7 +891,7 @@ public class ClientManager {
                 clientMigration = new ClientMigration(client, client.getOrg(), contractDate);
             }
 
-            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT) != null) {
+            if (checkBenefits && StringUtils.isNotEmpty(fieldConfig.getValue(FieldId.BENEFIT))) {
                 DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
                         Client.DISCOUNT_MODE_NONE, fieldConfig.getValue(FieldId.BENEFIT), "");
                 discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);

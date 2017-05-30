@@ -660,6 +660,20 @@ public class DAOUtils {
         return cls;
     }
 
+    public static List <Client> findClientsWithoutPredefinedForOrg(EntityManager em, Org organization) throws Exception {
+        String orgsClause = " where (client.org = :org ";
+        orgsClause += ") " + " and not (client.idOfClientGroup >= " +
+                ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and client.idOfClientGroup < " +
+                ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ")";
+
+        javax.persistence.Query query = em.createQuery(
+                "from Client client " + orgsClause);
+        query.setParameter("org", organization);
+        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        List <Client> cls = (List <Client>)query.getResultList();
+        return cls;
+    }
+
     public static List<Long> findFriendlyOrgIds(Session session, Long orgId) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg=:idOfOrg")

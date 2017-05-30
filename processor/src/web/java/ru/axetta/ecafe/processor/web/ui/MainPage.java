@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
-import generated.registry.manual_synch.Exception_Exception;
 import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -274,6 +273,8 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupOrgPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage spbGroupContingentPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage spbGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -5897,6 +5898,14 @@ public class MainPage implements Serializable {
         return nsiGroupOrgPage;
     }
 
+    public BasicWorkspacePage getSpbGroupContingentPage() {
+        return spbGroupContingentPage;
+    }
+
+    public BasicWorkspacePage getSpbGroupPage() {
+        return spbGroupPage;
+    }
+
     public BasicWorkspacePage getUosGroupPage() {
         return uosGroupPage;
     }
@@ -5929,6 +5938,18 @@ public class MainPage implements Serializable {
 
     public Object showNSIGroupOrgPage() {
         currentWorkspacePage = nsiGroupOrgPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showSpbGroupContingentPage() {
+        currentWorkspacePage = spbGroupContingentPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showSpbGroupPage() {
+        currentWorkspacePage = spbGroupPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -8638,6 +8659,14 @@ public class MainPage implements Serializable {
 
     public String getUserRole() throws Exception {
         return getCurrentUser().getRoleName();
+    }
+
+    public boolean isMskRegistry() {
+        return RuntimeContext.RegistryType.isMsk();
+    }
+
+    public boolean isSpbRegistry() {
+        return RuntimeContext.RegistryType.isSpb();
     }
 
     public boolean isEligibleToViewOrgs() throws Exception {

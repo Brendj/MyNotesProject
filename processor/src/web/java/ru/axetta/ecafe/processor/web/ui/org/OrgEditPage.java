@@ -108,6 +108,8 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private String statusDetailing;
 
+    private String registryUrl;
+
     private Boolean payByCashier;
     private Boolean oneActiveCard;
     private Boolean changesDSZN;
@@ -327,6 +329,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setIntroductionQueue(introductionQueue);
         org.setAdditionalIdBuilding(additionalIdBuilding);
         org.setUniqueAddressId(uniqueAddressId);
+        org.setRegistryUrl(registryUrl);
 
         if (this.statusTextArea != null) {
             if (this.statusDetail != null && this.statusDetail.length() > 0) {
@@ -464,6 +467,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.introductionQueue = org.getIntroductionQueue();
         this.additionalIdBuilding = org.getAdditionalIdBuilding();
         this.uniqueAddressId = org.getUniqueAddressId();
+        this.registryUrl = org.getRegistryUrl();
 
         String[] strings = org.getStatusDetailing().split("/");
 
@@ -1187,5 +1191,13 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public Boolean isCurrentOrg(Long idOrg) {
         return idOfOrg.equals(idOrg);
+    }
+
+    public String getRegistryUrl() {
+        return registryUrl;
+    }
+
+    public void setRegistryUrl(String registryUrl) {
+        this.registryUrl = registryUrl;
     }
 }

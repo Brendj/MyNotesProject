@@ -84,6 +84,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean photoRegistry;
     private Boolean variableFeeding;
     private Boolean isWorkInSummerTime;
+    private String registryUrl;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -185,6 +186,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.refectoryType = org.getRefectoryType();
         getRefectoryTypeStringRepresentation();
         this.organizationType= org.getType();
+        this.registryUrl = org.getRegistryUrl();
 
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
@@ -636,5 +638,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setUsePaydableSubscriptionFeeding(Boolean usePaydableSubscriptionFeeding) {
         this.usePaydableSubscriptionFeeding = usePaydableSubscriptionFeeding;
+    }
+
+    public String getRegistryUrl() {
+        return registryUrl;
+    }
+
+    public void setRegistryUrl(String registryUrl) {
+        this.registryUrl = registryUrl;
     }
 }

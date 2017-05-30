@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.BadOrgGuidsException;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 
 import org.slf4j.Logger;
@@ -217,7 +218,13 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeItem> refreshRegistryChangeItems(long idOfOrg) throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
+            if(RuntimeContext.RegistryType.isMsk()) {
+                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                        .syncClientsWithRegistry(idOfOrg, false, new StringBuffer(), true);
+            } else if(RuntimeContext.RegistryType.isSpb()) {
+                RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
+                        .syncClientsWithRegistry(idOfOrg);
+            }
             return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
         } catch (BadOrgGuidsException eGuid) {
             throw eGuid;
@@ -230,7 +237,13 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeItemV2> refreshRegistryChangeItemsV2(long idOfOrg) throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
+            if(RuntimeContext.RegistryType.isMsk()) {
+                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                        .syncClientsWithRegistry(idOfOrg, false, new StringBuffer(), true);
+            } else if(RuntimeContext.RegistryType.isSpb()) {
+                RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
+                        .syncClientsWithRegistry(idOfOrg);
+            }
             return loadRegistryChangeItemsV2(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
         } catch (BadOrgGuidsException eGuid) {
             throw eGuid;
@@ -254,20 +267,24 @@ public class FrontControllerProcessor {
                 return Collections.EMPTY_LIST;
             }
 
-            //boolean authPassed = false;
             for (Long idOfRegistryChange : changesList) {
-                /*if(!authPassed) {
-                    RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(idOfRegistryChange);
-                    authPassed = true;
-                } */
                 try {
-                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                    if(RuntimeContext.RegistryType.isMsk()) {
+                        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                    } else if(RuntimeContext.RegistryType.isSpb()) {
+                        RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                    }
                     result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
                 } catch (Exception e1) {
                     //if(e1 instanceof ClientAlreadyExistException) {
                     logger.error("Error sverka: ", e1);
-                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).setChangeError(
-                            idOfRegistryChange, e1);
+                    if(RuntimeContext.RegistryType.isMsk()) {
+                        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).setChangeError(
+                                idOfRegistryChange, e1);
+                    } else if(RuntimeContext.RegistryType.isSpb()) {
+                        RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).setChangeError(
+                                idOfRegistryChange, e1);
+                    }
                     //}
                     result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
                 }
@@ -316,7 +333,11 @@ public class FrontControllerProcessor {
             String comment,
             String author) {
         try {
-            RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+            if(RuntimeContext.RegistryType.isMsk()) {
+                RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+            } else if(RuntimeContext.RegistryType.isSpb()) {
+                RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+            }
             DAOService.getInstance().addRegistryChangeErrorComment(idOfRegistryChangeError, comment, author);
             return null;
         } catch (Exception e) {

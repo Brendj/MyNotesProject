@@ -796,7 +796,7 @@
                         rendered="#{mainPage.eligibleToServiceAdmin}" />
 
     <rich:panelMenuGroup id="nsiGroup" binding="#{mainPage.nsiGroupPage.mainMenuComponent}" label="Сверка"
-                         rendered="#{mainPage.eligibleToServiceAdmin}">
+                         rendered="#{mainPage.eligibleToServiceAdmin && mainPage.mskRegistry}">
         <a4j:support event="onclick" action="#{mainPage.showNSIGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuGroup id="nsiGroupContingent" binding="#{mainPage.nsiGroupContingentPage.mainMenuComponent}" label="Сверка контингента"
@@ -841,6 +841,30 @@
         </rich:panelMenuGroup>
 
     </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="spbGroup" binding="#{mainPage.spbGroupPage.mainMenuComponent}" label="Сверка"
+                         rendered="#{mainPage.eligibleToServiceAdmin && mainPage.spbRegistry}">
+        <a4j:support event="onclick" action="#{mainPage.showSpbGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="spbGroupContingent" binding="#{mainPage.spbGroupContingentPage.mainMenuComponent}" label="Сверка контингента"
+                             rendered="#{mainPage.eligibleToServiceAdmin}">
+            <a4j:support event="onclick" action="#{mainPage.showSpbGroupContingentPage}" reRender="workspaceForm" />
+
+            <%--@elvariable id="spbRegistrySynchPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySynchPage"--%>
+            <rich:panelMenuItem id="spbOrgRegistrySync" binding="#{spbRegistrySynchPage.mainMenuComponent}"
+                                label="Интерактивная сверка" action="#{spbRegistrySynchPage.show}"
+                                reRender="workspaceForm" />
+            <%--@elvariable id="spbRegistrySynchOverviewPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySynchOverviewPage"--%>
+            <rich:panelMenuItem id="spbOrgRegistrySyncOverview" binding="#{spbRegistrySynchOverviewPage.mainMenuComponent}"
+                                label="Статистика сверки" action="#{spbRegistrySynchOverviewPage.show}"
+                                reRender="workspaceForm" />
+            <%--@elvariable id="photoRegistryPage" type="ru.axetta.ecafe.processor.web.ui.service.PhotoRegistryPage"--%>
+            <rich:panelMenuItem id="photoRegistryItemSpb" binding="#{photoRegistryPage.mainMenuComponent}"
+                                label="Сверка фотографий клиентов" action="#{photoRegistryPage.show}"
+                                reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+    </rich:panelMenuGroup>
+
     <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" action="#{mainPage.showUOSGroupPage}" reRender="workspaceForm" />
