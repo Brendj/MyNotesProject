@@ -32,47 +32,62 @@ public class MonitoringOfReportService {
         } else if (dayOfWeek == 3) {
             DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -1), CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -1),
+                    CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriod);
         } else if (dayOfWeek == 4) {
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2), CalendarUtils.addDays(startTime, -1));
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2),
+                    CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
             DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -2), startTime);
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -2), CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -2),
+                    CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriod);
         } else if (dayOfWeek == 5) {
-            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -3), CalendarUtils.addDays(startTime, -2));
+            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -3),
+                    CalendarUtils.addDays(startTime, -2));
             datePeriodsList.add(datePeriodsss);
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -3), CalendarUtils.addDays(startTime, -1));
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -3),
+                    CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
             DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -3), startTime);
             datePeriodsList.add(datePeriod);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -3), CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -3),
+                    CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriods);
         } else if (dayOfWeek == 6) {
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addDays(startTime, -3));
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -4),
+                    CalendarUtils.addDays(startTime, -3));
             datePeriodsList.add(datePeriod);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addDays(startTime, -2));
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -4),
+                    CalendarUtils.addDays(startTime, -2));
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addDays(startTime, -1));
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -4),
+                    CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
             DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -4), startTime);
             datePeriodsList.add(datePeriodsss);
-            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -4), CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -4),
+                    CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriodssss);
         } else if (dayOfWeek == 7) {
-            DatePeriods datePeriodd = new DatePeriods(CalendarUtils.addDays(startTime, -5), CalendarUtils.addDays(startTime, -4));
+            DatePeriods datePeriodd = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+                    CalendarUtils.addDays(startTime, -4));
             datePeriodsList.add(datePeriodd);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -5), CalendarUtils.addDays(startTime, -3));
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+                    CalendarUtils.addDays(startTime, -3));
             datePeriodsList.add(datePeriod);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -5), CalendarUtils.addDays(startTime, -2));
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+                    CalendarUtils.addDays(startTime, -2));
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -5), CalendarUtils.addDays(startTime, -1));
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+                    CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
             DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -5), startTime);
             datePeriodsList.add(datePeriodsss);
-            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -5), CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+                    CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriodssss);
         }
 
@@ -86,12 +101,12 @@ public class MonitoringOfReportService {
 
         MonitoringOfItem monitoringOfItem = new MonitoringOfItem();
         monitoringOfItem.setsDate(datePeriod.getStartDate());
-        monitoringOfItem
-                .setNumberOfPassesStudents(generateNumberOfPassesStudents(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
-        monitoringOfItem
-                .setNumberOfPassesEmployees(generateNumberOfPassesEmployees(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
-        monitoringOfItem
-                .setNumberOfPassesGuardians(generateNumberOfPassesGuardians(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem.setNumberOfPassesStudents(
+                generateNumberOfPassesStudents(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem.setNumberOfPassesEmployees(
+                generateNumberOfPassesEmployees(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem.setNumberOfPassesGuardians(
+                generateNumberOfPassesGuardians(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
 
         monitoringOfItem.setSummaryOfPasses(
                 monitoringOfItem.getNumberOfPassesStudents() + monitoringOfItem.getNumberOfPassesEmployees()
@@ -178,20 +193,23 @@ public class MonitoringOfReportService {
             if (datePeriodsList.size() == 3) {
                 reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
                 reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
-                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+                reportItem
+                        .setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
             }
 
             if (datePeriodsList.size() == 4) {
                 reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
                 reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
-                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+                reportItem
+                        .setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
                 reportItem.setMonitoringOfItemsThursday(getMonitoringOfItems(session, datePeriodsList.get(3), idOfOrg));
             }
 
             if (datePeriodsList.size() == 5) {
                 reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
                 reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
-                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+                reportItem
+                        .setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
                 reportItem.setMonitoringOfItemsThursday(getMonitoringOfItems(session, datePeriodsList.get(3), idOfOrg));
                 reportItem.setMonitoringOfItemsFriday(getMonitoringOfItems(session, datePeriodsList.get(4), idOfOrg));
             }
@@ -199,7 +217,8 @@ public class MonitoringOfReportService {
             if (datePeriodsList.size() == 6) {
                 reportItem.setMonitoringOfItemsMonday(getMonitoringOfItems(session, datePeriodsList.get(0), idOfOrg));
                 reportItem.setMonitoringOfItemsTuesday(getMonitoringOfItems(session, datePeriodsList.get(1), idOfOrg));
-                reportItem.setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
+                reportItem
+                        .setMonitoringOfItemsWednesday(getMonitoringOfItems(session, datePeriodsList.get(2), idOfOrg));
                 reportItem.setMonitoringOfItemsThursday(getMonitoringOfItems(session, datePeriodsList.get(3), idOfOrg));
                 reportItem.setMonitoringOfItemsFriday(getMonitoringOfItems(session, datePeriodsList.get(4), idOfOrg));
                 reportItem.setMonitoringOfItemsSaturday(getMonitoringOfItems(session, datePeriodsList.get(5), idOfOrg));
@@ -262,6 +281,22 @@ public class MonitoringOfReportService {
 
         return result;
     }
+
+    //Питание Количество
+
+    public Long numberOfLgotnoe(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery(
+                "SELECT count(*) FROM CF_Clients cfc LEFT JOIN cf_orders cfo ON cfc.IdOfClient = cfo.IdOfClient WHERE cfc.IdOfOrg = : idoforg");
+        query.setParameter("idoforg", idOfOrg);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    /*public Long numberOfReserve(Long idOfOrg, Session session) {
+
+    }*/
 
     public static class ReportItem {
 
