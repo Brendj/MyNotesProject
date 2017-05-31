@@ -33,3 +33,4 @@ CREATE INDEX cf_orderdetails_sendtoexternal_partial_idx ON cf_orderdetails(sendt
 
 ALTER TABLE cf_orgs ADD COLUMN registryurl VARCHAR(256) DEFAULT '';
 
+--! ФИНАЛИЗИРОВАН (Семенов, 310517) НЕ МЕНЯТЬ
