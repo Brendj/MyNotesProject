@@ -165,6 +165,9 @@ public class MealManager {
     }
 
     private void updateOrders(List<TransactionDataItem> sendOrders, Session session) {
+        if(sendOrders.size() < 1) {
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("update cf_orderdetails set sendtoexternal = 1 where (idoforderdetail, idoforg) in (");
         for(TransactionDataItem item : sendOrders) {
@@ -197,6 +200,9 @@ public class MealManager {
     }
 
     private void updateTransactions(List<TransactionDataItem> sendOrders, Session session) {
+        if(sendOrders.size() < 1) {
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("update cf_transactions set sendtoexternal = 1 where idoftransaction in (");
         for(TransactionDataItem item : sendOrders) {
