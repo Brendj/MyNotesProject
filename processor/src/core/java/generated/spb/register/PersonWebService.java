@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "PersonWebService", targetNamespace = "http://85.143.161.170:8080/webservice/food_benefits_full/wsdl", wsdlLocation = "http://85.143.161.170:8080/webservice/food_benefits_full/wsdl")
+@WebServiceClient(name = "PersonWebService")
 public class PersonWebService
     extends Service
 {
@@ -45,8 +45,9 @@ public class PersonWebService
         super(wsdlLocation, serviceName);
     }
 
-    public PersonWebService(String url) {
-        super(PERSONWEBSERVICE_WSDL_LOCATION, new QName(url, "PersonWebService"));
+    public PersonWebService(String url) throws MalformedURLException {
+        //super(PERSONWEBSERVICE_WSDL_LOCATION, new QName(url, "PersonWebService"));
+        super(new URL(url), new QName(url, "PersonWebService"));
     }
 
     /**
