@@ -35,11 +35,11 @@ public class ClientSpbService {
     private QueryPersonPort createEventController(String url) {
         QueryPersonPort controller;
         try {
-            PersonWebService service = new PersonWebService(url);
-            controller = service.getQueryPersonPort(url);
+            PersonWebService service = new PersonWebService(url + "wsdl");
+            controller = service.getQueryPersonPort(url + "wsdl");
             BindingProvider bp = (BindingProvider)controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
-            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://85.143.161.170:8080/webservice/food_benefits_full/execute");
+            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url + "execute");
 
             Client proxy = ClientProxy.getClient(controller);
             proxy.getOutInterceptors().add(new HeaderHandler());

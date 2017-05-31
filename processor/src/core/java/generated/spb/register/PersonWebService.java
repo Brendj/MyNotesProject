@@ -24,6 +24,7 @@ public class PersonWebService
     extends Service
 {
 
+    private final static String WSDL_LOCATION = "META-INF/spb/SpbRegistryService.wsdl";
     private final static URL PERSONWEBSERVICE_WSDL_LOCATION;
     private final static Logger logger = Logger.getLogger(generated.spb.register.PersonWebService.class.getName());
 
@@ -32,9 +33,9 @@ public class PersonWebService
         try {
             URL baseUrl;
             baseUrl = generated.spb.register.PersonWebService.class.getResource(".");
-            url = new URL(baseUrl, "http://85.143.161.170:8080/webservice/food_benefits_full/wsdl");
+            url = new URL(baseUrl, PersonWebService.class.getClassLoader().getResource(WSDL_LOCATION).getPath());
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'http://85.143.161.170:8080/webservice/food_benefits_full/wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location META-INF/spb/SpbRegistryService.wsdl, retrying as a local file");
             logger.warning(e.getMessage());
         }
         PERSONWEBSERVICE_WSDL_LOCATION = url;

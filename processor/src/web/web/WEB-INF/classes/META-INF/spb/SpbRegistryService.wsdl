@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="MEALService"
+    targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:tns = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl"
+    xmlns:soap = "http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <documentation>
+        Служба загрузки информации о транзакциях, проводимых по школьной карте при предоставлении услуги детского питания
+    </documentation>
+
+    <types>
+        <xs:schema
+            xmlns:cmn = "http://svc.edu.n3demo.ru/service/webservice/mealTypes"
+            targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/mealTypes">
+            <xs:include schemaLocation="http://svc.edu.n3demo.ru/service/webservice/meal/xsd" />
+        </xs:schema>
+
+        <xs:schema
+            xmlns:cmn="http://svc.edu.n3demo.ru/service/webservice/mealTypes"
+            targetNamespace="http://svc.edu.n3demo.ru/service/webservice/meal/wsdl">
+
+            <xs:element name="login">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[a-zA-Z0-9\-_]{4,}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="password">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[a-zA-Z0-9]{6,}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+
+            <xs:element name="pushZipFileRequest">
+                <xs:annotation>
+                    <xs:documentation>
+                        Кодированное в base64 содержимое zip архива, в который упакованы данные
+                        Структура данных соответствует структуре элемента transactionList
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+
+            <xs:element name="mealData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="identityInfo">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Идентификационные данные
+                                </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="organizationUid" type="cmn:guidType" minOccurs="1">
+                                          <xs:annotation>
+                                              <xs:documentation>
+                                                  Уникальный идентификатор организации
+                                              </xs:documentation>
+                                          </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="studentUid" type="cmn:notNullStringType" minOccurs="1">
+                                          <xs:annotation>
+                                              <xs:documentation>
+                                                  Уникальный идентификатор обучающегося
+                                              </xs:documentation>
+                                          </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="userToken" type="cmn:notNullStringType" minOccurs="1">
+                                          <xs:annotation>
+                                              <xs:documentation>
+                                                  Ключ авторизации школьника
+                                              </xs:documentation>
+                                          </xs:annotation>
+                                      </xs:element>
+                                      <xs:element name="cardUid" type="cmn:notNullStringType" minOccurs="1">
+                                          <xs:annotation>
+                                              <xs:documentation>
+                                                  Идентификатор счета школьной карты
+                                              </xs:documentation>
+                                          </xs:annotation>
+                                      </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="transaction" type="cmn:transactionType" minOccurs="1" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="pushResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="result"  type="xs:boolean" minOccurs="1" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Результат постановки в очередь принятого пакета
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="queueId"  type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Идентификатор принятого пакета в очереди обработки
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </types>
+
+    <message name="pushZipFileRequest">
+        <part name="data" element="tns:pushZipFileRequest" />
+    </message>
+
+    <message name="pushDataRequest">
+        <part name="data" element="tns:mealData"/>
+    </message>
+
+    <message name="pushResponse">
+        <part name="result" element="tns:pushResponse"/>
+    </message>
+
+    <message name="packageHeader">
+        <part name="login" element="tns:login"/>
+        <part name="password" element="tns:password"/>
+    </message>
+
+    <portType name="pushMealPort">
+        <documentation>
+            Загрузка данных по школьному питанию
+        </documentation>
+        <operation name="pushZipFile">
+            <documentation>
+                Передача данных в zip архиве
+            </documentation>
+            <input message="tns:pushZipFileRequest"/>
+            <output message="tns:pushResponse"/>
+        </operation>
+        <operation name="pushData">
+            <documentation>
+                Передача данных в несжатом виде
+            </documentation>
+            <input message="tns:pushDataRequest"/>
+            <output message="tns:pushResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="pushMealBinding" type="tns:pushMealPort">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="pushZipFile">
+            <soap:operation soapAction="pushZipFile" />
+            <input>
+                <soap:header message="tns:packageHeader" part="login" use="literal"/>
+                <soap:header message="tns:packageHeader" part="password" use="literal"/>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+        <operation name="pushData">
+            <soap:operation soapAction="pushData" />
+            <input>
+                <soap:header message="tns:packageHeader" part="login" use="literal"/>
+                <soap:header message="tns:packageHeader" part="password" use="literal"/>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+    </binding>
+    <service name="MealWebService">
+        <documentation>Служба загрузки информации о транзакциях, проводимых по школьной карте при предоставлении услуги детского питания</documentation>
+        <port name="pushMealPort" binding="tns:pushMealBinding">
+            <soap:address location="http://svc.edu.n3demo.ru/service/webservice/meal"/>
+        </port>
+    </service>
+</definitions>
+
