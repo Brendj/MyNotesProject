@@ -523,6 +523,23 @@ public class ImportRegisterSpbClientsService {
             }
         }
 
+        if (operation == MOVE_OPERATION) {
+            ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
+            ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
+            ClientGroup currentGroup = currentClient.getClientGroup();
+            if (currentGroup != null) {
+                currentGroup = em.merge(currentGroup);
+                ch.setGroupNameFrom(currentGroup.getGroupName());
+            } else {
+                ch.setGroupNameFrom("");
+            }
+
+            ch.setGenderFrom(currentClient.getGender());
+            if (currentClient.getBirthDate() != null) {
+                ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
+            }
+            ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
+        }
         if (operation == MODIFY_OPERATION) {
             ClientGroup currentGroup = currentClient.getClientGroup();
             if (currentGroup != null) {

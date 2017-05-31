@@ -1545,7 +1545,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (enableSubBalanceOperation) {
                 String contractIdStr = String.valueOf(contractId);
                 int len = contractIdStr.length();
-                if (ContractIdGenerator.luhnTest(contractIdStr) || len < 2) {
+                if (ContractIdGenerator.luhnTest(contractIdStr) || len < 2 || RuntimeContext.RegistryType.isSpb()) {
                     return process(contractId, CLIENT_ID_INTERNALID, processor, handler);
                 } else {
                     return process(contractId, CLIENT_SUB_ID, processor, handler);
@@ -1987,7 +1987,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Long clientContractId = contractId;
         String contractIdstr = String.valueOf(contractId);
-        if (ContractIdGenerator.luhnTest(contractIdstr)) {
+        if (ContractIdGenerator.luhnTest(contractIdstr) || RuntimeContext.RegistryType.isSpb()) {
             clientContractId = contractId;
         } else {
             int len = contractIdstr.length();
@@ -2287,7 +2287,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Long clientContractId = contractId;
         String contractIdstr = String.valueOf(contractId);
-        if (ContractIdGenerator.luhnTest(contractIdstr)) {
+        if (ContractIdGenerator.luhnTest(contractIdstr) || RuntimeContext.RegistryType.isSpb()) {
             clientContractId = contractId;
         } else {
             int len = contractIdstr.length();

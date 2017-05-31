@@ -61,8 +61,6 @@
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
-    <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
-    <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Должность" styleClass="output-text" />
@@ -251,6 +249,8 @@
             <h:outputText escape="false" value="&nbsp;&nbsp;" styleClass="output-text" />
         </a4j:repeat>
     </h:panelGrid>
+    <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
+    <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
 </h:panelGrid>
 <br />
 <rich:separator />

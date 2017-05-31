@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.service.meal;
 
 
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 
 import java.util.Date;
@@ -33,6 +32,15 @@ public class TransactionDataItem {
     private Integer foodAmount;
 
     public TransactionDataItem() {
+    }
+
+    public TransactionDataItem(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public TransactionDataItem(Long idOfOrderDetail, Long idOfOrg) {
+        this.idOfOrderDetail = idOfOrderDetail;
+        this.idOfOrg = idOfOrg;
     }
 
     public TransactionDataItem(Long idOfOrderDetail, Long idOfOrg, String organizationUid, String studentUid, Long cardPrintedNo,
@@ -64,7 +72,6 @@ public class TransactionDataItem {
         this.transactionDate = transactionDate;
         this.balance = balance;
         this.amount = amount;
-        this.foodName = AccountTransaction.sourceTypeToString(sourceType);
     }
 
     public Long getIdOfOrderDetail() {

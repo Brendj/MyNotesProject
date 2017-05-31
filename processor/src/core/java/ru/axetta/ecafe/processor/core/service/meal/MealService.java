@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.xml.ws.BindingProvider;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Liya
@@ -38,8 +40,10 @@ public class MealService {
         try {
             MealWebService service = new MealWebService();
             controller = service.getPushMealPort();
-
             Client proxy = ClientProxy.getClient(controller);
+            BindingProvider bp = (BindingProvider) controller;
+            bp.getRequestContext().put("schema-validation-enabled", "false");
+            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://svc.edu.n3demo.ru/service/webservice/meal");
             proxy.getOutInterceptors().add(new HeaderHandler());
 
             HTTPConduit conduit = (HTTPConduit) proxy.getConduit();

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.way4;
 
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
@@ -110,7 +111,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
 
                 int subBalanceNum = 0;
                 String contractIdstr = String.valueOf(response.getClientId());
-                if(ContractIdGenerator.luhnTest(contractIdstr)){
+                if(ContractIdGenerator.luhnTest(contractIdstr) || RuntimeContext.RegistryType.isSpb()){
                     subBalanceNum = 0;
                 } else {
                     int len = contractIdstr.length();

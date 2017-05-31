@@ -37,7 +37,7 @@ background-image: url("/images/16x16/delete.png");
                                            styleClass="command-link" style="width: 25px;" />
                     </h:panelGroup>
                     <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
-                    <h:inputText value="#{mainPage.clientSelectListPage.clientFilter.contractId}" maxlength="10"
+                    <h:inputText value="#{mainPage.clientSelectListPage.clientFilter.contractId}" maxlength="16"
                                  styleClass="input-text" />
                 </h:panelGrid>
                 <rich:simpleTogglePanel label="По контактным данным" switchType="client" opened="false"

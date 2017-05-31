@@ -58,8 +58,6 @@
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.phone}" styleClass="input-text"
                  converter="phoneConverter" />
-    <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Должность" styleClass="output-text" />
@@ -196,6 +194,8 @@
     </a4j:repeat>
     <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

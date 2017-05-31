@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
@@ -3177,7 +3178,8 @@ public class Processor implements SyncProcessor {
                             payment.getIdOfOrder(), purchase.getQty(), purchase.getDiscount(),
                             purchase.getSocDiscount(), purchase.getrPrice(), purchase.getName(), purchase.getRootMenu(),
                             purchase.getMenuGroup(), purchase.getMenuOrigin(), purchase.getMenuOutput(),
-                            purchase.getType(), purchase.getIdOfMenu(), purchase.getManufacturer());
+                            purchase.getType(), purchase.getIdOfMenu(), purchase.getManufacturer(),
+                            purchase.getrPrice() == 0L || payment.getSumByCard() == 0L || payment.getIdOfClient() == null || !MealManager.isSendToExternal);
                     if (purchase.getItemCode() != null) {
                         orderDetail.setItemCode(purchase.getItemCode());
                     }

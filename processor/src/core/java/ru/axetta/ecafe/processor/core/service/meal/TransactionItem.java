@@ -66,7 +66,7 @@ public class TransactionItem {
         transactionType.setAmount(BigDecimal.valueOf(item.getAmount()));
         transactionType.setCardName(item.getCardName());
         transactionType.setFoodName(item.getFoodName());
-        transactionType.setFoodAmount(BigInteger.valueOf(item.getFoodAmount()));
+        transactionType.setFoodAmount(item.getFoodAmount() != null ? BigInteger.valueOf(item.getFoodAmount()) : null);
         transactionType.setDirectionType(item.getDirectionType());
 
         return transactionType;

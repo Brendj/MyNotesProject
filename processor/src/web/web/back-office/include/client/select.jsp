@@ -44,7 +44,7 @@
                             <h:outputText escape="true" value="Договор" styleClass="output-text" />
                             <h:panelGrid columns="2" styleClass="borderless-grid">
                                 <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractId}" maxlength="10"
+                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractId}" maxlength="16"
                                              styleClass="input-text" />
                                 <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
                                 <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractPerson.surname}"

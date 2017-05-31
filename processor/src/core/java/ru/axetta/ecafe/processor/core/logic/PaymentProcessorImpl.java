@@ -160,7 +160,7 @@ public class PaymentProcessorImpl implements PaymentProcessor {
         if (enableSubBalanceOperation) {
             if (payment.getContractId() != null) {
                 String contractIdstr = String.valueOf(payment.getContractId());
-                if (ContractIdGenerator.luhnTest(contractIdstr)) {
+                if (ContractIdGenerator.luhnTest(contractIdstr) || RuntimeContext.RegistryType.isSpb()) {
                     subBalanceNum = 0;
                     contractId = payment.getContractId();
                 } else {

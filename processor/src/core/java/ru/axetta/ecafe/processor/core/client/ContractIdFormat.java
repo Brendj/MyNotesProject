@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.client;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -16,7 +13,7 @@ import java.text.NumberFormat;
  */
 public class ContractIdFormat {
 
-    public static final int MAX_LENGTH = 10;
+    public static final int MAX_LENGTH = 16;
     public static final int MIN_LENGTH = 8;
 
     private ContractIdFormat() {

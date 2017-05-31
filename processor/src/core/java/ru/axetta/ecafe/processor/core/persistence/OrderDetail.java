@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintOrders;
-import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 
 import java.util.Set;
 
@@ -140,7 +139,7 @@ public class OrderDetail {
 
     public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
             long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
-            String menuOutput, int menuType, Long idOfMenuFromSync, String manufacturer) {
+            String menuOutput, int menuType, Long idOfMenuFromSync, String manufacturer, boolean sendToExternal) {
         this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
         this.idOfOrder = idOfOrder;
         this.qty = qty;
@@ -155,7 +154,7 @@ public class OrderDetail {
         this.menuType = menuType;
         this.idOfMenuFromSync = idOfMenuFromSync;
         this.manufacturer = manufacturer;
-        this.sendToExternal = rPrice > 0 && !MealManager.isSendToExternal;
+        this.sendToExternal = sendToExternal;
     }
 
     public CompositeIdOfOrderDetail getCompositeIdOfOrderDetail() {

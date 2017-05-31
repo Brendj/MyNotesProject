@@ -37,7 +37,7 @@
                                      disabled="#{mainPage.clientListPage.clientFilter.clientGroupId ne -1}" />
 
             <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractId}" maxlength="10"
+            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractId}" maxlength="16"
                          styleClass="input-text" />
 
             <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
