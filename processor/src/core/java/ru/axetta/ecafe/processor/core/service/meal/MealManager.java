@@ -108,7 +108,7 @@ public class MealManager {
             } catch (Exception e) {
                 logger.error(String.format(
                         "Не удалось доставить данные о покупках клиента studentUid = %s, transactionId = %s",
-                        mItem.getStudentUid(), mItem.getTransactionItems().get(0)), e);
+                        mItem.getStudentUid(), mItem.getTransactionItems().get(0).getTransactionId()), e);
             }
         }
         updateOrders(sendOrders, session);
@@ -137,7 +137,7 @@ public class MealManager {
             } catch (Exception e) {
                 logger.error(String.format(
                         "Не удалось доставить данные о транзакциях клиента studentUid = %s, transactionId = %s",
-                        mItem.getStudentUid(), mItem.getTransactionItems().get(0)), e);
+                        mItem.getStudentUid(), mItem.getTransactionItems().get(0).getTransactionId()), e);
             }
         }
         updateTransactions(sendTransactions, session);
