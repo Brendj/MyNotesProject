@@ -77,7 +77,7 @@ public class AccountTransaction {
         this.source = source;
         this.sourceType = sourceType;
         this.transactionTime = transactionTime;
-        this.sendToExternal = sourceType != CLIENT_ORDER_TRANSACTION_SOURCE_TYPE || card == null || !MealManager.isSendToExternal;
+        this.sendToExternal = sourceType == CLIENT_ORDER_TRANSACTION_SOURCE_TYPE || card == null || !MealManager.isSendToExternal;
     }
 
     public Long getIdOfTransaction() {
