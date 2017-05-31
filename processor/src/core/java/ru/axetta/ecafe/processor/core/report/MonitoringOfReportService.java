@@ -112,6 +112,12 @@ public class MonitoringOfReportService {
                 monitoringOfItem.getNumberOfPassesStudents() + monitoringOfItem.getNumberOfPassesEmployees()
                         + monitoringOfItem.getNumberOfPassesGuardians());
 
+        monitoringOfItem.setNumberOfLgotnoe(
+                numberOfLgotnoe(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
+        monitoringOfItem.setNumberOfReserve(
+                numberOfReserve(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
         monitoringOfItemList.add(monitoringOfItem);
 
         return monitoringOfItemList;
@@ -150,6 +156,40 @@ public class MonitoringOfReportService {
                 "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup = 1100000030 "
                         + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
 
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    //Питание Количество
+
+    public Long numberOfLgotnoe(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
+                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= 50 AND cfod.menutype < 100 AND cfod.idofrule >= 0");
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfReserve(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.ordertype IN (6) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
+                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= 50 AND cfod.menutype < 100 AND cfod.idofrule >= 0");
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -281,22 +321,6 @@ public class MonitoringOfReportService {
 
         return result;
     }
-
-    //Питание Количество
-
-    public Long numberOfLgotnoe(Long idOfOrg, Date startTime, Date endTime, Session session) {
-        Query query = session.createSQLQuery(
-                "SELECT count(*) FROM CF_Clients cfc LEFT JOIN cf_orders cfo ON cfc.IdOfClient = cfo.IdOfClient WHERE cfc.IdOfOrg = : idoforg");
-        query.setParameter("idoforg", idOfOrg);
-
-        Long result = ((BigInteger) query.uniqueResult()).longValue();
-
-        return result;
-    }
-
-    /*public Long numberOfReserve(Long idOfOrg, Session session) {
-
-    }*/
 
     public static class ReportItem {
 

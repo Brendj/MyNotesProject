@@ -7,6 +7,8 @@
 	<field name="numberOfPassesEmployees" class="java.lang.Long"/>
 	<field name="numberOfPassesGuardians" class="java.lang.Long"/>
 	<field name="summaryOfPasses" class="java.lang.Long"/>
+	<field name="numberOfLgotnoe" class="java.lang.Long"/>
+	<field name="numberOfReserve" class="java.lang.Long"/>
 	<detail>
 		<band height="26" splitType="Stretch">
 			<textField>
@@ -111,6 +113,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfLgotnoe}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="093ece74-6707-40f2-a8bd-32382c98cf07" x="300" y="0" width="60" height="25"/>
@@ -122,6 +125,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfReserve}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" x="360" y="0" width="60" height="25"/>
