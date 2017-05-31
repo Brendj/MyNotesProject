@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.Transformer;
@@ -120,7 +119,6 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
         }
     }
 
-    @Async
     public void registerSyncRequestInDb(long idOfOrg, String idOfSync) {
         DAOService.getInstance().registerSyncRequest(idOfOrg, idOfSync);
     }

@@ -86,6 +86,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -108,6 +109,7 @@ public class Processor implements SyncProcessor {
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.accRegistryUpdate.timeClient", 7) * 24 * 60 * 60 * 1000;
+    private static final int MIN_REMAINING_CAPACITY_POOL = 1000;
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
@@ -230,6 +232,17 @@ public class Processor implements SyncProcessor {
         return client;
     }
 
+    private void saveLastProcessSectionDateSmart(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType) {
+        ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor)RuntimeContext.getAppContext().getBean("executorWithPoolSizeRange");
+        //Если размер очереди в пуле приближается к размеру самого пула, то выполнить операцию синхронно, иначе все ок и асинхронно
+        if (ex == null || ex.getActiveCount() > ex.getCorePoolSize()*3 || ex.getThreadPoolExecutor().getQueue().remainingCapacity() < MIN_REMAINING_CAPACITY_POOL) {
+            processorUtils.saveLastProcessSectionCustomDate(sessionFactory, idOfOrg, sectionType);
+            logger.error("queue size of asyncThreadPoolTaskExecutor is near to limit. Run synchronously");
+        } else {
+            processorUtils.saveLastProcessSectionDate(sessionFactory, idOfOrg, sectionType);
+        }
+    }
+
     /* Do process full synchronization */
     private SyncResponse buildFullSyncResponse(SyncRequest request, Date syncStartTime, int syncResult)
             throws Exception {
@@ -301,7 +314,7 @@ public class Processor implements SyncProcessor {
                     throw new Exception("no license slots available");
                 }
             }
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
             resPaymentRegistry = processSyncPaymentRegistry(syncHistory.getIdOfSync(), request.getIdOfOrg(),
                     request.getPaymentRegistry(), errorClientIds);
         } catch (Exception e) {
@@ -363,7 +376,7 @@ public class Processor implements SyncProcessor {
 
         // Build client registry
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(),
                     errorClientIds);
         } catch (Exception e) {
@@ -416,7 +429,7 @@ public class Processor implements SyncProcessor {
         try {
             final OrganizationStructureRequest organizationStructureRequest = request.getOrganizationStructureRequest();
             if (organizationStructureRequest != null) {
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ORGANIZATIONS_STRUCTURE);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ORGANIZATIONS_STRUCTURE);
                 organizationStructure = getOrganizationStructureData(request.getOrg(),
                         organizationStructureRequest.getMaxVersion(), organizationStructureRequest.isAllOrgs());
             }
@@ -500,7 +513,7 @@ public class Processor implements SyncProcessor {
                         throw new Exception("no license slots available");
                     }
                 }
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ENTER_EVENTS);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ENTER_EVENTS);
                 resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
             }
         } catch (Exception e) {
@@ -603,8 +616,9 @@ public class Processor implements SyncProcessor {
         }
 
         try {
-            //ProcessorUtils.refreshOrg(persistenceSessionFactory, request.getOrg());
-            directiveElement = processFullSyncDirective(request.getDirectivesRequest(), request.getOrg());
+            if (request.getDirectivesRequest() != null) {
+                directiveElement = processFullSyncDirective(request.getDirectivesRequest(), request.getOrg());
+            }
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
@@ -618,7 +632,7 @@ public class Processor implements SyncProcessor {
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
 
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNTS_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNTS_REGISTRY);
             accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
                     .handlerFull(request, request.getIdOfOrg());
         } catch (Exception e) {
@@ -878,7 +892,7 @@ public class Processor implements SyncProcessor {
                 AccountsRegistry result = null;
                 switch (requestSection.getContentType()) {
                     case ForAll: {
-                        processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(),
+                        saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(),
                                 SectionType.ACCOUNTS_REGISTRY);
                         result = accountsRegistryHandler.handlerFull(request, request.getIdOfOrg());
                         break;
@@ -1118,7 +1132,7 @@ public class Processor implements SyncProcessor {
                         throw new Exception("no license slots available");
                     }
                 }
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ENTER_EVENTS);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ENTER_EVENTS);
                 SyncResponse.ResEnterEvents resEnterEvents = processSyncEnterEvents(request.getEnterEvents(),
                         request.getOrg());
                 addToResponseSections(resEnterEvents, responseSections);
@@ -1187,7 +1201,7 @@ public class Processor implements SyncProcessor {
                 AccRegistryUpdate accRegistryUpdate = getAccRegistryUpdate(request.getOrg(), accIncRegistryRequest.dateTime);
                 addToResponseSections(accRegistryUpdate, responseSections);
             }
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
             if (request.getProtoVersion() < 6) {
@@ -1255,7 +1269,7 @@ public class Processor implements SyncProcessor {
 
         OrganizationStructure organizationStructureData = null;
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ORGANIZATIONS_STRUCTURE);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ORGANIZATIONS_STRUCTURE);
             organizationStructureData = getOrganizationStructureData(request.getOrg(),
                     organizationStructureRequest.getMaxVersion(), organizationStructureRequest.isAllOrgs());
         } catch (Exception e) {
@@ -1331,7 +1345,7 @@ public class Processor implements SyncProcessor {
         try {
             SyncRequest.ClientRegistryRequest clientRegistryRequest = request.getClientRegistryRequest();
             if (clientRegistryRequest != null) {
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
                 SyncResponse.ClientRegistry clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
                         clientRegistryRequest, errorClientIds);
                 addToResponseSections(clientRegistry, responseSections);
@@ -1366,7 +1380,7 @@ public class Processor implements SyncProcessor {
                     throw new Exception("no license slots available");
                 }
             }
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
             ResPaymentRegistry resPaymentRegistry = processSyncPaymentRegistry(
                     syncHistory != null ? syncHistory.getIdOfSync() : null, request.getIdOfOrg(), paymentRegistryRequest, errorClientIds);
             addToResponseSections(resPaymentRegistry, responseSections);
@@ -1443,7 +1457,7 @@ public class Processor implements SyncProcessor {
     private void fullProcessingAccountOperationsRegistry(SyncRequest request,
             List<AbstractToElement> responseSections) {
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNT_OPERATIONS_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNT_OPERATIONS_REGISTRY);
             if (request.getAccountOperationsRegistry() != null) {
                 AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
                 ResAccountOperationsRegistry resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
@@ -1547,7 +1561,7 @@ public class Processor implements SyncProcessor {
             List<AbstractToElement> responseSections, Boolean error) {
         try {
             if (request.getAccountOperationsRegistry() != null) {
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNT_OPERATIONS_REGISTRY);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNT_OPERATIONS_REGISTRY);
                 AccountOperationsRegistryHandler accountOperationsRegistryHandler = new AccountOperationsRegistryHandler();
                 ResAccountOperationsRegistry resAccountOperationsRegistry = accountOperationsRegistryHandler.process(request);
                 addToResponseSections(resAccountOperationsRegistry, responseSections);
@@ -1568,7 +1582,7 @@ public class Processor implements SyncProcessor {
             List<AbstractToElement> responseSections, Boolean error, Long idOfPacket, List<Long> errorClientIds) {
         try {
             if (request.getPaymentRegistry() != null) {
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
                 if (request.getPaymentRegistry().getPayments() != null) {
                     if (request.getPaymentRegistry().getPayments().hasNext()) {
                         if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
@@ -1586,7 +1600,7 @@ public class Processor implements SyncProcessor {
                             throw new Exception("no license slots available");
                         }
                     }
-                    //processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
+                    //saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
                     ResPaymentRegistry resPaymentRegistry = processSyncPaymentRegistry(null, request.getIdOfOrg(),
                             request.getPaymentRegistry(), errorClientIds);
                     addToResponseSections(resPaymentRegistry, responseSections);
@@ -2018,7 +2032,7 @@ public class Processor implements SyncProcessor {
 
         InfoMessageData infoMessageData = null;
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.INFO_MESSAGE);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.INFO_MESSAGE);
             infoMessageData = getInfoMessageData(request.getOrg(), infoMessageRequest.getMaxVersion());
         } catch (Exception e) {
             String message = String.format("Failed to build organization structure, IdOfOrg == %s", request.getIdOfOrg());
@@ -2114,7 +2128,7 @@ public class Processor implements SyncProcessor {
         }
         // Build client registry
         try {
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(),
                     errorClientIds);
         } catch (Exception e) {
@@ -2338,7 +2352,7 @@ public class Processor implements SyncProcessor {
             } else {
                 accRegistryUpdate = getAccRegistryUpdate(request.getOrg(), request.getAccIncRegistryRequest().dateTime);
             }
-            processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
+            saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACC_INC_REGISTRY);
 
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
@@ -2360,7 +2374,7 @@ public class Processor implements SyncProcessor {
         // Process enterEvents
         try {
             if (request.getEnterEvents() != null) {
-                processorUtils.saveLastProcessSectionDate(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ENTER_EVENTS);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ENTER_EVENTS);
                 resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
             }
         } catch (Exception e) {

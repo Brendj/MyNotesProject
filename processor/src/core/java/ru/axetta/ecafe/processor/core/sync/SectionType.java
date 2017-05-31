@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Liya
@@ -44,5 +47,19 @@ public enum  SectionType {
 
     public int getType() {
         return type;
+    }
+
+    static Map<Integer,SectionType> map = new HashMap<Integer,SectionType>();
+    static {
+        for (SectionType questionaryStatus : SectionType.values()) {
+            map.put(questionaryStatus.ordinal(), questionaryStatus);
+        }
+    }
+
+    public static SectionType fromInteger(Integer value) throws IllegalArgumentException {
+        if (map.get(value-1) == null) {
+            throw new IllegalArgumentException("Element not found by value");
+        }
+        return map.get(value-1);
     }
 }
