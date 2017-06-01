@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions name="MEALService"
-    targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl"
+    targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl"
     xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:tns = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl"
+    xmlns:tns = "http://service.petersburgedu.ru/webservice/meal/wsdl"
     xmlns:soap = "http://schemas.xmlsoap.org/wsdl/soap/"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
@@ -12,14 +12,14 @@
 
     <types>
         <xs:schema
-            xmlns:cmn = "http://svc.edu.n3demo.ru/service/webservice/mealTypes"
-            targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/mealTypes">
-            <xs:include schemaLocation="http://svc.edu.n3demo.ru/service/webservice/meal/xsd" />
+            xmlns:cmn = "http://service.petersburgedu.ru/webservice/mealTypes"
+            targetNamespace = "http://service.petersburgedu.ru/webservice/mealTypes">
+            <xs:include schemaLocation="http://service.petersburgedu.ru/webservice/meal/xsd" />
         </xs:schema>
 
         <xs:schema
-            xmlns:cmn="http://svc.edu.n3demo.ru/service/webservice/mealTypes"
-            targetNamespace="http://svc.edu.n3demo.ru/service/webservice/meal/wsdl">
+            xmlns:cmn="http://service.petersburgedu.ru/webservice/mealTypes"
+            targetNamespace="http://service.petersburgedu.ru/webservice/meal/wsdl">
 
             <xs:element name="login">
                 <xs:simpleType>
@@ -185,7 +185,7 @@
     <service name="MealWebService">
         <documentation>Служба загрузки информации о транзакциях, проводимых по школьной карте при предоставлении услуги детского питания</documentation>
         <port name="pushMealPort" binding="tns:pushMealBinding">
-            <soap:address location="http://svc.edu.n3demo.ru/service/webservice/meal"/>
+            <soap:address location="http://service.petersburgedu.ru/webservice/meal"/>
         </port>
     </service>
 </definitions>

@@ -25,16 +25,16 @@ import java.util.List;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="organizationUid" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}guidType"/>
- *                   &lt;element name="studentUid" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
- *                   &lt;element name="userToken" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
- *                   &lt;element name="cardUid" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
+ *                   &lt;element name="organizationUid" type="{http://service.petersburgedu.ru/webservice/mealTypes}guidType"/>
+ *                   &lt;element name="studentUid" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
+ *                   &lt;element name="userToken" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
+ *                   &lt;element name="cardUid" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="transaction" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}transactionType" maxOccurs="unbounded"/>
+ *         &lt;element name="transaction" type="{http://service.petersburgedu.ru/webservice/mealTypes}transactionType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -120,10 +120,10 @@ public class MealData {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="organizationUid" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}guidType"/>
-     *         &lt;element name="studentUid" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
-     *         &lt;element name="userToken" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
-     *         &lt;element name="cardUid" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
+     *         &lt;element name="organizationUid" type="{http://service.petersburgedu.ru/webservice/mealTypes}guidType"/>
+     *         &lt;element name="studentUid" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
+     *         &lt;element name="userToken" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
+     *         &lt;element name="cardUid" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>

@@ -25,16 +25,16 @@ import java.math.BigInteger;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="transactionId" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
+ *         &lt;element name="transactionId" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
  *         &lt;element name="transactionDate" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *         &lt;element name="balance" type="{http://www.w3.org/2001/XMLSchema}decimal"/>
  *         &lt;element name="amount" type="{http://www.w3.org/2001/XMLSchema}decimal"/>
- *         &lt;element name="cardName" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
- *         &lt;element name="foodName" type="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType"/>
+ *         &lt;element name="cardName" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
+ *         &lt;element name="foodName" type="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType"/>
  *         &lt;element name="foodAmount" type="{http://www.w3.org/2001/XMLSchema}integer"/>
  *         &lt;element name="directionType" minOccurs="0">
  *           &lt;simpleType>
- *             &lt;restriction base="{http://svc.edu.n3demo.ru/service/webservice/mealTypes}notNullStringType">
+ *             &lt;restriction base="{http://service.petersburgedu.ru/webservice/mealTypes}notNullStringType">
  *               &lt;enumeration value="income"/>
  *               &lt;enumeration value="expense"/>
  *             &lt;/restriction>
@@ -49,7 +49,7 @@ import java.math.BigInteger;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "transactionType", namespace = "http://svc.edu.n3demo.ru/service/webservice/mealTypes", propOrder = {
+@XmlType(name = "transactionType", namespace = "http://service.petersburgedu.ru/webservice/mealTypes", propOrder = {
     "transactionId",
     "transactionDate",
     "balance",

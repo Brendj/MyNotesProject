@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "MealWebService", targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", wsdlLocation = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl")
+@WebServiceClient(name = "MealWebService", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", wsdlLocation = "http://service.petersburgedu.ru/webservice/meal/wsdl")
 public class MealWebService
     extends Service
 {
@@ -34,9 +34,9 @@ public class MealWebService
         try {
             URL baseUrl;
             baseUrl = MealWebService.class.getResource(".");
-            url = new URL(baseUrl, "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl");
+            url = new URL(baseUrl, "http://service.petersburgedu.ru/webservice/meal/wsdl");
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'http://svc.edu.n3demo.ru/service/webservice/meal/wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'http://service.petersburgedu.ru/webservice/meal/wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         MEALWEBSERVICE_WSDL_LOCATION = url;
@@ -47,17 +47,17 @@ public class MealWebService
     }
 
     public MealWebService() {
-        super(MEALWEBSERVICE_WSDL_LOCATION, new QName("http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", "MealWebService"));
+        super(MEALWEBSERVICE_WSDL_LOCATION, new QName("http://service.petersburgedu.ru/webservice/meal/wsdl", "MealWebService"));
     }
 
     @WebEndpoint(name = "pushMealPort")
     public PushMealPort getPushMealPort() {
-        return super.getPort(new QName("http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", "pushMealPort"), PushMealPort.class);
+        return super.getPort(new QName("http://service.petersburgedu.ru/webservice/meal/wsdl", "pushMealPort"), PushMealPort.class);
     }
 
     @WebEndpoint(name = "pushMealPort")
     public PushMealPort getPushMealPort(WebServiceFeature... features) {
-        return super.getPort(new QName("http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", "pushMealPort"), PushMealPort.class, features);
+        return super.getPort(new QName("http://service.petersburgedu.ru/webservice/meal/wsdl", "pushMealPort"), PushMealPort.class, features);
     }
 
 }

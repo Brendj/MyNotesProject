@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.xml.ws.BindingProvider;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Liya
@@ -41,9 +39,10 @@ public class MealService {
             MealWebService service = new MealWebService();
             controller = service.getPushMealPort();
             Client proxy = ClientProxy.getClient(controller);
-            BindingProvider bp = (BindingProvider) controller;
-            bp.getRequestContext().put("schema-validation-enabled", "false");
-            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://svc.edu.n3demo.ru/service/webservice/meal");
+            //BindingProvider bp = (BindingProvider) controller;
+            //bp.getRequestContext().put("schema-validation-enabled", "false");
+            //bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://svc.edu.n3demo.ru/service/webservice/meal");
+            //proxy.getInInterceptors().add(new ContentTypeHandler());
             proxy.getOutInterceptors().add(new HeaderHandler());
 
             HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
@@ -65,14 +64,7 @@ public class MealService {
             throw new Exception("Failed to create connection with meal web service");
         }
 
-        PushResponse response = subscription.pushData(MealDataItem.getMealData(item));
-
-        if(!response.isResult()) {
-            logger.error(String.format(
-                    "Не удалось доставить данные о покупке для клиента studentUid = %s, transactionId = %s",
-                    item.getStudentUid(), item.getTransactionItems().get(0)));
-        }
-        return response;
+        return subscription.pushData(MealDataItem.getMealData(item));
     }
 
 }

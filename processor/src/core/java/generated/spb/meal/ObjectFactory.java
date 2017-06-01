@@ -28,9 +28,9 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    public final static QName _Password_QNAME = new QName("http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", "password");
-    public final static QName _PushZipFileRequest_QNAME = new QName("http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", "pushZipFileRequest");
-    public final static QName _Login_QNAME = new QName("http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", "login");
+    public final static QName _Password_QNAME = new QName("http://service.petersburgedu.ru/webservice/meal/wsdl", "password");
+    public final static QName _PushZipFileRequest_QNAME = new QName("http://service.petersburgedu.ru/webservice/meal/wsdl", "pushZipFileRequest");
+    public final static QName _Login_QNAME = new QName("http://service.petersburgedu.ru/webservice/meal/wsdl", "login");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: generated.mealwebservice2
@@ -75,7 +75,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", name = "password")
+    @XmlElementDecl(namespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", name = "password")
     public JAXBElement<String> createPassword(String value) {
         return new JAXBElement<String>(_Password_QNAME, String.class, null, value);
     }
@@ -84,7 +84,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", name = "pushZipFileRequest")
+    @XmlElementDecl(namespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", name = "pushZipFileRequest")
     public JAXBElement<String> createPushZipFileRequest(String value) {
         return new JAXBElement<String>(_PushZipFileRequest_QNAME, String.class, null, value);
     }
@@ -93,7 +93,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", name = "login")
+    @XmlElementDecl(namespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", name = "login")
     public JAXBElement<String> createLogin(String value) {
         return new JAXBElement<String>(_Login_QNAME, String.class, null, value);
     }

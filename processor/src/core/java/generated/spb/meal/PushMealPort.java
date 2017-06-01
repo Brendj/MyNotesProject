@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * Generated source version: 2.1
  * 
  */
-@WebService(name = "pushMealPort", targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl")
+@WebService(name = "pushMealPort", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @XmlSeeAlso({
     ObjectFactory.class
@@ -27,16 +27,16 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public interface PushMealPort {
 
     @WebMethod(action = "pushZipFile")
-    @WebResult(name = "pushResponse", targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", partName = "result")
+    @WebResult(name = "pushResponse", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", partName = "result")
     public PushResponse pushZipFile(
-        @WebParam(name = "pushZipFileRequest", targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", partName = "data")
+        @WebParam(name = "pushZipFileRequest", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", partName = "data")
         String data);
 
 
     @WebMethod(action = "pushData")
-    @WebResult(name = "pushResponse", targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", partName = "result")
+    @WebResult(name = "pushResponse", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", partName = "result")
     public PushResponse pushData(
-        @WebParam(name = "mealData", targetNamespace = "http://svc.edu.n3demo.ru/service/webservice/meal/wsdl", partName = "data")
+        @WebParam(name = "mealData", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", partName = "data")
         MealData data);
 
 }
