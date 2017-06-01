@@ -35,11 +35,13 @@ public class ClientSpbService {
     private QueryPersonPort createEventController(String url) {
         QueryPersonPort controller;
         try {
-            PersonWebService service = new PersonWebService(url + "wsdl");
-            controller = service.getQueryPersonPort(url + "wsdl");
+            //PersonWebService service = new PersonWebService(url + "wsdl");
+            PersonWebService service = new PersonWebService();
+            //controller = service.getQueryPersonPort(url + "wsdl");
+            controller = service.getQueryPersonPort();
             BindingProvider bp = (BindingProvider)controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
-            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url + "execute");
+            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
 
             Client proxy = ClientProxy.getClient(controller);
             proxy.getOutInterceptors().add(new HeaderHandler());
@@ -62,7 +64,10 @@ public class ClientSpbService {
         if (subscription == null) {
             throw new Exception("Failed to create connection with spb person service");
         }
-        return subscription.pushData(query);
+
+        Schools response = subscription.pushData(query);
+        System.out.println(response);
+        return response;
 
     }
 
