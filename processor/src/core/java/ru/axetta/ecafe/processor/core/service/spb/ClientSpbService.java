@@ -65,9 +65,7 @@ public class ClientSpbService {
             throw new Exception("Failed to create connection with spb person service");
         }
 
-        Schools response = subscription.pushData(query);
-        System.out.println(response);
-        return response;
+        return subscription.pushData(query);
 
     }
 
