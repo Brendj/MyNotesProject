@@ -8,6 +8,7 @@ import generated.spb.meal.PushResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
+import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -145,18 +146,24 @@ public class MealManager {
     }
 
     @SuppressWarnings("unchecked")
-    private List<TransactionDataItem> findOrders(Session session, List<TransactionDataItem> sendOrders){
+    private List<TransactionDataItem> findOrders(Session session, List<TransactionDataItem> sendOrders) throws Exception {
         List<TransactionDataItem> result = new ArrayList<TransactionDataItem>();
         Criteria criteria = session.createCriteria(OrderDetail.class);
         criteria.add(Restrictions.eq("sendToExternal", Boolean.FALSE));
         List<OrderDetail> list = criteria.list();
         for(OrderDetail od : list) {
-            if(od.getOrder().getCard() != null && od.getOrder().getClient() != null && od.getOrder().getTransaction() != null) {
+            if(od.getOrder().getClient() != null) {
+                Card card = od.getOrder().getCard();
+                if(card == null) {
+                    //card = od.getOrder().getClient().findActiveCard(session, null);
+                }
                 result.add(new TransactionDataItem(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail(), od.getOrg().getIdOfOrg(),
                         od.getOrg().getGuid(), od.getOrder().getClient().getClientGUID(),
-                        od.getOrder().getCard().getCardPrintedNo(), od.getOrder().getCard().getCardType(),
-                        od.getOrder().getTransaction().getIdOfTransaction(), od.getOrder().getTransaction().getTransactionTime(),
-                        od.getOrder().getTransaction().getBalanceAfterTransaction(), od.getMenuDetailName(), od.getQty(), od.getRPrice()));
+                        card == null ? null : card.getCardPrintedNo(), card == null ? null : card.getCardType(),
+                        od.getOrder().getTransaction() == null ? null : od.getOrder().getTransaction().getIdOfTransaction(),
+                        od.getOrder().getTransaction() == null ? od.getOrder().getCreateTime() : od.getOrder().getTransaction().getTransactionTime(),
+                        od.getOrder().getTransaction() == null ? null : od.getOrder().getTransaction().getBalanceAfterTransaction(),
+                        od.getMenuDetailName(), od.getQty(), od.getRPrice()));
             } else {
                 sendOrders.add(new TransactionDataItem(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail(), od.getCompositeIdOfOrderDetail().getIdOfOrg()));
             }
@@ -182,15 +189,20 @@ public class MealManager {
     }
 
     @SuppressWarnings("unchecked")
-    private List<TransactionDataItem> findTransactions(Session session, List<TransactionDataItem> sendTransactions){
+    private List<TransactionDataItem> findTransactions(Session session, List<TransactionDataItem> sendTransactions) throws Exception {
         List<TransactionDataItem> result = new ArrayList<TransactionDataItem>();
         Criteria criteria = session.createCriteria(AccountTransaction.class);
         criteria.add(Restrictions.eq("sendToExternal", Boolean.FALSE));
         List<AccountTransaction> list = criteria.list();
         for(AccountTransaction tr : list) {
-            if(tr.getOrg() != null && tr.getCard() != null && tr.getClient() != null) {
+            if(tr.getOrg() != null && tr.getClient() != null) {
+                Card card = tr.getCard();
+                if(card == null) {
+                    card = tr.getClient().findActiveCard(session, null);
+                }
                 result.add(new TransactionDataItem(tr.getOrg().getIdOfOrg(), tr.getOrg().getGuid(), tr.getClient().getClientGUID(),
-                        tr.getCard().getCardPrintedNo(), tr.getCard().getCardType(), tr.getIdOfTransaction(), tr.getTransactionTime(),
+                        card == null ? null : card.getCardPrintedNo(),
+                        card == null ? null : card.getCardType(), tr.getIdOfTransaction(), tr.getTransactionTime(),
                         tr.getBalanceAfterTransaction(), tr.getTransactionSum(), tr.getSourceType()));
             } else {
                 sendTransactions.add(new TransactionDataItem(tr.getIdOfTransaction().toString()));

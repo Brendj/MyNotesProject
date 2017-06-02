@@ -51,11 +51,11 @@ public class TransactionDataItem {
         this.organizationUid = organizationUid;
         this.studentUid = studentUid;
         this.userToken = "";
-        this.cardUid = cardPrintedNo.toString();
-        this.transactionId = transactionId.toString();
-        this.transactionDate = transactionDate;
-        this.balance = balance;
-        this.cardName = Card.TYPE_NAMES[cardType];
+        this.cardUid = cardPrintedNo == null ? null : cardPrintedNo.toString();
+        this.transactionId = transactionId == null ? null : transactionId.toString();
+        this.transactionDate = transactionDate == null ? null : transactionDate;
+        this.balance = balance == null ? null : balance;
+        this.cardName = cardType == null ? "" : Card.TYPE_NAMES[cardType];
         this.foodName = foodName;
         this.foodAmount = qty.intValue();
         this.amount = qty * rprice;

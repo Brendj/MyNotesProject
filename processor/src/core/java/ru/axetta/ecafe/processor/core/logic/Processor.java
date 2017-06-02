@@ -3193,7 +3193,7 @@ public class Processor implements SyncProcessor {
                             purchase.getSocDiscount(), purchase.getrPrice(), purchase.getName(), purchase.getRootMenu(),
                             purchase.getMenuGroup(), purchase.getMenuOrigin(), purchase.getMenuOutput(),
                             purchase.getType(), purchase.getIdOfMenu(), purchase.getManufacturer(),
-                            purchase.getrPrice() == 0L || payment.getSumByCard() == 0L || payment.getIdOfClient() == null || !MealManager.isSendToExternal);
+                            payment.getIdOfClient() == null || !MealManager.isSendToExternal);
                     if (purchase.getItemCode() != null) {
                         orderDetail.setItemCode(purchase.getItemCode());
                     }
