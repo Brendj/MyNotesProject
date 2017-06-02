@@ -29,8 +29,8 @@ import javax.xml.bind.JAXBException;
 public class HeaderHandler extends AbstractSoapInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(HeaderHandler.class);
-    private static String LOGIN = RuntimeContext.getInstance().getRegistryLogin();
-    private static String PASSWORD = RuntimeContext.getInstance().getRegistryPassword();
+    private static String LOGIN = RuntimeContext.getInstance().getMealLogin();
+    private static String PASSWORD = RuntimeContext.getInstance().getMealPassword();
 
     public HeaderHandler() {
         super(Phase.PRE_LOGICAL);

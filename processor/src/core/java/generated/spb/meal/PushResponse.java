@@ -7,6 +7,7 @@ package generated.spb.meal;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -37,7 +38,9 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class PushResponse {
 
+    @XmlElement(namespace = "http://service.scud/webservice/meal")
     protected boolean result;
+    @XmlElement(namespace = "http://service.scud/webservice/meal")
     protected String queueId;
 
     /**
