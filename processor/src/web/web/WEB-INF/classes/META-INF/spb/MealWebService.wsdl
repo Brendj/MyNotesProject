@@ -18,7 +18,7 @@
         <xs:schema
             xmlns:cmn = "http://service.petersburgedu.ru/webservice/mealTypes"
             targetNamespace = "http://service.petersburgedu.ru/webservice/mealTypes">
-            <xs:include schemaLocation="spb/MealXSD.xml" />
+            <xs:include schemaLocation="http://10.146.136.36/service/webservice/meal/xsd" />
         </xs:schema>
 
         <xs:schema
