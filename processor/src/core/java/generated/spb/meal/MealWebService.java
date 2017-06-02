@@ -21,11 +21,12 @@ import java.util.logging.Logger;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "MealWebService", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", wsdlLocation = "http://service.petersburgedu.ru/webservice/meal/wsdl")
+@WebServiceClient(name = "MealWebService", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", wsdlLocation = "META-INF/spb/MealWebService.wsdl")
 public class MealWebService
     extends Service
 {
 
+    private final static String WSDL_LOCATION = "META-INF/spb/MealWebService.wsdl";
     private final static URL MEALWEBSERVICE_WSDL_LOCATION;
     private final static Logger logger = Logger.getLogger(MealWebService.class.getName());
 
@@ -34,9 +35,9 @@ public class MealWebService
         try {
             URL baseUrl;
             baseUrl = MealWebService.class.getResource(".");
-            url = new URL(baseUrl, "http://service.petersburgedu.ru/webservice/meal/wsdl");
+            url = new URL(baseUrl, MealWebService.class.getClassLoader().getResource(WSDL_LOCATION).getPath());
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'http://service.petersburgedu.ru/webservice/meal/wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'META-INF/spb/MealWebService.wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         MEALWEBSERVICE_WSDL_LOCATION = url;
