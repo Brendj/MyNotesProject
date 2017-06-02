@@ -38,9 +38,9 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class PushResponse {
 
-    @XmlElement(namespace = "http://service.scud/webservice/meal")
+    @XmlElement(namespace = "http://service.petersburgedu.ru/webservice/meal")
     protected boolean result;
-    @XmlElement(namespace = "http://service.scud/webservice/meal")
+    @XmlElement(namespace = "http://service.petersburgedu.ru/webservice/meal")
     protected String queueId;
 
     /**
