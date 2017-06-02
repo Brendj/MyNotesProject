@@ -89,7 +89,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + "WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minutes' "
                         + "WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minutes' "
                         + "WHEN ((lastsynctime IS NOT null) AND (lastsynctime - current_timestamp > INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS null)) THEN 'more3Hours' "
-                        + "ELSE 'other' END AS condition, nosynch.idoforg, cfor.shortname, cfor.address, cfos.lastsucbalancesync, cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district, "
+                        + "ELSE 'other' END AS condition, nosynch.idoforg, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync, cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district, "
                         + "to_timestamp(syncendtime / 1000) AS fullsyncendtime, lastsynctime "
                         + "FROM cf_synchistory cfsh INNER JOIN (SELECT idoforg, max(syncstarttime) AS lastfullsynctime "
                         + "FROM cf_synchistory cfs   WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', current_date) "
@@ -127,13 +127,14 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                             ((BigInteger) object[1]).longValue(),
                             (String) object[2],
                             (String) object[3],
-                            object[4] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[4]).longValue())),
-                            object[5] == null ? "" : (String) object[5],
+                            ((Integer) object[4]).equals(1),
+                            object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())),
                             object[6] == null ? "" : (String) object[6],
+                            object[7] == null ? "" : (String) object[7],
                             rowName((String) object[0]),
-                            (String) object[7],
                             (String) object[8],
-                            (String) object[9]);
+                            (String) object[7],
+                            (String) object[10]);
                     outOfSynchronizationReportList.add(outOfSynchronizationItem);
                 }
             }
