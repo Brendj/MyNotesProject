@@ -122,6 +122,7 @@ public class ClientSummaryExt {
     protected Long thresholdBalanceNotify;
 
     @XmlAttribute(name = "LastConfirmMobile")
+    @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar lastConfirmMobile;
     /**
      *
