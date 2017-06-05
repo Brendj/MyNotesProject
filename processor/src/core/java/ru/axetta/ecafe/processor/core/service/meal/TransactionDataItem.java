@@ -21,7 +21,6 @@ public class TransactionDataItem {
     private Long idOfOrg;
     private String organizationUid;
     private String studentUid;
-    private String userToken;
     private String cardUid;
     private String transactionId;
     private Date transactionDate;
@@ -50,7 +49,6 @@ public class TransactionDataItem {
         this.idOfOrg = idOfOrg;
         this.organizationUid = organizationUid;
         this.studentUid = studentUid;
-        this.userToken = "";
         this.cardUid = cardPrintedNo == null ? null : cardPrintedNo.toString();
         this.transactionId = transactionId == null ? null : transactionId.toString();
         this.transactionDate = transactionDate == null ? null : transactionDate;
@@ -104,14 +102,6 @@ public class TransactionDataItem {
 
     public void setStudentUid(String studentUid) {
         this.studentUid = studentUid;
-    }
-
-    public String getUserToken() {
-        return userToken;
-    }
-
-    public void setUserToken(String userToken) {
-        this.userToken = userToken;
     }
 
     public String getCardUid() {
