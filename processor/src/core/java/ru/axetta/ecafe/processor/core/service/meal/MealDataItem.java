@@ -21,6 +21,7 @@ public class MealDataItem {
 
     private String organizationUid;
     private String studentUid;
+    private String userToken;
     private String cardUid;
     private List<TransactionItem> transactionItems;
 
@@ -30,6 +31,7 @@ public class MealDataItem {
         MealData.IdentityInfo identityInfo = new MealData.IdentityInfo();
         identityInfo.setOrganizationUid(item.getOrganizationUid());
         identityInfo.setStudentUid(item.getStudentUid());
+        identityInfo.setUserToken(item.getStudentUid());
         identityInfo.setCardUid(item.getCardUid());
         mealData.setIdentityInfo(identityInfo);
 
@@ -40,10 +42,11 @@ public class MealDataItem {
         return mealData;
     }
 
-    public MealDataItem(String organizationUid, String studentUid, String cardUid,
+    public MealDataItem(String organizationUid, String studentUid, String userToken, String cardUid,
             TransactionItem transactionItem) {
         this.organizationUid = organizationUid;
         this.studentUid = studentUid;
+        this.userToken = userToken;
         this.cardUid = cardUid;
         this.transactionItems = new ArrayList<TransactionItem>();
         this.getTransactionItems().add(transactionItem);
@@ -63,6 +66,14 @@ public class MealDataItem {
 
     public void setStudentUid(String studentUid) {
         this.studentUid = studentUid;
+    }
+
+    public String getUserToken() {
+        return userToken;
+    }
+
+    public void setUserToken(String userToken) {
+        this.userToken = userToken;
     }
 
     public String getCardUid() {

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2017. Axetta LLC. All Rights Reserved.
  */
@@ -146,6 +145,8 @@ public class MealData {
         @XmlElement(required = true)
         protected String studentUid;
         @XmlElement(required = true)
+        protected String userToken;
+        @XmlElement(required = true)
         protected String cardUid;
 
         /**
@@ -194,6 +195,30 @@ public class MealData {
          */
         public void setStudentUid(String value) {
             this.studentUid = value;
+        }
+
+        /**
+         * Gets the value of the userToken property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getUserToken() {
+            return userToken;
+        }
+
+        /**
+         * Sets the value of the userToken property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setUserToken(String value) {
+            this.userToken = value;
         }
 
         /**

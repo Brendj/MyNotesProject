@@ -95,7 +95,7 @@ public class MealManager {
         for(TransactionDataItem item : list) {
             TransactionItem trItem = new TransactionItem(item.getTransactionId(), item.getTransactionDate(), item.getBalance(), item.getAmount(),
                     item.getCardName(), item.getFoodName(), item.getFoodAmount(), EXPENSE);
-            MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getCardUid(), trItem);
+            MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getUserToken(), item.getCardUid(), trItem);
             try {
                 PushResponse response = mealService.sendEvent(mItem);
                 if(response.isResult()) {
@@ -124,7 +124,7 @@ public class MealManager {
         for(TransactionDataItem item : list) {
             TransactionItem trItem = new TransactionItem(item.getTransactionId(), item.getTransactionDate(), item.getBalance(), Math.abs(item.getAmount()),
                     item.getCardName(), item.getFoodName(), item.getFoodAmount(), item.getAmount() > 0 ? INCOME : EXPENSE);
-            MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getCardUid(), trItem);
+            MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getUserToken(), item.getCardUid(), trItem);
             try {
                 PushResponse response = mealService.sendEvent(mItem);
                 if(response.isResult()) {
