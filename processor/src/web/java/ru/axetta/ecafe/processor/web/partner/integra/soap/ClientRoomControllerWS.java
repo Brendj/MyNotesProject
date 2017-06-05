@@ -8033,6 +8033,39 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }*/
 
+    @Override
+    public MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId, @WebParam(name = "museumName") String museumName) {
+        authenticateRequest(null);
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            long lCardId = Long.parseLong(cardId);
+            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            Client client = (card == null ? null : card.getClient());
+            if (client == null) {
+                return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY);
+            }
+
+            String orgShortName = client.getOrg().getShortNameInfoService();
+            Integer enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY;
+            Date currentDate = new Date();
+            boolean freeType = (
+                    (card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
+                    && card.getValidTime().after(currentDate) &&
+                            !(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_DELETED.getValue())
+            );
+            if (freeType) {
+                enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_FREE;
+            }
+            return new MuseumEnterInfo(RC_OK, RC_OK_DESC, orgShortName, enterType);
+        } catch (Exception e) {
+            return new MuseumEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY);
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     private Long[] getVPOrgsList() {
         List<Long> result = new ArrayList<Long>();
         String[] strs = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.vp.pilot.orgs", "697, 748, 1830, 1831, 1832, 2499").split(",");

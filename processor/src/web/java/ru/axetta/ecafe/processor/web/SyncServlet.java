@@ -118,6 +118,7 @@ public class SyncServlet extends HttpServlet {
 
             /////// Недопущение двух и более одновременных синхронизаций от одной организации
             boolean success, tooManyRequests = false;
+            int allSyncsCount, fullSyncsCount = 0;
             synchronized(syncsInProgress) {
                 success = syncsInProgress.add(idOfOrg);
                 if (success && syncType==SyncType.TYPE_FULL) {
@@ -128,6 +129,8 @@ public class SyncServlet extends HttpServlet {
                         fullSyncsInProgress.size()>runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS))) {
                     tooManyRequests = true;
                 }
+                allSyncsCount = syncsInProgress.size();
+                fullSyncsCount = fullSyncsInProgress.size();
             }
             if (!success) {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. This IdOfOrg is currently in sync", idOfOrg);
@@ -144,7 +147,9 @@ public class SyncServlet extends HttpServlet {
             }
             ///////
 
-            logger.info(String.format("-Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
+            long begin_sync = System.currentTimeMillis();
+            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s",
+                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
@@ -254,7 +259,8 @@ public class SyncServlet extends HttpServlet {
                 throw new ServletException(e);
             }
 
-            final String message = String.format("End of synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg);
+            final String message = String.format("End of synchronization with %s: id: %s, time taken: %s ms",
+                    request.getRemoteAddr(), idOfOrg, System.currentTimeMillis() - begin_sync);
             logger.info(message);
             removeSyncInProgress(idOfOrg);
         } catch (RuntimeContext.NotInitializedException e) {
