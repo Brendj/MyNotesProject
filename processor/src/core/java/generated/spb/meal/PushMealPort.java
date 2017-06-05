@@ -36,7 +36,7 @@ public interface PushMealPort {
     @WebMethod(action = "pushData")
     @WebResult(name = "pushResponse", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", partName = "result")
     public PushResponse pushData(
-        @WebParam(name = "mealData", targetNamespace = "http://service.petersburgedu.ru/webservice/meal/wsdl", partName = "data")
+        @WebParam(name = "mealData", partName = "data")
         MealData data);
 
 }

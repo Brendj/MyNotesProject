@@ -8,6 +8,8 @@ import generated.spb.meal.MealWebService;
 import generated.spb.meal.PushMealPort;
 import generated.spb.meal.PushResponse;
 
+import ru.axetta.ecafe.processor.core.partner.nsi.SOAPLoggingHandler;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -18,6 +20,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,6 +51,11 @@ public class MealService {
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://10.146.136.36/service/webservice/meal/");
             //proxy.getInInterceptors().add(new ContentTypeHandler());
             proxy.getOutInterceptors().add(new HeaderHandler());
+
+            final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+            final List<Handler> handlerChain = new ArrayList<Handler>();
+            handlerChain.add(soapLoggingHandler);
+            bp.getBinding().setHandlerChain(handlerChain);
 
             HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
             HTTPClientPolicy policy = conduit.getClient();

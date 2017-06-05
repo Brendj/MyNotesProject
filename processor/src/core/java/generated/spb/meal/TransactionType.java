@@ -49,7 +49,7 @@ import java.math.BigInteger;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "transactionType", namespace = "http://service.petersburgedu.ru/webservice/mealTypes", propOrder = {
+@XmlType(name = "transactionType", propOrder = {
     "transactionId",
     "transactionDate",
     "balance",

@@ -6,10 +6,6 @@ package ru.axetta.ecafe.processor.core.service.meal;
 
 import generated.spb.meal.TransactionType;
 
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Order;
-
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
@@ -48,12 +44,6 @@ public class TransactionItem {
         this.directionType = directionType;
     }
 
-    public TransactionItem getTransactionItem(AccountTransaction accountTransaction, Order order) {
-        return new TransactionItem(accountTransaction.getIdOfTransaction().toString(), accountTransaction.getTransactionTime(),
-                accountTransaction.getBalanceAfterTransaction(), accountTransaction.getTransactionSum(),
-                Card.TYPE_NAMES[accountTransaction.getCard().getCardType()], "", 1, "expense");
-    }
-
     public static TransactionType getTransactionType(TransactionItem item) throws Exception {
         TransactionType transactionType = new TransactionType();
 
@@ -62,8 +52,8 @@ public class TransactionItem {
         c.setTime(item.getTransactionDate());
         XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         transactionType.setTransactionDate(date);
-        transactionType.setBalance(BigDecimal.valueOf(item.getBalance()));
-        transactionType.setAmount(BigDecimal.valueOf(item.getAmount()));
+        transactionType.setBalance(new BigDecimal(item.getBalance() / 100));
+        transactionType.setAmount(new BigDecimal(item.getAmount() / 100));
         transactionType.setCardName(item.getCardName());
         transactionType.setFoodName(item.getFoodName());
         transactionType.setFoodAmount(item.getFoodAmount() != null ? BigInteger.valueOf(item.getFoodAmount()) : null);
