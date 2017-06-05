@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -118,6 +119,19 @@ public class MonitoringOfReportService {
         monitoringOfItem.setNumberOfReserve(
                 numberOfReserve(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
 
+        monitoringOfItem.setNumberOfSubFeedStudents(
+                numberOfSubFeedStudents(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
+        monitoringOfItem.setNumberOfSubFeedGuardians(
+                numberOfSubFeedGuardians(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
+        //Платные
+        monitoringOfItem.setNumberOfPaidStudents(
+                numberOfPaidStudents(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
+        monitoringOfItem.setNumberOfPaidGuardians(
+                numberOfPaidGuardians(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
         monitoringOfItemList.add(monitoringOfItem);
 
         return monitoringOfItemList;
@@ -173,10 +187,12 @@ public class MonitoringOfReportService {
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
-                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= 50 AND cfod.menutype < 100 AND cfod.idofrule >= 0");
+                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0");
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
 
         Long result = ((BigInteger) query.uniqueResult()).longValue();
 
@@ -189,7 +205,21 @@ public class MonitoringOfReportService {
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (6) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
-                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= 50 AND cfod.menutype < 100 AND cfod.idofrule >= 0");
+                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType AND cfod.idofrule >= 0");
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfBuffetStudent(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("");
+
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -199,6 +229,105 @@ public class MonitoringOfReportService {
         return result;
     }
 
+    public Long numberOfBuffetGuardians(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfSubFeedStudents(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
+                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
+                + " cfod.MenuType <= :maxType AND g.idofclientgroup < 1100000000");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfSubFeedGuardians(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
+                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND "
+                + "cfod.MenuType <= :maxType AND g.idofclientgroup  = 1100000030");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfPaidStudents(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
+                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
+                + " cfod.MenuType <= :maxType AND g.idofclientgroup < 1100000000");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfPaidGuardians(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
+                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
+                + " cfod.MenuType <= :maxType AND g.idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050)");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
 
     public List<ReportItem> getOrgData(Session session, List<Long> idOfOrgList, List<DatePeriods> datePeriodsList) {
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();

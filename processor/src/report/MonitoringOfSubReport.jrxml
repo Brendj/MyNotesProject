@@ -9,6 +9,10 @@
 	<field name="summaryOfPasses" class="java.lang.Long"/>
 	<field name="numberOfLgotnoe" class="java.lang.Long"/>
 	<field name="numberOfReserve" class="java.lang.Long"/>
+	<field name="numberOfPaidGuardians" class="java.lang.Long"/>
+	<field name="numberOfPaidStudents" class="java.lang.Long"/>
+	<field name="numberOfSubFeedGuardians" class="java.lang.Long"/>
+	<field name="numberOfSubFeedStudents" class="java.lang.Long"/>
 	<detail>
 		<band height="26" splitType="Stretch">
 			<textField>
@@ -69,6 +73,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfPaidGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2" x="600" y="0" width="60" height="25"/>
@@ -80,6 +85,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfPaidStudents}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6" x="540" y="0" width="60" height="25"/>
@@ -91,6 +97,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfSubFeedGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9" x="480" y="0" width="60" height="25"/>
@@ -102,6 +109,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfSubFeedStudents}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="d0f31606-6e4a-4339-b966-27ff01758cf6" x="240" y="0" width="60" height="25"/>
