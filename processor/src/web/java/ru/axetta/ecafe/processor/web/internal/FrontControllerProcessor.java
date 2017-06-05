@@ -249,9 +249,8 @@ public class FrontControllerProcessor {
             throw eGuid;
         }
         catch (Exception e) {
-            logger.error("Failed to refresh registry change items", e);
+            throw e;
         }
-        return Collections.EMPTY_LIST;
     }
 
     public List<RegistryChangeCallback> proceedRegitryChangeItem(List<Long> changesList,

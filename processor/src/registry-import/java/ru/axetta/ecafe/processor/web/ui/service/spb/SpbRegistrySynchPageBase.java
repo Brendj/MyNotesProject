@@ -35,7 +35,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.SOAPFaultException;
 import java.lang.Exception;
 import java.net.URL;
 import java.text.DateFormat;
@@ -356,10 +355,8 @@ public class SpbRegistrySynchPageBase extends BasicWorkspacePage/* implements Co
                 changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 refreshRegistryChangeItemsV2(idOfOrg);
             } catch (Exception e) {
-                if (e instanceof SOAPFaultException) {
-                    errorMessages = e.getMessage();
-                    return;
-                }
+                errorMessages = e.getMessage();
+                return;
             }
             if (changedItems == null || changedItems.isEmpty()) {
                 errorMessages = "Не получено разногласий либо устарел GUID организации";

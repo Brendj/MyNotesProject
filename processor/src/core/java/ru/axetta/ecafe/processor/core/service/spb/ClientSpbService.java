@@ -32,7 +32,7 @@ public class ClientSpbService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientSpbService.class);
 
-    private QueryPersonPort createEventController(String url) {
+    private QueryPersonPort createEventController(String url) throws Exception {
         QueryPersonPort controller;
         try {
             //PersonWebService service = new PersonWebService(url + "wsdl");
@@ -52,9 +52,9 @@ public class ClientSpbService {
             policy.setConnectionTimeout(30 * 60 * 1000);
 
             return controller;
-        } catch (java.lang.Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to create WS controller", e);
-            return null;
+            throw new Exception("Не удалось создать соединение с сервисом: ", e);
         }
     }
 
@@ -62,7 +62,7 @@ public class ClientSpbService {
     public Schools sendEvent(Query query, String url) throws Exception {
         QueryPersonPort subscription = createEventController(url);
         if (subscription == null) {
-            throw new Exception("Failed to create connection with spb person service");
+            throw new Exception("Failed to create connection with spb person service. Port is null.");
         }
 
         return subscription.pushData(query);
