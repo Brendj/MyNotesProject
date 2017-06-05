@@ -8053,7 +8053,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     (card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
                     && card.getValidTime().after(currentDate) &&
                             !(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_DELETED.getValue())
+                            && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_DELETED.getValue())
             );
             if (freeType) {
                 enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_FREE;
