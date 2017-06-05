@@ -10,6 +10,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -52,8 +53,10 @@ public class TransactionItem {
         c.setTime(item.getTransactionDate());
         XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         transactionType.setTransactionDate(date);
-        transactionType.setBalance(new BigDecimal(item.getBalance() / 100));
-        transactionType.setAmount(new BigDecimal(item.getAmount() / 100));
+        BigDecimal bg1 = BigDecimal.valueOf(item.getBalance()).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
+        transactionType.setBalance(bg1);
+        BigDecimal bg2 = BigDecimal.valueOf(item.getAmount()).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
+        transactionType.setAmount(bg2);
         transactionType.setCardName(item.getCardName());
         transactionType.setFoodName(item.getFoodName());
         transactionType.setFoodAmount(item.getFoodAmount() != null ? BigInteger.valueOf(item.getFoodAmount()) : null);

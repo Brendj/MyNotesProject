@@ -31,7 +31,7 @@ public class MealDataItem {
         MealData.IdentityInfo identityInfo = new MealData.IdentityInfo();
         identityInfo.setOrganizationUid(item.getOrganizationUid());
         identityInfo.setStudentUid(item.getStudentUid());
-        identityInfo.setUserToken(item.getUserToken());
+        identityInfo.setUserToken(item.getUserToken() == null ? "" : item.getUserToken());
         identityInfo.setCardUid(item.getCardUid());
         mealData.setIdentityInfo(identityInfo);
 
