@@ -41,10 +41,16 @@ public class SpbClientService {
 
         List<Pupil> pupils = new ArrayList<Pupil>();
 
+        boolean found = false;
         for(School school : schools.getSchool()) {
             if(school.getSchoolId().equals(guid)) {
                 pupils = school.getPupils().getPupil();
+                found = true;
             }
+        }
+
+        if(!found) {
+            throw new Exception(String.format("Не найдены данные по организации guid = %s.", guid));
         }
 
         return pupils;

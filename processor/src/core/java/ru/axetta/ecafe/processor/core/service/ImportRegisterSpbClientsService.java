@@ -129,18 +129,22 @@ public class ImportRegisterSpbClientsService {
 
         try {
             //  Итеративно загружаем клиентов, используя ограничения
-            List<Pupil> pupils = spbService.getPupilsByOrg(org.getGuid(), org.getRegistryUrl());
+            List<Pupil> result = spbService.getPupilsByOrg(org.getGuid(), org.getRegistryUrl());
+            List<Pupil> pupils = new ArrayList<Pupil>();
 
             SimpleDateFormat oldFormat = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat newFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-            for(Pupil pupil : pupils) {
+            for(Pupil pupil : result) {
                 if(StringUtils.isNotEmpty(pupil.getDob())) {
                     Date bDate = oldFormat.parse(pupil.getDob());
                     pupil.setDob(newFormat.format(bDate));
                 }
                 if(pupil.getClazz().equals(EMPLOYEE)) {
                     pupil.setClazz(ClientGroup.Predefined.CLIENT_EMPLOYEES.getNameOfGroup());
+                }
+                if(StringUtils.isNotEmpty(pupil.getClazz())) {
+                    pupils.add(pupil);
                 }
             }
 
