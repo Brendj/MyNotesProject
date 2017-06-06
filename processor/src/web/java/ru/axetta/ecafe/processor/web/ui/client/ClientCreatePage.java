@@ -629,6 +629,11 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if(idOfClientGroup != null) {
             client.setIdOfClientGroup(idOfClientGroup);
         } else {
+            ClientGroup group = DAOUtils.findClientGroup(persistenceSession,
+                    new CompositeIdOfClientGroup(this.org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_OTHERS.getValue()));
+            if(group == null) {
+                DAOUtils.createClientGroup(persistenceSession, this.org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_OTHERS);
+            }
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
 
