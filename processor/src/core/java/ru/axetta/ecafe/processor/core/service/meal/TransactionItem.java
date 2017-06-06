@@ -53,10 +53,18 @@ public class TransactionItem {
         c.setTime(item.getTransactionDate());
         XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         transactionType.setTransactionDate(date);
-        BigDecimal bg1 = BigDecimal.valueOf(item.getBalance()).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
-        transactionType.setBalance(bg1);
-        BigDecimal bg2 = BigDecimal.valueOf(item.getAmount()).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
-        transactionType.setAmount(bg2);
+        if(item.getBalance() != null) {
+            BigDecimal bg1 = BigDecimal.valueOf(item.getBalance()).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
+            transactionType.setBalance(bg1);
+        } else  {
+            transactionType.setBalance(null);
+        }
+        if(item.getAmount() != null) {
+            BigDecimal bg2 = BigDecimal.valueOf(item.getAmount()).divide(new BigDecimal(100), 2, RoundingMode.CEILING);
+            transactionType.setAmount(bg2);
+        } else {
+            transactionType.setAmount(null);
+        }
         transactionType.setCardName(item.getCardName());
         transactionType.setFoodName(item.getFoodName());
         transactionType.setFoodAmount(item.getFoodAmount() != null ? BigInteger.valueOf(item.getFoodAmount()) : null);

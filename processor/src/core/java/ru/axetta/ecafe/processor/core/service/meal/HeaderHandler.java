@@ -33,7 +33,7 @@ public class HeaderHandler extends AbstractSoapInterceptor {
     private static String PASSWORD = RuntimeContext.getInstance().getMealPassword();
 
     public HeaderHandler() {
-        super(Phase.PRE_LOGICAL);
+        super(Phase.PREPARE_SEND);
 
     }
 
