@@ -13,6 +13,8 @@
 	<field name="numberOfPaidStudents" class="java.lang.Long"/>
 	<field name="numberOfSubFeedGuardians" class="java.lang.Long"/>
 	<field name="numberOfSubFeedStudents" class="java.lang.Long"/>
+	<field name="numberOfBuffetStudent" class="java.lang.Long"/>
+	<field name="numberOfBuffetGuardians" class="java.lang.Long"/>
 	<detail>
 		<band height="26" splitType="Stretch">
 			<textField>
@@ -145,6 +147,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfBuffetStudent}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" x="420" y="0" width="60" height="25"/>
@@ -156,6 +159,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
