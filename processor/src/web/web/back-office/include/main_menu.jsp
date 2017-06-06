@@ -859,7 +859,7 @@
                                 label="Статистика сверки" action="#{spbRegistrySynchOverviewPage.show}"
                                 reRender="workspaceForm" />
             <%--@elvariable id="photoRegistryPage" type="ru.axetta.ecafe.processor.web.ui.service.PhotoRegistryPage"--%>
-            <rich:panelMenuItem id="photoRegistryItemSpb" binding="#{photoRegistryPage.mainMenuComponent}"
+            <rich:panelMenuItem binding="#{photoRegistryPage.mainMenuComponent}"
                                 label="Сверка фотографий клиентов" action="#{photoRegistryPage.show}"
                                 reRender="workspaceForm" />
         </rich:panelMenuGroup>
