@@ -37,6 +37,7 @@ import java.util.Properties;
 public class EventNotificationService {
 
     Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
+    private final Object emailSend = new Object();
 
     public static String NOTIFICATION_ENTER_EVENT = "enterEvent";
     public static String NOTIFICATION_BALANCE_TOPUP = "balanceTopup";
@@ -220,7 +221,7 @@ public class EventNotificationService {
     }
 
     @Async
-    public synchronized boolean sendEmailAsync(String email, String type, String[] values) {
+    public boolean sendEmailAsync(String email, String type, String[] values) {
         logger.trace("start");
         if (StringUtils.isEmpty(email)) {
             logger.trace("email is empty");
@@ -236,12 +237,14 @@ public class EventNotificationService {
             } else {
                 emailText = formatMessage(emailText, values);
                 emailSubject = formatMessage(emailSubject, values);
-                try {
-                    logger.trace("run");
-                    RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
-                } catch (Exception e) {
-                    logger.error("Failed to send email notification", e);
-                    return false;
+                synchronized (emailSend) {
+                    try {
+                        logger.trace("run");
+                        RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
+                    } catch (Exception e) {
+                        logger.error("Failed to send email notification", e);
+                        return false;
+                    }
                 }
             }
         }
