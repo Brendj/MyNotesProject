@@ -2,11 +2,9 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -32,10 +30,9 @@ import java.util.List;
  */
 @Component
 @Scope("singleton")
-public class SummaryDownloadMakerService {
+public class SummaryDownloadMakerService extends SummaryDownloadBaseService {
     Logger logger = LoggerFactory.getLogger(SummaryDownloadMakerService.class);
     public static final String FOLDER_PROPERTY = "ecafe.processor.download.summary.folder";
-    public static final String SSLCERT_DN_PROPERTY = "ecafe.processor.download.summary.sslcert.DN";
     public static final String NODE = "ecafe.processor.download.summary.node";
     public static final String USER = "ecafe.processor.download.summary.user";
     public static final String PASSWORD = "ecafe.processor.download.summary.password";
@@ -43,14 +40,8 @@ public class SummaryDownloadMakerService {
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
-    public void run() {
-        if (!isOn()) {
-            return;
-        }
-        Date prevDay = CalendarUtils.addDays(new Date(System.currentTimeMillis()), -1);
-        Date endDate = CalendarUtils.endOfDay(prevDay);
-        Date startDate = CalendarUtils.truncateToDayOfMonth(prevDay);
-        run(startDate, endDate);
+    protected String getNode() {
+        return NODE;
     }
 
     public void run(Date startDate, Date endDate) throws RuntimeException {
@@ -130,14 +121,4 @@ public class SummaryDownloadMakerService {
         }
     }
 
-    public static boolean isOn() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String instance = runtimeContext.getNodeName();
-        String reqInstance = runtimeContext.getConfigProperties().getProperty(NODE);
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
-                reqInstance.trim())) {
-            return false;
-        }
-        return true;
-    }
 }

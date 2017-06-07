@@ -133,7 +133,7 @@ public class ProcessorUtils {
             int result = query.executeUpdate();
             if (result < size) {
                 //если количество обновленных записей меньше размера списка, то обновляем записи по одной как в старом варианте
-                logger.error("Warning: batch update lastProcessSectionDates failed. Try run update in loop. " + query.getQueryString());
+                logger.error("Warning: batch update lastProcessSectionDates failed. Try run update in loop.");
                 for (LastProcessRecord record : sectionDates) {
                     saveLastProcessSectionCustomDateTransactionFree(session, record.getId().getIdOfOrg(), SectionType.fromInteger(
                             record.getId().getType()), record.getDatetime());

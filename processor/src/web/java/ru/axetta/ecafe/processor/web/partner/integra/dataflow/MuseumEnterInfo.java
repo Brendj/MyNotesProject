@@ -13,16 +13,18 @@ public class MuseumEnterInfo extends Result {
 
     private String orgName;
     private Integer enterType;
+    private String guid;
 
     public MuseumEnterInfo() {
 
     }
 
-    public MuseumEnterInfo(Long resultCode, String description, String orgName, Integer enterType) {
+    public MuseumEnterInfo(Long resultCode, String description, String orgName, Integer enterType, String guid) {
         this.resultCode = resultCode;
         this.description = description;
         this.orgName = orgName;
         this.enterType = enterType;
+        this.guid = guid;
     }
 
 
@@ -40,5 +42,13 @@ public class MuseumEnterInfo extends Result {
 
     public void setEnterType(Integer enterType) {
         this.enterType = enterType;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

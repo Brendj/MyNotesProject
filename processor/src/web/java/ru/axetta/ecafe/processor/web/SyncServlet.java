@@ -139,7 +139,8 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             if (tooManyRequests) {
-                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests", idOfOrg);
+                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s",
+                        idOfOrg, allSyncsCount, fullSyncsCount);
                 logger.error(message);
                 removeSyncInProgress(idOfOrg);
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);

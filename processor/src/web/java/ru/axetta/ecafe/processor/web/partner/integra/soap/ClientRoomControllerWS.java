@@ -8043,10 +8043,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Card card = DAOUtils.findCardByCardNo(session, lCardId);
             Client client = (card == null ? null : card.getClient());
             if (client == null) {
-                return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY);
+                return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY, "");
             }
 
             String orgShortName = client.getOrg().getShortNameInfoService();
+            String guid = client.getClientGUID();
             Integer enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY;
             Date currentDate = new Date();
             boolean freeType = (
@@ -8058,9 +8059,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (freeType) {
                 enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_FREE;
             }
-            return new MuseumEnterInfo(RC_OK, RC_OK_DESC, orgShortName, enterType);
+            return new MuseumEnterInfo(RC_OK, RC_OK_DESC, orgShortName, enterType, guid);
         } catch (Exception e) {
-            return new MuseumEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY);
+            return new MuseumEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY, "");
         } finally {
             HibernateUtils.close(session, logger);
         }
