@@ -88,7 +88,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             } else if (dayOfWeek == 4) {
                 templateFilename = reportsTemplateFilePath + "MonitoringOfReportWednesday" + ".jasper";
                 dateMonday = CalendarUtils.addDays(startTime, -2);
-                dateThursday = CalendarUtils.addDays(startTime, -1);
+                dateTuesday = CalendarUtils.addDays(startTime, -1);
                 dateWednesday = startTime;
             } else if (dayOfWeek == 5) {
                 templateFilename = reportsTemplateFilePath + "MonitoringOfReportThursday" + ".jasper";
