@@ -126,7 +126,7 @@ public class MonitoringOfReportService {
                 numberOfBuffetGuardians(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
 
         monitoringOfItem.setNumberOfSubFeedStudents(
-                numberOfBuffetStudent(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+                numberOfSubFeedStudents(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
 
         monitoringOfItem.setNumberOfSubFeedGuardians(
                 numberOfSubFeedGuardians(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
