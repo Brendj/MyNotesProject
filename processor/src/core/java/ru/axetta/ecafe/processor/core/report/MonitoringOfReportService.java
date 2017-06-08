@@ -257,12 +257,11 @@ public class MonitoringOfReportService {
 
     public Long numberOfSubFeedStudents(Long idOfOrg, Date startTime, Date endTime, Session session) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
-                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
-                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
-                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
                 + " cfod.MenuType <= :maxType AND g.idofclientgroup < 1100000000");
 
@@ -279,12 +278,11 @@ public class MonitoringOfReportService {
 
     public Long numberOfSubFeedGuardians(Long idOfOrg, Date startTime, Date endTime, Session session) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
-                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
-                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
-                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND "
                 + "cfod.MenuType <= :maxType AND g.idofclientgroup  IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050)");
 
@@ -301,12 +299,11 @@ public class MonitoringOfReportService {
 
     public Long numberOfPaidStudents(Long idOfOrg, Date startTime, Date endTime, Session session) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
-                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
-                + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                + "FROM CF_OrderDetails cfod LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
-                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
                 + " cfod.MenuType <= :maxType AND g.idofclientgroup < 1100000000");
 

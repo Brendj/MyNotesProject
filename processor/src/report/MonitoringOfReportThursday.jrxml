@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="4800" pageHeight="30000" columnWidth="4760" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.6830134553650707"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="179"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -239,7 +239,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="2240" y="25" width="60" height="110"/>
+				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="2300" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -303,7 +303,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2540" y="25" width="60" height="110"/>
+				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2480" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -351,7 +351,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2360" y="25" width="60" height="110"/>
+				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2540" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -367,7 +367,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="2300" y="25" width="60" height="110"/>
+				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="2240" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -383,7 +383,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2480" y="25" width="60" height="110"/>
+				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2420" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -399,7 +399,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="2420" y="25" width="60" height="110"/>
+				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="2360" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -415,7 +415,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="8ea4b7d5-4c24-4ab5-b0ff-263f1a393828" x="2960" y="25" width="60" height="110"/>
+				<reportElement uuid="8ea4b7d5-4c24-4ab5-b0ff-263f1a393828" x="3020" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -447,7 +447,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="29388668-d04b-4712-b8c9-cd1c4a09aa18" x="3020" y="25" width="60" height="110"/>
+				<reportElement uuid="29388668-d04b-4712-b8c9-cd1c4a09aa18" x="2960" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -527,7 +527,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="527bdf5f-1655-4072-b9fd-d4687dd36d65" x="3140" y="25" width="60" height="110"/>
+				<reportElement uuid="527bdf5f-1655-4072-b9fd-d4687dd36d65" x="3080" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -543,7 +543,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1f2ddc7d-25fb-45ce-ade2-2ada7c42ecb4" x="3260" y="25" width="60" height="110"/>
+				<reportElement uuid="1f2ddc7d-25fb-45ce-ade2-2ada7c42ecb4" x="3200" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -559,7 +559,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1d68bb50-8688-4e8c-9079-2dbf8a71554f" x="3080" y="25" width="60" height="110"/>
+				<reportElement uuid="1d68bb50-8688-4e8c-9079-2dbf8a71554f" x="3140" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -575,7 +575,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5a9b0fd9-852e-4412-b8cc-2fd7b7f63b9c" x="3200" y="25" width="60" height="110"/>
+				<reportElement uuid="5a9b0fd9-852e-4412-b8cc-2fd7b7f63b9c" x="3260" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -635,7 +635,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2aa6d217-6511-4757-9a50-a71edc57915c" x="3860" y="25" width="60" height="110"/>
+				<reportElement uuid="2aa6d217-6511-4757-9a50-a71edc57915c" x="3800" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -651,7 +651,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="8d187c2e-8a68-48ba-b078-c07913932dee" x="3920" y="25" width="60" height="110"/>
+				<reportElement uuid="8d187c2e-8a68-48ba-b078-c07913932dee" x="3980" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -667,7 +667,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5eeec0a0-86b3-4fb6-858e-792e7f13a891" x="3800" y="25" width="60" height="110"/>
+				<reportElement uuid="5eeec0a0-86b3-4fb6-858e-792e7f13a891" x="3860" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -759,7 +759,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e7c13acc-96dd-4c17-9396-8419dc211bde" x="3680" y="25" width="60" height="110"/>
+				<reportElement uuid="e7c13acc-96dd-4c17-9396-8419dc211bde" x="3740" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -775,7 +775,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="40c95ad1-6bb6-452d-b6ec-2c1621537337" x="3740" y="25" width="60" height="110"/>
+				<reportElement uuid="40c95ad1-6bb6-452d-b6ec-2c1621537337" x="3680" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -807,7 +807,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="7ce8d54b-168b-4e87-8c7c-cb7a589bf664" x="3980" y="25" width="60" height="110"/>
+				<reportElement uuid="7ce8d54b-168b-4e87-8c7c-cb7a589bf664" x="3920" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -887,7 +887,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c68fe49f-11fb-4905-a835-381ae2ace252" x="4520" y="25" width="60" height="110"/>
+				<reportElement uuid="c68fe49f-11fb-4905-a835-381ae2ace252" x="4580" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -903,7 +903,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="02bcf4e3-d3b7-4fdd-953e-73d5e5db89f7" x="4400" y="25" width="60" height="110"/>
+				<reportElement uuid="02bcf4e3-d3b7-4fdd-953e-73d5e5db89f7" x="4460" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -919,7 +919,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="908a598c-22f7-4e46-91d6-89d81adfad1f" x="4460" y="25" width="60" height="110"/>
+				<reportElement uuid="908a598c-22f7-4e46-91d6-89d81adfad1f" x="4400" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -935,7 +935,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ca29e52a-3c03-4fc7-b5e4-c852a2d690b9" x="4580" y="25" width="60" height="110"/>
+				<reportElement uuid="ca29e52a-3c03-4fc7-b5e4-c852a2d690b9" x="4520" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -951,7 +951,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b21452e5-3f78-4324-89bd-1da7cacdddd7" x="4700" y="25" width="60" height="110"/>
+				<reportElement uuid="b21452e5-3f78-4324-89bd-1da7cacdddd7" x="4640" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -999,7 +999,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="53764173-17c0-4923-813b-7063386316d4" x="4640" y="25" width="60" height="110"/>
+				<reportElement uuid="53764173-17c0-4923-813b-7063386316d4" x="4700" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3360" pageHeight="30000" columnWidth="3320" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
-	<property name="ireport.zoom" value="0.6830134553650707"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.3310000000000008"/>
+	<property name="ireport.x" value="80"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -235,7 +235,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="2240" y="25" width="60" height="110"/>
+				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="2300" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -299,7 +299,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2540" y="25" width="60" height="110"/>
+				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2480" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -347,7 +347,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2360" y="25" width="60" height="110"/>
+				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2420" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -363,7 +363,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="2300" y="25" width="60" height="110"/>
+				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="2240" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -379,7 +379,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2480" y="25" width="60" height="110"/>
+				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2540" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -395,7 +395,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="2420" y="25" width="60" height="110"/>
+				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="2360" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -411,7 +411,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f01f97d4-0188-49d5-a7bc-b7100255859a" x="3260" y="25" width="60" height="110"/>
+				<reportElement uuid="f01f97d4-0188-49d5-a7bc-b7100255859a" x="3200" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -427,7 +427,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ed1d5045-0268-4b91-a9d7-736fe72e22ea" x="3020" y="25" width="60" height="110"/>
+				<reportElement uuid="ed1d5045-0268-4b91-a9d7-736fe72e22ea" x="2960" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -443,7 +443,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1d6ad6a4-6448-4683-8911-b48dba0a3673" x="3080" y="25" width="60" height="110"/>
+				<reportElement uuid="1d6ad6a4-6448-4683-8911-b48dba0a3673" x="3140" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -475,7 +475,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f04eaeaf-7541-41f7-b8dc-50fe44ca7cd8" x="3140" y="25" width="60" height="110"/>
+				<reportElement uuid="f04eaeaf-7541-41f7-b8dc-50fe44ca7cd8" x="3080" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -491,7 +491,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="73ea81cd-b8e5-4cb0-8035-c35d04b474bd" x="3200" y="25" width="60" height="110"/>
+				<reportElement uuid="73ea81cd-b8e5-4cb0-8035-c35d04b474bd" x="3260" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -587,7 +587,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="920939ac-1624-4637-a207-152dd94e34a6" x="2960" y="25" width="60" height="110"/>
+				<reportElement uuid="920939ac-1624-4637-a207-152dd94e34a6" x="3020" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
