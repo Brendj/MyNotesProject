@@ -988,7 +988,7 @@ public class ClientManager {
     }
 
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
-            String mobile, String remark, Integer gender, ClientCreatedFromType createdFrom, Org org) throws Exception {
+            String mobile, String remark, Integer gender, Org org) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1033,12 +1033,12 @@ public class ClientManager {
         clientGuardianToSave.setAddress("");
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         clientGuardianToSave.setRemarks(remark);
-        clientGuardianToSave.setCreatedFrom(createdFrom);
         session.persist(clientGuardianToSave);
         return clientGuardianToSave;
     }
 
-    public static void createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled, Long idOfClientChild) {
+    public static void createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
+            Long idOfClientChild, ClientCreatedFromType createdFrom) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1050,7 +1050,7 @@ public class ClientManager {
 
         //сохранение связки представителя
         Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-        ClientGuardian clientGuardian = new ClientGuardian(idOfClientChild, guardian.getIdOfClient());
+        ClientGuardian clientGuardian = new ClientGuardian(idOfClientChild, guardian.getIdOfClient(), createdFrom);
         clientGuardian.setVersion(newGuardiansVersions);
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
@@ -1070,10 +1070,11 @@ public class ClientManager {
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
                 registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
-                remark, null, ClientCreatedFromType.DEFAULT, organization);
+                remark, null, organization);
 
         persistenceSession.persist(guardian);
-        createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(), true, idOfClientChild);
+        createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
+                true, idOfClientChild, ClientCreatedFromType.DEFAULT);
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }

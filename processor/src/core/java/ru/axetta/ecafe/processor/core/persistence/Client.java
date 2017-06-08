@@ -127,7 +127,7 @@ public class Client {
 
     private String ageTypeGroup;
     private Long balanceToNotify;
-    private ClientCreatedFromType createdFrom;
+
     private Date lastConfirmMobile;
 
     protected Client() {
@@ -163,7 +163,6 @@ public class Client {
         this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
         this.disablePlanCreationDate = null;
-        this.createdFrom = ClientCreatedFromType.DEFAULT;
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
             if (predefined.isEnabledAtDefault()) {
@@ -1023,14 +1022,6 @@ public class Client {
 
     public void setBalanceToNotify(Long balanceToNotify) {
         this.balanceToNotify = balanceToNotify;
-    }
-
-    public ClientCreatedFromType getCreatedFrom() {
-        return createdFrom;
-    }
-
-    public void setCreatedFrom(ClientCreatedFromType createdFrom) {
-        this.createdFrom = createdFrom;
     }
 
     public Date getLastConfirmMobile() {

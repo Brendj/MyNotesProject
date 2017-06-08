@@ -29,6 +29,11 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
+        <property name="createdFrom" column="CreatedFrom">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
+            </type>
+        </property>
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClientGuardian" not-null="true"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting"/>

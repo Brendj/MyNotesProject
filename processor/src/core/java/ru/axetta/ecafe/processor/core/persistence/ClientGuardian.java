@@ -25,19 +25,20 @@ public class ClientGuardian {
     private Date deleteDate;
     private ClientGuardianRelationType relation;
     private Set<ClientGuardianNotificationSetting> notificationSettings = new HashSet<ClientGuardianNotificationSetting>();
+    private ClientCreatedFromType createdFrom;
 
     protected ClientGuardian() {}
 
     public ClientGuardian(Long idOfChildren, Long idOfGuardian) {
         this.idOfChildren = idOfChildren;
         this.idOfGuardian = idOfGuardian;
-        // При создании опекунской связи проставляем ей настройки оповещений по умолчанию.
-        /*for (ClientGuardianNotificationSetting.Predefined predefined : ClientGuardianNotificationSetting.Predefined.values()) {
-            if (predefined.isEnabledAtDefault()) {
-                ClientGuardian clientGuardian = DAOReadonlyService.getInstance().findClientGuardianById(idOfChildren, idOfGuardian);
-                notificationSettings.add(new ClientGuardianNotificationSetting(clientGuardian, predefined.getValue()));
-            }
-        }*/
+        this.createdFrom = ClientCreatedFromType.DEFAULT;
+    }
+
+    public ClientGuardian(Long idOfChildren, Long idOfGuardian, ClientCreatedFromType createdFrom) {
+        this.idOfChildren = idOfChildren;
+        this.idOfGuardian = idOfGuardian;
+        this.createdFrom = createdFrom;
     }
 
     public Long getIdOfClientGuardian() {
@@ -145,5 +146,13 @@ public class ClientGuardian {
     @Override
     public int hashCode() {
         return idOfClientGuardian.hashCode();
+    }
+
+    public ClientCreatedFromType getCreatedFrom() {
+        return createdFrom;
+    }
+
+    public void setCreatedFrom(ClientCreatedFromType createdFrom) {
+        this.createdFrom = createdFrom;
     }
 }

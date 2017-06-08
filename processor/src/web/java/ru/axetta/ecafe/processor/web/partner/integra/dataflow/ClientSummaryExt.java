@@ -124,6 +124,9 @@ public class ClientSummaryExt {
     @XmlAttribute(name = "LastConfirmMobile")
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar lastConfirmMobile;
+
+    @XmlAttribute(name = "GuardianCreatedWhere")
+    protected Integer guardianCreatedWhere;
     /**
      *
      * Gets the value of the contractId property.
@@ -737,5 +740,13 @@ public class ClientSummaryExt {
 
     public void setLastConfirmMobile(XMLGregorianCalendar lastConfirmMobile) {
         this.lastConfirmMobile = lastConfirmMobile;
+    }
+
+    public Integer getGuardianCreatedWhere() {
+        return guardianCreatedWhere;
+    }
+
+    public void setGuardianCreatedWhere(Integer guardianCreatedWhere) {
+        this.guardianCreatedWhere = guardianCreatedWhere;
     }
 }

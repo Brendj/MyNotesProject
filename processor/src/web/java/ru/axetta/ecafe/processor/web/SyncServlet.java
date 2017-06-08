@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -58,7 +59,7 @@ public class SyncServlet extends HttpServlet {
     private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
     private static final List<String[]> restrictedFullSyncPeriods =
             getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
-    //private static final AtomicLong threadCounter = new AtomicLong();
+    private static final AtomicLong threadCounter = new AtomicLong();
 
     static class RequestData {
         public boolean isCompressed;
@@ -99,6 +100,7 @@ public class SyncServlet extends HttpServlet {
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
                 SyncCollector.setIdData(syncTime, idOfOrg, idOfSync, syncType);
                 if(syncType==null) throw new Exception("Unknown sync type");
+                Thread.currentThread().setName("SyncServlet-" + syncType + "-" + idOfOrg + "-n" + threadCounter.addAndGet(1));
             } catch (Exception e) {
                 String message = String.format("Failed to extract required packet attribute [remote address: %s]",
                         request.getRemoteAddr());

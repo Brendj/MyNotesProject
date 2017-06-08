@@ -138,7 +138,7 @@ public class ThreadDumpService {
             String pThreads = "";
             CollectionUtils.sortByValue(problemThreads);
             for (Map.Entry<String, Integer> th : problemThreads.entrySet()) {
-                if (th.getValue() < COUNT_PROBLEM_STACKS) break;
+                if (th.getValue() < COUNT_PROBLEM_STACKS) continue;
                 pThreads += String.format("Count: %s", th.getValue()) + NEWLINE + th.getKey() + NEWLINE;
             }
             result.setProblemStacks(pThreads);
@@ -251,7 +251,7 @@ public class ThreadDumpService {
 
         @Override
         public int compareTo(ThreadDumpInfoItem o) {
-            return threadCPUTime.compareTo(o.getThreadCPUTime());
+            return -threadCPUTime.compareTo(o.getThreadCPUTime());
         }
 
         public Long getThreadCPUTime() {

@@ -92,11 +92,7 @@
         <property name="balanceToNotify" column="BalanceToNotify" type="long" not-null="false"/>
         <property name="lastConfirmMobile" column="LastConfirmMobile"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="createdFrom" column="CreatedFrom">
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType</param>
-            </type>
-        </property>
+
 
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>

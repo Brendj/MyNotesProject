@@ -3496,12 +3496,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientsWithResultCode data = new ClientsWithResultCode();
         try {
-            List<Long> idOfClients = extractIDFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
+            Map<Long, ClientCreatedFromType> idOfClients = extractIDFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
             if (idOfClients.isEmpty()) {
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Клиент не найден";
             } else {
-                data.setClients(findListOfClientsByListOfIds(idOfClients, session));
+                Map<Client, ClientCreatedFromType> map = new HashMap<Client, ClientCreatedFromType>();
+                for (Map.Entry<Long, ClientCreatedFromType> entry : idOfClients.entrySet()) {
+                    map.put(DAOUtils.findClient(session, entry.getKey()), entry.getValue());
+                    //data.setClients(findListOfClientsByListOfIds(idOfClients, session));
+                }
+                data.setClients(map);
                 data.resultCode = RC_OK;
                 data.description = "OK";
             }
@@ -3513,8 +3518,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
-    public List<Long> extractIDFromGuardByGuardMobile(String guardMobile, Session session) {
-        Set<Long> result = new HashSet<Long>();
+    public Map<Long, ClientCreatedFromType> extractIDFromGuardByGuardMobile(String guardMobile, Session session) {
+        Map<Long, ClientCreatedFromType> result = new HashMap<Long, ClientCreatedFromType>();
         String query = "select client.idOfClient from cf_clients client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
         Query q = session.createSQLQuery(query);
         q.setParameter("guardMobile", guardMobile);
@@ -3530,16 +3535,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (list != null && list.size() > 0) {
                     for (ClientGuardian cg : list) {
                         if (!cg.isDisabled()) {
-                            result.add(cg.getIdOfChildren());
+                            result.put(cg.getIdOfChildren(), cg.getCreatedFrom());
                         }
                     }
                 } else {
-                    result.add(londId);
+                    result.put(londId, ClientCreatedFromType.DEFAULT);
                 }
             }
         }
 
-        return new ArrayList<Long>(result);
+        return result;
     }
 
     public List<Client> findListOfClientsByListOfIds(List<Long> idsOfClient, Session session) throws Exception {
@@ -3890,21 +3895,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientsWithResultCode cd = getClientsByGuardMobile(guardMobile, session);
 
             if (cd != null && cd.getClients() != null) {
-                for (Client cl : cd.getClients()) {
-                    Data dataProcess = new ClientRequest().process(cl, session, new Processor() {
+                for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                    Data dataProcess = new ClientRequest().process(entry.getKey(), session, new Processor() {
                         public void process(Client client, Data dataProcess, ObjectFactory objectFactory,
                                 Session session) throws Exception {
                             processSummary(client, dataProcess, objectFactory, session);
                         }
                     });
                     ClientSummaryResult cs = new ClientSummaryResult();
+                    if (!entry.getValue().equals(ClientCreatedFromType.DEFAULT)) {
+                        dataProcess.getClientSummaryExt().setGuardianCreatedWhere(entry.getValue().getValue());
+                    }
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
                     if (cs.clientSummary != null) {
                         clientSummaries.add(cs.clientSummary);
                         handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
-                                cl.getIdOfClient(), handler.getData().getOperationType());
+                                entry.getKey().getIdOfClient(), handler.getData().getOperationType());
                     }
                 }
             }
@@ -3961,7 +3969,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientRepresentative.setMobile(cl.getMobile());
                     clientRepresentative.setNotifyviaemail(cl.isNotifyViaEmail());
                     clientRepresentative.setNotifyviapush(cl.isNotifyViaPUSH());
-                    clientRepresentative.setCreatedWhere(cl.getCreatedFrom().getValue());
+                    if (!clientGuardian.getCreatedFrom().equals(ClientCreatedFromType.DEFAULT)) {
+                        clientRepresentative.setCreatedWhere(clientGuardian.getCreatedFrom().getValue());
+                    }
 
                     clientRepresentativesList.getRep().add(clientRepresentative);
                 }
@@ -7845,15 +7855,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (guardian == null) {
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
-                        surname, mobile, remark, gender, ClientCreatedFromType.MPGU, org);
+                        surname, mobile, remark, gender, org);
             }
 
             ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
-                ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient());
+                ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient(), ClientCreatedFromType.MPGU);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()){
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);
+                clientGuardian.setCreatedFrom(ClientCreatedFromType.MPGU);
                 session.update(clientGuardian);
             } else {
                 return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
