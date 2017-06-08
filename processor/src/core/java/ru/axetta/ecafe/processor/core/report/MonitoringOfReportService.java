@@ -244,7 +244,7 @@ public class MonitoringOfReportService {
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
-                + "WHERE cfo.ordertype IN (0, 1, 2) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup in (1100000020,1100000030, 1100000040, 1100000050) AND "
+                + "WHERE cfo.ordertype IN (0, 1, 2) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup in (1100000000, 1100000010, 1100000020,1100000030, 1100000040, 1100000050, 1100000080) AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime");
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
