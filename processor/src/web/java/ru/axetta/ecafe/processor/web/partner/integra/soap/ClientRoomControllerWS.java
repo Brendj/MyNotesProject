@@ -3971,6 +3971,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientRepresentative.setNotifyviapush(cl.isNotifyViaPUSH());
                     if (!clientGuardian.getCreatedFrom().equals(ClientCreatedFromType.DEFAULT)) {
                         clientRepresentative.setCreatedWhere(clientGuardian.getCreatedFrom().getValue());
+                        clientRepresentative.setIdOfOrg(cl.getOrg().getIdOfOrg());
+                        clientRepresentative.setOrgShortName(cl.getOrg().getShortName());
                     }
 
                     clientRepresentativesList.getRep().add(clientRepresentative);

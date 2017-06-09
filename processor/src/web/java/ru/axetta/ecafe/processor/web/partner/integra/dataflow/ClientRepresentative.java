@@ -54,6 +54,12 @@ public class ClientRepresentative {
     @XmlAttribute(name = "CreatedWhere")
     protected Integer createdWhere;
 
+    @XmlAttribute(name = "IdOfOrg")
+    private Long idOfOrg;
+
+    @XmlAttribute(name = "OrgShortName")
+    private String orgShortName;
+
     public Long getId() {
         return id;
     }
@@ -108,5 +114,21 @@ public class ClientRepresentative {
 
     public void setCreatedWhere(Integer createdWhere) {
         this.createdWhere = createdWhere;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
+
+    public String getOrgShortName() {
+        return orgShortName;
+    }
+
+    public void setOrgShortName(String orgShortName) {
+        this.orgShortName = orgShortName;
     }
 }
