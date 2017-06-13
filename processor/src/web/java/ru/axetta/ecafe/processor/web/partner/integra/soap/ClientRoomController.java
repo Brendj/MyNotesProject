@@ -498,8 +498,8 @@ public interface ClientRoomController {
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "gender") Integer gender, @WebParam(name = "contracts") ListOfContracts contracts);*/
 
-    /*@WebMethod Result removeGuardian(@WebParam(name = "guardianContractId") Long contractId,
-            @WebParam(name = "childContractId") Long childContractId);*/
+    @WebMethod Result removeGuardian(@WebParam(name = "guardianContractId") Long contractId,
+            @WebParam(name = "childContractId") Long childContractId);
 
     @WebMethod MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId, @WebParam(name = "museumName") String museumName);
 }

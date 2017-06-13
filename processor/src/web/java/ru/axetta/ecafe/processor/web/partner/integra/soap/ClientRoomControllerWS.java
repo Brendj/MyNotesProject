@@ -7995,7 +7995,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         return result;
-    }
+    }*/
 
     @Override
     public Result removeGuardian(@WebParam(name = "guardianContractId") Long guardianContractId,
@@ -8009,13 +8009,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client guardian = findClientByContractId(session, guardianContractId, result);
-            if (!guardian.getCreatedFrom().equals(ClientCreatedFromType.MPGU)) {
-                result.resultCode = RC_INVALID_DATA;
-                result.description = "Клиент был создан в другой системе. Удаление выбранного представителя невозможно";
-                return result;
-            }
             Client child = findClientByContractId(session, childContractId, result);
+            Client guardian = findClientByContractId(session, guardianContractId, result);
+
+
             if (guardian == null || child == null) {
                 result.resultCode = RC_CLIENT_NOT_FOUND;
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -8023,12 +8020,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             ClientGuardian cg = DAOReadonlyService.getInstance().findClientGuardianById(session, child.getIdOfClient(), guardian.getIdOfClient());
-            if (cg != null) {
-                Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
-                cg.setDisabled(true);
-                cg.setVersion(newGuardiansVersions);
-                session.update(cg);
+            if (cg == null || !cg.getCreatedFrom().equals(ClientCreatedFromType.MPGU)) {
+                result.resultCode = RC_INVALID_DATA;
+                result.description = "Представитель не найден или был создан в другой системе. Удаление невозможно";
+                return result;
             }
+
+            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+            cg.setDisabled(true);
+            cg.setVersion(newGuardiansVersions);
+            session.update(cg);
 
             transaction.commit();
             transaction = null;
@@ -8044,7 +8045,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         return result;
-    }*/
+    }
 
     @Override
     public MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId, @WebParam(name = "museumName") String museumName) {
