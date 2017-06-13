@@ -99,6 +99,12 @@
             </type>
         </property>
 
+        <property name="typeInitial" column="OrganizationType_Initial">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationType</param>
+            </type>
+        </property>
+
         <property name="status" column="OrganizationStatus">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationStatus</param>

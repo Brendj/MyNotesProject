@@ -108,6 +108,8 @@
     <h:inputText value="#{mainPage.orgViewPage.coSupplierName}" readonly="true" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.organizationType}" readonly="true" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Тип организации при внедрении" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgViewPage.organizationTypeInitial}" readonly="true" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.refectoryTypeStringRepresentation}" readonly="true" styleClass="input-text long-field" />
 

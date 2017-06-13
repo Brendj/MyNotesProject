@@ -115,6 +115,7 @@ public class Org implements Serializable {
     private Boolean variableFeeding;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
+    private OrganizationType typeInitial;
     private OrganizationStatus status;
     private OrganizationSecurityLevel securityLevel;
     private PhotoRegistryDirective photoRegistryDirective;
@@ -193,6 +194,7 @@ public class Org implements Serializable {
         this.changesDSZN = changesDSZN;
         this.variableFeeding = false;
         this.isWorkInSummerTime = false;
+        this.typeInitial = OrganizationType.SCHOOL;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -836,6 +838,14 @@ public class Org implements Serializable {
 
     public void setType(OrganizationType type) {
         this.type = type;
+    }
+
+    public OrganizationType getTypeInitial() {
+        return typeInitial;
+    }
+
+    public void setTypeInitial(OrganizationType typeInitial) {
+        this.typeInitial = typeInitial;
     }
 
     public OrganizationStatus getStatus() {

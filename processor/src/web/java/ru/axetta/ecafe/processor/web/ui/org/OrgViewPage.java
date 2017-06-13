@@ -73,6 +73,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean usePaydableSubscriptionFeeding;
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
+    private OrganizationType organizationTypeInitial;
     private String refectoryTypeStringRepresentation;
     private Long btiUnom;
     private Long btiUnad;
@@ -186,6 +187,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.refectoryType = org.getRefectoryType();
         getRefectoryTypeStringRepresentation();
         this.organizationType= org.getType();
+        this.organizationTypeInitial= org.getTypeInitial();
         this.registryUrl = org.getRegistryUrl();
 
         ////  menu exchange source
@@ -646,5 +648,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setRegistryUrl(String registryUrl) {
         this.registryUrl = registryUrl;
+    }
+
+    public OrganizationType getOrganizationTypeInitial() {
+        return organizationTypeInitial;
+    }
+
+    public void setOrganizationTypeInitial(OrganizationType organizationTypeInitial) {
+        this.organizationTypeInitial = organizationTypeInitial;
     }
 }

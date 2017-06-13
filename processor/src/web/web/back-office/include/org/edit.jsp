@@ -133,6 +133,11 @@
         <f:converter converterId="organizationTypeConverter"/>
         <f:selectItems value="#{mainPage.orgEditPage.organizationTypeMenu.items}" />
     </h:selectOneMenu>
+    <h:outputText escape="true" value="Тип организации при внедрении" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgEditPage.organizationTypeInitial}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationTypeConverter"/>
+        <f:selectItems value="#{mainPage.orgEditPage.organizationTypeMenu.items}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgEditPage.refectoryType}" styleClass="input-text" style="width: 250px;">
         <f:selectItems value="#{mainPage.orgEditPage.refectoryTypeComboMenuItems}" />

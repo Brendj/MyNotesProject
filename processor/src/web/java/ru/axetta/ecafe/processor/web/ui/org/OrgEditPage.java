@@ -84,6 +84,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
+    private OrganizationType organizationTypeInitial;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
     private OrganizationSecurityLevel securityLevel;
 
@@ -313,6 +314,7 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
         org.setType(this.organizationType);
+        org.setTypeInitial(this.organizationTypeInitial);
 
         if(this.fullSyncParam){
             org.setFullSyncParam(fullSyncParam);
@@ -412,6 +414,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
+        this.organizationTypeInitial = org.getTypeInitial();
 
         this.refectoryType = org.getRefectoryType();
         if (this.refectoryType == null) {
@@ -1027,6 +1030,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setVariableFeeding(Boolean variableFeeding) {
         this.variableFeeding = variableFeeding;
+    }
+
+    public OrganizationType getOrganizationTypeInitial() {
+        return organizationTypeInitial;
+    }
+
+    public void setOrganizationTypeInitial(OrganizationType organizationTypeInitial) {
+        this.organizationTypeInitial = organizationTypeInitial;
     }
 
     public static class ContragentItem {

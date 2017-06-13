@@ -68,6 +68,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private SelectItem[] refectoryTypeComboMenuItems = readRefectoryTypeComboMenuItems();
     // тип организации "Общеобразовательнок ОУ / Дошкольное ОУ / Поставщик питания / Профессиональное ОУ"
     private OrganizationType organizationType;
+    private OrganizationType organizationTypeInitial;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
     private OrganizationSecurityLevel securityLevel;
 
@@ -216,6 +217,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setModeContragentSelect(String modeContragentSelect) {
         this.modeContragentSelect = modeContragentSelect;
+    }
+
+    public OrganizationType getOrganizationTypeInitial() {
+        return organizationTypeInitial;
+    }
+
+    public void setOrganizationTypeInitial(OrganizationType organizationTypeInitial) {
+        this.organizationTypeInitial = organizationTypeInitial;
     }
 
     public static class ContragentItem {
@@ -548,6 +557,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         }
 
         org.setSecurityLevel(securityLevel);
+        org.setTypeInitial(getOrganizationTypeInitial());
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
 
