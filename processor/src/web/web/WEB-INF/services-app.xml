@@ -83,7 +83,7 @@
         <!--EP-320 <task:scheduled ref="projectStateReportService" method="run" cron="0 20 4 ? * *"/> -->
         <!--        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />-->
         <!--Убрано по задаче EP-266<task:scheduled ref="BIDataExportService" method="run" cron="0 0 5 * * ?"/>-->
-        <task:scheduled ref="synchCleanupService" method="run" cron="0 0 1 ? * *"/>
+        <task:scheduled ref="synchCleanupService" method="run" cron="0 10 0 ? * *"/>
         <task:scheduled ref="RNIPLoadPaymentsService" method="run" fixed-delay="60000"/>
         <task:scheduled ref="EMPProcessor" method="runStorageMerge" cron="0 0/5 * * * ?"/>
         <task:scheduled ref="syncStatsManager" method="shortDataLog" cron="0 0/10 * * * ?"/>
@@ -124,7 +124,7 @@
 
     <task:scheduler id="importRegisterClientsSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="importRegisterClientsSchedule">
-        <task:scheduled ref="importRegisterClientsService" method="run" cron="0 0 4 ? * *"/>
+        <task:scheduled ref="importRegisterClientsService" method="run" cron="0 11 0 ? * *"/>
     </task:scheduled-tasks>
 
     <task:scheduler id="importRegisterSpbClientsSchedule" pool-size="5"/>

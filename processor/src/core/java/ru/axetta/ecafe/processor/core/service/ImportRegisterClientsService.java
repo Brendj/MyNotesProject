@@ -289,8 +289,7 @@ public class ImportRegisterClientsService {
         cal.set(Calendar.MILLISECOND, 0);
         Session session = (Session) em.getDelegate();
         Query q = session.createSQLQuery(
-                  "BEGIN WORK; "
-                + "LOCK TABLE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors IN SHARE MODE; "
+                "LOCK TABLE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors IN SHARE MODE; "
                 + "CREATE TEMP TABLE cf_registrychange_guardians_backup ON COMMIT DROP AS "
                 + "      SELECT * FROM cf_registrychange_guardians WHERE createddate >=:minCreateDate ; "
                 + "CREATE TEMP TABLE cf_registrychange_backup ON COMMIT DROP AS "
@@ -300,8 +299,7 @@ public class ImportRegisterClientsService {
                 + "TRUNCATE cf_registrychange_guardians, cf_registrychange, cf_registrychange_errors; "
                 + "INSERT INTO cf_registrychange SELECT * FROM cf_registrychange_backup; "
                 + "INSERT INTO cf_registrychange_guardians SELECT * FROM cf_registrychange_guardians_backup; "
-                + "INSERT INTO cf_registrychange_errors SELECT * FROM cf_registrychange_errors_backup; "
-                + "COMMIT WORK;");
+                + "INSERT INTO cf_registrychange_errors SELECT * FROM cf_registrychange_errors_backup; ");
         q.setLong("minCreateDate", cal.getTimeInMillis());
         q.executeUpdate();
     }
