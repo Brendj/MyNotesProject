@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPPart;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -60,7 +59,7 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
         //==========Раскомментировать ниже для логирования запросов==========//
 
-        if (outboundProperty.booleanValue()) {
+        /*if (outboundProperty.booleanValue()) {
             out.println("\nOutbound message:");
         } else {
             out.println("\nInbound message:");
@@ -73,7 +72,7 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
             out.println("");   // just to add a newline
         } catch (Exception e) {
             out.println("Exception in handler: " + e);
-        }
+        }*/
     }
 
     public static String toString(Document doc) {

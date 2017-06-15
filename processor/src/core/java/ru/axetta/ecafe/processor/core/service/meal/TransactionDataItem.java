@@ -72,6 +72,8 @@ public class TransactionDataItem {
         this.transactionDate = transactionDate;
         this.balance = balance;
         this.amount = amount;
+        this.foodName = "Движение денег";
+        this.foodAmount = 1;
     }
 
     public Long getIdOfOrderDetail() {
