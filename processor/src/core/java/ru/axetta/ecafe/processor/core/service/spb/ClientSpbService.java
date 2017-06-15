@@ -9,6 +9,8 @@ import generated.spb.register.Query;
 import generated.spb.register.QueryPersonPort;
 import generated.spb.register.Schools;
 
+import ru.axetta.ecafe.processor.core.partner.nsi.SOAPLoggingHandler;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -19,6 +21,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +47,11 @@ public class ClientSpbService {
             BindingProvider bp = (BindingProvider)controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+
+            final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+            final List<Handler> handlerChain = new ArrayList<Handler>();
+            handlerChain.add(soapLoggingHandler);
+            bp.getBinding().setHandlerChain(handlerChain);
 
             Client proxy = ClientProxy.getClient(controller);
             proxy.getOutInterceptors().add(new HeaderHandler());
