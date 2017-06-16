@@ -47,7 +47,7 @@
         <h:selectBooleanCheckbox value="#{smsDeliveryReportPage.isActiveState}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
-        <h:outputText escape="false" value="Время без обмена более 2 минут" styleClass="output-text" />
+        <h:outputText escape="false" value="Время от регистрации события до отправки в ЕМП" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{smsDeliveryReportPage.moreThanTwoMinutes}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 

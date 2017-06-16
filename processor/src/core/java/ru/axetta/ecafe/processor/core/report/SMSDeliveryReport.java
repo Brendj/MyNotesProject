@@ -201,12 +201,12 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 findOrgData(items, session, moreThanTwoMinutes);
                 findEmptyRows(items);
 
-                long diff = Math.abs(end.getTime() - start.getTime());
+                /*long diff = Math.abs(end.getTime() - start.getTime());
                 long diffDays = diff / (24 * 60 * 60 * 1000);
 
                 if (diffDays < 1) {
                     dataZeroAllThePeriod(items);
-                }
+                } */
 
                 return items;
             } catch (Exception e) {
@@ -694,8 +694,15 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
             long lastSync       = 0L;
 
             List<Long[]> tsList = entry.getTsList();
+            if (tsList != null && tsList.size() > 0) {
+                Long[] firstEl = tsList.get(0);
+                //if (firstEl[1] > dateConstants.toDay0Hours00Minutes.getTime()) {
+                    firstEl[1] = dateConstants.toDay0Hours00Minutes.getTime();    //это из-за очистки таблицы synchistory_daily
+                //}
+            }
 
             for(Long[] ts : tsList) {
+                lastSync = Math.max(lastSync, ts[0]);
                 if(ts.length < 2 || ts[0] == null || ts[1] == null) {
                     continue;
                 }
@@ -706,11 +713,11 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 }
 
                 if (isTimeBetween0h00mAnd7h15m(ts[0], dateConstants)) {
-                    maxDelayMorning = Math.max(diff, maxDelayMorning);
-                    sumDelayMorning += diff;
-                } else if (isTimeBetween7h16mAnd8h45m(ts[0], dateConstants)) {
                     maxDelayMidnight = Math.max(diff, maxDelayMidnight);
                     sumDelayMidnight += diff;
+                } else if (isTimeBetween7h16mAnd8h45m(ts[0], dateConstants)) {
+                    maxDelayMorning = Math.max(diff, maxDelayMorning);
+                    sumDelayMorning += diff;
                 } else if (isTimeBetween8h46mAnd16h00m(ts[0], dateConstants)) {
                     maxDelayMidday = Math.max(diff, maxDelayMidday);
                     sumDelayMidday += diff;
@@ -719,7 +726,7 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     sumDelayNight += diff;
                 }
 
-                lastSync = Math.max(lastSync, ts[0]);
+                //lastSync = Math.max(lastSync, ts[0]);
             }
 
             if(res == null) {
