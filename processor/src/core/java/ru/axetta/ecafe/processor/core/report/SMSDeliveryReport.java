@@ -700,13 +700,27 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     firstEl[1] = dateConstants.toDay0Hours00Minutes.getTime();    //это из-за очистки таблицы synchistory_daily
                 //}
             }
-
+            boolean midnightExists = false;
+            boolean morningExists = false;
+            boolean middayExists = false;
+            boolean nightExists = false;
             for(Long[] ts : tsList) {
                 lastSync = Math.max(lastSync, ts[0]);
                 if(ts.length < 2 || ts[0] == null || ts[1] == null) {
                     continue;
                 }
-               // long zeroDiff;
+                if (isTimeBetween0h00mAnd7h15m(ts[0], dateConstants)) {
+                    midnightExists = true;
+                } else if (isTimeBetween7h16mAnd8h45m(ts[0], dateConstants)) {
+                    ts[1] = midnightExists || morningExists ? Math.max(ts[1], dateConstants.toDay7H16MinInMillis) : dateConstants.toDay7H15MinInMillis;
+                    morningExists = true;
+                } else if (isTimeBetween8h46mAnd16h00m(ts[0], dateConstants)) {
+                    ts[1] = morningExists ||middayExists ? Math.max(ts[1], dateConstants.toDay8H46MinInMillis) : dateConstants.toDay8H45MinInMillis;
+                    middayExists = true;
+                } else if (isTimeBetween16h01mAnd23h59m59s(ts[0], dateConstants)) {
+                    ts[1] = middayExists ||nightExists ? Math.max(ts[1], dateConstants.toDay16H01MinInMillis) : dateConstants.toDay16H00MinInMillis;
+                    nightExists = true;
+                }
                 long diff = ts[0] - ts[1];
                 if(diff < MAX_DELAY) {
                     continue;
@@ -726,7 +740,19 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                     sumDelayNight += diff;
                 }
 
-                //lastSync = Math.max(lastSync, ts[0]);
+            }
+
+            if (sumDelayMidnight == 0 && !midnightExists) {
+                maxDelayMidnight = sumDelayMidnight = timeBetween0h00mAnd7h15m(dateConstants);
+            }
+            if (sumDelayMorning == 0 && !morningExists) {
+                maxDelayMorning = sumDelayMorning = timeBetween7h16mAnd8h45m(dateConstants);
+            }
+            if (sumDelayMidday == 0 && !middayExists) {
+                maxDelayMidday = sumDelayMidday = timeBetween8h46mAnd16h00m(dateConstants);
+            }
+            if (sumDelayNight == 0 && !nightExists) {
+                maxDelayNight = sumDelayNight = timeBetween16h01mAnd23h59m59s(dateConstants);
             }
 
             if(res == null) {
@@ -776,6 +802,22 @@ public class SMSDeliveryReport extends BasicReportForAllOrgJob {
                 reportItem.setOrgStatus(Org.STATE_NAMES[org.getState()]);
 
             }
+        }
+
+        private static long timeBetween0h00mAnd7h15m(DateComparisonConstants constants) {
+            return constants.toDay7H15MinInMillis - constants.toDay0H00MinInMillis;
+        }
+
+        private static long timeBetween7h16mAnd8h45m(DateComparisonConstants constants) {
+            return constants.toDay8H45MinInMillis - constants.toDay7H16MinInMillis;
+        }
+
+        private static long timeBetween8h46mAnd16h00m(DateComparisonConstants constants) {
+            return constants.toDay16H00MinInMillis - constants.toDay8H46MinInMillis;
+        }
+
+        private static long timeBetween16h01mAnd23h59m59s(DateComparisonConstants constants) {
+            return constants.toDay23H59Min59SecInMillis - constants.toDay16H01MinInMillis;
         }
 
         private static boolean isTimeBetween0h00mAnd7h15m(long syncTime, DateComparisonConstants constants) {
