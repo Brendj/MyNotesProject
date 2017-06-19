@@ -33,62 +33,57 @@ public class MonitoringOfReportService {
         } else if (dayOfWeek == 3) {
             DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -1),
-                    CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriod = new DatePeriods(startTime, CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriod);
         } else if (dayOfWeek == 4) {
             DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2),
                     CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -2), startTime);
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -2),
-                    CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriod = new DatePeriods(startTime, CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriod);
         } else if (dayOfWeek == 5) {
             DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -3),
                     CalendarUtils.addDays(startTime, -2));
             datePeriodsList.add(datePeriodsss);
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -3),
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2),
                     CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -3), startTime);
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
             datePeriodsList.add(datePeriod);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -3),
-                    CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriods = new DatePeriods(startTime, CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriods);
         } else if (dayOfWeek == 6) {
             DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -4),
                     CalendarUtils.addDays(startTime, -3));
             datePeriodsList.add(datePeriod);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -4),
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -3),
                     CalendarUtils.addDays(startTime, -2));
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -4),
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2),
                     CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
-            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -4), startTime);
+            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
             datePeriodsList.add(datePeriodsss);
-            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -4),
-                    CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriodssss = new DatePeriods(startTime, CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriodssss);
         } else if (dayOfWeek == 7) {
             DatePeriods datePeriodd = new DatePeriods(CalendarUtils.addDays(startTime, -5),
                     CalendarUtils.addDays(startTime, -4));
             datePeriodsList.add(datePeriodd);
-            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+            DatePeriods datePeriod = new DatePeriods(CalendarUtils.addDays(startTime, -4),
                     CalendarUtils.addDays(startTime, -3));
             datePeriodsList.add(datePeriod);
-            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+            DatePeriods datePeriods = new DatePeriods(CalendarUtils.addDays(startTime, -3),
                     CalendarUtils.addDays(startTime, -2));
             datePeriodsList.add(datePeriods);
-            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -5),
+            DatePeriods datePeriodss = new DatePeriods(CalendarUtils.addDays(startTime, -2),
                     CalendarUtils.addDays(startTime, -1));
             datePeriodsList.add(datePeriodss);
-            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -5), startTime);
+            DatePeriods datePeriodsss = new DatePeriods(CalendarUtils.addDays(startTime, -1), startTime);
             datePeriodsList.add(datePeriodsss);
-            DatePeriods datePeriodssss = new DatePeriods(CalendarUtils.addDays(startTime, -5),
-                    CalendarUtils.addOneDay(startTime));
+            DatePeriods datePeriodssss = new DatePeriods(startTime, CalendarUtils.addOneDay(startTime));
             datePeriodsList.add(datePeriodssss);
         }
 

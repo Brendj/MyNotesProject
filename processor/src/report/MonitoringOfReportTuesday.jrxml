@@ -31,7 +31,7 @@
 					<font size="24" isBold="true"/>
 					<paragraph leftIndent="50"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Мониторинг с " + $P{dateTuesday}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Мониторинг с " + $P{dateMonday} + " по " + $P{dateTuesday}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
