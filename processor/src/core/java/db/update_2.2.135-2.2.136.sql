@@ -18,3 +18,5 @@ update cf_generators set idOfSyncHistoryException = (select  case when max(idOfS
 
 --изменeние типа поля с bigserial на bigint
 ALTER TABLE cf_synchistory_exceptions ALTER COLUMN IdOfSyncHistoryException DROP DEFAULT;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 190617) НЕ МЕНЯТЬ
