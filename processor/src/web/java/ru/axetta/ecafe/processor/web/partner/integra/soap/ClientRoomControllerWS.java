@@ -6265,9 +6265,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             Org org = client.getOrg();
 
-            final String groupName = client.getClientGroup().getGroupName();
-            final boolean isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES
-                  || ClientGroup.predefinedGroupNames().contains(groupName);
+            boolean isParent = false;
+            if (client.getClientGroup() != null) {
+                final String groupName = client.getClientGroup().getGroupName();
+                isParent = client.getIdOfClientGroup() >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES || ClientGroup.predefinedGroupNames().contains(groupName);
+            }
             boolean vp = (type == null ? false : type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal()));
             /*boolean vp = false;
             if (ArrayUtils.contains(getVPOrgsList(), org.getIdOfOrg())) {
