@@ -1135,6 +1135,8 @@
                             label="#{mainPage.migrantsReportPage.reportNameForMenu}" action="#{mainPage.showMigrantsReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="monitoringOfMenuItem" binding="#{mainPage.monitoringOfReportPage.mainMenuComponent}"
                             label="Мониторинг" action="#{mainPage.showMonitoringOfReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="clientTransactionsReportMenuItem" binding="#{mainPage.clientTransactionsReportPage.mainMenuComponent}"
+                            label="Транзакции клиента" action="#{mainPage.showClientTransactionsReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"

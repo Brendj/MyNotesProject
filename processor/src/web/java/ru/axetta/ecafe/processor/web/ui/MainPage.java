@@ -286,6 +286,7 @@ public class MainPage implements Serializable {
     private final SpecialDatesReportPage specialDatesReportPage = new SpecialDatesReportPage();
     private final MigrantsReportPage migrantsReportPage = new MigrantsReportPage();
     private final MonitoringOfReportPage monitoringOfReportPage = new MonitoringOfReportPage();
+    private final ClientTransactionsReportPage clientTransactionsReportPage = new ClientTransactionsReportPage();
     //private final BasicBasketReportPage basicBasketReportPage = new BasicBasketReportPage();
 
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
@@ -7043,6 +7044,23 @@ public class MainPage implements Serializable {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             currentWorkspacePage = monitoringOfReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set MonitoringOfReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public ClientTransactionsReportPage getClientTransactionsReportPage() {
+        return clientTransactionsReportPage;
+    }
+
+    public Object showClientTransactionsReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = clientTransactionsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set MonitoringOfReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
