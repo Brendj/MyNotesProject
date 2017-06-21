@@ -3978,49 +3978,40 @@ public class Processor implements SyncProcessor {
 
     private AccRegistryUpdate getAccRegistryUpdate(Org org, Date fromDateTime) throws Exception {
         AccRegistryUpdate accRegistryUpdate = new AccRegistryUpdate();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
+        final Date currentDate = new Date();
+        List<AccountTransactionExtended> accountTransactionList = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            final Date currentDate = new Date();
-            //persistenceSession.refresh(org);
-            List<AccountTransactionExtended> accountTransactionList = null;
-            try {
-                Date dateStartDate = getQueryStartDate(persistenceSession, org.getIdOfOrg(), fromDateTime);
-                long time_delta = System.currentTimeMillis();
-                accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, dateStartDate,
-                    currentDate);
-                time_delta = System.currentTimeMillis() - time_delta;
-                if (time_delta > 10L * 1000L) {
-                    logger.error(String.format("Transactions query time = %s ms. IdOfOrg = %s. Period = %3$td.%3$tm.%3$tY %3$tT - %4$td.%4$tm.%4$tY %4$tT (date from packet = %5$td.%5$tm.%5$tY %5$tT)",
-                            time_delta, org.getIdOfOrg(), dateStartDate, currentDate, fromDateTime));
-                }
-                for (AccountTransactionExtended accountTransaction : accountTransactionList) {
-                    accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
-                }
-            } catch (Exception e) {
-                logger.error("AccRegistryUpdate section failed", e);
-                accRegistryUpdate.setResult(new ResultOperation(500, e.getMessage()));
+            Date dateStartDate = getQueryStartDate(org.getIdOfOrg(), fromDateTime);
+            long time_delta = System.currentTimeMillis();
+            accountTransactionList = DAOReadonlyService.getInstance().getAccountTransactionsForOrgSinceTimeV2(org, dateStartDate,
+                currentDate);
+            time_delta = System.currentTimeMillis() - time_delta;
+            if (time_delta > 10L * 1000L) {
+                logger.error(String.format("Transactions query time = %s ms. IdOfOrg = %s. Period = %3$td.%3$tm.%3$tY %3$tT - %4$td.%4$tm.%4$tY %4$tT (date from packet = %5$td.%5$tm.%5$tY %5$tT)",
+                        time_delta, org.getIdOfOrg(), dateStartDate, currentDate, fromDateTime));
             }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            for (AccountTransactionExtended accountTransaction : accountTransactionList) {
+                accRegistryUpdate.addAccountTransactionInfoV2(accountTransaction);
+            }
+        } catch (Exception e) {
+            logger.error("AccRegistryUpdate section failed", e);
+            accRegistryUpdate.setResult(new ResultOperation(500, e.getMessage()));
         }
         return accRegistryUpdate;
     }
 
-    private Date getQueryStartDate(Session session, Long idOfOrg, Date fromDateTime) {
+    private Date getQueryStartDate(Long idOfOrg, Date fromDateTime) {
         long difference = System.currentTimeMillis() - fromDateTime.getTime();
-        long timeInMillis = ACC_REGISTRY_TIME_CLIENT_IN_MILLIS;
-        if (difference > timeInMillis) {
-            Date d = processorUtils.getLastProcessSectionDate(session, idOfOrg, SectionType.ACC_INC_REGISTRY);
-            return d == null ? fromDateTime : d;
-        } else {
+        if (difference <= ACC_REGISTRY_TIME_CLIENT_IN_MILLIS) {
             return fromDateTime;
+        }
+        Session persistenceSession = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            Date d = processorUtils.getLastProcessSectionDate(persistenceSession, idOfOrg, SectionType.ACC_INC_REGISTRY);
+            return d == null ? fromDateTime : d;
+        } finally {
+            HibernateUtils.close(persistenceSession, logger);
         }
     }
 
