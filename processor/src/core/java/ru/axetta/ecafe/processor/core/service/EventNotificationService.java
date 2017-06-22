@@ -222,15 +222,12 @@ public class EventNotificationService {
 
     @Async
     public boolean sendEmailAsync(String email, String type, String[] values) {
-        logger.trace("start");
         if (StringUtils.isEmpty(email)) {
-            logger.trace("email is empty");
             return false;
         }  else {
 
             String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
                     TYPE_EMAIL_SUBJECT);
-            logger.trace(emailSubject+" : "+emailText);
             if (emailText == null || emailSubject == null) {
                 logger.warn(String.format("No email text is specified for type '%s'. Email is not sent", type));
                 return false;
@@ -239,7 +236,6 @@ public class EventNotificationService {
                 emailSubject = formatMessage(emailSubject, values);
                 synchronized (emailSend) {
                     try {
-                        logger.trace("run");
                         RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
                     } catch (Exception e) {
                         logger.error("Failed to send email notification", e);
