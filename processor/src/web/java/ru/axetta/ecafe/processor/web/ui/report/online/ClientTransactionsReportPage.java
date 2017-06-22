@@ -356,9 +356,9 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
 
     public List<SelectItem> getOperationTypes() {
         List<SelectItem> items = new ArrayList<SelectItem>();
-        items.add(0, new SelectItem(SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT, "Пополнение"));
-        items.add(1, new SelectItem(SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER, "Списание"));
-        items.add(2, new SelectItem("Все", "Все"));
+        items.add(0, new SelectItem(0, "Все"));
+        items.add(1, new SelectItem(1, "Пополнение"));
+        items.add(2, new SelectItem(2, "Списание"));
         return items;
     }
 
