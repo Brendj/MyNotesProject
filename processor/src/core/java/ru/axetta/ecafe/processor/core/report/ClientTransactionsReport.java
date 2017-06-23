@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * Created by anvarov on 09.06.2017.
  */
-public class ClientTransactionsReport extends BasicReportForOrgJob {
+public class ClientTransactionsReport extends BasicReportForAllOrgJob {
 
 
     /*
@@ -44,7 +44,9 @@ public class ClientTransactionsReport extends BasicReportForOrgJob {
 
     public static final String REPORT_NAME_FOR_MENU = "Транзакции клиента";
 
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
+    }
 
     public static class Builder extends BasicReportJob.Builder {
 
@@ -56,7 +58,8 @@ public class ClientTransactionsReport extends BasicReportForOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            String reportTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+            String reportTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
+                    .getReportsTemplateFilePath();
 
             templateFilename = reportTemplateFilePath + ClientTransactionsReport.class.getSimpleName() + ".jasper";
 
@@ -64,35 +67,77 @@ public class ClientTransactionsReport extends BasicReportForOrgJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("reportName", REPORT_NAME);
 
-            String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-            Long idOfOrg = Long.parseLong(idOfOrgString);
+            String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty("idOfOrgList"));
+            String[] idOfOrgStringList = idOfOrgString.split(",");
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrg);
+            List<Long> idOfOrgList = new ArrayList<Long>();
+
+            for (String id : idOfOrgStringList) {
+                idOfOrgList.add(Long.valueOf(id));
+            }
+
+            String operationTypeString = null;
+
+            int operationType = Integer
+                    .parseInt(StringUtils.trimToEmpty(reportProperties.getProperty("operationType")));
+
+
+            if (operationType == 0) {
+                operationTypeString = "Все";
+            } else if (operationType == 1) {
+                operationTypeString = "Поподнение";
+            } else if (operationType == 2) {
+                operationTypeString = "Списание";
+            }
+
+
+            if (idOfOrgList.size() == 1) {
+                Org org = (Org) session.load(Org.class, idOfOrgList.get(0));
+                parameterMap.put("officialName", org.getOfficialName());
+                parameterMap.put("address", org.getAddress());
+                parameterMap.put("operationType", operationTypeString);
+            }
+
+            String clientListString = StringUtils.trimToEmpty(reportProperties.getProperty("clientList"));
+
+            if (!clientListString.isEmpty() && clientListString != null) {
+
+            }
+
+            Boolean showAllBuildings = Boolean
+                    .valueOf(StringUtils.trimToEmpty(reportProperties.getProperty("showAllBuildings")));
+
+            if (showAllBuildings) {
+
+            }
+
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
-            return new ClientTransactionsReport(generateTime, generateDuration, jasperPrint, startTime, endTime, idOfOrg);
+            return new ClientTransactionsReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList)
                 throws Exception {
             ClientTransactionsReportService service = new ClientTransactionsReportService();
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrg));
+            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrgList));
         }
     }
 
     public ClientTransactionsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime, Long idOfOrg) {
-        super(generateTime, generateDuration, print, startTime, endTime,idOfOrg);
+            Date endTime) {
+        super(generateTime, generateDuration, print, startTime, endTime);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ClientTransactionsReport.class);
 
-    public ClientTransactionsReport() {}
+    public ClientTransactionsReport() {
+    }
 
     @Override
-    public BasicReportForOrgJob createInstance() {
+    public BasicReportForAllOrgJob createInstance() {
         return new ClientTransactionsReport();
     }
 

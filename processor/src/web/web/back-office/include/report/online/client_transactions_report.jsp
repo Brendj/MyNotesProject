@@ -89,8 +89,6 @@
         </h:selectOneMenu>
     </h:panelGrid>
 
-
-
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.clientTransactionsReportPage.buildReportHTML}"
                            reRender="clientTransactionsReportTable"

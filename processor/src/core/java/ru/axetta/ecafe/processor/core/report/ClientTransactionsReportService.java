@@ -16,10 +16,20 @@ import java.util.List;
  */
 public class ClientTransactionsReportService {
 
-    public List<ClientTransactionsReportItem> buildReportItems(Session session, Date startTime, Date endTime, Long idOfOrg) {
+    public List<ClientTransactionsReportItem> buildReportItems(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) {
 
         List<ClientTransactionsReportItem> clientTransactionsReportItemList = new ArrayList<ClientTransactionsReportItem>();
 
+        ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
+
+        clientTransactionsReportItem.setContragent("Контрагент");
+        clientTransactionsReportItem.setIdOfOrg(100L);
+        clientTransactionsReportItem.setOperationType("Все");
+
+        clientTransactionsReportItemList.add(clientTransactionsReportItem);
+
         return clientTransactionsReportItemList;
     }
+
+
 }

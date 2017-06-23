@@ -145,6 +145,9 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
+        if (orgsEmpty() == null) {
+            return null;
+        }
         ClientTransactionsReport.Builder builder = new ClientTransactionsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -192,6 +195,9 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return ;
+        if (orgsEmpty() == null) {
+            return;
+        }
         Date generateTime = new Date();
         ClientTransactionsReport.Builder builder = new ClientTransactionsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
@@ -252,13 +258,28 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         return templateFilename;
     }
 
+    private String orgsEmpty() {
+        if(idOfOrgList.isEmpty()){
+            printError(String.format("Выберите организацию, или список организаций", ""));
+            return null;
+        }
+        return "";
+    }
+
     private Properties buildProperties() {
         Properties properties = new Properties();
         String idOfOrgString = "";
         if (idOfOrgList != null) {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
-        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+        properties.setProperty("idOfOrgList", idOfOrgString);
+        String clientListString = "";
+        if (clientList != null) {
+            clientListString = StringUtils.join(clientList.iterator(), ",");
+        }
+        properties.setProperty("clientList", clientListString);
+        properties.setProperty("showAllBuildings", showAllBuildings.toString());
+        properties.setProperty("operationType", getSelectedOperationType().toString());
         return properties;
     }
 
