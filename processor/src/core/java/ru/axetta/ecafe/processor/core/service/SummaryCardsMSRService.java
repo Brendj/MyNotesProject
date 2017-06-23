@@ -84,7 +84,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             List list = query.getResultList();
 
             List<String> result = new ArrayList<String>();
-            result.add("Номер записи\tНомер карты\tGUID");
+            result.add("id\tuid\tguid");
             long counter = 1;
             for (Object o : list) {
                 Object row[] = (Object[]) o;
