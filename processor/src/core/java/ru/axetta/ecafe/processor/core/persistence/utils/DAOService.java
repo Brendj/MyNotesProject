@@ -2140,7 +2140,9 @@ public class DAOService {
         } catch (Exception e) {
             logger.error("Failed to add new synch daily history entry", e);
         }
-        logger.info("test register sync request");
+        if (System.currentTimeMillis() - dateAt > 1000L) {
+            logger.error("Time save cf_synchistory_daily more than 1 second.");
+        }
     }
 
     public Long getClientGroupByClientId(Long idOfClient) {

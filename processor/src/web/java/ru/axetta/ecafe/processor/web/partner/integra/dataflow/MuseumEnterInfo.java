@@ -8,40 +8,26 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * Created by i.semenov on 01.06.2017.
  */
 public class MuseumEnterInfo extends Result {
-    public static final Integer MUSEUM_ENTER_TYPE_FREE = 0;
-    public static final Integer MUSEUM_ENTER_TYPE_PAY = 1;
 
-    private String orgName;
-    private Integer enterType;
     private String guid;
+    private Long cardStatusCode;
+    private String cardStatusName;
 
     public MuseumEnterInfo() {
 
     }
 
-    public MuseumEnterInfo(Long resultCode, String description, String orgName, Integer enterType, String guid) {
+    public MuseumEnterInfo(Long resultCode, String description) {
         this.resultCode = resultCode;
         this.description = description;
-        this.orgName = orgName;
-        this.enterType = enterType;
+    }
+
+    public MuseumEnterInfo(Long resultCode, String description, String guid, Long cardStatusCode, String cardStatusName) {
+        this.resultCode = resultCode;
+        this.description = description;
+        this.setCardStatusCode(cardStatusCode);
+        this.setCardStatusName(cardStatusName);
         this.guid = guid;
-    }
-
-
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
-
-    public Integer getEnterType() {
-        return enterType;
-    }
-
-    public void setEnterType(Integer enterType) {
-        this.enterType = enterType;
     }
 
     public String getGuid() {
@@ -50,5 +36,21 @@ public class MuseumEnterInfo extends Result {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Long getCardStatusCode() {
+        return cardStatusCode;
+    }
+
+    public void setCardStatusCode(Long cardStatusCode) {
+        this.cardStatusCode = cardStatusCode;
+    }
+
+    public String getCardStatusName() {
+        return cardStatusName;
+    }
+
+    public void setCardStatusName(String cardStatusName) {
+        this.cardStatusName = cardStatusName;
     }
 }

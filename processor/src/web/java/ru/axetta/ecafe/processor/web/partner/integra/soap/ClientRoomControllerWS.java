@@ -157,6 +157,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_INVALID_OPERATION_VARIABLE_FEEDING = 580L;
     private static final Long RC_ERROR_CREATE_VARIABLE_FEEDING = 590L;
     private static final Long RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING = 600L;
+    private static final Long RC_CARD_NOT_FOUND = 610L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -190,6 +191,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_OPERATION_VARIABLE_FEEDING_DESC = "Подписку на вариативное питание приостановить нельзя";
     private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один вариант комплекса каждого вида рациона (завтрак, обед)";
     private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы в пределах недели";
+    private static final String RC_CARD_NOT_FOUND_DESC = "Карта не найдена";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8050,34 +8052,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId, @WebParam(name = "museumName") String museumName) {
+    public MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId) {
         authenticateRequest(null);
         Session session = null;
         try {
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             long lCardId = Long.parseLong(cardId);
             Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            if (card == null) {
+                return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
+            }
             Client client = (card == null ? null : card.getClient());
             if (client == null) {
-                return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY, "");
+                return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
-            String orgShortName = client.getOrg().getShortNameInfoService();
             String guid = client.getClientGUID();
-            Integer enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY;
             Date currentDate = new Date();
-            boolean freeType = (
+            boolean clientPredefined = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                    && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_DELETED.getValue();
+            if (
                     (card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
-                    && card.getValidTime().after(currentDate) &&
-                            !(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_DELETED.getValue())
-            );
-            if (freeType) {
-                enterType = MuseumEnterInfo.MUSEUM_ENTER_TYPE_FREE;
+                    && card.getValidTime().after(currentDate) && !clientPredefined
+            ) {
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 0L, "Карта активна");
+            } else if (!clientPredefined) {
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 2L, "Карта не активна");
+            } else {
+                return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 1L, "Карта принадлежит другой группе держателей «Москвенка»");
             }
-            return new MuseumEnterInfo(RC_OK, RC_OK_DESC, orgShortName, enterType, guid);
         } catch (Exception e) {
-            return new MuseumEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC, "", MuseumEnterInfo.MUSEUM_ENTER_TYPE_PAY, "");
+            return new MuseumEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         } finally {
             HibernateUtils.close(session, logger);
         }

@@ -501,5 +501,5 @@ public interface ClientRoomController {
     @WebMethod Result removeGuardian(@WebParam(name = "guardianContractId") Long contractId,
             @WebParam(name = "childContractId") Long childContractId);
 
-    @WebMethod MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId, @WebParam(name = "museumName") String museumName);
+    @WebMethod MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId);
 }
