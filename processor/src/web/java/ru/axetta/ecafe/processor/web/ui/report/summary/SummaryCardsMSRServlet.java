@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by i.semenov on 07.06.2017.
  */
+@Deprecated
 public class SummaryCardsMSRServlet extends SummaryBaseServlet {
     private static final Logger logger = LoggerFactory.getLogger(SummaryCardsMSRServlet.class);
     private static final String SUMMARY_REPORT_DAY = "summaryDate";

@@ -167,9 +167,6 @@ public class SyncServlet extends HttpServlet {
 
             if (!verifySignature || bLogPackets) {
                 syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
-            } else {
-                String message = "Synchronization with %s, addr %s - type: %s - packets not logged";
-                logger.info(String.format(message, idOfOrg, request.getRemoteAddr(), syncType.toString()));
             }
 
             // Verify XML signature

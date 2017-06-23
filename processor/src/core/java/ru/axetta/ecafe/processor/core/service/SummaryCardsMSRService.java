@@ -8,8 +8,10 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.FTPUploader;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,11 +29,17 @@ import java.util.List;
 @Component
 public class SummaryCardsMSRService extends SummaryDownloadBaseService {
     Logger logger = LoggerFactory.getLogger(SummaryCardsMSRService.class);
-    public static final String FOLDER_PROPERTY = "ecafe.processor.download.msr.summary-cards.folder";
-    public static final String NODE = "ecafe.processor.download.msr.summary-cards.node";
-    public static final String USER = "ecafe.processor.download.msr.summary-cards.user";
-    public static final String PASSWORD = "ecafe.processor.download.msr.summary-cards.password";
+    public static final String FOLDER_PROPERTY = "ecafe.processor.download.msr.folder";
+    public static final String NODE = "ecafe.processor.download.msr.node";
+    public static final String USER = "ecafe.processor.download.msr.user"; //?
+    public static final String PASSWORD = "ecafe.processor.download.msr.password"; //?
+    public static final String FTP_SERVER = "ecafe.processor.download.msr.ftp.server";
+    public static final String FTP_PORT = "ecafe.processor.download.msr.ftp.port";
+    public static final String FTP_USER = "ecafe.processor.download.msr.ftp.user";
+    public static final String FTP_PASSWORD = "ecafe.processor.download.msr.ftp.password";
+    public static final String FTP_FOLDER = "ecafe.processor.download.msr.ftp.folder";
     private static final List card_states;
+    private static final String FILENAME_PREFIX = "ISPP_CARDS_";
 
     static {
         card_states = new ArrayList<Integer>();
@@ -60,8 +68,8 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             if (filename == null) {
                 throw new Exception(String.format("Not found property %s in application config", FOLDER_PROPERTY));
             }
-            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-            filename += "/" + df.format(endDate) + ".csv";
+            SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
+            filename += "/" + FILENAME_PREFIX + df.format(endDate) + ".csv";
 
             String query_str = "select card.cardNo, client.clientGUID from Card card inner join card.client client "
                     + "where client.clientGroup.compositeIdOfClientGroup.idOfClientGroup NOT between :group_employees and :group_deleted "
@@ -76,19 +84,36 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             List list = query.getResultList();
 
             List<String> result = new ArrayList<String>();
-            result.add("Номер карты;GUID");
+            result.add("Номер записи\tНомер карты\tGUID");
+            long counter = 1;
             for (Object o : list) {
                 Object row[] = (Object[]) o;
-                StringBuilder b = new StringBuilder();
-                b.append(row[0]).append(";");
-                b.append(row[1]);
-                result.add(b.toString());
+                if (!StringUtils.isEmpty((String)row[1])) {
+                    StringBuilder b = new StringBuilder();
+                    b.append(counter).append("\t").append(row[0]).append("\t").append(row[1]);
+                    result.add(b.toString());
+                    counter++;
+                }
             }
 
             File file = new File(filename);
             FileUtils.writeLines(file, result);
+
+            String server = RuntimeContext.getInstance().getPropertiesValue(FTP_SERVER, null);
+            int port = RuntimeContext.getInstance().getPropertiesValue(FTP_PORT, 0);
+            String user = RuntimeContext.getInstance().getPropertiesValue(FTP_USER, null);
+            String password = RuntimeContext.getInstance().getPropertiesValue(FTP_PASSWORD, null);
+            String remoteFolder = RuntimeContext.getInstance().getPropertiesValue(FTP_FOLDER, null);
+            if (server != null && port != 0 && user != null && password != null && remoteFolder != null) {
+                FTPUploader ftpUploader = new FTPUploader(server, port, user, password);
+                boolean success = ftpUploader.uploadTextFile(filename, remoteFolder);
+                logger.info(success ? "MSR upload file successful" : "MSR upload file error");
+            }
+            if (file.exists()) {
+                file.delete();
+            }
         } catch (Exception e) {
-            logger.error("Error build summary clients file for MSR", e);
+            logger.error("Error build and upload summary clients file for MSR", e);
         }
     }
 }

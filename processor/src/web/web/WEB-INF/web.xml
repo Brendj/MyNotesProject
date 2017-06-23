@@ -549,16 +549,6 @@
         <url-pattern>/summary/download</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>SummaryCardsMSRServlet</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.ui.report.summary.SummaryCardsMSRServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>SummaryCardsMSRServlet</servlet-name>
-        <url-pattern>/summary/cards-msr</url-pattern>
-    </servlet-mapping>
-
     <context-param>
        <param-name>com.sun.faces.numberOfViewsInSession</param-name>
        <param-value>2</param-value>
