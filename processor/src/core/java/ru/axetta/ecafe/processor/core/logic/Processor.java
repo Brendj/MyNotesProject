@@ -1497,9 +1497,12 @@ public class Processor implements SyncProcessor {
     private void processAccountRegistrySectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
             List<AbstractToElement> responseSections) {
         try {
-            AccountsRegistry accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
-                    .handlerMigrants(request.getIdOfOrg());
-            addToResponseSections(accountsRegistry, responseSections);
+            AccountsRegistryRequest requestSection = request.findSection(AccountsRegistryRequest.class);
+            if(requestSection == null || AccountsRegistryRequest.ContentType.ForCardsAndClients.equals(requestSection.getContentType())) {
+                AccountsRegistry accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
+                        .handlerMigrants(request.getIdOfOrg());
+                addToResponseSections(accountsRegistry, responseSections);
+            }
         } catch (Exception e) {
             String message = String
                     .format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg());
