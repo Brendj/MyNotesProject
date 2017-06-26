@@ -237,6 +237,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                         if(migrant != null){
                             Org orgReqIss = (Org)session.load(Org.class, inMigReqHisItem.getIdOfOrgRequestIssuer());
                             Client clientResol = (Client)session.load(Client.class, inMigReqHisItem.getIdOfClientResol());
+                            if(inMigReqHisItem.getIdOfClientResol() == -1L) {
+                                clientResol = null;
+                            }
                             inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgReqIss,
                                     inMigReqHisItem.getResolution(),inMigReqHisItem.getResolutionDateTime(),
                                     inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);

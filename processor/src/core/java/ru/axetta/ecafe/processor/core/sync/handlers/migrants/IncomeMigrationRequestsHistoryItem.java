@@ -89,7 +89,7 @@ public class IncomeMigrationRequestsHistoryItem {
         idOfClientResol = getLongValue(itemNode, "IdOfClientResol", emSetter, true);
         if(idOfClientResol != null) {
             Client client = DAOService.getInstance().findClientById(idOfClientResol);
-            if (client == null) {
+            if (client == null && idOfClientResol != -1L) {
                 emSetter.setCompositeErrorMessage(String.format("Client with id=%s not found", idOfClientResol));
             }
         }
