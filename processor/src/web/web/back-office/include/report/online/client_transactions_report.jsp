@@ -78,7 +78,7 @@
                                              target="#{mainPage.clientSelectListPage.clientFilter}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                          value=" {#{mainPage.clientTransactionsReportPage.filter}}" />
+                          value=" {#{mainPage.clientTransactionsReportPage.filterClient}}" />
         </h:panelGroup>
     </h:panelGrid>
 

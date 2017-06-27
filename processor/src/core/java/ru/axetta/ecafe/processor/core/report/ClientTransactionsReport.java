@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.apache.commons.lang.StringUtils;
@@ -100,8 +101,26 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
 
             String clientListString = StringUtils.trimToEmpty(reportProperties.getProperty("clientList"));
 
+            List<Client> clientList = new ArrayList<Client>();
+
             if (!clientListString.isEmpty() && clientListString != null) {
 
+                String[] clientStringList = clientListString.split(",");
+
+                for (String id : clientStringList) {
+                    Client client = (Client) session.load(Client.class, Long.parseLong(id));
+                    clientList.add(client);
+                }
+            }
+
+            if (clientList.size() == 1) {
+                parameterMap.put("contractNumber", clientList.get(0).getContractId());
+                if (clientList.get(0).getClientGroup() != null) {
+                    parameterMap.put("group", clientList.get(0).getClientGroup().getGroupName());
+                } else {
+                    parameterMap.put("group", "");
+                }
+                parameterMap.put("clientName", clientList.get(0).getPerson().getFullName());
             }
 
             Boolean showAllBuildings = Boolean
@@ -111,18 +130,18 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
 
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
             return new ClientTransactionsReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList)
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList, List<Client> clientList)
                 throws Exception {
             ClientTransactionsReportService service = new ClientTransactionsReportService();
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrgList));
+            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList));
         }
     }
 

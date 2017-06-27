@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.report;
 
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
+
 import org.hibernate.Session;
 
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ import java.util.List;
  */
 public class ClientTransactionsReportService {
 
-    public List<ClientTransactionsReportItem> buildReportItems(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) {
+    public List<ClientTransactionsReportItem> buildReportItems(Session session, Date startTime, Date endTime, List<Long> idOfOrgList, List<Client> clientList) {
 
         List<ClientTransactionsReportItem> clientTransactionsReportItemList = new ArrayList<ClientTransactionsReportItem>();
 

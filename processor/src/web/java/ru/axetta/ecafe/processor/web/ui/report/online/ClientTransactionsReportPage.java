@@ -52,7 +52,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
     private final String reportNameForMenu = ClientTransactionsReport.REPORT_NAME_FOR_MENU;
 
     private String htmlReport = null;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
 
     private Boolean showAllBuildings = false;
 
@@ -275,9 +275,14 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         properties.setProperty("idOfOrgList", idOfOrgString);
         String clientListString = "";
         if (clientList != null) {
-            clientListString = StringUtils.join(clientList.iterator(), ",");
+            for (ClientSelectListPage.Item client : clientList) {
+                clientListString = clientListString.concat(String.valueOf(client.getIdOfClient()));
+            }
+            if (clientList.size() > 1) {
+                clientListString = clientListString.concat(",");
+            }
         }
-        properties.setProperty("clientList", clientListString);
+        properties.setProperty("clientList", clientListString.trim());
         properties.setProperty("showAllBuildings", showAllBuildings.toString());
         properties.setProperty("operationType", getSelectedOperationType().toString());
         return properties;
