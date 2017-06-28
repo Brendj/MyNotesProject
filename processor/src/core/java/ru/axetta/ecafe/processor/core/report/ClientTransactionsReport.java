@@ -97,6 +97,23 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                 parameterMap.put("officialName", org.getOfficialName());
                 parameterMap.put("address", org.getAddress());
                 parameterMap.put("operationType", operationTypeString);
+            } else {
+                String officialName = "";
+                String address = "";
+                int count = 0;
+                for (Long idOfOrg : idOfOrgList) {
+                    Org org = (Org) session.load(Org.class, idOfOrg);
+                    officialName = officialName + org.getOfficialName();
+                    address = address + org.getAddress();
+                    if (count < idOfOrgList.size()-1) {
+                        officialName = officialName + "; ";
+                        address = address + "; ";
+                    }
+                    count++;
+                }
+                parameterMap.put("officialName", officialName);
+                parameterMap.put("address", address);
+                parameterMap.put("operationType", operationTypeString);
             }
 
             String clientListString = StringUtils.trimToEmpty(reportProperties.getProperty("clientList"));
@@ -126,9 +143,22 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             Boolean showAllBuildings = Boolean
                     .valueOf(StringUtils.trimToEmpty(reportProperties.getProperty("showAllBuildings")));
 
-            if (showAllBuildings) {
+            Set<Org> idOfOrgSet = new HashSet<Org>();
 
+            if (showAllBuildings) {
+                for (Long idOfOrg : idOfOrgList) {
+                    Org org = (Org) session.load(Org.class, idOfOrg);
+                    idOfOrgSet.addAll(org.getFriendlyOrg());
+                }
             }
+
+            List<Long> showIdOfOrgList = new ArrayList<Long>();
+
+            for (Org org : idOfOrgSet) {
+                showIdOfOrgList.add(org.getIdOfOrg());
+            }
+
+            idOfOrgList = showIdOfOrgList;
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
@@ -137,11 +167,12 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             return new ClientTransactionsReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList, List<Client> clientList)
-                throws Exception {
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList,
+                List<Client> clientList) throws Exception {
             ClientTransactionsReportService service = new ClientTransactionsReportService();
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList));
+            return new JRBeanCollectionDataSource(
+                    service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList));
         }
     }
 

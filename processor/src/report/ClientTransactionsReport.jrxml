@@ -18,16 +18,16 @@
 	<field name="orderNumber" class="java.lang.Long"/>
 	<field name="personalAccount" class="java.lang.Long"/>
 	<title>
-		<band height="138" splitType="Stretch">
+		<band height="291" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="d8d62c70-8b5e-418e-bc33-1b1f4c847a21" x="0" y="0" width="80" height="20"/>
+				<reportElement uuid="d8d62c70-8b5e-418e-bc33-1b1f4c847a21" stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="105"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b4cae1c0-ed01-429e-9a2f-035f0b1ff03f" x="0" y="20" width="80" height="20"/>
+				<reportElement uuid="b4cae1c0-ed01-429e-9a2f-035f0b1ff03f" stretchType="RelativeToBandHeight" x="0" y="105" width="80" height="105"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -35,28 +35,28 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="235a367e-a072-48d0-b403-91c01950bca1" x="0" y="40" width="80" height="20"/>
+				<reportElement uuid="235a367e-a072-48d0-b403-91c01950bca1" stretchType="RelativeToBandHeight" x="0" y="210" width="80" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Группа ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="58d5386e-2879-432c-9c3f-2280114e03ce" x="0" y="60" width="80" height="20"/>
+				<reportElement uuid="58d5386e-2879-432c-9c3f-2280114e03ce" stretchType="RelativeToBandHeight" x="0" y="230" width="80" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Клиент]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2c733dc4-5495-4d61-ae76-821c1c7f2d25" x="0" y="80" width="80" height="20"/>
+				<reportElement uuid="2c733dc4-5495-4d61-ae76-821c1c7f2d25" stretchType="RelativeToBandHeight" x="0" y="250" width="80" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Лицевой счет]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" x="0" y="100" width="80" height="20"/>
+				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" stretchType="RelativeToBandHeight" x="0" y="270" width="80" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -64,32 +64,32 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="1c675774-5899-4d6b-9df8-0f90c9972e6a" x="80" y="0" width="450" height="20"/>
+				<reportElement uuid="1c675774-5899-4d6b-9df8-0f90c9972e6a" stretchType="RelativeToBandHeight" x="80" y="0" width="850" height="105"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{officialName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="beb09a01-9bd8-48ed-978a-bae7fab941c4" x="80" y="20" width="450" height="20"/>
+				<reportElement uuid="beb09a01-9bd8-48ed-978a-bae7fab941c4" stretchType="RelativeToBandHeight" x="80" y="105" width="850" height="105"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="0fde5788-5acb-4ba8-8528-c66d3f4e3c27" x="80" y="40" width="450" height="20"/>
+				<reportElement uuid="0fde5788-5acb-4ba8-8528-c66d3f4e3c27" stretchType="RelativeToBandHeight" x="80" y="210" width="850" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{group}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="86eb708f-93ef-490d-a2bc-15a424ab832c" x="80" y="60" width="450" height="20"/>
+				<reportElement uuid="86eb708f-93ef-490d-a2bc-15a424ab832c" stretchType="RelativeToBandHeight" x="80" y="230" width="850" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{clientName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a10f183a-447e-4c00-bbcb-f69ed9205452" x="80" y="80" width="450" height="20"/>
+				<reportElement uuid="a10f183a-447e-4c00-bbcb-f69ed9205452" stretchType="RelativeToBandHeight" x="80" y="250" width="850" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{contractNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" x="80" y="100" width="450" height="20"/>
+				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" stretchType="RelativeToBandHeight" x="80" y="270" width="850" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{operationType}]]></textFieldExpression>
 			</textField>
