@@ -649,4 +649,17 @@ public class CalendarUtils {
         return calendar;
     }
 
+    public static boolean isDateToday(Date date) {
+        Calendar today = Calendar.getInstance();
+        today.setTime(new Date());
+        Calendar dateCalendar = Calendar.getInstance();
+        dateCalendar.setTime(date);
+        if (today.get(Calendar.DATE) == dateCalendar.get(Calendar.DATE) &&
+                today.get(Calendar.MONTH) == dateCalendar.get(Calendar.MONTH) &&
+                today.get(Calendar.YEAR) == dateCalendar.get(Calendar.YEAR)) {
+            return true;
+        }
+        return false;
+    }
+
 }

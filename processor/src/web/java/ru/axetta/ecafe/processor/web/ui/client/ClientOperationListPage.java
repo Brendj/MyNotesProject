@@ -23,6 +23,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -184,6 +185,18 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         for (EnterEvent event : res) {
             clientPasses.add(new ClientPassItem(event));
         }
+
+        criteria = session.createCriteria(ExternalEvent.class);
+        criteria.add(Restrictions.ge("evtDateTime", startTime));
+        criteria.add(Restrictions.le("evtDateTime", endTime));
+        criteria.add(Restrictions.eq("client", client));
+        criteria.addOrder(Order.asc("evtDateTime"));
+        List<ExternalEvent> res2 = (List<ExternalEvent>) criteria.list();
+        for (ExternalEvent event : res2) {
+            clientPasses.add(new ClientPassItem(event));
+        }
+        Collections.sort(clientPasses);
+
         criteria = session.createCriteria(RegularPayment.class);
         criteria.add(Restrictions.eq("client", client)).add(Restrictions.ge("paymentDate", startTime))
                 .add(Restrictions.le("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));

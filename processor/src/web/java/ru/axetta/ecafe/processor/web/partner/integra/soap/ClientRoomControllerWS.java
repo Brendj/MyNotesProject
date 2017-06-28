@@ -51,6 +51,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -8082,18 +8083,52 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new MuseumEnterInfo(RC_OK, RC_OK_DESC, guid, 1L, "Карта принадлежит другой группе держателей «Москвенка»");
             }
         } catch (Exception e) {
+            logger.error("Error in getMuseumEnterInfo method:", e);
             return new MuseumEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
         } finally {
             HibernateUtils.close(session, logger);
         }
     }
 
-    private Long[] getVPOrgsList() {
-        List<Long> result = new ArrayList<Long>();
-        String[] strs = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.vp.pilot.orgs", "697, 748, 1830, 1831, 1832, 2499").split(",");
-        for (String str : strs) {
-            result.add(Long.parseLong(str.trim()));
+    @Override
+    public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
+            @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime) {
+        authenticateRequest(null);
+        if (StringUtils.isEmpty(guid)) {
+            return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
         }
-        return result.toArray(new Long[result.size()]);
+        if (accessTime == null) {
+            return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
+        }
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client cl = DAOUtils.findClientByGuid(session, guid);
+            if (cl == null) {
+                return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
+            //здесь сохранение события в таблицу и отправка уведомления
+            ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime);
+            session.save(event);
+            //отправка уведомления
+            if (CalendarUtils.isDateToday(accessTime)) {
+                ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
+                String notifyType = EventNotificationService.NOTIFICATION_ENTER_MUSEUM;
+                notificationService.sendNotification(event, notifyType);
+            }
+            transaction.commit();
+            transaction = null;
+            return new Result(RC_OK, RC_OK_DESC);
+        } catch (Exception e) {
+            logger.error("Error in enterMuseum method:", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
+
 }

@@ -18,20 +18,23 @@ public class ClientSms {
     public static final int TEXT_CONTENTS_MAX_LENGTH = 70;
 
     public static final String UNKNOWN_CONTENTS_TYPE_DESCRIPTION = "Неизвестен";
-    public static final String CONTENTS_TYPE_DESCRIPTION[] = {UNKNOWN_CONTENTS_TYPE_DESCRIPTION, // 0 - UNKNOWN
-                                                              "Баланс меньше нуля", // 1 - TYPE_NEGATIVE_BALANCE
-                                                              "Уведомление о проходе", // 2 - TYPE_ENTER_EVENT_NOTIFY
-                                                              "Зачисление средств", // 3 - TYPE_PAYMENT_REGISTERED
-                                                              "Код активации", // 4 - TYPE_LINKING_TOKEN
-                                                              "Уведомление о покупке", // 5 - TYPE_PAYMENT_NOTIFY
-                                                              "Уведомление о скором списании абон. платы за SMS-сервис", // 6 - TYPE_SMS_SUBSCRIPTION_FEE
-                                                              "Уведомление о списании абон. платы за SMS-сервис", // 7 - TYPE_SMS_SUB_FEE_WITHDRAW
-                                                              "Уведомление о состоянии субсчета абонентского питания", // 8 - TYPE_SUBSCRIPTION_FEEDING
-                                                              "Уведомление о нехватке средств на субсчете", // 9 - TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS
-                                                              "Оповещение по итогам дня", // 10 - TYPE_SUMMARY_DAILY_NOTIFICATION
-                                                              "Оповещение по итогам недели", // 11 - TYPE_SUMMARY_WEEKLY_NOTIFICATION
-                                                              "Информационная рассылка",    // 12 - TYPE_INFO_MAILING_NOTIFICATION
-                                                              "Уведомление о снижении баланса"};  //13 - TYPE_LOW_BALANCE_NOTIFICATION
+    public static final String CONTENTS_TYPE_DESCRIPTION[] = {
+            UNKNOWN_CONTENTS_TYPE_DESCRIPTION, // 0 - UNKNOWN
+            "Баланс меньше нуля", // 1 - TYPE_NEGATIVE_BALANCE
+            "Уведомление о проходе", // 2 - TYPE_ENTER_EVENT_NOTIFY
+            "Зачисление средств", // 3 - TYPE_PAYMENT_REGISTERED
+            "Код активации", // 4 - TYPE_LINKING_TOKEN
+            "Уведомление о покупке", // 5 - TYPE_PAYMENT_NOTIFY
+            "Уведомление о скором списании абон. платы за SMS-сервис", // 6 - TYPE_SMS_SUBSCRIPTION_FEE
+            "Уведомление о списании абон. платы за SMS-сервис", // 7 - TYPE_SMS_SUB_FEE_WITHDRAW
+            "Уведомление о состоянии субсчета абонентского питания", // 8 - TYPE_SUBSCRIPTION_FEEDING
+            "Уведомление о нехватке средств на субсчете", // 9 - TYPE_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS
+            "Оповещение по итогам дня", // 10 - TYPE_SUMMARY_DAILY_NOTIFICATION
+            "Оповещение по итогам недели", // 11 - TYPE_SUMMARY_WEEKLY_NOTIFICATION
+            "Информационная рассылка",    // 12 - TYPE_INFO_MAILING_NOTIFICATION
+            "Уведомление о снижении баланса",  //13 - TYPE_LOW_BALANCE_NOTIFICATION
+            "Посещение музея" //14 - TYPE_ENTER_MUSEUM_NOTIFICATION
+    };
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
     public static final int TYPE_PAYMENT_REGISTERED = 3;
@@ -45,6 +48,7 @@ public class ClientSms {
     public static final int TYPE_SUMMARY_WEEKLY_NOTIFICATION = 11;
     public static final int TYPE_INFO_MAILING_NOTIFICATION = 12;
     public static final int TYPE_LOW_BALANCE_NOTIFICATION = 13;
+    public static final int TYPE_ENTER_MUSEUM_NOTIFICATION = 14;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;

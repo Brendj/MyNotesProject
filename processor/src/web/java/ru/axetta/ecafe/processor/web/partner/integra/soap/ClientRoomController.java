@@ -502,4 +502,7 @@ public interface ClientRoomController {
             @WebParam(name = "childContractId") Long childContractId);
 
     @WebMethod MuseumEnterInfo getMuseumEnterInfo(@WebParam(name = "cardId") String cardId);
+
+    @WebMethod Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
+            @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime);
 }

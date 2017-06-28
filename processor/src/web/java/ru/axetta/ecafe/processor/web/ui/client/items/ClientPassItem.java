@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client.items;
 
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.ExternalEvent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import java.util.Date;
@@ -16,7 +17,7 @@ import java.util.Date;
  * Time: 12:30
  */
 
-public class ClientPassItem {
+public class ClientPassItem implements Comparable {
 
     private String orgName;
     private Date enterTime;
@@ -33,6 +34,18 @@ public class ClientPassItem {
         if (checkerId != null) {
             this.checker = DAOService.getInstance().getClientFullNameById(checkerId);
         }
+    }
+
+    public ClientPassItem(ExternalEvent event) {
+        this.orgName = event.getOrgName();
+        this.enterTime = event.getEvtDateTime();
+        this.enterName = event.getEnterName();
+        this.direction = getDirection(EnterEvent.ENTRY);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return enterTime.compareTo(((ClientPassItem)o).getEnterTime());
     }
 
     public String getOrgName() {

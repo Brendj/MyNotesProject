@@ -1227,7 +1227,7 @@ public class FrontController extends HttpServlet {
         Transaction persistenceTransaction = null;
         List<EnterEventManualItem> listResult = new ArrayList<EnterEventManualItem>();
         try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria criteria = persistenceSession.createCriteria(EnterEventManual.class);
             criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
