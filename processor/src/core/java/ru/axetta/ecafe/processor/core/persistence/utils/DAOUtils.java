@@ -962,6 +962,41 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
+    public static boolean existVisitorDogm(Session persistenceSession, String passportNumber,
+            String driverLicenceNumber, String warTicketNumber) throws Exception {
+        boolean passport = StringUtils.isNotEmpty(passportNumber) && existVisitorDogmPassport(persistenceSession, passportNumber);
+        boolean driverLicence = StringUtils.isNotEmpty(driverLicenceNumber) && existVisitorDogmDriverLicence(persistenceSession, driverLicenceNumber);
+        boolean warTicket = StringUtils.isNotEmpty(warTicketNumber) && existVisitorDogmWarTicket(persistenceSession, warTicketNumber);
+        return passport || driverLicence || warTicket;
+    }
+
+    public static boolean existVisitorDogmPassport(Session persistenceSession, String passportNumber) throws Exception {
+        Query query = persistenceSession.createQuery("select 1 from Visitor visitor "
+                + "where visitor.passportNumber = ? and visitor.visitorType = ?");
+        query.setParameter(0, passportNumber);
+        query.setParameter(1, Visitor.VISITORDOGM_TYPE);
+        query.setMaxResults(1);
+        return !query.list().isEmpty();
+    }
+
+    public static boolean existVisitorDogmDriverLicence(Session persistenceSession, String driverLicenceNumber) throws Exception {
+        Query query = persistenceSession.createQuery("select 1 from Visitor visitor "
+                + "where visitor.driverLicenceNumber = ? and visitor.visitorType = ?");
+        query.setParameter(0, driverLicenceNumber);
+        query.setParameter(1, Visitor.VISITORDOGM_TYPE);
+        query.setMaxResults(1);
+        return !query.list().isEmpty();
+    }
+
+    public static boolean existVisitorDogmWarTicket(Session persistenceSession, String warTicketNumber) throws Exception {
+        Query query = persistenceSession.createQuery("select 1 from Visitor visitor "
+                + "where visitor.warTicketNumber = ? and visitor.visitorType = ?");
+        query.setParameter(0, warTicketNumber);
+        query.setParameter(1, Visitor.VISITORDOGM_TYPE);
+        query.setMaxResults(1);
+        return !query.list().isEmpty();
+    }
+
     public static long updateClientRegistryVersion(Session persistenceSession) throws Exception {
         return updateClientRegistryVersionWithPessimisticLock();
     }

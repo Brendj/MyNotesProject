@@ -57,6 +57,7 @@ import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
+import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -226,6 +227,7 @@ public class MainPage implements Serializable {
     private final CardFileLoadPage cardFileLoadPage = new CardFileLoadPage();
     private final NewCardFileLoadPage newCardFileLoadPage = new NewCardFileLoadPage();
     private final CardExpireBatchEditPage cardExpireBatchEditPage = new CardExpireBatchEditPage();
+    private final VisitorDogmLoadPage visitorDogmLoadPage = new VisitorDogmLoadPage();
 
     // Service pages
     private final BasicWorkspacePage serviceNewGroupPage = new BasicWorkspacePage();
@@ -3254,6 +3256,10 @@ public class MainPage implements Serializable {
         return "showRegistryLoadResultCSVList";
     }
 
+    public String showNewVisitorLoadResultCSVList() {
+        return "showNewVisitorLoadResultCSVList";
+    }
+
     public Long getSelectedIdOfCard() {
         return selectedIdOfCard;
     }
@@ -4272,6 +4278,64 @@ public class MainPage implements Serializable {
             logger.error("Failed to load cards from file", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при загрузке/регистрации данных по картам: " + e.getMessage(), null));
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public VisitorDogmLoadPage getVisitorDogmLoadPage() {
+        return visitorDogmLoadPage;
+    }
+
+    public Object showVisitorDogmLoadPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            visitorDogmLoadPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = visitorDogmLoadPage;
+        } catch (Exception e) {
+            logger.error("Failed to show visitor file load page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы загрузки новых сотрудников: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public void newVisitorLoadFileListener(UploadEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        UploadItem item = event.getUploadItem();
+        InputStream inputStream = null;
+        long dataSize = 0;
+        try {
+            if (item.isTempFile()) {
+                File file = item.getFile();
+                dataSize = file.length();
+                inputStream = new FileInputStream(file);
+            } else {
+                byte[] data = item.getData();
+                dataSize = data.length;
+                inputStream = new ByteArrayInputStream(data);
+            }
+            visitorDogmLoadPage.loadVisitors(inputStream, dataSize);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сотрудники загружены и зарегистрированы успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to load visitors from file", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при загрузке/регистрации данных сотрудников: " + e.getMessage(), null));
         } finally {
             close(inputStream);
         }

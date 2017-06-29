@@ -395,6 +395,9 @@
     <rich:panelMenuItem id="createVisitorDogmListMenuItem" binding="#{visitorDogmCreatePage.mainMenuComponent}"
                         label="Создание" action="#{visitorDogmCreatePage.show}" reRender="workspaceForm" />
 
+    <rich:panelMenuItem id="loadVisitorFromFileMenuItem" binding="#{mainPage.visitorDogmLoadPage.mainMenuComponent}"
+                        label="Загрузить из файла" action="#{mainPage.showVisitorDogmLoadPage}" reRender="workspaceForm" />
+
     <%--@elvariable id="visitorsDogmCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorsDogmCardGroupPage"--%>
     <rich:panelMenuGroup id="visitorDogmCardGroupMenu" label="Карты"
                          binding="#{visitorsDogmCardGroupPage.mainMenuComponent}">

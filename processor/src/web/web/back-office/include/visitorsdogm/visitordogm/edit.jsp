@@ -29,19 +29,19 @@
          <h:outputLabel escape="true" value="Дата выдачи паспорт" styleClass="output-text" />
          <rich:calendar value="#{visitorDogmEditPage.visitorDogm.passportDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />
-         <h:outputLabel escape="true" value="Серийный номер паспорта" styleClass="output-text" />
+         <h:outputLabel escape="true" value="Серия и номер паспорта" styleClass="output-text" />
          <h:inputText value="#{visitorDogmEditPage.visitorDogm.passportNumber}" styleClass="input-text" />
 
          <h:outputLabel escape="true" value="Дата выдачи водительского удостоверения" styleClass="output-text" />
          <rich:calendar value="#{visitorDogmEditPage.visitorDogm.driverLicenceDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />
-         <h:outputLabel escape="true" value="Серийный номер водительского удостоверения" styleClass="output-text" />
+         <h:outputLabel escape="true" value="Серия и номер водительского удостоверения" styleClass="output-text" />
          <h:inputText value="#{visitorDogmEditPage.visitorDogm.driverLicenceNumber}" styleClass="input-text" />
 
          <h:outputLabel escape="true" value="Дата выдачи военного билета" styleClass="output-text" />
          <rich:calendar value="#{visitorDogmEditPage.visitorDogm.warTicketDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                         inputClass="input-text" showWeeksBar="false" />
-         <h:outputLabel escape="true" value="Серийный номер военного билета" styleClass="output-text" />
+         <h:outputLabel escape="true" value="Серия и номер военного билета" styleClass="output-text" />
          <h:inputText value="#{visitorDogmEditPage.visitorDogm.warTicketNumber}" styleClass="input-text" />
 
      </h:panelGrid>

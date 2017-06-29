@@ -43,6 +43,19 @@ public class Visitor {
         this.person = person;
     }
 
+    public Visitor(Person person, String passportNumber, Date passportDate, String driverLicenceNumber,
+            Date driverLicenceDate, String warTicketNumber, Date warTicketDate, Integer visitorType, String position) {
+        this.person = person;
+        this.passportNumber = passportNumber;
+        this.passportDate = passportDate;
+        this.driverLicenceNumber = driverLicenceNumber;
+        this.driverLicenceDate = driverLicenceDate;
+        this.warTicketNumber = warTicketNumber;
+        this.warTicketDate = warTicketDate;
+        this.visitorType = visitorType;
+        this.position = position;
+    }
+
     public Date getWarTicketDate() {
         return warTicketDate;
     }

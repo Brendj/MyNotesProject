@@ -383,6 +383,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showNewVisitorLoadResultCSVList</from-outcome>
+            <to-view-id>/back-office/new_visitor_load_result_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showCCAccountCSVList</from-outcome>
             <to-view-id>/back-office/ccaccount_csv_list.jsp</to-view-id>
             <redirect/>
