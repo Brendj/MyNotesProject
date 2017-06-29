@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -1253,6 +1254,54 @@ public class FrontController extends HttpServlet {
         }
         return listResult;
     }
+
+    @WebMethod(operationName = "getExternalEvents")
+    public ExternalEventItems getExternalEvents(@WebParam(name = "orgId") long idOfOrg,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) throws FrontControllerException {
+        ExternalEventItems result = new ExternalEventItems();
+        ManualEvents manualEvents = new ManualEvents();
+        manualEvents.setEnterEventsManual(getEnterEventsManual(idOfOrg));
+        ExternalEvents externalEvents = new ExternalEvents();
+        externalEvents.setExternalEvents(getExternalEventsInternal(idOfOrg, startDate, endDate));
+        result.setExternalEvents(externalEvents);
+        result.setManualEvents(manualEvents);
+        return result;
+    }
+
+    private List<ExternalEventItem> getExternalEventsInternal(Long idOfOrg, Date startDate, Date endDate) throws FrontControllerException {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        List<ExternalEventItem> listResult = new ArrayList<ExternalEventItem>();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Query query = persistenceSession.createQuery("select e from ExternalEvent e "
+                    + "where e.evtDateTime between :startDate and :endDate and e.client.org.idOfOrg = :idOfOrg");
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+            query.setParameter("idOfOrg", idOfOrg);
+            List<ExternalEvent> list = query.list();
+            for (ExternalEvent event : list) {
+                ExternalEventItem item = new ExternalEventItem();
+                item.setIdOfClient(event.getClient().getIdOfClient());
+                item.setEvtDateTime(event.getEvtDateTime());
+                item.setOrgName(event.getOrgName());
+                item.setType(event.getEvtType().ordinal());
+                listResult.add(item);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при получении событий от внешних систем", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return listResult;
+        }
 
     public List<ClientsInsideItem> getClientsInside(@WebParam(name = "idOfOrg") long idOfOrg,
             @WebParam(name = "mode") int mode, @WebParam(name = "group") String group, @WebParam(name = "requestDate") long requestDate) throws FrontControllerException {
