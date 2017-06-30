@@ -73,6 +73,7 @@ public class EventNotificationService {
     public static final String PARAM_AMOUNT_LUNCH = "amountLunch";
     public static final String PARAM_AMOUNT = "amount";
     public static final String PARAM_BALANCE_TO_NOTIFY = "balanceToNotify";
+    public static final String PARAM_COMPLEX_NAME = "complexName";
 
     @Resource
     SMSService smsService;
@@ -728,6 +729,8 @@ public class EventNotificationService {
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
                     String orderEventDate = findValueInParams(new String[]{PARAM_ORDER_EVENT_TIME}, values);
                     empType.getParameters().put(PARAM_ORDER_EVENT_TIME, orderEventDate);
+                    String complexName = findValueInParams(new String[]{PARAM_COMPLEX_NAME}, values);
+                    empType.getParameters().put(PARAM_COMPLEX_NAME, complexName);
                 }
 
 

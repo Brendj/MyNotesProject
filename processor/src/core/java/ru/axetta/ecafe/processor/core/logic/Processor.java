@@ -3262,6 +3262,7 @@ public class Processor implements SyncProcessor {
                     }
                     String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
                     values = EventNotificationService.attachToValues(EventNotificationService.PARAM_ORDER_EVENT_TIME, date, values);
+                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_COMPLEX_NAME, getComplexName(payment), values);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     values = EventNotificationService
                             .attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
@@ -3325,6 +3326,16 @@ public class Processor implements SyncProcessor {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private String getComplexName(Payment payment) {
+        if (payment.getPurchases() == null) return "";
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getType() != null && purchase.getType() > 0 && purchase.getType() < 100) {
+                return purchase.getName();
+            }
+        }
+        return "";
     }
 
     private Long getOrderNotificationType(String[] values) throws Exception {
