@@ -68,7 +68,11 @@ public class EventNotificationService {
     public static final String SOURCE_ORG_VALUES_KEY   = "sourceOrgId";
     public static final String DIRECTION_VALUES_KEY   = "direction";
 
-
+    public static final String PARAM_ORDER_EVENT_TIME = "orderEventTime";
+    public static final String PARAM_AMOUNT_PRICE = "amountPrice";
+    public static final String PARAM_AMOUNT_LUNCH = "amountLunch";
+    public static final String PARAM_AMOUNT = "amount";
+    public static final String PARAM_BALANCE_TO_NOTIFY = "balanceToNotify";
 
     @Resource
     SMSService smsService;
@@ -720,31 +724,31 @@ public class EventNotificationService {
 
 
                 //  дата только для платного комплекса + льготного комплекса
-                if(findBooleanValueInParams(new String[]{"isBarOrder"}, values) ||
+                if(findBooleanValueInParams(new String[]{"isFreeOrder"}, values) ||
                    findBooleanValueInParams(new String[]{"isPayOrder"}, values)) {
-                    String orderEventDate = findValueInParams(new String[]{"orderEventDate"}, values);
-                    empType.getParameters().put("orderEventTime", orderEventDate);
+                    String orderEventDate = findValueInParams(new String[]{PARAM_ORDER_EVENT_TIME}, values);
+                    empType.getParameters().put(PARAM_ORDER_EVENT_TIME, orderEventDate);
                 }
 
 
                 //  сумма только для буфет + платное
-                String amountPrice = findValueInParams(new String[]{"amountPrice"}, values);
-                String amountLunch = findValueInParams(new String[]{"amountLunch"}, values);
-                String amount = findValueInParams(new String[]{"amount"}, values);
+                String amountPrice = findValueInParams(new String[]{PARAM_AMOUNT_PRICE}, values);
+                String amountLunch = findValueInParams(new String[]{PARAM_AMOUNT_LUNCH}, values);
+                String amount = findValueInParams(new String[]{PARAM_AMOUNT}, values);
                 amountPrice = amountPrice != null && !StringUtils.isEmpty(amountPrice) ? amountPrice : "" + 0D;
                 amountLunch = amountLunch != null && !StringUtils.isEmpty(amountLunch) ? amountLunch : "" + 0D;
                 amount = amount != null && !StringUtils.isEmpty(amount) ? amount : "" + 0D;
-                empType.getParameters().put("amountPrice", amountPrice);
-                empType.getParameters().put("amountLunch", amountLunch);
-                empType.getParameters().put("amount", amount);
+                empType.getParameters().put(PARAM_AMOUNT_PRICE, amountPrice);
+                empType.getParameters().put(PARAM_AMOUNT_LUNCH, amountLunch);
+                empType.getParameters().put(PARAM_AMOUNT, amount);
             } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, dataClient, destClient);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, destClient);
                 }
-                String balanceToNotify = findValueInParams(new String[]{"balanceToNotify"}, values);
-                empType.getParameters().put("balanceToNotify", balanceToNotify);
+                String balanceToNotify = findValueInParams(new String[]{PARAM_BALANCE_TO_NOTIFY}, values);
+                empType.getParameters().put(PARAM_BALANCE_TO_NOTIFY, balanceToNotify);
             } else if (type.equals(NOTIFICATION_ENTER_MUSEUM)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, dataClient, destClient);

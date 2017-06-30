@@ -86,7 +86,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -233,7 +232,8 @@ public class Processor implements SyncProcessor {
     }
 
     private void saveLastProcessSectionDateSmart(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType) {
-        ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor)RuntimeContext.getAppContext().getBean("executorWithPoolSizeRange");
+        processorUtils.saveLastProcessSectionCustomDate(sessionFactory, idOfOrg, sectionType);
+        /*ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor)RuntimeContext.getAppContext().getBean("executorWithPoolSizeRange");
         //Если размер очереди в пуле приближается к размеру самого пула, то выполнить операцию синхронно, иначе все ок и асинхронно
         //ex.getCorePoolSize() = 5 текущее значение в настройке пула
         if (ex == null || ex.getActiveCount() > ex.getCorePoolSize() || ex.getThreadPoolExecutor().getQueue().remainingCapacity() < MIN_REMAINING_CAPACITY_POOL) {
@@ -241,7 +241,7 @@ public class Processor implements SyncProcessor {
             logger.error("queue size of asyncThreadPoolTaskExecutor is near to limit. Run synchronously");
         } else {
             processorUtils.saveLastProcessSectionDate(sessionFactory, idOfOrg, sectionType);
-        }
+        }*/
     }
 
     /* Do process full synchronization */
@@ -2710,7 +2710,7 @@ public class Processor implements SyncProcessor {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+                persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 clients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
                 persistenceTransaction.commit();
@@ -3250,13 +3250,9 @@ public class Processor implements SyncProcessor {
                             payment.getOrderType().equals(OrderTypeEnumType.DEFAULT) ||
                             payment.getOrderType().equals(OrderTypeEnumType.VENDING)) {
                         values = EventNotificationService.attachToValues("isBarOrder", "true", values);
-                        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
-                        values = EventNotificationService.attachToValues("orderEventTime", date, values);
                     } else if (payment.getOrderType().equals(OrderTypeEnumType.PAY_PLAN) || payment.getOrderType()
                             .equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
                         values = EventNotificationService.attachToValues("isPayOrder", "true", values);
-                        String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
-                        values = EventNotificationService.attachToValues("orderEventTime", date, values);
                     } else if (payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN) ||
                             payment.getOrderType().equals(OrderTypeEnumType.DAILY_SAMPLE) ||
                             payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE) ||
@@ -3264,16 +3260,18 @@ public class Processor implements SyncProcessor {
                             payment.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
                         values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
                     }
+                    String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
+                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_ORDER_EVENT_TIME, date, values);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
                     values = EventNotificationService
                             .attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
                     long totalBuffetRSum = totalPurchaseRSum - totalLunchRSum;
                     long totalRSum = totalBuffetRSum + totalLunchRSum;
-                    values = EventNotificationService.attachToValues("amountPrice",
+                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_PRICE,
                             Long.toString(totalBuffetRSum / 100) + ',' + Long.toString(totalBuffetRSum % 100), values);
-                    values = EventNotificationService.attachToValues("amountLunch",
+                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT_LUNCH,
                             Long.toString(totalLunchRSum / 100) + ',' + Long.toString(totalLunchRSum % 100), values);
-                    values = EventNotificationService.attachToValues("amount",
+                    values = EventNotificationService.attachToValues(EventNotificationService.PARAM_AMOUNT,
                             Long.toString(totalRSum / 100) + ',' + Long.toString(totalRSum % 100), values);
                     if (client.getBalance() != null) {
                         values = EventNotificationService.attachToValues("balance",
@@ -4009,11 +4007,16 @@ public class Processor implements SyncProcessor {
             return fromDateTime;
         }
         Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
             Date d = processorUtils.getLastProcessSectionDate(persistenceSession, idOfOrg, SectionType.ACC_INC_REGISTRY);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             return d == null ? fromDateTime : d;
         } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
     }
@@ -4807,7 +4810,7 @@ public class Processor implements SyncProcessor {
                             0, null);
                     resEnterEvents.addItem(item);
 
-                    if (isDateToday(e.getEvtDateTime()) &&
+                    if (CalendarUtils.isDateToday(e.getEvtDateTime()) &&
                             idOfClient != null &&
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                                     e.getPassDirection() == EnterEvent.RE_ENTRY
@@ -5233,19 +5236,6 @@ public class Processor implements SyncProcessor {
         return new String[]{
                 "date", date, "contractId", contractId, "others", CurrencyStringUtils.copecksToRubles(others),
                 "complexes", CurrencyStringUtils.copecksToRubles(complexes), "empTime", empTime};
-    }
-
-    private static boolean isDateToday(Date date) {
-        Calendar today = Calendar.getInstance();
-        today.setTime(new Date());
-        Calendar dateCalendar = Calendar.getInstance();
-        dateCalendar.setTime(date);
-        if (today.get(Calendar.DATE) == dateCalendar.get(Calendar.DATE) &&
-                today.get(Calendar.MONTH) == dateCalendar.get(Calendar.MONTH) &&
-                today.get(Calendar.YEAR) == dateCalendar.get(Calendar.YEAR)) {
-            return true;
-        }
-        return false;
     }
 
     public void runRegularPaymentsIfEnabled(SyncRequest request) {
