@@ -148,6 +148,8 @@ public class Postman implements AutoReportPostman {
         properties.put("mail.smtp.ssl.trust", "*");
         properties.put("mail.smtp.host", smtpSettings.getHost());
         properties.put("mail.smtp.port", Integer.toString(smtpSettings.getPort()));
+        properties.put("mail.smtp.timeout", "600000");
+        properties.put("mail.smtp.connectiontimeout", "600000");
         if (smtpSettings.isStartTLS()) {
             properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.socketFactory.port", smtpSettings.getPort());
