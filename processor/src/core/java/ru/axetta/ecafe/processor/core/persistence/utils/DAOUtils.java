@@ -1165,7 +1165,8 @@ public class DAOUtils {
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
-                "firstName", client.getPerson().getFirstName(), "empTime", empTime, "balanceToNotify", CurrencyStringUtils.copecksToRubles(client.getBalanceToNotify())};
+                "firstName", client.getPerson().getFirstName(), "empTime", empTime,
+                EventNotificationService.PARAM_BALANCE_TO_NOTIFY, CurrencyStringUtils.copecksToRubles(client.getBalanceToNotify())};
     }
 
     /**
