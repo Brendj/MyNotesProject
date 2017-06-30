@@ -49,32 +49,42 @@ public class OrgSyncLockService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean lockOrgForSync(long idOfOrg) {
-        Query query = entityManager.createNativeQuery("select sync from cf_org_lock where idoforg = :idoforg for update");
-        query.setParameter("idoforg", idOfOrg);
-        boolean addRecord = false;
+        long time = System.currentTimeMillis();
         try {
-            Integer res = (Integer)query.getSingleResult();
-            if (res.equals(1)) {
-                return false;
-            } else {
-                query = entityManager.createNativeQuery("update cf_org_lock set sync = 1, datetime = :datetime where idoforg = :idoforg");
+            Query query = entityManager.createNativeQuery("SELECT sync FROM cf_org_lock WHERE idoforg = :idoforg FOR UPDATE");
+            query.setParameter("idoforg", idOfOrg);
+            boolean addRecord = false;
+            try {
+                Integer res = (Integer) query.getSingleResult();
+                if (res.equals(1)) {
+                    return false;
+                } else {
+                    query = entityManager.createNativeQuery(
+                            "UPDATE cf_org_lock SET sync = 1, datetime = :datetime WHERE idoforg = :idoforg");
+                    query.setParameter("idoforg", idOfOrg);
+                    query.setParameter("datetime", new Date().getTime());
+                    query.executeUpdate();
+                    return true;
+                }
+            } catch (NoResultException e) {
+                addRecord = true;
+            } catch (Exception ex) {
+                logger.error("Error in lockOrgForSync:", ex);
+            }
+            if (addRecord) {
+                query = entityManager.createNativeQuery(
+                        "INSERT INTO cf_org_lock(idoforg, sync, datetime) VALUES(:idoforg, 1, :datetime)");
                 query.setParameter("idoforg", idOfOrg);
                 query.setParameter("datetime", new Date().getTime());
                 query.executeUpdate();
-                return true;
             }
-        } catch (NoResultException e) {
-            addRecord = true;
-        } catch (Exception ex) {
-            logger.error("Error in lockOrgForSync:", ex);
+            return true;
+        } finally {
+            time = System.currentTimeMillis() - time;
+            if (time > 500) {
+                logger.info(String.format("Time lock org for sync = %s ms. IdOfOrg = %s", time, idOfOrg));
+            }
         }
-        if (addRecord) {
-            query = entityManager.createNativeQuery("insert into cf_org_lock(idoforg, sync, datetime) values(:idoforg, 1, :datetime)");
-            query.setParameter("idoforg", idOfOrg);
-            query.setParameter("datetime", new Date().getTime());
-            query.executeUpdate();
-        }
-        return true;
     }
 
     /**
