@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.service.OrgSyncLockService;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -134,6 +135,12 @@ public class SyncServlet extends HttpServlet {
                 allSyncsCount = syncsInProgress.size();
                 fullSyncsCount = fullSyncsInProgress.size();
             }
+            if (success) {
+                success = OrgSyncLockService.getInstance().lockOrgForSync(idOfOrg);
+                if (!success) {
+                    removeSyncInProgress(idOfOrg);
+                }
+            }
             if (!success) {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. This IdOfOrg is currently in sync", idOfOrg);
                 logger.error(message);
@@ -144,7 +151,7 @@ public class SyncServlet extends HttpServlet {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s",
                         idOfOrg, allSyncsCount, fullSyncsCount);
                 logger.error(message);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
@@ -179,7 +186,7 @@ public class SyncServlet extends HttpServlet {
             } catch (Exception e) {
                 String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 return;
             }
 
@@ -188,14 +195,14 @@ public class SyncServlet extends HttpServlet {
                     String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
                     logger.error(message);
                     sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                    removeSyncInProgress(idOfOrg);
+                    unlockOrg(idOfOrg);
                     return;
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
                 String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 return;
             }
 
@@ -213,7 +220,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to parse XML request. IdOfOrg=%s", idOfOrg), e);
                 String msg = String.format("Failed to parse XML request: %s", e.getMessage());
                 sendError(response, syncTime, msg, HttpServletResponse.SC_BAD_REQUEST);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 return;
             }
 
@@ -227,7 +234,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to process request. IdOfOrg=%s", idOfOrg), e);
                 String message = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, message, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 return;
             }
 
@@ -241,7 +248,7 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to serialize response. IdOfOrg=%s", idOfOrg), e);
                 String format = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, format, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 return;
             }
 
@@ -255,16 +262,16 @@ public class SyncServlet extends HttpServlet {
                 writeResponse(response, requestData.isCompressed, responseDocument);
             } catch (Exception e) {
                 logger.error(String.format("Failed to write response. IdOfOrg=%s", idOfOrg), e);
-                removeSyncInProgress(idOfOrg);
+                unlockOrg(idOfOrg);
                 throw new ServletException(e);
             }
 
             final String message = String.format("End of synchronization with %s: id: %s, time taken: %s ms",
                     request.getRemoteAddr(), idOfOrg, System.currentTimeMillis() - begin_sync);
             logger.info(message);
-            removeSyncInProgress(idOfOrg);
+            unlockOrg(idOfOrg);
         } catch (RuntimeContext.NotInitializedException e) {
-            removeSyncInProgress(idOfOrg);
+            unlockOrg(idOfOrg);
             SyncCollector.setErrMessage(syncTime, e.getMessage());
             SyncCollector.registerSyncEnd(syncTime);
             throw new UnavailableException(e.getMessage());
@@ -278,6 +285,11 @@ public class SyncServlet extends HttpServlet {
             syncsInProgress.remove(idOfOrg);
             fullSyncsInProgress.remove(idOfOrg);
         }
+    }
+
+    private void unlockOrg(long idOfOrg) {
+        OrgSyncLockService.getInstance().unlockOrgForSync(idOfOrg);
+        removeSyncInProgress(idOfOrg);
     }
 
     private void sendError(HttpServletResponse response, Long syncTime, String msgString, int responseResultCode) throws IOException {

@@ -7,6 +7,15 @@
 --Индекс по ид. орг в таблице мигрантов (запрос в синхре AccInc)
 CREATE INDEX cf_migrants_org_idx ON cf_migrants USING btree (idoforgvisit);
 
+--Служебная таблица для предотвращения одновременных сеансов синх-ии от одной ОО на разных серверах
+create table cf_org_lock
+(
+  idoforg bigint not null,
+  sync integer not null default 0,
+  datetime bigint,
+  constraint cf_org_lock_pk primary key (idoforg)
+);
+
 --Новая таблица проходов по карте вне школы
 CREATE TABLE cf_externalevents
 (
@@ -19,8 +28,8 @@ CREATE TABLE cf_externalevents
   evtdatetime bigint NOT NULL,
   CONSTRAINT cf_externalevents_pk PRIMARY KEY (idofexternalevent),
   CONSTRAINT cf_externalevents_idofclient_fk FOREIGN KEY (idofclient)
-    REFERENCES cf_clients (idofclient)
-    MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+  REFERENCES cf_clients (idofclient)
+  MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE INDEX cf_externalevents_datetime_event_idx ON cf_externalevents USING btree (evtdatetime);

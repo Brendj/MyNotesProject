@@ -77,6 +77,7 @@
 
     <task:scheduled-tasks scheduler="myScheduler">
         <task:scheduled ref="maintenanceService" method="run" fixed-delay="600000"/>
+        <task:scheduled ref="orgSyncLockService" method="clean" fixed-delay="1800000"/>
         <task:scheduled ref="SMSService" method="logQueue" fixed-delay="60000"/>
         <!--<task:scheduled ref="maintenanceService" method="run" cron="0 * * * * *" />-->
         <task:scheduled ref="transactionJournalService" method="processTransactionJournalQueue" fixed-delay="10000"/>
