@@ -9,14 +9,11 @@ import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.SJBalanceTypeEnum;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ClientTransactionsReport;
-import ru.axetta.ecafe.processor.core.report.MigrantsReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
@@ -160,7 +157,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
         } finally {
@@ -183,8 +180,8 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
                 htmlReport = os.toString("UTF-8");
                 os.close();
             } catch (Exception e) {
-                printError("Ошибка при построении отчета: "+e.getMessage());
-                logger.error("Failed build report ",e);
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
             }
         }
         return null;
@@ -194,7 +191,9 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) return ;
+        if (StringUtils.isEmpty(templateFilename)) {
+            return;
+        }
         if (orgsEmpty() == null) {
             return;
         }
@@ -207,7 +206,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -218,7 +217,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
             HibernateUtils.close(persistenceSession, logger);
         }
 
-        if(report!=null){
+        if (report != null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
@@ -251,7 +250,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFileName = ClientTransactionsReport.class.getSimpleName() + suffix;
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
+        if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
             return null;
         }
@@ -259,7 +258,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
     }
 
     private String orgsEmpty() {
-        if(idOfOrgList.isEmpty()){
+        if (idOfOrgList.isEmpty()) {
             printError(String.format("Выберите организацию, или список организаций", ""));
             return null;
         }
@@ -276,10 +275,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         String clientListString = "";
         if (clientList != null) {
             for (ClientSelectListPage.Item client : clientList) {
-                clientListString = clientListString.concat(String.valueOf(client.getIdOfClient()));
-            }
-            if (clientList.size() > 1) {
-                clientListString = clientListString.concat(",");
+                clientListString = clientListString + (String.valueOf(client.getIdOfClient())) + ",";
             }
         }
         properties.setProperty("clientList", clientListString.trim());

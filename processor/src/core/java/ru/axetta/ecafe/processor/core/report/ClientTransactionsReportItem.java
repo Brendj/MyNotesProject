@@ -15,14 +15,14 @@ public class ClientTransactionsReportItem {
     private String summ;
     private String transactionDescription;
     private String transactionTime;
-    private Long orderNumber;
+    private String orderNumber;
     private Long personalAccount;
 
     public ClientTransactionsReportItem() {
     }
 
     public ClientTransactionsReportItem(Long idOfOrg, String contragent, String operationType, String summ,
-            String transactionDescription, String transactionTime, Long orderNumber, Long personalAccount) {
+            String transactionDescription, String transactionTime, String orderNumber, Long personalAccount) {
         this.idOfOrg = idOfOrg;
         this.contragent = contragent;
         this.operationType = operationType;
@@ -81,11 +81,11 @@ public class ClientTransactionsReportItem {
         this.transactionTime = transactionTime;
     }
 
-    public Long getOrderNumber() {
+    public String getOrderNumber() {
         return orderNumber;
     }
 
-    public void setOrderNumber(Long orderNumber) {
+    public void setOrderNumber(String orderNumber) {
         this.orderNumber = orderNumber;
     }
 

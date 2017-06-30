@@ -105,7 +105,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                     Org org = (Org) session.load(Org.class, idOfOrg);
                     officialName = officialName + org.getOfficialName();
                     address = address + org.getAddress();
-                    if (count < idOfOrgList.size()-1) {
+                    if (count < idOfOrgList.size() - 1) {
                         officialName = officialName + "; ";
                         address = address + "; ";
                     }
@@ -131,13 +131,41 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             }
 
             if (clientList.size() == 1) {
-                parameterMap.put("contractNumber", clientList.get(0).getContractId());
+                parameterMap.put("contractNumber", clientList.get(0).getContractId().toString());
                 if (clientList.get(0).getClientGroup() != null) {
                     parameterMap.put("group", clientList.get(0).getClientGroup().getGroupName());
                 } else {
                     parameterMap.put("group", "");
                 }
                 parameterMap.put("clientName", clientList.get(0).getPerson().getFullName());
+            } else {
+                String contractNumber = "";
+                String clientName = "";
+                String group = "";
+
+                int count = 0;
+                for (Client client : clientList) {
+                    contractNumber = contractNumber + client.getContractId();
+                    clientName = clientName + client.getPerson().getFullName();
+
+                    if (client.getClientGroup() != null) {
+                        group = group + client.getClientGroup().getGroupName();
+                    }
+
+                    if (count < clientList.size() - 1) {
+                        contractNumber = contractNumber + ", ";
+                        clientName = clientName + ", ";
+
+                        if (client.getClientGroup() != null) {
+                            group = group + ", ";
+                        }
+                    }
+                    count++;
+                }
+
+                parameterMap.put("contractNumber", contractNumber);
+                parameterMap.put("group", group);
+                parameterMap.put("clientName", clientName);
             }
 
             Boolean showAllBuildings = Boolean
@@ -150,15 +178,15 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                     Org org = (Org) session.load(Org.class, idOfOrg);
                     idOfOrgSet.addAll(org.getFriendlyOrg());
                 }
+
+                List<Long> showIdOfOrgList = new ArrayList<Long>();
+
+                for (Org org : idOfOrgSet) {
+                    showIdOfOrgList.add(org.getIdOfOrg());
+                }
+
+                idOfOrgList = showIdOfOrgList;
             }
-
-            List<Long> showIdOfOrgList = new ArrayList<Long>();
-
-            for (Org org : idOfOrgSet) {
-                showIdOfOrgList.add(org.getIdOfOrg());
-            }
-
-            idOfOrgList = showIdOfOrgList;
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
