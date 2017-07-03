@@ -8111,6 +8111,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
             //здесь сохранение события в таблицу и отправка уведомления
+            if (museumName.length() > 255) {
+                museumName = museumName.substring(0, 255);
+            }
             ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime);
             session.save(event);
             //отправка уведомления
