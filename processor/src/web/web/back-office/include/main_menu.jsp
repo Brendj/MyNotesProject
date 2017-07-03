@@ -816,7 +816,7 @@
                                 reRender="workspaceForm" />
 
             <%--@elvariable id="photoRegistryPage" type="ru.axetta.ecafe.processor.web.ui.service.PhotoRegistryPage"--%>
-            <rich:panelMenuItem id="photoRegistryItem" binding="#{photoRegistryPage.mainMenuComponent}"
+            <rich:panelMenuItem id="photoRegistryItemMSK" binding="#{photoRegistryPage.mainMenuComponent}"
                                 label="Сверка фотографий клиентов" action="#{photoRegistryPage.show}"
                                 reRender="workspaceForm" />
 
@@ -861,9 +861,9 @@
             <rich:panelMenuItem id="spbOrgRegistrySyncOverview" binding="#{spbRegistrySynchOverviewPage.mainMenuComponent}"
                                 label="Статистика сверки" action="#{spbRegistrySynchOverviewPage.show}"
                                 reRender="workspaceForm" />
-            <%--@elvariable id="photoRegistryPage" type="ru.axetta.ecafe.processor.web.ui.service.PhotoRegistryPage"--%>
-            <rich:panelMenuItem binding="#{photoRegistryPage.mainMenuComponent}"
-                                label="Сверка фотографий клиентов" action="#{photoRegistryPage.show}"
+            <%--@elvariable id="photoRegistryPageSpb" type="ru.axetta.ecafe.processor.web.ui.service.PhotoRegistryPageSpb"--%>
+            <rich:panelMenuItem id="photoRegistryPageSpb" binding="#{photoRegistryPageSpb.mainMenuComponent}"
+                                label="Сверка фотографий клиентов" action="#{photoRegistryPageSpb.show}"
                                 reRender="workspaceForm" />
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
