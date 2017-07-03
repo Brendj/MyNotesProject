@@ -16,8 +16,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -39,8 +37,7 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurre
  * Date: 27.06.17
  * Time: 10:37
  */
-@Component
-@Scope("session")
+
 public class VisitorDogmLoadPage extends BasicWorkspacePage {
 
     private static final Logger logger = LoggerFactory.getLogger(VisitorDogmLoadPage.class);
