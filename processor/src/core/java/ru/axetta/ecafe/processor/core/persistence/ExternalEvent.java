@@ -33,7 +33,11 @@ public class ExternalEvent {
 
     private void buildEnterName() {
         if (evtType.equals(ExternalEventType.MUSEUM)) {
-            setEnterName("Посещение музея " + orgName);
+            String name = "Посещение музея " + orgName;
+            if (name.length() > 255) {
+                name = name.substring(0, 255);
+            }
+            setEnterName(name);
         }
     }
 
