@@ -36,6 +36,24 @@
         </init-param>
     </filter>
 
+    <filter-mapping>
+        <filter-name>RichfacesFilter</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>RichFacesFirefox11Filter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.RichFacesFirefox11Filter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>RichFacesFirefox11Filter</filter-name>
+        <url-pattern>/a4j/*</url-pattern>
+    </filter-mapping>
+
     <filter>
         <filter-name>LimitFilter</filter-name>
         <filter-class>ru.axetta.ecafe.processor.web.LimitFilter</filter-class>
@@ -46,22 +64,12 @@
         <filter-class>ru.axetta.ecafe.processor.web.XLSReportsFilter</filter-class>
     </filter>
 
-    <filter>
-        <filter-name>RichFacesFirefox11Filter</filter-name>
-        <filter-class>ru.axetta.ecafe.processor.web.RichFacesFirefox11Filter</filter-class>
-    </filter>
-
     <filter-mapping>
         <filter-name>LimitFilter</filter-name>
         <servlet-name>SyncServlet</servlet-name>
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <filter-mapping>
-        <filter-name>RichFacesFirefox11Filter</filter-name>
-        <url-pattern>/a4j/*</url-pattern>
     </filter-mapping>
 
     <filter-mapping>
@@ -327,14 +335,6 @@
         <servlet-name>RegularPaymentServlet</servlet-name>
         <url-pattern>/regpay-acquiropay</url-pattern>
     </servlet-mapping>
-
-    <filter-mapping>
-        <filter-name>RichfacesFilter</filter-name>
-        <servlet-name>Faces Servlet</servlet-name>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
 
     <security-constraint>
         <web-resource-collection>
