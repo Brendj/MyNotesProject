@@ -12,6 +12,7 @@
       { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель создания организации --%>
+<h:panelGrid id="orgCreateGrid" binding="#{mainPage.orgCreatePage.pageComponent}" styleClass="borderless-grid" columns="1">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
