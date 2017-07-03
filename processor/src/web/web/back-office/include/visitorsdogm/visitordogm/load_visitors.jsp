@@ -50,25 +50,25 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер строки файла" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.lineNo}" styleClass="output-text" />
+            <h:outputText id="${item.lineNo}newVisitorLoadLineNo" escape="true" value="#{item.lineNo}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Код результата" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.resultCode}" styleClass="output-text" />
+            <h:outputText id="${item.lineNo}newVisitorLoadResultCode" escape="true" value="#{item.resultCode}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Сообщение" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.message}" styleClass="output-text" />
+            <h:outputText id="${item.lineNo}newVisitorLoadMessage" escape="true" value="#{item.message}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Идентификатор сотрудника в БД" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.idOfVisitor}" styleClass="output-text" />
+            <h:outputText id="${item.lineNo}newVisitorLoadIdOfVisitor" escape="true" value="#{item.idOfVisitor}" styleClass="output-text" />
         </rich:column>
 
         <f:facet name="footer">
