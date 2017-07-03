@@ -143,6 +143,7 @@ public class VisitorDogmLoadPage extends BasicWorkspacePage {
     private LineResult createVisitor(String line, int lineNo) throws Exception {
 
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        format.setLenient(false);
 
         String[] tokens = line.split(";");
         if(tokens.length < 6) {
