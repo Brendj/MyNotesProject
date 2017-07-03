@@ -12,6 +12,7 @@
       { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель редактирования организации --%>
+<h:panelGrid id="orgEditGrid" binding="#{mainPage.orgEditPage.pageComponent}" styleClass="borderless-grid" columns="1">
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgEditGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
@@ -291,4 +292,5 @@
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+</h:panelGrid>
 </h:panelGrid>
