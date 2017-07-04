@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
@@ -58,7 +55,15 @@ public class ClientTransactionsReportService {
             ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
             clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
-            clientTransactionsReportItem.setContragent("");
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment: clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            }
+
             clientTransactionsReportItem.setOperationType("Пополнение");
             clientTransactionsReportItem.setTransactionDescription("Пополнение");
             clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
@@ -75,7 +80,15 @@ public class ClientTransactionsReportService {
             ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
             clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
-            clientTransactionsReportItem.setContragent("");
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment: clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            }
+
             if (accountTransaction.getTransactionSum() > 0) {
                 clientTransactionsReportItem.setOperationType("Пополнение");
                 clientTransactionsReportItem.setTransactionDescription("Пополнение");
@@ -106,7 +119,9 @@ public class ClientTransactionsReportService {
                         ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
                         clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
-                        clientTransactionsReportItem.setContragent("");
+
+                        clientTransactionsReportItem.setContragent(order.getContragent().getContragentName());
+
                         clientTransactionsReportItem.setOperationType(orderDetail.getMenuDetailName());
                         clientTransactionsReportItem.setTransactionDescription("Списание");
                         clientTransactionsReportItem
@@ -137,7 +152,15 @@ public class ClientTransactionsReportService {
             ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
             clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
-            clientTransactionsReportItem.setContragent("");
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment: clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            }
+
             clientTransactionsReportItem.setOperationType("Отмена");
             clientTransactionsReportItem.setTransactionDescription("Пополнение");
             clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
