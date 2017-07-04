@@ -36,3 +36,7 @@ CREATE INDEX cf_externalevents_datetime_event_idx ON cf_externalevents USING btr
 CREATE INDEX cf_externalevents_idofclient_idx ON cf_externalevents USING btree (idofclient);
 
 ALTER TABLE cf_visitors ALTER COLUMN position TYPE character varying(256);
+
+truncate table cf_threaddumps;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 040717) НЕ МЕНЯТЬ
