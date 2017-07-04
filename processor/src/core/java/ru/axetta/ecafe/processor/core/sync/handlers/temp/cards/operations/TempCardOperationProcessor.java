@@ -95,7 +95,10 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
     }
 
     private ResTempCardOperation registrVisitorOperation(TempCardOperation tempCardOperation, CardTemp cardTemp) {
-        Long idOfOrg;
+        //из-за того, что клиент высылает локальный Ид посетителя, всегда выдаем ОК на операции с перепривязкой посетителя
+        //todo вернуть старый алгоритм после доработок на стороне клиента
+        return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),0,null);
+        /*Long idOfOrg;
         if (cardTemp.getOrg() == null) {
             idOfOrg = tempCardOperation.getIdOfOrg();
         } else {
@@ -126,7 +129,7 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
             }  else {
                 return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),7,"Операция уже зарегистрирована");
             }
-        }
+        }*/
     }
 
     private ResTempCardOperation registrClientOperation(TempCardOperation tempCardOperation, CardTemp cardTemp) {
