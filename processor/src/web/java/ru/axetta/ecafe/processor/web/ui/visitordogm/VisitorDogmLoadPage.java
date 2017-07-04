@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.visitordogm;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CardOperationStation;
+import ru.axetta.ecafe.processor.core.persistence.CardTemp;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -162,6 +164,9 @@ public class VisitorDogmLoadPage extends BasicWorkspacePage {
         String driverLicenceNumber = tokens.length > 7 ? tokens[7].replace(" ", "") : null;
         Date warTicketDate;
         String warTicketNumber = tokens.length > 9 ? tokens[9].replace(" ", ""): null;
+        String cardNoStr = tokens.length > 10 ? tokens[10].replace(" ", ""): null;
+        String cardPrintedNo = tokens.length > 11 ? tokens[11].replace(" ", ""): null;
+        Long cardNo = null;
 
         if(StringUtils.isEmpty(surname)) {
             return new LineResult(lineNo, 1, "Поле \"фамилия\" не найдено.", null);
@@ -193,6 +198,19 @@ public class VisitorDogmLoadPage extends BasicWorkspacePage {
             return new LineResult(lineNo, 6, "Неверная дата выдачи документа.", null);
         }
 
+        try {
+            if(StringUtils.isNotEmpty(cardNoStr)) {
+                cardNo = Long.parseLong(cardNoStr);
+            }
+        } catch (Exception e) {
+            return new LineResult(lineNo, 9, "Поле \"Номер карты\" имеет неверный формат.", null);
+        }
+
+        if((StringUtils.isEmpty(cardNoStr) && StringUtils.isNotEmpty(cardPrintedNo)) ||
+                (StringUtils.isEmpty(cardPrintedNo) && StringUtils.isNotEmpty(cardNoStr))) {
+            return new LineResult(lineNo, 10, "Данные карты заполнены частично.", null);
+        }
+
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -208,11 +226,27 @@ public class VisitorDogmLoadPage extends BasicWorkspacePage {
                 }
             }
 
+            CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            if(cardTemp !=null && !cardPrintedNo.equals(cardTemp.getCardPrintedNo())) {
+                return new LineResult(lineNo, 11, "Карта найдена по номеру, но номер, нанесенный на карту, не совпадает с данными в БД.", null);
+            }
+
             Person person = new Person(firstName, surname, secondName);
             persistenceSession.save(person);
             Visitor visitor = new Visitor(person, passportNumber, passportDate,
                     driverLicenceNumber, driverLicenceDate, warTicketNumber, warTicketDate, VISITORDOGM_TYPE, position);
             persistenceSession.save(visitor);
+
+            if(StringUtils.isNotEmpty(cardNoStr) && StringUtils.isNotEmpty(cardPrintedNo)) {
+                if(cardTemp == null) {
+                    cardTemp = new CardTemp(cardNo, cardPrintedNo, CardOperationStation.REGISTRATION, 3); // ClientTypeEnum.VISITORDOGM);
+                    cardTemp.setVisitor(visitor);
+                    persistenceSession.save(cardTemp);
+                } else {
+                    cardTemp.setVisitor(visitor);
+                    persistenceSession.update(cardTemp);
+                }
+            }
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -220,7 +254,7 @@ public class VisitorDogmLoadPage extends BasicWorkspacePage {
             return new LineResult(lineNo, 0, "Сотрудник внесен в базу.", visitor.getIdOfVisitor());
         } catch (Exception e) {
             logger.debug("Failed to create visitor from file: ", e);
-            return new LineResult(lineNo, 10, e.getMessage(), null);
+            return new LineResult(lineNo, 100, e.getMessage(), null);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
