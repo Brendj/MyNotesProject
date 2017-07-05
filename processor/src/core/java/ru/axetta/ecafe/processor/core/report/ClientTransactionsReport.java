@@ -86,7 +86,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             if (operationType == 0) {
                 operationTypeString = "Все";
             } else if (operationType == 1) {
-                operationTypeString = "Поподнение";
+                operationTypeString = "Пополнение";
             } else if (operationType == 2) {
                 operationTypeString = "Списание";
             }
@@ -188,7 +188,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                 idOfOrgList = showIdOfOrgList;
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList, operationTypeString);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -196,11 +196,11 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList,
-                List<Client> clientList) throws Exception {
+                List<Client> clientList, String operationTypeString) throws Exception {
             ClientTransactionsReportService service = new ClientTransactionsReportService();
 
             return new JRBeanCollectionDataSource(
-                    service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList));
+                    service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList, operationTypeString));
         }
     }
 

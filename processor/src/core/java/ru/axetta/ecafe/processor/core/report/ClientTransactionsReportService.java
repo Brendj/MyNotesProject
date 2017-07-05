@@ -23,7 +23,7 @@ import java.util.Set;
 public class ClientTransactionsReportService {
 
     public List<ClientTransactionsReportItem> buildReportItems(Session session, Date startTime, Date endTime,
-            List<Long> idOfOrgList, List<Client> clientList) {
+            List<Long> idOfOrgList, List<Client> clientList, String operationTypeString) {
 
         List<ClientTransactionsReportItem> clientTransactionsReportItemList = new ArrayList<ClientTransactionsReportItem>();
 
@@ -32,7 +32,8 @@ public class ClientTransactionsReportService {
                     idOfOrgList);
 
             for (AccountTransaction accountTransaction : accountTransactionList) {
-                clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction));
+                clientTransactionsReportItemList
+                        .addAll(getItemsByAccountTransactions(accountTransaction));
             }
         } else {
             for (Client client : clientList) {
@@ -40,9 +41,24 @@ public class ClientTransactionsReportService {
                         client, idOfOrgList);
 
                 for (AccountTransaction accountTransaction : accountTransactionList) {
-                    clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction));
+                    clientTransactionsReportItemList
+                            .addAll(getItemsByAccountTransactions(accountTransaction));
                 }
             }
+        }
+
+        List<ClientTransactionsReportItem> clientTransactionsReportItems = new ArrayList<ClientTransactionsReportItem>();
+
+        if (!operationTypeString.equals("Все")) {
+            for (ClientTransactionsReportItem clientTransactionsReportItem : clientTransactionsReportItemList) {
+                if (clientTransactionsReportItem.getOperationType().equals(operationTypeString)) {
+                    clientTransactionsReportItems.add(clientTransactionsReportItem);
+                } else if (clientTransactionsReportItem.getOperationType().equals(operationTypeString)) {
+                    clientTransactionsReportItems.add(clientTransactionsReportItem);
+                }
+            }
+
+            clientTransactionsReportItemList = clientTransactionsReportItems;
         }
 
         return clientTransactionsReportItemList;
@@ -59,7 +75,7 @@ public class ClientTransactionsReportService {
             Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
 
             if (clientPayments.size() > 0) {
-                for (ClientPayment clientPayment: clientPayments) {
+                for (ClientPayment clientPayment : clientPayments) {
                     clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
                 }
             }
@@ -84,7 +100,7 @@ public class ClientTransactionsReportService {
             Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
 
             if (clientPayments.size() > 0) {
-                for (ClientPayment clientPayment: clientPayments) {
+                for (ClientPayment clientPayment : clientPayments) {
                     clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
                 }
             }
@@ -141,11 +157,57 @@ public class ClientTransactionsReportService {
         }
 
         if (accountTransaction.getSourceType() == 10) {
+            ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
+
+            clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment : clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            } else {
+                clientTransactionsReportItem.setContragent("");
+            }
+
+            clientTransactionsReportItem.setOperationType("Списание");
+            clientTransactionsReportItem.setTransactionDescription("Списание");
+            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
+                    Math.abs(accountTransaction.getTransactionSum() % 100)));
+            clientTransactionsReportItem
+                    .setTransactionTime(CalendarUtils.dateTimeToString(accountTransaction.getTransactionTime()));
+            clientTransactionsReportItem.setPersonalAccount(accountTransaction.getClient().getContractId());
+
+            clientTransactionsReportItemList.add(clientTransactionsReportItem);
 
         }
 
         if (accountTransaction.getSourceType() == 20) {
+            ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
+            clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment : clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            } else {
+                clientTransactionsReportItem.setContragent("");
+            }
+            clientTransactionsReportItem.setOperationType("Списание");
+            clientTransactionsReportItem.setTransactionDescription("Списание");
+            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
+                    Math.abs(accountTransaction.getTransactionSum() % 100)));
+            clientTransactionsReportItem
+                    .setTransactionTime(CalendarUtils.dateTimeToString(accountTransaction.getTransactionTime()));
+            clientTransactionsReportItem.setPersonalAccount(accountTransaction.getClient().getContractId());
+
+            clientTransactionsReportItemList.add(clientTransactionsReportItem);
         }
 
         if (accountTransaction.getSourceType() == 30) {
@@ -156,7 +218,7 @@ public class ClientTransactionsReportService {
             Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
 
             if (clientPayments.size() > 0) {
-                for (ClientPayment clientPayment: clientPayments) {
+                for (ClientPayment clientPayment : clientPayments) {
                     clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
                 }
             } else {
@@ -176,11 +238,61 @@ public class ClientTransactionsReportService {
         }
 
         if (accountTransaction.getSourceType() == 40) {
+            ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
+            clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment : clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            } else {
+                clientTransactionsReportItem.setContragent("");
+            }
+            if (accountTransaction.getTransactionSum() > 0) {
+                clientTransactionsReportItem.setOperationType("Пополнение");
+                clientTransactionsReportItem.setTransactionDescription("Пополнение");
+                clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            } else {
+                clientTransactionsReportItem.setOperationType("Списание");
+                clientTransactionsReportItem.setTransactionDescription("Списание");
+                clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            }
+            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
+                    Math.abs(accountTransaction.getTransactionSum() % 100)));
+            clientTransactionsReportItem
+                    .setTransactionTime(CalendarUtils.dateTimeToString(accountTransaction.getTransactionTime()));
+            clientTransactionsReportItem.setPersonalAccount(accountTransaction.getClient().getContractId());
+
+            clientTransactionsReportItemList.add(clientTransactionsReportItem);
         }
 
         if (accountTransaction.getSourceType() == 50) {
+            ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
+            clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment : clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            } else {
+                clientTransactionsReportItem.setContragent("");
+            }
+            clientTransactionsReportItem.setOperationType("Списание");
+            clientTransactionsReportItem.setTransactionDescription("Списание");
+            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
+                    Math.abs(accountTransaction.getTransactionSum() % 100)));
+            clientTransactionsReportItem
+                    .setTransactionTime(CalendarUtils.dateTimeToString(accountTransaction.getTransactionTime()));
+            clientTransactionsReportItem.setPersonalAccount(accountTransaction.getClient().getContractId());
+
+            clientTransactionsReportItemList.add(clientTransactionsReportItem);
         }
 
         return clientTransactionsReportItemList;
@@ -197,7 +309,6 @@ public class ClientTransactionsReportService {
         criteria.add(Restrictions.ge("transactionTime", startTime));
         criteria.add(Restrictions.le("transactionTime", endTime));
         orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
-        // orgCriteria.addOrder(Order.asc("idOfOrg"));
 
         List<AccountTransaction> accountTransactionList = criteria.list();
 

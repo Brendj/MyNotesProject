@@ -49,7 +49,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
     private final String reportNameForMenu = ClientTransactionsReport.REPORT_NAME_FOR_MENU;
 
     private String htmlReport = null;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
 
     private Boolean showAllBuildings = false;
 
