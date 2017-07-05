@@ -159,6 +159,8 @@ public class ClientTransactionsReportService {
                 for (ClientPayment clientPayment: clientPayments) {
                     clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
                 }
+            } else {
+                clientTransactionsReportItem.setContragent("");
             }
 
             clientTransactionsReportItem.setOperationType("Отмена");
