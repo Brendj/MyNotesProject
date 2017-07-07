@@ -16,7 +16,7 @@
                             headerClass="filter-panel-header">
         <h:panelGrid id="lateParametrsGrid" styleClass="borderless-grid" columns="2">
 
-            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <%--<h:outputText styleClass="output-text" escape="true" value="Организация" />
             <h:panelGroup>
                 <a4j:commandButton value="..." action="#{mainPage.latePaymentReportPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
@@ -28,16 +28,15 @@
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.latePaymentReportPage.filter}}" />
-            </h:panelGroup>
-
-            <%--<h:outputText styleClass="output-text" escape="true" value="С разбивкой по корпусам" />
-            <h:panelGroup>
-                <h:selectOneMenu value="#{mainPage.latePaymentReportPage.organizationTypeModify}"
-                                 styleClass="input-text" style="width: 250px;">
-                    <f:converter converterId="organizationTypeModifyConverter" />
-                    <f:selectItems value="#{mainPage.latePaymentReportPage.organizationTypeModifyMenu.customItems}" />
-                </h:selectOneMenu>
             </h:panelGroup>--%>
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{mainPage.latePaymentReportPage.filter}" readonly="true"
+                             styleClass="input-text long-field" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+            </h:panelGroup>
 
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.latePaymentReportPage.startDate}" datePattern="dd.MM.yyyy"

@@ -21,18 +21,20 @@ public class LatePaymentReportModelByDays {
     private Long daycount;
     private Long feedcount;
     private Date date;
+    private Long idOfOrg;
 
     public LatePaymentReportModelByDays() {
     }
 
     public LatePaymentReportModelByDays(String orgname, String address, Long benefitcount, Long daycount,
-            Long feedcount, Date date) {
+            Long feedcount, Date date, Long idOfOrg) {
         this.orgname = orgname;
         this.address = address;
         this.benefitcount = benefitcount;
         this.daycount = daycount;
         this.feedcount = feedcount;
         this.date = date;
+        this.idOfOrg = idOfOrg;
     }
 
     public String getOrgname() {
@@ -81,5 +83,13 @@ public class LatePaymentReportModelByDays {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }

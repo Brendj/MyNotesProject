@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment;
 
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -46,12 +47,12 @@ public class LatePaymentReportService {
                         + "INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient "
                         + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
                         + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> cast(to_timestamp(o.orderdate / 1000)AS DATE) "
-                        + "AND o.ordertype = 4 AND o.state = 0 AND o.createddate BETWEEN :startDate "
+                        + "AND o.ordertype in (:order_types) AND o.state = 0 AND o.createddate BETWEEN :startDate "
                         + "AND :endDate AND cc.idOfCategoryDiscount "
                         + "IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124) "
-                        + "AND cl.idofclientgroup < 1100000000 AND o.idoforg IN (:idOfOrgList)"
+                        + "AND o.idoforg IN (:idOfOrgList)"
                         + "GROUP BY o.idoforg,  cast (to_timestamp(o.createddate/1000) AS DATE) ORDER BY o.idoforg), "
-                        + "b AS (SELECT substring(cfo.shortname FROM 'Y*([0-9-]+)') orgname, cfo.address, "
+                        + "b AS (SELECT cfo.shortname as orgname, cfo.address, "
                         + "count(DISTINCT  cl.idOfClient) benefitcount, cfo.idoforg FROM cf_orgs cfo "
                         + "INNER JOIN cf_clients cl ON cl.idoforg = cfo.idoforg "
                         + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
@@ -60,10 +61,11 @@ public class LatePaymentReportService {
                         + "AND cl.idofclientgroup < 1100000000 GROUP BY cfo.idoforg, cfo.shortname, cfo.address "
                         + "ORDER BY cfo.idoforg, cfo.shortname, cfo.address) SELECT b.orgname, b.address, "
                         + "b.benefitcount, a.daycount, "
-                        + "a.feedcount, to_timestamp FROM a INNER JOIN b ON a.idoforg = b.idoforg");
+                        + "a.feedcount, to_timestamp, b.idoforg FROM a INNER JOIN b ON a.idoforg = b.idoforg");
         query.setParameterList("idOfOrgList", idOfOrgList);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
+        query.setParameterList("order_types", Arrays.asList(new Integer[] {OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal(), OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal()}));
 
         List resultList = query.list();
 
@@ -73,6 +75,7 @@ public class LatePaymentReportService {
         Long dayCount;
         Long feedCount;
         Date date;
+        Long idOfOrg;
 
         //Уникальные номера Организаций
         SortedSet<String> latePaymentReportModelSet = new TreeSet<String>();
@@ -87,9 +90,10 @@ public class LatePaymentReportService {
             dayCount = ((BigInteger) result[3]).longValue();
             feedCount = ((BigInteger) result[4]).longValue();
             date = (Date) result[5];
+            idOfOrg = ((BigInteger) result[6]).longValue();
 
             latePaymentReportModelByDays = new LatePaymentReportModelByDays(orgName, address, benefitCount, dayCount,
-                    feedCount, date);
+                    feedCount, date, idOfOrg);
 
             if (LatePaymentByOneDayCountType.MORE_FIVE.toString().equals(latePaymentByOneDayCountType)) {
                 if (latePaymentReportModelByDays.getFeedcount() > 5) {
@@ -120,7 +124,8 @@ public class LatePaymentReportService {
 
                     latePaymentReportModel = new LatePaymentReportModel(rowNum,
                             latePaymentReportModelByDay.getOrgname(), latePaymentReportModelByDay.getAddress(),
-                            latePaymentReportModelByDay.getBenefitcount(), sumDayCount, sumFeedCount);
+                            latePaymentReportModelByDay.getBenefitcount(), sumDayCount, sumFeedCount,
+                            latePaymentReportModelByDay.getIdOfOrg());
                 }
             }
 

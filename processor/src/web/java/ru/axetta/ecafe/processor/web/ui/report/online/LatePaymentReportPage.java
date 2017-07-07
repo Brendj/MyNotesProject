@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationTypeModify;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.financialControlReports.LatePaymentReport;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -170,16 +172,20 @@ public class LatePaymentReportPage extends OnlineReportPage {
     }
 
     private LatePaymentReport buildReport() {
-        if (idOfOrgList.isEmpty()) {
+
+        if (idOfOrg == null) {
             printError("Не указана организация");
             return null;
         }
+
+        if (CalendarUtils.getDifferenceInDays(startDate, endDate) > 31) {
+            printError("Интервал выборки для отчета не может превышать 31 день");
+        }
+
         BasicReportJob report = null;
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + "LatePaymentReport.jasper";
         LatePaymentReportBuilder builder = new LatePaymentReportBuilder(templateFilename);
-        String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
-        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         builder.getReportProperties().setProperty(LatePaymentReport.LATE_PAYMENT_DAYS_COUNT_TYPE, latePaymentDaysCountType.toString());
         builder.getReportProperties().setProperty(LatePaymentReport.LATE_PAYMENT_BY_ONE_DAY_COUNT_TYPE, latePaymentByOneDayCountType.toString());
         Session session = null;
@@ -187,6 +193,10 @@ public class LatePaymentReportPage extends OnlineReportPage {
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
+            List<Long> org_ids = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+            if (org_ids.size() == 0) org_ids.add(idOfOrg);
+            String idOfOrgString = StringUtils.join(org_ids.iterator(), ",");
+            builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
             report = builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;

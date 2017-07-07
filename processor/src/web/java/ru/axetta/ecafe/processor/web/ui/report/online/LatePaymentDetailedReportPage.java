@@ -169,7 +169,7 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             report = builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
