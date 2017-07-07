@@ -20,12 +20,13 @@ public class LatePaymentReportModel {
     private Long daycount;
     private Long feedcount;
     private Long idOfOrg;
+    private Long reservcount;
 
     public LatePaymentReportModel() {
     }
 
     public LatePaymentReportModel(Long num, String orgname, String address, Long benefitcount, Long daycount,
-            Long feedcount, Long idOfOrg) {
+            Long feedcount, Long idOfOrg, Long reservcount) {
         this.num = num;
         this.orgname = orgname;
         this.address = address;
@@ -33,6 +34,7 @@ public class LatePaymentReportModel {
         this.daycount = daycount;
         this.feedcount = feedcount;
         this.idOfOrg = idOfOrg;
+        this.reservcount = reservcount;
     }
 
     public Long getNum() {
@@ -89,5 +91,13 @@ public class LatePaymentReportModel {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public Long getReservcount() {
+        return reservcount;
+    }
+
+    public void setReservcount(Long reservcount) {
+        this.reservcount = reservcount;
     }
 }

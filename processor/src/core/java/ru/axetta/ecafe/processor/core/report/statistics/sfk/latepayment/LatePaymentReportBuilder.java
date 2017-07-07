@@ -60,6 +60,7 @@ public class LatePaymentReportBuilder extends BasicReportForAllOrgJob.Builder {
         Map<String, Object> parameterMap = new HashMap<String, Object>();
         parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
+        parameterMap.put("currentDate", CalendarUtils.dateToString(new Date()));
         JRDataSource dataSource = buildDataSource(session, idOFOrgList, startTime, endTime, latePaymentDaysCountType, latePaymentByOneDayCountType);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
