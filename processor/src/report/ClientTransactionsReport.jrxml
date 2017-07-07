@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ClientTransactionsReport" pageWidth="1250" pageHeight="20000" columnWidth="1210" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c65462d-004a-478a-a75e-6942bb1d4197">
-	<property name="ireport.zoom" value="0.8264462809917362"/>
+	<property name="ireport.zoom" value="1.0000000000000016"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="operationType" class="java.lang.String"/>
@@ -15,16 +15,17 @@
 	<field name="transactionTime" class="java.lang.String"/>
 	<field name="orderNumber" class="java.lang.String"/>
 	<field name="personalAccount" class="java.lang.Long"/>
-	<field name="orgNameAndAddress" class="java.util.List"/>
+	<field name="orgNames" class="java.util.List"/>
+	<field name="addresses" class="java.util.List"/>
 	<title>
-		<band height="435">
+		<band height="616">
 			<subreport>
-				<reportElement uuid="dfc5b99e-4a46-4430-af18-c534c5a45f86" x="0" y="0" width="1210" height="395"/>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{orgNameAndAddress})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ClientTransactionsConditionSubreport.jasper"]]></subreportExpression>
+				<reportElement uuid="dfc5b99e-4a46-4430-af18-c534c5a45f86" positionType="Float" x="0" y="0" width="605" height="576"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{orgNames})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ClientTransactionsConditionOrgSubreport.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" stretchType="RelativeToBandHeight" x="0" y="395" width="1210" height="20"/>
+				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" stretchType="RelativeToBandHeight" x="0" y="576" width="1210" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
@@ -32,10 +33,15 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" stretchType="RelativeToBandHeight" x="0" y="415" width="1210" height="20"/>
+				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" stretchType="RelativeToBandHeight" x="0" y="596" width="1210" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{operationType}]]></textFieldExpression>
 			</textField>
+			<subreport>
+				<reportElement uuid="db1427da-9fc0-4d05-b6af-28b62734f6b9" positionType="Float" x="605" y="0" width="605" height="576"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{addresses})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ClientTransactionsConditionAddressSubreport.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</title>
 	<columnHeader>

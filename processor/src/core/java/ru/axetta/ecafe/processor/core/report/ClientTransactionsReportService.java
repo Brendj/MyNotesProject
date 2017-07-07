@@ -44,28 +44,28 @@ public class ClientTransactionsReportService {
 
         List<ClientTransactionsReportItem> clientTransactionsReportItems = new ArrayList<ClientTransactionsReportItem>();
 
-        List<OrgNameAndAddress> orgNameAndAddresses = new ArrayList<OrgNameAndAddress>();
+        List<OrgNameAndAddress> orgNames = new ArrayList<OrgNameAndAddress>();
+        List<OrgNameAndAddress> addresses = new ArrayList<OrgNameAndAddress>();
 
         if (idOfOrgList.size() == 1) {
             Org org = (Org) session.load(Org.class, idOfOrgList.get(0));
             OrgNameAndAddress orgNameAndAddress = new OrgNameAndAddress("Организация", org.getShortNameInfoService());
             OrgNameAndAddress orgNameAndAddress1 = new OrgNameAndAddress("Адрес", org.getAddress());
-            orgNameAndAddresses.add(orgNameAndAddress);
-            orgNameAndAddresses.add(orgNameAndAddress1);
+            orgNames.add(orgNameAndAddress);
+            addresses.add(orgNameAndAddress1);
         } else {
             for (Long idOfOrg : idOfOrgList) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 OrgNameAndAddress orgNameAndAddress = new OrgNameAndAddress("Организация", org.getShortNameInfoService());
                 OrgNameAndAddress orgNameAndAddress1 = new OrgNameAndAddress("Адрес", org.getAddress());
-                orgNameAndAddresses.add(orgNameAndAddress);
-                orgNameAndAddresses.add(orgNameAndAddress1);
+                orgNames.add(orgNameAndAddress);
+                addresses.add(orgNameAndAddress1);
             }
         }
 
-        Collections.sort(orgNameAndAddresses);
-
         for (ClientTransactionsReportItem clientTransactionsReportItem : clientTransactionsReportItemList) {
-            clientTransactionsReportItem.setOrgNameAndAddress(orgNameAndAddresses);
+            clientTransactionsReportItem.setOrgNames(orgNames);
+            clientTransactionsReportItem.setAddresses(addresses);
         }
 
         if (!operationTypeString.equals("Все")) {

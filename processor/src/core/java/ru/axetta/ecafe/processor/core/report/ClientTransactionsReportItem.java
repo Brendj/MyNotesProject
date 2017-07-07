@@ -20,7 +20,8 @@ public class ClientTransactionsReportItem {
     private String orderNumber;
     private Long personalAccount;
 
-    private List<OrgNameAndAddress> orgNameAndAddress;
+    private List<OrgNameAndAddress> orgNames;
+    private List<OrgNameAndAddress> addresses;
 
     public ClientTransactionsReportItem() {
     }
@@ -101,11 +102,19 @@ public class ClientTransactionsReportItem {
         this.personalAccount = personalAccount;
     }
 
-    public List<OrgNameAndAddress> getOrgNameAndAddress() {
-        return orgNameAndAddress;
+    public List<OrgNameAndAddress> getOrgNames() {
+        return orgNames;
     }
 
-    public void setOrgNameAndAddress(List<OrgNameAndAddress> orgNameAndAddress) {
-        this.orgNameAndAddress = orgNameAndAddress;
+    public void setOrgNames(List<OrgNameAndAddress> orgNames) {
+        this.orgNames = orgNames;
+    }
+
+    public List<OrgNameAndAddress> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<OrgNameAndAddress> addresses) {
+        this.addresses = addresses;
     }
 }

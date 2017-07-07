@@ -40,7 +40,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
         */
     public static final String REPORT_NAME = "Транзакции клиента";
     public static final String[] TEMPLATE_FILE_NAMES = {
-            "ClientTransactionsReport.jasper", "ClientTransactionsConditionSubreport.jasper"};
+            "ClientTransactionsReport.jasper", "ClientTransactionsOrgSubreport.jasper", "ClientTransactionsAddressSubreport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
