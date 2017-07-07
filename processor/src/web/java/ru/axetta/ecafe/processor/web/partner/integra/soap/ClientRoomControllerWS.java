@@ -94,6 +94,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
@@ -8058,7 +8059,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session session = null;
         try {
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
-            long lCardId = Long.parseLong(cardId);
+            Long lCardId = Long.parseLong(cardId);
+            if (lCardId > 0xFFFFFFFFL) {
+                //Обработка 7-ми байтного номера карты, преобразование к 4-х байтному в принятом у нас представлении
+                String hex = Long.toHexString(lCardId);
+                while (hex.length() < 14) {
+                    hex = "0".concat(hex);
+                }
+                StringBuilder sb = new StringBuilder(hex).reverse();
+                hex = "0x" + sb.charAt(7) + sb.charAt(6) + sb.charAt(9) + sb.charAt(8) +
+                        sb.charAt(11) + sb.charAt(10) + sb.charAt(13) + sb.charAt(12);
+                lCardId = Long.decode(hex);
+            }
             Card card = DAOUtils.findCardByCardNo(session, lCardId);
             if (card == null) {
                 return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
@@ -8088,6 +8100,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } finally {
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private long bytesToLong(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.put(bytes);
+        buffer.flip();//need flip
+        return buffer.getLong();
     }
 
     @Override
