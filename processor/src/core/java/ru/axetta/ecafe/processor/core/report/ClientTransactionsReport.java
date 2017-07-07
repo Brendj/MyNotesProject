@@ -39,7 +39,8 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
         * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
         */
     public static final String REPORT_NAME = "Транзакции клиента";
-    public static final String[] TEMPLATE_FILE_NAMES = {"ClientTransactionsReport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {
+            "ClientTransactionsReport.jasper", "ClientTransactionsConditionSubreport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
@@ -52,6 +53,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
     public static class Builder extends BasicReportJob.Builder {
 
         private String templateFilename;
+        private String subReportDir;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -63,10 +65,15 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                     .getReportsTemplateFilePath();
 
             templateFilename = reportTemplateFilePath + ClientTransactionsReport.class.getSimpleName() + ".jasper";
+            String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
+                    .getReportsTemplateFilePath();
+
+            subReportDir = reportsTemplateFilePath;
 
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("reportName", REPORT_NAME);
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty("idOfOrgList"));
             String[] idOfOrgStringList = idOfOrgString.split(",");
@@ -91,30 +98,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                 operationTypeString = "Списание";
             }
 
-
-            if (idOfOrgList.size() == 1) {
-                Org org = (Org) session.load(Org.class, idOfOrgList.get(0));
-                parameterMap.put("officialName", org.getOfficialName());
-                parameterMap.put("address", org.getAddress());
-                parameterMap.put("operationType", operationTypeString);
-            } else {
-                String officialName = "";
-                String address = "";
-                int count = 0;
-                for (Long idOfOrg : idOfOrgList) {
-                    Org org = (Org) session.load(Org.class, idOfOrg);
-                    officialName = officialName + org.getOfficialName();
-                    address = address + org.getAddress();
-                    if (count < idOfOrgList.size() - 1) {
-                        officialName = officialName + "; ";
-                        address = address + "; ";
-                    }
-                    count++;
-                }
-                parameterMap.put("officialName", officialName);
-                parameterMap.put("address", address);
-                parameterMap.put("operationType", operationTypeString);
-            }
+            parameterMap.put("operationType", operationTypeString);
 
             String clientListString = StringUtils.trimToEmpty(reportProperties.getProperty("clientList"));
 
@@ -128,44 +112,6 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                     Client client = (Client) session.load(Client.class, Long.parseLong(id));
                     clientList.add(client);
                 }
-            }
-
-            if (clientList.size() == 1) {
-                parameterMap.put("contractNumber", clientList.get(0).getContractId().toString());
-                if (clientList.get(0).getClientGroup() != null) {
-                    parameterMap.put("group", clientList.get(0).getClientGroup().getGroupName());
-                } else {
-                    parameterMap.put("group", "");
-                }
-                parameterMap.put("clientName", clientList.get(0).getPerson().getFullName());
-            } else {
-                String contractNumber = "";
-                String clientName = "";
-                String group = "";
-
-                int count = 0;
-                for (Client client : clientList) {
-                    contractNumber = contractNumber + client.getContractId();
-                    clientName = clientName + client.getPerson().getFullName();
-
-                    if (client.getClientGroup() != null) {
-                        group = group + client.getClientGroup().getGroupName();
-                    }
-
-                    if (count < clientList.size() - 1) {
-                        contractNumber = contractNumber + ", ";
-                        clientName = clientName + ", ";
-
-                        if (client.getClientGroup() != null) {
-                            group = group + ", ";
-                        }
-                    }
-                    count++;
-                }
-
-                parameterMap.put("contractNumber", contractNumber);
-                parameterMap.put("group", group);
-                parameterMap.put("clientName", clientName);
             }
 
             Boolean showAllBuildings = Boolean
@@ -188,7 +134,8 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                 idOfOrgList = showIdOfOrgList;
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList, operationTypeString);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList,
+                    operationTypeString);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -200,7 +147,8 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             ClientTransactionsReportService service = new ClientTransactionsReportService();
 
             return new JRBeanCollectionDataSource(
-                    service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList, operationTypeString));
+                    service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList,
+                            operationTypeString));
         }
     }
 

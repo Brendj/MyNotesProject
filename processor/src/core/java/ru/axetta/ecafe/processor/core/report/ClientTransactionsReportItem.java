@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import java.util.List;
+
 /**
  * Created by anvarov on 14.06.2017.
  */
@@ -17,6 +19,8 @@ public class ClientTransactionsReportItem {
     private String transactionTime;
     private String orderNumber;
     private Long personalAccount;
+
+    private List<OrgNameAndAddress> orgNameAndAddress;
 
     public ClientTransactionsReportItem() {
     }
@@ -95,5 +99,13 @@ public class ClientTransactionsReportItem {
 
     public void setPersonalAccount(Long personalAccount) {
         this.personalAccount = personalAccount;
+    }
+
+    public List<OrgNameAndAddress> getOrgNameAndAddress() {
+        return orgNameAndAddress;
+    }
+
+    public void setOrgNameAndAddress(List<OrgNameAndAddress> orgNameAndAddress) {
+        this.orgNameAndAddress = orgNameAndAddress;
     }
 }

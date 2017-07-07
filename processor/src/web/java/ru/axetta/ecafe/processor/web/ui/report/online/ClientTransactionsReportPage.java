@@ -33,10 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -49,7 +46,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
     private final String reportNameForMenu = ClientTransactionsReport.REPORT_NAME_FOR_MENU;
 
     private String htmlReport = null;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
 
     private Boolean showAllBuildings = false;
 
@@ -79,6 +76,13 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
 
     public ClientTransactionsReportPage() {
         super();
+        localCalendar.setTime(new Date());
+        CalendarUtils.truncateToDayOfMonth(localCalendar);
+        localCalendar.add(Calendar.DAY_OF_MONTH, -1);
+        this.startDate = localCalendar.getTime();
+        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = CalendarUtils.endOfDay(localCalendar.getTime());
     }
 
     public void showOrgListSelectPage() {
@@ -154,6 +158,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            endDate = CalendarUtils.endOfDay(endDate);
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -206,6 +211,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            endDate = CalendarUtils.endOfDay(endDate);
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;

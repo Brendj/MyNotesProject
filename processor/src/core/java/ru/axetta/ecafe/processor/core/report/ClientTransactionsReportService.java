@@ -12,10 +12,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by anvarov on 16.06.2017.
@@ -32,8 +29,7 @@ public class ClientTransactionsReportService {
                     idOfOrgList);
 
             for (AccountTransaction accountTransaction : accountTransactionList) {
-                clientTransactionsReportItemList
-                        .addAll(getItemsByAccountTransactions(accountTransaction));
+                clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction));
             }
         } else {
             for (Client client : clientList) {
@@ -41,13 +37,36 @@ public class ClientTransactionsReportService {
                         client, idOfOrgList);
 
                 for (AccountTransaction accountTransaction : accountTransactionList) {
-                    clientTransactionsReportItemList
-                            .addAll(getItemsByAccountTransactions(accountTransaction));
+                    clientTransactionsReportItemList.addAll(getItemsByAccountTransactions(accountTransaction));
                 }
             }
         }
 
         List<ClientTransactionsReportItem> clientTransactionsReportItems = new ArrayList<ClientTransactionsReportItem>();
+
+        List<OrgNameAndAddress> orgNameAndAddresses = new ArrayList<OrgNameAndAddress>();
+
+        if (idOfOrgList.size() == 1) {
+            Org org = (Org) session.load(Org.class, idOfOrgList.get(0));
+            OrgNameAndAddress orgNameAndAddress = new OrgNameAndAddress("Организация", org.getShortNameInfoService());
+            OrgNameAndAddress orgNameAndAddress1 = new OrgNameAndAddress("Адрес", org.getAddress());
+            orgNameAndAddresses.add(orgNameAndAddress);
+            orgNameAndAddresses.add(orgNameAndAddress1);
+        } else {
+            for (Long idOfOrg : idOfOrgList) {
+                Org org = (Org) session.load(Org.class, idOfOrg);
+                OrgNameAndAddress orgNameAndAddress = new OrgNameAndAddress("Организация", org.getShortNameInfoService());
+                OrgNameAndAddress orgNameAndAddress1 = new OrgNameAndAddress("Адрес", org.getAddress());
+                orgNameAndAddresses.add(orgNameAndAddress);
+                orgNameAndAddresses.add(orgNameAndAddress1);
+            }
+        }
+
+        Collections.sort(orgNameAndAddresses);
+
+        for (ClientTransactionsReportItem clientTransactionsReportItem : clientTransactionsReportItemList) {
+            clientTransactionsReportItem.setOrgNameAndAddress(orgNameAndAddresses);
+        }
 
         if (!operationTypeString.equals("Все")) {
             for (ClientTransactionsReportItem clientTransactionsReportItem : clientTransactionsReportItemList) {
@@ -57,7 +76,6 @@ public class ClientTransactionsReportService {
                     clientTransactionsReportItems.add(clientTransactionsReportItem);
                 }
             }
-
             clientTransactionsReportItemList = clientTransactionsReportItems;
         }
 
@@ -314,6 +332,4 @@ public class ClientTransactionsReportService {
 
         return accountTransactionList;
     }
-
-
 }

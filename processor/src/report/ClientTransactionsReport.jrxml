@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ClientTransactionsReport" pageWidth="970" pageHeight="20000" columnWidth="930" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c65462d-004a-478a-a75e-6942bb1d4197">
-	<property name="ireport.zoom" value="1.4641000000000008"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ClientTransactionsReport" pageWidth="1250" pageHeight="20000" columnWidth="1210" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c65462d-004a-478a-a75e-6942bb1d4197">
+	<property name="ireport.zoom" value="0.8264462809917362"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<parameter name="officialName" class="java.lang.String"/>
-	<parameter name="address" class="java.lang.String"/>
-	<parameter name="group" class="java.lang.String"/>
-	<parameter name="clientName" class="java.lang.String"/>
-	<parameter name="contractNumber" class="java.lang.String"/>
 	<parameter name="operationType" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\axRep\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
 	<field name="idOfOrg" class="java.lang.Long"/>
 	<field name="contragent" class="java.lang.String"/>
 	<field name="operationType" class="java.lang.String"/>
@@ -17,102 +15,33 @@
 	<field name="transactionTime" class="java.lang.String"/>
 	<field name="orderNumber" class="java.lang.String"/>
 	<field name="personalAccount" class="java.lang.Long"/>
+	<field name="orgNameAndAddress" class="java.util.List"/>
 	<title>
-		<band height="291" splitType="Stretch">
+		<band height="435">
+			<subreport>
+				<reportElement uuid="dfc5b99e-4a46-4430-af18-c534c5a45f86" x="0" y="0" width="1210" height="395"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{orgNameAndAddress})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ClientTransactionsConditionSubreport.jasper"]]></subreportExpression>
+			</subreport>
 			<staticText>
-				<reportElement uuid="d8d62c70-8b5e-418e-bc33-1b1f4c847a21" stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="105"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Организация]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="b4cae1c0-ed01-429e-9a2f-035f0b1ff03f" stretchType="RelativeToBandHeight" x="0" y="105" width="80" height="105"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Адрес
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="235a367e-a072-48d0-b403-91c01950bca1" stretchType="RelativeToBandHeight" x="0" y="210" width="80" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Группа ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="58d5386e-2879-432c-9c3f-2280114e03ce" stretchType="RelativeToBandHeight" x="0" y="230" width="80" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Клиент]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="2c733dc4-5495-4d61-ae76-821c1c7f2d25" stretchType="RelativeToBandHeight" x="0" y="250" width="80" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Лицевой счет]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" stretchType="RelativeToBandHeight" x="0" y="270" width="80" height="20"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" stretchType="RelativeToBandHeight" x="0" y="395" width="1210" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Тип операции
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="1c675774-5899-4d6b-9df8-0f90c9972e6a" stretchType="RelativeToBandHeight" x="80" y="0" width="850" height="105"/>
-				<textElement/>
-				<textFieldExpression><![CDATA[$P{officialName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="beb09a01-9bd8-48ed-978a-bae7fab941c4" stretchType="RelativeToBandHeight" x="80" y="105" width="850" height="105"/>
-				<textElement/>
-				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="0fde5788-5acb-4ba8-8528-c66d3f4e3c27" stretchType="RelativeToBandHeight" x="80" y="210" width="850" height="20"/>
-				<textElement/>
-				<textFieldExpression><![CDATA[$P{group}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="86eb708f-93ef-490d-a2bc-15a424ab832c" stretchType="RelativeToBandHeight" x="80" y="230" width="850" height="20"/>
-				<textElement/>
-				<textFieldExpression><![CDATA[$P{clientName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="a10f183a-447e-4c00-bbcb-f69ed9205452" stretchType="RelativeToBandHeight" x="80" y="250" width="850" height="20"/>
-				<textElement/>
-				<textFieldExpression><![CDATA[$P{contractNumber}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" stretchType="RelativeToBandHeight" x="80" y="270" width="850" height="20"/>
+				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" stretchType="RelativeToBandHeight" x="0" y="415" width="1210" height="20"/>
 				<textElement/>
 				<textFieldExpression><![CDATA[$P{operationType}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<columnHeader>
-		<band height="20">
+		<band height="40">
 			<staticText>
-				<reportElement uuid="d212cf09-0dec-490e-8acc-2246cb54f1b2" x="0" y="0" width="80" height="20"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Лицевой счет]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="8fa48b3a-4c5c-4b6e-bab8-eaf2e4ec046e" x="80" y="0" width="200" height="20"/>
+				<reportElement uuid="8fa48b3a-4c5c-4b6e-bab8-eaf2e4ec046e" x="80" y="0" width="200" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -126,7 +55,7 @@
 				<text><![CDATA[Номер заказа/идентификатор платежа]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1dcdc8ac-cff5-486f-9d8a-ca850d743aca" x="280" y="0" width="100" height="20"/>
+				<reportElement uuid="1dcdc8ac-cff5-486f-9d8a-ca850d743aca" x="280" y="0" width="200" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -140,7 +69,7 @@
 				<text><![CDATA[Время транзакции]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5141f81c-f79b-419a-9a3d-6b34e14dd695" x="380" y="0" width="150" height="20"/>
+				<reportElement uuid="5141f81c-f79b-419a-9a3d-6b34e14dd695" x="480" y="0" width="150" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -154,7 +83,7 @@
 				<text><![CDATA[Описание транзакции]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="74341793-1e66-4ec3-bb89-c6dc61a5ba78" x="530" y="0" width="100" height="20"/>
+				<reportElement uuid="9f5f6e14-5650-492e-879f-099e22f82ac6" x="930" y="0" width="150" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -165,12 +94,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Сумма
-
-]]></text>
+				<text><![CDATA[Контрагент]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="9a86bdcd-d3ce-4868-a43e-a53ab4a9b532" x="630" y="0" width="100" height="20"/>
+				<reportElement uuid="74341793-1e66-4ec3-bb89-c6dc61a5ba78" x="630" y="0" width="100" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -181,12 +108,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Тип операции
-
-]]></text>
+				<text><![CDATA[Сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="9f5f6e14-5650-492e-879f-099e22f82ac6" x="730" y="0" width="100" height="20"/>
+				<reportElement uuid="9a86bdcd-d3ce-4868-a43e-a53ab4a9b532" x="730" y="0" width="200" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -197,12 +122,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Контрагент
-
-]]></text>
+				<text><![CDATA[Тип операции]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="64c3c744-7c01-4b03-8cab-9d4eddd76b7c" x="830" y="0" width="100" height="20"/>
+				<reportElement uuid="d212cf09-0dec-490e-8acc-2246cb54f1b2" x="0" y="0" width="80" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -213,76 +136,28 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Идентификатор ОО
-
-]]></text>
+				<text><![CDATA[Лицевой счет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="64c3c744-7c01-4b03-8cab-9d4eddd76b7c" x="1080" y="0" width="130" height="40"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Идентификатор ОО]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
+		<band height="30" splitType="Stretch">
 			<textField>
-				<reportElement uuid="97fca2ca-7021-4584-9ecc-2c2baa6e92ad" x="830" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="49da611f-376e-45df-aa81-575dd08b1d6b" x="730" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{contragent}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="7355767e-76ff-4c86-9f38-47e4732c0a14" x="630" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{operationType}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="8079b407-3bb8-4382-abec-98aed920469b" x="530" y="0" width="100" height="20"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{summ}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="4a26fb6d-4117-4a0f-b830-e8c6c000cd48" x="380" y="0" width="150" height="20"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{transactionDescription}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="ebf238b3-b442-43ac-b571-6c879c61d398" x="280" y="0" width="100" height="20"/>
+				<reportElement uuid="ebf238b3-b442-43ac-b571-6c879c61d398" x="280" y="0" width="200" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -294,7 +169,7 @@
 				<textFieldExpression><![CDATA[$F{transactionTime}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="5691957e-efce-4f60-91d1-999cd6bc2d6f" x="80" y="0" width="200" height="20"/>
+				<reportElement uuid="5691957e-efce-4f60-91d1-999cd6bc2d6f" x="80" y="0" width="200" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -306,7 +181,7 @@
 				<textFieldExpression><![CDATA[$F{orderNumber}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="3296a5b1-e03c-4415-96ce-96382ee39bc9" x="0" y="0" width="80" height="20"/>
+				<reportElement uuid="3296a5b1-e03c-4415-96ce-96382ee39bc9" x="0" y="0" width="80" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -316,6 +191,66 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{personalAccount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="4a26fb6d-4117-4a0f-b830-e8c6c000cd48" x="480" y="0" width="150" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{transactionDescription}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8079b407-3bb8-4382-abec-98aed920469b" x="630" y="0" width="100" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{summ}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="49da611f-376e-45df-aa81-575dd08b1d6b" x="930" y="0" width="150" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{contragent}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="7355767e-76ff-4c86-9f38-47e4732c0a14" x="730" y="0" width="200" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{operationType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="97fca2ca-7021-4584-9ecc-2c2baa6e92ad" x="1080" y="0" width="130" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
