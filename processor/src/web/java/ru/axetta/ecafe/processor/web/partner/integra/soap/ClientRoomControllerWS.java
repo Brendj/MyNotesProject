@@ -94,7 +94,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
@@ -8100,13 +8099,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } finally {
             HibernateUtils.close(session, logger);
         }
-    }
-
-    private long bytesToLong(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.put(bytes);
-        buffer.flip();//need flip
-        return buffer.getLong();
     }
 
     @Override
