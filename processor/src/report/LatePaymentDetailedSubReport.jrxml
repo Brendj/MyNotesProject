@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1_subreport1" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="042ce3d5-ef68-4075-a0cb-740c00b0bc76">
-	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="id" class="java.lang.Integer">
@@ -32,12 +32,13 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 	</queryString>
 	<field name="foodDate" class="java.lang.String"/>
 	<field name="client" class="java.lang.String"/>
-	<group name="foodDate" isStartNewColumn="true">
-		<groupExpression><![CDATA[$F{foodDate}]]></groupExpression>
+	<field name="groupName" class="java.lang.String"/>
+	<group name="groupName" isStartNewColumn="true">
+		<groupExpression><![CDATA[$F{groupName}]]></groupExpression>
 		<groupHeader>
 			<band height="30">
 				<textField>
-					<reportElement uuid="a6f36032-0177-4d61-9258-58683c56294d" x="0" y="0" width="555" height="30"/>
+					<reportElement uuid="a6f36032-0177-4d61-9258-58683c56294d" isPrintRepeatedValues="false" x="0" y="0" width="555" height="30"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -49,6 +50,22 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 						<font size="14" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Дата предоставления питания " + $F{foodDate}]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="30">
+				<textField>
+					<reportElement uuid="992b17ba-5cda-4b86-a3bb-5fae20c75661" x="0" y="0" width="555" height="30"/>
+					<box>
+						<pen lineWidth="0.5"/>
+						<topPen lineWidth="0.5"/>
+						<leftPen lineWidth="0.5"/>
+						<bottomPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font size="14" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["  " + $F{groupName}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
