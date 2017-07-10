@@ -159,6 +159,10 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
             printError("Не указана организация");
             return null;
         }
+        if (CalendarUtils.getDifferenceInDays(startDate, endDate) > 31) {
+            printError("Интервал выборки для отчета не может превышать 31 день");
+        }
+
         BasicReportForAllOrgJob report = null;
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + "LatePaymentDetailedReport.jasper";

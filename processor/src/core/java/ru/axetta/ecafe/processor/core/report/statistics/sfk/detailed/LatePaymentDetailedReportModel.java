@@ -18,13 +18,15 @@ public class LatePaymentDetailedReportModel {
     private String orgnum;
     private String address;
     private String paymentDate;
+    private Long idOfOrg;
 
     private List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList;
 
-    public LatePaymentDetailedReportModel(String orgnum, String address, String paymentDate) {
+    public LatePaymentDetailedReportModel(String orgnum, String address, String paymentDate, Long idOfOrg) {
         this.orgnum = orgnum;
         this.address = address;
         this.paymentDate = paymentDate;
+        this.idOfOrg = idOfOrg;
     }
 
     public LatePaymentDetailedReportModel() {
@@ -61,5 +63,13 @@ public class LatePaymentDetailedReportModel {
     public void setLatePaymentDetailedSubReportModelList(
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList) {
         this.latePaymentDetailedSubReportModelList = latePaymentDetailedSubReportModelList;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }

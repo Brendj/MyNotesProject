@@ -15,10 +15,12 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
 
     private String foodDate;
     private String client;
+    private String groupName;
 
-    public LatePaymentDetailedSubReportModel(String foodDate, String client) {
+    public LatePaymentDetailedSubReportModel(String foodDate, String client, String groupName) {
         this.foodDate = foodDate;
         this.client = client;
+        this.groupName = groupName;
     }
 
     public LatePaymentDetailedSubReportModel() {
@@ -43,5 +45,13 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
     @Override
     public int compareTo(LatePaymentDetailedSubReportModel o) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

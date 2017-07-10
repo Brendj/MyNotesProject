@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
 
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Query;
@@ -38,19 +39,24 @@ public class LatePaymentDetailedReportService {
 
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = new ArrayList<LatePaymentDetailedReportModel>();
 
+        String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
+        if (showReverse) {
+            cats += ", 50";
+        }
         Query query = session.createSQLQuery(
-                "SELECT substring(cfo.shortname FROM 'Y*([0-9-]+)') orgnum, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE) paymentDate"
+                "SELECT cfo.shortnameinfoservice as orgnum, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE) paymentDate"
                         + " FROM cf_orders o INNER JOIN cf_orgs cfo ON cfo.idoforg = o.idoforg"
                         + " INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
                         + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
                         + " WHERE cast (to_timestamp(o.createddate/1000) AS DATE) <> cast (to_timestamp(o.orderdate/1000) AS DATE)"
-                        + " AND o.ordertype IN (4,6) AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate"
-                        + " AND o.idoforg = :idOfOrg AND cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)"
-                        + " GROUP BY cfo.shortname, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE), o.idoforg"
-                        + " ORDER BY cfo.shortname, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE)");
+                        + " AND o.ordertype IN (:order_types) AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate"
+                        + " AND o.idoforg = :idOfOrg AND cc.idOfCategoryDiscount IN (" + cats + ")"
+                        + " GROUP BY cfo.shortnameinfoservice, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE), o.idoforg"
+                        + " ORDER BY cfo.shortnameinfoservice, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
+        query.setParameterList("order_types", getOrderTypes(showReverse));
 
         List resultList = query.list();
 
@@ -66,7 +72,7 @@ public class LatePaymentDetailedReportService {
             paymentDate = (Date) result[2];
 
             LatePaymentDetailedReportModel latePaymentDetailedReportModel = new LatePaymentDetailedReportModel(orgNum,
-                    address, dateFormat.format(paymentDate));
+                    address, dateFormat.format(paymentDate), idOfOrg);
 
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = getExtraData(session,
                     idOfOrg, CalendarUtils.parseDate(latePaymentDetailedReportModel.getPaymentDate()), startDate,
@@ -81,46 +87,62 @@ public class LatePaymentDetailedReportService {
         return latePaymentDetailedReportModelList;
     }
 
+    private List<Integer> getOrderTypes(Boolean showReverse) {
+        List<Integer> order_types = new ArrayList<Integer>();
+        order_types.add(OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
+        order_types.add(OrderTypeEnumType.CORRECTION_TYPE.ordinal());
+        if (showReverse) {
+            order_types.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
+        }
+        return order_types;
+    }
+
     public List<LatePaymentDetailedSubReportModel> getExtraData(Session session, Long idOfOrg, Date paymentDate,
             Date startDate, Date endDate, Boolean showReverse) {
 
-        String orderTypeCondition = " and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124))) ";
-
+        String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
         if (showReverse) {
-            orderTypeCondition = " and ((o.ordertype = 4 and cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124)) or (o.ordertype = 6 and cc.idOfCategoryDiscount = 50)) ";
+            cats += ", 50";
         }
+        String orderTypeCondition = " and ((o.ordertype in (:order_types) and cc.idOfCategoryDiscount IN (" + cats + "))) ";
 
         List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = new ArrayList<LatePaymentDetailedSubReportModel>();
 
         Query query = session.createSQLQuery(
-                "SELECT cast (to_timestamp(o.createddate/1000) as date) foodDate, p.surname ||' ' ||p.firstname ||' '|| p.secondname || ' (' || od.menudetailname ||')' client"
+                "SELECT cast (to_timestamp(o.createddate/1000) as date) foodDate, "
+                        + " p.surname ||' ' ||p.firstname ||' '|| p.secondname || ' (' || od.menudetailname ||')' client"
+                        + " , coalesce(cg.GroupName, '') as groupName "
                         + " FROM cf_orders o INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
                         + " INNER JOIN cf_persons p ON cl.idofperson = p.idofperson"
                         + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg"
                         + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
+                        + " left join CF_ClientGroups cg on cl.idoforg = cg.IdOfOrg and cl.IdOfClientGroup = cg.IdOfClientGroup"
                         + " WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
                         + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
                         + " AND o.state = 0 AND o.idoforg = :idOfOrg " + orderTypeCondition
-                        + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, od.menudetailname, o.ordertype"
-                        + " ORDER BY o.createddate");
+                        + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, cg.groupname, od.menudetailname, o.ordertype"
+                        + " ORDER BY o.createddate, cg.GroupName");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("paymentDate", paymentDate);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
+        query.setParameterList("order_types", getOrderTypes(showReverse));
 
         List resultList = query.list();
 
         Date foodDate;
         String client;
+        String groupName;
 
         for (Object res : resultList) {
             Object[] result = (Object[]) res;
 
             foodDate = (Date) result[0];
             client = (String) result[1];
+            groupName = (String) result[2];
 
             LatePaymentDetailedSubReportModel latePaymentDetailedSubReportModel = new LatePaymentDetailedSubReportModel(
-                    dateFormat.format(foodDate), client);
+                    dateFormat.format(foodDate), client, groupName);
 
 
             latePaymentDetailedSubReportModelList.add(latePaymentDetailedSubReportModel);
