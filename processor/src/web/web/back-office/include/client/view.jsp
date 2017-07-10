@@ -200,6 +200,7 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{!clientGuardian.disabled}" disabled="true" readonly="true" styleClass="output-text" />
+            <h:graphicImage value="/images/moskvenok.png" rendered="#{clientGuardian.isMoskvenok}" title="Создано на mos.ru"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -254,6 +255,7 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{!clientWard.disabled}" disabled="true" readonly="true" styleClass="output-text" />
+            <h:graphicImage value="/images/moskvenok.png" rendered="#{clientWard.isMoskvenok}" title="Создано на mos.ru"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

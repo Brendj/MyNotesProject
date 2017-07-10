@@ -1428,7 +1428,7 @@ public class ClientManager {
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
-                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(), notificationSettings));
+                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(), notificationSettings, clientGuardian.getCreatedFrom()));
             }
         }
         return guardianItems;
@@ -1445,7 +1445,7 @@ public class ClientManager {
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
-                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(), notificationSettings));
+                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(), notificationSettings, clientWard.getCreatedFrom()));
             }
         }
         return wardItems;

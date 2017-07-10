@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.client.items;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationType;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class ClientGuardianItem {
     private boolean isNew;
     private Integer relation;
     private List<NotificationSettingItem> notificationItems = new ArrayList<NotificationSettingItem>();
+    private ClientCreatedFromType createdWhere;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -32,7 +34,8 @@ public class ClientGuardianItem {
         isNew = true;
     }
 
-    public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation, List notificationSettings) {
+    public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
+            List notificationSettings, ClientCreatedFromType createdWhere) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
@@ -41,8 +44,15 @@ public class ClientGuardianItem {
         this.relation = relation == null ? null : relation.ordinal();
         this.notificationItems = notificationSettings;
         isNew = false;
+        this.createdWhere = createdWhere;
+        if (createdWhere.equals(ClientCreatedFromType.MPGU)) {
+
+        }
     }
 
+    public boolean getIsMoskvenok() {
+        return createdWhere.equals(ClientCreatedFromType.MPGU);
+    }
     public Long getIdOfClient() {
         return idOfClient;
     }
