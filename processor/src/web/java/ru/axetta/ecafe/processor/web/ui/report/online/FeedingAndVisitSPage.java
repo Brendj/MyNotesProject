@@ -55,7 +55,16 @@ public class FeedingAndVisitSPage extends OnlineReportPage{
     private ReportDAOService daoService;
     private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+
+    public FeedingAndVisitSPage() throws RuntimeContext.NotInitializedException {
+        super();
+        this.startDate = CalendarUtils.truncateToDayOfMonth(new Date());
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.DATE, 7);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+    }
 
     public PeriodTypeMenu getPeriodTypeMenu() {
         return periodTypeMenu;
@@ -70,12 +79,12 @@ public class FeedingAndVisitSPage extends OnlineReportPage{
             case ONE_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 6));
             } break;
-            case TWO_WEEK: {
+          /*  case TWO_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 13));
             } break;
             case ONE_MONTH: {
                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            } break;
+            } break;*/
         }
     }
 
@@ -90,7 +99,7 @@ public class FeedingAndVisitSPage extends OnlineReportPage{
             switch (noOfDays){
                 case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
                 case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
-                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                //case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
                 default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
             }
         }

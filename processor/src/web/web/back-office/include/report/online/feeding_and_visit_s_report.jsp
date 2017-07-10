@@ -44,7 +44,7 @@
             <h:selectOneMenu id="endDatePeriodSelect" value="#{feedingAndVisitSPage.periodTypeMenu.periodType}"
                              styleClass="input-text" style="width: 250px;">
                 <f:converter converterId="periodTypeConverter" />
-                <f:selectItems value="#{feedingAndVisitSPage.periodTypeMenu.items}" />
+                <f:selectItems value="#{feedingAndVisitSPage.periodTypeMenu.itemsShort}" />
                 <a4j:support event="onchange" reRender="endDateCalendar,registerStampReportPanel"
                              actionListener="#{feedingAndVisitSPage.onReportPeriodChanged}" />
             </h:selectOneMenu>

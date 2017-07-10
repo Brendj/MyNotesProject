@@ -37,6 +37,7 @@ public class PeriodTypeMenu {
     }
 
     private List<SelectItem> items = readAllItems();
+    private List<SelectItem> itemsShort = readAllItemsShort();
     private PeriodTypeMenu.PeriodTypeEnum periodType;
 
     public PeriodTypeMenu() {
@@ -56,6 +57,17 @@ public class PeriodTypeMenu {
         return items;
     }
 
+    private List<SelectItem> readAllItemsShort() {
+        PeriodTypeEnum[] periodTypeEnums = PeriodTypeEnum.values();
+        List<SelectItem> itemsShort = new ArrayList<SelectItem>(periodTypeEnums.length);
+        for (PeriodTypeEnum periodTypeEnum : periodTypeEnums) {
+            if (!periodTypeEnum.toString().equals("2 недели") && !periodTypeEnum.toString().equals("1 месяц") && !periodTypeEnum.toString().equals("Точная дата")) {
+                itemsShort.add(new SelectItem(periodTypeEnum, periodTypeEnum.toString()));
+            }
+        }
+        return itemsShort;
+    }
+
     public PeriodTypeEnum getPeriodType() {
         return periodType;
     }
@@ -70,5 +82,13 @@ public class PeriodTypeMenu {
 
     public void setItems(List<SelectItem> items) {
         this.items = items;
+    }
+
+    public List<SelectItem> getItemsShort() {
+        return itemsShort;
+    }
+
+    public void setItemsShort(List<SelectItem> itemsShort) {
+        this.itemsShort = itemsShort;
     }
 }
