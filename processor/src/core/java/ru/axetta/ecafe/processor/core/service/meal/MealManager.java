@@ -158,7 +158,7 @@ public class MealManager {
                     //card = od.getOrder().getClient().findActiveCard(session, null);
                 }
                 result.add(new TransactionDataItem(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail(), od.getOrg().getIdOfOrg(),
-                        od.getOrg().getGuid(), od.getOrder().getClient().getClientGUID(),
+                        od.getOrg().getOGRN(), od.getOrder().getClient().getClientGUID(),
                         card == null ? null : card.getCardPrintedNo(), card == null ? null : card.getCardType(),
                         od.getOrder().getTransaction() == null ? null : od.getOrder().getTransaction().getIdOfTransaction(),
                         od.getOrder().getTransaction() == null ? od.getOrder().getCreateTime() : od.getOrder().getTransaction().getTransactionTime(),
@@ -200,7 +200,7 @@ public class MealManager {
                 if(card == null) {
                     card = tr.getClient().findActiveCard(session, null);
                 }
-                result.add(new TransactionDataItem(tr.getOrg().getIdOfOrg(), tr.getOrg().getGuid(), tr.getClient().getClientGUID(),
+                result.add(new TransactionDataItem(tr.getOrg().getIdOfOrg(), tr.getOrg().getOGRN(), tr.getClient().getClientGUID(),
                         card == null ? null : card.getCardPrintedNo(),
                         card == null ? null : card.getCardType(), tr.getIdOfTransaction(), tr.getTransactionTime(),
                         tr.getBalanceAfterTransaction(), tr.getTransactionSum(), tr.getSourceType()));
