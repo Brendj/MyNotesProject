@@ -129,6 +129,8 @@ public class Client {
     private Long balanceToNotify;
 
     private Date lastConfirmMobile;
+    private ClientCreatedFromType createdFrom;
+    private String createdFromDesc;
 
     protected Client() {
         // For Hibernate only
@@ -163,6 +165,7 @@ public class Client {
         this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
         this.disablePlanCreationDate = null;
+        this.createdFrom = ClientCreatedFromType.DEFAULT;
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
             if (predefined.isEnabledAtDefault()) {
@@ -1032,4 +1035,19 @@ public class Client {
         this.lastConfirmMobile = lastConfirmMobile;
     }
 
+    public ClientCreatedFromType getCreatedFrom() {
+        return createdFrom;
+    }
+
+    public void setCreatedFrom(ClientCreatedFromType createdFrom) {
+        this.createdFrom = createdFrom;
+    }
+
+    public String getCreatedFromDesc() {
+        return createdFromDesc;
+    }
+
+    public void setCreatedFromDesc(String createdFromDesc) {
+        this.createdFromDesc = createdFromDesc;
+    }
 }

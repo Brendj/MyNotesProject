@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -79,7 +80,8 @@ public class ClientManager {
         AGE_TYPE_GROUP,
         SSOID,
         BENEFIT,
-        CHECKBENEFITS
+        CHECKBENEFITS,
+        CREATED_FROM
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -124,7 +126,9 @@ public class ClientManager {
             new FieldProcessor.Def(37, false, false, "Тип возрастной группы", null, FieldId.AGE_TYPE_GROUP, true),
             new FieldProcessor.Def(38, false, false, "SSOID", null, FieldId.SSOID, true),
             new FieldProcessor.Def(39, false, false, "Льгота учащегося ИСПП", null, FieldId.BENEFIT, true),
-            new FieldProcessor.Def(39, false, false, "Участие льгот в сверке", null, FieldId.CHECKBENEFITS, false),
+            new FieldProcessor.Def(40, false, false, "Участие льгот в сверке", null, FieldId.CHECKBENEFITS, false),
+            new FieldProcessor.Def(41, false, false, "Источник создания записи", Integer.toString(ClientCreatedFromType.DEFAULT.getValue()),
+                    FieldId.CREATED_FROM, false),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -872,6 +876,8 @@ public class ClientManager {
                 client.setRemarks(registerCommentsAdds);
             }
 
+            client.setCreatedFrom(ClientCreatedFromType.values()[fieldConfig.getValueInt(FieldId.CREATED_FROM)]);
+
             logger.debug("save client");
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
@@ -988,7 +994,7 @@ public class ClientManager {
     }
 
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
-            String mobile, String remark, Integer gender, Org org) throws Exception {
+            String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom, String createdFromDesc) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1033,6 +1039,8 @@ public class ClientManager {
         clientGuardianToSave.setAddress("");
         clientGuardianToSave.setDiscountMode(Client.DISCOUNT_MODE_NONE);
         clientGuardianToSave.setRemarks(remark);
+        clientGuardianToSave.setCreatedFrom(createdFrom);
+        clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
         session.persist(clientGuardianToSave);
         return clientGuardianToSave;
     }
@@ -1070,11 +1078,11 @@ public class ClientManager {
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
                 registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
-                remark, null, organization);
+                remark, null, organization, ClientCreatedFromType.REGISTRY, "");
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.DEFAULT);
+                true, idOfClientChild, ClientCreatedFromType.REGISTRY);
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
@@ -1428,7 +1436,8 @@ public class ClientManager {
             Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
-                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(), notificationSettings, clientGuardian.getCreatedFrom()));
+                guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
+                        notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc()));
             }
         }
         return guardianItems;
@@ -1445,7 +1454,8 @@ public class ClientManager {
             Client cl = DAOUtils.findClient(session, clientWard.getIdOfChildren());
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
-                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(), notificationSettings, clientWard.getCreatedFrom()));
+                wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
+                        notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc()));
             }
         }
         return wardItems;
@@ -1606,13 +1616,13 @@ public class ClientManager {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
-                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems());
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(), item.getCreatedWhereGuardian());
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
-            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems) {
+            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems, ClientCreatedFromType createdWhere) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1623,8 +1633,16 @@ public class ClientManager {
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
+            clientGuardian.setCreatedFrom(createdWhere);
             attachNotifications(clientGuardian, notificationItems);
             session.persist(clientGuardian);
+            Client guardian = (Client)session.get(Client.class, idOfGuardian);
+            try {
+                long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                guardian.setClientRegistryVersion(clientRegistryVersion);
+                guardian.setCreatedFromDesc(DAOReadonlyService.getInstance().getUserFromSession().getUserName());
+                session.update(guardian);
+            } catch (Exception e) { }
         } else {
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
@@ -1675,7 +1693,7 @@ public class ClientManager {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
-                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems());
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(), item.getCreatedWhereGuardian());
         }
     }
 

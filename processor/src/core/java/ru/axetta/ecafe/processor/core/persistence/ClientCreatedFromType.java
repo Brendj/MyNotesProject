@@ -9,7 +9,10 @@ package ru.axetta.ecafe.processor.core.persistence;
  */
 public enum ClientCreatedFromType {
     DEFAULT(0,"По умолчанию"),//Создание клиента без учета привязки источника
-    MPGU(1,"МПГУ");//Создание клиента в МПГУ (создание представителей в методе сервиса информирования)
+    MPGU(1,"МПГУ"),//Создание клиента в МПГУ (создание представителей в методе сервиса информирования)
+    BACK_OFFICE(2,"Бэк-офис"),
+    REGISTRY(3,"АИС Реестры"),
+    ARM(4,"АРМ");
 
     private final int value;
     private final String description;
@@ -25,5 +28,10 @@ public enum ClientCreatedFromType {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return getDescription();
     }
 }

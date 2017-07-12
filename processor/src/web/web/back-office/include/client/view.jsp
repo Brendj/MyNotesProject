@@ -188,6 +188,8 @@
                 <h:outputText escape="true" value="ФИО клиента" />
             </f:facet>
             <h:outputText escape="true" value="#{clientGuardian.personName}" styleClass="output-text" />
+            <br/>
+            <h:outputText escape="true" value="#{clientGuardian.createdWhereGuardianStr}" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -200,7 +202,8 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{!clientGuardian.disabled}" disabled="true" readonly="true" styleClass="output-text" />
-            <h:graphicImage value="/images/moskvenok.png" rendered="#{clientGuardian.isMoskvenok}" title="Создано на mos.ru"/>
+            <br/>
+            <h:outputText escape="true" value="#{clientGuardian.createdWhereClientGuardianStr}" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -255,7 +258,8 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{!clientWard.disabled}" disabled="true" readonly="true" styleClass="output-text" />
-            <h:graphicImage value="/images/moskvenok.png" rendered="#{clientWard.isMoskvenok}" title="Создано на mos.ru"/>
+            <br/>
+            <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" rendered="#{!clientWard.isCreatedWhereDefault}"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

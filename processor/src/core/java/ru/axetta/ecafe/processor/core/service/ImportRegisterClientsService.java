@@ -1206,6 +1206,7 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
+                    createConfig.setValue(ClientManager.FieldId.CREATED_FROM, Integer.toString(ClientCreatedFromType.REGISTRY.getValue()));
                     afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                             (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
                     change.setIdOfClient(afterSaveClient.getIdOfClient());

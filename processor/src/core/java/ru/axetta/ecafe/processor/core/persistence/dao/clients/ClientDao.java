@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
@@ -225,7 +226,8 @@ public class ClientDao extends WritableJpaDao {
 
         //Создаем опекунскую связь
         Long version = generateNewClientGuardianVersion(session);
-        ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(), version, false, null, null);
+        ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(), version, false, null, null,
+                ClientCreatedFromType.DEFAULT);
 
         //Очищаем данные клиента (ребенка)
         Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -748,11 +749,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if (typeAddClient == null) return;
             if (typeAddClient.equals("guardian")) {
                 if (!guardianExists(idOfClient))
-                    clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(), ClientCreatedFromType.DEFAULT));
+                    clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
+                            ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName()));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
-                    clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(), ClientCreatedFromType.DEFAULT));
+                    clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
+                            ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName()));
             }
         }
     }

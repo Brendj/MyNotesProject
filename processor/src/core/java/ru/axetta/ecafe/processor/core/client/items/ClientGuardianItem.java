@@ -23,7 +23,9 @@ public class ClientGuardianItem {
     private boolean isNew;
     private Integer relation;
     private List<NotificationSettingItem> notificationItems = new ArrayList<NotificationSettingItem>();
-    private ClientCreatedFromType createdWhere;
+    private ClientCreatedFromType createdWhereClientGuardian;
+    private ClientCreatedFromType createdWhereGuardian;
+    private String createdWhereGuardianDesc;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -35,7 +37,8 @@ public class ClientGuardianItem {
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
-            List notificationSettings, ClientCreatedFromType createdWhere) {
+            List notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
+            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
@@ -44,14 +47,38 @@ public class ClientGuardianItem {
         this.relation = relation == null ? null : relation.ordinal();
         this.notificationItems = notificationSettings;
         isNew = false;
-        this.createdWhere = createdWhere;
-        if (createdWhere.equals(ClientCreatedFromType.MPGU)) {
-
-        }
+        this.createdWhereClientGuardian = createdWhereClientGuardian;
+        this.createdWhereGuardian = createdWhereGuardian;
+        this.createdWhereGuardianDesc = createdWhereGuardianDesc;
     }
 
+    public String getCreatedWhereClientGuardianStr() {
+        switch (createdWhereClientGuardian) {
+            case DEFAULT : return "";
+            case ARM: return "Создано в АРМ";
+            case BACK_OFFICE: return String.format("Создано в веб (пользователь: %s)", createdWhereGuardianDesc);
+            case MPGU: return String.format("Создано на mos.ru (%s)", createdWhereGuardianDesc);
+            case REGISTRY: return "Создано в АИС НСИ Реестр";
+        }
+        return "";
+    }
+
+    public String getCreatedWhereGuardianStr() {
+        switch (createdWhereGuardian) {
+            case DEFAULT : return "";
+            case ARM: return "Создано в АРМ";
+            case BACK_OFFICE: return String.format("Создано в веб (пользователь: %s)", createdWhereGuardianDesc);
+            case MPGU: return String.format("Создано на mos.ru (%s)", createdWhereGuardianDesc);
+            case REGISTRY: return "Создано в АИС НСИ Реестр";
+        }
+        return "";
+    }
+
+    public boolean getIsCreatedWhereDefault() {
+        return createdWhereClientGuardian.equals(ClientCreatedFromType.DEFAULT);
+    }
     public boolean getIsMoskvenok() {
-        return createdWhere.equals(ClientCreatedFromType.MPGU);
+        return createdWhereClientGuardian.equals(ClientCreatedFromType.MPGU);
     }
     public Long getIdOfClient() {
         return idOfClient;
@@ -111,5 +138,21 @@ public class ClientGuardianItem {
 
     public void setNotificationItems(List<NotificationSettingItem> items) {
         this.notificationItems = items;
+    }
+
+    public ClientCreatedFromType getCreatedWhereGuardian() {
+        return createdWhereGuardian;
+    }
+
+    public void setCreatedWhereGuardian(ClientCreatedFromType createdWhereGuardian) {
+        this.createdWhereGuardian = createdWhereGuardian;
+    }
+
+    public String getCreatedWhereGuardianDesc() {
+        return createdWhereGuardianDesc;
+    }
+
+    public void setCreatedWhereGuardianDesc(String createdWhereGuardianDesc) {
+        this.createdWhereGuardianDesc = createdWhereGuardianDesc;
     }
 }

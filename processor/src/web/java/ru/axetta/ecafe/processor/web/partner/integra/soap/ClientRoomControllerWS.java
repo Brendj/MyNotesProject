@@ -7862,7 +7862,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (guardian == null) {
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
-                        surname, mobile, remark, gender, org);
+                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile);
+            } else {
+                long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                guardian.setClientRegistryVersion(clientRegistryVersion);
+                guardian.setCreatedFromDesc(creatorMobile);
+                session.update(guardian);
             }
 
             ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -606,6 +607,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         if(discountMode == Client.DISCOUNT_MODE_BY_CATEGORY && idOfCategoryList.size()==0){
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
+
+        client.setCreatedFrom(ClientCreatedFromType.BACK_OFFICE);
+        client.setCreatedFromDesc(DAOReadonlyService.getInstance().getUserFromSession().getUserName());
         // Категории скидок
           /*
         for (CategoryDiscountItem categoryDiscount : categoryDiscounts) {
