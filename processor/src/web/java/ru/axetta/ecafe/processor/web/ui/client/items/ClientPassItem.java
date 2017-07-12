@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.client.items;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.ExternalEvent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,7 +26,7 @@ public class ClientPassItem implements Comparable {
     private Date enterTime;
     private String enterName;
     private String direction;
-    private String checker;
+    private List<ClientChekerPassItem> chekerItemList = new ArrayList<ClientChekerPassItem>();
 
     public ClientPassItem(EnterEvent event) {
         this.orgName = event.getOrg().getShortName();
@@ -31,8 +34,16 @@ public class ClientPassItem implements Comparable {
         this.enterName = event.getEnterName();
         this.direction = getDirection(event.getPassDirection());
         Long checkerId = event.getChildPassCheckerId();
+        Long guardianId = event.getGuardianId();
         if (checkerId != null) {
-            this.checker = DAOService.getInstance().getClientFullNameById(checkerId);
+            Client cheker = DAOService.getInstance().findClientById(checkerId);
+            this.chekerItemList.add(new ClientChekerPassItem(cheker.getIdOfClient(), cheker.getContractId(),
+                    cheker.getPerson().getFullName(), cheker.getClientGroup().getGroupName()));
+        }
+        if (guardianId != null) {
+            Client guardian = DAOService.getInstance().findClientById(guardianId);
+            this.chekerItemList.add(new ClientChekerPassItem(guardian.getIdOfClient(), guardian.getContractId(),
+                    guardian.getPerson().getFullName(), guardian.getClientGroup().getGroupName()));
         }
     }
 
@@ -64,8 +75,12 @@ public class ClientPassItem implements Comparable {
         return direction;
     }
 
-    public String getChecker() {
-        return checker;
+    public List<ClientChekerPassItem> getChekerItemList() {
+        return chekerItemList;
+    }
+
+    public Integer getChekerItemListCount() {
+        return chekerItemList.size() + 1;
     }
 
     private String getDirection(int direction) {
@@ -98,6 +113,52 @@ public class ClientPassItem implements Comparable {
                 return "отмечен учителем внутри здания";
             default:
                 return "Ошибка обратитесь администратору";
+        }
+    }
+
+    public static class ClientChekerPassItem {
+        private Long idOfClient;
+        private Long contractId;
+        private String cheker;
+        private String groupName;
+
+        public ClientChekerPassItem(Long idOfClient, Long contractId, String cheker, String groupName) {
+            this.idOfClient = idOfClient;
+            this.contractId = contractId;
+            this.cheker = cheker;
+            this.groupName = groupName;
+        }
+
+        public Long getIdOfClient() {
+            return idOfClient;
+        }
+
+        public void setIdOfClient(Long idOfClient) {
+            this.idOfClient = idOfClient;
+        }
+
+        public Long getContractId() {
+            return contractId;
+        }
+
+        public void setContractId(Long contractId) {
+            this.contractId = contractId;
+        }
+
+        public String getCheker() {
+            return cheker;
+        }
+
+        public void setCheker(String cheker) {
+            this.cheker = cheker;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
         }
     }
 }

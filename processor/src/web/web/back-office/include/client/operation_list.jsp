@@ -524,43 +524,70 @@
 <h:outputText value="Проходы:" />
 <rich:dataTable id="clientPassesTable" var="pass" value="#{mainPage.clientOperationListPage.clientPasses}"
                 rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8">
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="№" />
-        </f:facet>
+
+    <f:facet name="header">
+        <rich:columnGroup>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="№" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Организация" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Наименование входа" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Дата и время" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Направление" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Кто отметил" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Группа отметившего" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Л/с отметившего" styleClass="column-header" />
+            </rich:column>
+        </rich:columnGroup>
+    </f:facet>
+
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Организация" />
-        </f:facet>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.orgName}" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Наименование входа" />
-        </f:facet>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.enterName}" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Дата и время" />
-        </f:facet>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.enterTime}" styleClass="output-text"
                       converter="timeMinuteConverter" />
     </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Направление" />
-        </f:facet>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Кто отметил" />
-        </f:facet>
-        <h:outputText escape="true" value="#{pass.checker}" styleClass="output-text" />
-    </rich:column>
+
+    <rich:subTable value="#{pass.chekerItemList}" var="cheker"
+                   columnClasses="center-aligned-column, center-aligned-column, center-aligned-column">
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{cheker.cheker}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" rendered="false">
+            <h:outputText escape="true" value="#{cheker.groupName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{cheker.contractId}" converter="contractIdConverter"
+                              styleClass="output-text" />
+                <f:setPropertyActionListener value="#{cheker.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </a4j:commandLink>
+        </rich:column>
+    </rich:subTable>
+
     <f:facet name="footer">
         <rich:datascroller for="clientPassesTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                            stepControls="auto" boundaryControls="hide">
