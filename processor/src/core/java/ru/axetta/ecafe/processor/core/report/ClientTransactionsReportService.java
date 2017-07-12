@@ -323,10 +323,12 @@ public class ClientTransactionsReportService {
             Criteria clientCriteria = criteria.createCriteria("client", "cl");
             clientCriteria.add(Restrictions.eq("contractId", client.getContractId()));
         }
-        Criteria orgCriteria = criteria.createCriteria("org", "o");
+        if (!idOfOrgList.isEmpty()) {
+            Criteria orgCriteria = criteria.createCriteria("org", "o");
+            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+        }
         criteria.add(Restrictions.ge("transactionTime", startTime));
         criteria.add(Restrictions.le("transactionTime", endTime));
-        orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
 
         List<AccountTransaction> accountTransactionList = criteria.list();
 

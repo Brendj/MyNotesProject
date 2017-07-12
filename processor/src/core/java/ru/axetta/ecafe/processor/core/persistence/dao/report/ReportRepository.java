@@ -10,11 +10,13 @@ import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -63,6 +65,8 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_AUTO_ENTER_EVENTS_SUBJECT = "Сводный отчет по посещению";
     private final String REPORT_AUTO_ENTER_EVENTS_V2= "AutoEnterEventV2Report";
     private final String REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT = "Детализированный отчет по посещению";
+    private final String REPORT_CLIENT_TRANSACTIONS = "ClientTransactionsReport";
+    private final String REPORT_CLIENT_TRANSACTIONS_SUBJECT = "Транзакции клиента";
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
 
@@ -94,8 +98,10 @@ public class ReportRepository extends BaseJpaDao {
         } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS)) {
             return getAutoEnterEventByDaysReport(parameters, REPORT_AUTO_ENTER_EVENTS_SUBJECT);
         } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS_V2)) {
-        return getAutoEnterEventV2Report(parameters, REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT);
-    }
+            return getAutoEnterEventV2Report(parameters, REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT);
+        } else if (reportType.equals(REPORT_CLIENT_TRANSACTIONS)) {
+            return getClientTransactionsReport(parameters, REPORT_CLIENT_TRANSACTIONS_SUBJECT);
+        }
         return null;
     }
 
@@ -218,6 +224,22 @@ public class ReportRepository extends BaseJpaDao {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
         BasicJasperReport jasperReport = buildAutoEnterEventV2Report(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getClientTransactionsReport(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildClientTransactionsReport(session, reportParameters);
         if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
@@ -375,6 +397,30 @@ public class ReportRepository extends BaseJpaDao {
             builder.setOrgShortItemList(Arrays.asList(orgShortItem));
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+    }
+
+    private BasicJasperReport buildClientTransactionsReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFileName =
+                autoReportGenerator.getReportsTemplateFilePath() + ClientTransactionsReport.class.getSimpleName()
+                        + ".jasper";
+        ClientTransactionsReport.Builder builder = new ClientTransactionsReport.Builder(templateFileName);
+        try {
+            Client client = DAOUtils.findClientByContractId(session, reportParameters.getIdOfContract());
+            Org org = client.getOrg();
+            Properties properties = new Properties();
+            properties.setProperty("idOfOrgList", String.valueOf(org.getIdOfOrg()));
+            properties.setProperty("clientList", String.valueOf(reportParameters.getIdOfContract()));
+            builder.setReportProperties(properties);
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
+                            new GregorianCalendar());
             return jasperReport;
         } catch (EntityNotFoundException e) {
             logger.error("Not found organization to generate report");
