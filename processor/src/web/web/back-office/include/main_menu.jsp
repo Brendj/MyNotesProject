@@ -956,6 +956,13 @@
                         label="Системные показатели" action="#{monitoringPersistanceCachePage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
+<rich:panelMenuGroup id="chartsGroupMenu" binding="#{mainPage.chartsGroupPage.mainMenuComponent}"
+                         label="Мониторинг ОУ">
+    <rich:panelMenuItem id="enterCardsChartReportMenuItem" binding="#{mainPage.enterCardsChartReportPage.mainMenuComponent}"
+                        label="Использование электронных носителей при посещении здания ОО"
+                        action="#{mainPage.showEnterCardsChartReportPage}" reRender="workspaceForm" />
+</rich:panelMenuGroup>
+
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
     <a4j:support event="onclick" action="#{mainPage.showReportOnlineGroupPage}" reRender="workspaceForm" />

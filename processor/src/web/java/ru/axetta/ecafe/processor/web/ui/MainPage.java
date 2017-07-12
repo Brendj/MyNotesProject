@@ -300,6 +300,10 @@ public class MainPage implements Serializable {
     private final TotalSalesPage totalSalesPage = new TotalSalesPage();
     private final OrdersByManufacturerReportPage ordersByManufacturerReportPage = new OrdersByManufacturerReportPage();
 
+    //Charts
+    private final BasicWorkspacePage chartsGroupPage = new BasicWorkspacePage();
+    private final EnterCardsChartReportPage enterCardsChartReportPage = new EnterCardsChartReportPage();
+
     // POS manipulation
     private final BasicWorkspacePage posGroupPage = new BasicWorkspacePage();
     private final PosListPage posListPage = new PosListPage();
@@ -7254,6 +7258,33 @@ public class MainPage implements Serializable {
             logger.error("Failed to set OrdersByManufacturerReport page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы сводного отчета по производителю: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BasicWorkspacePage getChartsGroupPage() {
+        return chartsGroupPage;
+    }
+
+    public Object showChartsGroupPage() {
+        currentWorkspacePage = chartsGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public EnterCardsChartReportPage getEnterCardsChartReportPage() {
+        return enterCardsChartReportPage;
+    }
+
+    public Object showEnterCardsChartReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = enterCardsChartReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set EnterCardsChartReport page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
