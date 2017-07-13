@@ -576,7 +576,7 @@
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{cheker.cheker}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" rendered="false">
+        <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{cheker.groupName}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">

@@ -7,7 +7,8 @@ package ru.axetta.ecafe.processor.web.ui.client.items;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.ExternalEvent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+
+import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class ClientPassItem implements Comparable {
     private String direction;
     private List<ClientChekerPassItem> chekerItemList = new ArrayList<ClientChekerPassItem>();
 
-    public ClientPassItem(EnterEvent event) {
+    public ClientPassItem(Session session, EnterEvent event) {
         this.orgName = event.getOrg().getShortName();
         this.enterTime = event.getEvtDateTime();
         this.enterName = event.getEnterName();
@@ -36,14 +37,17 @@ public class ClientPassItem implements Comparable {
         Long checkerId = event.getChildPassCheckerId();
         Long guardianId = event.getGuardianId();
         if (checkerId != null) {
-            Client cheker = DAOService.getInstance().findClientById(checkerId);
+            Client cheker = (Client) session.get(Client.class, checkerId);
             this.chekerItemList.add(new ClientChekerPassItem(cheker.getIdOfClient(), cheker.getContractId(),
                     cheker.getPerson().getFullName(), cheker.getClientGroup().getGroupName()));
         }
         if (guardianId != null) {
-            Client guardian = DAOService.getInstance().findClientById(guardianId);
+            Client guardian = (Client) session.get(Client.class, guardianId);
             this.chekerItemList.add(new ClientChekerPassItem(guardian.getIdOfClient(), guardian.getContractId(),
                     guardian.getPerson().getFullName(), guardian.getClientGroup().getGroupName()));
+        }
+        if(checkerId == null && guardianId == null) {
+            this.chekerItemList.add(new ClientChekerPassItem(0L, null, "", ""));
         }
     }
 

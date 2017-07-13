@@ -183,7 +183,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         List<EnterEvent> res = (List<EnterEvent>) criteria.list();
         clientPasses = new ArrayList<ClientPassItem>();
         for (EnterEvent event : res) {
-            clientPasses.add(new ClientPassItem(event));
+            clientPasses.add(new ClientPassItem(session, event));
         }
 
         criteria = session.createCriteria(ExternalEvent.class);
