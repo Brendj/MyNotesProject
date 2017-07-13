@@ -932,8 +932,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private Properties loadConfig() throws Exception {
 
         Transaction persistenceTransaction = null;
+        Session persistenceSession = null;
         try {
-            Session persistenceSession = sessionFactory.openSession();
+            persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             // Get configuration from CF_Options
             Criteria criteria = persistenceSession.createCriteria(Option.class);
@@ -943,9 +944,12 @@ public class RuntimeContext implements ApplicationContextAware {
             StringReader stringReader = new StringReader(optionText);
             Properties properties = new Properties();
             properties.load(stringReader);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             return properties;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
 
     }
