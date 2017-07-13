@@ -416,7 +416,8 @@ public class ReportRepository extends BaseJpaDao {
             Org org = client.getOrg();
             Properties properties = new Properties();
             properties.setProperty("idOfOrgList", String.valueOf(org.getIdOfOrg()));
-            properties.setProperty("clientList", String.valueOf(reportParameters.getIdOfContract()));
+            properties.setProperty("clientList", String.valueOf(client.getIdOfClient()));
+            properties.setProperty("operationType", "0");
             builder.setReportProperties(properties);
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
