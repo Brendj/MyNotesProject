@@ -11,3 +11,5 @@ CREATE INDEX cf_friendly_organization_currentorg_idx ON cf_friendly_organization
 
 alter table cf_clients add column createdFrom integer not null default 0,
   add column createdFromDesc character varying(128);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 130717) НЕ МЕНЯТЬ
