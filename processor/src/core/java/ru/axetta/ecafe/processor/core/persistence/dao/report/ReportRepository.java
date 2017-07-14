@@ -69,6 +69,10 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_CLIENT_TRANSACTIONS_SUBJECT = "Транзакции клиента";
     private final String REPORT_SPENDING_FUNDS_INQUIRY = "SpendingFundsInquiryReport";
     private final String REPORT_SPENDING_FUNDS_INQUIRY_SUBJECT = "Справка расходования средств";
+    private final String REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES = "ConsolidateDiscontsFoodServicesReport";
+    private final String REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES_SUBJECT = "Сводная справка об услугах питания за счет бюджета города";
+    private final String REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES = "DiscountComplexesInAllSuperCategoriesReport";
+    private final String REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT = "Справка по предоставлению бесплатного питания обучающимся";
 
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
@@ -106,6 +110,10 @@ public class ReportRepository extends BaseJpaDao {
             return getClientTransactionsReport(parameters, REPORT_CLIENT_TRANSACTIONS_SUBJECT);
         } else if (reportType.equals(REPORT_SPENDING_FUNDS_INQUIRY)) {
             return getReferReport(parameters, REPORT_SPENDING_FUNDS_INQUIRY_SUBJECT);
+        } else if (reportType.equals(REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES)) {
+
+        } else if (reportType.equals(REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES)) {
+
         }
         return null;
     }
