@@ -67,6 +67,9 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT = "Детализированный отчет по посещению";
     private final String REPORT_CLIENT_TRANSACTIONS = "ClientTransactionsReport";
     private final String REPORT_CLIENT_TRANSACTIONS_SUBJECT = "Транзакции клиента";
+    private final String REPORT_SPENDING_FUNDS_INQUIRY = "SpendingFundsInquiryReport";
+    private final String REPORT_SPENDING_FUNDS_INQUIRY_SUBJECT = "Справка расходования средств";
+
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
 
@@ -101,6 +104,8 @@ public class ReportRepository extends BaseJpaDao {
             return getAutoEnterEventV2Report(parameters, REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT);
         } else if (reportType.equals(REPORT_CLIENT_TRANSACTIONS)) {
             return getClientTransactionsReport(parameters, REPORT_CLIENT_TRANSACTIONS_SUBJECT);
+        } else if (reportType.equals(REPORT_SPENDING_FUNDS_INQUIRY)) {
+            return getReferReport(parameters, REPORT_SPENDING_FUNDS_INQUIRY_SUBJECT);
         }
         return null;
     }
@@ -240,6 +245,22 @@ public class ReportRepository extends BaseJpaDao {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
         BasicJasperReport jasperReport = buildClientTransactionsReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPagesOrZero(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getReferReport(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildReferReport(session, reportParameters);
         if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
@@ -252,6 +273,11 @@ public class ReportRepository extends BaseJpaDao {
     private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
         return deliveredServicesReport.getPrint().getPages() != null
                 && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0;
+    }
+
+    private boolean isEmptyReportPrintPagesOrZero(BasicJasperReport deliveredServicesReport) {
+        return deliveredServicesReport.getPrint().getPages() != null
+                && deliveredServicesReport.getPrint().getPages().size() == 0;
     }
 
     private void postReportToEmails(String subject, ReportParameters reportParameters, byte[] arr) {
@@ -427,6 +453,11 @@ public class ReportRepository extends BaseJpaDao {
             logger.error("Not found organization to generate report");
             return null;
         }
+    }
+
+    private BasicJasperReport buildReferReport(Session session, ReportParameters reportParameters) throws Exception {
+
+return null;
     }
 
     private AutoReportGenerator getAutoReportGenerator() {
