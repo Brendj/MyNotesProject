@@ -452,6 +452,7 @@ public class ReportRepository extends BaseJpaDao {
             properties.setProperty("idOfOrgList", String.valueOf(org.getIdOfOrg()));
             properties.setProperty("clientList", String.valueOf(client.getIdOfClient()));
             properties.setProperty("operationType", "0");
+            properties.setProperty("showAllBuildings", "true");
             builder.setReportProperties(properties);
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
@@ -464,6 +465,23 @@ public class ReportRepository extends BaseJpaDao {
     }
 
     private BasicJasperReport buildReferReport(Session session, ReportParameters reportParameters) throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFileName =
+                autoReportGenerator.getReportsTemplateFilePath() + ReferReport.class.getSimpleName() + ".jasper";
+        ReferReport.Builder builder = new ReferReport.Builder(templateFileName);
+        try {
+
+            Long idOfOrg = reportParameters.getIdOfOrg();
+
+
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
+                            new GregorianCalendar());
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+
 
 return null;
     }
