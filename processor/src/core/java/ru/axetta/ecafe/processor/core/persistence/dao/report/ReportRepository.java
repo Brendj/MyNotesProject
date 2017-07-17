@@ -111,9 +111,9 @@ public class ReportRepository extends BaseJpaDao {
         } else if (reportType.equals(REPORT_SPENDING_FUNDS_INQUIRY)) {
             return getReferReport(parameters, REPORT_SPENDING_FUNDS_INQUIRY_SUBJECT);
         } else if (reportType.equals(REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES)) {
-
+            return getReferReportConsolidated(parameters, REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES_SUBJECT);
         } else if (reportType.equals(REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES)) {
-
+            return getReferReportDiscount(parameters, REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT);
         }
         return null;
     }
@@ -269,6 +269,38 @@ public class ReportRepository extends BaseJpaDao {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
         BasicJasperReport jasperReport = buildReferReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getReferReportConsolidated(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildReferReportConsolidated(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
+    private byte[] getReferReportDiscount(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildReferReportDiscount(session, reportParameters);
         if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
@@ -472,18 +504,74 @@ public class ReportRepository extends BaseJpaDao {
         try {
 
             Long idOfOrg = reportParameters.getIdOfOrg();
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
 
-
+            builder.setOrg(orgShortItem);
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
                             new GregorianCalendar());
+
+            return jasperReport;
         } catch (EntityNotFoundException e) {
             logger.error("Not found organization to generate report");
             return null;
         }
+    }
 
+    private BasicJasperReport buildReferReportConsolidated(Session session, ReportParameters reportParameters) throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFileName =
+                autoReportGenerator.getReportsTemplateFilePath() + ReferReport.class.getSimpleName() + ".jasper";
+        ReferReport.Builder builder = new ReferReport.Builder(templateFileName);
+        try {
 
-return null;
+            Long idOfOrg = reportParameters.getIdOfOrg();
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
+            builder.setOrg(orgShortItem);
+            Properties props = new Properties();
+            props.setProperty(DailyReferReport.SUBCATEGORY_PARAMETER, DailyReferReport.SUBCATEGORY_ALL.getName());
+            builder.setReportProperties(props);
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
+                            new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+    }
+
+    private BasicJasperReport buildReferReportDiscount(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFileName =
+                autoReportGenerator.getReportsTemplateFilePath() + ReferReport.class.getSimpleName() + ".jasper";
+        ReferReport.Builder builder = new ReferReport.Builder(templateFileName);
+        try {
+
+            Long idOfOrg = reportParameters.getIdOfOrg();
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
+
+            builder.setOrg(orgShortItem);
+            Properties props = new Properties();
+            props.setProperty(DailyReferReport.SUBCATEGORY_PARAMETER,
+                    DailyReferReport.SUBCATEGORY_SHOOL[reportParameters.getCategory()].getName());
+
+            builder.setReportProperties(props);
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
+                            new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
     }
 
     private AutoReportGenerator getAutoReportGenerator() {
@@ -610,6 +698,7 @@ return null;
         private String region;
         private String email;
         private String enterEventType;
+        private Integer category;
 
         public ReportParameters(List<ReportParameter> parameters) {
             this.parameters = parameters;
@@ -647,6 +736,10 @@ return null;
             return enterEventType;
         }
 
+        public Integer getCategory() {
+            return category;
+        }
+
         public ReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
@@ -656,6 +749,8 @@ return null;
             region = null;
             email = null;
             enterEventType = null;
+            category = null;
+
             DateFormat safeDateFormat = dateFormat.get();
             for (ReportParameter parameter : parameters) {
                 if (parameter.getParameterName().equals("startDate")) {
@@ -683,6 +778,9 @@ return null;
                 }
                 if (parameter.getParameterName().equals("enterEventType")) {
                     enterEventType = parameter.getParameterValue();
+                }
+                if (parameter.getParameterName().equals("category")) {
+                    category = Integer.valueOf(parameter.getParameterValue());
                 }
             }
             return this;
