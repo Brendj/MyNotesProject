@@ -111,9 +111,9 @@ public class ReportRepository extends BaseJpaDao {
         } else if (reportType.equals(REPORT_SPENDING_FUNDS_INQUIRY)) {
             return getReferReport(parameters, REPORT_SPENDING_FUNDS_INQUIRY_SUBJECT);
         } else if (reportType.equals(REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES)) {
-            return getReferReportConsolidated(parameters, REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES_SUBJECT);
+            return getDailyReferReportConsolidated(parameters, REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES_SUBJECT);
         } else if (reportType.equals(REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES)) {
-            return getReferReportDiscount(parameters, REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT);
+            return getDailyReferReportDiscount(parameters, REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT);
         }
         return null;
     }
@@ -278,13 +278,13 @@ public class ReportRepository extends BaseJpaDao {
         return rawDataReport;
     }
 
-    private byte[] getReferReportConsolidated(List<ReportParameter> parameters, String subject) throws Exception {
+    private byte[] getDailyReferReportConsolidated(List<ReportParameter> parameters, String subject) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         ReportParameters reportParameters = new ReportParameters(parameters).parse();
         if (!reportParameters.checkRequiredParameters()) {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
-        BasicJasperReport jasperReport = buildReferReportConsolidated(session, reportParameters);
+        BasicJasperReport jasperReport = buildDailyReferReportConsolidated(session, reportParameters);
         if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
@@ -294,13 +294,13 @@ public class ReportRepository extends BaseJpaDao {
         return rawDataReport;
     }
 
-    private byte[] getReferReportDiscount(List<ReportParameter> parameters, String subject) throws Exception {
+    private byte[] getDailyReferReportDiscount(List<ReportParameter> parameters, String subject) throws Exception {
         Session session = entityManager.unwrap(Session.class);
         ReportParameters reportParameters = new ReportParameters(parameters).parse();
         if (!reportParameters.checkRequiredParameters()) {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
-        BasicJasperReport jasperReport = buildReferReportDiscount(session, reportParameters);
+        BasicJasperReport jasperReport = buildDailyReferReportDiscount(session, reportParameters);
         if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
             return null;
         }
@@ -520,11 +520,11 @@ public class ReportRepository extends BaseJpaDao {
         }
     }
 
-    private BasicJasperReport buildReferReportConsolidated(Session session, ReportParameters reportParameters) throws Exception {
+    private BasicJasperReport buildDailyReferReportConsolidated(Session session, ReportParameters reportParameters) throws Exception {
         AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
         String templateFileName =
-                autoReportGenerator.getReportsTemplateFilePath() + ReferReport.class.getSimpleName() + ".jasper";
-        ReferReport.Builder builder = new ReferReport.Builder(templateFileName);
+                autoReportGenerator.getReportsTemplateFilePath() + DailyReferReport.class.getSimpleName() + ".jasper";
+        DailyReferReport.Builder builder = new DailyReferReport.Builder(templateFileName);
         try {
 
             Long idOfOrg = reportParameters.getIdOfOrg();
@@ -545,12 +545,12 @@ public class ReportRepository extends BaseJpaDao {
         }
     }
 
-    private BasicJasperReport buildReferReportDiscount(Session session, ReportParameters reportParameters)
+    private BasicJasperReport buildDailyReferReportDiscount(Session session, ReportParameters reportParameters)
             throws Exception {
         AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
         String templateFileName =
-                autoReportGenerator.getReportsTemplateFilePath() + ReferReport.class.getSimpleName() + ".jasper";
-        ReferReport.Builder builder = new ReferReport.Builder(templateFileName);
+                autoReportGenerator.getReportsTemplateFilePath() + DailyReferReport.class.getSimpleName() + ".jasper";
+        DailyReferReport.Builder builder = new DailyReferReport.Builder(templateFileName);
         try {
 
             Long idOfOrg = reportParameters.getIdOfOrg();
