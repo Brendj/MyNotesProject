@@ -779,7 +779,7 @@ public class ReportRepository extends BaseJpaDao {
                 if (parameter.getParameterName().equals("enterEventType")) {
                     enterEventType = parameter.getParameterValue();
                 }
-                if (parameter.getParameterName().equals("category")) {
+                if (parameter.getParameterName().equals("categories")) {
                     category = Integer.valueOf(parameter.getParameterValue());
                 }
             }
