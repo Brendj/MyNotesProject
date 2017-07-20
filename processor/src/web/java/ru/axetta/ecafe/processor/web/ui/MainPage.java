@@ -389,6 +389,7 @@ public class MainPage implements Serializable {
 
     private BasicWorkspacePage infoGroupMenu = new BasicWorkspacePage();
     private BasicWorkspacePage debugGroupMenu = new BasicWorkspacePage();
+    private BasicWorkspacePage cardGroupMenu = new BasicWorkspacePage();
 
     private final BasicWorkspacePage technologicalMapGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage technologicalMapGroupsGroupPage = new BasicWorkspacePage();
@@ -8867,6 +8868,10 @@ public class MainPage implements Serializable {
         return getCurrentUser().isSupplier() || getCurrentUser().hasFunction(Function.FUNC_SUPPLIER);
     }
 
+    public boolean isCardOperator() throws Exception {
+        return getCurrentUser().isCardOperator();
+    }
+
     public boolean isEligibleToEditUsers() throws Exception {
         return getCurrentUser().isSecurityAdmin();
         //return getCurrentUser().hasFunction(Function.FUNC_USER_EDIT);
@@ -9019,6 +9024,10 @@ public class MainPage implements Serializable {
 
     public boolean isEligibleToViewManualReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_MANUAL_REPORT);
+    }
+
+    public boolean isEligibleToViewCardOperator() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CARD_OPERATOR);
     }
 
     public Object removeClient() {
@@ -9300,6 +9309,10 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getDebugGroupMenu() {
         return debugGroupMenu;
+    }
+
+    public BasicWorkspacePage getCardGroupMenu() {
+        return cardGroupMenu;
     }
 
     public String getUserContragentsList() {

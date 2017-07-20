@@ -232,6 +232,19 @@ public class FunctionSelector {
         return supplierReportFunctions;
     }
 
+    public Set<Function> getCardOperatorFunctions(Session session) {
+        Criteria allFunctionsCriteria = session.createCriteria(Function.class);
+        List allFunctions = allFunctionsCriteria.list();
+        Set<Function> cardOperatorFunctions = new HashSet<Function>();
+        for (Object object : allFunctions) {
+            Function function = (Function) object;
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_CARD_OPERATOR)) {
+                cardOperatorFunctions.add(function);
+            }
+        }
+        return cardOperatorFunctions;
+    }
+
     public void fill(Session session) throws Exception {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions

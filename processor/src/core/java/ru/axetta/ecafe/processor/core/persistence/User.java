@@ -121,7 +121,9 @@ public class User {
         SUPPLIER(2,"поставщик питания"),
         MONITORING(3,"мониторинг"),
         ADMIN_SECURITY(4, "администратор ИБ"),
-        SUPPLIER_REPORT(5, "отчетность поставщика питания");
+        SUPPLIER_REPORT(5, "отчетность поставщика питания"),
+        CARD_OPERATOR(6, "оператор по картам");
+
 
         private Integer identification;
         private String description;
@@ -359,6 +361,10 @@ public class User {
 
     public boolean isSupplier() {
         return idOfRole.equals(DefaultRole.SUPPLIER.ordinal());
+    }
+
+    public boolean isCardOperator() {
+        return idOfRole.equals(DefaultRole.CARD_OPERATOR.ordinal());
     }
 
     public String getRegion() {

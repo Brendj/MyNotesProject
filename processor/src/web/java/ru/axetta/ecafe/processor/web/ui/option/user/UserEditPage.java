@@ -204,6 +204,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setRoleName(role.toString());
             }
+            if (role.equals(User.DefaultRole.CARD_OPERATOR)) {
+                user.setFunctions(functionSelector.getCardOperatorFunctions(session));
+                user.setRoleName(role.toString());
+            }
             if (region != null && region.length() > 0) {
                 user.setRegion(region);
             } else {
@@ -387,6 +391,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return role.equals(User.DefaultRole.SUPPLIER_REPORT);
     }
 
+    public Boolean getIsCardOperator() {
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.CARD_OPERATOR);
+    }
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {

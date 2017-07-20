@@ -312,6 +312,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setRoleName(role.toString());
             }
+            if (role.equals(User.DefaultRole.CARD_OPERATOR)){
+                user.setFunctions(functionSelector.getCardOperatorFunctions(session));
+                user.setRoleName(role.toString());
+            }
             user.setNeedChangePassword(needChangePassword);
             session.save(user);
             for (OrgItem orgItem : orgItems) {
@@ -358,6 +362,11 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     public Boolean getIsSupplierReport() {
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.SUPPLIER_REPORT);
+    }
+
+    public Boolean getIsCardOperator() {
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.CARD_OPERATOR);
     }
 
     @Override
