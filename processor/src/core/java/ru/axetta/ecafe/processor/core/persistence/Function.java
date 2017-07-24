@@ -128,7 +128,7 @@ public class Function {
     public static final String FUNC_RESTRICT_MANUAL_REPORT = "manualRprt";
     public static final String FUNCD_RESTRICT_MANUAL_REPORT = "Закрыть 'Ручной запуск отчетов'";
     public static final String FUNC_RESTRICT_CARD_OPERATOR = "cardOperator";
-    public static final String FUNCD_RESTRICT_CARD_OPERATOR = "Закрыть 'Опреации с картами'";
+    public static final String FUNCD_RESTRICT_CARD_OPERATOR = "Опреации по картам";
 
     private Long idOfFunction;
     private String functionName;

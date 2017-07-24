@@ -59,6 +59,7 @@ public class FunctionViewer {
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
+    private List<Item> cardOperatorItems = Collections.emptyList();
 
     public List<Item> getOnlineReportItems() {
         return onlineReportItems;
@@ -104,6 +105,10 @@ public class FunctionViewer {
         return optionsItems;
     }
 
+    public List<Item> getCardOperatorItems() {
+        return cardOperatorItems;
+    }
+
     public void fill(User user) throws Exception {
         List<Item> onlineReportItems = new ArrayList<Item>();
         List<Item> organizationItems = new ArrayList<Item>();
@@ -117,6 +122,7 @@ public class FunctionViewer {
         List<Item> repositoryItems = new ArrayList<Item>();
         List<Item> optionsItems = new ArrayList<Item>();
         Set<Function> userFunctions = user.getFunctions();
+        List<Item> cardOperatorItems = new ArrayList<Item>();
         for (Function function : userFunctions) {
             Item item = new Item(function);
             if (item.getFunctionName().equals("orgEdit") || item.getFunctionName().equals("orgView")) {
@@ -160,6 +166,8 @@ public class FunctionViewer {
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
                     .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP")) {
                 onlineReportItems.add(item);
+            } else if (item.getFunctionName().equals("cardOperator")) {
+                cardOperatorItems.add(item);
             }
         }
         this.onlineReportItems = onlineReportItems;
@@ -179,6 +187,7 @@ public class FunctionViewer {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.optionsItems = optionsItems;
+        this.cardOperatorItems = cardOperatorItems;
         Collections.sort(optionsItems);
     }
 

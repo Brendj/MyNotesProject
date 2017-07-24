@@ -120,6 +120,15 @@
             <h:outputText escape="true" value="#{onlineReportItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="Операции по картам" styleClass="output-text" rendered="#{mainPage.userViewPage.functionViewer.isEmpty(mainPage.userViewPage.functionViewer.cardOperatorItems)}" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.cardOperatorItems}" var="monitorItems" rendered="#{mainPage.userViewPage.functionViewer.isEmpty(mainPage.userViewPage.functionViewer.cardOperatorItems)}">
+        <rich:column>
+            <h:outputText escape="true" value="#{monitorItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{monitorItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showUserEditPage}"

@@ -278,6 +278,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         if (User.DefaultRole.DEFAULT.equals(role) && !user.getFunctions().equals(functionSelector.getSelected(session))) {
             return true;
         }
+        if (role.equals(User.DefaultRole.CARD_OPERATOR) && !user.getFunctions().equals(functionSelector.getCardOperatorFunctions(session))) {
+            return true;
+        }
 
         Set<Contragent> contragents = new HashSet<Contragent>();
         for (ContragentItem it : this.contragentItems) {
