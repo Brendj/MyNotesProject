@@ -53,7 +53,9 @@
                            rendered="#{mainPage.cardEditPage.tempCard}"/>
     </h:panelGroup>
     <h:outputText escape="true" value="Причина блокировки карты" styleClass="output-text" />
-    <h:inputText value="#{mainPage.cardEditPage.lockReason}" maxlength="64" styleClass="input-text" />
+    <h:selectOneMenu value="#{mainPage.cardEditPage.lockReasonState}" styleClass="input-text">
+        <f:selectItems value="#{mainPage.cardEditPage.cardLockReasonMenu.items}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Статус расположения карты" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.cardEditPage.lifeState}" styleClass="input-text">
         <f:selectItems value="#{mainPage.cardEditPage.cardLifeStateMenu.items}" />

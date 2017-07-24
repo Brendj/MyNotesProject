@@ -41,6 +41,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     private Date updateTime;
     private Integer state;
     private String lockReason;
+    private Integer lockReasonState;
     private Date validTime;
     private Date issueTime;
     private Integer lifeState;
@@ -49,6 +50,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
     private final CardTypeMenu cardTypeMenu = new CardTypeMenu();
     private final CardStateMenu cardStateMenu = new CardStateMenu();
     private final CardLifeStateMenu cardLifeStateMenu = new CardLifeStateMenu();
+    private final CardLockReasonMenu cardLockReasonMenu = new CardLockReasonMenu();
 
     public Long getCardPrintedNo() {
         return cardPrintedNo;
@@ -114,6 +116,14 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         this.lockReason = lockReason;
     }
 
+    public Integer getLockReasonState() {
+        return lockReasonState;
+    }
+
+    public void setLockReasonState(Integer lockReasonState) {
+        this.lockReasonState = lockReasonState;
+    }
+
     public Date getValidTime() {
         return validTime;
     }
@@ -158,6 +168,10 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         return cardLifeStateMenu;
     }
 
+    public CardLockReasonMenu getCardLockReasonMenu() {
+        return cardLockReasonMenu;
+    }
+
     public void fill( Long idOfCard) throws Exception {
         Card card = CardReadOnlyRepository.getInstance().find(idOfCard);
         fill(card);
@@ -185,7 +199,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         validTime = CalendarUtils.endOfDay(validTime);
         runtimeContext.getCardManager()
                 .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
-                        this.lifeState, this.lockReason, this.issueTime, this.externalId);
+                        this.lifeState, getDescriptionByValue(lockReasonState), this.issueTime, this.externalId);
         fill(session, this.idOfCard);
     }
 
@@ -202,6 +216,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         this.updateTime = card.getUpdateTime();
         this.state = card.getState();
         this.lockReason = card.getLockReason();
+        this.lockReasonState = getValueByDescription(this.lockReason);
         this.validTime = card.getValidTime();
         this.issueTime = card.getIssueTime();
         this.lifeState = card.getLifeState();
@@ -221,6 +236,10 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
                 &&(CardState.TEMPBLOCKED.getValue() != state)
                 &&(CardState.TEMPISSUED.getValue() != state)){
             throw new IllegalStateException("Требуется изменить статус карты");
+        } else {
+            if (CardLockReason.EMPTY.getValue() == lockReasonState) {
+                throw new IllegalStateException("Требуется изменить статус карты, Введите 'Причину блокировки карты'");
+            }
         }
     }
 
@@ -240,5 +259,41 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     public boolean isTempCard(){
         return state == CardState.TEMPISSUED.getValue();
+    }
+
+    public String getDescriptionByValue(Integer value) {
+        String descriptionString = null;
+        if (value == CardLockReason.EMPTY.getValue()) {
+            descriptionString = CardLockReason.EMPTY.getDescription();
+        }else if (value == CardLockReason.NEW.getValue()) {
+            descriptionString = CardLockReason.NEW.getDescription();
+        } else if (value == CardLockReason.REISSUE_BROKEN.getValue()) {
+            descriptionString = CardLockReason.REISSUE_BROKEN.getDescription();
+        } else if (value == CardLockReason.REISSUE_LOSS.getValue()) {
+            descriptionString = CardLockReason.REISSUE_LOSS.getDescription();
+        } else if (value == CardLockReason.DEMAGNETIZED.getValue()) {
+            descriptionString = CardLockReason.DEMAGNETIZED.getDescription();
+        } else if (value == CardLockReason.OTHER.getValue()) {
+            descriptionString = CardLockReason.OTHER.getDescription();
+        }
+        return descriptionString;
+    }
+
+    public Integer getValueByDescription(String description) {
+        Integer valueInt = null;
+        if (description.equals(CardLockReason.EMPTY.getDescription())) {
+            valueInt = CardLockReason.EMPTY.getValue();
+        } else if (description.equals(CardLockReason.NEW.getDescription())) {
+            valueInt = CardLockReason.NEW.getValue();
+        } else if (description.equals(CardLockReason.REISSUE_BROKEN.getDescription())) {
+            valueInt = CardLockReason.REISSUE_BROKEN.getValue();
+        } else if (description.equals(CardLockReason.REISSUE_LOSS.getDescription())) {
+            valueInt = CardLockReason.REISSUE_LOSS.getValue();
+        } else if (description.equals(CardLockReason.DEMAGNETIZED.getDescription())) {
+            valueInt = CardLockReason.DEMAGNETIZED.getValue();
+        } else if (description.equals(CardLockReason.OTHER.getDescription())) {
+            valueInt = CardLockReason.OTHER.getValue();
+        }
+        return valueInt;
     }
 }
