@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Criteria;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import javax.faces.context.FacesContext;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -878,8 +880,14 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(orgId);
         ///
         try {
-            return RuntimeContext.getInstance().getCardManager().createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE,
-                    validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo);
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            if (user.isCardOperator()) {
+                return RuntimeContext.getInstance().getCardManager()
+                        .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo, user);
+            } else {
+                return RuntimeContext.getInstance().getCardManager()
+                        .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo);
+            }
         } catch (Exception e) {
             logger.error("Failed registerCard", e);
             throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
@@ -893,7 +901,14 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(orgId);
         ///
         try {
-            RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            if (user.isCardOperator()) {
+                RuntimeContext.getInstance().getCardManager()
+                        .changeCardOwner(newOwnerId, cardNo, changeTime, validTime, user);
+            } else {
+                RuntimeContext.getInstance().getCardManager()
+                        .changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
+            }
         } catch (Exception e) {
             logger.error("Failed changeCardOwner", e);
             throw new FrontControllerException(String.format("Ошибка при смене владельца карты: %s", e.getMessage()), e);
@@ -1139,7 +1154,7 @@ public class FrontController extends HttpServlet {
         if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
                 String.format("Ключ сертификата невалиден: %d", orgId));
     }
-    
+
     @WebMethod(operationName = "generateLinkingToken")
     public String generateLinkingToken(@WebParam(name = "orgId") Long orgId, @WebParam(name = "idOfClient") Long idOfClient)
             throws Exception {

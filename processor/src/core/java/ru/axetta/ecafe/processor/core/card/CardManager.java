@@ -4,9 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.card;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.jws.soap.SOAPBinding;
 import java.util.Date;
 
 /**
@@ -24,12 +27,20 @@ public interface CardManager {
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
 
+    Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception;;
+
     void createTempCard(Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception;
 
     void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception;
 
+    void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, String externalId, User user) throws Exception;
+
     void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;
+
+    void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime, User cardOperatorUser) throws Exception;
 
     Long createNewCard(Session persistenceSession, Transaction persistenceTransaction, long cardNo, Long cardPrintedNo, Integer cardType) throws Exception;
 

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -197,9 +198,17 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (externalId!=null && externalId.length()==0) externalId=null;
         validTime = CalendarUtils.endOfDay(validTime);
-        runtimeContext.getCardManager()
-                .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
-                        this.lifeState, getDescriptionByValue(lockReasonState), this.issueTime, this.externalId);
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        if (user.isCardOperator()) {
+            runtimeContext.getCardManager()
+                    .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
+                            this.lifeState, getDescriptionByValue(lockReasonState), this.issueTime, this.externalId,
+                            user);
+        } else {
+            runtimeContext.getCardManager()
+                    .updateCard(this.client.getIdOfClient(), idOfCard, this.cardType, this.state, this.validTime,
+                            this.lifeState, getDescriptionByValue(lockReasonState), this.issueTime, this.externalId);
+        }
         fill(session, this.idOfCard);
     }
 
@@ -238,7 +247,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
             throw new IllegalStateException("Требуется изменить статус карты");
         } else {
             if (CardLockReason.EMPTY.getValue() == lockReasonState) {
-                throw new IllegalStateException("Требуется изменить статус карты, Введите 'Причину блокировки карты'");
+                throw new IllegalStateException("Введите 'Причину блокировки карты'");
             }
         }
     }
@@ -281,7 +290,7 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
 
     public Integer getValueByDescription(String description) {
         Integer valueInt = null;
-        if (description.equals(CardLockReason.EMPTY.getDescription())) {
+        if (description == null || description.equals(CardLockReason.EMPTY.getDescription())) {
             valueInt = CardLockReason.EMPTY.getValue();
         } else if (description.equals(CardLockReason.NEW.getDescription())) {
             valueInt = CardLockReason.NEW.getValue();

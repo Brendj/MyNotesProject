@@ -20,6 +20,8 @@
                      not-null="false" fetch="select" lazy="proxy"/>
         <many-to-one name="newOwner" class="ru.axetta.ecafe.processor.core.persistence.Client" column="newowner"
                      not-null="false"/>
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser"
+                    not-null="false"/>
 
         <property name="informationAboutCard" column="informationaboutcard" type="string" length="1024"/>
     </class>

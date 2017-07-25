@@ -39,16 +39,22 @@ public class HistoryCard {
      */
     private String informationAboutCard;
 
+    /**
+     * Информация о Операторе по картам
+     */
+    private User user;
+
     public HistoryCard() {
 
     }
 
-    public HistoryCard(Card card, Date upDatetime, Client formerOwner, Client newOwner, String informationAboutCard) {
+    public HistoryCard(Card card, Date upDatetime, Client formerOwner, Client newOwner, String informationAboutCard, User user) {
         this.card = card;
         this.upDatetime = upDatetime;
         this.formerOwner = formerOwner;
         this.newOwner = newOwner;
         this.informationAboutCard = informationAboutCard;
+        this.user = user;
     }
 
     public Long getIdOfHistoryCard() {
@@ -99,4 +105,11 @@ public class HistoryCard {
         this.informationAboutCard = informationAboutCard;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
