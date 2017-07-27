@@ -90,6 +90,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String syncRestrictFullSyncPeriods;
     private String syncRegisterSupportEmail;
     private Integer thinClientMinClaimsEditableDays;
+    private String readerForWebInterfaceString;
     private int smsPaymentType;
     private Long smsDefaultSubscriptionFee;
     private Boolean enableBalanceAutoRefill;
@@ -559,6 +560,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.thinClientMinClaimsEditableDays = thinClientMinClaimsEditableDays;
     }
 
+    public String getReaderForWebInterfaceString() {
+        return readerForWebInterfaceString;
+    }
+
+    public void setReaderForWebInterfaceString(String readerForWebInterfaceString) {
+        this.readerForWebInterfaceString = readerForWebInterfaceString;
+    }
+
     public int getSmsPaymentType() {
         return smsPaymentType;
     }
@@ -860,6 +869,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterMaxAttempts = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
         syncRegisterSupportEmail = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
         thinClientMinClaimsEditableDays = runtimeContext.getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
+
         syncRegisterDaysTimeout = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT);
         monitoringAllowedTags = runtimeContext.getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
         cleanupRepositoryReports = runtimeContext.getOptionValueBool(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS);
@@ -896,6 +906,8 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPSenderCode = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE);
         RNIPSenderName = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME);
         RNIPTSAServer = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_TSA_SERVER);
+
+        readerForWebInterfaceString = runtimeContext.getOptionValueString(Option.OPTION_READER_FOR_WEB_STRING);
 
         bankListPage.onShow();
 
@@ -1037,6 +1049,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_SENDER_NAME, RNIPSenderName);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_TSA_SERVER, RNIPTSAServer);
             runtimeContext.setOptionValue(Option.OPTION_DISABLE_EMAIL_EDIT, disableEmailEdit);
+
+            runtimeContext.setOptionValue(Option.OPTION_READER_FOR_WEB_STRING, readerForWebInterfaceString);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

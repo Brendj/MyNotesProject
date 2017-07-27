@@ -134,7 +134,8 @@ public class Option {
             OPTION_REGIONS_FROM_NSI = 100084,
             OPTION_FOUNDER_FROM_NSI = 100085,
             OPTION_INDUSTRY_FROM_NSI = 100086,
-            OPTION_LAST_CHANGE_FROM_NSI = 100087;
+            OPTION_LAST_CHANGE_FROM_NSI = 100087,
+            OPTION_READER_FOR_WEB_STRING = 100088;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -246,7 +247,8 @@ public class Option {
                     + "Северо-Восточный,Северо-Западный,Троицкий,Троицкий и Новомосковский,Центральный,Юго-Восточный,Юго-Западный,Южный",
             OPTION_FOUNDER_FROM_NSI, "Департамент образования города Москвы",
             OPTION_INDUSTRY_FROM_NSI, "",
-            OPTION_LAST_CHANGE_FROM_NSI, ""
+            OPTION_LAST_CHANGE_FROM_NSI, "",
+            OPTION_READER_FOR_WEB_STRING, ""
 };
 
     private Long idOfOption;
