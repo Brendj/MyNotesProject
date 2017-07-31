@@ -41,7 +41,7 @@ public class MigrantsReport extends BasicReportForListOrgsJob {
     *
     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
     */
-    public static final String REPORT_NAME = "Отчет по посещению здания образовательной организации клиентами других образовательных организаций";
+    public static final String REPORT_NAME = "Мониторинг";
     public static final String[] TEMPLATE_FILE_NAMES = {"MigrantsReport.jasper", "MigrantsReport_Subreport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};

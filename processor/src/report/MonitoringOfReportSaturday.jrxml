@@ -59,7 +59,7 @@
 				<text><![CDATA[Номер ОУ в ЕКИС]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="69b0ff7d-7f51-4c0d-ac6c-b4bbfde102c7" x="50" y="0" width="500" height="135"/>
+				<reportElement uuid="69b0ff7d-7f51-4c0d-ac6c-b4bbfde102c7" stretchType="RelativeToBandHeight" x="50" y="0" width="500" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -72,7 +72,7 @@
 				<text><![CDATA[Наименование в ЕКИС]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" x="550" y="0" width="400" height="135"/>
+				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" stretchType="RelativeToBandHeight" x="550" y="0" width="400" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1465,7 +1465,7 @@
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" x="550" y="0" width="400" height="25"/>
+				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="550" y="0" width="400" height="25"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
