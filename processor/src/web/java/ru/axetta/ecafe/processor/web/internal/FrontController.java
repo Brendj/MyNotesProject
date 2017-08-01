@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import javax.faces.context.FacesContext;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -1272,18 +1271,18 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "getExternalEvents")
     public ExternalEventItems getExternalEvents(@WebParam(name = "orgId") long idOfOrg,
-            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) throws FrontControllerException {
+            @WebParam(name = "version") long version) throws FrontControllerException {
         ExternalEventItems result = new ExternalEventItems();
         ManualEvents manualEvents = new ManualEvents();
         manualEvents.setEnterEventsManual(getEnterEventsManual(idOfOrg));
         ExternalEvents externalEvents = new ExternalEvents();
-        externalEvents.setExternalEvents(getExternalEventsInternal(idOfOrg, startDate, endDate));
+        externalEvents.setExternalEvents(getExternalEventsInternal(idOfOrg, version));
         result.setExternalEvents(externalEvents);
         result.setManualEvents(manualEvents);
         return result;
     }
 
-    private List<ExternalEventItem> getExternalEventsInternal(Long idOfOrg, Date startDate, Date endDate) throws FrontControllerException {
+    private List<ExternalEventItem> getExternalEventsInternal(Long idOfOrg, long version) throws FrontControllerException {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         List<ExternalEventItem> listResult = new ArrayList<ExternalEventItem>();
@@ -1292,9 +1291,8 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Query query = persistenceSession.createQuery("select e from ExternalEvent e "
-                    + "where e.evtDateTime between :startDate and :endDate and e.client.org.idOfOrg = :idOfOrg");
-            query.setParameter("startDate", startDate);
-            query.setParameter("endDate", endDate);
+                    + "where e.version > :version and e.client.org.idOfOrg = :idOfOrg");
+            query.setParameter("version", version);
             query.setParameter("idOfOrg", idOfOrg);
             List<ExternalEvent> list = query.list();
             for (ExternalEvent event : list) {
@@ -1303,6 +1301,7 @@ public class FrontController extends HttpServlet {
                 item.setEvtDateTime(event.getEvtDateTime());
                 item.setOrgName(event.getOrgName());
                 item.setType(event.getEvtType().ordinal());
+                item.setVersion(event.getVersion());
                 listResult.add(item);
             }
 

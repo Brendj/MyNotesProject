@@ -31,6 +31,8 @@ public class ExternalEventItem {
     private Integer type;
     @XmlAttribute(name = "orgName")
     private String orgName;
+    @XmlAttribute(name = "version")
+    private Long version;
 
     public String getEnterName() {
         return enterName;
@@ -72,4 +74,11 @@ public class ExternalEventItem {
         this.orgName = orgName;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 }
