@@ -105,8 +105,8 @@
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.orgFilterCanceled}}" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Регион" styleClass="output-text" rendered="#{!mainPage.userEditPage.isCardOperator}" />
-    <h:selectOneMenu value="#{mainPage.userEditPage.region}" styleClass="input-text" rendered="#{!mainPage.userEditPage.isCardOperator}">
+    <h:outputText escape="true" value="Регион" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.userEditPage.region}" styleClass="input-text">
         <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
         <f:selectItems value="#{mainPage.userEditPage.regions}" />
     </h:selectOneMenu>
