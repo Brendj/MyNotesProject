@@ -1717,13 +1717,12 @@
 </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="cardOperatorMenu" binding="#{mainPage.cardGroupMenu.mainMenuComponent}"
-                         label="Опреации по картам" rendered="#{mainPage.eligibleToViewCardOperator}" >
+                         label="Операции по картам" rendered="#{mainPage.eligibleToViewCardOperator}" >
         <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
         <rich:panelMenuItem id="cardOpatorItem" binding="#{cardOperatorPage.mainMenuComponent}"
                             label="Список карт" action="#{cardOperator.show}" reRender="workspaceForm" />
-        <%--@elvariable id="cardOperationListPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperationListPage"--%>
-        <rich:panelMenuItem id="cardOperationList" binding="#{cardOperationListPage.mainMenuComponent}"
-                            label="Список операций" action="#{cardOperationListPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="cardOperatorList" binding="#{mainPage.cardOperatorListPage.mainMenuComponent}"
+                            label="Список операций" action="#{mainPage.showCardOperatorListPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
 </rich:panelMenu>

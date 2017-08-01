@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
 import ru.axetta.ecafe.processor.web.ui.card.*;
+import ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorListPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountCreatePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
@@ -423,6 +424,7 @@ public class MainPage implements Serializable {
     private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
     private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
     private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
+    private final CardOperatorListPage cardOperatorListPage = new CardOperatorListPage();
 
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
@@ -3936,6 +3938,86 @@ public class MainPage implements Serializable {
             persistenceTransaction = persistenceSession.beginTransaction();
             cardListPage.getCardFilter().clear();
             cardListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to clear filter for card list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public CardOperatorListPage getCardOperatorListPage() {
+        return cardOperatorListPage;
+    }
+
+    public Object showCardOperatorListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            cardOperatorListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = cardOperatorListPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill card list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object updateCardOperatorListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            cardOperatorListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to set filter for card list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object clearCardOperatorListPageFilter() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            cardOperatorListPage.getCardOperatorFilter().clear();
+            cardOperatorListPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
