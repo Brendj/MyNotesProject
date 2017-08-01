@@ -271,6 +271,7 @@ public class ClientSmsList {
         criteria.add(Restrictions.ge("serviceSendTime", startTime));
         criteria.add(Restrictions.le("serviceSendTime", endTime));
         criteria.add(Restrictions.eq("client", client));
+        criteria.addOrder(Order.asc("eventTime"));
 
         List<Item> items = new LinkedList<Item>();
         List clientPayments = criteria.list();

@@ -17,28 +17,40 @@ public class ExternalEvent {
     private Client client;
     private Date evtDateTime;
     private ExternalEventType evtType;
+    private ExternalEventStatus evtStatus;
+    private Long version;
 
     public ExternalEvent() {
         //default constructor
     }
 
-    public ExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType, Date evtDateTime) {
+    public ExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus, ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
         this.client = client;
         this.orgCode = orgCode;
         this.orgName = orgName;
         this.evtType = evtType;
         this.evtDateTime = evtDateTime;
-        buildEnterName();
+        this.evtStatus = evtStatus;
+        this.version = handlerVersion.getVersion();
+        buildEnterName(evtStatus);
     }
 
-    private void buildEnterName() {
+    protected void buildEnterName(ExternalEventStatus evtStatus) throws IllegalArgumentException {
+        String name = "";
+        if (evtType == null) throw new IllegalArgumentException("Неверный тип события");
+        if (evtStatus == null) throw new IllegalArgumentException("Неверный статус");
         if (evtType.equals(ExternalEventType.MUSEUM)) {
-            String name = "Посещение музея " + orgName;
-            if (name.length() > 255) {
-                name = name.substring(0, 255);
+            if (getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                name = String.format("Вход (%s)", getOrgName());
+            } else if (getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                name = String.format("Возврат билета (%s)", getOrgName());
             }
-            setEnterName(name);
         }
+        if (name.length() > 255) {
+            name = name.substring(0, 255);
+        }
+        setEnterName(name);
     }
 
     public Long getIdOfExternalEvent() {
@@ -95,5 +107,21 @@ public class ExternalEvent {
 
     public void setEvtType(ExternalEventType evtType) {
         this.evtType = evtType;
+    }
+
+    public ExternalEventStatus getEvtStatus() {
+        return evtStatus;
+    }
+
+    public void setEvtStatus(ExternalEventStatus evtStatus) {
+        this.evtStatus = evtStatus;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

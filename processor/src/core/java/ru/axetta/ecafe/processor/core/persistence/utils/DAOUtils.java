@@ -2486,6 +2486,17 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByExternalEvent(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select e.version from cf_externalevents as e order by e.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);

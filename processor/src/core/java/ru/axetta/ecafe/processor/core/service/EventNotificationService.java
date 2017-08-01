@@ -59,6 +59,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_INFO_MAILING = "infoMailing";
     public static String NOTIFICATION_LOW_BALANCE = "lowBalance";
     public static String NOTIFICATION_ENTER_MUSEUM = "enterMuseum";
+    public static String NOTIFICATION_NOENTER_MUSEUM = "noEnterMuseum";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -172,7 +173,9 @@ public class EventNotificationService {
             NOTIFICATION_LOW_BALANCE + "." + TYPE_SMS,
             "[surname] [name] (л/с: [account]): баланс ниже [balanceToNotify] руб.",
             NOTIFICATION_ENTER_MUSEUM + "." + TYPE_SMS,
-            "[surname] [name] (л/с: [account]): посещение музея [event_place_code]"
+            "[surname] [name] (л/с: [account]): посещение музея [event_place_code]",
+            NOTIFICATION_NOENTER_MUSEUM + "." + TYPE_SMS,
+            "[surname] [name] (л/с: [account]): возврат билета в музей [event_place_code]"
     };                       // короткое имя школы
 
     String getDefaultText(String name) {
@@ -469,6 +472,8 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_LOW_BALANCE_NOTIFICATION;
             } else if (type.equals(NOTIFICATION_ENTER_MUSEUM)) {
                 clientSMSType = ClientSms.TYPE_ENTER_MUSEUM_NOTIFICATION;
+            } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
+                clientSMSType = ClientSms.TYPE_NOENTER_MUSEUM_NOTIFICATION;
             } else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
@@ -758,6 +763,15 @@ public class EventNotificationService {
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, destClient);
                 }
+            } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient);
+                }
+            }
+
+            if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 String eventPlaceCode = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_CODE}, values);
                 empType.getParameters().put(ExternalEventNotificationService.PLACE_CODE, eventPlaceCode);
                 String eventPlaceName = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_NAME}, values);

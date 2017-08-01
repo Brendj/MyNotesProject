@@ -13,6 +13,7 @@
         <property name="orgCode" column="OrgCode" type="string" length="20"/>
         <property name="orgName" column="OrgName" type="string" length="256"/>
         <property name="enterName" column="EnterName" type="string" length="256"/>
+        <property name="version" column="version" type="long" not-null="true"/>
         <property name="evtType" column="EvtType">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ExternalEventType</param>
@@ -23,5 +24,11 @@
                      not-null="true" update="false" />
         <property name="evtDateTime" column="EvtDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
+        <property name="evtStatus" column="EvtStatus">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ExternalEventStatus</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
     </class>
 </hibernate-mapping>

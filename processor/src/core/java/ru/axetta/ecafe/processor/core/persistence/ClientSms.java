@@ -33,7 +33,8 @@ public class ClientSms {
             "Оповещение по итогам недели", // 11 - TYPE_SUMMARY_WEEKLY_NOTIFICATION
             "Информационная рассылка",    // 12 - TYPE_INFO_MAILING_NOTIFICATION
             "Уведомление о снижении баланса",  //13 - TYPE_LOW_BALANCE_NOTIFICATION
-            "Посещение музея" //14 - TYPE_ENTER_MUSEUM_NOTIFICATION
+            "Вход в музей", //14 - TYPE_ENTER_MUSEUM_NOTIFICATION
+            "Возврат билета в музей" //15 - TYPE_NOENTER_MUSEUM_NOTIFICATION
     };
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
@@ -49,6 +50,7 @@ public class ClientSms {
     public static final int TYPE_INFO_MAILING_NOTIFICATION = 12;
     public static final int TYPE_LOW_BALANCE_NOTIFICATION = 13;
     public static final int TYPE_ENTER_MUSEUM_NOTIFICATION = 14;
+    public static final int TYPE_NOENTER_MUSEUM_NOTIFICATION = 15;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;

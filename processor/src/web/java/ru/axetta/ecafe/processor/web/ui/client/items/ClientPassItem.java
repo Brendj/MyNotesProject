@@ -4,9 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client.items;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.ExternalEvent;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.hibernate.Session;
 
@@ -55,7 +53,14 @@ public class ClientPassItem implements Comparable {
         this.orgName = event.getOrgName();
         this.enterTime = event.getEvtDateTime();
         this.enterName = event.getEnterName();
-        this.direction = getDirection(EnterEvent.ENTRY);
+        if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
+            if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                this.direction = getDirection(EnterEvent.ENTRY);
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                this.direction = getDirection(EnterEvent.PASSAGE_RUFUSAL);
+            }
+        }
+
     }
 
     @Override

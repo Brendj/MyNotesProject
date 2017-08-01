@@ -6,9 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
-import ru.axetta.ecafe.processor.core.persistence.ExternalEvent;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -39,14 +37,21 @@ public class ExternalEventNotificationService {
     public static String NAME = "name";
     public static String ACCOUNT = "account";
 
-    public void sendNotification(ExternalEvent event, String type) throws Exception {
+    public void sendNotification(Client client, ExternalEvent event) throws Exception {
+        String type = null;
+        if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
+            if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                type = EventNotificationService.NOTIFICATION_ENTER_MUSEUM;
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                type = EventNotificationService.NOTIFICATION_NOENTER_MUSEUM;
+            }
+        }
+        if (type == null) return;
         Session persistenceSession = null;
         Transaction transaction = null;
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = persistenceSession.beginTransaction();
-
-            Client client = (Client)persistenceSession.get(Client.class, event.getClient().getIdOfClient());
             String[] values = generateNotificationParams(client, event);
             final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                     EventNotificationService.class);
@@ -73,7 +78,6 @@ public class ExternalEventNotificationService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-
     }
 
     private String[] generateNotificationParams(Client client, ExternalEvent event) {

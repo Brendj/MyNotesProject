@@ -8108,7 +8108,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
-            @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime) {
+            @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
+            @WebParam(name = "ticketStatus") Integer ticketStatus) {
         authenticateRequest(null);
         if (StringUtils.isEmpty(guid)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
@@ -8130,17 +8131,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (museumName != null && museumName.length() > 255) {
                 museumName = museumName.substring(0, 255);
             }
-            ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime);
+            ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
+            ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime,
+                    ExternalEventStatus.fromInteger(ticketStatus), handler);
             session.save(event);
+            transaction.commit();
+            transaction = null;
+
             //отправка уведомления
             if (CalendarUtils.isDateToday(accessTime)) {
                 ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
-                String notifyType = EventNotificationService.NOTIFICATION_ENTER_MUSEUM;
-                notificationService.sendNotification(event, notifyType);
+                notificationService.sendNotification(cl, event);
             }
-            transaction.commit();
-            transaction = null;
             return new Result(RC_OK, RC_OK_DESC);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error in enterMuseum method:", e);
+            return new Result(RC_INTERNAL_ERROR, e.getMessage());
         } catch (Exception e) {
             logger.error("Error in enterMuseum method:", e);
             return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
