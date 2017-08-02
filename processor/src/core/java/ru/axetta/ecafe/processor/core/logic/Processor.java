@@ -2348,8 +2348,7 @@ public class Processor implements SyncProcessor {
         processPaymentRegistrySections(request, null, responseSections, bError, idOfPacket, errorClientIds);
 
         //info messages
-        //todo временно отключаем для теста
-        //processInfoMessageSections(request, responseSections);
+        processInfoMessageSections(request, responseSections);
 
         try {
             if (request.getProtoVersion() < 6) {
