@@ -261,17 +261,29 @@ public class SummaryCalculationService {
 
         //Подсчет данных по событиям проходов. Первый запрос - старая таблица уведомлений, второй - новая
         String query_ee = "SELECT c.idofclient, p.surname, p.firstname, "
-                + "coalesce(e.evtdatetime, -1) as evtdatetime, coalesce(e.passdirection, -1) as passdirection, "
-                + "coalesce(e.guardianid, -1) as guardianId, coalesce(e.childpasschecker, -1) as childpasschecker, "
-                + "coalesce(e.childpasscheckerid, -1) as childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
-                + "FROM cf_clientsnotificationsettings n inner join cf_clients c on c.idofclient = n.idofclient and n.notifytype = :notifyType "
+                + "coalesce(e.evtdatetime, -1) AS evtdatetime, coalesce(e.passdirection, -1) AS passdirection, "
+                + "coalesce(e.guardianid, -1) AS guardianId, coalesce(e.childpasschecker, -1) AS childpasschecker, "
+                + "coalesce(e.childpasscheckerid, -1) AS childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
+                + "FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                 + "INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
-                + "INNER JOIN cf_orgs o on c.idoforg = o.idoforg "
+                + "INNER JOIN cf_orgs o ON c.idoforg = o.idoforg "
                 + "LEFT OUTER JOIN cf_enterevents e ON c.idofclient = e.idofclient "
                 + "AND e.evtdatetime BETWEEN :startTime AND :endTime "
-                + "WHERE (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
-                + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.IdOfClient)) "
-                + "and c.idofclientgroup not between :group_employees and :group_displaced order by 1, 4";
+                + "WHERE c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced "
+                + "UNION "
+                + "SELECT c.idofclient, p.surname, p.firstname, "
+                + "coalesce(e.evtdatetime, -1) AS evtdatetime, coalesce(e.passdirection, -1) AS passdirection, "
+                + "coalesce(e.guardianid, -1) AS guardianId, coalesce(e.childpasschecker, -1) AS childpasschecker, "
+                + "coalesce(e.childpasscheckerid, -1) AS childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
+                + "FROM cf_client_guardian_notificationsettings n "
+                + "INNER JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
+                + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
+                + "INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
+                + "INNER JOIN cf_orgs o ON c.idoforg = o.idoforg "
+                + "LEFT OUTER JOIN cf_enterevents e ON c.idofclient = e.idofclient "
+                + "AND e.evtdatetime BETWEEN :startTime AND :endTime "
+                + "WHERE c.idofclientgroup NOT BETWEEN :group_employees AND :group_displaced "
+                + "ORDER BY 1, 4";
         Query equery = entityManager.createNativeQuery(query_ee);
         equery.setParameter("notifyType", notifyType);
         equery.setParameter("startTime", startDate.getTime());
