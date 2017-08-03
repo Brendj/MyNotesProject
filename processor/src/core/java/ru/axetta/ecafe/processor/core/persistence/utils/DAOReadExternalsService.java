@@ -232,6 +232,9 @@ public class DAOReadExternalsService {
         Integer addDays = org.getConfigurationProvider().getMenuSyncCountDays();
         if (addDays == null) addDays = 7;
         endDate = CalendarUtils.addDays(endDate, addDays);
+
+        today = CalendarUtils.addDays(today, -7); //todo в будущем нужна настройка на сдвиг начальной даты
+
         TypedQuery<ComplexInfo> query = entityManager.createQuery(sql,
                 ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
                 .setParameter("endDate", endDate).setParameter("idOfComplex", idOfComplex);
