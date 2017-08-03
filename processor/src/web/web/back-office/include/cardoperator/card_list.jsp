@@ -8,6 +8,15 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<script>
+    var filePrefix = "\\cardprinterforschools\jobs";
+    function SaveFile(fileName, fileText) {
+        var fso = new ActiveXObject("Scripting.FileSystemObject"); // Создаем объект
+        var file = fso.CreateTextFile(filePrefix + fileName, true); // Создаем файл
+        file.WriteLine(fileText); // Выводим в него строку
+        file.Close(); // Закрываем файл
+    }
+</script>
 
 <h:panelGrid id="cardOperationListGrid" binding="#{mainPage.cardOperatorListPage.pageComponent}"
              styleClass="borderless-grid">
@@ -36,8 +45,9 @@
                                         #{rich:component('modalClientListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
-                    <f:setPropertyActionListener value="#{mainPage.cardOperatorListPage.cardOperatorFilter.getStringClientList}"
-                                                 target="#{mainPage.clientSelectListPage.clientFilter}" />
+                    <f:setPropertyActionListener
+                            value="#{mainPage.cardOperatorListPage.cardOperatorFilter.getStringClientList}"
+                            target="#{mainPage.clientSelectListPage.clientFilter}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
                               value=" {#{mainPage.cardOperatorListPage.cardOperatorFilter.filterClient}}" />
@@ -50,8 +60,9 @@
             </h:selectOneMenu>
 
             <h:outputText styleClass="output-text" escape="true" value="Дата операции" />
-            <rich:calendar value="#{mainPage.cardOperatorListPage.cardOperatorFilter.startDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <rich:calendar value="#{mainPage.cardOperatorListPage.cardOperatorFilter.startDate}"
+                           datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
+                           showWeeksBar="false" />
 
             <h:outputText escape="false" value="Показать операции за весь период" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}"
@@ -106,18 +117,30 @@
             <h:outputText escape="true" value="#{item.status}" styleClass="output-text" />
         </rich:column>
 
-        <rich:column headerClass="column-header" rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" >
+        <rich:column headerClass="column-header"
+                     rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}">
             <f:facet name="header">
-                <h:outputText escape="true" value="Последние изменения" rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
+                <h:outputText escape="true" value="Последние изменения"
+                              rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.date}" converter="timeConverter" styleClass="output-text" rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
+            <h:outputText escape="true" value="#{item.date}" converter="timeConverter" styleClass="output-text"
+                          rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
         </rich:column>
 
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Печать" />
             </f:facet>
-            <h:graphicImage value="/images/16x16/print.png" style="border: 0;" />
+            <%--<a4j:commandLink action="#{mainPage.showCardOperatorListPage}" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm" onclick="SaveFile('file.csv', '45678977887')">
+                <h:graphicImage value="/images/16x16/print.png" style="border: 0;" />
+            </a4j:commandLink>--%>
+
+            <h:commandButton action="#{mainPage.cardOperatorListPage.saveToFile}" image="/images/16x16/print.png" >
+                <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}"/>
+                <f:setPropertyActionListener value="#{item.date}" target="#{mainPage.cardOperatorListPage.dateAction}"/>
+            </h:commandButton>
+            <%--<button onclick="SaveFile('file.csv', '4567890')" image="/images/16x16/print.png"></button>--%>
         </rich:column>
 
         <f:facet name="footer">

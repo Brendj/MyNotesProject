@@ -8,11 +8,16 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -128,5 +133,58 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             }
         }
         this.items = items;
+    }
+
+    public Long action;
+
+    public Long getAction() {
+        return action;
+    }
+
+    public void setAction(Long action) {
+        this.action = action;
+    }
+
+    public Date dateAction;
+
+    public Date getDateAction() {
+        return dateAction;
+    }
+
+    public void setDateAction(Date dateAction) {
+        this.dateAction = dateAction;
+    }
+
+    public void saveToFile() throws Exception {
+
+       /* try {
+            FileWriter writer = new FileWriter("\\DIAMOND-PC\\one.csv", false);
+            // запись всей строки
+            String text = String.valueOf(action);
+            writer.write(text);
+            // запись по символам
+            writer.flush();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }*/
+
+       String fn = action + "-" + CalendarUtils.dateShortToStringFullYear(dateAction) + ".csv";
+
+        String pathToFile = "\\\\cardprinterforschools\\jobs";
+        File file = new File(pathToFile);
+        file.mkdirs();
+
+        File fileNew = new File(pathToFile + "/" + fn);
+
+        try {
+            // открываем поток для записи
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fileNew));
+            // пишем данные
+            bw.write(String.valueOf(action));
+            // закрываем поток
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
