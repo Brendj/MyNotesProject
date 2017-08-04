@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -504,7 +505,7 @@ public class User {
         if (user == null) {
             throw new Exception(String.format("Cannot find user %s", userName));
         }
-        String code = generateSmsCode();
+        String code = ProcessorUtils.generateSmsCode();
 
         /*Client fakeClient = createFakeClient(user.getPhone());
         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
@@ -586,15 +587,7 @@ public class User {
         }*/
     }
 
-    private static String generateSmsCode() {
-        //return new BigInteger(4 * 5, new SecureRandom()).toString(32); - символьно-цифровой код. Ниже чисто цифровой
-        String result = "";
-        Random random = new Random(System.currentTimeMillis());
-        for (int i = 0; i < 4; i++) {
-            result += random.nextInt(10);
-        }
-        return result;
-    }
+
 
     public boolean loginAllowed() {
         if (idOfRole.equals(DefaultRole.ADMIN_SECURITY.getIdentification())) {

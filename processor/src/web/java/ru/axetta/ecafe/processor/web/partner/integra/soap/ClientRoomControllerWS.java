@@ -5271,6 +5271,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public SendResult sendPasswordRecoverBySms(@WebParam(name = "contractId") Long contractId) {
+        ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
+        SendResult sr = new SendResult();
+        sr.resultCode = RC_OK;
+        sr.description = RC_OK_DESC;
+        try {
+            int succeeded = clientPasswordRecover.sendPasswordRecoverBySms(contractId);
+            sr.recoverStatus = succeeded;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            sr.resultCode = RC_INTERNAL_ERROR;
+            sr.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return sr;
+    }
+
+    @Override
     public CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name = "request") RequestWebParam request) {
         ClientPasswordRecover clientPasswordRecover = RuntimeContext.getInstance().getClientPasswordRecover();
         CheckPasswordResult cpr = new CheckPasswordResult();

@@ -294,6 +294,8 @@ public interface ClientRoomController {
     @WebMethod SendResult sendPasswordRecoverURLFromEmail(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "request") RequestWebParam request);
 
+    @WebMethod SendResult sendPasswordRecoverBySms(@WebParam(name = "contractId") Long contractId);
+
     @WebMethod CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name = "request") RequestWebParam request);
 
     @WebMethod IdResult getIdOfClient(@WebParam(name = "contractId") Long contractId);

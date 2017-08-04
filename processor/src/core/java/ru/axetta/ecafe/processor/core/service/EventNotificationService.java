@@ -60,6 +60,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_LOW_BALANCE = "lowBalance";
     public static String NOTIFICATION_ENTER_MUSEUM = "enterMuseum";
     public static String NOTIFICATION_NOENTER_MUSEUM = "noEnterMuseum";
+    public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -562,8 +563,34 @@ public class EventNotificationService {
         return result;
     }
 
+    @Async
+    public boolean sendNotificationClientNewPasswordAsync(Client destClient, String[] values) {
+        boolean result = false;
+        int clientSMSType = ClientSms.TYPE_CLIENT_NEWPASSWORD_NOTIFICATION;
+        try {
+            Object textObject = getClientNewPasswordNotificationObject(destClient, values);
+            if (textObject != null) {
+                smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, new Date());
+                result = true;
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to send client new password notification to client with contract_id = %s.", destClient.getContractId());
+            logger.error(message, e);
+            return false;
+        }
+        return result;
+    }
+
     private Object getInfoMailingNotificationObject(Client destClient, String[] values) {
         EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.INFO_MAILING_EVENT, destClient);
+        for (int i = 0; i < values.length-1; i=i+2) {
+            empType.getParameters().put(values[i], values[i+1]);
+        }
+        return empType;
+    }
+
+    private Object getClientNewPasswordNotificationObject(Client destClient, String[] values) {
+        EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CLIENT_NEWPASSWORD_EVENT, destClient);
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }

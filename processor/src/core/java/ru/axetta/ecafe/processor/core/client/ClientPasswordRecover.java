@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Option;
@@ -173,6 +174,50 @@ public class ClientPasswordRecover {
         return succeeded;
     }
 
+    public int sendPasswordRecoverBySms(Long contractId) throws Exception {
+        int succeeded = -1;
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(Client.class);
+            criteria.add(Restrictions.eq("contractId", contractId));
+            Client currClient = (Client) criteria.uniqueResult();
+            succeeded = (null != currClient ? 0 : -1);
+            if (null != currClient) {
+                String clientMobile = currClient.getMobile();
+                if (StringUtils.isEmpty(clientMobile)) {
+                    succeeded = CONTRACT_HAS_NOT_EMAIL;
+                } else {
+                    String plainPassword = ProcessorUtils.generateSmsCode(); //генерируем пароль аналогично алгоритму для входа в бэк-офис (4 цифры)
+                    currClient.setPassword(plainPassword);
+                    currClient.setUpdateTime(new Date());
+                    session.update(currClient);
+
+                    String[] values = generateNotificationParams(currClient, plainPassword);
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendNotificationClientNewPasswordAsync(currClient, values);
+
+                    logger.info("Sent recover password sms code to '" + clientMobile + "'");
+                }
+            } else {
+                succeeded = NOT_FOUND_CONTRACT_BY_ID;
+            }
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return succeeded;
+
+    }
+
+    private String[] generateNotificationParams(Client client, String password) {
+        return new String[] {
+                "account", client.getContractId().toString(),
+                "password", password
+        };
+    }
 
     public boolean checkPasswordRestoreRequest(HttpServletRequest request) throws Exception {
         boolean succeeded = false;

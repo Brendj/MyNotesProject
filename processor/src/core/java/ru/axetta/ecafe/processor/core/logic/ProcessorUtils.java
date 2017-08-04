@@ -24,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -205,6 +202,16 @@ public class ProcessorUtils {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public static String generateSmsCode() {
+        //return new BigInteger(4 * 5, new SecureRandom()).toString(32); - символьно-цифровой код. Ниже чисто цифровой
+        String result = "";
+        Random random = new Random(System.currentTimeMillis());
+        for (int i = 0; i < 4; i++) {
+            result += random.nextInt(10);
+        }
+        return result;
     }
 
     public static class LastProcessRecord {

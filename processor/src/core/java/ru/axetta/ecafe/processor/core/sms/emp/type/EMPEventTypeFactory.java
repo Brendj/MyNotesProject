@@ -32,6 +32,7 @@ public class EMPEventTypeFactory {
     public static final int ENTER_MUSEUM_EVENT        = 901240013;
     public static final int NOENTER_MUSEUM_EVENT      = 901240014;
     public static final int INFO_MAILING_EVENT        = 901240056;
+    public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
 
     public static final EMPEventType buildEvent(int type, Client client) {
         return buildEvent(type, client, Collections.EMPTY_MAP);
@@ -100,6 +101,9 @@ public class EMPEventTypeFactory {
                 break;
             case NOENTER_MUSEUM_EVENT:
                 event = new EMPNoEnterMuseumEventType();
+                break;
+            case CLIENT_NEWPASSWORD_EVENT:
+                event = new EMPClientNewPasswordEventType();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

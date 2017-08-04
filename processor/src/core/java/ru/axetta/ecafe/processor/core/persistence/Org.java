@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 
+import javax.persistence.Version;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -388,6 +389,7 @@ public class Org implements Serializable {
         this.idOfOrg = idOfOrg;
     }
 
+    @Version
     public long getVersion() {
         // For Hibernate only
         return version;
