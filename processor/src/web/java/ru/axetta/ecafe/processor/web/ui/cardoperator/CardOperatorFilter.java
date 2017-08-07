@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.web.ui.CompareFilterMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardFilter;
 import ru.axetta.ecafe.processor.web.ui.card.CardLifeStateFilterMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardStateFilterMenu;
-import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Created by anvarov on 31.07.2017.
  */
-public class CardOperatorFilter implements ClientSelectListPage.CompleteHandler {
+public class CardOperatorFilter extends OnlineReportPage implements ClientSelectListPage.CompleteHandler {
 
     private Calendar localCalendar;
 
@@ -77,7 +77,7 @@ public class CardOperatorFilter implements ClientSelectListPage.CompleteHandler 
                 getClientList().add(item);
             }
         }
-        filterClient = getStringClientList();
+        filter = getStringClientList();
     }
 
     public static class OrgItem {
@@ -124,24 +124,11 @@ public class CardOperatorFilter implements ClientSelectListPage.CompleteHandler 
     private int balanceCompareCondition = CompareFilterMenu.NO_CONDITION;
 
     private final List<ClientSelectListPage.Item> clientList = new ArrayList<ClientSelectListPage.Item>();
-    private final ClientFilter clientFilter = new ClientFilter();
-    protected String filterClient = "Не выбрано";
+
     private Boolean showOperationsAllPeriod;
 
     public List<ClientSelectListPage.Item> getClientList() {
         return clientList;
-    }
-
-    public ClientFilter getClientFilter() {
-        return clientFilter;
-    }
-
-    public String getFilterClient() {
-        return filterClient;
-    }
-
-    public void setFilterClient(String filterClient) {
-        this.filterClient = filterClient;
     }
 
     public Boolean getShowOperationsAllPeriod() {

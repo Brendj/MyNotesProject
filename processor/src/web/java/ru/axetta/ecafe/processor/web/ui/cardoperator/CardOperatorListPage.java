@@ -65,14 +65,15 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         private String shortNameInfoService;
         private Long cardNo;
         private String personName;
-        private String status;
+        private Integer state;
         private Date date;
 
         public Item(Org org, Card card, String personName, CardOperatorFilter cardFilter) {
             this.shortNameInfoService = org.getShortNameInfoService();
             this.cardNo = card.getCardNo();
             this.personName = personName;
-            this.status = cardFilter.getStatus();
+            this.state = card.getState();
+
             this.date = card.getCreateTime();
         }
 
@@ -100,12 +101,12 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             this.personName = personName;
         }
 
-        public String getStatus() {
-            return status;
+        public Integer getState() {
+            return state;
         }
 
-        public void setStatus(String status) {
-            this.status = status;
+        public void setState(Integer state) {
+            this.state = state;
         }
 
         public Date getDate() {

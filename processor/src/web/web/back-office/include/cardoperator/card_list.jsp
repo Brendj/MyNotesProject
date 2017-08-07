@@ -50,7 +50,7 @@
                             target="#{mainPage.clientSelectListPage.clientFilter}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                              value=" {#{mainPage.cardOperatorListPage.cardOperatorFilter.filterClient}}" />
+                              value=" {#{mainPage.cardOperatorListPage.cardOperatorFilter.filter}}" />
             </h:panelGroup>
 
             <h:outputText escape="true" value="Cтатус" styleClass="output-text" />
@@ -114,7 +114,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Статус" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.status}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.state}" converter="cardStateConverter" styleClass="output-text" />
         </rich:column>
 
         <rich:column headerClass="column-header"
