@@ -67,6 +67,14 @@ public class Card {
         // For Hibernate only
     }
 
+    public Card(Client client, Long cardNo, Integer cardType, Date validTime, Long cardPrintedNo) {
+        this.client = client;
+        this.cardNo = cardNo;
+        this.cardType = cardType;
+        this.validTime = validTime;
+        this.cardPrintedNo = cardPrintedNo;
+    }
+
     public Card(Client client, long cardNo, int cardType, int state, Date validTime, int lifeState, Long cardPrintedNo)
             throws Exception {
         this.client = client;

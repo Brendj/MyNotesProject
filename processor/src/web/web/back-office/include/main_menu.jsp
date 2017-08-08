@@ -1721,6 +1721,8 @@
         <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
         <rich:panelMenuItem id="cardOpatorItem" binding="#{cardOperatorPage.mainMenuComponent}"
                             label="Список карт" action="#{cardOperatorPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="cardRegistrationAndIssueItem" binding="#{mainPage.cardRegistrationAndIssuePage.mainMenuComponent}"
+                            label="Регистрация и выдача карты" action="#{mainPage.showCardRegistrationAndIssuePage}" reRender="workspaceForm"/>
         <rich:panelMenuItem id="cardOperatorList" binding="#{mainPage.cardOperatorListPage.mainMenuComponent}"
                             label="Список операций" action="#{mainPage.showCardOperatorListPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>

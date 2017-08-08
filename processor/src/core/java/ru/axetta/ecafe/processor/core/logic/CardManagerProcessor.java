@@ -675,6 +675,83 @@ public class CardManagerProcessor implements CardManager {
         }
     }
 
+    @Override
+    public Long createCard(Long idOfClient, Long cardNo, Integer cardType, Date validTime, String lockReason,
+            Date issueTime, Long cardPrintedNo) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Long idOfCard = createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, validTime, lockReason, issueTime, cardPrintedNo);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return idOfCard;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient,
+            Long cardNo, Integer cardType, Date validTime, String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
+        logger.debug("check valid date");
+        if (validTime.after(CalendarUtils.AFTER_DATE)) {
+            throw new Exception("Не верно введена дата");
+        }
+
+        logger.debug("check issue date");
+        if (issueTime != null && validTime.before(issueTime)) {
+            throw new Exception("Не верно введена дата");
+        }
+
+        logger.debug("check exist client");
+        Client client = getClientReference(persistenceSession, idOfClient);
+        if (client == null) {
+            throw new Exception("Клиент не найден: " + idOfClient);
+        }
+        logger.debug("check exist card");
+        Card c = findCardByCardNo(persistenceSession, cardNo);
+        if (c != null && c.getClient() != null) {
+            throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
+        }
+        logger.debug("check exist temp card");
+        CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
+        if (ct != null) {
+            if (ct.getClient() != null) {
+                throw new Exception(String.format(
+                        "Карта с таким номером уже зарегистрирована как временная на клиента: %s. Статус карты - %s.",
+                        ct.getClient().getIdOfClient(), ct.getCardStation()));
+            }
+            if (ct.getVisitor() != null) {
+                throw new Exception(String.format(
+                        "Карта с таким номером уже зарегистрирована как временная на посетителя: %s. Статус карты - %s.",
+                        ct.getVisitor().getIdOfVisitor(), ct.getCardStation()));
+            }
+        }
+
+        logger.debug("create card");
+        Card card = new Card(client, cardNo, cardType, validTime, cardPrintedNo);
+        card.setIssueTime(issueTime);
+        card.setLockReason(lockReason);
+        card.setOrg(client.getOrg());
+        persistenceSession.save(card);
+
+        //История карты при создании новой карты
+        HistoryCard historyCard = new HistoryCard();
+        historyCard.setCard(card);
+        historyCard.setUpDatetime(new Date());
+        historyCard.setNewOwner(client);
+        historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo());
+        persistenceSession.save(historyCard);
+
+        return card.getIdOfCard();
+    }
+
+
     private static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
         for (Card card : lockableCards) {
             if (card.getState() == Card.ACTIVE_STATE) {

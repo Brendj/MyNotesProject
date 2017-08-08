@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
 import ru.axetta.ecafe.processor.web.ui.card.*;
 import ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorListPage;
+import ru.axetta.ecafe.processor.web.ui.cardoperator.CardRegistrationAndIssuePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountCreatePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
@@ -425,6 +426,7 @@ public class MainPage implements Serializable {
     private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
     private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
     private final CardOperatorListPage cardOperatorListPage = new CardOperatorListPage();
+    private final CardRegistrationAndIssuePage cardRegistrationAndIssuePage = new CardRegistrationAndIssuePage();
 
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
@@ -4030,6 +4032,35 @@ public class MainPage implements Serializable {
 
 
         }
+        return null;
+    }
+
+    public CardRegistrationAndIssuePage getCardRegistrationAndIssuePage() {
+        return cardRegistrationAndIssuePage;
+    }
+
+    public Object showCardRegistrationAndIssuePage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            cardRegistrationAndIssuePage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = cardRegistrationAndIssuePage;
+        } catch (Exception e) {
+            logger.error("Failed to show card create page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы регистрации карты: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
         return null;
     }
 

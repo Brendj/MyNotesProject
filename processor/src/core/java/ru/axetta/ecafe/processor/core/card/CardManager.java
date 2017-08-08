@@ -50,6 +50,9 @@ public interface CardManager {
 
     NewCardItem getNewCardPrintedNo(long cardNo) throws Exception;
 
+    Long createCard(Long idOfClient, Long cardNo, Integer cardType, Date validTime, String lockReason, Date issueTime,
+            Long cardPrintedNo) throws Exception;
+
     class NewCardItem{
         private Long cardPrintedNo;
         private Integer cardType;
