@@ -63,17 +63,20 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
     public static class Item {
 
         private String shortNameInfoService;
+        private Long contractId;
         private Long cardNo;
+        private Long cardPrintedNo;
         private String personName;
         private Integer state;
         private Date date;
 
-        public Item(Org org, Card card, String personName, CardOperatorFilter cardFilter) {
+        public Item(Org org, Card card, String personName) {
             this.shortNameInfoService = org.getShortNameInfoService();
+            this.contractId = card.getClient().getContractId();
             this.cardNo = card.getCardNo();
+            this.cardPrintedNo = card.getCardPrintedNo();
             this.personName = personName;
             this.state = card.getState();
-
             this.date = card.getCreateTime();
         }
 
@@ -85,12 +88,28 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             this.shortNameInfoService = shortNameInfoService;
         }
 
+        public Long getContractId() {
+            return contractId;
+        }
+
+        public void setContractId(Long contractId) {
+            this.contractId = contractId;
+        }
+
         public Long getCardNo() {
             return cardNo;
         }
 
         public void setCardNo(Long cardNo) {
             this.cardNo = cardNo;
+        }
+
+        public Long getCardPrintedNo() {
+            return cardPrintedNo;
+        }
+
+        public void setCardPrintedNo(Long cardPrintedNo) {
+            this.cardPrintedNo = cardPrintedNo;
         }
 
         public String getPersonName() {
@@ -130,10 +149,20 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
                     Person person = DAOService.getInstance().getPersonByClient(card.getClient());
                     personName = person.getFullName();
                 }
-                items.add(new Item(org, card, personName, cardOperatorFilter));
+                items.add(new Item(org, card, personName));
             }
         }
         this.items = items;
+    }
+
+    public Long actionContractId;
+
+    public Long getActionContractId() {
+        return actionContractId;
+    }
+
+    public void setActionContractId(Long actionContractId) {
+        this.actionContractId = actionContractId;
     }
 
     public Long action;
@@ -154,6 +183,16 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
 
     public void setDateAction(Date dateAction) {
         this.dateAction = dateAction;
+    }
+
+    public Long actionCardPrintedNo;
+
+    public Long getActionCardPrintedNo() {
+        return actionCardPrintedNo;
+    }
+
+    public void setActionCardPrintedNo(Long actionCardPrintedNo) {
+        this.actionCardPrintedNo = actionCardPrintedNo;
     }
 
     public String personNameAction;
@@ -179,7 +218,7 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             System.out.println(ex.getMessage());
         }*/
 
-       String fn = action + "-" + CalendarUtils.dateShortToStringFullYear(dateAction) + ".csv";
+       String fn = actionContractId + "-" + CalendarUtils.dateShortToStringFullYear(dateAction) + ".csv";
 
         String pathToFile = "\\\\cardprinterforschools\\jobs";
         File file = new File(pathToFile);
@@ -191,7 +230,7 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             // открываем поток для записи
             BufferedWriter bw = new BufferedWriter(new FileWriter(fileNew));
             // пишем данные
-            bw.write(String.valueOf(action) + ";" + personNameAction);
+            bw.write(String.valueOf(actionContractId) + ";" + personNameAction + ";" + String.valueOf(action) + ";" + String.valueOf(actionContractId));
             // закрываем поток
             bw.close();
         } catch (IOException e) {

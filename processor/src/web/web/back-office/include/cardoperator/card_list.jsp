@@ -137,7 +137,9 @@
             </a4j:commandLink>--%>
 
             <h:commandButton action="#{mainPage.cardOperatorListPage.saveToFile}" image="/images/16x16/print.png" >
+                <f:setPropertyActionListener value="#{item.contractId}" target="#{mainPage.cardOperatorListPage.actionContractId}"/>
                 <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}"/>
+                <f:setPropertyActionListener value="#{item.cardPrintedNo}" target="#{mainPage.cardOperatorListPage.actionCardPrintedNo}"/>
                 <f:setPropertyActionListener value="#{item.date}" target="#{mainPage.cardOperatorListPage.dateAction}"/>
                 <f:setPropertyActionListener value="#{item.personName}" target="#{mainPage.cardOperatorListPage.personNameAction}"/>
             </h:commandButton>
