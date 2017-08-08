@@ -139,6 +139,7 @@
             <h:commandButton action="#{mainPage.cardOperatorListPage.saveToFile}" image="/images/16x16/print.png" >
                 <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}"/>
                 <f:setPropertyActionListener value="#{item.date}" target="#{mainPage.cardOperatorListPage.dateAction}"/>
+                <f:setPropertyActionListener value="#{item.personName}" target="#{mainPage.cardOperatorListPage.personNameAction}"/>
             </h:commandButton>
             <%--<button onclick="SaveFile('file.csv', '4567890')" image="/images/16x16/print.png"></button>--%>
         </rich:column>

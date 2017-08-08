@@ -156,6 +156,16 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         this.dateAction = dateAction;
     }
 
+    public String personNameAction;
+
+    public String getPersonNameAction() {
+        return personNameAction;
+    }
+
+    public void setPersonNameAction(String personNameAction) {
+        this.personNameAction = personNameAction;
+    }
+
     public void saveToFile() throws Exception {
 
        /* try {
@@ -181,7 +191,7 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             // открываем поток для записи
             BufferedWriter bw = new BufferedWriter(new FileWriter(fileNew));
             // пишем данные
-            bw.write(String.valueOf(action));
+            bw.write(String.valueOf(action) + ";" + personNameAction);
             // закрываем поток
             bw.close();
         } catch (IOException e) {
