@@ -13,10 +13,12 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,10 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /***
  *
@@ -248,4 +247,24 @@ public class DAOReadExternalsService {
         return query.getResultList();
     }
 
+    public int isClientInside(Session session, long idOfClient) {
+        int result = 0;
+        Date beginDate = CalendarUtils.truncateToDayOfMonth(new Date());
+        Date endDate = CalendarUtils.addOneDay(beginDate);
+        SQLQuery query = session.createSQLQuery("SELECT ee.passDirection " +
+                " FROM cf_enterevents ee " +
+                " WHERE ee.idofclient = :idOfClient  AND ee.evtdatetime BETWEEN :beginDate AND :endDate " +
+                " order by ee.EvtDateTime desc limit 1");
+        query.setParameter("idOfClient", idOfClient);
+        query.setParameter("beginDate", beginDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        List<Integer> passDirections = Arrays.asList(EnterEvent.ENTRY, EnterEvent.RE_ENTRY, EnterEvent.DIRECTION_ENTER,
+                EnterEvent.DETECTED_INSIDE, EnterEvent.CHECKED_BY_TEACHER_EXT, EnterEvent.CHECKED_BY_TEACHER_INT, EnterEvent.QUERY_FOR_ENTER);
+        query.addScalar("passDirection", StandardBasicTypes.INTEGER);
+        Integer pd = (Integer)query.uniqueResult();
+        if (pd != null) {
+            if (passDirections.contains(pd)) result = 1;
+        }
+        return result; //0 - по событиям проходов нет в ОО, 1 - находится в ОО
+    }
 }

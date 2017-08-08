@@ -508,4 +508,6 @@ public interface ClientRoomController {
     @WebMethod Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
+
+    @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
 }

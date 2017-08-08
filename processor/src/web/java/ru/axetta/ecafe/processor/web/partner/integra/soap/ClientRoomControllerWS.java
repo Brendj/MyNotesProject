@@ -1744,6 +1744,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientSummaryResult;
     }
 
+    private ClientSummaryBase processSummaryBase(Client client) {
+        ClientSummaryBase clientSummaryBase = new ClientSummaryBase();
+        clientSummaryBase.setContractId(client.getContractId());
+        clientSummaryBase.setBalance(client.getBalance());
+        clientSummaryBase.setFirstName(client.getPerson().getFirstName());
+        clientSummaryBase.setLastName(client.getPerson().getSurname());
+        clientSummaryBase.setMiddleName(client.getPerson().getSecondName());
+        if (client.getClientGroup() == null) {
+            clientSummaryBase.setGrade(null);
+        } else {
+            clientSummaryBase.setGrade(client.getClientGroup().getGroupName());
+        }
+        clientSummaryBase.setOfficialName(client.getOrg().getShortNameInfoService());
+        clientSummaryBase.setMobilePhone(client.getMobile());
+        clientSummaryBase.setOrgId(client.getOrg().getIdOfOrg());
+        clientSummaryBase.setOrgType(client.getOrg().getType());
+        return clientSummaryBase;
+    }
+
     private void processSummary(Client client, Data data, ObjectFactory objectFactory, Session session)
           throws DatatypeConfigurationException {
         ClientSummaryExt clientSummaryExt = objectFactory.createClientSummaryExt();
@@ -3499,17 +3518,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientsWithResultCode data = new ClientsWithResultCode();
         try {
-            Map<Long, ClientCreatedFromType> idOfClients = extractIDFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
-            if (idOfClients.isEmpty()) {
+            Map<Client, ClientCreatedFromType> clients = extractClientsFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
+            if (clients.isEmpty()) {
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Клиент не найден";
             } else {
-                Map<Client, ClientCreatedFromType> map = new HashMap<Client, ClientCreatedFromType>();
-                for (Map.Entry<Long, ClientCreatedFromType> entry : idOfClients.entrySet()) {
-                    map.put(DAOUtils.findClient(session, entry.getKey()), entry.getValue());
-                    //data.setClients(findListOfClientsByListOfIds(idOfClients, session));
-                }
-                data.setClients(map);
+                data.setClients(clients);
                 data.resultCode = RC_OK;
                 data.description = "OK";
             }
@@ -3521,8 +3535,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
-    public Map<Long, ClientCreatedFromType> extractIDFromGuardByGuardMobile(String guardMobile, Session session) {
-        Map<Long, ClientCreatedFromType> result = new HashMap<Long, ClientCreatedFromType>();
+    public Map<Client, ClientCreatedFromType> extractClientsFromGuardByGuardMobile(String guardMobile, Session session) throws Exception {
+        Map<Client, ClientCreatedFromType> result = new HashMap<Client, ClientCreatedFromType>();
         String query = "select client.idOfClient from cf_clients client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
         Query q = session.createSQLQuery(query);
         q.setParameter("guardMobile", guardMobile);
@@ -3531,18 +3545,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (clients != null && !clients.isEmpty()){
             for(BigInteger id : clients){
                 Long londId = id.longValue();
-                Query q2 = session.createQuery("select cg from ClientGuardian cg " +
-                        "where cg.idOfGuardian = :idOfGuardian and cg.deletedState = false");  //все дети текущего клиента
+                Query q2 = session.createQuery("select c, cg.createdFrom from ClientGuardian cg, Client c "
+                        + "where cg.idOfChildren = c.idOfClient and cg.idOfGuardian = :idOfGuardian "
+                        + "and cg.deletedState = false and cg.disabled = false");  //все дети текущего клиента
                 q2.setParameter("idOfGuardian", londId);
-                List<ClientGuardian> list = q2.list();
+                List list = q2.list();
                 if (list != null && list.size() > 0) {
-                    for (ClientGuardian cg : list) {
-                        if (!cg.isDisabled()) {
-                            result.put(cg.getIdOfChildren(), cg.getCreatedFrom());
-                        }
+                    for (Object o : list) {
+                        Object[] row = (Object[])o;
+                        result.put((Client)row[0], (ClientCreatedFromType)row[1]);
                     }
                 } else {
-                    result.put(londId, ClientCreatedFromType.DEFAULT);
+                    result.put(DAOUtils.findClient(session, londId), ClientCreatedFromType.DEFAULT);
                 }
             }
         }
@@ -8167,6 +8181,48 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (Exception e) {
             logger.error("Error in enterMuseum method:", e);
             return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @Override
+    public ClientSummaryBaseListResult getSummaryByGuardMobileMin(String guardMobile) {
+        HTTPData data = new HTTPData();
+        HTTPDataHandler handler = new HTTPDataHandler(data);
+        authenticateRequest(null, handler);
+        Date date = new Date(System.currentTimeMillis());
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            List<ClientSummaryBase> clientSummaries = new ArrayList<ClientSummaryBase>();
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+            ClientsWithResultCode cd = getClientsByGuardMobile(guardMobile, session);
+
+            if (cd != null && cd.getClients() != null) {
+                for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                    ClientSummaryBase base = processSummaryBase(entry.getKey());
+                    base.setGuardianCreatedWhere(entry.getValue().getValue());
+                    base.setIsInside(DAOReadExternalsService.getInstance().isClientInside(session, entry.getKey().getIdOfClient()));
+                    if (base != null) {
+                        clientSummaries.add(base);
+                        handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
+                                entry.getKey().getIdOfClient(), handler.getData().getOperationType());
+                    }
+                }
+            }
+
+            ClientSummaryBaseListResult clientSummaryBaseListResult = new ClientSummaryBaseListResult();
+            clientSummaryBaseListResult.clientSummary = clientSummaries;
+            clientSummaryBaseListResult.resultCode = cd.resultCode;
+            clientSummaryBaseListResult.description = cd.description;
+            transaction.commit();
+            transaction = null;
+
+            return clientSummaryBaseListResult;
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
