@@ -9,18 +9,23 @@ import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +36,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.security.PublicKey;
 import java.util.*;
 
 @Component
@@ -42,9 +48,12 @@ public class DebugInfoPage extends BasicWorkspacePage {
     private Date startDate = new Date(System.currentTimeMillis());
     private Date endDate = new Date(System.currentTimeMillis());
     private String result = "";
+    private String messageSocket;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
+    @Autowired
+    private EventNotificationService eventNotificationService;
 
     @Override
     public String getPageFilename() {
@@ -87,7 +96,95 @@ public class DebugInfoPage extends BasicWorkspacePage {
         }
     }
 
+    private Org findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
+        PublicKey publicKey;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            // Start data model transaction
+            persistenceTransaction = persistenceSession.beginTransaction();
+            // Find given org
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            if (null == org) {
+                final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
+                logger.error(message);
+                throw new NullPointerException(message);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return org;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
     public void runTest2() throws Exception {
+        for (Long w = 1499868946299L; w < 1499868946399L; w++) {
+            DAOService.getInstance().registerSyncRequest(5, w.toString());
+            Thread.sleep(500);
+        }
+
+        //RuntimeContext.getAppContext().getBean(OrgSyncLockService.class).clean();
+
+        /*for (long i = 20; i <=300; i++) {
+            try {
+                Org org = findOrg(RuntimeContext.getInstance(), i);
+                //Org org = DAOReadonlyService.getInstance().findOrg(i);
+
+                Thread thread = new Thread(){
+                    private Org org;
+                    public void run(){
+                        try {
+                            List<AccountTransactionExtended> list = DAOReadonlyService.getInstance()
+                                    .getAccountTransactionsForOrgSinceTimeV2(org, new Date(1401617600000L), new Date(1402617660000L));
+                            System.out.println(Thread.currentThread().getId() + "---" + list.size());
+                        }catch (Exception e) {
+                            System.out.println("Error");
+                        }
+                    }
+                    public Thread setOrg(Org org) {
+                        this.org = org;
+                        return this;
+                    }
+                }.setOrg(org);
+                thread.start();
+            } catch (Exception e) {
+                continue;
+            }
+        }*/
+
+        /*eventNotificationService.sendEmailAsync("ww",
+                EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, new String[1]);*/
+
+        /*SummaryCardsMSRService service = RuntimeContext.getAppContext().getBean(SummaryCardsMSRService.class);
+        Date endDate = CalendarUtils.endOfDay(new Date());
+        Date startDate = CalendarUtils.truncateToDayOfMonth(new Date());
+        service.run(startDate, endDate);*/
+
+        /*ProcessorUtils utils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
+        SessionFactory factory = ((Session)entityManager.getDelegate()).getSessionFactory();
+        for (Long org = 3L; org < 900; org++) {
+            try {
+                utils.saveLastProcessSectionCustomDate(factory, org, SectionType.ACC_INC_REGISTRY);
+            } catch (Exception e) {
+
+            }
+        }*/
+
+        /*SyncLogger syncLogger = RuntimeContext.getInstance().getSyncLogger();
+        for (Long org = 3L; org < 9; org++) {
+            syncLogger.registerSyncRequestInDb(org, "15");
+        }*/
+
+        /*Session session = RuntimeContext.getInstance().createPersistenceSession();
+        List<Long> list = DAOUtils.findFriendlyOrgIds(session, 16L);
+        logger.info(list.toString());*/
+
+        /*EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
+        processor.runReceiveUpdates();*/
+
         /*ClientMskNSIService nsiService = RuntimeContext.getAppContext().getBean(ClientMskNSIService.class);
         MskNSIService.SearchPredicateInfo searchPredicateInfo = new MskNSIService.SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Вид представителя");
@@ -247,5 +344,13 @@ public class DebugInfoPage extends BasicWorkspacePage {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public String getMessageSocket() {
+        return messageSocket;
+    }
+
+    public void setMessageSocket(String messageSocket) {
+        this.messageSocket = messageSocket;
     }
 }

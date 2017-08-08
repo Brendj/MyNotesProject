@@ -7,6 +7,16 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<script>
+    var socket = new WebSocket("ws://localhost:8001");
+    function SaveFile(message)
+    {
+        var mes = message;
+
+        socket.send(mes);
+        return false;
+    }
+</script>
 
 <%--@elvariable id="debugInfoPage" type="ru.axetta.ecafe.processor.web.ui.option.DebugInfoPage"--%>
 <h:panelGrid id="debugInfoGrid" binding="#{debugInfoPage.pageComponent}" styleClass="borderless-grid">
@@ -62,6 +72,13 @@
             <h:outputText escape="true" value="Test VFS" styleClass="output-text" />
             <a4j:commandButton value="Запуск" action="#{debugInfoPage.runVFSCollapse()}" reRender="debug_result"
                                status="debugTaskStatus" />
+        </h:panelGrid>
+        <h:panelGrid columns="3" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Socket send" styleClass="output-text" />
+            <h:inputText value="#{debugInfoPage.messageSocket}"/>
+            <a4j:commandButton value="Отправить в сокет" id="azxcvbnm"
+                               oncomplete="SaveFile('#{debugInfoPage.messageSocket}');"
+                               />
         </h:panelGrid>
     </rich:simpleTogglePanel>
 </h:panelGrid>
