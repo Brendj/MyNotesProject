@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ZeroTransactionsReport" pageWidth="840" pageHeight="595" orientation="Landscape" columnWidth="800" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="300db74b-afe9-4084-97db-23a78eab4b7f">
+	<property name="ireport.zoom" value="1.100000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date">
+		<parameterDescription><![CDATA[Конечная дата]]></parameterDescription>
+	</parameter>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="label" class="java.lang.String"/>
+	<field name="value" class="java.lang.Integer"/>
+	<variable name="startDate" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
+	</variable>
+	<variable name="endDate" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="438" splitType="Prevent">
+			<staticText>
+				<reportElement uuid="d84c13cc-9e08-465d-9127-c439401cd8e1" x="0" y="13" width="800" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[Использование электронных носителей при посещении здания ОО]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ea5f0d6c-067d-4cf7-8772-a5ecdee00288" x="0" y="33" width="800" height="16">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box bottomPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["За период: " + $V{startDate} + " - " + $V{endDate}]]></textFieldExpression>
+			</textField>
+			<pie3DChart>
+				<chart evaluationTime="Report" renderType="image" theme="default">
+					<reportElement uuid="4ed0c37c-6600-4b90-9722-c05c59b55d60" x="0" y="65" width="800" height="373" isPrintWhenDetailOverflows="true"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend position="Top"/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{label}]]></keyExpression>
+					<valueExpression><![CDATA[$F{value}]]></valueExpression>
+				</pieDataset>
+				<pie3DPlot isCircular="true">
+					<plot orientation="Horizontal"/>
+					<itemLabel/>
+				</pie3DPlot>
+			</pie3DChart>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
