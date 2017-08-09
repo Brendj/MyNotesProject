@@ -41,45 +41,18 @@
                                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
                                                    styleClass="command-link" style="width: 25px;" />
                             </h:panelGroup>
-                            <h:outputText escape="true" value="Договор" styleClass="output-text" />
-                            <h:panelGrid columns="2" styleClass="borderless-grid">
-                                <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractId}" maxlength="16"
-                                             styleClass="input-text" />
-                                <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractPerson.surname}"
-                                             maxlength="128" styleClass="input-text" />
-                                <h:outputText escape="true" value="Имя" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractPerson.firstName}"
-                                             maxlength="64" styleClass="input-text" />
-                                <h:outputText escape="true" value="Отчество" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractPerson.secondName}"
-                                             maxlength="128" styleClass="input-text" />
-                                <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractPerson.idDocument}"
-                                             maxlength="128" styleClass="input-text" />
-                            </h:panelGrid>
-                            <h:outputText escape="true" value="Обслуживается" styleClass="output-text" />
-                            <h:panelGrid columns="2" styleClass="borderless-grid">
-                                <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.surname}"
-                                             maxlength="128" styleClass="input-text" />
-                                <h:outputText escape="true" value="Имя" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.firstName}"
-                                             maxlength="64" styleClass="input-text" />
-                                <h:outputText escape="true" value="Отчество" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.secondName}"
-                                             maxlength="128" styleClass="input-text" />
-                                <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
-                                <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.idDocument}"
-                                             maxlength="128" styleClass="input-text" />
-                            </h:panelGrid>
-                            <h:outputText escape="true" value="Наличие карт" styleClass="output-text" />
-                            <h:selectOneMenu value="#{mainPage.clientSelectPage.clientFilter.clientCardOwnCondition}"
-                                             styleClass="input-text">
-                                <f:selectItems
-                                        value="#{mainPage.clientSelectPage.clientFilter.clientCardOwnMenu.items}" />
-                            </h:selectOneMenu>
+                            <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
+                            <h:inputText value="#{mainPage.clientSelectPage.clientFilter.contractId}" maxlength="16"
+                                         styleClass="input-text" />
+                            <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+                            <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.surname}"
+                                         maxlength="128" styleClass="input-text" />
+                            <h:outputText escape="true" value="Имя" styleClass="output-text" />
+                            <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.firstName}"
+                                         maxlength="64" styleClass="input-text" />
+                            <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+                            <h:inputText value="#{mainPage.clientSelectPage.clientFilter.person.secondName}"
+                                         maxlength="128" styleClass="input-text" />
                         </h:panelGrid>
                         <h:panelGrid columns="2" styleClass="borderless-grid">
                             <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectPage}"
