@@ -89,8 +89,10 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             for (Object o : list) {
                 Object row[] = (Object[]) o;
                 if (!StringUtils.isEmpty((String)row[1])) {
+                    Long cardId = (Long)row[0];
+                    cardId = convertCardId(cardId);
                     StringBuilder b = new StringBuilder();
-                    b.append(counter).append("\t").append(row[0]).append("\t").append(row[1]);
+                    b.append(counter).append("\t").append(cardId).append("\t").append(row[1]);
                     result.add(b.toString());
                     counter++;
                 }
@@ -114,6 +116,27 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             }
         } catch (Exception e) {
             logger.error("Error build and upload summary clients file for MSR", e);
+        }
+    }
+
+    public static Long convertCardId(Long cardId) {
+        String hex = Long.toHexString(cardId);
+        if (cardId > 0xFFFFFFFFL) {
+            while (hex.length() < 14) {
+                hex = "0".concat(hex);
+            }
+            StringBuilder sb = new StringBuilder(hex).reverse();
+            hex = "0x" + sb.charAt(7) + sb.charAt(6) + sb.charAt(9) + sb.charAt(8) +
+                    sb.charAt(11) + sb.charAt(10) + sb.charAt(13) + sb.charAt(12);
+            return Long.decode(hex);
+        } else {
+            while (hex.length() < 14) {
+                hex = "0".concat(hex);
+            }
+            StringBuilder sb = new StringBuilder(hex).reverse();
+            hex = "0x" + sb.charAt(1) + sb.charAt(0) + sb.charAt(3) + sb.charAt(2) +
+                    sb.charAt(5) + sb.charAt(4) + sb.charAt(7) + sb.charAt(6);
+            return Long.decode(hex);
         }
     }
 }

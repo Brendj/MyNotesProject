@@ -49,10 +49,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
-import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
-import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
+import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -8095,17 +8092,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             Long lCardId = Long.parseLong(cardId);
-            if (lCardId > 0xFFFFFFFFL) {
-                //Обработка 7-ми байтного номера карты, преобразование к 4-х байтному в принятом у нас представлении
-                String hex = Long.toHexString(lCardId);
-                while (hex.length() < 14) {
-                    hex = "0".concat(hex);
-                }
-                StringBuilder sb = new StringBuilder(hex).reverse();
-                hex = "0x" + sb.charAt(7) + sb.charAt(6) + sb.charAt(9) + sb.charAt(8) +
-                        sb.charAt(11) + sb.charAt(10) + sb.charAt(13) + sb.charAt(12);
-                lCardId = Long.decode(hex);
-            }
+            lCardId = SummaryCardsMSRService.convertCardId(lCardId);
             Card card = DAOUtils.findCardByCardNo(session, lCardId);
             if (card == null) {
                 return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
