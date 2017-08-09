@@ -78,6 +78,11 @@ public class FunctionSelector {
     private List<Item> repositoryItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
     private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
+    private static final String[] notAdminFunctions = new String[]{
+            "cardRprts", "clientRprts", "clientsBenefitsRprt", "electronicReconciliationRprt", "enterEventRprt",
+            "financialControl", "informRprts", "onlineRprtActivity", "onlineRprtBenefit", "onlineRprtComplex",
+            "onlineRprtMeals", "onlineRprtRefill", "onlineRprtRequest", "paidFood", "salesRprt", "statisticDifferences",
+            "subscriptionFeeding", "totalServicesRprt", "transactionsRprt"};
     private static final String[] securityAdminFunctions = new String[]{
             "viewUser", "editUser", "deleteUser", "workOption"};
 
@@ -134,6 +139,7 @@ public class FunctionSelector {
     public Set<Function> getAdminFunctions(Session session) {
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", userFunctions)));
+        allFunctionsCriteria.add(Restrictions.not(Restrictions.in("functionName", notAdminFunctions)));
         return new HashSet<Function>((List<Function>) allFunctionsCriteria.list());
     }
 
