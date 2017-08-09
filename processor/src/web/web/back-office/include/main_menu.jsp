@@ -956,12 +956,12 @@
                         label="Системные показатели" action="#{monitoringPersistanceCachePage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
-<%--<rich:panelMenuGroup id="chartsGroupMenu" binding="#{mainPage.chartsGroupPage.mainMenuComponent}"
+<rich:panelMenuGroup id="chartsGroupMenu" binding="#{mainPage.chartsGroupPage.mainMenuComponent}"
                          label="Мониторинг ОУ">
     <rich:panelMenuItem id="enterCardsChartReportMenuItem" binding="#{mainPage.enterCardsChartReportPage.mainMenuComponent}"
                         label="Использование электронных носителей при посещении здания ОО"
                         action="#{mainPage.showEnterCardsChartReportPage}" reRender="workspaceForm" />
-</rich:panelMenuGroup> --%>
+</rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
@@ -1353,6 +1353,9 @@
     <%--@elvariable id="istkKioskOptionsPage" type="ru.axetta.ecafe.processor.web.ui.option.IstkKioskOptionsPage"--%>
     <rich:panelMenuItem id="showIstkKioskOptionsMenuItem" binding="#{istkKioskOptionsPage.mainMenuComponent}"
                         label="Инфокиоски" action="#{istkKioskOptionsPage.show}" reRender="workspaceForm"/>
+    <%--@elvariable id="externalSystemsPage" type="ru.axetta.ecafe.processor.web.ui.option.ExternalSystemsPage"--%>
+    <rich:panelMenuItem id="showexternalSystemsItem" binding="#{externalSystemsPage.mainMenuComponent}"
+                        label="Внешние системы" action="#{externalSystemsPage.show}" reRender="workspaceForm"/>
 
 </rich:panelMenuGroup>
 

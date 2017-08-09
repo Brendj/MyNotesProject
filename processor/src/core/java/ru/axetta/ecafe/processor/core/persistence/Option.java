@@ -135,7 +135,11 @@ public class Option {
             OPTION_FOUNDER_FROM_NSI = 100085,
             OPTION_INDUSTRY_FROM_NSI = 100086,
             OPTION_LAST_CHANGE_FROM_NSI = 100087,
-            OPTION_READER_FOR_WEB_STRING = 100088;
+            OPTION_READER_FOR_WEB_STRING = 100088,
+            OPTION_EXTERNAL_SYSTEM_ENABLED = 100089,
+            OPTION_EXTERNAL_SYSTEM_URL  = 100090,
+            OPTION_EXTERNAL_SYSTEM_TYPES  = 100091,
+            OPTION_EXTERNAL_SYSTEM_OPERATION_TYPES  = 100092;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -248,7 +252,12 @@ public class Option {
             OPTION_FOUNDER_FROM_NSI, "Департамент образования города Москвы",
             OPTION_INDUSTRY_FROM_NSI, "",
             OPTION_LAST_CHANGE_FROM_NSI, "",
-            OPTION_READER_FOR_WEB_STRING, ""
+            OPTION_READER_FOR_WEB_STRING, "",
+            OPTION_EXTERNAL_SYSTEM_ENABLED, "",
+            OPTION_EXTERNAL_SYSTEM_URL, "",
+            OPTION_EXTERNAL_SYSTEM_TYPES, "",
+            OPTION_EXTERNAL_SYSTEM_OPERATION_TYPES, ""
+
 };
 
     private Long idOfOption;
