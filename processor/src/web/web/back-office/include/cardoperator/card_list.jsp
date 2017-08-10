@@ -9,7 +9,12 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <script>
-    var socket = new WebSocket("ws://localhost:8001");
+    var socket;
+
+    function SetWebSocket (webSocket) {
+        socket = new WebSocket(webSocket);
+    }
+
     function SaveFile(message)
     {
         var mes = message;
@@ -73,7 +78,7 @@
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{mainPage.updateCardOperatorListPage}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
+                               reRender="workspaceTogglePanel" styleClass="command-button" oncomplete="SetWebSocket('#{mainPage.cardOperatorListPage.serverPath}')"/>
             <a4j:commandButton value="Очистить" action="#{mainPage.clearCardOperatorListPageFilter}"
                                reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
         </h:panelGrid>
@@ -133,12 +138,17 @@
                 <h:outputText escape="true" value="Печать" />
             </f:facet>
 
-            <a4j:commandButton image="/images/16x16/print.png" oncomplete="SaveFile('#{mainPage.cardOperatorListPage.message}')">
-                <f:setPropertyActionListener value="#{item.contractId}" target="#{mainPage.cardOperatorListPage.actionContractId}"/>
-                <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}"/>
-                <f:setPropertyActionListener value="#{item.cardPrintedNo}" target="#{mainPage.cardOperatorListPage.actionCardPrintedNo}"/>
-                <f:setPropertyActionListener value="#{item.date}" target="#{mainPage.cardOperatorListPage.dateAction}"/>
-                <f:setPropertyActionListener value="#{item.personName}" target="#{mainPage.cardOperatorListPage.personNameAction}"/>
+            <a4j:commandButton image="/images/16x16/print.png"
+                               oncomplete="SaveFile('#{mainPage.cardOperatorListPage.message}')">
+                <f:setPropertyActionListener value="#{item.contractId}"
+                                             target="#{mainPage.cardOperatorListPage.actionContractId}" />
+                <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}" />
+                <f:setPropertyActionListener value="#{item.cardPrintedNo}"
+                                             target="#{mainPage.cardOperatorListPage.actionCardPrintedNo}" />
+                <f:setPropertyActionListener value="#{item.date}"
+                                             target="#{mainPage.cardOperatorListPage.dateAction}" />
+                <f:setPropertyActionListener value="#{item.personName}"
+                                             target="#{mainPage.cardOperatorListPage.personNameAction}" />
             </a4j:commandButton>
         </rich:column>
 

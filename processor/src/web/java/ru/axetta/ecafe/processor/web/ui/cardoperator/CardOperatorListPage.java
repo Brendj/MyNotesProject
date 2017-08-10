@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.cardoperator;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
@@ -27,6 +28,19 @@ import java.util.List;
  * Created by anvarov on 27.07.2017.
  */
 public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+
+    private static final String configString = "ecafe.processor.ws.message.server.path";
+
+    private String serverPath = RuntimeContext.getInstance().getConfigProperties()
+            .getProperty(configString, "");
+
+    public String getServerPath() {
+        return serverPath;
+    }
+
+    public void setServerPath(String serverPath) {
+        this.serverPath = serverPath;
+    }
 
     private CardOperatorFilter cardOperatorFilter = new CardOperatorFilter();
 
