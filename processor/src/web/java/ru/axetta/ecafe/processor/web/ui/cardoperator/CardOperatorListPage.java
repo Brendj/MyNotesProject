@@ -72,7 +72,9 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
 
         public Item(Org org, Card card, String personName) {
             this.shortNameInfoService = org.getShortNameInfoService();
-            this.contractId = card.getClient().getContractId();
+            if (card.getClient() != null) {
+                this.contractId = card.getClient().getContractId();
+            }
             this.cardNo = card.getCardNo();
             this.cardPrintedNo = card.getCardPrintedNo();
             this.personName = personName;
@@ -205,18 +207,7 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         this.personNameAction = personNameAction;
     }
 
-    public void saveToFile() throws Exception {
-
-       /* try {
-            FileWriter writer = new FileWriter("\\DIAMOND-PC\\one.csv", false);
-            // запись всей строки
-            String text = String.valueOf(action);
-            writer.write(text);
-            // запись по символам
-            writer.flush();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }*/
+   /* public void saveToFile() throws Exception {
 
        String fn = actionContractId + "-" + CalendarUtils.dateShortToStringFullYear(dateAction) + ".csv";
 
@@ -230,11 +221,16 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             // открываем поток для записи
             BufferedWriter bw = new BufferedWriter(new FileWriter(fileNew));
             // пишем данные
-            bw.write(String.valueOf(actionContractId) + ";" + personNameAction + ";" + String.valueOf(action) + ";" + String.valueOf(actionContractId));
+            bw.write(String.valueOf(actionContractId) + ";" + personNameAction + ";" + String.valueOf(action) + ";" + String.valueOf(actionCardPrintedNo));
             // закрываем поток
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }*/
+
+    public String getMessage() {
+        String message = String.valueOf(actionContractId) + ";" + personNameAction + ";" + String.valueOf(action) + ";" + String.valueOf(actionCardPrintedNo);
+        return message;
     }
 }

@@ -9,12 +9,13 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <script>
-    var filePrefix = "\\cardprinterforschools\jobs";
-    function SaveFile(fileName, fileText) {
-        var fso = new ActiveXObject("Scripting.FileSystemObject"); // Создаем объект
-        var file = fso.CreateTextFile(filePrefix + fileName, true); // Создаем файл
-        file.WriteLine(fileText); // Выводим в него строку
-        file.Close(); // Закрываем файл
+    var socket = new WebSocket("ws://localhost:8001");
+    function SaveFile(message)
+    {
+        var mes = message;
+
+        socket.send(mes);
+        return false;
     }
 </script>
 
@@ -131,19 +132,14 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Печать" />
             </f:facet>
-            <%--<a4j:commandLink action="#{mainPage.showCardOperatorListPage}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm" onclick="SaveFile('file.csv', '45678977887')">
-                <h:graphicImage value="/images/16x16/print.png" style="border: 0;" />
-            </a4j:commandLink>--%>
 
-            <h:commandButton action="#{mainPage.cardOperatorListPage.saveToFile}" image="/images/16x16/print.png" >
+            <a4j:commandButton image="/images/16x16/print.png" oncomplete="SaveFile('#{mainPage.cardOperatorListPage.message}')">
                 <f:setPropertyActionListener value="#{item.contractId}" target="#{mainPage.cardOperatorListPage.actionContractId}"/>
                 <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}"/>
                 <f:setPropertyActionListener value="#{item.cardPrintedNo}" target="#{mainPage.cardOperatorListPage.actionCardPrintedNo}"/>
                 <f:setPropertyActionListener value="#{item.date}" target="#{mainPage.cardOperatorListPage.dateAction}"/>
                 <f:setPropertyActionListener value="#{item.personName}" target="#{mainPage.cardOperatorListPage.personNameAction}"/>
-            </h:commandButton>
-            <%--<button onclick="SaveFile('file.csv', '4567890')" image="/images/16x16/print.png"></button>--%>
+            </a4j:commandButton>
         </rich:column>
 
         <f:facet name="footer">
