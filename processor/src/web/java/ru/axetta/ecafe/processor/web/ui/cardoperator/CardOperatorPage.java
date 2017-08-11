@@ -4,17 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.ui.cardoperator;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.CardListPage;
+import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +32,16 @@ import java.util.List;
 @Component
 @Scope(value = "session")
 public class CardOperatorPage extends BasicWorkspacePage {
+
+    private ru.axetta.ecafe.processor.web.ui.card.items.ClientItem client = new ru.axetta.ecafe.processor.web.ui.card.items.ClientItem();
+
+    public ru.axetta.ecafe.processor.web.ui.card.items.ClientItem getClient() {
+        return client;
+    }
+
+    public void setClient(ru.axetta.ecafe.processor.web.ui.card.items.ClientItem client) {
+        this.client = client;
+    }
 
     public static class PersonItem {
 
@@ -217,6 +234,54 @@ public class CardOperatorPage extends BasicWorkspacePage {
 
     public void setItems(List<CardListPage.Item> items) {
         this.items = items;
+    }
+
+    public Object updateCardOperatorPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, null);
+            HibernateUtils.close(persistenceSession, null);
+        }
+        return null;
+    }
+
+    private void fill(Session persistenceSession) {
+
+    }
+
+    public Object clearCardOperatorPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, null);
+            HibernateUtils.close(persistenceSession, null);
+        }
+        return null;
     }
 
 

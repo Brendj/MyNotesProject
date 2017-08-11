@@ -12,6 +12,23 @@
 <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
 <h:panelGrid id="cardOperatorGrid" binding="#{cardOperatorPage.pageComponent}" styleClass="borderless-grid">
 
+    <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:outputText escape="true" value="Клиент" styleClass="output-text" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{cardOperatorPage.client.shortName}" readonly="true" styleClass="input-text"
+                         style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
+        </h:panelGroup>
+
+
+        <a4j:commandButton value="Применить" action="#{cardOperatorPage.updateCardOperatorPage}"
+                           reRender="workspaceTogglePanel" styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}"
+                           reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+
+    </h:panelGrid>
     <rich:dataTable id="cardTable" value="#{cardOperatorPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
