@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.cardoperator;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
@@ -14,6 +15,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.CardListPage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -31,7 +33,9 @@ import java.util.List;
  */
 @Component
 @Scope(value = "session")
-public class CardOperatorPage extends BasicWorkspacePage {
+public class CardOperatorPage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
+
+    private boolean clientHasNotBlockedCard = false;
 
     private ru.axetta.ecafe.processor.web.ui.card.items.ClientItem client = new ru.axetta.ecafe.processor.web.ui.card.items.ClientItem();
 
@@ -41,6 +45,23 @@ public class CardOperatorPage extends BasicWorkspacePage {
 
     public void setClient(ru.axetta.ecafe.processor.web.ui.card.items.ClientItem client) {
         this.client = client;
+    }
+
+    @Override
+    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
+        if (null != idOfClient) {
+            Client client = (Client) session.load(Client.class, idOfClient);
+            this.client = new ru.axetta.ecafe.processor.web.ui.card.items.ClientItem(client);
+            clientHasNotBlockedCard = false;
+            if (client.getCards() != null) {
+                for (Card card : client.getCards()) {
+                    if (card.getState().intValue() != CardState.BLOCKED.getValue()) {
+                        clientHasNotBlockedCard = true;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public static class PersonItem {
@@ -214,6 +235,14 @@ public class CardOperatorPage extends BasicWorkspacePage {
         public Long getCardPrintedNo() {
             return cardPrintedNo;
         }
+    }
+
+    public boolean isClientHasNotBlockedCard() {
+        return clientHasNotBlockedCard;
+    }
+
+    public void setClientHasNotBlockedCard(boolean clientHasNotBlockedCard) {
+        this.clientHasNotBlockedCard = clientHasNotBlockedCard;
     }
 
     private List<CardListPage.Item> items = Collections.emptyList();
