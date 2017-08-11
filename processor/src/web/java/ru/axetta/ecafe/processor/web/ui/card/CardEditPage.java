@@ -245,11 +245,11 @@ public class CardEditPage extends BasicWorkspacePage implements ClientSelectPage
                 &&(CardState.TEMPBLOCKED.getValue() != state)
                 &&(CardState.TEMPISSUED.getValue() != state)){
             throw new IllegalStateException("Требуется изменить статус карты");
-        } else {
+        } /*else {
             if (CardLockReason.EMPTY.getValue() == lockReasonState) {
                 throw new IllegalStateException("Введите 'Причину блокировки карты'");
             }
-        }
+        }*/
     }
 
     public Object returnCard(String userName) {
