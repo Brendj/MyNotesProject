@@ -8,6 +8,15 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<script>
+    var socket = new WebSocket("ws://localhost:8001");
+    socket.onmessage = function(event) {
+        var incomingMessage = event.data;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:cardNo").value = incomingMessage;
+    };
+</script>
+
+
 <h:panelGrid id="cardRegistrationAndIssueGrid" binding="#{mainPage.cardRegistrationAndIssuePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Клиент" styleClass="output-text" />
@@ -19,7 +28,7 @@
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
-    <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardNo}" converter="cardNoConverter" maxlength="10"
+    <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardNo}" converter="cardNoConverter" maxlength="10" id="cardNo"
                  styleClass="input-text" />
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardPrintedNo}" converter="cardPrintedNoConverter"
@@ -36,7 +45,7 @@
                    converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Зарегистрировать новую карту" action="#{mainPage.createCard}"
+    <a4j:commandButton value="Зарегистрировать новую карту" action="#{mainPage.cardRegistrationAndIssuePage.createCard}"
                        styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

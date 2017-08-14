@@ -956,12 +956,12 @@
                         label="Системные показатели" action="#{monitoringPersistanceCachePage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="chartsGroupMenu" binding="#{mainPage.chartsGroupPage.mainMenuComponent}"
+<%--<rich:panelMenuGroup id="chartsGroupMenu" binding="#{mainPage.chartsGroupPage.mainMenuComponent}"
                          label="Мониторинг ОУ">
     <rich:panelMenuItem id="enterCardsChartReportMenuItem" binding="#{mainPage.enterCardsChartReportPage.mainMenuComponent}"
                         label="Использование электронных носителей при посещении здания ОО"
                         action="#{mainPage.showEnterCardsChartReportPage}" reRender="workspaceForm" />
-</rich:panelMenuGroup>
+</rich:panelMenuGroup>--%>
 
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
@@ -1723,7 +1723,7 @@
                          label="Операции по картам" rendered="#{mainPage.eligibleToViewCardOperator}" >
         <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
         <rich:panelMenuItem id="cardOpatorItem" binding="#{cardOperatorPage.mainMenuComponent}"
-                            label="Список карт" action="#{cardOperatorPage.show}" reRender="workspaceForm" />
+                            label="Список карт" action="#{cardOperatorPage.show}" reRender="workspaceForm" oncomplete=""/>
         <rich:panelMenuItem id="cardRegistrationAndIssueItem" binding="#{mainPage.cardRegistrationAndIssuePage.mainMenuComponent}"
                             label="Регистрация и выдача карты" action="#{mainPage.showCardRegistrationAndIssuePage}" reRender="workspaceForm"/>
         <rich:panelMenuItem id="cardOperatorList" binding="#{mainPage.cardOperatorListPage.mainMenuComponent}"

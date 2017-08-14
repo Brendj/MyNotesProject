@@ -10,11 +10,11 @@ import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.CardLifeStateMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardStateMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardTypeMenu;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
 import org.hibernate.Session;
@@ -122,7 +122,7 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
         this.cardType = 1;
         this.lockReason = null;
         this.validTime = new Date();
-        this.validTime = CalendarUtils.addYear(validTime, 2);
+        this.validTime = CalendarUtils.addYear(validTime, 5);
         this.issueTime = new Date();
         this.idOfOrg = -1;
     }
@@ -143,17 +143,22 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
         }
     }
 
-    public void createCard(Session session) throws Exception {
+    public void createCard() throws Exception {
         if (isClientHasNotBlockedCard()){
-            throw new IllegalStateException("Данный клиент имеет незаблокированную(ые) карту(ы).");
+            printError("Данный клиент имеет незаблокированную(ые) карту(ы).");
+            return;
         }
         CardService.getInstance().resetAllCards(client.getIdOfClient());
 
-        RuntimeContext runtimeContext = null;
-        runtimeContext = RuntimeContext.getInstance();
         validTime = CalendarUtils.endOfDay(validTime);
-        runtimeContext.getCardManager()
-                .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, this.validTime, this.lockReason, this.issueTime, this.cardPrintedNo);
+        try {
+            RuntimeContext.getInstance().getCardManager()
+                    .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, CardState.ISSUED.getValue(),
+                            this.validTime, 1 /*Card.LIFE_STATE_NAMES[1]="Выдана клиенту"*/, this.lockReason, this.issueTime, this.cardPrintedNo);
+            printMessage("Карта зарегистрирована успешно");
+        } catch (Exception e) {
+            printError("При попытке регистрации карты произошла ошибка с текстом: " + e.getMessage());
+        }
     }
 
 
