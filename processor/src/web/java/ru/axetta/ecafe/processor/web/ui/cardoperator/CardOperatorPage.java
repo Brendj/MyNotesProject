@@ -14,11 +14,12 @@ import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.CardListPage;
-import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,7 @@ public class CardOperatorPage extends BasicWorkspacePage implements ClientSelect
     public void setClient(ru.axetta.ecafe.processor.web.ui.card.items.ClientItem client) {
         this.client = client;
     }
+    private Long cardNo;
 
     @Override
     public void completeClientSelection(Session session, Long idOfClient) throws Exception {
@@ -61,6 +63,65 @@ public class CardOperatorPage extends BasicWorkspacePage implements ClientSelect
                     }
                 }
             }
+        }
+    }
+
+    public Long getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(Long cardNo) {
+        //printError(cardNo.toString());
+        this.cardNo = cardNo;
+        /*Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("cardNo", cardNo));
+            Card card = (Card)criteria.uniqueResult();
+            if (card == null) {
+                printError("Карта не найдена");
+            } else {
+                CardListPage.Item item = new CardListPage.Item(card);
+                items.add(item);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+
+        } finally {
+            HibernateUtils.rollback(transaction, getLogger());
+            HibernateUtils.close(session, getLogger());
+        }*/
+
+        //printError(cardNo.toString());
+    }
+
+    public void refresh() {
+        printError("refresh");
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("cardNo", cardNo));
+            Card card = (Card)criteria.uniqueResult();
+            if (card == null) {
+                printError("Карта не найдена");
+            } else {
+                CardListPage.Item item = new CardListPage.Item(card);
+                items.add(item);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+
+        } finally {
+            HibernateUtils.rollback(transaction, getLogger());
+            HibernateUtils.close(session, getLogger());
         }
     }
 

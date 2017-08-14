@@ -3,15 +3,27 @@
   ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
   --%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<script>
+    var socket = new WebSocket("ws://localhost:8001");
+    socket.onmessage = function(event) {
+        var incomingMessage = event.data;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:cardNoByCardReader").value = incomingMessage;
+        var button = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:refreshCardsList");
+        button.click();
+    };
+
+</script>
+
 <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
 <h:panelGrid id="cardOperatorGrid" binding="#{cardOperatorPage.pageComponent}" styleClass="borderless-grid">
-
+    <a4j:commandButton id="refreshCardsList" action="#{cardOperatorPage.refresh}"  reRender="cardOperatorTable" />
+    <h:inputText value="#{cardOperatorPage.cardNo}" converter="cardNoConverter" maxlength="10" id="cardNoByCardReader"
+                 style="display: none;"  />
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Клиент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
@@ -29,7 +41,9 @@
                            reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 
     </h:panelGrid>
-    <rich:dataTable id="cardTable" value="#{cardOperatorPage.items}" var="item" rows="20"
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+    <rich:dataTable id="cardOperatorTable" value="#{cardOperatorPage.items}" var="item" rows="20"
                     columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header">
@@ -97,7 +111,7 @@
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="cardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="cardOperatorTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
