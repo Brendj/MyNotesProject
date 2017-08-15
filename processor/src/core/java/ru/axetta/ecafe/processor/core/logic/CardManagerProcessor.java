@@ -42,75 +42,8 @@ public class CardManagerProcessor implements CardManager {
     public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
             Long cardPrintedNo) throws Exception {
-
-        logger.debug("check valid date");
-        if (validTime.after(CalendarUtils.AFTER_DATE)) {
-            throw new Exception("Не верно введена дата");
-        }
-
-        logger.debug("check issue date");
-        if (issueTime != null && validTime.before(issueTime)) {
-            throw new Exception("Не верно введена дата");
-        }
-
-        logger.debug("check exist client");
-        Client client = getClientReference(persistenceSession, idOfClient);
-        if (client == null) {
-            throw new Exception("Клиент не найден: " + idOfClient);
-        }
-        logger.debug("check exist card");
-        Card c = findCardByCardNo(persistenceSession, cardNo);
-        if (c != null && c.getClient() != null) {
-            throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
-        }
-        logger.debug("check exist temp card");
-        CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
-        if (ct != null) {
-            if (ct.getClient() != null) {
-                throw new Exception(String.format(
-                        "Карта с таким номером уже зарегистрирована как временная на клиента: %s. Статус карты - %s.",
-                        ct.getClient().getIdOfClient(), ct.getCardStation()));
-            }
-            if (ct.getVisitor() != null) {
-                throw new Exception(String.format(
-                        "Карта с таким номером уже зарегистрирована как временная на посетителя: %s. Статус карты - %s.",
-                        ct.getVisitor().getIdOfVisitor(), ct.getCardStation()));
-            }
-        }
-
-        if (state == CardState.ISSUED.getValue()) {
-            boolean haveActiveCard = false;
-            for (Card card : client.getCards()) {
-                if (CardState.ISSUED.getValue() == card.getState()) {
-                    haveActiveCard = true;
-                }
-            }
-            if (haveActiveCard && client.getOrg().getOneActiveCard()) {
-                throw new Exception("У клиента уже есть активная карта.");
-            }
-        }
-
-        logger.debug("clear active card");
-        if (state == Card.ACTIVE_STATE) {
-            lockActiveCards(persistenceSession, client.getCards());
-        }
-
-        logger.debug("create card");
-        Card card = new Card(client, cardNo, cardType, state, validTime, lifeState, cardPrintedNo);
-        card.setIssueTime(issueTime);
-        card.setLockReason(lockReason);
-        card.setOrg(client.getOrg());
-        persistenceSession.save(card);
-
-        //История карты при создании новой карты
-        HistoryCard historyCard = new HistoryCard();
-        historyCard.setCard(card);
-        historyCard.setUpDatetime(new Date());
-        historyCard.setNewOwner(client);
-        historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo());
-        persistenceSession.save(historyCard);
-
-        return card.getIdOfCard();
+        return createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state, validTime,
+            lifeState, lockReason, issueTime, cardPrintedNo, null);
     }
 
     public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
@@ -191,23 +124,7 @@ public class CardManagerProcessor implements CardManager {
     @Override
     public Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Long idOfCard = createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state,
-                    validTime, lifeState, lockReason, issueTime, cardPrintedNo);
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            return idOfCard;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        return createCard(idOfClient, cardNo, cardType, state, validTime, lifeState, lockReason, issueTime, cardPrintedNo, null);
     }
 
     @Override
@@ -281,55 +198,7 @@ public class CardManagerProcessor implements CardManager {
     @Override
     public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Client newCardOwner = getClientReference(persistenceSession, idOfClient);
-            Card updatedCard = getCardReference(persistenceSession, idOfCard);
-
-            if (state == Card.ACTIVE_STATE) {
-                Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
-                clientCards.remove(updatedCard);
-                lockActiveCards(persistenceSession, clientCards);
-            }
-
-            final long oldClient = (updatedCard.getClient() != null) ? updatedCard.getClient().getIdOfClient() : -1;
-            final long newClient = newCardOwner.getIdOfClient();
-
-            //История карты при обновлении информации
-            if (oldClient != newClient) {
-                HistoryCard historyCard = new HistoryCard();
-                historyCard.setCard(updatedCard);
-                historyCard.setUpDatetime(new Date());
-                historyCard
-                        .setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
-                historyCard.setNewOwner(newCardOwner);
-                historyCard.setFormerOwner(updatedCard.getClient());
-                persistenceSession.save(historyCard);
-            }
-
-            updatedCard.setClient(newCardOwner);
-            updatedCard.setCardType(cardType);
-            updatedCard.setUpdateTime(new Date());
-            updatedCard.setState(state);
-            updatedCard.setLockReason(lockReason);
-            updatedCard.setValidTime(validTime);
-            updatedCard.setIssueTime(issueTime);
-            updatedCard.setLifeState(lifeState);
-            updatedCard.setExternalId(externalId);
-            updatedCard.setUpdateTime(new Date());
-            persistenceSession.update(updatedCard);
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        updateCard(idOfClient, idOfCard, cardType, state, validTime, lifeState, lockReason, issueTime, externalId, null);
     }
 
     @Override
@@ -390,94 +259,7 @@ public class CardManagerProcessor implements CardManager {
 
     @Override
     public void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            logger.debug("check valid date");
-            if (validTime.after(CalendarUtils.AFTER_DATE)) {
-                throw new Exception("Не верно введена дата");
-            }
-
-            logger.debug("check issue date");
-            if (validTime.before(changeTime)) {
-                throw new Exception("Не верно введена дата");
-            }
-
-            Client newCardOwner = getClientReference(persistenceSession, idOfClient);
-            if (newCardOwner == null) {
-                throw new Exception("Клиент не найден: " + idOfClient);
-            }
-
-            CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
-            if (ct != null) {
-                if (ct.getClient() != null) {
-                    final String format = "Карта с таким номером уже зарегистрирована как временная на клиента: %d";
-                    final String message = String.format(format, ct.getClient().getIdOfClient());
-                    throw new Exception(message);
-                }
-                if (ct.getVisitor() != null) {
-                    final String format = "Карта с таким номером уже зарегистрирована как временная на посетителя: %d";
-                    final String message = String.format(format, ct.getVisitor().getIdOfVisitor());
-                    throw new Exception(message);
-                }
-                if (ct.getVisitor() == null && ct.getClient() == null) {
-                    final String format = "Карта с таким номером уже зарегистрирована как временная, но не имеет владельца: %d";
-                    final String message = String.format(format, cardNo);
-                    throw new Exception(message);
-                }
-            }
-
-            //Card updatedCard = DAOUtils.getCardReference(persistenceSession, idOfCard);
-            Card updatedCard = findCardByCardNo(persistenceSession, cardNo);
-            if (updatedCard == null) {
-                throw new Exception("Неизвестная карта: " + cardNo);
-            }
-
-            //if (state == Card.ACTIVE_STATE) {
-            //    Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
-            //    clientCards.remove(updatedCard);
-            //    lockActiveCards(persistenceSession, clientCards);
-            //}
-
-            lockActiveCards(persistenceSession, newCardOwner.getCards());
-
-            final long oldClient = (updatedCard.getClient() != null) ? updatedCard.getClient().getIdOfClient() : -1;
-            final long newClient = newCardOwner.getIdOfClient();
-
-            //История карты при смене владельца
-            if (oldClient != newClient) {
-                HistoryCard historyCard = new HistoryCard();
-                historyCard.setCard(updatedCard);
-                historyCard.setUpDatetime(new Date());
-                historyCard
-                        .setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
-                historyCard.setFormerOwner(updatedCard.getClient());
-                historyCard.setNewOwner(newCardOwner);
-                persistenceSession.save(historyCard);
-            }
-
-            updatedCard.setClient(newCardOwner);
-            //updatedCard.setCardType(cardType);
-            updatedCard.setUpdateTime(new Date());
-            updatedCard.setState(Card.ACTIVE_STATE);
-            updatedCard.setLockReason("");
-            updatedCard.setValidTime(validTime);
-            updatedCard.setIssueTime(changeTime);
-            //updatedCard.setLifeState(lifeState);
-            //updatedCard.setExternalId(externalId);
-            updatedCard.setUpdateTime(new Date());
-            persistenceSession.update(updatedCard);
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        changeCardOwner(idOfClient, cardNo, changeTime, validTime, null);
     }
 
     @Override

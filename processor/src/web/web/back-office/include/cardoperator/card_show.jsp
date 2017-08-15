@@ -14,28 +14,31 @@
         var incomingMessage = event.data;
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:cardNoByCardReader").value = incomingMessage;
         var button = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:refreshCardsList");
-        button.click();
+        if (button != null) {
+            button.click();
+        }
     };
 
 </script>
 
 <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
 <h:panelGrid id="cardOperatorGrid" binding="#{cardOperatorPage.pageComponent}" styleClass="borderless-grid">
-    <a4j:commandButton id="refreshCardsList" action="#{cardOperatorPage.refresh}"  reRender="cardOperatorTable" />
+    <a4j:commandButton id="refreshCardsList" action="#{cardOperatorPage.onCardRead}"  reRender="cardOperatorTable, cardOperatorPageClient"
+                 style="display: none;"/>
     <h:inputText value="#{cardOperatorPage.cardNo}" converter="cardNoConverter" maxlength="10" id="cardNoByCardReader"
                  style="display: none;"  />
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Клиент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{cardOperatorPage.client.shortName}" readonly="true" styleClass="input-text"
-                         style="margin-right: 2px;" />
+            <h:inputText value="#{cardOperatorPage.client.shortName}" readonly="true" styleClass="input-text long-field"
+                         style="margin-right: 2px;" id="cardOperatorPageClient" />
             <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
 
 
-        <a4j:commandButton value="Применить" action="#{cardOperatorPage.updateCardOperatorPage}"
+        <a4j:commandButton value="Применить" action="#{cardOperatorPage.applyClient}"
                            reRender="workspaceTogglePanel" styleClass="command-button" />
         <a4j:commandButton value="Очистить" action="#{cardOperatorPage.clearCardOperatorPage}"
                            reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
@@ -50,34 +53,21 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер карты" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter"
-                              styleClass="output-text" />
-                <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </a4j:commandLink>
+            <h:outputText escape="true" value="#{item.cardNo}" converter="cardNoConverter"
+                          styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер, нанесённый на карту" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{item.cardPrintedNo}" converter="cardNoConverter"
-                              styleClass="output-text" />
-                <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </a4j:commandLink>
+            <h:outputText escape="true" value="#{item.cardPrintedNo}" converter="cardNoConverter"
+                          styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Клиент" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{item.client.shortName}" styleClass="output-text" />
-                <f:setPropertyActionListener value="#{item.client.idOfClient}"
-                                             target="#{mainPage.selectedIdOfClient}" />
-            </a4j:commandLink>
+            <h:outputText escape="true" value="#{item.client.shortName}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -87,28 +77,35 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Статус расположения" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.lifeState}" converter="cardLifeStateConverter"
-                          styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
                 <h:outputText escape="true" value="Последние изменения" />
             </f:facet>
             <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Редактировать" />
+                <h:outputText escape="true" value="Заблокировать" />
             </f:facet>
-            <%--@elvariable id="runtimeContext" type="ru.axetta.ecafe.processor.core.RuntimeContext"--%>
-            <a4j:commandLink action="#{mainPage.showCardEditPage}" styleClass="command-link"
-                             reRender="mainMenu, workspaceForm"
-                             disabled="#{runtimeContext.settingsConfig.cardsEditDisabled}">
-                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
+            <a4j:commandLink action="#{cardOperatorPage.showBlockCardPanel}" styleClass="command-link"
+                             reRender="cardOperatorTable"
+                             rendered="#{item.canBeBlocked}">
+                <h:graphicImage value="/images/16x16/stop.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
             </a4j:commandLink>
+            <h:panelGrid styleClass="borderless-grid" columns="4" rendered="#{item.lockingNow}">
+                <h:outputText escape="true" value="Причина блокировки: " styleClass="output-text" />
+                <%--<h:inputText value="#{item.lockReason}" styleClass="input-text" />--%>
+                <h:selectOneMenu value="#{item.lockReasonState}" styleClass="input-text">
+                    <f:selectItems value="#{cardOperatorPage.cardLockReasonMenu.items}" />
+                </h:selectOneMenu>
+                <a4j:commandButton value="Заблокировать" action="#{cardOperatorPage.blockCard}"
+                                   reRender="cardOperatorTable" styleClass="command-button">
+                    <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
+                </a4j:commandButton>
+                <a4j:commandButton value="Отмена" action="#{cardOperatorPage.hideBlockCardPanel}"
+                                   reRender="cardOperatorTable" styleClass="command-button">
+                    <f:setPropertyActionListener value="#{item}" target="#{cardOperatorPage.selectedItem}" />
+                </a4j:commandButton>
+            </h:panelGrid>
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="cardOperatorTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"

@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.CardLifeStateMenu;
@@ -134,7 +133,7 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
             clientHasNotBlockedCard = false;
             if (client.getCards() != null) {
                 for (Card card : client.getCards()) {
-                    if (card.getState().intValue() != CardState.BLOCKED.getValue()) {
+                    if (card.getState().intValue() != CardState.BLOCKED.getValue() && card.getState().intValue() != CardState.TEMPBLOCKED.getValue()) {
                         clientHasNotBlockedCard = true;
                         break;
                     }
@@ -144,11 +143,18 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
     }
 
     public void createCard() throws Exception {
+        if (client == null || client.getIdOfClient() == null) {
+            printError("Выберите клиента для привязки карты");
+            return;
+        }
         if (isClientHasNotBlockedCard()){
             printError("Данный клиент имеет незаблокированную(ые) карту(ы).");
             return;
         }
-        CardService.getInstance().resetAllCards(client.getIdOfClient());
+        if (cardNo == null || cardNo.equals(0L)) {
+            printError("Введите номер карты.");
+            return;
+        }
 
         validTime = CalendarUtils.endOfDay(validTime);
         try {

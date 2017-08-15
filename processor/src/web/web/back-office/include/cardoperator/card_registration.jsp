@@ -29,7 +29,7 @@
     </h:panelGroup>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardNo}" converter="cardNoConverter" maxlength="10" id="cardNo"
-                 styleClass="input-text" />
+                 styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardPrintedNo}" converter="cardPrintedNoConverter"
                  maxlength="16" styleClass="input-text" />
