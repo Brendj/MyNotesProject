@@ -15,6 +15,9 @@ import java.util.Map;
  * Time: 11:04
  * To change this template use File | Settings | File Templates.
  */
+//Этот тип сообщения отправляет клиенту пароль в смс и не должно использоваться.
+// Вместо этого реализована схема с кодом активации - сообщение TOKEN_GENERATED_EVENT=901250001
+@Deprecated
 public class EMPClientNewPasswordEventType extends EMPAbstractEventType {
     protected static final String NAME = "Генерация нового пароля для клиента";
 
