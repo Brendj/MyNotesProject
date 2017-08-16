@@ -18,7 +18,13 @@
             button.click();
         }
     };
+    function SaveFile(message)
+    {
+        var mes = message;
 
+        socket.send(mes);
+        return false;
+    }
 </script>
 
 <%--@elvariable id="cardOperatorPage" type="ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorPage"--%>
@@ -47,7 +53,8 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <rich:dataTable id="cardOperatorTable" value="#{cardOperatorPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
+                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                    left-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -80,6 +87,15 @@
                 <h:outputText escape="true" value="Последние изменения" />
             </f:facet>
             <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Печать" />
+            </f:facet>
+
+            <a4j:commandButton image="/images/16x16/print.png"
+                               oncomplete="SaveFile('#{item.message}')">
+            </a4j:commandButton>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

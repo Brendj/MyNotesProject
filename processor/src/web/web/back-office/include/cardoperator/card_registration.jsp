@@ -12,14 +12,22 @@
     var socket = new WebSocket("ws://localhost:8001");
     socket.onmessage = function(event) {
         var incomingMessage = event.data;
-        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:cardNo").value = incomingMessage;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:cardNoHidden").value = incomingMessage;
+        var button = document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:setCardNoByHidden");
+        if (button != null) {
+            button.click();
+        }
     };
 </script>
 
 
 <h:panelGrid id="cardRegistrationAndIssueGrid" binding="#{mainPage.cardRegistrationAndIssuePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Клиент" styleClass="output-text" />
+    <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardNoHidden}" converter="cardNoConverter" maxlength="10" id="cardNoHidden"
+                 style="display: none;" />
+    <a4j:commandButton id="setCardNoByHidden" action="#{mainPage.cardRegistrationAndIssuePage.onCardRead}"  reRender="cardNo"
+                       style="display: none;"/>
+    <h:outputText escape="true" value="Клиент" styleClass="output-text long-field" />
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.client.shortName}" readonly="true"
                      styleClass="input-text" style="margin-right: 2px;" />
@@ -29,7 +37,7 @@
     </h:panelGroup>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardNo}" converter="cardNoConverter" maxlength="10" id="cardNo"
-                 styleClass="input-text" readonly="true"/>
+                 styleClass="input-text" readonly="true" />
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.cardPrintedNo}" converter="cardPrintedNoConverter"
                  maxlength="16" styleClass="input-text" />

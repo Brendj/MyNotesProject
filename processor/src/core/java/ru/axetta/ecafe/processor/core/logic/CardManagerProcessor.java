@@ -68,7 +68,8 @@ public class CardManagerProcessor implements CardManager {
         logger.debug("check exist card");
         Card c = findCardByCardNo(persistenceSession, cardNo);
         if (c != null && c.getClient() != null) {
-            throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
+            throw new Exception(String.format("Карта уже зарегистрирована на клиента с л/с=%s",
+                    c.getClient().getContractId()));
         }
         logger.debug("check exist temp card");
         CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
@@ -229,6 +230,19 @@ public class CardManagerProcessor implements CardManager {
                 historyCard.setUpDatetime(new Date());
                 historyCard
                         .setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
+                historyCard.setNewOwner(newCardOwner);
+                historyCard.setFormerOwner(updatedCard.getClient());
+                historyCard.setUser(cardOperatorUser);
+                persistenceSession.save(historyCard);
+            } else if (cardOperatorUser != null) {
+                HistoryCard historyCard = new HistoryCard();
+                historyCard.setCard(updatedCard);
+                historyCard.setUpDatetime(new Date());
+                if (state == CardState.BLOCKED.getValue()) {
+                    historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo());
+                } else {
+                    historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo());
+                }
                 historyCard.setNewOwner(newCardOwner);
                 historyCard.setFormerOwner(updatedCard.getClient());
                 historyCard.setUser(cardOperatorUser);

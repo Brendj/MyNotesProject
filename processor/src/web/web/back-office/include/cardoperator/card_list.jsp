@@ -44,7 +44,7 @@
 
             <h:outputText styleClass="output-text" escape="true" value="Клиент" />
             <h:panelGroup id="clientFilter">
-                <a4j:commandButton value="..."
+                <%--<a4j:commandButton value="..."
                                    action="#{mainPage.showClientSelectListPage(mainPage.cardOperatorListPage.cardOperatorFilter.getClientList())}"
                                    reRender="modalClientListSelectorPanel,selectedClientList"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
@@ -54,9 +54,12 @@
                     <f:setPropertyActionListener
                             value="#{mainPage.cardOperatorListPage.cardOperatorFilter.getStringClientList}"
                             target="#{mainPage.clientSelectListPage.clientFilter}" />
-                </a4j:commandButton>
+                </a4j:commandButton>--%>
+                <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel,selectedClientList"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
                 <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
-                              value=" {#{mainPage.cardOperatorListPage.cardOperatorFilter.filter}}" />
+                              value=" {#{mainPage.cardOperatorListPage.cardOperatorFilter.client.shortName}}" />
             </h:panelGroup>
 
             <h:outputText escape="true" value="Cтатус" styleClass="output-text" />
@@ -92,7 +95,7 @@
     </a4j:status>
 
     <rich:dataTable id="cardTable" value="#{mainPage.cardOperatorListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
+                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column"
                     footerClass="data-table-footer">
 
         <rich:column headerClass="column-header">
@@ -104,7 +107,7 @@
 
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Лицевой счет" />
+                <h:outputText escape="true" value="Номер карты" />
             </f:facet>
             <h:outputText escape="true" value="#{item.cardNo}" styleClass="output-text" />
         </rich:column>
@@ -118,38 +121,16 @@
 
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Статус" />
+                <h:outputText escape="true" value="Операция" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.state}" converter="cardStateConverter" styleClass="output-text" />
-        </rich:column>
-
-        <rich:column headerClass="column-header"
-                     rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Последние изменения"
-                              rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.date}" converter="timeConverter" styleClass="output-text"
-                          rendered="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
+            <h:outputText escape="true" value="#{item.operation}" styleClass="output-text" />
         </rich:column>
 
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Печать" />
+                <h:outputText escape="true" value="Время операции" />
             </f:facet>
-
-            <a4j:commandButton image="/images/16x16/print.png"
-                               oncomplete="SaveFile('#{mainPage.cardOperatorListPage.message}')">
-                <f:setPropertyActionListener value="#{item.contractId}"
-                                             target="#{mainPage.cardOperatorListPage.actionContractId}" />
-                <f:setPropertyActionListener value="#{item.cardNo}" target="#{mainPage.cardOperatorListPage.action}" />
-                <f:setPropertyActionListener value="#{item.cardPrintedNo}"
-                                             target="#{mainPage.cardOperatorListPage.actionCardPrintedNo}" />
-                <f:setPropertyActionListener value="#{item.date}"
-                                             target="#{mainPage.cardOperatorListPage.dateAction}" />
-                <f:setPropertyActionListener value="#{item.personName}"
-                                             target="#{mainPage.cardOperatorListPage.personNameAction}" />
-            </a4j:commandButton>
+            <h:outputText escape="true" value="#{item.date}" converter="timeConverter" styleClass="output-text" />
         </rich:column>
 
         <f:facet name="footer">

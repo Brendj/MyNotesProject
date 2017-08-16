@@ -5,26 +5,28 @@
 package ru.axetta.ecafe.processor.web.ui.cardoperator;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.HistoryCard;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.CompareFilterMenu;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.card.CardFilter;
 import ru.axetta.ecafe.processor.web.ui.card.CardLifeStateFilterMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardStateFilterMenu;
-import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
+import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +34,7 @@ import java.util.List;
 /**
  * Created by anvarov on 31.07.2017.
  */
-public class CardOperatorFilter extends OnlineReportPage implements ClientSelectListPage.CompleteHandler {
+public class CardOperatorFilter extends OnlineReportPage {
 
     private Calendar localCalendar;
 
@@ -68,16 +70,12 @@ public class CardOperatorFilter extends OnlineReportPage implements ClientSelect
         this.startDate = startDate;
     }
 
-    @Override
-    public void completeClientSelection(Session session, List<ClientSelectListPage.Item> items) throws Exception {
-        Client cl = null;
-        if (items != null) {
-            getClientList().clear();
-            for (ClientSelectListPage.Item item : items) {
-                getClientList().add(item);
-            }
-        }
-        filter = getStringClientList();
+    public ClientItem getClient() {
+        return client;
+    }
+
+    public void setClient(ClientItem client) {
+        this.client = client;
     }
 
     public static class OrgItem {
@@ -116,6 +114,7 @@ public class CardOperatorFilter extends OnlineReportPage implements ClientSelect
     }
 
     private CardFilter.OrgItem org = new CardFilter.OrgItem();
+    private ClientItem client;
     private CardStateFilterMenu cardStateFilterMenu = new CardStateFilterMenu();
     private CardLifeStateFilterMenu cardLifeStateFilterMenu = new CardLifeStateFilterMenu();
     private CompareFilterMenu balanceCompareFilterMenu = new CompareFilterMenu();
@@ -123,13 +122,7 @@ public class CardOperatorFilter extends OnlineReportPage implements ClientSelect
     private int cardLifeState = CardLifeStateFilterMenu.NO_CONDITION;
     private int balanceCompareCondition = CompareFilterMenu.NO_CONDITION;
 
-    private final List<ClientSelectListPage.Item> clientList = new ArrayList<ClientSelectListPage.Item>();
-
-    private Boolean showOperationsAllPeriod;
-
-    public List<ClientSelectListPage.Item> getClientList() {
-        return clientList;
-    }
+    private Boolean showOperationsAllPeriod = false;
 
     public Boolean getShowOperationsAllPeriod() {
         return showOperationsAllPeriod;
@@ -137,18 +130,6 @@ public class CardOperatorFilter extends OnlineReportPage implements ClientSelect
 
     public void setShowOperationsAllPeriod(Boolean showOperationsAllPeriod) {
         this.showOperationsAllPeriod = showOperationsAllPeriod;
-    }
-
-    public String getStringClientList() {
-        List<String> val = new ArrayList<String>();
-        for (ClientSelectListPage.Item item : getClientList()) {
-            val.add(item.getCaption());
-        }
-        if (val.isEmpty()) {
-            return "";
-        } else {
-            return val.toString();
-        }
     }
 
     public int getCardState() {
@@ -194,7 +175,7 @@ public class CardOperatorFilter extends OnlineReportPage implements ClientSelect
 
     public boolean isEmpty() {
         return CardStateFilterMenu.NO_CONDITION == cardState && CardLifeStateFilterMenu.NO_CONDITION == cardLifeState
-                && CompareFilterMenu.NO_CONDITION == balanceCompareCondition && org.isEmpty();
+                && CompareFilterMenu.NO_CONDITION == balanceCompareCondition && org.isEmpty() && (client == null || client.getIdOfClient() == null);
     }
 
     public String getStatus() {
@@ -219,30 +200,52 @@ public class CardOperatorFilter extends OnlineReportPage implements ClientSelect
     }
 
     public List retrieveCards(Session session) throws Exception {
-        Criteria criteria = session.createCriteria(Card.class, "card");
-        if (!this.isEmpty()) {
-            if (CardStateFilterMenu.NO_CONDITION != this.cardState) {
-                criteria.add(Restrictions.eq("card.state", this.cardState));
-            }
-            if (CardLifeStateFilterMenu.NO_CONDITION != this.cardLifeState) {
-                criteria.add(Restrictions.eq("card.lifeState", this.cardLifeState));
-            }
-            if (!showOperationsAllPeriod) {
-                if (startDate != null) {
-                    criteria.add(
-                            Restrictions.between("card.createTime", startDate, CalendarUtils.addOneDay(startDate)));
-                }
-            }
-            if (!clientList.isEmpty()) {
-                criteria.add(Restrictions.in("card.client", clientList));
-            }
-            if (!this.org.isEmpty()) {
-                Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
-                criteria.createAlias("client", "client", JoinType.LEFT_OUTER_JOIN);
-                criteria.add(Restrictions.disjunction().add(Restrictions.eq("card.org", org))
-                        .add(Restrictions.eq("client.org", org)));
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        Criteria cr = session.createCriteria(HistoryCard.class);
+        cr.add(Restrictions.eq("user", user));
+        if (CardStateFilterMenu.NO_CONDITION != this.cardState) {
+            cr.add(Restrictions.eq("card.state", this.cardState));
+        }
+        if (!showOperationsAllPeriod) {
+            if (startDate != null) {
+                cr.add(
+                        Restrictions.between("upDatetime", startDate, CalendarUtils.addOneDay(startDate)));
             }
         }
-        return criteria.list();
+        if (client != null && client.getIdOfClient() != null) {
+            Client cl = (Client)session.load(Client.class, client.getIdOfClient());
+            cr.add(Restrictions.eq("card.client", cl));
+        }
+        if (!this.org.isEmpty()) {
+            Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
+            cr.createAlias("client", "card.client", JoinType.LEFT_OUTER_JOIN);
+            cr.add(Restrictions.disjunction().add(Restrictions.eq("card.org", org))
+                    .add(Restrictions.eq("client.org", org)));
+        }
+        cr.addOrder(Order.asc("upDatetime"));
+        return cr.list();
+
+
+        /*Criteria criteria = session.createCriteria(Card.class, "card");
+        if (CardStateFilterMenu.NO_CONDITION != this.cardState) {
+            criteria.add(Restrictions.eq("card.state", this.cardState));
+        }
+        if (!showOperationsAllPeriod) {
+            if (startDate != null) {
+                criteria.add(
+                        Restrictions.between("card.updateTime", startDate, CalendarUtils.addOneDay(startDate)));
+            }
+        }
+        if (client != null && client.getIdOfClient() != null) {
+            Client cl = (Client)session.load(Client.class, client.getIdOfClient());
+            criteria.add(Restrictions.eq("card.client", cl));
+        }
+        if (!this.org.isEmpty()) {
+            Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
+            criteria.createAlias("client", "client", JoinType.LEFT_OUTER_JOIN);
+            criteria.add(Restrictions.disjunction().add(Restrictions.eq("card.org", org))
+                    .add(Restrictions.eq("client.org", org)));
+        }
+        return criteria.list();*/
     }
 }

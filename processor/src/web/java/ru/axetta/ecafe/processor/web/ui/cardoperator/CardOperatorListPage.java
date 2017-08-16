@@ -5,20 +5,15 @@
 package ru.axetta.ecafe.processor.web.ui.cardoperator;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -27,9 +22,10 @@ import java.util.List;
 /**
  * Created by anvarov on 27.07.2017.
  */
-public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, ClientSelectPage.CompleteHandler {
 
     private static final String configString = "ecafe.processor.ws.message.server.path";
+    private ClientItem client;
 
     private String serverPath = RuntimeContext.getInstance().getConfigProperties()
             .getProperty(configString, "");
@@ -74,6 +70,13 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         this.cardOperatorFilter.completeOrgSelection(session, idOfOrg);
     }
 
+    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
+        if (null != idOfClient) {
+            Client client = (Client) session.load(Client.class, idOfClient);
+            this.cardOperatorFilter.setClient(new ClientItem(client));
+        }
+    }
+
     public static class Item {
 
         private String shortNameInfoService;
@@ -81,10 +84,11 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         private Long cardNo;
         private Long cardPrintedNo;
         private String personName;
-        private Integer state;
+        private String operation;
         private Date date;
 
-        public Item(Org org, Card card, String personName) {
+        public Item(Org org, HistoryCard history, String personName) {
+            Card card = history.getCard();
             this.shortNameInfoService = org.getShortNameInfoService();
             if (card.getClient() != null) {
                 this.contractId = card.getClient().getContractId();
@@ -92,8 +96,8 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             this.cardNo = card.getCardNo();
             this.cardPrintedNo = card.getCardPrintedNo();
             this.personName = personName;
-            this.state = card.getState();
-            this.date = card.getCreateTime();
+            this.operation = history.getInformationAboutCard();
+            this.date = history.getUpDatetime();
         }
 
         public String getShortNameInfoService() {
@@ -136,14 +140,6 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             this.personName = personName;
         }
 
-        public Integer getState() {
-            return state;
-        }
-
-        public void setState(Integer state) {
-            this.state = state;
-        }
-
         public Date getDate() {
             return date;
         }
@@ -151,21 +147,30 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         public void setDate(Date date) {
             this.date = date;
         }
+
+        public String getOperation() {
+            return operation;
+        }
+
+        public void setOperation(String operation) {
+            this.operation = operation;
+        }
     }
 
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        if (!cardOperatorFilter.isEmpty()) {
-            List cards = cardOperatorFilter.retrieveCards(session);
-            for (Object object : cards) {
-                Card card = (Card) object;
+        if (!cardOperatorFilter.isEmpty() || !cardOperatorFilter.getShowOperationsAllPeriod()) {
+            List history = cardOperatorFilter.retrieveCards(session);
+            for (Object object : history) {
+                HistoryCard hist = (HistoryCard) object;
+                Card card = hist.getCard();
                 Org org = card.getOrg();
                 String personName = "";
                 if (card.getClient() != null) {
                     Person person = DAOService.getInstance().getPersonByClient(card.getClient());
                     personName = person.getFullName();
                 }
-                items.add(new Item(org, card, personName));
+                items.add(new Item(org, hist, personName));
             }
         }
         this.items = items;

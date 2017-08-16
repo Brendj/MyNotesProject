@@ -8,8 +8,10 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.card.CardLifeStateMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardStateMenu;
 import ru.axetta.ecafe.processor.web.ui.card.CardTypeMenu;
@@ -28,6 +30,7 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
     private ClientItem client = new ClientItem();
     private long idOfOrg;
     private Long cardNo;
+    private Long cardNoHidden;
     private Integer cardType;
 
     private String lockReason;
@@ -158,17 +161,31 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
 
         validTime = CalendarUtils.endOfDay(validTime);
         try {
+            User user = MainPage.getSessionInstance().getCurrentUser();
             RuntimeContext.getInstance().getCardManager()
                     .createCard(this.client.getIdOfClient(), this.cardNo, this.cardType, CardState.ISSUED.getValue(),
-                            this.validTime, 1 /*Card.LIFE_STATE_NAMES[1]="Выдана клиенту"*/, this.lockReason, this.issueTime, this.cardPrintedNo);
+                            this.validTime, 1 /*Card.LIFE_STATE_NAMES[1]="Выдана клиенту"*/, this.lockReason, this.issueTime,
+                            this.cardPrintedNo, user);
             printMessage("Карта зарегистрирована успешно");
         } catch (Exception e) {
-            printError("При попытке регистрации карты произошла ошибка с текстом: " + e.getMessage());
+            printError(e.getMessage());
         }
     }
 
 
     public boolean isClientHasNotBlockedCard() {
         return clientHasNotBlockedCard;
+    }
+
+    public Long getCardNoHidden() {
+        return cardNoHidden;
+    }
+
+    public void setCardNoHidden(Long cardNoHidden) {
+        this.cardNoHidden = cardNoHidden;
+    }
+
+    public void onCardRead() {
+        cardNo = cardNoHidden;
     }
 }

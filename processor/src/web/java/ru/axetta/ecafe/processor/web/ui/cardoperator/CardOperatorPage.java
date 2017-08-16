@@ -284,6 +284,12 @@ public class CardOperatorPage extends BasicWorkspacePage implements ClientSelect
             this.externalId = card.getExternalId();
         }
 
+        public String getMessage() {
+            String personNameAction = client.getPerson().getSurname() + " " + client.getPerson().getFirstName() + " " + client.getPerson().getSecondName();
+            String message = String.valueOf(client.getContractId()) + ";" + personNameAction + ";" + String.valueOf(cardNo) + ";" + String.valueOf(cardPrintedNo);
+            return message;
+        }
+
         public Boolean getCanBeBlocked() {
             return this.state.equals(CardState.ISSUED.getValue()) && !lockingNow;
         }
