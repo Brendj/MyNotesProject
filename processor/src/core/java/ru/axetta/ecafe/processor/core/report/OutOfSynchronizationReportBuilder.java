@@ -133,7 +133,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                             object[7] == null ? "" : (String) object[7],
                             rowName((String) object[0]),
                             (String) object[8],
-                            (String) object[7],
+                            (String) object[9],
                             (String) object[10]);
                     outOfSynchronizationReportList.add(outOfSynchronizationItem);
                 }
