@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.cardoperator;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -95,7 +96,7 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
             }
             this.cardNo = card.getCardNo();
             this.cardPrintedNo = card.getCardPrintedNo();
-            this.personName = personName;
+            this.personName = ContractIdFormat.format(contractId) + " (): " + personName;
             this.operation = history.getInformationAboutCard();
             this.date = history.getUpDatetime();
         }
