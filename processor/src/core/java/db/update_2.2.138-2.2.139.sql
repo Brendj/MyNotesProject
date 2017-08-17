@@ -12,3 +12,5 @@ alter table cf_externalevents add column evtStatus integer,
   alter column orgcode type character varying(25);
 
 CREATE INDEX cf_externalevents_version_idx ON cf_externalevents USING btree (version);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 170817) НЕ МЕНЯТЬ
