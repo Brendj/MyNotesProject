@@ -3541,9 +3541,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     public Map<Client, ClientCreatedFromType> extractClientsFromGuardByGuardMobile(String guardMobile, Session session) throws Exception {
         Map<Client, ClientCreatedFromType> result = new HashMap<Client, ClientCreatedFromType>();
-        String query = "select client.idOfClient from cf_clients client where client.phone=:guardMobile or client.mobile=:guardMobile"; //все клиенты с номером телефона
+        String query = "select client.idOfClient from cf_clients client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
+                + "and client.IdOfClientGroup not in (:leaving, :deleted)"; //все клиенты с номером телефона
         Query q = session.createSQLQuery(query);
         q.setParameter("guardMobile", guardMobile);
+        q.setParameter("leaving", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        q.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
         List<BigInteger> clients = q.list();
 
         if (clients != null && !clients.isEmpty()){
