@@ -127,6 +127,8 @@ public class ClientSummaryExt {
 
     @XmlAttribute(name = "GuardianCreatedWhere")
     protected Integer guardianCreatedWhere;
+    @XmlAttribute(name = "GroupPredefined")
+    private Integer groupPredefined;
     /**
      *
      * Gets the value of the contractId property.
@@ -748,5 +750,13 @@ public class ClientSummaryExt {
 
     public void setGuardianCreatedWhere(Integer guardianCreatedWhere) {
         this.guardianCreatedWhere = guardianCreatedWhere;
+    }
+
+    public Integer getGroupPredefined() {
+        return groupPredefined;
+    }
+
+    public void setGroupPredefined(Integer groupPredefined) {
+        this.groupPredefined = groupPredefined;
     }
 }
