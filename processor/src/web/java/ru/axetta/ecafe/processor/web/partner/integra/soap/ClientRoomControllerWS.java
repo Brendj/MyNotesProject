@@ -1753,6 +1753,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } else {
             clientSummaryBase.setGrade(client.getClientGroup().getGroupName());
         }
+        Long groupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+        if (groupId >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() && groupId <= ClientGroup.Predefined.CLIENT_DISPLACED.getValue()) {
+            clientSummaryBase.setGroupPredefined(1);
+        } else {
+            clientSummaryBase.setGroupPredefined(0);
+        }
         clientSummaryBase.setOfficialName(client.getOrg().getShortNameInfoService());
         clientSummaryBase.setMobilePhone(client.getMobile());
         clientSummaryBase.setOrgId(client.getOrg().getIdOfOrg());
