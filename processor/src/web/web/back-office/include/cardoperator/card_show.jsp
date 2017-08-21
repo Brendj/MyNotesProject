@@ -21,8 +21,9 @@
     function SaveFile(message)
     {
         var mes = message;
-
-        socket.send(mes);
+        if (mes != '') {
+            socket.send(mes);
+        }
         return false;
     }
 </script>
