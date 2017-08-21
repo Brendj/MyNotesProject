@@ -285,9 +285,15 @@ public class CardOperatorPage extends BasicWorkspacePage implements ClientSelect
         }
 
         public String getMessage() {
-            String personNameAction = client.getPerson().getSurname() + " " + client.getPerson().getFirstName() + " " + client.getPerson().getSecondName();
-            String message = String.valueOf(client.getContractId()) + ";" + personNameAction + ";" + String.valueOf(cardNo) + ";" + String.valueOf(cardPrintedNo);
-            return message;
+            try {
+                String personNameAction =
+                        client.getPerson().getSurname() + " " + client.getPerson().getFirstName() + " " + client.getPerson().getSecondName();
+                String message =
+                        String.valueOf(client.getContractId()) + ";" + personNameAction + ";" + String.valueOf(cardNo) + ";" + String.valueOf(cardPrintedNo);
+                return message;
+            } catch (Exception e) {
+                return "";
+            }
         }
 
         public Boolean getCanBeBlocked() {
