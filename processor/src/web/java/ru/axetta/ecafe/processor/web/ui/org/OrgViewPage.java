@@ -85,6 +85,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean photoRegistry;
     private Boolean variableFeeding;
     private Boolean isWorkInSummerTime;
+    private Boolean isRecyclingEnabled;
+    private Boolean autoCreateCards;
     private String registryUrl;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
@@ -256,6 +258,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
         this.variableFeeding = org.getVariableFeeding();
         this.isWorkInSummerTime = org.getIsWorkInSummerTime();
+        this.isRecyclingEnabled = org.getIsRecyclingEnabled();
+        this.autoCreateCards = org.getAutoCreateCards();
     }
 
     public String getFilterOrgs() {
@@ -656,5 +660,21 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setOrganizationTypeInitial(OrganizationType organizationTypeInitial) {
         this.organizationTypeInitial = organizationTypeInitial;
+    }
+
+    public Boolean getRecyclingEnabled() {
+        return isRecyclingEnabled;
+    }
+
+    public void setRecyclingEnabled(Boolean recyclingEnabled) {
+        isRecyclingEnabled = recyclingEnabled;
+    }
+
+    public Boolean getAutoCreateCards() {
+        return autoCreateCards;
+    }
+
+    public void setAutoCreateCards(Boolean autoCreateCards) {
+        this.autoCreateCards = autoCreateCards;
     }
 }

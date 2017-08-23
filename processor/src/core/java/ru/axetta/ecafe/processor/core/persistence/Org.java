@@ -139,6 +139,8 @@ public class Org implements Serializable {
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
     private Boolean isWorkInSummerTime;
+    private Boolean isRecyclingEnabled;
+    private Boolean autoCreateCards;
 
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
@@ -195,6 +197,8 @@ public class Org implements Serializable {
         this.changesDSZN = changesDSZN;
         this.variableFeeding = false;
         this.isWorkInSummerTime = false;
+        this.isRecyclingEnabled = false;
+        this.autoCreateCards = false;
         this.typeInitial = OrganizationType.SCHOOL;
     }
 
@@ -1063,5 +1067,21 @@ public class Org implements Serializable {
 
     public void setIsWorkInSummerTime(Boolean workInSummerTime) {
         isWorkInSummerTime = workInSummerTime;
+    }
+
+    public Boolean getIsRecyclingEnabled() {
+        return isRecyclingEnabled;
+    }
+
+    public void setIsRecyclingEnabled(Boolean recyclingEnabled) {
+        isRecyclingEnabled = recyclingEnabled;
+    }
+
+    public Boolean getAutoCreateCards() {
+        return autoCreateCards;
+    }
+
+    public void setAutoCreateCards(Boolean autoCreateCards) {
+        this.autoCreateCards = autoCreateCards;
     }
 }

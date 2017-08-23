@@ -7,12 +7,14 @@ package ru.axetta.ecafe.processor.core.service;
 import generated.spb.register.Pupil;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.partner.spb.SpbClientService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -21,6 +23,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,6 +183,10 @@ public class ImportRegisterSpbClientsService {
 
             Boolean migration = false;
 
+            Date issueTime = new Date();
+            Date validTime = CalendarUtils.endOfDay(CalendarUtils.addYear(issueTime, 5));
+            Long cardNo;
+
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
@@ -204,6 +211,19 @@ public class ImportRegisterSpbClientsService {
                     }
                     afterSaveClient = ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
                             (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+                    try {
+                        cardNo = Long.parseLong(afterSaveClient.getClientGUID());
+                    } catch (Exception e) {
+                        cardNo = null;
+                    }
+                    if (cardNo != null) {
+                        Org org = DAOUtils.findOrg(session, change.getIdOfOrg());
+                        if (org.getAutoCreateCards()) {
+                            RuntimeContext.getInstance().getCardManager()
+                                    .createCardTransactionFree(session, afterSaveClient.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
+                                            CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                        }
+                    }
                     change.setIdOfClient(afterSaveClient.getIdOfClient());
                     change.setIdOfOrg(afterSaveClient.getOrg().getIdOfOrg());
 
@@ -832,5 +852,70 @@ public class ImportRegisterSpbClientsService {
             logger.error(str);
         }
     }
+
+    public static int createSpbCards(Long idOfOrg) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        int counter = 0;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            List<Org> orgs = DAOUtils.findFriendlyOrgs(session, idOfOrg);
+            for (Org org : orgs) {
+                if (!org.getAutoCreateCards()) {
+                    throw new Exception(String.format("У организации c идентификатором = %s не включен флаг автогенерации карт!", org.getIdOfOrg()));
+                }
+            }
+
+            Criteria criteria = session.createCriteria(Client.class);
+            criteria.add(Restrictions.in("org", orgs));
+            Disjunction groupDisjunction = Restrictions.disjunction();
+            groupDisjunction.add(Restrictions.lt("idOfClientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()));
+            groupDisjunction.add(Restrictions.gt("idOfClientGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue()));
+            criteria.add(groupDisjunction);
+            List<Client> clients = criteria.list();
+
+            Date issueTime = new Date();
+            Date validTime = CalendarUtils.endOfDay(CalendarUtils.addYear(issueTime, 5));
+            Long cardNo;
+            boolean doCreate;
+
+            for(Client client : clients) {
+                if (StringUtils.isEmpty(client.getClientGUID())) continue;
+                try {
+                    cardNo = Long.parseLong(client.getClientGUID());
+                } catch (Exception e) {
+                    cardNo = null;
+                }
+                if (cardNo == null) continue;
+                doCreate = true;
+                for (Card card : client.getCards()) {
+                    if (card.getState().equals(CardState.ISSUED)) {
+                        if (card.getCardNo().equals(client.getClientGUID())) {
+                            doCreate = false;
+                        }
+                    }
+                }
+                if (doCreate) {
+                    CardManagerProcessor.lockActiveCards(session, client.getCards());
+                    RuntimeContext.getInstance().getCardManager()
+                            .createCardTransactionFree(session, client.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
+                                    CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                    counter++;
+                }
+            }
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error SPb cards creation: ", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return counter;
+    }
+
 
 }

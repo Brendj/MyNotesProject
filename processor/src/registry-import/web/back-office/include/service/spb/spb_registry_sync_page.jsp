@@ -76,7 +76,7 @@
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText value="Включать только классы:" styleClass="output-text"/>
-            <h:selectBooleanCheckbox value="#{spbRegistrySynchPage.showOnlyClientGroups}"/>
+            <h:selectBooleanCheckbox value="#{spbRegistrySynchPage.showOnlyClientGoups}"/>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Обновить" action="#{spbRegistrySynchPage.doUpdate}"
@@ -228,6 +228,8 @@
                         <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество найденных разногласий всего" styleClass="output-text"/></h:panelGroup>
                         <h:outputText value="#{spbRegistrySynchPage.totalCount}" styleClass="output-text" style="font-weight: bold;"/>
                     </h:panelGrid>
+                    <a4j:commandButton value="Создать карты" action="#{spbRegistrySynchPage.createCards}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
+                                       onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

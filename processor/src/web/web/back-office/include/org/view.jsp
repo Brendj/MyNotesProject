@@ -141,6 +141,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.variableFeeding}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.payByCashier}"  styleClass="input-text" disabled="true"  />
+    <h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.recyclingEnabled}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.cardLimit}" converter="copeckSumConverter"
                  styleClass="input-text" />
@@ -198,6 +200,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
+    <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.autoCreateCards}" styleClass="input-text" disabled="true" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showOrgEditPage}"

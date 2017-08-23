@@ -42,11 +42,11 @@ public class CardManagerProcessor implements CardManager {
     public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
             Long cardPrintedNo) throws Exception {
-        return createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state, validTime,
+        return createCard(persistenceSession, idOfClient, cardNo, cardType, state, validTime,
             lifeState, lockReason, issueTime, cardPrintedNo, null);
     }
 
-    public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
+    public Long createCard(Session persistenceSession, Long idOfClient, long cardNo,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
             Long cardPrintedNo, User cardOperatorUser) throws Exception {
 
@@ -129,6 +129,12 @@ public class CardManagerProcessor implements CardManager {
     }
 
     @Override
+    public Long createCardTransactionFree(Session session, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
+        return createCard(session, idOfClient, cardNo, cardType, state, validTime, lifeState, lockReason, issueTime, cardPrintedNo, null);
+    }
+
+    @Override
     public Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo, User cardOperatorUser) throws Exception {
         Session persistenceSession = null;
@@ -137,7 +143,7 @@ public class CardManagerProcessor implements CardManager {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Long idOfCard = createCard(persistenceSession, persistenceTransaction, idOfClient, cardNo, cardType, state,
+            Long idOfCard = createCard(persistenceSession, idOfClient, cardNo, cardType, state,
                     validTime, lifeState, lockReason, issueTime, cardPrintedNo, cardOperatorUser);
 
             persistenceSession.flush();
@@ -548,11 +554,12 @@ public class CardManagerProcessor implements CardManager {
     }
 
 
-    private static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
+    public static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
         for (Card card : lockableCards) {
             if (card.getState() == Card.ACTIVE_STATE) {
                 card.setState(CardState.BLOCKED.getValue());
                 card.setLockReason("Выпуск новой карты");
+                card.setUpdateTime(new Date());
                 persistenceSession.update(card);
             }
         }

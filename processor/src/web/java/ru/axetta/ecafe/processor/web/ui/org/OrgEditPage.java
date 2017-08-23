@@ -121,6 +121,8 @@ public class OrgEditPage extends BasicWorkspacePage
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
     private String modeContragentSelect;
+    private Boolean isRecyclingEnabled;
+    private Boolean autoCreateCards;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -353,6 +355,8 @@ public class OrgEditPage extends BasicWorkspacePage
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
         org.setPhotoRegistryDirective(photoD);
         org.setVariableFeeding(variableFeeding);
+        org.setIsRecyclingEnabled(isRecyclingEnabled);
+        org.setAutoCreateCards(autoCreateCards);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -500,6 +504,8 @@ public class OrgEditPage extends BasicWorkspacePage
         this.securityLevel = org.getSecurityLevel();
         this.photoRegistry = org.getPhotoRegistryDirective().getCode().equals(1);
         this.variableFeeding = org.getVariableFeeding();
+        this.isRecyclingEnabled = org.getIsRecyclingEnabled();
+        this.autoCreateCards = org.getAutoCreateCards();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1038,6 +1044,22 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setOrganizationTypeInitial(OrganizationType organizationTypeInitial) {
         this.organizationTypeInitial = organizationTypeInitial;
+    }
+
+    public Boolean getRecyclingEnabled() {
+        return isRecyclingEnabled;
+    }
+
+    public void setRecyclingEnabled(Boolean recyclingEnabled) {
+        isRecyclingEnabled = recyclingEnabled;
+    }
+
+    public Boolean getAutoCreateCards() {
+        return autoCreateCards;
+    }
+
+    public void setAutoCreateCards(Boolean autoCreateCards) {
+        this.autoCreateCards = autoCreateCards;
     }
 
     public static class ContragentItem {

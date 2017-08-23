@@ -246,6 +246,8 @@
         <property name="interdistrictCouncilChief" column="interdistrictCouncilChief" type="string" length="256"/>
         <property name="updateTime" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="isWorkInSummerTime" column="IsWorkInSummerTime" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="isRecyclingEnabled" column="IsRecyclingEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="autoCreateCards" column="autoCreateCards" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
 
     </class>
 </hibernate-mapping>

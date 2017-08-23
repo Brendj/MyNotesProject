@@ -9675,4 +9675,8 @@ public class MainPage implements Serializable {
     /*public BasicBasketReportPage getBasicBasketReportPage() {
         return basicBasketReportPage;
     }*/
+
+    public boolean getIsSpb() {
+        return RuntimeContext.RegistryType.isSpb();
+    }
 }

@@ -28,6 +28,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.SOAPFaultException;
 import java.lang.Exception;
 import java.net.URL;
 import java.text.DateFormat;
@@ -50,34 +50,35 @@ import java.util.*;
  * Time: 13:57
  * To change this template use File | Settings | File Templates.
  */
-@Component
+@Primary
+@Component("NSIOrgRegistrySynchPageBase")
 @Scope("session")
 public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements CompleteOrgSelectHandler*/{
-    private static final int DISPLAY_ALL_MODE = 1;
-    private static final int DISPLAY_COMMENTED_MODE = 2;
-    private static final int DISPLAY_NON_COMMENTED_MODE = 3;
-    private static final boolean ALLOW_TO_APPLY_PREVIOS_REVISIONS = false;
-    private static final int ALL_OPERATIONS = 0;
-    private DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    private boolean fullNameValidation = true;
-    private String errorMessages;
-    private String infoMessages;
-    Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
-    private long revisionCreateDate;
-    private int actionFilter;
-    private List<RevisionItem> revisions;
-    private List<RegistryChangeErrorItem> errors;
-    private static Map<Integer, String> ACTION_FILTERS = new HashMap<Integer, String>();
-    private long idOfSelectedError;
-    List <WebRegistryChangeItem> items;
-    private Map<Long, CategoryDiscount> categoryMap;
-    private Map<Integer, CategoryDiscountDSZN> categoryDSZNMap;
-    private String errorComment;
-    private List<SelectItem> displayModes;
-    private int displayMode;
-    private String nameFilter;
-    private long loadedOrgRevisions = -1L;
-    boolean showOnlyClientGoups = true;
+    protected static final int DISPLAY_ALL_MODE = 1;
+    protected static final int DISPLAY_COMMENTED_MODE = 2;
+    protected static final int DISPLAY_NON_COMMENTED_MODE = 3;
+    protected static final boolean ALLOW_TO_APPLY_PREVIOS_REVISIONS = false;
+    protected static final int ALL_OPERATIONS = 0;
+    protected DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    protected boolean fullNameValidation = true;
+    protected String errorMessages;
+    protected String infoMessages;
+    protected Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
+    protected long revisionCreateDate;
+    protected int actionFilter;
+    protected List<RevisionItem> revisions;
+    protected List<RegistryChangeErrorItem> errors;
+    protected static Map<Integer, String> ACTION_FILTERS = new HashMap<Integer, String>();
+    protected long idOfSelectedError;
+    protected List <WebRegistryChangeItem> items;
+    protected Map<Long, CategoryDiscount> categoryMap;
+    protected Map<Integer, CategoryDiscountDSZN> categoryDSZNMap;
+    protected String errorComment;
+    protected List<SelectItem> displayModes;
+    protected int displayMode;
+    protected String nameFilter;
+    protected long loadedOrgRevisions = -1L;
+    protected boolean showOnlyClientGoups = true;
 
 
     public String getPageFilename() {
@@ -328,7 +329,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
     }
 
-    private void load(boolean refresh) {
+    protected void load(boolean refresh) {
         resetMessages();
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 0L) {
@@ -361,10 +362,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 refreshRegistryChangeItemsV2(idOfOrg);
             } catch (Exception e) {
-                if (e instanceof SOAPFaultException) {
-                    errorMessages = e.getMessage();
-                    return;
-                }
+                errorMessages = e.getMessage();
+                return;
             }
             if (changedItems == null || changedItems.isEmpty()) {
                 errorMessages = "Не получено разногласий либо устарел GUID организации";

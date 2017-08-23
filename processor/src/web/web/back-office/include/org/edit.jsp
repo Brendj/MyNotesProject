@@ -187,6 +187,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.variableFeeding}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.payByCashier}"  styleClass="input-text"  />
+    <h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.recyclingEnabled}" styleClass="input-text" />
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
 </h:panelGrid>
@@ -257,6 +259,8 @@
     </h:panelGrid>
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
+    <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
 <br />
 <rich:separator />
