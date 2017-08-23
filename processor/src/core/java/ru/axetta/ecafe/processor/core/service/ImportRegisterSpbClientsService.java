@@ -898,10 +898,15 @@ public class ImportRegisterSpbClientsService {
                     }
                 }
                 if (doCreate) {
-                    CardManagerProcessor.lockActiveCards(session, client.getCards());
-                    RuntimeContext.getInstance().getCardManager()
-                            .createCardTransactionFree(session, client.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
-                                    CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                    try {
+                        CardManagerProcessor.lockActiveCards(session, client.getCards());
+                        RuntimeContext.getInstance().getCardManager()
+                                .createCardTransactionFree(session, client.getIdOfClient(), cardNo, Card.parseCardType(Card.TYPE_NAMES[1]),
+                                        CardState.ISSUED.getValue(), validTime, Card.ISSUED_LIFE_STATE, "", issueTime, cardNo);
+                    } catch (Exception e) {
+                        logger.error("Error SPb cards creation for client " + client.getContractId(), e);
+                        continue;
+                    }
                     counter++;
                 }
             }

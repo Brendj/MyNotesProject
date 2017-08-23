@@ -68,8 +68,8 @@ public class CardManagerProcessor implements CardManager {
         logger.debug("check exist card");
         Card c = findCardByCardNo(persistenceSession, cardNo);
         if (c != null && c.getClient() != null) {
-            throw new Exception(String.format("Карта уже зарегистрирована на клиента с л/с=%s",
-                    c.getClient().getContractId()));
+            throw new Exception(String.format("Карта %s уже зарегистрирована на клиента с л/с=%s",
+                    c.getClient().getContractId(), cardNo));
         }
         logger.debug("check exist temp card");
         CardTemp ct = findCardTempByCardNo(persistenceSession, cardNo);
