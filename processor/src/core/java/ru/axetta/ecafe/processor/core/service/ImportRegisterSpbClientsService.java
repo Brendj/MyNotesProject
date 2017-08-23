@@ -860,15 +860,16 @@ public class ImportRegisterSpbClientsService {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            List<Org> orgs = DAOUtils.findFriendlyOrgs(session, idOfOrg);
-            for (Org org : orgs) {
+            List<Long> orgs = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+            for (Long id : orgs) {
+                Org org = DAOUtils.findOrg(session, id);
                 if (!org.getAutoCreateCards()) {
-                    throw new Exception(String.format("У организации c идентификатором = %s не включен флаг автогенерации карт!", org.getIdOfOrg()));
+                    throw new Exception(String.format("У организации c идентификатором = %s не включен флаг автогенерации карт!", id));
                 }
             }
 
             Criteria criteria = session.createCriteria(Client.class);
-            criteria.add(Restrictions.in("org", orgs));
+            criteria.add(Restrictions.in("org.idOfOrg", orgs));
             Disjunction groupDisjunction = Restrictions.disjunction();
             groupDisjunction.add(Restrictions.lt("idOfClientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()));
             groupDisjunction.add(Restrictions.gt("idOfClientGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue()));
