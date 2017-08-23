@@ -28,6 +28,7 @@ public class SpbRegistrySynchPageBase extends NSIOrgRegistrySynchPageBase {
     }
 
     public void createCards() {
+        resetMessages();
         long idOfOrg = getIdOfOrg();
         if (idOfOrg == -1) {
             errorMessages = "Выберите организацию";
