@@ -891,9 +891,10 @@ public class ImportRegisterSpbClientsService {
                 if (cardNo == null) continue;
                 doCreate = true;
                 for (Card card : client.getCards()) {
-                    if (card.getState().equals(CardState.ISSUED)) {
-                        if (card.getCardNo().equals(client.getClientGUID())) {
+                    if (card.getState().equals(CardState.ISSUED.getValue())) {
+                        if (card.getCardNo().equals(cardNo)) {
                             doCreate = false;
+                            break;
                         }
                     }
                 }
