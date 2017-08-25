@@ -156,6 +156,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ERROR_CREATE_VARIABLE_FEEDING = 590L;
     private static final Long RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING = 600L;
     private static final Long RC_CARD_NOT_FOUND = 610L;
+    private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -190,6 +191,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один вариант комплекса каждого вида рациона (завтрак, обед)";
     private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы в пределах недели";
     private static final String RC_CARD_NOT_FOUND_DESC = "Карта не найдена";
+    private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -7330,19 +7332,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result putCycleDiagram(@WebParam(name = "contractId") Long contractId,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram, @WebParam(name = "type") Integer type) {
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram, @WebParam(name = "type") Integer type,
+          @WebParam(name = "startWeekPosition") Integer startWeekPosition) {
         authenticateRequest(contractId);
-        return putCycleDiagram(contractId, null, cycleDiagram, type);
+        return putCycleDiagram(contractId, null, cycleDiagram, type, startWeekPosition);
     }
 
     @Override
     public Result putCycleDiagram(@WebParam(name = "san") String san,
-          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram, @WebParam(name = "type") Integer type) {
+          @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram, @WebParam(name = "type") Integer type,
+          @WebParam(name = "startWeekPosition") Integer startWeekPosition) {
         authenticateRequest(null);
-        return putCycleDiagram(null, san, cycleDiagram, type);
+        return putCycleDiagram(null, san, cycleDiagram, type, startWeekPosition);
     }
 
-    private Result putCycleDiagram(Long contractId, String san, CycleDiagramExt cycleDiagram, Integer type) {
+    private Result putCycleDiagram(Long contractId, String san, CycleDiagramExt cycleDiagram, Integer type, Integer startWeekPosition) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
@@ -7392,6 +7396,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List list = criteria.list();
             SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
             boolean vp = (type == null ? false : type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal()));
+            if (vp && startWeekPosition == null) {
+                result.resultCode = RC_START_WEEK_POSITION_NOT_FOUND;
+                result.description = RC_START_WEEK_POSITION_NOT_FOUND_DESC;
+                return result;
+            }
             /* boolean vp = false;
             if (ArrayUtils.contains(getVPOrgsList(), clientOrg.getIdOfOrg())) {
                 vp = true;
@@ -7455,6 +7464,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 diagram.setSundayPrice("0");
                 diagram.setStaff(null);
                 diagram.setFeedingType(vp ? SubscriptionFeedingType.VARIABLE_TYPE : SubscriptionFeedingType.ABON_TYPE);
+                if (type != null && type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal())) {
+                    diagram.setStartWeekPosition(startWeekPosition);
+                }
                 session.save(diagram);
             } else {
                 // изменяем те что есть
@@ -7482,6 +7494,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     diagram.setSaturdayPrice(sfService.getPriceOfDay(cycleDiagram.getSaturday(), availableComplexes));
                     diagram.setSunday("");
                     diagram.setSundayPrice("0");
+                    if (type != null && type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal())) {
+                        diagram.setStartWeekPosition(startWeekPosition);
+                    }
                     session.save(diagram);
                 }
             }
@@ -7862,7 +7877,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
-                || gender == null || childContractId == null) {
+                || childContractId == null) {
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {

@@ -63,6 +63,7 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
+        <property name="startWeekPosition" column="startWeekPosition" type="integer" />
 
         <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="idOfStaff" not-null="false" />

@@ -53,6 +53,7 @@ public class CycleDiagram extends DistributedObject{
     private String guidOfStaff;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
     private SubscriptionFeedingType feedingType;
+    private Integer startWeekPosition;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -83,6 +84,7 @@ public class CycleDiagram extends DistributedObject{
         projectionList.add(Projections.property("sundayPrice"), "sundayPrice");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         projectionList.add(Projections.property("feedingType"), "feedingType");
+        projectionList.add(Projections.property("startWeekPosition"), "startWeekPosition");
         criteria.setProjection(projectionList);
     }
 
@@ -101,39 +103,9 @@ public class CycleDiagram extends DistributedObject{
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
-/*
-        // проверить бросить искл если idкл совпал и даты совпали гуид различается DATA_EXIST_VALUE
-        Criteria criteria = session.createCriteria(CycleDiagram.class);
-        criteria.add(Restrictions.eq("client", this.client));
-        criteria.add(Restrictions.eq("dateActivationDiagram", this.dateActivationDiagram));
-        criteria.add(Restrictions.eq("deletedState", false));
-        criteria.add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
-        CycleDiagram cDiagram = (CycleDiagram) criteria.uniqueResult();
-        session.clear();
-
-        if (cDiagram != null && cDiagram.getClient().equals(client) && cDiagram.getDateActivationDiagram()
-                .equals(dateActivationDiagram) && !cDiagram.getGuid().equals(guid)) {
-            DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
-            doe.setData(cDiagram.getGuid());
-            throw doe;
-        }*/
-
-        /* При синхронизации пришла активная циклограмма */
-        /*if(isActual()){
-            *//* проверяем, есть ли на текущую дату активная циклограмма *//*
-            SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
-            CycleDiagram cd = sfService.findActiveCycleDiagram(client, this.dateActivationDiagram);
-            *//* записываем заблокированной текущую диаграмму *//*
-            if(cd != null){
-                stateDiagram = StateDiagram.BLOCK;
-            }
-        }*/
-        // Проверка на случай, если циклограмма была активирована как на вебе, так и на клиенте.
-        //if (cd != null && isActual() && !cd.getGuid().equals(guid)) {
-        //    DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
-        //    doe.setData(cd.getGuid());
-        //    throw doe;
-        //}
+        if (feedingType.equals(SubscriptionFeedingType.VARIABLE_TYPE) && startWeekPosition == null) {
+            throw new DistributedObjectException("Cycle diagram of variable type requires start week position");
+        }
     }
 
     @Override
@@ -167,6 +139,7 @@ public class CycleDiagram extends DistributedObject{
             XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
         }
         XMLUtils.setAttributeIfNotNull(element, "Type", feedingType.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "StartWeekPosition", startWeekPosition);
     }
 
     @Override
@@ -204,6 +177,12 @@ public class CycleDiagram extends DistributedObject{
         } else {
             setFeedingType(SubscriptionFeedingType.ABON_TYPE);
         }
+        Integer swPosition = XMLUtils.getIntegerAttributeValue(node, "StartWeekPosition");
+        //if(swPosition == null && feedingType.equals(SubscriptionFeedingType.VARIABLE_TYPE)) {
+        //    throw new DistributedObjectException("Cycle diagram of variable type requires start week position");
+        //} else {
+            setStartWeekPosition(swPosition);
+        //}
 
         setMonday(XMLUtils.getStringAttributeValue(node, "Monday", 255));
         setMondayPrice(XMLUtils.getStringAttributeValue(node, "MondayPrice", 255));
@@ -240,6 +219,7 @@ public class CycleDiagram extends DistributedObject{
         setStaff(((CycleDiagram) distributedObject).getStaff());
         setGuidOfStaff(((CycleDiagram) distributedObject).getGuidOfStaff());
         setFeedingType(((CycleDiagram) distributedObject).getFeedingType());
+        setStartWeekPosition(((CycleDiagram) distributedObject).getStartWeekPosition());
     }
 
     @Override
@@ -425,5 +405,13 @@ public class CycleDiagram extends DistributedObject{
 
     public void setFeedingType(SubscriptionFeedingType feedingType) {
         this.feedingType = feedingType;
+    }
+
+    public Integer getStartWeekPosition() {
+        return startWeekPosition;
+    }
+
+    public void setStartWeekPosition(Integer startWeekPosition) {
+        this.startWeekPosition = startWeekPosition;
     }
 }

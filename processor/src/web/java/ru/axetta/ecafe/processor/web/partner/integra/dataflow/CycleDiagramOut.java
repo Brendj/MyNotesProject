@@ -61,6 +61,8 @@ public class CycleDiagramOut extends Result implements Serializable {
     private Date updateDate;
     @XmlElement(name = "ChangesPlace")
     private Boolean changesPlace;
+    @XmlElement(name = "StartWeekPosition")
+    private Integer startWeekPosition;
 
     public CycleDiagramOut() {
     }
@@ -94,6 +96,7 @@ public class CycleDiagramOut extends Result implements Serializable {
         } else {
             this.changesPlace = true;
         }
+        this.startWeekPosition = cd.getStartWeekPosition();
     }
 
     public Long getGlobalId() {
@@ -246,5 +249,13 @@ public class CycleDiagramOut extends Result implements Serializable {
 
     public void setChangesPlace(Boolean changesPlace) {
         this.changesPlace = changesPlace;
+    }
+
+    public Integer getStartWeekPosition() {
+        return startWeekPosition;
+    }
+
+    public void setStartWeekPosition(Integer startWeekPosition) {
+        this.startWeekPosition = startWeekPosition;
     }
 }

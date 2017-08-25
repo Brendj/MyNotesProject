@@ -460,12 +460,12 @@ public interface ClientRoomController {
     @WebMethod(operationName = "putCycleDiagram")
     Result putCycleDiagram(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram,
-          @WebParam(name = "type") Integer type);
+          @WebParam(name = "type") Integer type, @WebParam(name = "startWeekPosition") Integer startWeekPosition);
 
     @WebMethod(operationName = "putCycleDiagramBySan")
     Result putCycleDiagram(@WebParam(name = "san") String san,
           @WebParam(name = "cycleDiagram") CycleDiagramExt cycleDiagram,
-          @WebParam(name = "type") Integer type);
+          @WebParam(name = "type") Integer type, @WebParam(name = "startWeekPosition") Integer startWeekPosition);
 
     @WebMethod(operationName = "getMenuListWithProhibitions")
     MenuListWithProhibitionsResult getMenuListWithProhibitions(@WebParam(name = "contractId") Long contractId,
