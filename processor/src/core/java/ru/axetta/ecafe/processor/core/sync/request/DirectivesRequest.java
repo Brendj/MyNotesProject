@@ -18,18 +18,33 @@ public class DirectivesRequest implements SectionRequest {
     public static final String SECTION_NAME = "DirectivesRequest";
     private final Boolean tradeConfigChangedSuccess;
     private final Integer isWorkInSummerTime;
+    private final Integer recyclingEnabled;
 
-    public DirectivesRequest(Node directivesRequestNode) throws Exception {
+    public DirectivesRequest(Node sectionElement) throws Exception {
         this.tradeConfigChangedSuccess =
-                XMLUtils.findFirstChildElement(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
-        this.isWorkInSummerTime = null;
+                XMLUtils.findFirstChildElement(sectionElement, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
+        Node isWorkInSummerTimeNode = XMLUtils.findFirstChildElement(sectionElement, "IS_WORK_IN_SUMMER_TIME");
+        if (isWorkInSummerTimeNode != null) {
+            NamedNodeMap attributes = isWorkInSummerTimeNode.getAttributes();
+            String value = attributes.getNamedItem("value").getTextContent();
+            this.isWorkInSummerTime = Integer.parseInt(value);
+        } else
+            this.isWorkInSummerTime = null;
+
+        Node recyclingEnabled = XMLUtils.findFirstChildElement(sectionElement, "IS_RECYCLING_AND_CHANGE_MODE_ENABLED");
+        if (recyclingEnabled != null) {
+            NamedNodeMap attributes = recyclingEnabled.getAttributes();
+            String value = attributes.getNamedItem("value").getTextContent();
+            this.recyclingEnabled = Integer.parseInt(value);
+        } else
+            this.recyclingEnabled = null;
     }
 
-    public DirectivesRequest(Node directivesRequestNode, Integer isWorkInSummerTime) throws Exception {
+    /*public DirectivesRequest(Node directivesRequestNode, Integer isWorkInSummerTime) throws Exception {
         this.tradeConfigChangedSuccess =
                 XMLUtils.findFirstChildElement(directivesRequestNode, "TRADE_ACCOUNT_CONFIG_CHANGED_SUCCESS") != null;
         this.isWorkInSummerTime = isWorkInSummerTime;
-    }
+    }*/
 
 
     @Override
@@ -53,24 +68,9 @@ public class DirectivesRequest implements SectionRequest {
         public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
             Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, SECTION_NAME);
             if (sectionElement != null) {
-                Node isWorkInSummerTimeNode = XMLUtils.findFirstChildElement(sectionElement, "IS_WORK_IN_SUMMER_TIME");
-
-                if (isWorkInSummerTimeNode != null) {
-                    NamedNodeMap attributes = isWorkInSummerTimeNode.getAttributes();
-                    String value = attributes.getNamedItem("value").getTextContent();
-                    if (value.equals("0")) {
-                        return new DirectivesRequest(sectionElement, 0);
-                    }
-
-                    if (value.equals("1")) {
-                        return new DirectivesRequest(sectionElement, 1);
-                    }
-                }
-
                 return new DirectivesRequest(sectionElement);
-            } else {
+            } else
                 return null;
-            }
         }
     }
 
@@ -80,5 +80,9 @@ public class DirectivesRequest implements SectionRequest {
 
     public Integer getIsWorkInSummerTime() {
         return isWorkInSummerTime;
+    }
+
+    public Integer getRecyclingEnabled() {
+        return recyclingEnabled;
     }
 }

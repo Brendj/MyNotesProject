@@ -355,7 +355,7 @@ public class OrgEditPage extends BasicWorkspacePage
         PhotoRegistryDirective photoD = photoRegistry ? PhotoRegistryDirective.ALLOWED : PhotoRegistryDirective.DISALLOWED;
         org.setPhotoRegistryDirective(photoD);
         org.setVariableFeeding(variableFeeding);
-        org.setIsRecyclingEnabled(isRecyclingEnabled);
+        //org.setIsRecyclingEnabled(isRecyclingEnabled);
         org.setAutoCreateCards(autoCreateCards);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));

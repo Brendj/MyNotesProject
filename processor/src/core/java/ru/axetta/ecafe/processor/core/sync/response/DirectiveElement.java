@@ -95,8 +95,9 @@ public class DirectiveElement implements AbstractToElement{
             }
         }
 
-        if (directivesRequest.getIsWorkInSummerTime() != null) {
-            DAOService.getInstance().saveWorkInSummerTimeDirective(org.getIdOfOrg(), directivesRequest.getIsWorkInSummerTime());
+        if (directivesRequest.getIsWorkInSummerTime() != null || directivesRequest.getRecyclingEnabled() != null) {
+            DAOService.getInstance().saveDirectives(org.getIdOfOrg(), directivesRequest.getIsWorkInSummerTime(), directivesRequest.getRecyclingEnabled());
+            //DAOService.getInstance().saveWorkInSummerTimeDirective(org.getIdOfOrg(), directivesRequest.getIsWorkInSummerTime());
         }
 
         Boolean disEditServicesInfoFlag = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();

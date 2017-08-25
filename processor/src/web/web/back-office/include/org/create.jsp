@@ -159,8 +159,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.changesDSZN}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.payByCashier}"  styleClass="input-text"  />
-    <h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.recyclingEnabled}" styleClass="input-text" />
+    <%--<h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.recyclingEnabled}" styleClass="input-text" />--%>
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
 </h:panelGrid>

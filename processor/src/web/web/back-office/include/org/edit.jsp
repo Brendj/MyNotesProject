@@ -187,8 +187,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.variableFeeding}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Пополнение через кассовый терминал" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.payByCashier}"  styleClass="input-text"  />
-    <h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.recyclingEnabled}" styleClass="input-text" />
+    <%--<h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.recyclingEnabled}" styleClass="input-text" />--%>
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
 </h:panelGrid>

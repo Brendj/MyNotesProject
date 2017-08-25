@@ -576,7 +576,7 @@ public class OrgCreatePage extends BasicWorkspacePage
 
         org.setSecurityLevel(securityLevel);
         org.setTypeInitial(getOrganizationTypeInitial());
-        org.setIsRecyclingEnabled(isRecyclingEnabled);
+        //org.setIsRecyclingEnabled(isRecyclingEnabled);
         org.setAutoCreateCards(autoCreateCards);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
