@@ -157,6 +157,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING = 600L;
     private static final Long RC_CARD_NOT_FOUND = 610L;
     private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
+    private static final Long RC_START_WEEK_POSITION_NOT_CORRECT = 630L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -192,6 +193,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы в пределах недели";
     private static final String RC_CARD_NOT_FOUND_DESC = "Карта не найдена";
     private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
+    private static final String RC_START_WEEK_POSITION_NOT_CORRECT_DESC = "Номер стартовой недели некорректен";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -7400,6 +7402,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.resultCode = RC_START_WEEK_POSITION_NOT_FOUND;
                 result.description = RC_START_WEEK_POSITION_NOT_FOUND_DESC;
                 return result;
+            } else if (vp) {
+                String complexesByDayOfWeek;
+                int cnt = 0;
+                int countMatches = 0;
+                for (int i = 1; i < 8; i++) {
+                    complexesByDayOfWeek = getCycleDiagramValueByDayOfWeek(i, cycleDiagram);
+                    cnt = StringUtils.countMatches(complexesByDayOfWeek, "|");
+                    if (cnt > countMatches) countMatches = cnt;
+                }
+                if (startWeekPosition < 1 || startWeekPosition > countMatches + 1) {
+                    result.resultCode = RC_START_WEEK_POSITION_NOT_CORRECT;
+                    result.description = RC_START_WEEK_POSITION_NOT_CORRECT_DESC;
+                    return result;
+                }
             }
             /* boolean vp = false;
             if (ArrayUtils.contains(getVPOrgsList(), clientOrg.getIdOfOrg())) {
