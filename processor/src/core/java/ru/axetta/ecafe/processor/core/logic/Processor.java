@@ -3257,7 +3257,9 @@ public class Processor implements SyncProcessor {
                             payment.getOrderType().equals(OrderTypeEnumType.DAILY_SAMPLE) ||
                             payment.getOrderType().equals(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE) ||
                             payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE) ||
-                            payment.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
+                            payment.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING) ||
+                            payment.getOrderType().equals(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE) ||
+                            payment.getOrderType().equals(OrderTypeEnumType.RECYCLING_RETIONS)) {
                         values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
                     }
                     String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
