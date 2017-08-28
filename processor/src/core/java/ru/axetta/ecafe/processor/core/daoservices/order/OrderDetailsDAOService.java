@@ -293,6 +293,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.RECYCLING_RETIONS);
         //orderTypeEnumTypeSet.add(OrderTypeEnumType.WATER_ACCOUNTING);
         return orderTypeEnumTypeSet;
     }

@@ -156,7 +156,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ERROR_CREATE_VARIABLE_FEEDING = 590L;
     private static final Long RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING = 600L;
     private static final Long RC_CARD_NOT_FOUND = 610L;
-    private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
+    //private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
     private static final Long RC_START_WEEK_POSITION_NOT_CORRECT = 630L;
 
 
@@ -192,7 +192,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один вариант комплекса каждого вида рациона (завтрак, обед)";
     private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы в пределах недели";
     private static final String RC_CARD_NOT_FOUND_DESC = "Карта не найдена";
-    private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
+    //private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
     private static final String RC_START_WEEK_POSITION_NOT_CORRECT_DESC = "Номер стартовой недели некорректен";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
@@ -7399,9 +7399,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
             boolean vp = (type == null ? false : type.equals(SubscriptionFeedingType.VARIABLE_TYPE.ordinal()));
             if (vp && startWeekPosition == null) {
-                result.resultCode = RC_START_WEEK_POSITION_NOT_FOUND;
-                result.description = RC_START_WEEK_POSITION_NOT_FOUND_DESC;
-                return result;
+                startWeekPosition = 1;
+                //result.resultCode = RC_START_WEEK_POSITION_NOT_FOUND;
+                //result.description = RC_START_WEEK_POSITION_NOT_FOUND_DESC;
+                //return result;
             } else if (vp) {
                 String complexesByDayOfWeek;
                 int cnt = 0;
