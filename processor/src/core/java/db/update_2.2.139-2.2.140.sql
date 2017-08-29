@@ -10,3 +10,5 @@ alter table cf_orgs add column isrecyclingenabled integer NOT NULL DEFAULT 0,
 
 --Номер недели циклограммы ВП
 alter table cf_clients_cycle_diagrams add column StartWeekPosition integer;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 170829) НЕ МЕНЯТЬ
