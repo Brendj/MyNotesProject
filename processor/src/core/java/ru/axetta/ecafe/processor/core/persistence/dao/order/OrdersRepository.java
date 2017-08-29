@@ -73,7 +73,7 @@ public class OrdersRepository extends BaseJpaDao {
         }
         sql += " AND o.socdiscount > 0 " + " AND o.createddate between " + startTime.getTime()
                 + " AND " + endTime.getTime() + " " + " AND o.state = 0 "
-                + " AND o.ordertype in (4,6,8) AND c.idofclientgroup < 1100000000 "
+                + " AND o.ordertype in (4,6,8,11,12) AND c.idofclientgroup < 1100000000 "
                 + " ORDER BY g.groupname,  c.idofclient, o.createddate, o.ordertype, od.menudetailname ";
         return getOrderItemBySQL(sql);
     }

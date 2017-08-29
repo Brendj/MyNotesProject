@@ -255,7 +255,7 @@ public class DeliveredServicesReportBuilder extends BasicReportForAllOrgJob.Buil
         }
 
         //String typeCondition = " cf_orders.ordertype<>8 and ";
-        String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10)) and " +
+        String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6,8,10,11,12)) and " +
                 " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
         String sql =
                 "select cf_orgs.shortnameinfoservice, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
