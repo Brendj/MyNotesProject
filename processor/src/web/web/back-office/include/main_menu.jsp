@@ -1726,6 +1726,8 @@
                             label="Список карт" action="#{cardOperatorPage.show}" reRender="workspaceForm" oncomplete=""/>
         <rich:panelMenuItem id="cardRegistrationAndIssueItem" binding="#{mainPage.cardRegistrationAndIssuePage.mainMenuComponent}"
                             label="Регистрация и выдача карты" action="#{mainPage.showCardRegistrationAndIssuePage}" reRender="workspaceForm"/>
+        <rich:panelMenuItem id="clientRegistrationByOperatorItem" binding="#{mainPage.clientRegistrationByCardOperatorPage.mainMenuComponent}"
+                            label="Регистрация клиента" action="#{mainPage.showClientRegistrationByCardOperatorPage}" reRender="workspaceForm"/>
         <rich:panelMenuItem id="cardOperatorList" binding="#{mainPage.cardOperatorListPage.mainMenuComponent}"
                             label="Список операций" action="#{mainPage.showCardOperatorListPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>

@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
 import ru.axetta.ecafe.processor.web.ui.card.*;
+import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorListPage;
 import ru.axetta.ecafe.processor.web.ui.cardoperator.CardRegistrationAndIssuePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountCreatePage;
@@ -137,6 +138,7 @@ public class MainPage implements Serializable {
     private Long removedIdOfReportRule;
     private String DEFAULT_ORG_FILTER_PAGE_NAME = "Выбор организаций";
     private String orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
+    private Long contractIdCardOperator;
 
     private boolean eligibleToViewUsers;
 
@@ -427,6 +429,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
     private final CardOperatorListPage cardOperatorListPage = new CardOperatorListPage();
     private final CardRegistrationAndIssuePage cardRegistrationAndIssuePage = new CardRegistrationAndIssuePage();
+    private final ClientCreateByCardOperatorPage clientRegistrationByCardOperatorPage = new ClientCreateByCardOperatorPage();
 
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
@@ -3092,6 +3095,37 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object createClientByCardOperator() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = clientRegistrationByCardOperatorPage.createClient(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            String.format("Клиент зарегистрирован успешно, ид %d, номер лицевого счета %d",
+                                    client.getIdOfClient(), client.getContractId()), null));
+        } catch (IllegalArgumentException e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Необходимо выбрать организацию!", null));
+        }catch (Exception e) {
+            logger.error("Failed to create client", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при регистрации клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public ClientFileLoadPage getClientFileLoadPage() {
         return clientFileLoadPage;
     }
@@ -4055,6 +4089,59 @@ public class MainPage implements Serializable {
             logger.error("Failed to show card create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы регистрации карты: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showCardRegistrationAndIssuePageWithContractId() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            cardRegistrationAndIssuePage.fill(persistenceSession);
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractIdCardOperator);
+            cardRegistrationAndIssuePage.setClient(new ClientItem(client));
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = cardRegistrationAndIssuePage;
+        } catch (Exception e) {
+            logger.error("Failed to show card create page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы регистрации карты: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showClientRegistrationByCardOperatorPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientRegistrationByCardOperatorPage.fill(persistenceSession);
+            clientRegistrationByCardOperatorPage.setNewContractId(null);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = clientRegistrationByCardOperatorPage;
+        } catch (Exception e) {
+            logger.error("Failed to show card create page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы регистрации клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -9677,5 +9764,17 @@ public class MainPage implements Serializable {
 
     public boolean getIsSpb() {
         return RuntimeContext.RegistryType.isSpb();
+    }
+
+    public ClientCreateByCardOperatorPage getClientRegistrationByCardOperatorPage() {
+        return clientRegistrationByCardOperatorPage;
+    }
+
+    public Long getContractIdCardOperator() {
+        return contractIdCardOperator;
+    }
+
+    public void setContractIdCardOperator(Long contractIdCardOperator) {
+        this.contractIdCardOperator = contractIdCardOperator;
     }
 }

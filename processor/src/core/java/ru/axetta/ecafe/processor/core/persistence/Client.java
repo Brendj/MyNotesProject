@@ -613,6 +613,10 @@ public class Client {
         this.cypheredPassword = cypheredPassword;
     }
 
+    public void setCypheredPasswordByCardOperator(String cypheredPassword) {
+        this.cypheredPassword = cypheredPassword;
+    }
+
     public Integer getPayForSMS() {
         return payForSMS;
     }
