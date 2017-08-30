@@ -1039,12 +1039,33 @@
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание" rendered="#{mainPage.eligibleToViewMealsReports}">
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
-        <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
-        <rich:panelMenuItem id="registerStampReportMenuItem" binding="#{registerStampPage.mainMenuComponent}"
-                            label="Реестр талонов (предварительный)" action="#{registerStampPage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="registerStampElectronicCollationPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampElectronicCollationPage"--%>
-        <rich:panelMenuItem id="registerStampElectronicCollationReportMenuItem" binding="#{registerStampElectronicCollationPage.mainMenuComponent}"
-                            label="Реестр талонов (электронная сверка)" action="#{registerStampElectronicCollationPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuGroup id="registerStampGroupMenu" binding="#{mainPage.registerStampGroupMenu.mainMenuComponent}"
+                             label="Реестр талонов (предварительный)" rendered="#{mainPage.eligibleToViewMealsReports}">
+
+            <%--@elvariable id="registerStampNewPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampNewPage"--%>
+            <rich:panelMenuItem id="registerStampNewReportMenuItem" binding="#{registerStampNewPage.mainMenuComponent}"
+                                label="Реестр талонов (новая форма)" action="#{registerStampNewPage.show}"
+                                reRender="workspaceForm" />
+
+            <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
+            <rich:panelMenuItem id="registerStampReportMenuItem" binding="#{registerStampPage.mainMenuComponent}"
+                                label="Реестр талонов" action="#{registerStampPage.show}" reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+        <rich:panelMenuGroup id="registerStampElectronicCollationGroupMenu"
+                             binding="#{mainPage.registerStampElectronicCollationGroupMenu.mainMenuComponent}"
+                             label="Реестр талонов (электронная сверка)"
+                             rendered="#{mainPage.eligibleToViewMealsReports}">
+            <%--@elvariable id="registerStampNewElectronicCollationPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampNewElectronicCollationPage"--%>
+            <rich:panelMenuItem id="registerStampNewElectronicCollationReportMenuItem"
+                                binding="#{registerStampNewElectronicCollationPage.mainMenuComponent}"
+                                label="Реестр талонов (новая форма)"
+                                action="#{registerStampNewElectronicCollationPage.show}" reRender="workspaceForm" />
+            <%--@elvariable id="registerStampElectronicCollationPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampElectronicCollationPage"--%>
+            <rich:panelMenuItem id="registerStampElectronicCollationReportMenuItem"
+                                binding="#{registerStampElectronicCollationPage.mainMenuComponent}"
+                                label="Реестр талонов" action="#{registerStampElectronicCollationPage.show}"
+                                reRender="workspaceForm" />
+        </rich:panelMenuGroup>
 
         <%--@elvariable id="feedingAndVisitSPage" type="ru.axetta.ecafe.processor.web.ui.report.online.FeedingAndVisitSPage"--%>
         <rich:panelMenuItem id="feedingAndVisitSReportMenuItem" binding="#{feedingAndVisitSPage.mainMenuComponent}"

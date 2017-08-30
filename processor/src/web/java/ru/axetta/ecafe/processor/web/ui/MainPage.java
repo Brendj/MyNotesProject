@@ -375,6 +375,9 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage clientReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
 
+    private final BasicWorkspacePage registerStampGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage registerStampElectronicCollationGroupMenu = new BasicWorkspacePage();
+
     private final OrgDiscountsReportPage orgDiscountsReportPage = new OrgDiscountsReportPage();
     private final AllOrgsDiscountsReportPage allOrgsDiscountsReportPage = new AllOrgsDiscountsReportPage();
 
@@ -6347,6 +6350,14 @@ public class MainPage implements Serializable {
         currentWorkspacePage = informReportsGroupMenu;
         updateSelectedMainMenu();
         return null;
+    }
+
+    public BasicWorkspacePage getRegisterStampGroupMenu() {
+        return registerStampGroupMenu;
+    }
+
+    public BasicWorkspacePage getRegisterStampElectronicCollationGroupMenu() {
+        return registerStampElectronicCollationGroupMenu;
     }
 
     public Object showRepositoryUtilityGroupMenu() {
