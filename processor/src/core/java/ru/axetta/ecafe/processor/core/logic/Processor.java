@@ -35,6 +35,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ResClientPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ComplexScheduleData;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ComplexScheduleProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ResComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -285,6 +289,8 @@ public class Processor implements SyncProcessor {
         InteractiveReport interactiveReport = null;
         ZeroTransactionData zeroTransactionData = null;
         ResZeroTransactions resZeroTransactions = null;
+        ComplexScheduleData complexScheduleData = null;
+        ResComplexSchedules resComplexSchedules = null;
         SpecialDatesData specialDatesData = null;
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
@@ -658,6 +664,19 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            if (request.getComplexSchedules() != null) {
+                complexScheduleData = processComplexScheduleData(request.getComplexSchedules());
+                resComplexSchedules = processComplexSchedules(request.getComplexSchedules());
+                responseSections.add(resComplexSchedules);
+                responseSections.add(complexScheduleData);
+            }
+        } catch (Exception e) {
+            String message = String.format("processComplexSchedules: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
@@ -2629,6 +2648,42 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resZeroTransactions;
+    }
+
+    private ResComplexSchedules processComplexSchedules(ListComplexSchedules complexSchedules) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResComplexSchedules resComplexSchedules = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ComplexScheduleProcessor(persistenceSession, complexSchedules);
+            resComplexSchedules = (ResComplexSchedules) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resComplexSchedules;
+    }
+
+    private ComplexScheduleData processComplexScheduleData(ListComplexSchedules complexSchedules) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ComplexScheduleData complexScheduleData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ComplexScheduleProcessor processor = new ComplexScheduleProcessor(persistenceSession, complexSchedules);
+            complexScheduleData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return complexScheduleData;
     }
 
     private SpecialDatesData processSpecialDatesData(SpecialDates specialDates) throws Exception {

@@ -332,6 +332,17 @@ public class DAOReadonlyService {
         }
     }
 
+    public ComplexSchedule findComplexSchedule(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT schedule from ComplexSchedule schedule "
+                    + "where schedule.guid = :guid");
+            query.setParameter("guid", guid);
+            return (ComplexSchedule) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public Integer findTaloonApprovalSoldedQty(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
         Date dateEnd = CalendarUtils.addOneDay(taloonDate);
         try {

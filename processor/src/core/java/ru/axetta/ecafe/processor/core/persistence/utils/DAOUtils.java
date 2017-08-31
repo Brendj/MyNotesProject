@@ -2411,6 +2411,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByComplexSchedule(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select s.version from cf_complex_schedules as s order by s.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByZeroTransaction(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select t.version from cf_zerotransactions as t order by t.version desc limit 1 for update");
@@ -2504,6 +2514,14 @@ public class DAOUtils {
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));
         //criteria.add(Restrictions.eq("deletedState", false));
+        return criteria.list();
+    }
+
+    public static List<ComplexSchedule> getComplexSchedulesForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
+        Criteria criteria = session.createCriteria(ComplexSchedule.class);
+        criteria.add(Restrictions.in("idOfOrg", orgIds));
+        criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
 

@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientG
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
@@ -2524,6 +2525,7 @@ public class SyncRequest {
             builders.add(new QuestionaryClientsRequest.Builder());
             builders.add(new GroupsOrganizationRequest.Builder(idOfOrg));
             builders.add(new InfoMessageRequest.InfoMessageRequestBuilder());
+            builders.add(new ListComplexSchedules.Builder(idOfOrg));
             return builders;
         }
 
@@ -2731,6 +2733,10 @@ public class SyncRequest {
 
     public ZeroTransactions getZeroTransactions() {
         return this.<ZeroTransactions>findSection(ZeroTransactions.class);
+    }
+
+    public ListComplexSchedules getComplexSchedules() {
+        return this.<ListComplexSchedules>findSection(ListComplexSchedules.class);
     }
 
     public AccountsRegistryRequest getAccountsRegistryRequest() {
