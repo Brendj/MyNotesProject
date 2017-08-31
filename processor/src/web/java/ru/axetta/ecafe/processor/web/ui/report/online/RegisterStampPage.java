@@ -194,7 +194,7 @@ public class RegisterStampPage extends OnlineReportPage{
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-        String templateShortFileName = RegisterStampReport.class.getSimpleName() + ".jasper";
+        String templateShortFileName = RegisterStampReport.class.getSimpleName() + "_summary.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if(!(new File(templateFilename)).exists()){
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
