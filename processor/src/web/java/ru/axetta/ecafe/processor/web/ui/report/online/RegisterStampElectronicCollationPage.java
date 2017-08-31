@@ -222,7 +222,7 @@ public class RegisterStampElectronicCollationPage extends OnlineReportPage {
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-        String templateShortFileName = RegisterStampElectronicCollationReport.class.getSimpleName() + ".jasper";
+        String templateShortFileName = RegisterStampElectronicCollationReport.class.getSimpleName() + "_summary.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
