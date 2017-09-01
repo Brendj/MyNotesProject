@@ -32,6 +32,7 @@ public class ComplexScheduleItem {
     private String errorMessage;
     private Integer resCode;
     private Long version;
+    private String groupsIds;
 
     public ComplexScheduleItem(ComplexSchedule schedule) {
         this.idOfOrg = schedule.getIdOfOrg();
@@ -50,13 +51,14 @@ public class ComplexScheduleItem {
     }
 
     public ComplexScheduleItem(Long idOfOrg, Long idOfComplex, String guid, Integer intervalFrom, Integer intervalTo,
-            Long idOfOrgCreated) {
+            Long idOfOrgCreated, String groupsIds) {
         this.idOfOrg = idOfOrg;
         this.idOfComplex = idOfComplex;
         this.guid = guid;
         this.intervalFrom = intervalFrom;
         this.intervalTo = intervalTo;
         this.idOfOrgCreated = idOfOrgCreated;
+        this.groupsIds = groupsIds;
         this.resCode = 0;
     }
 
@@ -70,15 +72,16 @@ public class ComplexScheduleItem {
         String strIdOfComplex = XMLUtils.getAttributeValue(itemNode, "ComplexId");
         String strIntervalFrom = XMLUtils.getAttributeValue(itemNode, "IntervalFrom");
         String strIntervalTo = XMLUtils.getAttributeValue(itemNode, "IntervalTo");
-            try {
-                idOfOrg = Long.parseLong(strIdOfOrg);
-                idOfComplex = Long.parseLong(strIdOfComplex);
-                intervalFrom = Integer.parseInt(strIntervalFrom);
-                intervalTo = Integer.parseInt(strIntervalTo);
-                return new ComplexScheduleItem(idOfOrg, idOfComplex, guid, intervalFrom, intervalTo, orgOwner);
-            } catch (Exception e) {
-                return new ComplexScheduleItem(guid, 1, "Incorrect attribute values");
-            }
+        String groupsIds = XMLUtils.getAttributeValue(itemNode, "GroupsIds");
+        try {
+            idOfOrg = Long.parseLong(strIdOfOrg);
+            idOfComplex = Long.parseLong(strIdOfComplex);
+            intervalFrom = Integer.parseInt(strIntervalFrom);
+            intervalTo = Integer.parseInt(strIntervalTo);
+            return new ComplexScheduleItem(idOfOrg, idOfComplex, guid, intervalFrom, intervalTo, orgOwner, groupsIds);
+        } catch (Exception e) {
+            return new ComplexScheduleItem(guid, 1, "Incorrect attribute values");
+        }
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
@@ -89,6 +92,7 @@ public class ComplexScheduleItem {
         XMLUtils.setAttributeIfNotNull(element, "ComplexId", idOfComplex);
         XMLUtils.setAttributeIfNotNull(element, "IntervalFrom", intervalFrom);
         XMLUtils.setAttributeIfNotNull(element, "IntervalTo", intervalTo);
+        XMLUtils.setAttributeIfNotNull(element, "GroupsIds", groupsIds);
         return element;
     }
 
@@ -162,5 +166,13 @@ public class ComplexScheduleItem {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public String getGroupsIds() {
+        return groupsIds;
+    }
+
+    public void setGroupsIds(String groupsIds) {
+        this.groupsIds = groupsIds;
     }
 }

@@ -15,6 +15,7 @@ public class ComplexSchedule {
     private Integer intervalTo;
     private Long version;
     private Long idOfOrgCreated;
+    private String groupsIds;
 
     public ComplexSchedule() {
 
@@ -78,5 +79,13 @@ public class ComplexSchedule {
 
     public void setIdOfOrgCreated(Long idOfOrgCreated) {
         this.idOfOrgCreated = idOfOrgCreated;
+    }
+
+    public String getGroupsIds() {
+        return groupsIds;
+    }
+
+    public void setGroupsIds(String groupsIds) {
+        this.groupsIds = groupsIds;
     }
 }

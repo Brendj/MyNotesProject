@@ -54,6 +54,7 @@ public class ComplexScheduleProcessor extends AbstractProcessor<ResReestrTaloonA
                     Integer intervalFrom = item.getIntervalFrom();
                     Integer intervalTo = item.getIntervalTo();
                     Long idOfOrgCreated = item.getIdOfOrgCreated();
+                    String groupsIds = item.getGroupsIds();
 
                     ComplexSchedule complexSchedule = DAOReadonlyService.getInstance().findComplexSchedule(guid);
                     if (complexSchedule == null)
@@ -64,6 +65,7 @@ public class ComplexScheduleProcessor extends AbstractProcessor<ResReestrTaloonA
                     complexSchedule.setIntervalTo(intervalTo);
                     complexSchedule.setIdOfOrgCreated(idOfOrgCreated);
                     complexSchedule.setVersion(nextVersion);
+                    complexSchedule.setGroupsIds(groupsIds);
                     session.saveOrUpdate(complexSchedule);
                     resItem = new ResComplexScheduleItem(guid, nextVersion, 0, null);
                     items.add(resItem);
