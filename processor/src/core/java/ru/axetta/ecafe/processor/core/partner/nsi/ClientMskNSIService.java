@@ -48,6 +48,7 @@ public class ClientMskNSIService extends MskNSIService {
         while (true) {
             List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
             iterationPupils = getClientsForOrgs(orgGuids, familyName, firstName, secondName, importIteration);
+            if (iterationPupils == null) continue;
             if (iterationPupils.size() > 0) {
                 pupils.addAll(iterationPupils);
             } else {
@@ -205,6 +206,7 @@ public class ClientMskNSIService extends MskNSIService {
         searchPredicateInfo.addSearchPredicate(search3);
 
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
+        if (queryResults == null) return null;
         LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
         for(Item i : queryResults) {
             ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();

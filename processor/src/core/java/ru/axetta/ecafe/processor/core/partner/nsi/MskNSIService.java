@@ -154,6 +154,10 @@ public class MskNSIService {
         if (response.getMessageData().getAppData() != null
                 && response.getMessageData().getAppData().getGeneralResponse() != null &&
                 response.getMessageData().getAppData().getGeneralResponse().getQueryResult() != null) {
+            if (response.getMessageData().getAppData().getGeneralResponse().getError() != null) {
+                logger.error("Error got from nsi, try again");
+                return null;
+            }
             return response.getMessageData().getAppData().getGeneralResponse().getItem();
         } else {
             JAXBContext jc = JAXBContext.newInstance(NSIResponseType.class.getPackage().getName());
