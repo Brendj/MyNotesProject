@@ -21,3 +21,6 @@ create table cf_complex_schedules
   CONSTRAINT cf_complex_schedules_idoforgcreated_fk FOREIGN KEY (idoforgcreated)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Увеличиваем размерность
+ALTER TABLE cf_menuexchange ALTER COLUMN menudata SET DATA TYPE character varying(80000);
