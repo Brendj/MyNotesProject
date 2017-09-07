@@ -18,7 +18,7 @@ import java.util.Date;
 public class MenuExchange {
     public final static int FLAG_NONE=0, FLAG_ANCHOR_MENU=1, FLAG_SETTINGS=2;
 
-    final static int MAX_MENU_DATA_LENGTH = 1000000;
+    final static int MAX_MENU_DATA_LENGTH = 80000;
 
     private CompositeIdOfMenuExchange compositeIdOfMenuExchange;
     private String menuData;
