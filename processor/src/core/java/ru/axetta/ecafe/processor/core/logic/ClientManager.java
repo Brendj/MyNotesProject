@@ -916,7 +916,7 @@ public class ClientManager {
     }
 
     public static void applyClientGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
-            Long idOfOrg, Long idOfClientChild) throws Exception {
+            Long idOfOrg, Long idOfClientChild, Iterator<Long> iterator) throws Exception {
         try {
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
 
@@ -933,7 +933,7 @@ public class ClientManager {
                     if (mobilePhoneGuardianAno != null) {
                         mobilePhoneGuardianAno = Client.checkAndConvertMobile(mobilePhoneGuardianAno);
                         if (mobilePhoneGuardianAno == null) {
-                            throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона");
+                            throw new Exception("Ошибка при создании представителя: Не верный формат мобильного телефона " + registryChangeGuardians.getPhoneNumber());
                         }
                     }
 
@@ -973,19 +973,19 @@ public class ClientManager {
 
                             } else {
                                 applyGuardians(registryChangeGuardians, persistenceSession,
-                                        organization, idOfClientChild);
+                                        organization, idOfClientChild, iterator);
                             }
                         } else {
                             applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                                    idOfClientChild);
+                                    idOfClientChild, iterator);
                         }
                     } else {
                         applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                                idOfClientChild);
+                                idOfClientChild, iterator);
                     }
                 } else {
                     applyGuardians(registryChangeGuardians, persistenceSession, organization,
-                            idOfClientChild);
+                            idOfClientChild, iterator);
                 }
             }
         } catch (Exception e) {
@@ -994,7 +994,8 @@ public class ClientManager {
     }
 
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
-            String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom, String createdFromDesc) throws Exception {
+            String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
+            String createdFromDesc, Iterator<Long> iterator) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1005,8 +1006,12 @@ public class ClientManager {
         Date currentDate = new Date();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
-        Long contractIdGuardian = runtimeContext.getClientContractIdGenerator()
-                .generateTransactionFree(org.getIdOfOrg(), session);
+        Long contractIdGuardian = null;
+        if (iterator != null) contractIdGuardian = iterator.next();
+        if (contractIdGuardian == null) {
+            contractIdGuardian = runtimeContext.getClientContractIdGenerator()
+                    .generateTransactionFree(org.getIdOfOrg(), session);
+        }
 
         long clientRegistryVersionGuardian = DAOUtils.updateClientRegistryVersion(session);
         Long limitGuardian = RuntimeContext.getInstance()
@@ -1073,12 +1078,13 @@ public class ClientManager {
         session.persist(clientGuardian);
     }
 
-    public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession, Org organization, Long idOfClientChild) throws Exception{
+    public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
+            Org organization, Long idOfClientChild, Iterator<Long> iterator) throws Exception{
         String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
                 registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
-                remark, null, organization, ClientCreatedFromType.REGISTRY, "");
+                remark, null, organization, ClientCreatedFromType.REGISTRY, "", iterator);
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),

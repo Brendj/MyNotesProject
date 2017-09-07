@@ -7938,7 +7938,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (guardian == null) {
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
-                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile);
+                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);

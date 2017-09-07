@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2017. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.internal.front.items;
+package ru.axetta.ecafe.processor.core.service;
 
 /**
  * Created with IntelliJ IDEA.

@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.BadOrgGuidsException;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
+import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 
 import org.slf4j.Logger;
@@ -266,26 +267,21 @@ public class FrontControllerProcessor {
                 return Collections.EMPTY_LIST;
             }
 
-            for (Long idOfRegistryChange : changesList) {
-                try {
-                    if(RuntimeContext.RegistryType.isMsk()) {
-                        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
-                    } else if(RuntimeContext.RegistryType.isSpb()) {
-                        RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+            if(RuntimeContext.RegistryType.isMsk()) {
+                result = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                        .applyRegistryChangeBatch(changesList, fullNameValidation);
+            } else {
+                for (Long idOfRegistryChange : changesList) {
+                    try {
+                        RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
+                                    .applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                        result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
+                    } catch (Exception e1) {
+                        logger.error("Error sverka: ", e1);
+                            RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
+                                    .setChangeError(idOfRegistryChange, e1);
+                        result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
                     }
-                    result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
-                } catch (Exception e1) {
-                    //if(e1 instanceof ClientAlreadyExistException) {
-                    logger.error("Error sverka: ", e1);
-                    if(RuntimeContext.RegistryType.isMsk()) {
-                        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).setChangeError(
-                                idOfRegistryChange, e1);
-                    } else if(RuntimeContext.RegistryType.isSpb()) {
-                        RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).setChangeError(
-                                idOfRegistryChange, e1);
-                    }
-                    //}
-                    result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
                 }
             }
         } catch (Exception e) {

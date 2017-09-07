@@ -1155,17 +1155,77 @@ public class ImportRegisterClientsService {
         return e;
     }
 
-    //@Transactional
-    public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
+    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation) throws Exception {
         Session session = null;
         Transaction transaction = null;
-
-        Client afterSaveClient = null;
-
+        List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-            RegistryChange change = (RegistryChange)session.load(RegistryChange.class, idOfRegistryChange);
+            List<RegistryChange> registryChangeList = getRegistryChangeList(session, changesList); //получаем список объектов разногласий
+            Integer newOperationsCount = 0; //количество созданий нового клиента на весь пакет (Дети + представители)
+            Long idOfOrg = null;
+            for (RegistryChange change : registryChangeList) {
+                if (change.getOperation().equals(CREATE_OPERATION)) {
+                    newOperationsCount++; //+1 л/с на каждое создание клиента
+                    if (change.getGuardiansCount() != null) newOperationsCount += change.getGuardiansCount();  //+ количество представителей у создаваемого клиента
+                }
+
+                if (idOfOrg == null) idOfOrg = change.getIdOfOrg(); //idOfOrg у всего пакета совпадает
+            }
+            List<Long> contractIds = null;
+            Iterator<Long> iterator = null;
+            if (newOperationsCount > 0) {
+                contractIds = RuntimeContext.getInstance().getClientContractIdGenerator()
+                        .generateTransactionFree(idOfOrg, newOperationsCount);
+                iterator = contractIds.iterator();
+            }
+
+
+            for (RegistryChange change : registryChangeList) {
+                try {
+                    transaction = session.beginTransaction();
+                    applyRegistryChange(session, change, fullNameValidation, iterator);
+                    transaction.commit();
+                    transaction = null;
+                    if (change.getIdOfClient() != null) {
+                        try {
+                            saveClientGuardians(change, iterator);
+                        } catch (Exception e) {
+                            logger.error("Error creating guardian: ", e);
+                        }
+                    }
+                    result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), ""));
+                } catch (Exception e) {
+                    logger.error("Error sverka: ", e);
+                    setChangeError(change.getIdOfRegistryChange(), e);
+                    result.add(new RegistryChangeCallback(change.getIdOfRegistryChange(), e.getMessage()));
+                } finally {
+                    HibernateUtils.rollback(transaction, logger);
+                }
+            }
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    private List<RegistryChange> getRegistryChangeList(Session session, List<Long> changesList) {
+        Criteria criteria = session.createCriteria(RegistryChange.class);
+        criteria.add(Restrictions.in("idOfRegistryChange", changesList));
+        return criteria.list();
+    }
+
+    private Long getNextContractIdFromList(Iterator<Long> iterator) {
+        try {
+            return iterator.next();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //@Transactional
+    public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation, Iterator<Long> iterator) throws Exception {
+        Client afterSaveClient = null;
 
             Client dbClient = null;
             if (change.getIdOfClient() != null) {
@@ -1183,6 +1243,10 @@ public class ImportRegisterClientsService {
                     String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
                     String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
                     FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
+                    Long contractId = getNextContractIdFromList(iterator);
+                    if (contractId != null) {
+                        createConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
+                    }
                     createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
                     createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
@@ -1298,16 +1362,6 @@ public class ImportRegisterClientsService {
             }
             change.setApplied(true);
             session.update(change);
-            transaction.commit();
-            transaction = null;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-
-        if (afterSaveClient != null) {
-            saveClientGuardians(idOfRegistryChange);
-        }
 
     }
 
@@ -1341,14 +1395,7 @@ public class ImportRegisterClientsService {
         }
     }
 
-    private static void saveClientGuardians(Long idOfRegistryChange) throws Exception {
-
-        Session sessionOne = null;
-        Transaction transactionOne = null;
-        try {
-            sessionOne = RuntimeContext.getInstance().createPersistenceSession();
-            transactionOne = sessionOne.beginTransaction();
-            RegistryChange registryChange = (RegistryChange) sessionOne.load(RegistryChange.class, idOfRegistryChange);
+    private static void saveClientGuardians(RegistryChange registryChange, Iterator<Long> iterator) throws Exception {
 
             Set<RegistryChangeGuardians> registryChangeGuardiansSet = registryChange.getRegistryChangeGuardiansSet();
 
@@ -1361,7 +1408,7 @@ public class ImportRegisterClientsService {
                     transaction = session.beginTransaction();
                     Long clientId = registryChange.getIdOfClient();
                     Long idOfOrg = registryChange.getIdOfOrg();
-                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId);
+                    ClientManager.applyClientGuardians(registryChangeGuardians, session, idOfOrg, clientId, iterator);
                     transaction.commit();
                     transaction = null;
                 } finally {
@@ -1369,12 +1416,6 @@ public class ImportRegisterClientsService {
                     HibernateUtils.close(session, logger);
                 }
             }
-            transactionOne.commit();
-            transactionOne = null;
-        } finally {
-            HibernateUtils.rollback(transactionOne, logger);
-            HibernateUtils.close(sessionOne, logger);
-        }
     }
 
     //@Transactional
@@ -1405,22 +1446,25 @@ public class ImportRegisterClientsService {
         session.save(migration);
     }
 
-    @Transactional
     public void setChangeError(long idOfRegistryChange, Exception e) throws Exception {
-        RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
         Session session = null;
+        Transaction transaction = null;
         try {
-            session = (Session) em.getDelegate();
-        } catch (Exception ex) {
-            logger.error("Failed to craete session", e);
-            throw ex;
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            RegistryChange change = (RegistryChange)session.load(RegistryChange.class, idOfRegistryChange);
+            String err = e.getMessage();
+            if (err != null && err.length() > 255) {
+                err = err.substring(0, 255).trim();
+            }
+            change.setError(err);
+            session.update(change);
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        String err = e.getMessage();
-        if (err != null && err.length() > 255) {
-            err = err.substring(0, 255).trim();
-        }
-        change.setError(err);
-        session.update(change);
     }
 
     @Transactional

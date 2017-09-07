@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +29,7 @@ import java.util.Map;
  * Time: 18:34
  * To change this template use File | Settings | File Templates.
  */
-@Primary
-@Component("NSIOrgRegistrySynchErrorPage")
+@Component
 @Scope("session")
 public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
     Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchErrorPage.class);
@@ -92,7 +90,7 @@ public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
                 errorMessages = "Невозможно создать запись об ошибке. Не выбрана организация";
                 return;
             }
-            FrontController controller = getController();
+            FrontController controller = NSIOrgRegistrySynchPageBase.createController(logger);
             controller.addRegistryChangeErrorInternal(idOfOrg, revisionCreateDate, errors.get(errorType), errorDetails);
         } catch (Exception e) {
             logger.error("Failed to load client by name", e);
@@ -100,10 +98,6 @@ public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
         } finally {
             //HibernateUtils.close(session, logger);
         }
-    }
-
-    protected FrontController getController() {
-        return NSIOrgRegistrySynchPageBase.createController(logger);
     }
 
     public void doApply () {
