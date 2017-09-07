@@ -735,12 +735,17 @@ public class ClientManager {
                 } else if(RuntimeContext.RegistryType.isSpb()) {
                     try {
                         String c = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
-                        contractId = Long.parseLong(c);
+                        if (!StringUtils.isEmpty(c)) {
+                            contractId = Long.parseLong(c);
+                        } else {
+                            contractId = runtimeContext.getClientContractIdGenerator()
+                                    .generateTransactionFree(organization.getIdOfOrg(), persistenceSession);
+                        }
                     } catch (Exception e) {
-                        throw new Exception("Неправильный формат идентификатор клиента", e);
+                        throw new Exception("Неправильный формат лицевого счета клиента", e);
                     }
                 } else {
-                    throw new Exception("Неправильный формат идентификатор клиента");
+                    throw new Exception("Неправильный формат лицевого счета клиента");
                 }
             } else {
                 contractId = Long.parseLong(contractIdText);
