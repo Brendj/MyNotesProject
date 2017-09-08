@@ -43,6 +43,7 @@ public class ComplexScheduleItem {
         this.intervalTo = schedule.getIntervalTo();
         this.idOfOrgCreated = schedule.getIdOfOrgCreated();
         this.groupsIds = schedule.getGroupsIds();
+        this.deleted = schedule.getDeletedState();
         this.version = schedule.getVersion();
     }
 
