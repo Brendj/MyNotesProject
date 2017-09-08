@@ -12,5 +12,6 @@
         <property name="intervalTo" column="intervalTo" type="int" update="true"/>
         <property name="version" column="version" type="long" not-null="true" update="true"/>
         <property name="groupsIds" column="GroupsIds" type="string" length="128"/>
+        <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
     </class>
 </hibernate-mapping>
