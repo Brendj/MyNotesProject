@@ -33,6 +33,7 @@ public class ComplexScheduleItem {
     private Integer resCode;
     private Long version;
     private String groupsIds;
+    private Boolean deleted;
 
     public ComplexScheduleItem(ComplexSchedule schedule) {
         this.idOfOrg = schedule.getIdOfOrg();
@@ -52,7 +53,7 @@ public class ComplexScheduleItem {
     }
 
     public ComplexScheduleItem(Long idOfOrg, Long idOfComplex, String guid, Integer intervalFrom, Integer intervalTo,
-            Long idOfOrgCreated, String groupsIds) {
+            Long idOfOrgCreated, String groupsIds, Boolean deleted) {
         this.idOfOrg = idOfOrg;
         this.idOfComplex = idOfComplex;
         this.guid = guid;
@@ -60,6 +61,7 @@ public class ComplexScheduleItem {
         this.intervalTo = intervalTo;
         this.idOfOrgCreated = idOfOrgCreated;
         this.groupsIds = groupsIds;
+        this.deleted = deleted;
         this.resCode = 0;
     }
 
@@ -68,18 +70,21 @@ public class ComplexScheduleItem {
         Long idOfComplex;
         Integer intervalFrom;
         Integer intervalTo;
+        Boolean deleted;
         String guid = XMLUtils.getAttributeValue(itemNode, "Guid");
         String strIdOfOrg = XMLUtils.getAttributeValue(itemNode, "IdOfOrg");
         String strIdOfComplex = XMLUtils.getAttributeValue(itemNode, "ComplexId");
         String strIntervalFrom = XMLUtils.getAttributeValue(itemNode, "IntervalFrom");
         String strIntervalTo = XMLUtils.getAttributeValue(itemNode, "IntervalTo");
         String groupsIds = XMLUtils.getAttributeValue(itemNode, "GroupsIds");
+        String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
         try {
             idOfOrg = Long.parseLong(strIdOfOrg);
             idOfComplex = Long.parseLong(strIdOfComplex);
             intervalFrom = Integer.parseInt(strIntervalFrom);
             intervalTo = Integer.parseInt(strIntervalTo);
-            return new ComplexScheduleItem(idOfOrg, idOfComplex, guid, intervalFrom, intervalTo, orgOwner, groupsIds);
+            deleted = (Integer.parseInt(strDeletedState) == 1);
+            return new ComplexScheduleItem(idOfOrg, idOfComplex, guid, intervalFrom, intervalTo, orgOwner, groupsIds, deleted);
         } catch (Exception e) {
             return new ComplexScheduleItem(guid, 1, "Incorrect attribute values");
         }
@@ -94,6 +99,7 @@ public class ComplexScheduleItem {
         XMLUtils.setAttributeIfNotNull(element, "IntervalFrom", intervalFrom);
         XMLUtils.setAttributeIfNotNull(element, "IntervalTo", intervalTo);
         XMLUtils.setAttributeIfNotNull(element, "GroupsIds", groupsIds);
+        XMLUtils.setAttributeIfNotNull(element, "D", deleted);
         return element;
     }
 
@@ -175,5 +181,13 @@ public class ComplexScheduleItem {
 
     public void setGroupsIds(String groupsIds) {
         this.groupsIds = groupsIds;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

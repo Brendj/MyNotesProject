@@ -15,6 +15,7 @@ create table cf_complex_schedules
   version bigint not null,
   idoforgcreated bigint not null,
   GroupsIds character varying(128),
+  deletedstate boolean NOT NULL DEFAULT false,
   constraint cf_complex_schedules_pk primary key (guid),
   CONSTRAINT cf_complex_schedules_idoforg_fk FOREIGN KEY (idoforg)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,

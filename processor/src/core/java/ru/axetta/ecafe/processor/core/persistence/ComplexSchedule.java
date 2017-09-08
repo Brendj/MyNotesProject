@@ -16,6 +16,7 @@ public class ComplexSchedule {
     private Long version;
     private Long idOfOrgCreated;
     private String groupsIds;
+    private Boolean deletedState;
 
     public ComplexSchedule() {
 
@@ -87,5 +88,13 @@ public class ComplexSchedule {
 
     public void setGroupsIds(String groupsIds) {
         this.groupsIds = groupsIds;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 }
