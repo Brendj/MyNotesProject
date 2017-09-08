@@ -92,6 +92,7 @@ public class MealManager {
         List<TransactionDataItem> sendOrders = new ArrayList<TransactionDataItem>();
         List<TransactionDataItem> list = findOrders(session, sendOrders);
         int i = 0;
+        logger.info("MealManager: start sending orders to external system.");
         for(TransactionDataItem item : list) {
             TransactionItem trItem = new TransactionItem(item.getTransactionId(), item.getTransactionDate(), item.getBalance(), item.getAmount(),
                     item.getCardName(), item.getFoodName(), item.getFoodAmount(), EXPENSE);
@@ -158,7 +159,7 @@ public class MealManager {
                     //card = od.getOrder().getClient().findActiveCard(session, null);
                 }
                 result.add(new TransactionDataItem(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail(), od.getOrg().getIdOfOrg(),
-                        od.getOrg().getOGRN(), od.getOrder().getClient().getClientGUID(),
+                        od.getOrg().getOGRN(), od.getOrder().getClient().getContractId().toString(),
                         card == null ? null : card.getCardPrintedNo(), card == null ? null : card.getCardType(),
                         od.getOrder().getTransaction() == null ? null : od.getOrder().getTransaction().getIdOfTransaction(),
                         od.getOrder().getTransaction() == null ? od.getOrder().getCreateTime() : od.getOrder().getTransaction().getTransactionTime(),
@@ -177,12 +178,20 @@ public class MealManager {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("update cf_orderdetails set sendtoexternal = 1 where (idoforderdetail, idoforg) in (");
+        Integer divider = 100;
         for(TransactionDataItem item : sendOrders) {
             sb.append("(")
             .append(item.getIdOfOrderDetail())
             .append(",")
             .append(item.getIdOfOrg())
             .append("), ");
+            divider++;
+            if (divider % 100 == 0) {
+                Query query = session.createSQLQuery(sb.substring(0, sb.length() - 2) + ")");
+                query.executeUpdate();
+                sb.setLength(0);
+                sb.append("update cf_orderdetails set sendtoexternal = 1 where (idoforderdetail, idoforg) in (");
+            }
         }
         Query query = session.createSQLQuery(sb.substring(0, sb.length() - 2) + ")");
         query.executeUpdate();
