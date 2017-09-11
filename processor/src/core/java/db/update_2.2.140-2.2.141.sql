@@ -25,3 +25,5 @@ create table cf_complex_schedules
 
 --Увеличиваем размерность
 ALTER TABLE cf_menuexchange ALTER COLUMN menudata SET DATA TYPE character varying(80000);
+
+--! ФИНАЛИЗИРОВАН (Семенов, 170911) НЕ МЕНЯТЬ
