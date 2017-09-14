@@ -837,6 +837,9 @@ public class Processor implements SyncProcessor {
         // обработка нулевых транзакций
         fullProcessingZeroTransactions(request, syncHistory, responseSections);
 
+        //обработка расписания комплексов
+        fullProcessingComplexSchedule(request, syncHistory, responseSections);
+
         // обработка SpecialDates
         fullProcessingSpecialDates(request, syncHistory, responseSections);
 
@@ -1002,6 +1005,24 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("processZeroTransactions: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingComplexSchedule(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ListComplexSchedules complexScheduleRequest = request.findSection(ListComplexSchedules.class);
+            if (complexScheduleRequest != null) {
+                ComplexScheduleData complexScheduleData = processComplexScheduleData(request.getComplexSchedules());
+                addToResponseSections(complexScheduleData, responseSections);
+
+                ResComplexSchedules resComplexSchedules = processComplexSchedules(request.getComplexSchedules());
+                addToResponseSections(resComplexSchedules, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processComplexSchedules: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }

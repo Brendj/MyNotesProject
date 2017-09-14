@@ -79,6 +79,7 @@ public class ComplexScheduleItem {
         String strIntervalTo = XMLUtils.getAttributeValue(itemNode, "IntervalTo");
         String groupsIds = XMLUtils.getAttributeValue(itemNode, "GroupsIds");
         String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
+        if (strDeletedState == null) strDeletedState = "0";
         try {
             idOfOrg = Long.parseLong(strIdOfOrg);
             idOfComplex = Long.parseLong(strIdOfComplex);
