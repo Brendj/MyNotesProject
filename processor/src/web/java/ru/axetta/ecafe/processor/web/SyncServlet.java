@@ -57,6 +57,7 @@ public class SyncServlet extends HttpServlet {
     private static final SyncCollector SYNC_COLLECTOR = SyncCollector.getInstance();
     private static final HashSet<Long> syncsInProgress = new HashSet<Long>();
     private static final HashSet<Long> fullSyncsInProgress = new HashSet<Long>();
+    private static final HashSet<Long> accIncSyncsInProgress = new HashSet<Long>();
     private static final List<String[]> restrictedFullSyncPeriods =
             getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
     private static final AtomicLong threadCounter = new AtomicLong();
@@ -120,11 +121,15 @@ public class SyncServlet extends HttpServlet {
 
             /////// Недопущение двух и более одновременных синхронизаций от одной организации
             boolean success, tooManyRequests = false;
-            int allSyncsCount, fullSyncsCount = 0;
+            int allSyncsCount, fullSyncsCount, accIncSyncsCount = 0;
             synchronized(syncsInProgress) {
                 success = syncsInProgress.add(idOfOrg);
                 if (success && syncType==SyncType.TYPE_FULL) {
                     fullSyncsInProgress.add(idOfOrg);
+                }
+                //Тип синхры AccInc - разрешаем выполнение одновременно с другими типами
+                if (syncType==SyncType.TYPE_GET_ACC_INC) {
+                    success = accIncSyncsInProgress.add(idOfOrg);
                 }
                 // ограничение количества одновременных синхр - срабатывает только для полных синхр
                 if (success && (syncType==SyncType.TYPE_FULL &&
@@ -133,6 +138,7 @@ public class SyncServlet extends HttpServlet {
                 }
                 allSyncsCount = syncsInProgress.size();
                 fullSyncsCount = fullSyncsInProgress.size();
+                accIncSyncsCount = accIncSyncsInProgress.size();
             }
             if (!success) {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. This IdOfOrg is currently in sync", idOfOrg);
@@ -141,8 +147,8 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             if (tooManyRequests) {
-                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s",
-                        idOfOrg, allSyncsCount, fullSyncsCount);
+                String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s, accInc syncs: %s",
+                        idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount);
                 logger.error(message);
                 removeSyncInProgress(idOfOrg);
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
@@ -151,8 +157,8 @@ public class SyncServlet extends HttpServlet {
             ///////
 
             long begin_sync = System.currentTimeMillis();
-            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s",
-                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount));
+            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s",
+                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
@@ -277,6 +283,7 @@ public class SyncServlet extends HttpServlet {
         synchronized (syncsInProgress) {
             syncsInProgress.remove(idOfOrg);
             fullSyncsInProgress.remove(idOfOrg);
+            accIncSyncsInProgress.remove(idOfOrg);
         }
     }
 
