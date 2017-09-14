@@ -116,7 +116,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             List<BasicReportJob.OrgShortItem> orgShortItemList;
             if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
                 List<Long> orgIdsList;
