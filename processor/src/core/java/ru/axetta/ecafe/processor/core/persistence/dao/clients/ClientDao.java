@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -52,6 +51,8 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClie
 @Repository
 public class ClientDao extends WritableJpaDao {
     public static final String UNKNOWN_PERSON_DATA = "Не заполнено";
+    public static final String UNKNOWN_PERSON_SURNAME = "Представитель: %s";
+    public static final String COMMENT_AUTO_CREATE = "{Создано %s}";
     private static final Logger logger = LoggerFactory.getLogger(ClientDao.class);
 
     public static ClientDao getInstance() {
@@ -202,7 +203,9 @@ public class ClientDao extends WritableJpaDao {
     private void createParentAndGuardianship(Session session, ClientContactInfo clientInfo) throws Exception {
         //Создаем нового клиента-родителя
         FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
-        createConfig.setValue(ClientManager.FieldId.SURNAME, UNKNOWN_PERSON_DATA);
+        Client child = (Client)session.load(Client.class, clientInfo.getIdOfClient());
+        String surname = String.format(UNKNOWN_PERSON_SURNAME, child.getPerson().getSurnameAndFirstLetters());
+        createConfig.setValue(ClientManager.FieldId.SURNAME, surname);
         createConfig.setValue(ClientManager.FieldId.NAME, UNKNOWN_PERSON_DATA);
         createConfig.setValue(ClientManager.FieldId.SECONDNAME, "");
         createConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
@@ -222,7 +225,7 @@ public class ClientDao extends WritableJpaDao {
         String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
         Client clientId = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
-                (ClientManager.ClientFieldConfig) createConfig, false, session, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
+                (ClientManager.ClientFieldConfig) createConfig, false, session, String.format(COMMENT_AUTO_CREATE, dateCreate));
 
         //Создаем опекунскую связь
         Long version = generateNewClientGuardianVersion(session);
@@ -237,7 +240,6 @@ public class ClientDao extends WritableJpaDao {
 
     private void clearClientContacts(Client client, Session session) throws Exception {
         client.setMobile("");
-        logger.info("class : ClientDao, method : clearClientContacts line : 231, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
         client.setEmail("");
         client.setNotifyViaSMS(false);
         client.setNotifyViaPUSH(false);

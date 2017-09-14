@@ -4633,12 +4633,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
             result.classRegisterEventListByGUIDResult = result_list;
 
-            persistenceSession.flush();
             persistenceTransaction.commit();
-            persistenceSession.close();
+            persistenceTransaction = null;
         }
         catch (Exception e) {
             logger.error("Internal error in putClassRegisterEventListByGUID", e);
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
@@ -4654,7 +4654,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria criteria = persistenceSession.createCriteria(Client.class);
             criteria.add(Restrictions.eq("clientGUID", event.guid));
             List<Client> clientList = criteria.list();
-            persistenceSession.clear();
             if (clientList == null || clientList.size() == 0) {
                 logger.warn(String.format("Client with guid=%s not found to save manual enter event", event.guid));
                 throw new IllegalArgumentException(String.format("Клиент с guid=%s не найден", event.guid));

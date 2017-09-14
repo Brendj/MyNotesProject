@@ -7,6 +7,11 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<script language="javascript">
+    function disableButtons(value) {
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled=value;
+    }
+</script>
 
 <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
 
@@ -66,9 +71,9 @@
     </rich:panel>
 
     <rich:panel>
-        <a4j:commandButton value="Генерировать представителей" action="#{otherActionsPage.runGenerateGuardians}"
+        <a4j:commandButton value="Генерировать представителей" action="#{otherActionsPage.runGenerateGuardians}" id="generateGuardiansByOrgs"
                          title="Принудительное создание представителя клиентам из не предопределенных групп."
-                         styleClass="command-button" /><br/>
+                         styleClass="command-button" onclick="disableButtons(true);" oncomplete="disableButtons(false)" /><br/>
         <h:outputText value="Список ид. организаций:"/>
         <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
     </rich:panel>
