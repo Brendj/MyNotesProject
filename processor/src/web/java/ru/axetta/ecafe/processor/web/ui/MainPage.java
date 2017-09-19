@@ -50,6 +50,7 @@ import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
+import ru.axetta.ecafe.processor.web.ui.org.settings.*;
 import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
@@ -116,6 +117,7 @@ public class MainPage implements Serializable {
     private Long selectedIdOfPos;
     private Long selectedIdOfSettlement;
     private Long selectedIdOfEventNotification;
+    private Long selectedIdOfFeedingSetting;
     private Long removedIdOfEventNotification;
     private Long idOfUser;
     private String removedReportTemplate;
@@ -170,6 +172,11 @@ public class MainPage implements Serializable {
     //categories orgs
     private final BasicWorkspacePage benefitsOptionsPage = new BasicWorkspacePage();
     private final BasicWorkspacePage categoryOrgGroupPage = new BasicWorkspacePage();
+    private final FeedingSettingGroupPage feedingSettingsGroupPage = new FeedingSettingGroupPage();
+    private final FeedingSettingsListPage feedingSettingsListPage = new FeedingSettingsListPage();
+    private final FeedingSettingViewPage feedingSettingViewPage = new FeedingSettingViewPage();
+    private final FeedingSettingEditPage feedingSettingEditPage = new FeedingSettingEditPage();
+    private final FeedingSettingCreatePage feedingSettingCreatePage = new FeedingSettingCreatePage();
     private final BasicWorkspacePage optionsGroupPage = new BasicWorkspacePage();
     private final OrgListPage orgListPage = new OrgListPage();
     private final SelectedOrgGroupPage selectedOrgGroupPage = new SelectedOrgGroupPage();
@@ -681,6 +688,33 @@ public class MainPage implements Serializable {
 
     public Object showCategoryOrgGroupPage() {
         currentWorkspacePage = categoryOrgGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showFeedingSettingGroupPage() {
+        //currentWorkspacePage = feedingSettingsGroupPage;
+        //updateSelectedMainMenu();
+        //return null;
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            feedingSettingsGroupPage.fill(persistenceSession, selectedIdOfFeedingSetting);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = feedingSettingsGroupPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill feeding setting group page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке общей страницы настройки платного питания: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
         updateSelectedMainMenu();
         return null;
     }
@@ -9240,6 +9274,19 @@ public class MainPage implements Serializable {
         return getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CARD_OPERATOR);
     }
 
+    /*public boolean isEligibleToViewFeedingSettings() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_FEEDING_SETTINGS_VIEW);
+    }
+
+    public boolean isEligibleToEditFeedingSettings() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_FEEDING_SETTINGS_EDIT);
+    }*/
+
+    public boolean isEligibleToViewOrEditFeedingSettings() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_FEEDING_SETTINGS_SUPPLIER) ||
+                getCurrentUser().hasFunction(Function.FUNC_FEEDING_SETTINGS_ADMIN);
+    }
+
     public Object removeClient() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -9761,6 +9808,120 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showFeedingSettingViewPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            feedingSettingsGroupPage.fill(persistenceSession, selectedIdOfFeedingSetting);
+            feedingSettingViewPage.setIdOfSetting(selectedIdOfFeedingSetting);
+            feedingSettingViewPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            feedingSettingsGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = feedingSettingViewPage;
+        } catch (Exception e) {
+            logger.error("Failed to show feeding setting page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы настроек платного питания: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showFeedingSettingEditPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            feedingSettingsGroupPage.fill(persistenceSession, selectedIdOfFeedingSetting);
+            feedingSettingEditPage.setIdOfSetting(selectedIdOfFeedingSetting);
+            feedingSettingEditPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            feedingSettingsGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = feedingSettingEditPage;
+        } catch (Exception e) {
+            logger.error("Failed to show feeding setting edit page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы настроек платного питания: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showFeedingSettingCreatePage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            feedingSettingCreatePage.clear();
+            currentWorkspacePage = feedingSettingCreatePage;
+        } catch (Exception e) {
+            logger.error("Failed to show feeding setting create page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы создания настройки платного питания: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showFeedingSettingListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            feedingSettingsListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = feedingSettingsListPage;
+        } catch (Exception e) {
+            logger.error("Failed to show feeding setting edit page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы настроек платного питания: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object deleteFeedingSetting() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            FeedingSetting setting = (FeedingSetting)persistenceSession.load(FeedingSetting.class, selectedIdOfFeedingSetting);
+            persistenceSession.delete(setting);
+            feedingSettingsListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            feedingSettingsGroupPage.hideMenuGroup();
+            currentWorkspacePage = feedingSettingsListPage;
+        } catch (Exception e) {
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при попытке удаления настройки платного питания: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public BasicWorkspacePage getInfoMessageGroupPage() {
         return infoMessageGroupPage;
     }
@@ -9787,5 +9948,33 @@ public class MainPage implements Serializable {
 
     public void setContractIdCardOperator(Long contractIdCardOperator) {
         this.contractIdCardOperator = contractIdCardOperator;
+    }
+
+    public BasicWorkspacePage getFeedingSettingsGroupPage() {
+        return feedingSettingsGroupPage;
+    }
+
+    public Long getSelectedIdOfFeedingSetting() {
+        return selectedIdOfFeedingSetting;
+    }
+
+    public void setSelectedIdOfFeedingSetting(Long selectedIdOfFeedingSetting) {
+        this.selectedIdOfFeedingSetting = selectedIdOfFeedingSetting;
+    }
+
+    public FeedingSettingsListPage getFeedingSettingsListPage() {
+        return feedingSettingsListPage;
+    }
+
+    public FeedingSettingViewPage getFeedingSettingViewPage() {
+        return feedingSettingViewPage;
+    }
+
+    public FeedingSettingEditPage getFeedingSettingEditPage() {
+        return feedingSettingEditPage;
+    }
+
+    public FeedingSettingCreatePage getFeedingSettingCreatePage() {
+        return feedingSettingCreatePage;
     }
 }

@@ -129,6 +129,10 @@ public class Function {
     public static final String FUNCD_RESTRICT_MANUAL_REPORT = "Закрыть 'Ручной запуск отчетов'";
     public static final String FUNC_RESTRICT_CARD_OPERATOR = "cardOperator";
     public static final String FUNCD_RESTRICT_CARD_OPERATOR = "Опрерации по картам";
+    public static final String FUNC_FEEDING_SETTINGS_SUPPLIER = "feedingSettingsSupplier";
+    public static final String FUNCD_FEEDING_SETTINGS_SUPPLIER = "Настройки платного питания - поставщик";
+    public static final String FUNC_FEEDING_SETTINGS_ADMIN = "feedingSettingsAdmin";
+    public static final String FUNCD_FEEDING_SETTINGS_ADMIN = "Настройки платного питания - админ";
 
     private Long idOfFunction;
     private String functionName;

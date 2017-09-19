@@ -408,4 +408,15 @@ public class DAOReadonlyService {
         }
     }
 
+    public boolean orgInFeedingSettingFound(List<Long> orgs, Long idOfSetting) {
+        String str_query = "select coalesce(max(idOfSetting), 0) from cf_feeding_settings_orgs fs where fs.idOfOrg in (:idOfOrg)";
+        if (idOfSetting != null) str_query += " and idOfSetting <> :idOfSetting";
+        Query query = entityManager.createNativeQuery(str_query);
+        query.setParameter("idOfOrg", orgs);
+        if (idOfSetting != null) {
+            query.setParameter("idOfSetting", idOfSetting);
+        }
+        Object result = query.getSingleResult();
+        return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
+    }
 }

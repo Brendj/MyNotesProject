@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -46,5 +47,17 @@ public class OrgReadOnlyRepository extends BaseJpaDao {
             return ((Integer)r.getResultList().get(0)) == 1;
         }
         return false;
+    }
+
+    public Long getFeedingSettingLimit(long idOfOrg) {
+        Query query = entityManager.createNativeQuery("select limitamount from cf_feeding_settings fs "
+                + "join cf_feeding_settings_orgs fso on fs.idofsetting = fso.idofsetting "
+                + "where fso.idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        try {
+            return ((BigInteger)query.getSingleResult()).longValue();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

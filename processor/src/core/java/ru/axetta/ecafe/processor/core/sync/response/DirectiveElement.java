@@ -85,6 +85,11 @@ public class DirectiveElement implements AbstractToElement{
         Integer photoRegistryFlag = org.getPhotoRegistryDirective().getCode();
         directiveItemList.add(new DirectiveItem("IS_ALLOWED_PHOTO_REGISTRY", photoRegistryFlag.toString()));
 
+        Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
+        if (feedingSettingLimit != null) {
+            directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
+        }
+
         if(directivesRequest.getTradeConfigChangedSuccess() != null && directivesRequest.getTradeConfigChangedSuccess()) {
             //org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.NOT_CHANGED);
             DAOService.getInstance().saveTradeAccountConfigChangeDirective(org.getIdOfOrg());

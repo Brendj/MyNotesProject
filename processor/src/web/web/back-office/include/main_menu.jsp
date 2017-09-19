@@ -1094,6 +1094,25 @@
         <%--@elvariable id="registerStampPaidPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPaidPage"--%>
         <rich:panelMenuItem id="registerStampPaidReportMenuItem" binding="#{registerStampPaidPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampPaidPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="feedingSettingsGroupMenu" label="Настройки платного питания" rendered="#{mainPage.eligibleToViewOrEditFeedingSettings}">
+            <rich:panelMenuItem id="feedingSettingsListMenuItem" binding="#{mainPage.feedingSettingsListPage.mainMenuComponent}"
+                            label="Список" action="#{mainPage.showFeedingSettingListPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuGroup id="selectedFeedingSettingGroupMenu" label="#{mainPage.feedingSettingsGroupPage.title}" rendered="false"
+                                 binding="#{mainPage.feedingSettingsGroupPage.mainMenuComponent}">
+                <a4j:support event="onclick" action="#{mainPage.showFeedingSettingGroupPage}"
+                             reRender="workspaceForm" />
+                <rich:panelMenuItem id="viewFeedingSettingMenuItem" binding="#{mainPage.feedingSettingViewPage.mainMenuComponent}"
+                                    label="Просмотр" action="#{mainPage.showFeedingSettingViewPage}" reRender="mainMenu, workspaceForm" />
+                <rich:panelMenuItem id="editFeedingSettingMenuItem" binding="#{mainPage.feedingSettingEditPage.mainMenuComponent}"
+                                    label="Редактирование" action="#{mainPage.showFeedingSettingEditPage}" reRender="mainMenu, workspaceForm" />
+            </rich:panelMenuGroup>
+
+            <rich:panelMenuItem id="showFeedingSettingCreateMenuItem" binding="#{mainPage.feedingSettingCreatePage.mainMenuComponent}"
+                                label="Регистрация" action="#{mainPage.showFeedingSettingCreatePage}" reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="subscriptionFeedingGroupMenu" binding="#{mainPage.subscriptionFeedingGroupMenu.mainMenuComponent}"

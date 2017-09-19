@@ -16,8 +16,8 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
     //private int dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
     private int hoursForbidChange; // Количество часов, в течение которых запрещено редактировать заявки
-    private int daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     private boolean sixWorkWeek; // Шестидневный план рабочих дней
+    private int daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     private int dayCreateVP; //Количество дней, на которые создаются заявки вариативного питания
     private int hoursForbidVP; //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
 
