@@ -8,9 +8,6 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 
-<% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditFeedingSettings())
-{ out.println("Недостаточно прав для просмотра страницы"); return; } %>
-
 <%--@elvariable id="mainPage" type="ru.axetta.ecafe.processor.web.ui.MainPage"--%>
 <h:panelGrid id="feedingSettingEditPage" binding="#{mainPage.feedingSettingEditPage.pageComponent}"
              styleClass="borderless-grid">
