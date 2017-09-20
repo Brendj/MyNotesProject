@@ -46,6 +46,8 @@ public class JBossLoginModule implements LoginModule {
     private static final Logger logger = LoggerFactory.getLogger(JBossLoginModule.class);
     private static final String AUTH_ERROR_THROUGH_CURRENT_URL = "Запрашиваемый ресурс аутентификации недоступен пользователю с данной ролью.";
     private static final String AUTH_USER_ROLE_ATTRIBUTE_NAME = "ru.axetta.ecafe.userRole";
+    public static final String ROLENAME_ADMIN = "admin";
+    public static final String ROLENAME_DIRECTOR = "director";
 
     /**
      * Created by IntelliJ IDEA.
@@ -262,9 +264,7 @@ public class JBossLoginModule implements LoginModule {
             }
             final Integer idOfRole = user.getIdOfRole();
             final String userRole = request.getParameter("ecafeUserRole");
-            final boolean isAdminLoginAttempt = userRole == null ? false : userRole.equals("admin");
-            if (isCommonUserLoginFromWrongURL(isAdminLoginAttempt, idOfRole) || (isAdminLoginFromWrongURL(
-                    isAdminLoginAttempt, idOfRole))) {
+            if (!loginFromCorrectURL(userRole, idOfRole)) {
                 request.setAttribute("errorMessage", AUTH_ERROR_THROUGH_CURRENT_URL);
                 final String message = String.format("%s Login: %s.", AUTH_ERROR_THROUGH_CURRENT_URL, username);
                 logger.debug(message);
@@ -374,14 +374,16 @@ public class JBossLoginModule implements LoginModule {
         return true;
     }
 
-    private boolean isCommonUserLoginFromWrongURL(boolean isAdmin, Integer idOfRole) {
-        return ((isAdmin) && !(User.DefaultRole.ADMIN.getIdentification().equals(idOfRole)) && !(User.DefaultRole
-                .ADMIN_SECURITY.getIdentification().equals(idOfRole)));
-    }
+    private boolean loginFromCorrectURL(String userRole, Integer idOfRole) {
+        boolean isAdminLoginAttempt = userRole == null ? false : userRole.equals(ROLENAME_ADMIN);
+        boolean isDirectorLoginAttempt = userRole == null ? false : userRole.equals(ROLENAME_DIRECTOR);
+        boolean isCommonUserLoginAttempt = (userRole == null) || !(userRole.equals(ROLENAME_ADMIN) || userRole.equals(ROLENAME_DIRECTOR));
 
-    private boolean isAdminLoginFromWrongURL(boolean isAdmin, Integer idOfRole) {
-        return ((!isAdmin) && ((User.DefaultRole.ADMIN.getIdentification().equals(idOfRole)) || (User.DefaultRole
-                .ADMIN_SECURITY.getIdentification().equals(idOfRole))));
+        return (isAdminLoginAttempt && (User.DefaultRole.ADMIN.getIdentification().equals(idOfRole) || User.DefaultRole.ADMIN_SECURITY.getIdentification().equals(idOfRole)))
+                ||
+                (isDirectorLoginAttempt && User.DefaultRole.DIRECTOR.getIdentification().equals(idOfRole))
+                ||
+                (isCommonUserLoginAttempt && !User.DefaultRole.ADMIN.getIdentification().equals(idOfRole) &&
+                        !User.DefaultRole.ADMIN_SECURITY.getIdentification().equals(idOfRole) && !User.DefaultRole.DIRECTOR.getIdentification().equals(idOfRole));
     }
-
 }

@@ -398,6 +398,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.CARD_OPERATOR);
     }
+
+    public Boolean getIsDirector(){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DIRECTOR);
+    }
+
     @Override
     public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
             String classTypes) throws Exception {

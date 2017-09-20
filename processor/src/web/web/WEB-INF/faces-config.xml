@@ -38,6 +38,13 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
 
+    <managed-bean>
+        <display-name>directorPage</display-name>
+        <managed-bean-name>directorPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.DirectorPage</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
     <converter>
         <description>fromTypeConverter</description>
         <converter-id>fromTypeConverter</converter-id>
@@ -268,6 +275,15 @@
         <navigation-case>
             <from-outcome>logoutAdmin</from-outcome>
             <to-view-id>/back-office/admin/index.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/director/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>logout</from-outcome>
+            <to-view-id>/back-office/director/index.jsp</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>

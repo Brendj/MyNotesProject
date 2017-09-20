@@ -3,6 +3,7 @@
   ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
   --%>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.login.JBossLoginModule" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%
     if (StringUtils.isNotEmpty(request.getRemoteUser())) {
@@ -12,7 +13,8 @@
     }
     String requestedResource = (String)request.getAttribute("javax.servlet.forward.request_uri");
     String userRoleParam = "";
-    if ((requestedResource.endsWith("/admin/index.faces")) || (requestedResource.endsWith("/admin/j_security_check"))) userRoleParam = "admin";
+    if ((requestedResource.endsWith("/admin/index.faces")) || (requestedResource.endsWith("/admin/j_security_check"))) userRoleParam = JBossLoginModule.ROLENAME_ADMIN;
+    if ((requestedResource.endsWith("/director/index.faces")) || (requestedResource.endsWith("/director/j_security_check"))) userRoleParam = JBossLoginModule.ROLENAME_DIRECTOR;
 %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

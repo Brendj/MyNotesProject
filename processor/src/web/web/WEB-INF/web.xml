@@ -339,34 +339,6 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Restrict direct access to JSFs</web-resource-name>
-            <url-pattern>/back-office/login.jsp</url-pattern>
-            <url-pattern>/back-office/index.jsp</url-pattern>
-            <url-pattern>/back-office/menu_load_result_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/client_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/client_org_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/free_complex_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/pay_complex_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/sale_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/client_load_result_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/client_update_load_result_csv_list.jsp</url-pattern>            
-            <url-pattern>/back-office/card_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/card_load_result_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/ccaccount_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/pos_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/settlement_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/addpayment_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/menu_data_xml.jsp</url-pattern>
-            <url-pattern>/back-office/org_basic_stats_csv_list.jsp</url-pattern>
-            <url-pattern>/back-office/admin/index.jsp</url-pattern>
-        </web-resource-collection>
-        <auth-constraint/>
-    </security-constraint>
-
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Restrict direct access to JSFs</web-resource-name>
             <url-pattern>/back-office/elections.jsp</url-pattern>
         </web-resource-collection>
     </security-constraint>
@@ -422,6 +394,7 @@
             <url-pattern>/repository/download</url-pattern>
             <url-pattern>/back-office/org_basic_stats_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/admin/index.faces</url-pattern>
+            <url-pattern>/back-office/director/index.faces</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>AuthorizedUser</role-name>

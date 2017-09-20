@@ -123,7 +123,8 @@ public class User {
         MONITORING(3,"мониторинг"),
         ADMIN_SECURITY(4, "администратор ИБ"),
         SUPPLIER_REPORT(5, "отчетность поставщика питания"),
-        CARD_OPERATOR(6, "оператор по картам");
+        CARD_OPERATOR(6, "оператор по картам"),
+        DIRECTOR(7, "директор школы");
 
 
         private Integer identification;

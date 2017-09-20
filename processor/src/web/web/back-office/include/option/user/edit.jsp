@@ -70,8 +70,8 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>--%>
-    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin}"/>
-    <h:panelGroup styleClass="borderless-div" rendered="#{!mainPage.userEditPage.isSecurityAdmin}">
+    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
         <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
                            reRender="modalContragentListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
@@ -83,8 +83,8 @@
         </a4j:commandButton>
         <h:outputText value=" {#{mainPage.userEditPage.contragentFilter}}" styleClass="output-text" escape="true" />
     </h:panelGroup>
-    <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin}" />
-    <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin}">
+    <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}" />
+    <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
         <a4j:commandButton value="..." action="#{mainPage.userEditPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
@@ -94,8 +94,8 @@
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.orgFilter}}" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Список организаций отмены (заказов)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin}" />
-    <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin}">
+    <h:outputText escape="true" value="Список организаций отмены (заказов)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}" />
+    <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
         <a4j:commandButton value="..." action="#{mainPage.userEditPage.showOrgListSelectCancelPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px">
