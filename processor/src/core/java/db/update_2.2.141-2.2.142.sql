@@ -29,3 +29,6 @@ create table cf_feeding_settings_orgs
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
   constraint cf_feeding_settings_UQ UNIQUE (idoforg)
 );
+
+--увеличиваем размерность для сохранения названий групп вместо идентификаторов
+alter table cf_complex_schedules ALTER COLUMN groupsids SET DATA TYPE character varying(512);

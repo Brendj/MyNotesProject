@@ -77,7 +77,7 @@ public class ComplexScheduleItem {
         String strIdOfComplex = XMLUtils.getAttributeValue(itemNode, "ComplexId");
         String strIntervalFrom = XMLUtils.getAttributeValue(itemNode, "IntervalFrom");
         String strIntervalTo = XMLUtils.getAttributeValue(itemNode, "IntervalTo");
-        String groupsIds = XMLUtils.getAttributeValue(itemNode, "GroupsIds");
+        String groupsIds = XMLUtils.getAttributeValue(itemNode, "GroupsNames");
         String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
         if (strDeletedState == null) strDeletedState = "0";
         try {
@@ -100,7 +100,7 @@ public class ComplexScheduleItem {
         XMLUtils.setAttributeIfNotNull(element, "ComplexId", idOfComplex);
         XMLUtils.setAttributeIfNotNull(element, "IntervalFrom", intervalFrom);
         XMLUtils.setAttributeIfNotNull(element, "IntervalTo", intervalTo);
-        XMLUtils.setAttributeIfNotNull(element, "GroupsIds", groupsIds);
+        XMLUtils.setAttributeIfNotNull(element, "GroupsNames", groupsIds);
         XMLUtils.setAttributeIfNotNull(element, "D", deleted);
         return element;
     }
