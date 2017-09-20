@@ -122,6 +122,8 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
     public void fill(Session session) throws Exception {
         this.client = new ClientItem();
         this.cardType = 1;
+        this.cardNo = null;
+        this.cardPrintedNo = null;
         this.lockReason = null;
         this.validTime = new Date();
         this.validTime = CalendarUtils.addYear(validTime, 5);

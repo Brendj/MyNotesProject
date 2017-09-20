@@ -24,6 +24,9 @@ public class ClientCreateByCardOperatorPage extends ClientCreatePage {
     }
 
     public Client createClient(Session persistenceSession) throws Exception {
+        if (getIdOfClientGroup() == null) {
+            throw new Exception("Выберите группу!");
+        }
         this.setPlainPassword("");
         setContractPerson(new PersonItem(new Person("", "", "")));
         setAddress("");
