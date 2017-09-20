@@ -1343,6 +1343,25 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod
+    public List<SimpleEnterEventItem> getEnterEvents(@WebParam(name = "idOfOrg") long idOfOrg, @WebParam(name = "groupName") String groupName,
+            @WebParam(name = "requestDate") long requestDate) throws FrontControllerException {
+        try {
+            Date beginDate = CalendarUtils.truncateToDayOfMonth(new Date(requestDate));
+            Date endDate = CalendarUtils.addOneDay(beginDate);
+            List<SimpleEnterEventItem> list = new ArrayList<SimpleEnterEventItem>();
+            List<EnterEvent> eeList = DAOReadonlyService.getInstance().getEnterEventsByOrgAndGroup(idOfOrg, groupName, beginDate, endDate);
+            for (EnterEvent ee : eeList) {
+                SimpleEnterEventItem item = new SimpleEnterEventItem(ee);
+                list.add(item);
+            }
+            return list;
+        } catch (Exception e) {
+            logger.error("Ошибка при получении списка событий прохода", e);
+            throw new FrontControllerException(String.format("Ошибка: %s", e.getMessage()));
+        }
+    }
+
+    @WebMethod
     public List<OrgIstkSummaryItem> getOrgsForIstkSync() throws FrontControllerException {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

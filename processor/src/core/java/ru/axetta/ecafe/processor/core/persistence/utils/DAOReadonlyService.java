@@ -127,6 +127,19 @@ public class DAOReadonlyService {
         return result;
     }
 
+    public List<EnterEvent> getEnterEventsByOrgAndGroup(long idOfOrg, String groupName, Date beginDate, Date endDate) {
+        //Query query = entityManager.createQuery("select e from EnterEvent e where e.org.idOfOrg = :idOfOrg "
+        //        + "and e.evtDateTime between :beginDate and :endDate and e.client.clientGroup.groupName = :groupName");
+        Query query = entityManager.createQuery("select e from EnterEvent e inner join e.client c inner join c.clientGroup g "
+                + "where e.org.idOfOrg = :idOfOrg "
+            + "and e.evtDateTime between :beginDate and :endDate and g.groupName = :groupName");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("beginDate", beginDate);
+        query.setParameter("endDate", endDate);
+        query.setParameter("groupName", groupName);
+        return query.getResultList();
+    }
+
     public User getUserFromSession() {
         try {
             HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
