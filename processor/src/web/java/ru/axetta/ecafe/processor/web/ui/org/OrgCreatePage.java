@@ -84,7 +84,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean photoRegistry;
     private Boolean changesDSZN;
     private Boolean isRecyclingEnabled;
-    private Boolean autoCreateCards;
+    private Boolean autoCreateCards = false;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
