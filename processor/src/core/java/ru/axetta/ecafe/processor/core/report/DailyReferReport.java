@@ -377,12 +377,12 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
                 DailyReferReportItem totalI = null;
                 for(DailyReferReportItem ii : res) {
-                    if(ii.getDay().equals(day) &&
-                       ii.getGroup0().equals(group0) &&
-                       ii.getGroup1().equals(group1) &&
-                       ii.getGroup2().equals(group2)) {
-                        totalI = ii;
-                        break;
+                    if (ii.getGroup2() != null) {
+                        if (ii.getDay().equals(day) && ii.getGroup0().equals(group0) && ii.getGroup1().equals(group1)
+                                && ii.getGroup2().equals(group2)) {
+                            totalI = ii;
+                            break;
+                        }
                     }
                 }
                 if(totalI == null) {
@@ -467,13 +467,15 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             double breakfast = 0D;
             double lunch = 0D;
             for(DailyReferReportItem i : result) {
-                if(i.getGroup2().equals(ReferReport.BREAKFAST)) {
-                    breakfast = i.getPrice();
-                } else if(i.getGroup2().equals(ReferReport.LUNCH)) {
-                    lunch = i.getPrice();
-                }
-                if(breakfast != 0D && lunch != 0D) {
-                    break;
+                if(i.getGroup2() != null) {
+                    if (i.getGroup2().equals(ReferReport.BREAKFAST)) {
+                        breakfast = i.getPrice();
+                    } else if (i.getGroup2().equals(ReferReport.LUNCH)) {
+                        lunch = i.getPrice();
+                    }
+                    if (breakfast != 0D && lunch != 0D) {
+                        break;
+                    }
                 }
             }
             for(DailyReferReportItem i : result) {
