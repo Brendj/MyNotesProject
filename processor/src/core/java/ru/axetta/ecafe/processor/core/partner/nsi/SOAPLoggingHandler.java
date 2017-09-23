@@ -4,9 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.partner.nsi;
 
+import ru.axetta.ecafe.processor.core.service.meal.MealManager;
+
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPPart;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -59,20 +62,22 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
         //==========Раскомментировать ниже для логирования запросов==========//
 
-        /*if (outboundProperty.booleanValue()) {
-            out.println("\nOutbound message:");
-        } else {
-            out.println("\nInbound message:");
-        }
+        if (!MealManager.isOn()) {
+            if (outboundProperty.booleanValue()) {
+                out.println("\nOutbound message:");
+            } else {
+                out.println("\nInbound message:");
+            }
 
-        try {
-            final SOAPPart soapPart = smc.getMessage().getSOAPPart();
-            final Document doc = soapPart.getEnvelope().getOwnerDocument();
-            System.out.println(toString(doc));
-            out.println("");   // just to add a newline
-        } catch (Exception e) {
-            out.println("Exception in handler: " + e);
-        }*/
+            try {
+                final SOAPPart soapPart = smc.getMessage().getSOAPPart();
+                final Document doc = soapPart.getEnvelope().getOwnerDocument();
+                System.out.println(toString(doc));
+                out.println("");   // just to add a newline
+            } catch (Exception e) {
+                out.println("Exception in handler: " + e);
+            }
+        }
     }
 
     public static String toString(Document doc) {

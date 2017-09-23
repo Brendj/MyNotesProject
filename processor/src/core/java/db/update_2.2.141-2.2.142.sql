@@ -35,3 +35,5 @@ alter table cf_complex_schedules ALTER COLUMN groupsids SET DATA TYPE character 
 
 --новое поле для количества заявок на временных клиентов
 alter table cf_goods_requests_positions add column tempclientscount bigint;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 170923) НЕ МЕНЯТЬ
