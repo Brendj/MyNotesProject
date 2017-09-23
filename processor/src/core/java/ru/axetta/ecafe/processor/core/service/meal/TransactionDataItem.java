@@ -66,8 +66,8 @@ public class TransactionDataItem {
         this.idOfOrg = idOfOrg;
         this.organizationUid = organizationUid;
         this.studentUid = studentUid;
-        this.cardUid = cardPrintedNo.toString();
-        this.cardName = Card.TYPE_NAMES[cardType];
+        this.cardUid = cardPrintedNo == null ? "" : cardPrintedNo.toString();
+        this.cardName = cardType == null ? "" : Card.TYPE_NAMES[cardType];
         this.transactionId = transactionId.toString();
         this.transactionDate = transactionDate;
         this.balance = balance;

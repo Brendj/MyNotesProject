@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -204,6 +205,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
 
         printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
+    }
+
+    public void runMealTest() {
+        MealManager manager = RuntimeContext.getAppContext().getBean(MealManager.class);
+        try {
+            manager.sendToExternal(10);
+        } catch (Exception e) {
+            getLogger().error("Error in test meal run: ", e);
+            printError(e.getMessage());
+        }
     }
 
     public void runGenerateSummaryDownloadFile() {

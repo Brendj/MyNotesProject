@@ -49,10 +49,13 @@ public class MealService {
             BindingProvider bp = (BindingProvider) controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://10.146.136.36/service/webservice/meal/");
+            //String endpoint = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.mealmanager.service", "http://10.146.136.36/service/webservice/meal/");
+            //bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
             //proxy.getInInterceptors().add(new ContentTypeHandler());
             proxy.getOutInterceptors().add(new HeaderHandler());
 
             final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+            //final MealServiceHandler soapLoggingHandler = new MealServiceHandler();
             final List<Handler> handlerChain = new ArrayList<Handler>();
             handlerChain.add(soapLoggingHandler);
             bp.getBinding().setHandlerChain(handlerChain);

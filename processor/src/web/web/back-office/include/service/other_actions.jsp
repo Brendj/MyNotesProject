@@ -88,6 +88,11 @@
             <a4j:support event="onchanged" />
         </rich:calendar>
     </rich:panel>
+
+    <rich:panel>
+        <a4j:commandButton value="Тест Meal Service" action="#{otherActionsPage.runMealTest}" id="runMealTest"
+                           styleClass="command-button" /><br/>
+    </rich:panel>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
