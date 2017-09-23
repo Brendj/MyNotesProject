@@ -41,6 +41,7 @@
         </property>
         <property name="totalCount" column="TotalCount" type="long"/>
         <property name="dailySampleCount" column="DailySampleCount" type="long"/>
+        <property name="tempClientsCount" column="TempClientsCount" type="long"/>
         <property name="netWeight" column="NetWeight" type="long"/>
         <property name="lastTotalCount" column="LastTotalCount" type="long"/>
         <property name="lastDailySampleCount" column="LastDailySampleCount" type="long"/>

@@ -32,3 +32,6 @@ create table cf_feeding_settings_orgs
 
 --увеличиваем размерность для сохранения названий групп вместо идентификаторов
 alter table cf_complex_schedules ALTER COLUMN groupsids SET DATA TYPE character varying(512);
+
+--новое поле для количества заявок на временных клиентов
+alter table cf_goods_requests_positions add column tempclientscount bigint;

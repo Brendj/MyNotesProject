@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
@@ -12,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -21,14 +19,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,6 +40,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     /* старые значения всего и суточной пробы */
     private Long lastTotalCount;
     private Long lastDailySampleCount; // суточная проба
+    private Long tempClientsCount; //временные клиенты
     private Long netWeight;
     private Product product;
     private String guidOfP;
@@ -80,6 +76,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("unitsScale"), "unitsScale");
         projectionList.add(Projections.property("totalCount"), "totalCount");
         projectionList.add(Projections.property("dailySampleCount"), "dailySampleCount"); // суточная проба
+        projectionList.add(Projections.property("tempClientsCount"), "tempClientsCount");
         projectionList.add(Projections.property("netWeight"), "netWeight");
         projectionList.add(Projections.property("lastTotalCount"), "lastTotalCount");
         projectionList.add(Projections.property("lastDailySampleCount"), "lastDailySampleCount");
@@ -96,6 +93,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitsScale.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
+        XMLUtils.setAttributeIfNotNull(element, "TempClientsCount", tempClientsCount);
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
         if (!StringUtils.isEmpty(guidOfGR))
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
@@ -145,6 +143,9 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         Long longDailySampleCount = XMLUtils.getLongAttributeValue(node, "DailySampleCount"); // суточная проба
         if (longDailySampleCount != null)
             setDailySampleCount(longDailySampleCount);
+        Long longTempClientsCount = XMLUtils.getLongAttributeValue(node, "TempClientsCount");
+        if (longTempClientsCount != null)
+            setTempClientsCount(longTempClientsCount);
         Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
         if (longNetWeight != null)
             setNetWeight(longNetWeight);
@@ -167,6 +168,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setNetWeight(((GoodRequestPosition) distributedObject).getNetWeight());
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
         setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
+        setTempClientsCount(((GoodRequestPosition) distributedObject).getTempClientsCount());
         /* старые значения всего и суточной пробы */
         setLastTotalCount(lastTotalCount);
         setLastDailySampleCount(lastDailySampleCount); // суточная проба
@@ -300,5 +302,13 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     public void setNotified(Boolean notified) {
         this.notified = notified;
+    }
+
+    public Long getTempClientsCount() {
+        return tempClientsCount;
+    }
+
+    public void setTempClientsCount(Long tempClientsCount) {
+        this.tempClientsCount = tempClientsCount;
     }
 }
