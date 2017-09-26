@@ -9,10 +9,10 @@ import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
@@ -77,7 +77,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         orgCriteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
         try {
-            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
             ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, orgCriteria);
         } catch (Exception ignored) {
         }

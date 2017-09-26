@@ -23,6 +23,9 @@
         <link rel="stylesheet" href="<c:url value="/back-office/styles.css"/>" type="text/css">
     </head>
     <body>
+    <f:subview id="orgListSelectSubView">
+        <c:import url="select_orgs.jsp" />
+    </f:subview>
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td style="min-width: 210px; vertical-align: top;" width="215px">
@@ -46,7 +49,6 @@
                 </h:panelGrid> <%-- Нижний колонтитул --%>
             </td>
         </tr>
-
     </table>
     </body>
 </html>

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.director.DirectorOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -19,7 +20,8 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
-public abstract class OnlineReportPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList, OrgSelectPage.CompleteHandler {
+public abstract class OnlineReportPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList,
+        OrgSelectPage.CompleteHandler, DirectorOrgListSelectPage.CompleteHandlerList {
     protected Date startDate;
     protected Date endDate;
     protected List<Long> idOfOrgList = new ArrayList<Long>();
@@ -91,6 +93,10 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
                 filter = filter.substring(0, filter.length() - 1);
             }
         }
+    }
+
+    public void completeDirectorOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        completeOrgListSelection(orgMap);
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
