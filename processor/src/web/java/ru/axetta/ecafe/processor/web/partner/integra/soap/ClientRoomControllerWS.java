@@ -3537,9 +3537,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Клиент не найден";
             } else {
-                data.setClients(clients);
-                data.resultCode = RC_OK;
-                data.description = "OK";
+                boolean onlyNotActiveCG = true;
+                for (Map.Entry<Client, ClientCreatedFromType> entry : clients.entrySet()) {
+                    if (entry.getValue() != null) {
+                        onlyNotActiveCG = false;
+                        break;
+                    }
+                }
+                if (onlyNotActiveCG) {
+                    data.resultCode = RC_CLIENT_NOT_FOUND;
+                    data.description = "Связка не активна";
+                } else {
+                    data.setClients(clients);
+                    data.resultCode = RC_OK;
+                    data.description = "OK";
+                }
             }
         } catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
@@ -3562,15 +3574,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (clients != null && !clients.isEmpty()){
             for(BigInteger id : clients){
                 Long londId = id.longValue();
-                Query q2 = session.createQuery("select c, cg.createdFrom from ClientGuardian cg, Client c "
+                Query q2 = session.createQuery("select c, cg from ClientGuardian cg, Client c "
                         + "where cg.idOfChildren = c.idOfClient and cg.idOfGuardian = :idOfGuardian "
-                        + "and cg.deletedState = false and cg.disabled = false");  //все дети текущего клиента
+                        + "and cg.deletedState = false");  //все дети текущего клиента
                 q2.setParameter("idOfGuardian", londId);
                 List list = q2.list();
                 if (list != null && list.size() > 0) {
                     for (Object o : list) {
                         Object[] row = (Object[])o;
-                        result.put((Client)row[0], (ClientCreatedFromType)row[1]);
+                        ClientGuardian cg = (ClientGuardian) row[1];
+                        if (!cg.isDisabled()) {
+                            result.put((Client) row[0], cg.getCreatedFrom());
+                        } else {
+                            result.put((Client) row[0], null);
+                        }
                     }
                 } else {
                     result.put(DAOUtils.findClient(session, londId), ClientCreatedFromType.DEFAULT);
@@ -3930,6 +3947,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                    if (entry.getValue() == null) continue;
                     Data dataProcess = new ClientRequest().process(entry.getKey(), session, new Processor() {
                         public void process(Client client, Data dataProcess, ObjectFactory objectFactory,
                                 Session session) throws Exception {
@@ -8238,6 +8256,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                    if (entry.getValue() == null) continue;
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
                     base.setGuardianCreatedWhere(entry.getValue().getValue());
                     base.setIsInside(DAOReadExternalsService.getInstance().isClientInside(session, entry.getKey().getIdOfClient()));

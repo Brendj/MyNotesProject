@@ -4,12 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.partner.nsi;
 
-import ru.axetta.ecafe.processor.core.service.meal.MealManager;
-
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPPart;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -62,7 +59,7 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
         //==========Раскомментировать ниже для логирования запросов==========//
 
-        if (!MealManager.isOn()) {
+        /*if (!MealManager.isOn()) {
             if (outboundProperty.booleanValue()) {
                 out.println("\nOutbound message:");
             } else {
@@ -77,7 +74,7 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
             } catch (Exception e) {
                 out.println("Exception in handler: " + e);
             }
-        }
+        }*/
     }
 
     public static String toString(Document doc) {
