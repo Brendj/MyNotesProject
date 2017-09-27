@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.aegis.type.xml.SourceType;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,52 +105,275 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             allGoods.addAll(service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
-            List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
+            //List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
+
+            RegisterStampReportItem.RegisterStampReportData data = new RegisterStampReportItem.RegisterStampReportData();
+
+            List<RegisterStampReportItem.RegisterStampReportData> result = new ArrayList<RegisterStampReportItem.RegisterStampReportData>();
             calendar.setTime(startTime);
             GoodItem emptyGoodItem = new GoodItem();
+
+            List<RegisterStampReportItem> waterItems = new ArrayList<RegisterStampReportItem>();
+            Map<String, RegisterStampReportItem> headerMap = new TreeMap<String, RegisterStampReportItem>();
+
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 Date time = calendar.getTime();
                 String date = timeFormat.format(time);
                 if(allGoods.isEmpty()){
-                    RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date, time);
-                    RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"Итого", CalendarUtils
+                    RegisterStampReportItem itemEmpty = new RegisterStampReportItem(emptyGoodItem,0L,date, time);
+                    RegisterStampReportItem totalEmpty = new RegisterStampReportItem(emptyGoodItem,0L,"Итого", CalendarUtils
                             .addDays(endTime, 1));
-                    RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    result.add(allTotal);
-                    result.add(item);
-                    result.add(total);
+                    //RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
+                    //result.add(allTotal);
+
+                    data.getList153().add(itemEmpty);
+                    data.getList153().add(totalEmpty);
+
+                    data.getList37().add(itemEmpty);
+                    data.getList37().add(totalEmpty);
+
+                    data.getList14().add(itemEmpty);
+                    data.getList14().add(totalEmpty);
+
+                    data.getList511().add(itemEmpty);
+                    data.getList511().add(totalEmpty);
+
+                    headerMap.put(itemEmpty.getLevel4(), itemEmpty);
                 } else {
                     for (GoodItem goodItem: allGoods){
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
                         Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies);
+
                         RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date,number, time);
-                        RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
+
+                        /*RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
                         RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                        result.add(allTotal);
+*/
+                        /*result.add(allTotal);
                         result.add(item);
-                        result.add(total);
+                        result.add(total);*/
+
+                        if (item.getLevel3().equals("1,5-3") || item.getLevel3().equals("1.5-3")) {
+                            data.getList153().add(item);
+                            Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                    goodItem.getFullName(), withOutActDiscrepancies);
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            data.getList153().add(total1);
+                        } else if (item.getLevel3().equals("3-7")) {
+                            data.getList37().add(item);
+                            Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                    goodItem.getFullName(), withOutActDiscrepancies);
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            data.getList37().add(total1);
+                        } else if (item.getLevel3().equals("1-4")) {
+                            data.getList14().add(item);
+                            Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                    goodItem.getFullName(), withOutActDiscrepancies);
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            data.getList14().add(total1);
+                        } else if (item.getLevel3().equals("5-11")) {
+                            data.getList511().add(item);
+                            Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                    goodItem.getFullName(), withOutActDiscrepancies);
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            data.getList511().add(total1);
+                        } else if (item.getOrderType().equals(1)) {
+                            waterItems.add(item);
+                            Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                    goodItem.getFullName(), withOutActDiscrepancies);
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            waterItems.add(total1);
+                        }
+
+                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerMap.keySet().contains(item.getLevel4())) {
+                            headerMap.put(item.getLevel4(), item);
+                        }
                     }
                 }
                 calendar.add(Calendar.DATE,1);
             }
-            if(allGoods.isEmpty()){
-                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(emptyGoodItem,0L,"Суточная проба", CalendarUtils.addDays(endTime, 2));
-                RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                result.add(allTotal);
-                result.add(dailySampleItem);
-            } else {
-                for (GoodItem goodItem: allGoods){
-                    Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
-                            goodItem.getFullName());
-                    RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"Суточная проба", CalendarUtils.addDays(endTime, 2));
-                    RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    result.add(allTotal);
-                    result.add(dailySampleItem);
+
+            List<RegisterStampReportItem> headerList = new ArrayList<RegisterStampReportItem>(headerMap.values());
+            data.setHeaderList(headerList);
+
+            List<RegisterStampReportItem> list153Totals = totals(headerList, data.getList153());
+            List<RegisterStampReportItem> list37Totals = totals(headerList, data.getList37());
+            List<RegisterStampReportItem> list14Totals = totals(headerList, data.getList14());
+            List<RegisterStampReportItem> list511Totals = totals(headerList, data.getList511());
+
+            List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerList);
+
+            List<RegisterStampReportItem> allTotalsByAllCategory = new ArrayList<RegisterStampReportItem>();
+
+            allTotalsByAllCategory.addAll(list153Totals);
+            allTotalsByAllCategory.addAll(list37Totals);
+            allTotalsByAllCategory.addAll(list14Totals);
+            allTotalsByAllCategory.addAll(list511Totals);
+
+            for (RegisterStampReportItem allTotalItem: allTotalsByAllCategory) {
+                for (RegisterStampReportItem registerStampReportItem: resultGlobalTotal) {
+                    if (allTotalItem.getLevel4().equals(registerStampReportItem.getLevel4())) {
+                        registerStampReportItem.setQty(registerStampReportItem.getQty() + allTotalItem.getQty());
+                    }
                 }
             }
+
+            if (!data.getList153().isEmpty()) {
+                List<RegisterStampReportItem> listHeader153 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы дошкольного образования, в возрасте 1,5-3 л.");
+                data.setList153Header(listHeader153);
+            }
+
+            if (!data.getList37().isEmpty()) {
+                List<RegisterStampReportItem> listHeader37 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы дошкольного образования, в возрасте 3-7 л.");
+                data.setList37Header(listHeader37);
+            }
+
+            if (!data.getList14().isEmpty()) {
+                List<RegisterStampReportItem> listHeader14 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы начального общего образования");
+                data.setList14Header(listHeader14);
+            }
+
+            if (!data.getList511().isEmpty()) {
+                List<RegisterStampReportItem> listHeader511 = doAnotherCaption(headerList, "Контингент питающихся: обучающиеся, осваивающие образовательные программы основного и среднего общего образования");
+                data.setList511Header(listHeader511);
+            }
+
+            List<RegisterStampReportItem> listTotalAllHeader = doAnotherCaption(headerList, " ");
+            data.setListTotalAllHeader(listTotalAllHeader);
+
+            data.getList153().addAll(addItemsByGoodNamesNE(headerList, data.getList153()));
+            data.getList37().addAll(addItemsByGoodNamesNE(headerList, data.getList37()));
+            data.getList14().addAll(addItemsByGoodNamesNE(headerList, data.getList14()));
+            data.getList511().addAll(addItemsByGoodNamesNE(headerList, data.getList511()));
+
+            Collections.sort(data.getList14());
+            Collections.sort(data.getList37());
+            Collections.sort(data.getList153());
+            Collections.sort(data.getList511());
+
+            data.getListTotalAll().addAll(resultGlobalTotal);
+
+            result.add(data);
             return new JRBeanCollectionDataSource(result);
         }
+    }
+
+    public static List<RegisterStampReportItem> totals (List<RegisterStampReportItem> headerList, List<RegisterStampReportItem> mainList) {
+        List<RegisterStampReportItem> totals = new ArrayList<RegisterStampReportItem>();
+        Set<String> goodName = allGoodNameExists(headerList);
+
+        for (String good: goodName) {
+            Long sumByGood = 0L;
+            for (RegisterStampReportItem registerStampReportItem : mainList) {
+                if (registerStampReportItem.getLevel4().equals(good) && registerStampReportItem.getDatePlusNumber().equals("Итого")) {
+                    sumByGood += registerStampReportItem.getQty();
+                }
+            }
+            RegisterStampReportItem tot = new RegisterStampReportItem();
+            tot.setLevel4(good);
+            tot.setQty(sumByGood);
+            tot.setDatePlusNumber("Всего, кол-во");
+            totals.add(tot);
+        }
+
+        return totals;
+    }
+
+    public static List<RegisterStampReportItem> emptyGlobalTotal(List<RegisterStampReportItem> headerList) {
+        List<RegisterStampReportItem> emptyTotals = new ArrayList<RegisterStampReportItem>();
+        Set<String> goodName = allGoodNameExists(headerList);
+
+        for (String good: goodName) {
+            RegisterStampReportItem tot = new RegisterStampReportItem();
+            tot.setLevel4(good);
+            tot.setQty(0L);
+            tot.setDatePlusNumber("Всего, кол-во");
+            emptyTotals.add(tot);
+        }
+
+        return emptyTotals;
+    }
+
+    private static Set<String> allGoodNameExists(List<RegisterStampReportItem> headerList) {
+        Set<String> goodName = new HashSet<String>();
+
+        for (RegisterStampReportItem reportItem : headerList) {
+            goodName.add(reportItem.getLevel4());
+        }
+        return goodName;
+    }
+
+    public static List<RegisterStampReportItem> addItemsByGoodNamesNE (List<RegisterStampReportItem> headerList, List<RegisterStampReportItem> mainList) {
+        Set<String> goodName = getGoodNameNotExists(headerList, mainList);
+        List<RegisterStampReportItem> resultList = goodNameNotExistsItems(mainList, goodName);
+        return resultList;
+    }
+
+    public static List<RegisterStampReportItem> goodNameNotExistsItems(List<RegisterStampReportItem> data,
+            Set<String> goodName) {
+        List<RegisterStampReportItem> dataNew = new ArrayList<RegisterStampReportItem>();
+
+        for (String str : goodName) {
+            for (RegisterStampReportItem reportItem : data) {
+
+                RegisterStampReportItem itemEmpty = new RegisterStampReportItem();
+                itemEmpty.setLevel1(reportItem.getLevel1());
+                itemEmpty.setLevel2(reportItem.getLevel2());
+                itemEmpty.setLevel3(reportItem.getLevel3());
+                itemEmpty.setLevel4(str);
+                itemEmpty.setQty(0L);
+                itemEmpty.setDate(reportItem.getDate());
+                itemEmpty.setNumber(reportItem.getNumber());
+                itemEmpty.setDateTime(reportItem.getDateTime());
+                itemEmpty.setOrderType(reportItem.getOrderType());
+                itemEmpty.setDatePlusNumber(reportItem.getDatePlusNumber());
+                dataNew.add(itemEmpty);
+
+                RegisterStampReportItem totalEmpty = new RegisterStampReportItem();
+                totalEmpty.setLevel1(reportItem.getLevel1());
+                totalEmpty.setLevel2(reportItem.getLevel2());
+                totalEmpty.setLevel3(reportItem.getLevel3());
+                totalEmpty.setLevel4(str);
+                totalEmpty.setQty(0L);
+                totalEmpty.setDate("Итого");
+                totalEmpty.setNumber(reportItem.getNumber());
+                totalEmpty.setDateTime(reportItem.getDateTime());
+                totalEmpty.setOrderType(reportItem.getOrderType());
+                totalEmpty.setDatePlusNumber("Итого");
+                dataNew.add(totalEmpty);
+            }
+        }
+        return dataNew;
+    }
+
+    public static Set<String> getGoodNameNotExists (List<RegisterStampReportItem> headerList, List<RegisterStampReportItem> data) {
+        Set<String> goodName = new HashSet<String>();
+
+        for (RegisterStampReportItem reportItem: headerList) {
+            for (RegisterStampReportItem stampReportItem: data) {
+                if (stampReportItem.getLevel4().equals(reportItem.getLevel4())) {
+                    break;
+                } else {
+                    goodName.add(reportItem.getLevel4());
+                }
+            }
+        }
+        return goodName;
+    }
+
+    public static List<RegisterStampReportItem> doAnotherCaption(List<RegisterStampReportItem> list, String caption) {
+        List<RegisterStampReportItem> registerStampReportItems = new ArrayList<RegisterStampReportItem>();
+
+        for (RegisterStampReportItem item: list ) {
+            RegisterStampReportItem registerStampReportItem = new RegisterStampReportItem();
+            registerStampReportItem.setCaption(caption);
+            registerStampReportItem.setLevel4(item.getLevel4());
+
+            registerStampReportItems.add(registerStampReportItem);
+        }
+
+        return registerStampReportItems;
     }
 
     public RegisterStampNewReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
