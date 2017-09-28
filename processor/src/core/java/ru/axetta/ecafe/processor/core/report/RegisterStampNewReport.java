@@ -173,6 +173,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
                             RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            total1.setLevel4("Вода питьевая");
                             waterItems.add(total1);
                         }
 
@@ -181,6 +182,9 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                         }
                     }
                 }
+
+                addWaterCategory(headerMap);
+
                 calendar.add(Calendar.DATE,1);
             }
 
@@ -191,6 +195,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             List<RegisterStampReportItem> list37Totals = totals(headerList, data.getList37());
             List<RegisterStampReportItem> list14Totals = totals(headerList, data.getList14());
             List<RegisterStampReportItem> list511Totals = totals(headerList, data.getList511());
+            List<RegisterStampReportItem> listWaterTotals = totals(headerList, waterItems);
 
             List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerList);
 
@@ -200,6 +205,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             allTotalsByAllCategory.addAll(list37Totals);
             allTotalsByAllCategory.addAll(list14Totals);
             allTotalsByAllCategory.addAll(list511Totals);
+            allTotalsByAllCategory.addAll(listWaterTotals);
 
             for (RegisterStampReportItem allTotalItem: allTotalsByAllCategory) {
                 for (RegisterStampReportItem registerStampReportItem: resultGlobalTotal) {
@@ -247,6 +253,26 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             result.add(data);
             return new JRBeanCollectionDataSource(result);
         }
+    }
+
+    public static void addWaterCategory (Map<String, RegisterStampReportItem> headerMap) {
+        String waterName = "Вода питьевая";
+
+        List<RegisterStampReportItem> headerList = new ArrayList<RegisterStampReportItem>(headerMap.values());
+
+        RegisterStampReportItem waterItem = new RegisterStampReportItem();
+        waterItem.setLevel1(headerList.get(0).getLevel1());
+        waterItem.setLevel2(headerList.get(0).getLevel2());
+        waterItem.setLevel3(headerList.get(0).getLevel3());
+        waterItem.setLevel4(waterName);
+        waterItem.setQty(0L);
+        waterItem.setDate(headerList.get(0).getDate());
+        waterItem.setNumber(headerList.get(0).getNumber());
+        waterItem.setDateTime(headerList.get(0).getDateTime());
+        waterItem.setOrderType(headerList.get(0).getOrderType());
+        waterItem.setDatePlusNumber(headerList.get(0).getDatePlusNumber());
+
+        headerMap.put(waterItem.getLevel4(), waterItem);
     }
 
     public static List<RegisterStampReportItem> totals (List<RegisterStampReportItem> headerList, List<RegisterStampReportItem> mainList) {
