@@ -39,6 +39,7 @@ import java.util.List;
 public class MealManager {
     private final static String EXPENSE = "expense";
     private final static String INCOME = "income";
+    private final static String CARDNAME = "Счёт питания";
     private final String updateInitialStatement = "update cf_orderdetails set sendtoexternal = 1 where (idoforderdetail, idoforg) in (";
     private final static Integer LIMIT_RECORDS = 1000;
 
@@ -101,7 +102,7 @@ public class MealManager {
         logger.info("MealManager: start sending orders to external system.");
         for(TransactionDataItem item : list) {
             TransactionItem trItem = new TransactionItem(item.getTransactionId(), item.getTransactionDate(), item.getBalance(), item.getAmount(),
-                    item.getCardName(), item.getFoodName(), item.getFoodAmount(), EXPENSE);
+                    CARDNAME, item.getFoodName(), item.getFoodAmount(), EXPENSE);
             MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getUserToken(), item.getCardUid(), trItem);
             try {
                 PushResponse response = mealService.sendEvent(mItem);
@@ -133,7 +134,7 @@ public class MealManager {
         int i = 0;
         for(TransactionDataItem item : list) {
             TransactionItem trItem = new TransactionItem(item.getTransactionId(), item.getTransactionDate(), item.getBalance(), Math.abs(item.getAmount()),
-                    item.getCardName(), item.getFoodName(), item.getFoodAmount(), item.getAmount() > 0 ? INCOME : EXPENSE);
+                    CARDNAME, item.getFoodName(), item.getFoodAmount(), item.getAmount() > 0 ? INCOME : EXPENSE);
             MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getUserToken(), item.getCardUid(), trItem);
             try {
                 PushResponse response = mealService.sendEvent(mItem);
