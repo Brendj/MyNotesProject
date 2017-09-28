@@ -105,7 +105,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             allGoods.addAll(service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
-            //List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
 
             RegisterStampReportItem.RegisterStampReportData data = new RegisterStampReportItem.RegisterStampReportData();
 
@@ -123,8 +122,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                     RegisterStampReportItem itemEmpty = new RegisterStampReportItem(emptyGoodItem,0L,date, time);
                     RegisterStampReportItem totalEmpty = new RegisterStampReportItem(emptyGoodItem,0L,"Итого", CalendarUtils
                             .addDays(endTime, 1));
-                    //RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    //result.add(allTotal);
 
                     data.getList153().add(itemEmpty);
                     data.getList153().add(totalEmpty);
@@ -146,13 +143,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                                 goodItem.getFullName(), withOutActDiscrepancies);
 
                         RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date,number, time);
-
-                        /*RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
-                        RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-*/
-                        /*result.add(allTotal);
-                        result.add(item);
-                        result.add(total);*/
 
                         if (item.getLevel3().equals("1,5-3") || item.getLevel3().equals("1.5-3")) {
                             data.getList153().add(item);
