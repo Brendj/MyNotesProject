@@ -502,7 +502,7 @@ public class DAOService {
         return entityManager.find(ReportInfo.class, idOfReportInfo);
     }
 
-    public Client findClientById(long idOfClient) {
+    public Client findClientById(Long idOfClient) {
         return entityManager.find(Client.class, idOfClient);
     }
 

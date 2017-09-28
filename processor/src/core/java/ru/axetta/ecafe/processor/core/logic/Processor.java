@@ -3311,10 +3311,9 @@ public class Processor implements SyncProcessor {
                 // Commit data model transaction
                 persistenceSession.flush();
                 persistenceTransaction.commit();
+                persistenceTransaction = null;
 
                 SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
-
-                persistenceTransaction = null;
 
                 // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
                 /* в случае анонимного заказа мы не знаем клиента */
@@ -3379,17 +3378,17 @@ public class Processor implements SyncProcessor {
                 // TODO: есть ли необходимость оповещать клиента о сторне?
                 // отмена заказа
                 if (null != order) {
-                    Client client = DAOService.getInstance().findClientById(payment.getIdOfClient());
-                    SecurityJournalBalance journalBalance = SecurityJournalBalance
-                            .getSecurityJournalBalanceDataFromOrder(payment, client, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT,
-                                    SJBalanceSourceEnum.SJBALANCE_SOURCE_CANCEL_ORDER, idOfOrg);
+                    if (payment.getIdOfClient() != null) {
+                        Client client = DAOService.getInstance().findClientById(payment.getIdOfClient());
+                        SecurityJournalBalance journalBalance = SecurityJournalBalance
+                                .getSecurityJournalBalanceDataFromOrder(payment, client, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT,
+                                        SJBalanceSourceEnum.SJBALANCE_SOURCE_CANCEL_ORDER, idOfOrg);
+                        SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
+                    }
                     // Update client balance
                     RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
-
-                    SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
-
                     persistenceTransaction = null;
                 } else {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0,
