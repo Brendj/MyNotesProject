@@ -195,7 +195,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             List<RegisterStampReportItem> list37Totals = totals(headerList, data.getList37());
             List<RegisterStampReportItem> list14Totals = totals(headerList, data.getList14());
             List<RegisterStampReportItem> list511Totals = totals(headerList, data.getList511());
-            List<RegisterStampReportItem> listWaterTotals = totals(headerList, waterItems);
+            List<RegisterStampReportItem> listWaterTotals = totalWater("Вода питьевая", waterItems);
 
             List<RegisterStampReportItem> resultGlobalTotal = emptyGlobalTotal(headerList);
 
@@ -292,6 +292,25 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             tot.setDatePlusNumber("Всего, кол-во");
             totals.add(tot);
         }
+
+        return totals;
+    }
+
+    public static List<RegisterStampReportItem> totalWater (String goodName, List<RegisterStampReportItem> mainList) {
+        List<RegisterStampReportItem> totals = new ArrayList<RegisterStampReportItem>();
+
+            Long sumByGood = 0L;
+            for (RegisterStampReportItem registerStampReportItem : mainList) {
+                if (registerStampReportItem.getLevel4().equals(goodName) && registerStampReportItem.getDatePlusNumber().equals("Итого")) {
+                    sumByGood += registerStampReportItem.getQty();
+                }
+            }
+
+            RegisterStampReportItem tot = new RegisterStampReportItem();
+            tot.setLevel4(goodName);
+            tot.setQty(sumByGood);
+            tot.setDatePlusNumber("Всего, кол-во");
+            totals.add(tot);
 
         return totals;
     }
