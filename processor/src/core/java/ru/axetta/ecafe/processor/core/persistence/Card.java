@@ -59,6 +59,7 @@ public class Card {
     private Integer lifeState;
     private Long cardPrintedNo;
     private String externalId;
+    private Integer cardSignCertNum;
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     private Set<Order> orders = new HashSet<Order>();
     private Set<HistoryCard> historyCards = new HashSet<HistoryCard>();
@@ -299,5 +300,13 @@ public class Card {
                 + ", cardType=" + cardType + ", createTime=" + createTime + ", updateTime=" + updateTime + ", state="
                 + state + ", lockReason='" + lockReason + '\'' + ", validTime=" + validTime + ", issueTime=" + issueTime
                 + ", lifeState=" + lifeState + ", cardPrintedNo=" + cardPrintedNo + '}';
+    }
+
+    public Integer getCardSignCertNum() {
+        return cardSignCertNum;
+    }
+
+    public void setCardSignCertNum(Integer cardSignCertNum) {
+        this.cardSignCertNum = cardSignCertNum;
     }
 }

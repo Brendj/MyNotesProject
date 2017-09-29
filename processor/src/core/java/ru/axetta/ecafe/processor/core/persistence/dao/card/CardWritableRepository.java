@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.visitor.VisitorReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardSignVerifyType;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
 import org.springframework.stereotype.Repository;
@@ -56,11 +57,31 @@ public class CardWritableRepository extends WritableJpaDao {
         entityManager.merge(card);
     }
 
-    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type) {
+    private void checkVerifyCardSign(Org org, Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
+        if (!org.getNeedVerifyCardSign()) {
+            return;
+        }
+        if (cardSignVerifyRes == null || cardSignCertNum == null) throw new IllegalStateException("Ошибка регистрации");
+        switch (CardSignVerifyType.fromInteger(cardSignVerifyRes)) {
+            case NOT_PROCESSED:
+            case VERIFY_FAIL:
+                throw new IllegalStateException("Ошибка регистрации");
+            case VERIFY_SUCCESS:
+                CardSign cardSign = entityManager.find(CardSign.class, cardSignCertNum);
+                if (cardSign == null) throw new Exception("Ошибка регистрации");
+                return;
+            default: throw new IllegalStateException("Неизвестное значение параметра cardSignVerifyRes");
+        }
+    }
+
+    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,
+            Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
+        checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum);
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());
         card.setCreateTime(new Date());
+        card.setCardSignCertNum(cardSignCertNum);
 
         entityManager.persist(card);
         return card;

@@ -85,6 +85,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean changesDSZN;
     private Boolean isRecyclingEnabled;
     private Boolean autoCreateCards = false;
+    private Boolean needVerifyCardSign = false;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -243,6 +244,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setAutoCreateCards(Boolean autoCreateCards) {
         this.autoCreateCards = autoCreateCards;
+    }
+
+    public Boolean getNeedVerifyCardSign() {
+        return needVerifyCardSign;
+    }
+
+    public void setNeedVerifyCardSign(Boolean needVerifyCardSign) {
+        this.needVerifyCardSign = needVerifyCardSign;
     }
 
     public static class ContragentItem {
@@ -578,6 +587,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setTypeInitial(getOrganizationTypeInitial());
         //org.setIsRecyclingEnabled(isRecyclingEnabled);
         org.setAutoCreateCards(autoCreateCards);
+        org.setNeedVerifyCardSign(needVerifyCardSign);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
 

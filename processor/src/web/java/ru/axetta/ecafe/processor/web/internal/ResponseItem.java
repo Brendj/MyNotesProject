@@ -16,9 +16,11 @@ public class ResponseItem implements Serializable {
     public static final int OK = 0;
     public static final int ERROR_DUPLICATE = 160;
     public static final int ERROR_INTERNAL = 170;
+    public static final int ERROR_SIGN_VERIFY = 180;
     public static final String OK_MESSAGE = "Ok.";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
     public static final String ERROR_INTERNAL_MESSAGE = "Внутренняя ошибка приложения.";
+    public static final String ERROR_SIGN_VERIFY_MESSAGE = "Не пройдена проверка цифровой подписи";
     public int code;
     public String message;
 

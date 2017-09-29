@@ -18,10 +18,10 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
+import ru.axetta.ecafe.processor.core.utils.Base64;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Criteria;
@@ -29,7 +29,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -880,14 +879,8 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(orgId);
         ///
         try {
-            User user = MainPage.getSessionInstance().getCurrentUser();
-            if (user.isCardOperator()) {
-                return RuntimeContext.getInstance().getCardManager()
-                        .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo, user);
-            } else {
-                return RuntimeContext.getInstance().getCardManager()
-                        .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo);
-            }
+            return RuntimeContext.getInstance().getCardManager()
+                    .createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE, validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo);
         } catch (Exception e) {
             logger.error("Failed registerCard", e);
             throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
@@ -901,14 +894,8 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(orgId);
         ///
         try {
-            User user = MainPage.getSessionInstance().getCurrentUser();
-            if (user.isCardOperator()) {
-                RuntimeContext.getInstance().getCardManager()
-                        .changeCardOwner(newOwnerId, cardNo, changeTime, validTime, user);
-            } else {
-                RuntimeContext.getInstance().getCardManager()
-                        .changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
-            }
+            RuntimeContext.getInstance().getCardManager()
+                    .changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
         } catch (Exception e) {
             logger.error("Failed changeCardOwner", e);
             throw new FrontControllerException(String.format("Ошибка при смене владельца карты: %s", e.getMessage()), e);
@@ -1215,22 +1202,20 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "registerCardWithoutClient")
     public  ResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
-            @WebParam(name = "type") int type)
-            throws FrontControllerException {
+            @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
+            @WebParam(name = "cardSignCertNum") Integer cardSignCertNum) throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
 
         CardService cardService = CardService.getInstance();
         try{
-            cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type);
+            cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum);
         }catch (Exception e){
-            logger.error(e.getMessage());
-            Throwable t = e.getCause();
-            while ((t != null) && !(t instanceof ConstraintViolationException)) {
-                t = t.getCause();
-            }
-            if (t != null) {
+            if (e.getMessage().contains("ConstraintViolationException")) {
                 return new ResponseItem(ResponseItem.ERROR_DUPLICATE, ResponseItem.ERROR_DUPLICATE_CARD_MESSAGE);
-            }else {
+            } else if (e instanceof IllegalStateException) {
+                return new ResponseItem(ResponseItem.ERROR_SIGN_VERIFY, ResponseItem.ERROR_SIGN_VERIFY_MESSAGE);
+            } else {
+                logger.error("Error in register card", e);
                 return new ResponseItem(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
             }
         }
@@ -1357,6 +1342,22 @@ public class FrontController extends HttpServlet {
             return list;
         } catch (Exception e) {
             logger.error("Ошибка при получении списка событий прохода", e);
+            throw new FrontControllerException(String.format("Ошибка: %s", e.getMessage()));
+        }
+    }
+
+    @WebMethod
+    public String getCardSignVerifyKey(@WebParam(name = "idOfOrg") long idOfOrg, @WebParam(name = "cardSignCertNum") int cardSignCertNum,
+            @WebParam(name = "signType") Integer signType) throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        try {
+            byte[] signData = DAOReadonlyService.getInstance().getCardSignData(cardSignCertNum, signType);
+            if (signData == null) {
+                throw new FrontControllerException("Ключ не найден по входным данным");
+            }
+            return Base64.encodeBytes(signData);
+        } catch (Exception e) {
+            logger.error("Ошибка при получении ключа цифровой подписи для верификации карты", e);
             throw new FrontControllerException(String.format("Ошибка: %s", e.getMessage()));
         }
     }

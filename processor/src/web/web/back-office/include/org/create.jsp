@@ -194,6 +194,8 @@
     <h:inputText value="#{mainPage.orgCreatePage.publicKey}" maxlength="1024" styleClass="input-text" />
     <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.oneActiveCard}"  styleClass="input-text"  />
+    <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.needVerifyCardSign}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgCreatePage.securityLevel}" styleClass="input-text" style="width: 250px;">
         <f:converter converterId="organizationSecurityLevelConverter"/>

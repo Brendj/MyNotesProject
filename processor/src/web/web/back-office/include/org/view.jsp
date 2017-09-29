@@ -180,6 +180,8 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.idOfPacket}" styleClass="input-text" />
     <h:outputText escape="true" value="Разрешить одну активную карту" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.oneActiveCard}"  styleClass="input-text" disabled="true"  />
+    <h:outputText escape="true" value="Цифровая подпись при регистрации карты" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.needVirifyCardSign}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.securityLevel}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />

@@ -32,6 +32,7 @@
         <property name="lifeState" column="LifeState" type="integer" not-null="true"/>
         <property name="cardPrintedNo" column="CardPrintedNo" type="long" update="false"/>
         <property name="externalId" column="ExternalId" type="string" length="32"/>
+        <property name="cardSignCertNum" column="CardSignCertNum" type="integer" />
         <set name="transactionsInternal" inverse="true" cascade="all">
             <key column="IdOfCard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"/>

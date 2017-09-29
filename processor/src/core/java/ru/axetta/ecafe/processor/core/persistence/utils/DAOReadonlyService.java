@@ -432,4 +432,15 @@ public class DAOReadonlyService {
         Object result = query.getSingleResult();
         return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
     }
+
+    public byte[] getCardSignData(Integer idOfCardSign, Integer signType) {
+        try {
+            Query query = entityManager.createQuery("select cs.signData from CardSign cs " + "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType");
+            query.setParameter("idOfCardSign", idOfCardSign);
+            query.setParameter("signType", signType);
+            return (byte[]) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

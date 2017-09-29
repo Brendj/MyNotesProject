@@ -468,6 +468,33 @@
                         binding="#{mainPage.cardExpireBatchEditPage.mainMenuComponent}"
                         action="#{mainPage.showCardExpireBatchEditPage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="cardSignsGroupPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignsGroupPage"--%>
+    <rich:panelMenuGroup id="cardSignsGroupMenu" label="Цифровые подписи" binding="#{cardSignsGroupPage.mainMenuComponent}">
+        <%--@elvariable id="cardSignListPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignListPage"--%>
+        <%--@elvariable id="cardSignGroupPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignGroupPage"--%>
+        <%--@elvariable id="cardSignViewPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignViewPage"--%>
+        <%--@elvariable id="cardSignEditPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignEditPage"--%>
+        <%--@elvariable id="cardSignCreatePage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignCreatePage"--%>
+
+        <rich:panelMenuItem id="showCardSignListMenuItem" binding="#{cardSignListPage.mainMenuComponent}"
+                            label="Список" action="#{cardSignListPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedCardSignGroupMenu"
+                             label="#{cardSignGroupPage.currentCard.printedName}"
+                             binding="#{cardSignGroupPage.mainMenuComponent}" rendered="false">
+            <a4j:support event="onclick" action="#{cardSignGroupPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="viewCardSignMenuItem" binding="#{cardSignViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{cardSignViewPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="editCardSignMenuItem" binding="#{cardSignEditPage.mainMenuComponent}"
+                                label="Редактировать" action="#{cardSignEditPage.show}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="cardSignListMenuItem" binding="#{cardSignCreatePage.mainMenuComponent}"
+                            label="Создание" action="#{cardSignCreatePage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <%--@elvariable id="commodityAccountingGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.CommodityAccountingGroupPage"--%>

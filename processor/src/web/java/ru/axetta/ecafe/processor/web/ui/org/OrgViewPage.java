@@ -87,6 +87,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean isWorkInSummerTime;
     private Boolean isRecyclingEnabled;
     private Boolean autoCreateCards;
+    private Boolean needVirifyCardSign;
     private String registryUrl;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
@@ -259,6 +260,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.variableFeeding = org.getVariableFeeding();
         this.isWorkInSummerTime = org.getIsWorkInSummerTime();
         this.isRecyclingEnabled = org.getIsRecyclingEnabled();
+        this.needVirifyCardSign = org.getNeedVerifyCardSign();
         this.autoCreateCards = org.getAutoCreateCards();
     }
 
@@ -676,5 +678,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setAutoCreateCards(Boolean autoCreateCards) {
         this.autoCreateCards = autoCreateCards;
+    }
+
+    public Boolean getNeedVirifyCardSign() {
+        return needVirifyCardSign;
+    }
+
+    public void setNeedVirifyCardSign(Boolean needVirifyCardSign) {
+        this.needVirifyCardSign = needVirifyCardSign;
     }
 }

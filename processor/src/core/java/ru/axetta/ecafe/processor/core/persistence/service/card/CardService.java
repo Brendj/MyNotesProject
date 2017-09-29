@@ -60,9 +60,10 @@ public class CardService {
 
 
     //1. Регистрация карты
-    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type){
+    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type,
+            Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
         Org org = orgRepository.findOne(idOfOrg);
-        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type);
+        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum);
     }
 
     //1. Регистрация карты

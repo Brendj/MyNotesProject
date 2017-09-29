@@ -123,6 +123,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String modeContragentSelect;
     private Boolean isRecyclingEnabled;
     private Boolean autoCreateCards;
+    private Boolean needVerifyCardSign;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -357,6 +358,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setVariableFeeding(variableFeeding);
         //org.setIsRecyclingEnabled(isRecyclingEnabled);
         org.setAutoCreateCards(autoCreateCards);
+        org.setNeedVerifyCardSign(needVerifyCardSign);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -506,6 +508,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.variableFeeding = org.getVariableFeeding();
         this.isRecyclingEnabled = org.getIsRecyclingEnabled();
         this.autoCreateCards = org.getAutoCreateCards();
+        this.needVerifyCardSign = org.getNeedVerifyCardSign();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1060,6 +1063,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setAutoCreateCards(Boolean autoCreateCards) {
         this.autoCreateCards = autoCreateCards;
+    }
+
+    public Boolean getNeedVerifyCardSign() {
+        return needVerifyCardSign;
+    }
+
+    public void setNeedVerifyCardSign(Boolean needVerifyCardSign) {
+        this.needVerifyCardSign = needVerifyCardSign;
     }
 
     public static class ContragentItem {
