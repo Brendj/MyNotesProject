@@ -49,6 +49,7 @@
 	<field name="hideLastValue" class="java.lang.Integer"/>
 	<field name="feedingPlanTypeStr" class="java.lang.String"/>
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
+	<field name="tempClients" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -217,7 +218,7 @@
 					<crosstabColumnHeader>
 						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
 							<textField pattern="" isBlankWhenNull="false">
-								<reportElement uuid="2b8c79cb-cab8-4ac5-acd0-f1e499ddd5b6" mode="Opaque" x="0" y="0" width="57" height="34" backcolor="#F0F8FF"/>
+								<reportElement uuid="2b8c79cb-cab8-4ac5-acd0-f1e499ddd5b6" mode="Opaque" x="0" y="0" width="90" height="34" backcolor="#F0F8FF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
 									<font size="12" isBold="true"/>
 								</textElement>
@@ -247,7 +248,10 @@
 				<measure name="hideLastValueSum" class="java.lang.Integer" calculation="Sum">
 					<measureExpression><![CDATA[$F{hideLastValue}]]></measureExpression>
 				</measure>
-				<crosstabCell width="57" height="41">
+				<measure name="tempClientsMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{tempClients}]]></measureExpression>
+				</measure>
+				<crosstabCell width="90" height="41">
 					<cellContents style="table">
 						<textField>
 							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="41" forecolor="#FFFFFF" backcolor="#FF6666">
@@ -283,28 +287,30 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
     ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="41">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="41">
 								<printWhenExpression><![CDATA[$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="12"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
-($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
-    ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
+($V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L)
+    ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell height="41" rowTotalGroup="orgNum">
+				<crosstabCell width="90" height="41" rowTotalGroup="orgNum">
 					<cellContents backcolor="#000000" mode="Transparent">
 						<textField>
-							<reportElement uuid="75b7be62-4feb-4f53-b204-0e6987a61483" style="table" x="0" y="0" width="57" height="40"/>
+							<reportElement uuid="75b7be62-4feb-4f53-b204-0e6987a61483" style="table" x="0" y="0" width="90" height="40"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="12" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}/2L+
-($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0L
-    ? "" : " / "+ $V{dailySampleMeasure}/2L )]]></textFieldExpression>
+($V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L)
+    ? "" : " / "+ $V{dailySampleMeasure}/2L + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}/2L))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -326,7 +332,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="57" height="4" rowTotalGroup="officialName">
+				<crosstabCell width="90" height="4" rowTotalGroup="officialName">
 					<cellContents backcolor="#000000" mode="Opaque" style="style2">
 						<staticText>
 							<reportElement uuid="30270492-c0d6-4af8-bb02-c45b81d040c7" style="style2" x="0" y="0" width="57" height="3" forecolor="#000000" backcolor="#000000"/>
@@ -340,7 +346,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 				<crosstabCell rowTotalGroup="officialName" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="57" height="40" rowTotalGroup="goodName">
+				<crosstabCell width="90" height="40" rowTotalGroup="goodName">
 					<cellContents backcolor="#99CCFF" mode="Opaque" style="style2">
 						<staticText>
 							<reportElement uuid="59c14182-de93-4b3f-b3c9-6cca48484167" mode="Transparent" x="0" y="0" width="40" height="3" forecolor="#005FB3" backcolor="#005FB3"/>
@@ -372,7 +378,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 				<crosstabCell rowTotalGroup="goodName" columnTotalGroup="doneDate">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell height="3" rowTotalGroup="feedingPlanTypeStr">
+				<crosstabCell width="90" height="3" rowTotalGroup="feedingPlanTypeStr">
 					<cellContents backcolor="#005FB3" mode="Opaque"/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="feedingPlanTypeStr" columnTotalGroup="doneDate">
