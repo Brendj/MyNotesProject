@@ -105,7 +105,7 @@
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.hideMissedColumns}"
                                      styleClass="output-text" />
 
-            <h:outputText escape="true" value="Скрывать значения суточной пробы" styleClass="output-text"/>
+            <h:outputText escape="true" value="Скрывать значения суточной пробы и заявки обучающихся других ОО" styleClass="output-text"/>
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.hideDailySamplesCount}"
                                      styleClass="output-text"/>
 

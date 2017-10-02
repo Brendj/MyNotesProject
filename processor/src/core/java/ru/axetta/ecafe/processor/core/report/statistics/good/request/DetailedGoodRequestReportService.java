@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.core.report.statistics.good.request;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.report.BasicReportForOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
@@ -87,7 +86,7 @@ public class DetailedGoodRequestReportService {
                 }
 
                 sql = "select request.number, request.doneDate, position.totalCount/1000, "
-                        + " position.dailySampleCount/1000, good.nameOfGood, position.createdDate, position.lastUpdate "
+                        + " position.dailySampleCount/1000, position.tempClientsCount/1000, good.nameOfGood, position.createdDate, position.lastUpdate "
                         + " from GoodRequest request"
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.good good"
@@ -107,15 +106,19 @@ public class DetailedGoodRequestReportService {
                 if (!(requests == null || requests.isEmpty())) {
                     for (Object o : requests) {
                         Object[] row = (Object[]) o;
-                        Date lastCreate = (Date) row[5];
-                        Date lastUpdate = (Date) row[6];
+                        Date lastCreate = (Date) row[6];
+                        Date lastUpdate = (Date) row[7];
                         RequestItem request = new RequestItem(row[0].toString(), (Date) row[1], lastCreate, lastUpdate);
                         Long dcount = null;
                         if (row[3] != null) {
                             dcount = Long.parseLong(row[3].toString());
                         }
-                        Commodity commodity = new Commodity(row[4].toString(), Long.parseLong(row[2].toString()),
-                                dcount);
+                        Long tempCount = null;
+                        if (row[4] != null) {
+                            tempCount = Long.parseLong(row[4].toString());
+                        }
+                        Commodity commodity = new Commodity(row[5].toString(), Long.parseLong(row[2].toString()),
+                                dcount, tempCount);
                         requestMap.put(request, commodity);
 
                     }

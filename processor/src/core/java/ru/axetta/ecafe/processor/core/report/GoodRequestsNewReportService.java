@@ -230,6 +230,7 @@ public class GoodRequestsNewReportService {
 
         Long totalCount = position.getTotalCount() / 1000;
         Long dailySampleCount = getSafeValue(position.getDailySampleCount()) / 1000L;
+        Long tempClientsCount = getSafeValue(position.getTempClientsCount()) / 1000L;
 
         Long newTotalCount = 0L;
         Long newDailySample = 0L;
@@ -276,14 +277,14 @@ public class GoodRequestsNewReportService {
         // чтобы хотя бы раз выполнилмся, для уведомлений
         if (!hideMissedColumns && hideTotalRow && goodRequestPositionList.indexOf(obj) == 0) {
             while (beginDate.getTime() <= endDate.getTime()) {
-                itemList.add(new Item(org, name, beginDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
+                itemList.add(new Item(org, name, beginDate, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
                         feedingPlanType, 0L));
                 dates.add(beginDate);
                 beginDate = CalendarUtils.addOneDay(beginDate);
             }
         }
 
-        addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, newTotalCount, newDailySample,
+        addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, tempClientsCount, newTotalCount, newDailySample,
                 hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark);
         dates.add(doneDate);
         if (notification) {
@@ -325,13 +326,8 @@ public class GoodRequestsNewReportService {
             criteria.add(Restrictions.or(Restrictions.ilike("g.fullName", nameFilter, MatchMode.ANYWHERE),
                     Restrictions.ilike("g.nameOfGood", nameFilter, MatchMode.ANYWHERE)));
         }
-        List list = criteria.list();
-        List<GoodRequestPosition> resultList = new ArrayList<GoodRequestPosition>();
-        for (Object o : list) {
-            GoodRequestPosition grp = (GoodRequestPosition) o;
-            resultList.add(grp);
-        }
-        return resultList;
+        List<GoodRequestPosition> list = criteria.list();
+        return list == null ? new ArrayList<GoodRequestPosition>() : list;
     }
 
     private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
@@ -345,12 +341,12 @@ public class GoodRequestsNewReportService {
     }
 
     private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
-            Long totalCount, Long dailySampleCount, Long newTotalCount, Long newDailySample, int hideDailySampleValue,
+            Long totalCount, Long dailySampleCount, Long tempClientsCount, Long newTotalCount, Long newDailySample, int hideDailySampleValue,
             int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
-        itemList.add(new Item(org, name, doneDate, totalCount, dailySampleCount, newTotalCount, newDailySample,
+        itemList.add(new Item(org, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount, newDailySample,
                 hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark));
         if (!hideTotalRow) {
-            itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, newTotalCount,
+            itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
                     newDailySample, hideDailySampleValue, hideLastValue, feedingPlanType, 0L));
         }
     }
@@ -424,18 +420,19 @@ public class GoodRequestsNewReportService {
         private Integer feedingPlanTypeNum;
         private Long totalCount;
         private Long dailySample;
+        private Long tempClients;
         private Long newTotalCount;
         private Long newDailySample;
         private Long notificationMark;
 
         protected Item(Item item, Date doneDate) {
-            this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L,
+            this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L, 0L,
                     item.getHideDailySample(), item.getHideLastValue(), item.getFeedingPlanType(),
                     item.getNotificationMark());
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount,
-                Long dailySample, Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
+                Long dailySample, Long tempClients, Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
                 FeedingPlanType feedingPlanType, Long notificationMark) {
             this.orgNum = orgNum;
             this.officialName = officialName;
@@ -444,6 +441,7 @@ public class GoodRequestsNewReportService {
             doneDateStr = YEAR_DATE_FORMAT.format(doneDate);
             this.totalCount = totalCount;
             this.dailySample = dailySample;
+            this.tempClients = tempClients;
             this.newTotalCount = newTotalCount;
             this.newDailySample = newDailySample;
             this.hideDailySample = hideDailySampleValue;
@@ -462,22 +460,22 @@ public class GoodRequestsNewReportService {
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
-            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark);
+            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue,
+                    hideLastValue, feedingPlanType, notificationMark);
         }
 
-        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
+        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample, Long tempClients,
                 Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue,
                 FeedingPlanType feedingPlanType, Long notificationMark) {
             this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName, doneDate,
-                    totalCount, dailySample, newTotalCount, newDailySample, hideDailySampleValue, hideLastValue,
+                    totalCount, dailySample, tempClients, newTotalCount, newDailySample, hideDailySampleValue, hideLastValue,
                     feedingPlanType, notificationMark);
 
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
-            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType,
+            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType,
                     notificationMark);
         }
 
@@ -628,6 +626,14 @@ public class GoodRequestsNewReportService {
 
         public void setNotificationMark(Long notificationMark) {
             this.notificationMark = notificationMark;
+        }
+
+        public Long getTempClients() {
+            return tempClients;
+        }
+
+        public void setTempClients(Long tempClients) {
+            this.tempClients = tempClients;
         }
     }
 }

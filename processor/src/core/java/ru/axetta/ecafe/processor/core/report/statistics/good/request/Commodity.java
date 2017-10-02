@@ -11,11 +11,13 @@ public class Commodity {
     private final String name;
     private final Long totalCount;
     private final Long dailySampleCount;
+    private final Long tempClientsCount;
 
-    public Commodity(String name, Long totalCount, Long dailySampleCount) {
+    public Commodity(String name, Long totalCount, Long dailySampleCount, Long tempClientsCount) {
         this.name = name;
         this.totalCount = totalCount;
         this.dailySampleCount = dailySampleCount;
+        this.tempClientsCount = tempClientsCount;
     }
 
     public String getName() {
@@ -28,5 +30,9 @@ public class Commodity {
 
     public Long getDailySampleCount() {
         return dailySampleCount;
+    }
+
+    public Long getTempClientsCount() {
+        return tempClientsCount;
     }
 }

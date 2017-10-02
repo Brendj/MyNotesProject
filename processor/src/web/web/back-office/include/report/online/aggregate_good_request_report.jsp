@@ -95,7 +95,7 @@
     <h:panelGrid styleClass="borderless-div">
         <rich:dataTable id="detailedGoodRequestTable" var="items"
                         value="#{mainPage.detailedGoodRequestReportPage.detailedGoodRequestReportItems}"
-                        footerClass="data-table-footer" rows="20">
+                        footerClass="data-table-footer" rows="20" width="100%">
             <f:facet name="header">
                 <rich:columnGroup>
                     <rich:column rowspan="2">
@@ -111,10 +111,13 @@
                         <h:outputText value="Товар/продукт" />
                     </rich:column>
                     <rich:column rowspan="2">
-                        <h:outputText value="Количество заказов" />
+                        <h:outputText value="Количество заказов общее" />
                     </rich:column>
                     <rich:column rowspan="2">
                         <h:outputText value="Количество суточной пробы" />
+                    </rich:column>
+                    <rich:column rowspan="2">
+                        <h:outputText value="Количество заказов на детей, временно обучающихся в данной ОО"/>
                     </rich:column>
                     <rich:column rowspan="2">
                         <h:outputText value="Дата к исполнению" />
@@ -163,9 +166,8 @@
             <rich:column rowspan="#{items.commoditiesCounts}">
                 <h:outputText value="#{items.educationName}" />
             </rich:column>
-<%--            <rich:column rowspan="#{items.commoditiesCounts}">
-                <h:outputText value="#{items.lastCreateOrUpdateDate}" converter="dateConverter" />
-            </rich:column>--%>
+            <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+            </rich:column>
             <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
             </rich:column>
             <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
@@ -175,17 +177,11 @@
             <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
                 <h:outputText value="#{items.doneDate}" converter="dateConverter" />
             </rich:column>
-     <%--       <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
-                <h:outputText value="#{items.lastCreate}" converter="timeConverter" />
-            </rich:column>
-            <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
-                <h:outputText value="#{items.lastUpdate}" converter="timeConverter" />
-            </rich:column>--%>
             <rich:column rowspan="#{items.commoditiesCounts}" styleClass="center-aligned-column">
                 <h:outputText value="#{items.lastCreateOrUpdateDate}" converter="timeConverter" />
             </rich:column>
             <rich:subTable value="#{items.commodities}" var="commodity"
-                           columnClasses="center-aligned-column, center-aligned-column, center-aligned-column">
+                           columnClasses="center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
                 <rich:column>
                     <h:outputText value="#{commodity.name}" />
                 </rich:column>
@@ -193,7 +189,10 @@
                     <h:outputText value="#{commodity.totalCount}" />
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{commodity.dailySampleCount==null?'-':commodity.dailySampleCount}" />
+                    <h:outputText value="#{commodity.dailySampleCount==null?'0':commodity.dailySampleCount}" />
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{commodity.tempClientsCount==null?'0':commodity.tempClientsCount}" />
                 </rich:column>
             </rich:subTable>
             <f:facet name="footer">
