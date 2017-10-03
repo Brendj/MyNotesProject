@@ -177,6 +177,11 @@ public class RegisterStampNewElectronicCollationReport extends BasicReportForOrg
                     headerMap.values());
             data.setHeaderList(headerList);
 
+            Collections.sort(data.getList14());
+            Collections.sort(data.getList37());
+            Collections.sort(data.getList153());
+            Collections.sort(data.getList511());
+
             data.getList153().addAll(addItemsByGoodNamesNE(headerList, data.getList153()));
             data.getList37().addAll(addItemsByGoodNamesNE(headerList, data.getList37()));
             data.getList14().addAll(addItemsByGoodNamesNE(headerList, data.getList14()));
@@ -234,11 +239,6 @@ public class RegisterStampNewElectronicCollationReport extends BasicReportForOrg
 
             List<RegisterStampElectronicCollationReportItem> listTotalAllHeader = doAnotherCaption(headerList, " ");
             data.setListTotalAllHeader(listTotalAllHeader);
-
-            Collections.sort(data.getList14());
-            Collections.sort(data.getList37());
-            Collections.sort(data.getList153());
-            Collections.sort(data.getList511());
 
             data.getListTotalAll().addAll(resultGlobalTotal);
 
