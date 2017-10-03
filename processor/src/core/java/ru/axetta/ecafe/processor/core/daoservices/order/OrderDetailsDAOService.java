@@ -226,10 +226,10 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
         String [] parts;
 
-        String pathPart1 = "";
-        String pathPart2 = "";
-        String pathPart3 = "";
-        String pathPart4 = "";
+        String pathPart1;
+        String pathPart2;
+        String pathPart3;
+        String pathPart4;
 
         Long qty;
 
@@ -264,7 +264,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             if(parts.length>3) {
                 pathPart4 = parts[3];
             } else {
-                pathPart4 = "";
+                pathPart4 = parts[0];
             }
 
             qty = ((Integer) objects[1]).longValue();
