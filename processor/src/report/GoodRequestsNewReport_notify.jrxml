@@ -60,7 +60,7 @@
 	<field name="feedingPlanTypeStr" class="java.lang.String"/>
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<field name="notificationMark" class="java.lang.Long"/>
-	<field name="tempClients" class="java.lang.String"/>
+	<field name="tempClients" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -237,7 +237,7 @@
 						<property name="local_mesure_unitheight" value="pixel"/>
 						<property name="local_mesure_unitwidth" value="pixel"/>
 						<textField isStretchWithOverflow="true">
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" forecolor="#FFFFFF" backcolor="#FF6666">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="108" height="24" forecolor="#FFFFFF" backcolor="#FF6666">
 								<printWhenExpression><![CDATA[(!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -245,20 +245,12 @@
 								<font size="12" isBold="false"/>
 							</textElement>
 							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
-( $V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0 ? "" : " / "+ $V{dailySampleMeasure} )
-+($V{hideLastValueSum}==0L?"":
-(
-" (" +
-new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue() )
-  +
-( $V{hideDailySampleSum}==0L || (new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue()))==0L? "" : " / "+
-new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue() )
-)
-+ ")"
-)) + "</font>"]]></textFieldExpression>
+( $V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L) ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))
++"</font>"]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
-							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" backcolor="#92D050">
+							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="108" height="24" backcolor="#92D050">
 								<printWhenExpression><![CDATA[($V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -266,11 +258,12 @@ new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValu
 								<font size="12"/>
 							</textElement>
 							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
-($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
-    ? "" : " / "+ $V{dailySampleMeasure} ) + "</font>"]]></textFieldExpression>
+( $V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L) ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))
++"</font>"]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="108" height="24">
 								<printWhenExpression><![CDATA[(!Integer.valueOf($V{doneDate}.getDay()).equals(0)
 && $V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -278,11 +271,12 @@ new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValu
 								<font size="12"/>
 							</textElement>
 							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
-($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
-    ? "" : " / "+ $V{dailySampleMeasure} ) + "</font>"]]></textFieldExpression>
+( $V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L) ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))
++"</font>"]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
-							<reportElement uuid="317b030e-0775-4653-b428-52ae97c008ec" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="100" height="24" backcolor="#CCCCCC">
+							<reportElement uuid="317b030e-0775-4653-b428-52ae97c008ec" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="108" height="24" backcolor="#CCCCCC">
 								<printWhenExpression><![CDATA[(Integer.valueOf($V{doneDate}.getDay()).equals(0)
 && $V{newTotalCountMeasure}.equals(0L)) && $V{notificationMark}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -290,8 +284,9 @@ new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValu
 								<font size="12"/>
 							</textElement>
 							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
-($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
-    ? "" : " / "+ $V{dailySampleMeasure} ) + "</font>"]]></textFieldExpression>
+( $V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L) ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))
++"</font>"]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement uuid="d8c9d2f0-0c77-4aeb-a23f-d0eb3cde29ac" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="108" height="24" forecolor="#FFFFFF" backcolor="#FF6666">

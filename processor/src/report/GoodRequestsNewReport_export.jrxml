@@ -44,6 +44,7 @@
 	<field name="feedingPlanTypeStr" class="java.lang.String"/>
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<field name="tempClients" class="java.lang.Long"/>
+	<field name="newTempClients" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -241,10 +242,13 @@
 				<measure name="tempClientsMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{tempClients}]]></measureExpression>
 				</measure>
+				<measure name="newTempClientsMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{newTempClients}]]></measureExpression>
+				</measure>
 				<crosstabCell width="54" height="20">
 					<cellContents style="table">
 						<textField>
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="40" height="20" forecolor="#FFFFFF" backcolor="#FF6666">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="54" height="20" forecolor="#FFFFFF" backcolor="#FF6666">
 								<printWhenExpression><![CDATA[!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -252,20 +256,27 @@
 								<font size="8" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
-( $V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0 ? "" : " / "+ $V{dailySampleMeasure} )
+($V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L)
+    ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))
 +($V{hideLastValueSum}==0L?"":
 (
 " (" +
 new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue() )
   +
-( $V{hideDailySampleSum}==0L || (new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue()))==0L? "" : " / "+
+( $V{hideDailySampleSum}==0L
+    || (new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue()))==0L? "" : " / "+
     new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue() )
+) +
+( $V{hideDailySampleSum}==0L
+    || (new Long($V{tempClientsMeasure}.longValue() - $V{newTempClientsMeasure}.longValue()))==0L? "" : " / "+
+    new Long($V{tempClientsMeasure}.longValue() - $V{newTempClientsMeasure}.longValue() )
 )
 + ")"
 ))]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="40" height="20" backcolor="#92D050">
+							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="54" height="20" backcolor="#92D050">
 								<printWhenExpression><![CDATA[$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -273,8 +284,9 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
-($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
-    ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
+($V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L)
+    ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
+$V{tempClientsMeasure}))]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="54" height="20">
