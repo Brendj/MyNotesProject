@@ -24,3 +24,6 @@ alter table cf_cards
   add column cardSignCertNum integer,
   add constraint cf_cards_certnum_fk foreign key(cardSignCertNum)
   references cf_card_signs(idofcardsign) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+--новое поле для количества заявок на временных клиентов
+alter table cf_goods_requests_positions add column lasttempclientscount bigint;

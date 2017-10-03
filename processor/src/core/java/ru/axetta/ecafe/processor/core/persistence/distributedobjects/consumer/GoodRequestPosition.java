@@ -40,6 +40,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     /* старые значения всего и суточной пробы */
     private Long lastTotalCount;
     private Long lastDailySampleCount; // суточная проба
+    private Long lastTempClientsCount;
     private Long tempClientsCount; //временные клиенты
     private Long netWeight;
     private Product product;
@@ -80,6 +81,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("netWeight"), "netWeight");
         projectionList.add(Projections.property("lastTotalCount"), "lastTotalCount");
         projectionList.add(Projections.property("lastDailySampleCount"), "lastDailySampleCount");
+        projectionList.add(Projections.property("lastTempClientsCount"), "lastTempClientsCount");
 
         projectionList.add(Projections.property("gr.guid"), "guidOfGR");
         projectionList.add(Projections.property("g.guid"), "guidOfG");
@@ -160,6 +162,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     public void fill(DistributedObject distributedObject) {
         final Long lastTotalCount = getTotalCount();
         final Long lastDailySampleCount = getDailySampleCount();
+        final Long lastTempClientsCount = getTempClientsCount();
         setOrgOwner(distributedObject.getOrgOwner());
         setGoodRequest(((GoodRequestPosition) distributedObject).getGoodRequest());
         setGood(((GoodRequestPosition) distributedObject).getGood());
@@ -172,6 +175,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         /* старые значения всего и суточной пробы */
         setLastTotalCount(lastTotalCount);
         setLastDailySampleCount(lastDailySampleCount); // суточная проба
+        setLastTempClientsCount(lastTempClientsCount);
         setNotified(false);
     }
 
@@ -310,5 +314,13 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     public void setTempClientsCount(Long tempClientsCount) {
         this.tempClientsCount = tempClientsCount;
+    }
+
+    public Long getLastTempClientsCount() {
+        return lastTempClientsCount;
+    }
+
+    public void setLastTempClientsCount(Long lastTempClientsCount) {
+        this.lastTempClientsCount = lastTempClientsCount;
     }
 }
