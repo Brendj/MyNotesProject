@@ -4,9 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.partner.nsi;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPPart;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -25,6 +30,7 @@ import java.util.Set;
  */
 public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
+    private final Logger logger = LoggerFactory.getLogger(SOAPLoggingHandler.class);
     // change this to redirect output if desired
     private static PrintStream out = System.out;
 
@@ -59,22 +65,21 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 
         //==========Раскомментировать ниже для логирования запросов==========//
 
-        /*if (!MealManager.isOn()) {
+        if (RuntimeContext.RegistryType.isSpb()) {
             if (outboundProperty.booleanValue()) {
-                out.println("\nOutbound message:");
+                logger.info("Outbound message:");
             } else {
-                out.println("\nInbound message:");
+                logger.info("Inbound message:");
             }
 
             try {
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
                 final Document doc = soapPart.getEnvelope().getOwnerDocument();
-                System.out.println(toString(doc));
-                out.println("");   // just to add a newline
+                logger.info(toString(doc));
             } catch (Exception e) {
-                out.println("Exception in handler: " + e);
+                logger.error("Exception in handler: ", e);
             }
-        }*/
+        }
     }
 
     public static String toString(Document doc) {

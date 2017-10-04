@@ -27,3 +27,5 @@ alter table cf_cards
 
 --новое поле для количества заявок на временных клиентов
 alter table cf_goods_requests_positions add column lasttempclientscount bigint;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 171004) НЕ МЕНЯТЬ
