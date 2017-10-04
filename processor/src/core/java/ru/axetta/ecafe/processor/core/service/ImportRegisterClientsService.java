@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
@@ -56,6 +57,8 @@ public class ImportRegisterClientsService {
     public static final int MODIFY_OPERATION = 3;
     public static final int MOVE_OPERATION = 4;
 
+    public static final long TIME_DELTA_PER_REQUEST = 60*60*1000; //1 час
+
     private static final int MAX_CLIENTS_PER_TRANSACTION = 50;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -68,6 +71,13 @@ public class ImportRegisterClientsService {
     private static final long MILLISECONDS_IN_DAY = 86400000L;
     private static final int MAX_THREADS = 10;
 
+
+    @PostConstruct
+    private void clearOrgSyncsRegistryTable() {
+        if (RuntimeContext.getInstance().isMainNode()) {
+            DAOService.getInstance().clearOrgSyncsRegistryTable();
+        }
+    }
 
     public static boolean isOn() {
         return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
@@ -1471,7 +1481,11 @@ public class ImportRegisterClientsService {
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {
         if (!DAOService.getInstance().isSverkaEnabled()) {
-            throw new Exception("Service temporary unavailable");
+            throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
+        }
+        if (!DAOService.getInstance().isSverkaEnabledByOrg(idOfOrg)) {
+            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
+            throw new RegistryTimeDeltaException("Запрос не развешен. Повторите попытку не ранее, чем через час");
         }
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         Org org = em.find(Org.class, idOfOrg);
@@ -1486,6 +1500,7 @@ public class ImportRegisterClientsService {
         boolean isSuccessEnd = true;
 
         try {
+            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
             OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
             List<String> list = service.getBadGuids(orgGuids.orgGuids);
@@ -1507,8 +1522,10 @@ public class ImportRegisterClientsService {
             //  !!!!!!!!!!
             //  !!!!!!!!!!
             saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
+            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, new Date().getTime());
             return logBuffer;
         } catch (Exception e) {
+            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
             isSuccessEnd = false;
             throw e;
         } finally {

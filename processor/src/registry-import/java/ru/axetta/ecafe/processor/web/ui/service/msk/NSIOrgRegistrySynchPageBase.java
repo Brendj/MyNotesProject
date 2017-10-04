@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.RegistryTimeDeltaException;
+import ru.axetta.ecafe.processor.core.service.ServiceTemporaryUnavailableException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontControllerProcessor;
@@ -360,6 +362,12 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 //changedItems = controller.refreshRegistryChangeItemsInternalV2(getIdOfOrg());
                 changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 refreshRegistryChangeItemsV2(idOfOrg);
+            } catch (ServiceTemporaryUnavailableException e) {
+                errorMessages = e.getMessage();
+                return;
+            } catch (RegistryTimeDeltaException e) {
+                errorMessages = e.getMessage();
+                return;
             } catch (Exception e) {
                 if (e instanceof SOAPFaultException) {
                     errorMessages = e.getMessage();

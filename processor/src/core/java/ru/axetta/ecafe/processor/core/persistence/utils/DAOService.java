@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -2272,6 +2273,60 @@ public class DAOService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    @Transactional
+    public Boolean isSverkaEnabledByOrg(long idOfOrg) {
+        try {
+            String str_query = "select lastsyncstart, lastsyncend from cf_org_syncs_registry where idoforg = :idOfOrg";
+            Query q = entityManager.createNativeQuery(str_query);
+            q.setParameter("idOfOrg", idOfOrg);
+            List list = q.getResultList();
+            if (list.size() == 0) {
+                return true;
+            } else {
+                Object[] row = (Object[])list.get(0);
+                Long startDate = ((BigInteger)row[0]).longValue();
+                Long endDate = ((BigInteger)row[1]).longValue();
+                if (endDate == 1L) {
+                    return false; //в настоящее время идет сверка
+                } else if (System.currentTimeMillis() - endDate < ImportRegisterClientsService.TIME_DELTA_PER_REQUEST ||
+                        System.currentTimeMillis() - startDate < ImportRegisterClientsService.TIME_DELTA_PER_REQUEST) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Can't get org last sync registry: ", e);
+            return false;
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateOrgRegistrySync(long idOfOrg, long dateEnd) {
+        try {
+            Query q = entityManager.createNativeQuery("update cf_org_syncs_registry set lastsyncstart = :dateStart, lastsyncend = :dateEnd where idoforg = :idOfOrg");
+            q.setParameter("idOfOrg", idOfOrg);
+            q.setParameter("dateStart", new Date().getTime());
+            q.setParameter("dateEnd", dateEnd);
+            int res = q.executeUpdate();
+            if (res == 0) {
+                q = entityManager.createNativeQuery("insert into cf_org_syncs_registry(idoforg, lastsyncstart, lastsyncend) values(:idOfOrg, :dateStart, :dateEnd)");
+                q.setParameter("idOfOrg", idOfOrg);
+                q.setParameter("dateStart", new Date().getTime());
+                q.setParameter("dateEnd", dateEnd);
+                q.executeUpdate();
+            }
+        } catch (Exception e) {
+            logger.error("Can't save org last sync registry: ", e);
+        }
+    }
+
+    @Transactional
+    public void clearOrgSyncsRegistryTable() {
+        javax.persistence.Query q = entityManager.createNativeQuery("TRUNCATE TABLE cf_org_syncs_registry");
+        q.executeUpdate(); //при старте приложения обнуляем таблицу
     }
 
     @Transactional

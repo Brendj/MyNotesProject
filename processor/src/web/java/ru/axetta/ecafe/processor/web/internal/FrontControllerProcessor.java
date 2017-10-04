@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.BadOrgGuidsException;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
-import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
+import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 
 import org.slf4j.Logger;
@@ -230,7 +227,13 @@ public class FrontControllerProcessor {
         } catch (BadOrgGuidsException eGuid) {
             throw eGuid;
         }
-        catch (Exception e) {
+        catch (ServiceTemporaryUnavailableException e) {
+            logger.error("Failed to refresh registry change items", e);
+            throw new FrontController.FrontControllerException(e.getMessage());
+        } catch (RegistryTimeDeltaException e) {
+            logger.error("Failed to refresh registry change items", e);
+            throw new FrontController.FrontControllerException(e.getMessage());
+        } catch (Exception e) {
             logger.error("Failed to refresh registry change items", e);
         }
         return Collections.EMPTY_LIST;
