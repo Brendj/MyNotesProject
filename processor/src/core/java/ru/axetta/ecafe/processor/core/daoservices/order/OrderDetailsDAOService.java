@@ -130,6 +130,35 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    /* Подсчет суточной пробы для льготного питания*/
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampDailySampleValueNew(Long idOfOrg, Date start, String fullname) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and" +
+                " cforder.ordertype in (5) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigInteger) res).longValue();
+        }
+    }
+
     /* получаем список всех товаров для льготного питания */
     @SuppressWarnings("unchecked")
     public List<GoodItem> findAllGoods(Long idOfOrg, Date startTime, Date endTime, Set orderTypes){
