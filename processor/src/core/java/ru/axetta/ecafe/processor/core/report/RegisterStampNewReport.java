@@ -150,7 +150,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList153().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList153().add(total1);
                         } else if (item.getLevel3().equals("3-7")) {
                             data.getList37().add(item);
@@ -159,7 +159,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList37().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList37().add(total1);
                         } else if (item.getLevel3().equals("1-4")) {
                             data.getList14().add(item);
@@ -168,7 +168,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList14().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList14().add(total1);
                         } else if (item.getLevel3().equals("5-11")) {
                             data.getList511().add(item);
@@ -177,7 +177,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList511().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
+                            RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList511().add(total1);
                         } else if (item.getOrderType().equals(1)) {
                             waterItems.add(item);
