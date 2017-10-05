@@ -1485,7 +1485,7 @@ public class ImportRegisterClientsService {
         }
         if (!DAOService.getInstance().isSverkaEnabledByOrg(idOfOrg)) {
             DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
-            throw new RegistryTimeDeltaException("Запрос не развешен. Повторите попытку не ранее, чем через час");
+            throw new RegistryTimeDeltaException("Запрос не разрешен. Повторите попытку не ранее, чем через час");
         }
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         Org org = em.find(Org.class, idOfOrg);
