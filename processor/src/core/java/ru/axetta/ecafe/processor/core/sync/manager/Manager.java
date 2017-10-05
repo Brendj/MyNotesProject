@@ -394,7 +394,30 @@ public class Manager implements AbstractToElement {
                 saveException(sessionFactory, errorMessage);
             }
         }
+
+        if (doClass.getSimpleName().equals("GoodRequestPosition")) {
+            List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
+            try {
+                currentResultDOListResult = currentResultDOListFind(currentResultDOList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            currentResultDOList = currentResultDOListResult;
+        }
+
         return currentResultDOList;
+    }
+
+    private List<DistributedObject> currentResultDOListFind (List<DistributedObject> currentResultDOList) throws Exception {
+        List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
+
+        for (DistributedObject distributedObject: currentResultDOList) {
+            GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
+            if (goodRequestPosition.getGuidOfGR() != null) {
+                currentResultDOListResult.add(goodRequestPosition);
+            }
+        }
+        return currentResultDOListResult;
     }
 
     private List<DistributedObject> findConfirmedDO(SessionFactory sessionFactory,
