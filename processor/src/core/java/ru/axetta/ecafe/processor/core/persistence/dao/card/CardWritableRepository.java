@@ -81,7 +81,8 @@ public class CardWritableRepository extends WritableJpaDao {
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());
         card.setCreateTime(new Date());
-        card.setCardSignCertNum(cardSignCertNum);
+        if (!(cardSignCertNum == null || cardSignCertNum == 0))
+            card.setCardSignCertNum(cardSignCertNum);
 
         entityManager.persist(card);
         return card;
