@@ -54,7 +54,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and good.fullname like '"+fullname+"' "
                 + "     and orderdetail.menutype>=:mintype "
                 + "     and orderdetail.menutype<=:maxtype "
-                + "     and (cforder.ordertype in (4,6,10) or (cforder.ordertype=8"
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8"
                 + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
