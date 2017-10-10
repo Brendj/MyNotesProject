@@ -40,7 +40,7 @@ public class CardSignEditPage extends CardSignDataBasicPage {
 
     private void fill() {
         idOfCardSign = groupPage.getCurrentCard().getIdOfCardSign();
-        signType = groupPage.getCurrentCard().getSignType();
+        signType = CardSignItem.getSignTypeFromString(groupPage.getCurrentCard().getSignType());
         manufacturerCode = groupPage.getCurrentCard().getManufacturerCode();
         manufacturerName = groupPage.getCurrentCard().getManufacturerName();
         signData = groupPage.getCurrentCard().getSignData();
@@ -57,7 +57,7 @@ public class CardSignEditPage extends CardSignDataBasicPage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             CardSign cardSign = (CardSign)session.load(CardSign.class, groupPage.getCurrentCard().getIdOfCardSign());
-            cardSign.setSignType(CardSignItem.getSignTypeFromString(signType));
+            cardSign.setSignType(new Integer(signType));
             cardSign.setManufacturerCode(manufacturerCode);
             cardSign.setManufacturerName(manufacturerName);
             cardSign.setSignData(signData);

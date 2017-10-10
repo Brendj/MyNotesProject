@@ -40,7 +40,7 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             CardSign cardSign = new CardSign();
-            cardSign.setSignType(CardSignItem.getSignTypeFromString(getSignType()));
+            cardSign.setSignType(new Integer(signType));
             cardSign.setManufacturerCode(getManufacturerCode());
             cardSign.setManufacturerName(getManufacturerName());
             cardSign.setSignData(signData);

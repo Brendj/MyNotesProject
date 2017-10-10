@@ -24,10 +24,10 @@ public class CardSignItem {
         signData = cardSign.getSignData();
     }
 
-    public static Integer getSignTypeFromString(String sType) {
-        if (sType.equals(CardSign.CARDSIGN_SCRIPT_TYPE)) return 0;
-        if (sType.equals(CardSign.CARDSIGN_ECDSA_TYPE)) return 1;
-        return 0;
+    public static String getSignTypeFromString(String sType) {
+        if (sType.equals(CardSign.CARDSIGN_SCRIPT_TYPE)) return "0";
+        if (sType.equals(CardSign.CARDSIGN_ECDSA_TYPE)) return "1";
+        return "0";
     }
 
     public String getPrintedName() {

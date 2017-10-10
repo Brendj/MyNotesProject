@@ -4,8 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.card.sign;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CardSign;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -35,11 +40,23 @@ public class CardSignViewPage extends BasicWorkspacePage {
     }
 
     private void fill() {
-        idOfCardSign = groupPage.getCurrentCard().getIdOfCardSign();
-        signType = groupPage.getCurrentCard().getSignType();
-        signData = groupPage.getCurrentCard().getSignData();
-        manufacturerCode = groupPage.getCurrentCard().getManufacturerCode();
-        manufacturerName = groupPage.getCurrentCard().getManufacturerName();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            idOfCardSign = groupPage.getCurrentCard().getIdOfCardSign();
+            CardSign cardSign = (CardSign)session.get(CardSign.class, idOfCardSign);
+            signType = CardSign.CARDSIGN_TYPES[cardSign.getSignType()];
+            signData = cardSign.getSignData();
+            manufacturerCode = cardSign.getManufacturerCode();
+            manufacturerName = cardSign.getManufacturerName();
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, getLogger());
+            HibernateUtils.close(session, getLogger());
+        }
     }
 
     public String getSignDataSize() {

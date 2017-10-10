@@ -115,10 +115,10 @@ public class Circulation extends LibraryDistributedObject {
             try{
                 currentClient = DAOUtils.findClient(session, getIdOfClient());
             } catch (Exception e){
-                throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client GUID:\"" + currentClient.getClientGUID() +"\"");
+                throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client ID:\"" + getIdOfClient() +"\"");
             }
             if(currentClient==null){
-                throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client GUID:\"" + currentClient.getClientGUID() +"");
+                throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Client ID:\"" + getIdOfClient() +"\"");
             }
             setClient(currentClient);
         }
