@@ -68,7 +68,7 @@ public class CardWritableRepository extends WritableJpaDao {
                 throw new IllegalStateException("Ошибка регистрации");
             case VERIFY_SUCCESS:
                 CardSign cardSign = entityManager.find(CardSign.class, cardSignCertNum);
-                if (cardSign == null) throw new Exception("Ошибка регистрации");
+                if (cardSign == null) throw new IllegalStateException("Ошибка регистрации");
                 return;
             default: throw new IllegalStateException("Неизвестное значение параметра cardSignVerifyRes");
         }
