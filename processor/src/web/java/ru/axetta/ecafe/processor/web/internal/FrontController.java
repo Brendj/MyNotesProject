@@ -963,6 +963,7 @@ public class FrontController extends HttpServlet {
                 String cardIssued = getClientParamDescValueByName("cardIssued", cd.getClientDescParams().getParam());
                 String birthDate = getClientParamDescValueByName("birthDate", cd.getClientDescParams().getParam());
                 String gender = getClientParamDescValueByName("gender", cd.getClientDescParams().getParam());
+                String middleGroup = getClientParamDescValueByName("middleGroup", cd.getClientDescParams().getParam());
 
                 fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, contractSurname == null ? " " : contractSurname);
                 if (contractName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_NAME, contractName);
@@ -995,6 +996,7 @@ public class FrontController extends HttpServlet {
                 if (snils!=null) fc.setValue(ClientManager.FieldId.SAN, snils);
                 if (birthDate!=null) fc.setValue(ClientManager.FieldId.BIRTH_DATE, birthDate);
                 if (gender!=null) fc.setValue(ClientManager.FieldId.GENDER, gender);
+                if (middleGroup!=null) fc.setValue(ClientManager.FieldId.MIDDLE_GROUP, middleGroup);
 
                 logger.debug("register client v2");
                 boolean noComment = true;

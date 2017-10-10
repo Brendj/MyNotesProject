@@ -81,7 +81,8 @@ public class ClientManager {
         SSOID,
         BENEFIT,
         CHECKBENEFITS,
-        CREATED_FROM
+        CREATED_FROM,
+        MIDDLE_GROUP
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -129,6 +130,7 @@ public class ClientManager {
             new FieldProcessor.Def(40, false, false, "Участие льгот в сверке", null, FieldId.CHECKBENEFITS, false),
             new FieldProcessor.Def(41, false, false, "Источник создания записи", Integer.toString(ClientCreatedFromType.DEFAULT.getValue()),
                     FieldId.CREATED_FROM, false),
+            new FieldProcessor.Def(42, false, false, "Подгруппа", null, FieldId.MIDDLE_GROUP, false),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -815,6 +817,11 @@ public class ClientManager {
                 } else {
                     client.setIdOfClientGroup(null);
                 }
+            }
+
+            if (fieldConfig.getValue(FieldId.MIDDLE_GROUP) != null) {
+                String middleGroup = fieldConfig.getValue(FieldId.MIDDLE_GROUP);
+                if (!StringUtils.isEmpty(middleGroup)) client.setMiddleGroup(middleGroup);
             }
 
             if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID) != null) {
