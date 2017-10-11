@@ -365,6 +365,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             } catch (ServiceTemporaryUnavailableException e) {
                 errorMessages = e.getMessage();
                 return;
+            } catch (ru.axetta.ecafe.processor.web.internal.FrontController.FrontControllerException e) {
+                errorMessages = e.getMessage();
+                return;
             } catch (RegistryTimeDeltaException e) {
                 errorMessages = e.getMessage();
                 return;
@@ -375,7 +378,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 }
             }
             if (changedItems == null || changedItems.isEmpty()) {
-                errorMessages = "Не получено разногласий либо устарел GUID организации";
+                errorMessages = "Не получено разногласий";
                 return;
             }
         }

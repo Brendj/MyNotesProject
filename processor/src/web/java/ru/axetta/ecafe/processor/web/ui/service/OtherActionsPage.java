@@ -217,6 +217,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void loadNSIFile() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(ImportRegisterFileService.class).loadNSIFile();
+            printMessage("Файл загружен");
+        } catch (Exception e) {
+            getLogger().error("Error run load NSI file: ", e);
+            printError("Во время загрузки из файла произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
     public void runGenerateSummaryDownloadFile() {
         summaryDate = CalendarUtils.addMinute(summaryDate, 60 * 12);
         Date endDate = CalendarUtils.endOfDay(summaryDate);

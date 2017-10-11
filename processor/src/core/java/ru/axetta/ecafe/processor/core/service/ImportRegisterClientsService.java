@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
-import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
@@ -72,12 +70,12 @@ public class ImportRegisterClientsService {
     private static final int MAX_THREADS = 10;
 
 
-    @PostConstruct
+    /*@PostConstruct
     private void clearOrgSyncsRegistryTable() {
         if (RuntimeContext.getInstance().isMainNode()) {
             DAOService.getInstance().clearOrgSyncsRegistryTable();
         }
-    }
+    }*/
 
     public static boolean isOn() {
         return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
@@ -1477,6 +1475,14 @@ public class ImportRegisterClientsService {
         }
     }
 
+    private ClientMskNSIService getNSIService() {
+        if (ImportRegisterFileService.isFileMode()) {
+            return RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class);
+        } else {
+            return RuntimeContext.getAppContext().getBean("ClientMskNSIService", ClientMskNSIService.class);
+        }
+    }
+
     @Transactional
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {
@@ -1484,7 +1490,7 @@ public class ImportRegisterClientsService {
             throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
         }
         if (!DAOService.getInstance().isSverkaEnabledByOrg(idOfOrg)) {
-            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
+            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
             throw new RegistryTimeDeltaException("Запрос не разрешен. Повторите попытку не ранее, чем через час");
         }
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
@@ -1502,7 +1508,7 @@ public class ImportRegisterClientsService {
         try {
             DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
-            OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
+            ClientMskNSIService service = getNSIService();
             List<String> list = service.getBadGuids(orgGuids.orgGuids);
             if (list != null && !list.isEmpty()) {
                 String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
@@ -1510,11 +1516,11 @@ public class ImportRegisterClientsService {
                     badGuids += g;
                 }
                 isSuccessEnd = false;
-                throw new BadOrgGuidsException(badGuids); // UnsupportedOperationException(badGuids);
+                throw new BadOrgGuidsException(badGuids);
             }
 
             //  Итеративно загружаем клиентов, используя ограничения
-            List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);//test();
+            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);
             log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
             //  !!!!!!!!!!
             //  !!!!!!!!!!

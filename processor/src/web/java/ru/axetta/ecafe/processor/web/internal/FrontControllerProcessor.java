@@ -224,10 +224,9 @@ public class FrontControllerProcessor {
                         .syncClientsWithRegistry(idOfOrg);
             }
             return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
-        } catch (BadOrgGuidsException eGuid) {
-            throw eGuid;
-        }
-        catch (ServiceTemporaryUnavailableException e) {
+        } catch (BadOrgGuidsException e) {
+            throw new FrontController.FrontControllerException(e.getMessage());
+        } catch (ServiceTemporaryUnavailableException e) {
             logger.error("Failed to refresh registry change items", e);
             throw new FrontController.FrontControllerException(e.getMessage());
         } catch (RegistryTimeDeltaException e) {
