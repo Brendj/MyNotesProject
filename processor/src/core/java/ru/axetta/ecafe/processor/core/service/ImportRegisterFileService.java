@@ -80,7 +80,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             }
             File file = new File(filename);
             if (!file.exists()) {
-                throw new Exception(String.format("Файл выгрузки от НСИ %s не найден"));
+                throw new Exception(String.format("Файл выгрузки от НСИ %s не найден", filename));
             }
             fileInputStream = new FileInputStream(filename); //"/home/jbosser/processor/Debugs/catalog-123.out");
             inputStreamReader = new InputStreamReader(fileInputStream, "windows-1251");
