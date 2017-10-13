@@ -1127,7 +1127,7 @@ public class ImportRegisterClientsService {
             orgGuids = new HashSet<String>();
             guidInfo = "";
             for (Org o : orgs) {
-                if (o.getGuid() == null) {
+                if (StringUtils.isEmpty(o.getGuid())) {
                     continue;
                 }
                 if (guidInfo.length() > 0) {
