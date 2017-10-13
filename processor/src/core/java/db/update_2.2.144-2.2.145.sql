@@ -30,3 +30,5 @@ create table cf_registry_file
 
 --Убираем уникальность кода поставщика
 alter table cf_card_signs drop constraint cf_card_signs_code_uk;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 171004) НЕ МЕНЯТЬ
