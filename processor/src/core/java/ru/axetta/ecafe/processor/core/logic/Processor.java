@@ -3476,7 +3476,7 @@ public class Processor implements SyncProcessor {
                 }*/
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
-                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients);
+                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients, orgSet);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -3505,8 +3505,8 @@ public class Processor implements SyncProcessor {
     }
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
-            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg, List<Long> allocatedClients)
-            throws Exception {
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
+            List<Long> allocatedClients, Set<Org> orgSet) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -3518,6 +3518,18 @@ public class Processor implements SyncProcessor {
             if (clientParamItem.getVersion() != null && clientParamItem.getVersion() < client.getClientRegistryVersion()) {
                 return;
             }
+
+            Long orgOwner = clientParamItem.getOrgOwner();
+            if (orgOwner != null) {
+                Org org = (Org)persistenceSession.get(Org.class, orgOwner);
+                if (!orgSet.contains(org)) {
+                    errorClientIds.add(client.getIdOfClient());
+                    throw new IllegalArgumentException(String.format("OrgId not belongs to friendly set. IdOfClient=%s, clientParamItem=%s, OrgId=%s",
+                            client.getIdOfClient(), clientParamItem, orgOwner));
+                }
+                client.setOrg(org);
+            }
+
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 if(!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient()).size() > 0)){
                     if(!allocatedClients.contains(clientParamItem.getIdOfClient())) {

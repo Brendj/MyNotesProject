@@ -84,6 +84,10 @@ public class SyncRequest {
                 return balanceToNotify;
             }
 
+            public Long getOrgOwner() {
+                return orgOwner;
+            }
+
             public static class Builder {
 
                 public Builder() {
@@ -134,6 +138,7 @@ public class SyncRequest {
                         disablePlanCreationDate = loadContext.getTimeFormat()
                                 .parse(namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent());
                     }
+                    Long orgOwner = getLongValueNullSafe(namedNodeMap, "OrgId");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -141,7 +146,7 @@ public class SyncRequest {
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
-                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate);
+                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, orgOwner);
                 }
 
 
@@ -165,6 +170,7 @@ public class SyncRequest {
             private final Long version;
             private final Long balanceToNotify;
             private final Date disablePlanCreationDate;
+            private final Long orgOwner;
 
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
@@ -172,7 +178,7 @@ public class SyncRequest {
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
-                    Date disablePlanCreationDate) {
+                    Date disablePlanCreationDate, Long orgOwner) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -202,6 +208,7 @@ public class SyncRequest {
                 this.version = version;
                 this.balanceToNotify = balanceToNotify;
                 this.disablePlanCreationDate = disablePlanCreationDate;
+                this.orgOwner = orgOwner;
             }
 
             public long getIdOfClient() {
