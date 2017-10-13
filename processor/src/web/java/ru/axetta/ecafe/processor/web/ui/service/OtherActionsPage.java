@@ -218,6 +218,10 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void loadNSIFile() throws Exception {
+        if (!DAOService.getInstance().isSverkaEnabled()) {
+            printError("Сверка отключена в настройках. Загрузка файла не будет выполнена");
+            return;
+        }
         try {
             RuntimeContext.getAppContext().getBean(ImportRegisterFileService.class).loadNSIFile();
             printMessage("Файл загружен");
