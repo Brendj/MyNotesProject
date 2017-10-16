@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.option;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
@@ -224,7 +223,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
     }
 
     public void runTestAISReestr() throws Exception {
-        OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
+        /*OrgMskNSIService service = RuntimeContext.getAppContext().getBean(OrgMskNSIService.class);
         Set<String> guids = new HashSet<String>();
         guids.add("AD1CA6A0-7390-4270-8F76-ED31C1E52A2D");
         guids.add("9290FB1E-5512-41D3-A447-8A865D0E8215");
@@ -236,7 +235,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
             for (String s : list) {
                 System.out.println(String.format("Гуид %s не найден в АИС Реестр", s));
             }
-        }
+        }  */
     }
 
     @Transactional
