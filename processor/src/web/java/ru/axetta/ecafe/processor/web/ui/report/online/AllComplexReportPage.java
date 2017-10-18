@@ -28,7 +28,7 @@ public class AllComplexReportPage extends OnlineReportPage {
 
     public void buildReport(Session session) throws Exception {
         this.complexReport = new AllComplexReport();
-        AllComplexReport.Builder reportBuilder = new AllComplexReport.Builder();
+        AllComplexReportBuilder reportBuilder = new AllComplexReportBuilder();
         this.complexReport = reportBuilder.build(session, startDate, endDate, idOfOrgList);
     }
 }
