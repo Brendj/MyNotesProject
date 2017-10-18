@@ -191,7 +191,10 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     }
 
     private String getQuotedStr(String str) {
-        return "'" + str.replaceAll("\"", "").replaceAll("'", "''") + "'";
+        if (str.startsWith("\"") && str.endsWith("\"")) {
+            str = str.substring(1, str.length()-1);
+        }
+        return "'" + str.replaceAll("\"\"", "\"").replaceAll("'", "''") + "'";
     }
 
     /*private Integer getGender(String str) {

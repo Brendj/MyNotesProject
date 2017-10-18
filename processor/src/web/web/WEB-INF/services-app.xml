@@ -178,7 +178,7 @@
     <task:scheduler id="processNSIFile"/>
     <task:scheduled-tasks scheduler="processNSIFile">
         <task:scheduled ref="ImportRegisterFileService" method="run"
-                        cron="0 0 20 * * ?"/>
+                        cron="0 30 21 * * ?"/>
     </task:scheduled-tasks>
 
     <!-- Оповещение клиента об недостатке средств в субсчет для оплаты АП, срабатывает каждый день в 16 часов вечера -->
