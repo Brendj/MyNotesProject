@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfSubReport" pageWidth="720" pageHeight="75" columnWidth="720" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2bf994d8-e604-40e4-a634-d361bc64a1ec">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfSubReport" pageWidth="840" pageHeight="75" columnWidth="840" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2bf994d8-e604-40e4-a634-d361bc64a1ec">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -15,6 +15,8 @@
 	<field name="numberOfSubFeedStudents" class="java.lang.Long"/>
 	<field name="numberOfBuffetStudent" class="java.lang.Long"/>
 	<field name="numberOfBuffetGuardians" class="java.lang.Long"/>
+	<field name="numberOfLgotnoeFriendlyOrg" class="java.lang.Long"/>
+	<field name="numberOfLgotnoeOtherOrg" class="java.lang.Long"/>
 	<detail>
 		<band height="26" splitType="Stretch">
 			<textField>
@@ -66,7 +68,7 @@
 				<textFieldExpression><![CDATA[$F{summaryOfPasses}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="ab0094f9-4274-4791-a65c-83eba43ff7b3" x="660" y="0" width="60" height="25"/>
+				<reportElement uuid="ab0094f9-4274-4791-a65c-83eba43ff7b3" x="780" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -78,7 +80,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPaidGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2" x="600" y="0" width="60" height="25"/>
+				<reportElement uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2" x="720" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -90,7 +92,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPaidStudents}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6" x="540" y="0" width="60" height="25"/>
+				<reportElement uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6" x="660" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -102,7 +104,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfSubFeedGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9" x="480" y="0" width="60" height="25"/>
+				<reportElement uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9" x="600" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -126,7 +128,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfLgotnoe}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="093ece74-6707-40f2-a8bd-32382c98cf07" x="300" y="0" width="60" height="25"/>
+				<reportElement uuid="093ece74-6707-40f2-a8bd-32382c98cf07" x="420" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -138,7 +140,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfReserve}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" x="360" y="0" width="60" height="25"/>
+				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" x="480" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -150,7 +152,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfBuffetStudent}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" x="420" y="0" width="60" height="25"/>
+				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" x="540" y="0" width="60" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -160,6 +162,30 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="42019b29-3830-46d6-8e48-5446f7179f43" x="300" y="0" width="60" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfLgotnoeFriendlyOrg}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="c585bb5a-fcc8-4385-ba83-49d6d5a7d778" x="360" y="0" width="60" height="25"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfLgotnoeOtherOrg}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
