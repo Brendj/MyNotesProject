@@ -60,23 +60,41 @@
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Скидка на ед" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Количество" />
+                    <rich:column headerClass="center-aligned-column" colspan="4">
+                        <h:outputText styleClass="column-header" escape="true" value="Льготное питание обучающихся своей ОО" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Сумма без скидки" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Сумма скидки" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Итоговая сумма" />
+                    <rich:column headerClass="center-aligned-column" colspan="4">
+                        <h:outputText styleClass="column-header" escape="true" value="Льготное питание временно обучающихся в данной ОО" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Время первой продажи" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Время последней продажи" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" breakBefore="true">
+                        <h:outputText styleClass="column-header" escape="true" value="Количество" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Сумма без скидки" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Сумма скидки" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Итоговая сумма" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Количество" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Сумма без скидки" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Сумма скидки" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Итоговая сумма" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
@@ -106,6 +124,18 @@
             </rich:column>
             <rich:column styleClass="right-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.total}" />
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.qtyTemp}" />
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.sumPriceTemp}" />
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.sumPriceDiscountTemp}" />
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
+                <h:outputText styleClass="output-text" value="#{complex.totalTemp}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{complex.firstTimeSale}" converter="timeConverter" />

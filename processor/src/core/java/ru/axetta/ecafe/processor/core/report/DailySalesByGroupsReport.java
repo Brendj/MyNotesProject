@@ -606,6 +606,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     .add(new TotalDataRow("Буфет ВСЕГО: ", totalBuffetCount, totalBuffetSum, subReportDataRowsBuffet));
 
             long totalUnPaidCount = 0, totalUnPaidSum = 0;
+            long totalUnPaidTempClientsCount = 0, totalUnPaidTempClientsSum = 0;
             long totalPayCount = 0, totalPaySum = 0;
 
             totalCount = 0;
@@ -694,14 +695,18 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                         .add(new TotalDataRow("Платное комплексное питание + Буфет ВСЕГО: ", totalPayAndBuffetCount,
                                 totalPayAndBuffetSum, subReportDataRowsPay));
 
-                //// бесплатное питание
+                //// бесплатное питание по своей ОО
 
                 List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
 
                 Query freeComplexQuery1 = session.createSQLQuery(
                         "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount "
-                                + "FROM CF_ORDERS o,CF_ORDERDETAILS od "
-                                + String.format("WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 ", orgAdditionalCondition)
+                                + "FROM CF_ORDERS o,CF_ORDERDETAILS od, cf_clients c "
+                                + String.format("WHERE %s AND (o.IdOfOrder=od.IdOfOrder) "
+                                + "and c.idofclient = o.idofclient "
+                                + "and c.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = o.idoforg)"
+                                + "AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) "
+                                + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 ", orgAdditionalCondition)
                                 + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
 
                 freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
@@ -742,8 +747,63 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroupUnPaid, totalCount, totalSum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
                         totalCountMixed, totalSumMixed));
 
-                long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount;
+                /*long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount;
                 long totalByAllSum = totalBuffetSum + totalPaySum + totalUnPaidSum;
+
+                totalDataRows.add(new TotalDataRow("ОБЩЕЕ: ", totalByAllCount, totalByAllSum, subReportDataRowsUnPaid));*/
+
+                //бесплатное пропитание временно обуччающихся другой ООО
+                List<SubReportDataRow> subReportDataRowsUnPaidTempClients = new LinkedList<SubReportDataRow>();
+
+                Query freeComplexQueryTempClients = session.createSQLQuery(
+                        "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount "
+                                + "FROM CF_ORDERS o,CF_ORDERDETAILS od, cf_clients c "
+                                + String.format("WHERE %s AND (o.IdOfOrder=od.IdOfOrder) "
+                                + "and c.idofclient = o.idofclient "
+                                + "and c.idoforg not in (select friendlyorg from cf_friendly_organization where currentorg = o.idoforg)"
+                                + "AND (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) "
+                                + "AND (od.RPrice=0 AND od.Discount>0) AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 ", orgAdditionalCondition)
+                                + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
+
+                freeComplexQueryTempClients.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+                freeComplexQueryTempClients.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+                freeComplexQueryTempClients.setParameter("startTime", startTime.getTime());
+                freeComplexQueryTempClients.setParameter("endTime", endTime.getTime());
+
+                mealsList = freeComplexQueryTempClients.list();
+
+                totalCount = 0;
+                totalSum = 0;
+
+                String menuGroupUnPaidTempClients = "Бeсплатное комплексное питание временно обучающихся другой ОО";
+
+                MealRow mealRowUnPaidTempClients = new MealRow(menuGroupUnPaidTempClients, new ArrayList<SubReportMealRow>());
+                mealRowHashMap.put(menuGroupUnPaidTempClients, mealRowUnPaidTempClients);
+
+                for (Object o : mealsList) {
+                    vals = (Object[]) o;
+                    String menuNameUnPaidTempClients = vals[4].toString(); // od.MenuType
+                    long count = Long.parseLong(vals[1].toString());
+                    long rPrice = vals[2] == null ? 0 : Long.parseLong(vals[2].toString());
+                    long sum = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
+                    long socdiscount = vals[5] == null ? 0 : Long.parseLong(vals[5].toString());
+                    totalCount += count;
+                    totalUnPaidTempClientsCount += count;
+                    totalSum += sum;
+                    totalUnPaidTempClientsSum += sum;
+
+                    subReportMealRow = new SubReportMealRow(menuNameUnPaidTempClients, count, rPrice + socdiscount, sum, null, null, null, null, null, null);
+                    mealRowHashMap.get(menuGroupUnPaidTempClients).getSubReportMealRowList().add(subReportMealRow);
+                }
+
+                mealRowHashMap.get(menuGroupUnPaidTempClients).setMealCountGroupTotal(totalUnPaidTempClientsCount);
+                mealRowHashMap.get(menuGroupUnPaidTempClients).setMealSumGroupTotal(totalUnPaidTempClientsSum);
+
+                subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroupUnPaidTempClients, totalCount, totalSum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
+                        totalCountMixed, totalSumMixed));
+
+                long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount + totalUnPaidTempClientsCount;
+                long totalByAllSum = totalBuffetSum + totalPaySum + totalUnPaidSum + totalUnPaidTempClientsSum;
 
                 totalDataRows.add(new TotalDataRow("ОБЩЕЕ: ", totalByAllCount, totalByAllSum, subReportDataRowsUnPaid));
             }

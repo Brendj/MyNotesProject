@@ -210,7 +210,7 @@ public class MonitoringOfReportPage extends OnlineReportPage {
             if (templateShortFileName != null) {
                 printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
             } else {
-                printError(String.format("Отчет строиться на все дни недели кроме 'Воскресенья'"));
+                printError(String.format("Отчет строится на все дни недели кроме 'Воскресенья'"));
             }
             return null;
         }

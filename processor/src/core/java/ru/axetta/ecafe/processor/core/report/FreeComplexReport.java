@@ -36,48 +36,75 @@ public class FreeComplexReport extends BasicReport {
                 }
                 orgCondition = orgCondition.substring(0, orgCondition.length() - 4) + ") ";
 
-                String preparedQuery = "select org.officialName, od.menuDetailName, od.rPrice, od.discount, "
-                        + "sum(od.qty) as quantity, " + " min(o.createdDate), max(o.createdDate) "
-                        + "  from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
-                        + " where o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
-                        + "   and o.idOfOrg = od.idOfOrg" + "   and org.idOfOrg = od.idOfOrg "
-                        + "   and o.createdDate >= :fromCreatedDate " + "   and o.createdDate <= :toCreatedDate"
-                        + "   and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) " + orgCondition
-                        //+ "   and (((od.rPrice + od.discount) = od.discount and o.trdDiscount is null) or"
-                        + "   and (od.socDiscount > 0 and od.rprice = 0) "
-                        + " group by org.officialName, od.menuDetailName, od.rPrice, od.discount "
-                        + " order by org.officialName, od.menuDetailName";
-                List resultList = null;
-                Query query = session.createSQLQuery(preparedQuery);
+                List resultList = getResultList(session, orgCondition, startDate, endDate, false);
+                complexItems = getComplexItems(resultList);
 
-                long startDateLong = startDate.getTime();
-                long endDateLong = endDate.getTime();
-                query.setLong("fromCreatedDate", startDateLong);
-                query.setLong("toCreatedDate", endDateLong);
-                query.setInteger("fromMenuType", OrderDetail.TYPE_COMPLEX_MIN);
-                query.setInteger("toMenuType", OrderDetail.TYPE_COMPLEX_MAX);
-
-                resultList = query.list();
-
-                for (Object result : resultList) {
-                    Object[] complex = (Object[]) result;
-                    String officialName = (String) complex[0];
-                    String menuDetailName = (String) complex[1];
-                    Long rPrice = ((BigInteger) complex[2]).longValue();
-                    Long discount = ((BigInteger) complex[3]).longValue();
-                    Long qty = ((BigInteger) complex[4]).longValue();
-                    Date firstTimeSale = new Date(((BigInteger) complex[5]).longValue());
-                    Date lastTimeSale = new Date(((BigInteger) complex[6]).longValue());
-                    ComplexItem complexItem = new ComplexItem(officialName, menuDetailName, rPrice, discount, qty,
-                            firstTimeSale, lastTimeSale);
-                    complexItems.add(complexItem);
+                resultList = getResultList(session, orgCondition, startDate, endDate, true);
+                if (resultList != null && resultList.size() > 0) {
+                    List<ComplexItem> complexItems2 = getComplexItems(resultList);
+                    for (ComplexItem item2 : complexItems2) {
+                        for (ComplexItem item : complexItems) {
+                            if (item.equals(item2)) {
+                                item.setQtyTemp(item2.getQty());
+                                item.setSumPriceDiscountTemp(item2.getSumPriceDiscount());
+                                item.setSumPriceTemp(item2.getSumPrice());
+                                item.setTotalTemp(item2.getTotal());
+                                break;
+                            }
+                        }
+                    }
                 }
+
             } else {
                 throw new Exception("Укажите список организаций");
             }
             return new FreeComplexReport(generateTime, new Date().getTime() - generateTime.getTime(), complexItems);
         }
 
+    }
+
+    private static List<ComplexItem> getComplexItems(List resultList) {
+        List<ComplexItem> complexItems = new LinkedList<ComplexItem>();
+        for (Object result : resultList) {
+            Object[] complex = (Object[]) result;
+            String officialName = (String) complex[0];
+            String menuDetailName = (String) complex[1];
+            Long rPrice = ((BigInteger) complex[2]).longValue();
+            Long discount = ((BigInteger) complex[3]).longValue();
+            Long qty = ((BigInteger) complex[4]).longValue();
+            Date firstTimeSale = new Date(((BigInteger) complex[5]).longValue());
+            Date lastTimeSale = new Date(((BigInteger) complex[6]).longValue());
+            ComplexItem complexItem = new ComplexItem(officialName, menuDetailName, rPrice, discount, qty,
+                    firstTimeSale, lastTimeSale);
+            complexItems.add(complexItem);
+        }
+        return complexItems;
+    }
+
+    private static List getResultList(Session session, String orgCondition, Date startDate, Date endDate, boolean tempClients) {
+        String preparedQuery = "select org.officialName, od.menuDetailName, od.rPrice, od.discount, "
+                + "sum(od.qty) as quantity, " + " min(o.createdDate), max(o.createdDate) "
+                + "  from CF_Orders o, CF_OrderDetails od, CF_Orgs org, cf_clients c "
+                + " where o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
+                + "   and o.idOfOrg = od.idOfOrg" + "   and org.idOfOrg = od.idOfOrg "
+                + "   and o.idofclient = c.idofclient and c.idoforg" + (tempClients ? " not " : "")
+                + " in (select friendlyOrg from cf_friendly_organization where currentorg = o.idoforg) "
+                + "   and o.createdDate >= :fromCreatedDate " + "   and o.createdDate <= :toCreatedDate"
+                + "   and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) " + orgCondition
+                + "   and (od.socDiscount > 0 and od.rprice = 0) "
+                + " group by org.officialName, od.menuDetailName, od.rPrice, od.discount "
+                + " order by org.officialName, od.menuDetailName";
+        List resultList = null;
+        Query query = session.createSQLQuery(preparedQuery);
+
+        long startDateLong = startDate.getTime();
+        long endDateLong = endDate.getTime();
+        query.setLong("fromCreatedDate", startDateLong);
+        query.setLong("toCreatedDate", endDateLong);
+        query.setInteger("fromMenuType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setInteger("toMenuType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        return query.list();
     }
 
     public FreeComplexReport() {
@@ -102,6 +129,10 @@ public class FreeComplexReport extends BasicReport {
         private final String total; // Итоговая сумма
         private final Date firstTimeSale; // Время первой продажи
         private final Date lastTimeSale; // Время последней продажи
+        private Long qtyTemp; // Кол-во
+        private String sumPriceTemp; //Сумма без скидки
+        private String sumPriceDiscountTemp; // Сумма скидки
+        private String totalTemp; // Итоговая сумма
 
         public String getOfficialName() {
             return officialName;
@@ -155,6 +186,38 @@ public class FreeComplexReport extends BasicReport {
             this.total = longToMoney(rPrice * qty);
             this.firstTimeSale = firstTimeSale;
             this.lastTimeSale = lastTimeSale;
+        }
+
+        public Long getQtyTemp() {
+            return qtyTemp;
+        }
+
+        public void setQtyTemp(Long qtyTemp) {
+            this.qtyTemp = qtyTemp;
+        }
+
+        public String getSumPriceTemp() {
+            return sumPriceTemp;
+        }
+
+        public void setSumPriceTemp(String sumPriceTemp) {
+            this.sumPriceTemp = sumPriceTemp;
+        }
+
+        public String getSumPriceDiscountTemp() {
+            return sumPriceDiscountTemp;
+        }
+
+        public void setSumPriceDiscountTemp(String sumPriceDiscountTemp) {
+            this.sumPriceDiscountTemp = sumPriceDiscountTemp;
+        }
+
+        public String getTotalTemp() {
+            return totalTemp;
+        }
+
+        public void setTotalTemp(String totalTemp) {
+            this.totalTemp = totalTemp;
         }
     }
 

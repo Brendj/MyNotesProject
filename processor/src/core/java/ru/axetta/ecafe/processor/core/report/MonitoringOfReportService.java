@@ -109,7 +109,13 @@ public class MonitoringOfReportService {
                         + monitoringOfItem.getNumberOfPassesGuardians());
 
         monitoringOfItem.setNumberOfLgotnoe(
-                numberOfLgotnoe(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+                numberOfLgotnoeNewway(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session, null));
+
+        monitoringOfItem.setNumberOfLgotnoeFriendlyOrg(
+                numberOfLgotnoeNewway(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session, true));
+
+        monitoringOfItem.setNumberOfLgotnoeOtherOrg(
+                numberOfLgotnoeNewway(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session, false));
 
         monitoringOfItem.setNumberOfReserve(
                 numberOfReserve(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
@@ -189,6 +195,25 @@ public class MonitoringOfReportService {
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0");
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long numberOfLgotnoeNewway(Long idOfOrg, Date startTime, Date endTime, Session session, Boolean friendly) {
+        Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
+                + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg = :idoforg AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
+                + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0 "
+                + (friendly == null ? "" : ("and c.idoforg " + (friendly ? "" : "not ") + "in (select friendlyorg from cf_friendly_organization where currentorg = :idoforg)")));
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -672,6 +697,8 @@ public class MonitoringOfReportService {
         private Long summaryOfPasses;
 
         private Long numberOfLgotnoe;
+        private Long numberOfLgotnoeFriendlyOrg;
+        private Long numberOfLgotnoeOtherOrg;
         private Long numberOfReserve;
         private Long numberOfBuffetStudent;
         private Long numberOfBuffetGuardians;
@@ -804,6 +831,22 @@ public class MonitoringOfReportService {
 
         public void setNumberOfPaidGuardians(Long numberOfPaidGuardians) {
             this.numberOfPaidGuardians = numberOfPaidGuardians;
+        }
+
+        public Long getNumberOfLgotnoeFriendlyOrg() {
+            return numberOfLgotnoeFriendlyOrg;
+        }
+
+        public void setNumberOfLgotnoeFriendlyOrg(Long numberOfLgotnoeFriendlyOrg) {
+            this.numberOfLgotnoeFriendlyOrg = numberOfLgotnoeFriendlyOrg;
+        }
+
+        public Long getNumberOfLgotnoeOtherOrg() {
+            return numberOfLgotnoeOtherOrg;
+        }
+
+        public void setNumberOfLgotnoeOtherOrg(Long numberOfLgotnoeOtherOrg) {
+            this.numberOfLgotnoeOtherOrg = numberOfLgotnoeOtherOrg;
         }
     }
 
