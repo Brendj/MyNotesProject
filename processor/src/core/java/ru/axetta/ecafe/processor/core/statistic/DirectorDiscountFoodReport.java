@@ -1,0 +1,464 @@
+/*
+ * Copyright (c) 2017. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.statistic;
+
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.report.BasicReport;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+
+import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.text.NumberFormat;
+import java.util.*;
+
+public class DirectorDiscountFoodReport extends BasicReport {
+
+    private final List<DirectorDiscountFoodEntry> items;
+
+    private static final Long youngSOSH     = -90L; // начальные СОШ
+    private static final Long middleSOSH    = -91L; // средние СОШ
+    private static final Long elderSOSH     = -92L; // старшие СОШ
+
+    private static final Long youngDOU1     = 105L; // 1.5-3 ДОУ
+    private static final Long youngDOU2     = 123L; // 1.5-3 ДОУ
+    private static final Long elderDOU1     = 106L; // 3-7 ДОУ
+    private static final Long elderDOU2     = 124L; // 3-7 ДОУ
+
+    private Boolean allOO;
+
+    public static class Builder {
+        public DirectorDiscountFoodReport build(Session session, Date startDate, Date endDate, List<Long> idsOfOrg, Boolean allOO) throws Exception {
+            Date generateTime = new Date();
+            List<DirectorDiscountFoodEntry> entries = new ArrayList<DirectorDiscountFoodEntry>();
+
+            String sqlQuery =
+                        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, dr.categoriesdiscounts "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced) THEN e.idofclient END)) AS s2_LGOTNOE "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve) THEN e.idofclient END)) AS s3_RESERV "
+                      + "FROM cf_orgs o "
+                      + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND (e.idofclientgroup<:employees OR e.idofclientgroup > :deleted) "
+                      + "           AND e.ordertype IN (:reduced,:reserve) AND e.createddate>=:startDate AND e.createddate<:endDate "
+                      + "LEFT JOIN cf_orderdetails od ON e.idoforder=od.idoforder AND e.idoforg=od.idoforg AND e.state=:state_commited AND od.state=0 AND od.idofrule IS NOT NULL "
+                      + "LEFT JOIN cf_discountrules dr ON dr.idofrule=od.idofrule "
+                      + "LEFT JOIN cf_clients c ON e.idofclient=c.idofclient "
+                      + "WHERE o.idoforg IN (:idsOfOrg) "
+                      + "GROUP BY o.idoforg, o.shortnameinfoservice, o.shortaddress, o.shortname, o.organizationtype, dr.categoriesdiscounts";
+
+            Query query = session.createSQLQuery(sqlQuery);
+            query.setParameter("reduced", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
+            query.setParameter("reserve", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
+            query.setParameter("state_commited", Order.STATE_COMMITED);
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+            query.setParameter("startDate", startDate.getTime());
+            query.setParameter("endDate", endDate.getTime());
+            query.setParameterList("idsOfOrg", idsOfOrg);
+
+            List resultList = query.list();
+
+            HashMap<Long, DirectorDiscountFoodEntry> entryHashMap = new HashMap<Long, DirectorDiscountFoodEntry>();
+
+            for (Object o : resultList) {
+                Object vals[] = (Object[]) o;
+
+
+                DirectorDiscountFoodEntry entry;
+                List<String> categoryDiscounts = Collections.emptyList();
+
+                if (null != vals[5]) {
+                    categoryDiscounts = Arrays.asList(((String) vals[5]).split(","));
+                }
+                Long orgType = ((Integer)vals[1]).longValue();
+                Long idOfOrg = ((BigInteger)vals[0]).longValue();
+
+                if (categoryDiscounts.isEmpty()) {
+                    entry = new DirectorDiscountFoodEntry();
+                    entry.setShortNameInfoService((String)vals[2]);
+                    entry.setShortName((String)vals[3]);
+                    entry.setAddress((String)vals[4]);
+                    entry.setOrganizationType(orgType);
+                    entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
+                    entryHashMap.put(entry.getIdOfOrg(), entry);
+                }
+
+                for (String discount : categoryDiscounts) {
+                    Long discountL = Long.parseLong(discount);
+
+                    if (entryHashMap.containsKey(idOfOrg)) {
+                        entry = entryHashMap.get(idOfOrg);
+
+                        if (entry.getOrganizationType().equals(orgType)) {
+                            if (youngSOSH.equals(discountL)) {                                // начальные СОШ
+                                entry.setPrivilegeYoungValue(entry.getPrivilegeYoungValue() + ((BigInteger) vals[6]).longValue());
+                                entry.setReserveYoungValue(entry.getReserveYoungValue() + ((BigInteger) vals[7]).longValue());
+                            } else if (middleSOSH.equals(discountL)) {                         // средние СОШ
+                                entry.setPrivilegeMiddleValue(entry.getPrivilegeMiddleValue() + ((BigInteger) vals[6]).longValue());
+                                entry.setReserveMiddleValue(entry.getReserveMiddleValue() + ((BigInteger) vals[7]).longValue());
+                            } else if (elderSOSH.equals(discountL)) {                         // старшие СОШ
+                                entry.setPrivilegeElderValue(entry.getPrivilegeElderValue() + ((BigInteger) vals[6]).longValue());
+                                entry.setReserveElderValue(entry.getReserveElderValue() + ((BigInteger) vals[7]).longValue());
+                            } else if (youngDOU1.equals(discountL) || youngDOU2.equals(discountL)) {    // 1.5-3 ДОУ
+                                entry.setPrivilegeDOUYoungValue(entry.getPrivilegeDOUYoungValue() + ((BigInteger) vals[6]).longValue());
+                                entry.setReserveDOUYoungValue(entry.getReserveDOUYoungValue() + ((BigInteger) vals[7]).longValue());
+                            } else if (elderDOU1.equals(discountL) || elderDOU2.equals(discountL)) {    // 3-7 ДОУ
+                                entry.setPrivilegeDOUElderValue(entry.getPrivilegeElderValue() + ((BigInteger) vals[6]).longValue());
+                                entry.setReserveDOUElderValue(entry.getReserveDOUElderValue() + ((BigInteger) vals[7]).longValue());
+                            }
+                        }
+                    } else {
+                        entry = new DirectorDiscountFoodEntry();
+                        entry.setShortNameInfoService((String)vals[2]);
+                        entry.setShortName((String)vals[3]);
+                        entry.setAddress((String)vals[4]);
+                        entry.setOrganizationType(orgType);
+                        entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
+
+                        if (youngSOSH.equals(discountL)) {                                // начальные СОШ
+                            entry.setPrivilegeYoungValue(((BigInteger)vals[6]).longValue());
+                            entry.setReserveYoungValue(((BigInteger)vals[7]).longValue());
+                            entry.setDescription(discountL, "начальные классы");
+                            entryHashMap.put(entry.getIdOfOrg(), entry);
+                        } else if (middleSOSH.equals(discountL)) {                         // средние СОШ
+                            entry.setPrivilegeMiddleValue(((BigInteger)vals[6]).longValue());
+                            entry.setReserveElderValue(((BigInteger)vals[7]).longValue());
+                            entry.setDescription(discountL,"средние классы");
+                            entryHashMap.put(entry.getIdOfOrg(), entry);
+                        } else if (elderSOSH.equals(discountL)) {                         // старшие СОШ
+                            entry.setPrivilegeElderValue(((BigInteger)vals[6]).longValue());
+                            entry.setReserveElderValue(((BigInteger)vals[7]).longValue());
+                            entry.setDescription(discountL,"старшие классы");
+                            entryHashMap.put(entry.getIdOfOrg(), entry);
+                        } else if (youngDOU1.equals(discountL) || youngDOU2.equals(discountL)) {    // 1.5-3 ДОУ
+                            entry.setPrivilegeDOUYoungValue(((BigInteger)vals[6]).longValue());
+                            entry.setReserveDOUYoungValue(((BigInteger)vals[7]).longValue());
+                            entry.setDescription(discountL,"дошкольное отделение 1.5-3");
+                            entryHashMap.put(entry.getIdOfOrg(), entry);
+                        } else if (elderDOU1.equals(discountL) || elderDOU2.equals(discountL)) {    // 3-7 ДОУ
+                            entry.setPrivilegeDOUElderValue(((BigInteger)vals[6]).longValue());
+                            entry.setReserveDOUElderValue(((BigInteger)vals[7]).longValue());
+                            entry.setDescription(discountL,"дошкольное отделение 3-7");
+                            entryHashMap.put(entry.getIdOfOrg(), entry);
+                        }
+                    }
+                }
+            }
+
+            for (Long key : entryHashMap.keySet())
+                entries.add(entryHashMap.get(key));
+
+            return new DirectorDiscountFoodReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, allOO);
+        }
+    }
+
+    public DirectorDiscountFoodReport() {
+        super();
+        this.items = Collections.emptyList();
+        this.allOO = false;
+    }
+
+    public DirectorDiscountFoodReport(Date generateTime, long generateDuration, List<DirectorDiscountFoodEntry> entries, Boolean allOO) {
+        super(generateTime, generateDuration);
+        this.items = entries;
+        this.allOO = allOO;
+    }
+
+    public List<String> chartData() {
+        List<String> resultList = new ArrayList<String>();
+
+        if (items.isEmpty())
+            return resultList;
+
+        Long privilegeYoung = 0L,
+                privilegeMiddle = 0L,
+                privilegeElder = 0L,
+                reserveYoung = 0L,
+                reserveMiddle = 0L,
+                reserveElder = 0L,
+                privilegeDOUYoung = 0L,
+                privilegeDOUElder = 0L,
+                reserveDOUYoung = 0L,
+                reserveDOUElder = 0L;
+
+        for (DirectorDiscountFoodEntry entry : items) {
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+            // СОШ
+            if (OrganizationType.SCHOOL.getCode().longValue() == entry.getOrganizationType()) {
+                // если строим отчет не для всего комплекса ОО
+                if (!this.allOO) {
+                    dataset.addValue(entry.getPrivilegeYoungValue().doubleValue(), "льготная категория",
+                            "начальные (СОШ)");
+                    dataset.addValue(entry.getPrivilegeMiddleValue().doubleValue(), "льготная категория",
+                            "средние (СОШ)");
+                    dataset.addValue(entry.getPrivilegeElderValue().doubleValue(), "льготная категория", "старшие (СОШ)");
+
+                    dataset.addValue(entry.getReserveYoungValue().doubleValue(), "резервная категория",
+                            "начальные (СОШ)");
+                    dataset.addValue(entry.getReserveMiddleValue().doubleValue(), "резервная категория", "средние (СОШ)");
+                    dataset.addValue(entry.getReserveElderValue().doubleValue(), "резервная категория", "старшие (СОШ)");
+                }
+
+                privilegeYoung += entry.getPrivilegeYoungValue();
+                privilegeMiddle += entry.getPrivilegeMiddleValue();
+                privilegeElder += entry.getPrivilegeElderValue();
+
+                reserveYoung += entry.getReserveYoungValue();
+                reserveMiddle += entry.getReserveMiddleValue();
+                reserveElder += entry.getReserveElderValue();
+            }
+
+            // ДОУ
+            if (OrganizationType.KINDERGARTEN.getCode().longValue() == entry.getOrganizationType()) {
+                // если строим отчет не для всего комплекса ОО
+                if (!this.allOO) {
+                    dataset.addValue(entry.getPrivilegeDOUYoungValue().doubleValue(), "льготная категория",
+                            "1.5-3 (ДОУ)");
+                    dataset.addValue(entry.getPrivilegeDOUElderValue().doubleValue(), "льготная категория", "3-7 (ДОУ)");
+
+                    dataset.addValue(entry.getReserveDOUYoungValue().doubleValue(), "резервная категория", "1.5-3 (ДОУ)");
+                    dataset.addValue(entry.getReserveDOUElderValue().doubleValue(), "резервная категория", "3-7 (ДОУ)");
+                }
+
+                privilegeDOUYoung += entry.getPrivilegeDOUYoungValue();
+                privilegeDOUElder += entry.getPrivilegeDOUElderValue();
+
+                reserveDOUYoung += entry.getReserveDOUYoungValue();
+                reserveDOUElder += entry.getReserveDOUElderValue();
+            }
+
+            // если строим отчет не для всего комплекса ОО
+            if (!this.allOO) {
+                JFreeChart barChart = ChartFactory.createBarChart(
+                        String.format("Предоставление льготного питания %s(%s)", entry.getShortNameInfoService(), entry.getAddress()),
+                        "", "", dataset, PlotOrientation.VERTICAL, true, true, false);
+
+                barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
+                        new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
+                barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
+
+                BufferedImage image = barChart.createBufferedImage(800, 400);
+                resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
+            }
+        }
+        // если строим отчет для всего комплекса ОО
+            if (this.allOO) {
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+            dataset.addValue(privilegeYoung.doubleValue(), "льготная категория", "начальные (СОШ)");
+            dataset.addValue(privilegeMiddle.doubleValue(), "льготная категория", "средние (СОШ)");
+            dataset.addValue(privilegeElder.doubleValue(), "льготная категория", "старшие (СОШ)");
+
+            dataset.addValue(reserveYoung.doubleValue(), "резервная категория", "начальные (СОШ)");
+            dataset.addValue(reserveMiddle.doubleValue(), "резервная категория", "средние (СОШ)");
+            dataset.addValue(reserveElder.doubleValue(), "резервная категория", "старшие (СОШ)");
+
+            dataset.addValue(privilegeDOUYoung.doubleValue(), "льготная категория", "1.5-3 (ДОУ)");
+            dataset.addValue(privilegeDOUElder.doubleValue(), "льготная категория", "3-7 (ДОУ)");
+
+            dataset.addValue(reserveDOUYoung.doubleValue(), "резервная категория", "1.5-3 (ДОУ)");
+            dataset.addValue(reserveDOUElder.doubleValue(), "резервная категория", "3-7 (ДОУ)");
+
+            JFreeChart barChart = ChartFactory.createBarChart(
+                    String.format("Предоставление льготного питания %s(весь комплекс)", items.get(0).getShortNameInfoService()),
+                    "", "", dataset, PlotOrientation.VERTICAL, true, true, false);
+
+            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
+                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
+            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
+
+            BufferedImage image = barChart.createBufferedImage(800, 400);
+            resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
+        }
+
+        return resultList;
+    }
+
+    public static String imgToBase64String(final RenderedImage img, final String formatName) {
+        String base64String = "";
+        try {
+            final ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ImageIO.write(img, formatName, output);
+            base64String = DatatypeConverter.printBase64Binary(output.toByteArray());
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+        return base64String;
+    }
+
+    public static class DirectorDiscountFoodEntry {
+        private Long idOfOrg;
+        private Long organizationType;
+        private String shortNameInfoService;
+        private String shortName;
+        private String address;
+        private Long privilegeElderValue;       // СОШ старшие льготники
+        private Long privilegeMiddleValue;      // СОШ средние льготники
+        private Long privilegeYoungValue;       // СОШ младшие льготники
+        private Long reserveElderValue;         // СОШ старшие резервники
+        private Long reserveMiddleValue;        // СОШ средние резервники
+        private Long reserveYoungValue;         // СОШ средние резервники
+        private Long privilegeDOUYoungValue;    // ДОУ 1.5-3 льготники
+        private Long privilegeDOUElderValue;    // ДОУ 3-7 льготники
+        private Long reserveDOUYoungValue;      // ДОУ 1.5-3 резервники
+        private Long reserveDOUElderValue;      // ДОУ 3-7 резервники
+        private HashMap<Long, String> descriptions;
+
+        public DirectorDiscountFoodEntry() {
+            idOfOrg                 = -1L;
+            organizationType        = -1L;
+            privilegeElderValue     = 0L;
+            privilegeMiddleValue    = 0L;
+            privilegeYoungValue     = 0L;
+            reserveElderValue       = 0L;
+            reserveMiddleValue      = 0L;
+            reserveYoungValue       = 0L;
+            privilegeDOUYoungValue  = 0L;
+            privilegeDOUElderValue  = 0L;
+            reserveDOUElderValue    = 0L;
+            reserveDOUYoungValue    = 0L;
+            descriptions = new HashMap<Long, String>();
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public Long getOrganizationType() {
+            return organizationType;
+        }
+
+        public String getShortNameInfoService() {
+            return shortNameInfoService;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public Long getPrivilegeElderValue() {
+            return privilegeElderValue;
+        }
+
+        public Long getPrivilegeMiddleValue() {
+            return privilegeMiddleValue;
+        }
+
+        public Long getPrivilegeYoungValue() {
+            return privilegeYoungValue;
+        }
+
+        public Long getReserveElderValue() {
+            return reserveElderValue;
+        }
+
+        public Long getReserveMiddleValue() {
+            return reserveMiddleValue;
+        }
+
+        public Long getReserveYoungValue() {
+            return reserveYoungValue;
+        }
+
+        public Long getPrivilegeDOUYoungValue() {
+            return privilegeDOUYoungValue;
+        }
+
+        public Long getPrivilegeDOUElderValue() {
+            return privilegeDOUElderValue;
+        }
+
+        public Long getReserveDOUElderValue() {
+            return reserveDOUElderValue;
+        }
+
+        public Long getReserveDOUYoungValue() {
+            return reserveDOUYoungValue;
+        }
+
+        public String getDescription(Long idOfCategoryDiscount) {
+            return descriptions.get(idOfCategoryDiscount);
+        }
+
+        public void setIdOfOrg(Long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public void setOrganizationType(Long organizationType) {
+            this.organizationType = organizationType;
+        }
+
+        public void setShortNameInfoService(String shortNameInfoService) {
+            this.shortNameInfoService = shortNameInfoService;
+        }
+
+        public void setShortName(String shortName) {
+            this.shortName = shortName;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public void setPrivilegeElderValue(Long privilegeElderValue) {
+            this.privilegeElderValue = privilegeElderValue;
+        }
+
+        public void setPrivilegeMiddleValue(Long privilegeMiddleValue) {
+            this.privilegeMiddleValue = privilegeMiddleValue;
+        }
+
+        public void setPrivilegeYoungValue(Long privilegeYoungValue) {
+            this.privilegeYoungValue = privilegeYoungValue;
+        }
+
+        public void setReserveYoungValue(Long reserveYoungValue) {
+            this.reserveYoungValue = reserveYoungValue;
+        }
+
+        public void setReserveMiddleValue(Long reserveMiddleValue) {
+            this.reserveMiddleValue = reserveMiddleValue;
+        }
+
+        public void setReserveElderValue(Long reserveElderValue) {
+            this.reserveElderValue = reserveElderValue;
+        }
+
+        public void setPrivilegeDOUYoungValue(Long privilegeDOUYoungValue) {
+            this.privilegeDOUYoungValue = privilegeDOUYoungValue;
+        }
+
+        public void setPrivilegeDOUElderValue(Long privilegeDOUElderValue) {
+            this.privilegeDOUElderValue = privilegeDOUElderValue;
+        }
+
+        public void setReserveDOUElderValue(Long reserveDOUElderValue) {
+            this.reserveDOUElderValue = reserveDOUElderValue;
+        }
+
+        public void setReserveDOUYoungValue(Long reserveDOUYoungValue) {
+            this.reserveDOUYoungValue = reserveDOUYoungValue;
+        }
+
+        public void setDescription(Long idOfCategoryDiscount, String description) {
+            this.descriptions.put(idOfCategoryDiscount, description);
+        }
+    }
+}

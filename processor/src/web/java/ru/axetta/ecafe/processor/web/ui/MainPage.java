@@ -366,6 +366,7 @@ public class MainPage implements Serializable {
     private final ClientSelectListPage clientSelectListPage = new ClientSelectListPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
     private final UserSelectPage userSelectPage = new UserSelectPage();
+    private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
 
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
@@ -9976,5 +9977,120 @@ public class MainPage implements Serializable {
 
     public FeedingSettingCreatePage getFeedingSettingCreatePage() {
         return feedingSettingCreatePage;
+    }
+
+    public OrgMainBuildingListSelectPage getOrgMainBuildingListSelectPage() {
+        return orgMainBuildingListSelectPage;
+    }
+
+    public Object showOrgMainBuildingListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof OrgMainBuildingListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof OrgMainBuildingListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                Long organizationId = null;
+
+                if (currentWorkspacePage instanceof UserCreatePage)
+                    organizationId = userCreatePage.getOrganizationId();
+
+                if (currentWorkspacePage instanceof UserEditPage)
+                    organizationId = userEditPage.getOrganizationId();
+
+
+                orgMainBuildingListSelectPage.fill(persistenceSession, organizationId);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof OrgMainBuildingListSelectPage.CompleteHandler) {
+                    orgMainBuildingListSelectPage
+                            .pushCompleteHandler((OrgMainBuildingListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(orgMainBuildingListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill contragents list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка организаций: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+        return null;
+    }
+
+    public Object clearOrgMainBuildingListSelectedItemsList() {
+        orgMainBuildingListSelectPage.deselectAllItems();
+
+        if (currentWorkspacePage instanceof UserCreatePage)
+            userCreatePage.setOrganizationId(null);
+
+        if (currentWorkspacePage instanceof UserEditPage)
+            userEditPage.setOrganizationId(null);
+
+        showOrgMainBuildingListSelectPage();
+        return null;
+    }
+
+    public Object completeOrgMainBuildingListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Long organizationId = null;
+
+            if (currentWorkspacePage instanceof UserCreatePage)
+                organizationId = userCreatePage.getOrganizationId();
+
+            if (currentWorkspacePage instanceof UserEditPage)
+                organizationId = userEditPage.getOrganizationId();
+
+            orgMainBuildingListSelectPage.completeOrgMainBuildingSelection(persistenceSession, organizationId);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == orgMainBuildingListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            orgMainBuildingListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("Failed to complete org mainbuilding list selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка организаций: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object cancelOrgMainBuildingListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            orgMainBuildingListSelectPage.cancelOrgMainBuildingListSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == orgMainBuildingListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+            orgMainBuildingListSelectPage.setFilter("");
+        } catch (Exception e) {
+            logger.error("{}", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора списка организаций: " + e.getMessage(), null));
+        }
+        return null;
     }
 }

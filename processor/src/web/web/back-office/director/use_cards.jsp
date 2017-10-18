@@ -17,28 +17,47 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<style type="text/css">
+    .out-of-date {
+        color: gray;
+    }
+</style>
+
 <h:panelGrid id="directorUseCardsGrid" binding="#{directorPage.directorUseCardsPage.pageComponent}" styleClass="borderless-grid"
              columns="2">
-    <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
-    <h:panelGroup>
-        <a4j:commandButton value="..." action="#{directorPage.showOrgListSelectPage}"
-                           reRender="directorUseCardsGrid, modalOrgListSelectorOrgTable"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;">
-            <f:setPropertyActionListener value="#{directorPage.directorUseCardsPage.getStringIdOfOrgList}"
-                                         target="#{directorPage.orgFilterOfSelectOrgListSelectPage}" />
-        </a4j:commandButton>
-        <h:outputText styleClass="output-text" escape="true" value=" #{directorPage.directorUseCardsPage.filter}" />
-    </h:panelGroup>
+    <h:outputText styleClass="output-text" escape="true" value="Список организаций"/>
+    <%--<h:panelGroup>--%>
+        <%--<a4j:commandButton value="..." action="#{directorPage.showOrgListSelectPage}"--%>
+                           <%--reRender="directorUseCardsGrid, modalOrgListSelectorOrgTable"--%>
+                           <%--oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"--%>
+                           <%--styleClass="command-link" style="width: 25px;">--%>
+            <%--<f:setPropertyActionListener value="#{directorPage.directorUseCardsPage.getStringIdOfOrgList}"--%>
+                                         <%--target="#{directorPage.orgFilterOfSelectOrgListSelectPage}" />--%>
+        <%--</a4j:commandButton>--%>
+    <%--</h:panelGroup>--%>
+    <h:selectManyCheckbox value="#{directorPage.directorUseCardsPage.selectedOrgs}" id="directorUseCardsGridSelectionPanel" styleClass="output-text" layout="pageDirection">
+        <f:selectItem itemValue="-1" itemLabel="весь комплекс ОО"/>
+        <c:forEach items="#{directorPage.directorUseCardsPage.organizations}" var="item">
+            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName}" itemDisabled="#{directorPage.directorUseCardsPage.selectedOrgs.contains('-1')}"/>
+        </c:forEach>
+        <a4j:support event="onchange" reRender="directorUseCardsGridSelectionPanel"/>
+    </h:selectManyCheckbox>
+
     <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
     <rich:calendar value="#{directorPage.directorUseCardsPage.startDate}" datePattern="dd.MM.yyyy"
-                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" dataModel="#{directorPage.directorUseCardsPage.startCalendarModel}"
+                   mode="ajax" boundaryDatesMode="scroll">
+        <a4j:support event="onchanged" reRender="directorUseCardsGrid" ajaxSingle="true"/>
+    </rich:calendar>
     <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
     <rich:calendar value="#{directorPage.directorUseCardsPage.endDate}" datePattern="dd.MM.yyyy"
-                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" dataModel="#{directorPage.directorUseCardsPage.endCalendarModel}"
+                   mode="ajax" boundaryDatesMode="scroll">
+        <a4j:support event="onchanged" reRender="directorUseCardsGrid" ajaxSingle="true"/>
+    </rich:calendar>
     <a4j:commandButton value="Генерировать отчет" action="#{directorPage.directorUseCardsPage.buildUseCardsReport}"
                        reRender="workspaceTogglePanel, directorUseCardsGrid" styleClass="command-button"
-                       status="idReportGenerateStatus" />
+                       status="idReportGenerateStatus"/>
     <a4j:status id="idReportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -47,3 +66,10 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
+<h:panelGroup id="directorUseCardsReportGrid" styleClass="borderless-grid">
+    <c:forEach items="#{directorPage.directorUseCardsPage.chartData}" var="item">
+        <div class="report-holder">
+            <h:graphicImage value="#{item}" width="800" height="400" rendered="#{directorPage.directorUseCardsPage.showReport}"/>
+        </div>
+    </c:forEach>
+</h:panelGroup>

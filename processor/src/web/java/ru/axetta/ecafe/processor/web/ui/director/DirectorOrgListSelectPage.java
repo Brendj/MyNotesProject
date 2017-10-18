@@ -83,9 +83,13 @@ public class DirectorOrgListSelectPage extends OrgSelectionBasicPage {
         this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
     }
 
-    public synchronized void fill(Session session, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
+    public synchronized void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
             throws Exception {
-        selectedOrgs.clear();
+        if (isUpdate) {
+            updateSelectedOrgs();
+        } else {
+            selectedOrgs.clear();
+        }
         List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList);
         for (OrgShortItem orgShortItem : items) {
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));

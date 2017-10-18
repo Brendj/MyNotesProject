@@ -4,11 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.director;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.statistic.DirectorFinanceReport;
 import ru.axetta.ecafe.processor.core.statistic.DirectorLoader;
-import ru.axetta.ecafe.processor.core.statistic.DirectorUseCardsReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -21,17 +19,10 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
-/**
- * Created by i.semenov on 19.09.2017.
- */
-public class DirectorUseCardsPage extends OnlineReportPage {
-    private Logger logger = LoggerFactory.getLogger(DirectorUseCardsPage.class);
-    private DirectorUseCardsReport directorUseCardsReport;
+public class DirectorFinancePage extends OnlineReportPage{
+    private Logger logger = LoggerFactory.getLogger(DirectorFinancePage.class);
+    private DirectorFinanceReport directorFinanceReport;
     private DirectorLoader directorLoader = new DirectorLoader();
-
-    public DirectorUseCardsReport getDirectorUseCardsReport() {
-        return directorUseCardsReport;
-    }
 
     private static final String SELECT_ALL_OO = "-1";
 
@@ -43,7 +34,7 @@ public class DirectorUseCardsPage extends OnlineReportPage {
 
     private List<DirectorLoader.OrgItem> organizations = new ArrayList<DirectorLoader.OrgItem>();
 
-    public DirectorUseCardsPage() {
+    public DirectorFinancePage() {
         selectedOrgs.add(SELECT_ALL_OO);
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -56,14 +47,15 @@ public class DirectorUseCardsPage extends OnlineReportPage {
         this.startDate = localCalendar.getTime();
     }
 
-    public Object buildUseCardsReport() {
+    public Object buildFinanceReport() {
         RuntimeContext runtimeContext;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
+        Session session = null;
+        Transaction transaction = null;
+
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession(); //открытие сессии к отчетной БД (запросы только на чтение)
-            persistenceTransaction = persistenceSession.beginTransaction();
+            session = runtimeContext.createReportPersistenceSession();
+            transaction = session.beginTransaction();
 
             List<Long> orgList = new ArrayList<Long>();
 
@@ -78,33 +70,33 @@ public class DirectorUseCardsPage extends OnlineReportPage {
                 }
             }
 
-            buildReport(persistenceSession, this.startDate, this.endDate, orgList, selectedOrgs.contains(SELECT_ALL_OO));
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            buildReport(session, this.startDate, this.endDate, orgList, selectedOrgs.contains(SELECT_ALL_OO));
+            transaction.commit();
+            transaction = null;
         } catch (Exception e) {
-            logger.error("Failed to build director use cards report", e);
+            logger.error("Failed to build director finance report", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
         } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
         return null;
     }
 
     public String getPageFilename() {
-        return "use_cards";
+        return "finance";
     }
 
     public void buildReport(Session session, Date startDate, Date endDate, List<Long> idsOfOrg, Boolean allOO) throws Exception {
-        DirectorUseCardsReport.Builder reportBuilder = new DirectorUseCardsReport.Builder();
-        this.directorUseCardsReport = reportBuilder.build(session, startDate, endDate, idsOfOrg, allOO);
+        DirectorFinanceReport.Builder reportBuilder = new DirectorFinanceReport.Builder();
+        this.directorFinanceReport = reportBuilder.build(session, startDate, endDate, idsOfOrg, allOO);
         showReport = true;
     }
 
     public List<String> getChartData() {
-        if (null == directorUseCardsReport)
+        if (null == directorFinanceReport)
             return Collections.emptyList();
-        return directorUseCardsReport.chartData();
+        return directorFinanceReport.chartData();
     }
 
     public Boolean getShowReport() {
@@ -127,7 +119,7 @@ public class DirectorUseCardsPage extends OnlineReportPage {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Failed to load organizations in director use cards report", e);
+            logger.error("Failed to load organizations in director finance report", e);
             printError("Ошибка при загрузке списка организаций: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);

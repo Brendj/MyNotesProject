@@ -9,6 +9,7 @@
   Time: 18:35
   To change this template use File | Settings | File Templates.
 --%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -17,7 +18,59 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<h:panelGrid id="directorDiscountFoodGrid" binding="#{directorPage.discountFoodPage.pageComponent}" styleClass="borderless-grid"
+<style type="text/css">
+    .out-of-date {
+        color: gray;
+    }
+</style>
+
+<h:panelGrid id="directorDiscountFoodGrid" binding="#{directorPage.directorDiscountFoodPage.pageComponent}" styleClass="borderless-grid"
              columns="2">
-    <h:outputText value="#{directorPage.discountFoodPage.helloText}"/>
+    <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
+<%--<h:panelGroup>--%>
+<%--<a4j:commandButton value="..." action="#{directorPage.showOrgListSelectPage}"--%>
+                   <%--reRender="directorDiscountFoodGrid, modalOrgListSelectorOrgTable"--%>
+                   <%--oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"--%>
+                   <%--styleClass="command-link" style="width: 25px;">--%>
+    <%--<f:setPropertyActionListener value="#{directorPage.directorDiscountFoodPage.getStringIdOfOrgList}"--%>
+                                 <%--target="#{directorPage.orgFilterOfSelectOrgListSelectPage}" />--%>
+<%--</a4j:commandButton>--%>
+    <%--<h:outputText styleClass="output-text" escape="true" value=" #{directorPage.directorDiscountFoodPage.filter}" />--%>
+<%--</h:panelGroup>--%>
+    <h:selectManyCheckbox value="#{directorPage.directorDiscountFoodPage.selectedOrgs}" id="directorDiscountFoodGridSelectionPanel" styleClass="output-text" layout="pageDirection">
+        <f:selectItem itemValue="-1" itemLabel="весь комплекс ОО"/>
+        <c:forEach items="#{directorPage.directorDiscountFoodPage.organizations}" var="item">
+            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName}" itemDisabled="#{directorPage.directorDiscountFoodPage.selectedOrgs.contains('-1')}"/>
+        </c:forEach>
+        <a4j:support event="onchange" reRender="directorDiscountFoodGridSelectionPanel"/>
+    </h:selectManyCheckbox>
+    <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+    <rich:calendar value="#{directorPage.directorDiscountFoodPage.startDate}" datePattern="dd.MM.yyyy"
+                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" dataModel="#{directorPage.directorDiscountFoodPage.startCalendarModel}"
+                   mode="ajax" boundaryDatesMode="scroll">
+        <a4j:support event="onchanged" reRender="directorDiscountFoodGrid" ajaxSingle="true"/>
+    </rich:calendar>
+    <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+    <rich:calendar value="#{directorPage.directorDiscountFoodPage.endDate}" datePattern="dd.MM.yyyy"
+                   converter="dateConverter" inputClass="input-text" showWeeksBar="false" dataModel="#{directorPage.directorDiscountFoodPage.endCalendarModel}"
+                   mode="ajax" boundaryDatesMode="scroll">
+        <a4j:support event="onchanged" reRender="directorDiscountFoodGrid" ajaxSingle="true"/>
+    </rich:calendar>
+    <a4j:commandButton value="Генерировать отчет" action="#{directorPage.directorDiscountFoodPage.buildDiscountFoodReport}"
+                       reRender="workspaceTogglePanel, directorDiscountFoodGrid" styleClass="command-button"
+                       status="idReportGenerateStatus"/>
+<a4j:status id="idReportGenerateStatus">
+<f:facet name="start">
+    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+</f:facet>
+</a4j:status>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 </h:panelGrid>
+<h:panelGroup id="directorDiscountFoodReportGrid" styleClass="borderless-grid">
+    <c:forEach items="#{directorPage.directorDiscountFoodPage.chartData}" var="item">
+        <div class="report-holder">
+            <h:graphicImage value="#{item}" width="800" height="400" rendered="#{directorPage.directorDiscountFoodPage.showReport}" />
+        </div>
+    </c:forEach>
+</h:panelGroup>

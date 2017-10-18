@@ -12,9 +12,12 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgMainBuildingListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.jboss.as.web.security.SecurityContextAssociationValve;
 
 import javax.faces.model.SelectItem;
@@ -31,7 +34,8 @@ import java.util.Map;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class UserCreatePage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList{
+public class UserCreatePage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList,
+        OrgMainBuildingListSelectPage.CompleteHandler {
 
     private Long idOfUser;
     private String userName;
@@ -51,11 +55,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     private String region;
     private String orgFilter = "Не выбрано";
     private String orgFilterCanceled = "Не выбрано";
+    private String organizationsFilter = "Не выбрано";
     private UserNotificationType selectOrgType;
     private String orgIds;
     private Boolean needChangePassword;
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
+    protected List<OrgItem> organizationItems = new ArrayList<OrgItem>(0);
+    private Long organizationId;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -329,6 +336,36 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
                 session.save(userOrgs);
             }
+
+            for (OrgItem orgItem : organizationItems) {
+                Org org = (Org)session.get(Org.class, orgItem.idOfOrg);
+                if (org.isMainBuilding()) {
+                    Criteria criteria = session.createCriteria(UserDirectorOrg.class);
+                    //criteria.add(Restrictions.eq("org", org));
+                    criteria.add(Restrictions.eq("user", user));
+                    UserDirectorOrg userDirectorOrg = (UserDirectorOrg) criteria.uniqueResult();
+
+                    if (null != userDirectorOrg) {
+                        userDirectorOrg.setUser(user);
+                        userDirectorOrg.setOrg(org);
+                    } else {
+                        userDirectorOrg = new UserDirectorOrg(user, org);
+                    }
+
+                    session.saveOrUpdate(userDirectorOrg);
+                }
+            }
+
+            // если не выбрано организаций - удаляем из базы привязку
+            if (organizationItems.isEmpty()) {
+                UserDirectorOrg userDirectorOrg = (UserDirectorOrg)session.createCriteria(UserDirectorOrg.class)
+                        .add(Restrictions.eq("user", user)).uniqueResult();
+
+                if (null != userDirectorOrg) {
+                    session.delete(userDirectorOrg);
+                }
+            }
+
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
                     .createUserEditRecord(SecurityJournalAuthenticate.EventType.CREATE_USER, request.getRemoteAddr(), currentUserName,
                             currentUser, true, null, String.format("Создан пользователь %s", userName));
@@ -421,14 +458,22 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     protected static class OrgItem {
         private final Long idOfOrg;
         private final String shortName;
+        private final Boolean mainBuilding;
 
         OrgItem(Org org) {
-            this(org.getIdOfOrg(), org.getShortName());
+            this(org.getIdOfOrg(), org.getShortName(), org.isMainBuilding());
         }
 
         public OrgItem(Long idOfOrg, String shortName) {
             this.idOfOrg = idOfOrg;
             this.shortName = shortName;
+            this.mainBuilding = Boolean.FALSE;
+        }
+
+        public OrgItem(Long idOfOrg, String shortName, Boolean mainBuilding) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.mainBuilding = mainBuilding;
         }
 
         public Long getIdOfOrg() {
@@ -514,5 +559,45 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
 
     public void setSelectOrgType(int id) {
         this.selectOrgType = UserNotificationType.values()[id];
+    }
+
+    public Object showOrgListPage(){
+        MainPage.getSessionInstance().showOrgMainBuildingListSelectPage();
+        return null;
+    }
+
+    public String getOrganizationsFilter() {
+        return organizationsFilter;
+    }
+
+    public void setOrganizationsFilter(String organizationsFilter) {
+        this.organizationsFilter = organizationsFilter;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    @Override
+    public void completeOrgMainBuildingListSelection(Session session, List<Org> orgs) throws Exception {
+        if (getIsDirector()) {
+            if (null != orgs) {
+                organizationItems = new ArrayList<UserCreatePage.OrgItem>();
+                if (orgs.isEmpty()) {
+                    organizationsFilter = "Не выбрано";
+                } else {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (Org org : orgs) {
+                        organizationItems.add(new UserCreatePage.OrgItem(org.getIdOfOrg(), org.getShortName(), org.isMainBuilding()));
+                        stringBuilder.append(org.getShortName()).append("; ");
+                    }
+                    organizationsFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+                }
+            }
+        }
     }
 }

@@ -27,8 +27,14 @@
         <rich:panelMenuGroup id="directorGroupMenu" label="Личный кабинет директора" expanded="true">
             <rich:panelMenuItem id="directorUseCardsMenuItem" label="Использование электронных носителей" binding="#{directorPage.directorUseCardsPage.mainMenuComponent}"
                                 action="#{directorPage.showUseCardsPage}" reRender="workspaceForm" />
-            <rich:panelMenuItem id="directorDiscountFoodMenuItem" label="Предоставление льготного питания" binding="#{directorPage.discountFoodPage.mainMenuComponent}"
-                                action="#{directorPage.showDiscountFoodPage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorDiscountFoodMenuItem" label="Предоставление льготного питания" binding="#{directorPage.directorDiscountFoodPage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorDiscountFoodPage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorStaffAttendanceMenuItem" label="Посещаемость сотрудников" binding="#{directorPage.directorStaffAttendancePage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorStaffAttendancePage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorStudentAttendanceMenuItem" label="Посещаемость обучающихся" binding="#{directorPage.directorStudentAttendancePage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorStudentAttendancePage}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="directorFinanceMenuItem" label="Финансовые и количественные показатели платного питания" binding="#{directorPage.directorFinancePage.mainMenuComponent}"
+                                action="#{directorPage.showDirectorFinancePage}" reRender="workspaceForm" />
             <rich:panelMenuItem id="directorLogout" label="Выход" action="#{directorPage.logout}" reRender="workspaceForm" />
         </rich:panelMenuGroup>
     </rich:panelMenu>

@@ -100,9 +100,19 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px">
             <f:setPropertyActionListener value="1" target="#{mainPage.userEditPage.selectOrgType}"/>
-            <f:setPropertyActionListener value="#{mainPage.userEditPage.orgIdsCanceled}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            <%--<f:setPropertyActionListener value="#{mainPage.userEditPage.orgIdsCanceled}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />--%>
         </a4j:commandButton>
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.orgFilterCanceled}}" />
+    </h:panelGroup>
+
+    <h:outputText escape="true" value="Список организаций" styleClass="output-text" rendered="#{mainPage.userEditPage.isDirector}" />
+    <h:panelGroup rendered="#{mainPage.userEditPage.isDirector}">
+        <a4j:commandButton value="..." action="#{mainPage.userEditPage.showOrgListPage}" reRender="modalOrgMainbuildingListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgMainbuildingListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px">
+            <f:setPropertyActionListener value="#{mainPage.userEditPage.orgIds}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.organizationsFilter}}" />
     </h:panelGroup>
 
     <h:outputText escape="true" value="Регион" styleClass="output-text" />

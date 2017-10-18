@@ -6,9 +6,7 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.director.DirectorOrgListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.director.DirectorUseCardsPage;
-import ru.axetta.ecafe.processor.web.ui.director.DiscountFoodPage;
+import ru.axetta.ecafe.processor.web.ui.director.*;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -43,7 +41,10 @@ public class DirectorPage implements Serializable {
 
     Logger logger = LoggerFactory.getLogger(DirectorPage.class);
     private final DirectorUseCardsPage directorUseCardsPage = new DirectorUseCardsPage();
-    private final DiscountFoodPage discountFoodPage = new DiscountFoodPage();
+    private final DirectorDiscountFoodPage directorDiscountFoodPage = new DirectorDiscountFoodPage();
+    private final DirectorStaffAttendancePage directorStaffAttendancePage = new DirectorStaffAttendancePage();
+    private final DirectorStudentAttendancePage directorStudentAttendancePage = new DirectorStudentAttendancePage();
+    private final DirectorFinancePage directorFinancePage = new DirectorFinancePage();
 
     private UIComponent pageComponent;
     private HtmlPanelMenu mainMenu;
@@ -69,12 +70,37 @@ public class DirectorPage implements Serializable {
         return directorUseCardsPage;
     }
 
+    public DirectorStudentAttendancePage getDirectorStudentAttendancePage() {
+        return directorStudentAttendancePage;
+    }
+
+    public DirectorFinancePage getDirectorFinancePage() {
+        return directorFinancePage;
+    }
+
     public Object showUseCardsPage() {
+        directorUseCardsPage.loadOrganizations();
         return showDirectorReportPage(directorUseCardsPage);
     }
 
-    public Object showDiscountFoodPage() {
-        return showDirectorReportPage(discountFoodPage);
+    public Object showDirectorDiscountFoodPage() {
+        directorDiscountFoodPage.loadOrganizations();
+        return showDirectorReportPage(directorDiscountFoodPage);
+    }
+
+    public Object showDirectorStaffAttendancePage() {
+        directorStaffAttendancePage.loadOrganizations();
+        return showDirectorReportPage(directorStaffAttendancePage);
+    }
+
+    public Object showDirectorStudentAttendancePage() {
+        directorStudentAttendancePage.loadOrganizations();
+        return showDirectorReportPage(directorStudentAttendancePage);
+    }
+
+    public Object showDirectorFinancePage() {
+        directorFinancePage.loadOrganizations();
+        return showDirectorReportPage(directorFinancePage);
     }
 
     private Object showDirectorReportPage(BasicWorkspacePage page) {
@@ -137,7 +163,7 @@ public class DirectorPage implements Serializable {
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, null, null);
+                    orgListSelectPage.fill(persistenceSession, false, null, null);
                 } else {
                     getOrgListSelectPage()
                             .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, null,
@@ -173,7 +199,7 @@ public class DirectorPage implements Serializable {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                orgListSelectPage.fill(persistenceSession, null, null);
+                orgListSelectPage.fill(persistenceSession, true, null, null);
             } else {
                 orgListSelectPage
                         .fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, null,
@@ -250,8 +276,8 @@ public class DirectorPage implements Serializable {
         return currentWorkspacePage;
     }
 
-    public DiscountFoodPage getDiscountFoodPage() {
-        return discountFoodPage;
+    public DirectorDiscountFoodPage getDirectorDiscountFoodPage() {
+        return directorDiscountFoodPage;
     }
 
     public DirectorOrgListSelectPage getOrgListSelectPage() {
@@ -280,5 +306,22 @@ public class DirectorPage implements Serializable {
 
     public void setOrgFilterPageName(String orgFilterPageName) {
         this.orgFilterPageName = orgFilterPageName;
+    }
+
+    public DirectorStaffAttendancePage getDirectorStaffAttendancePage() {
+        return directorStaffAttendancePage;
+    }
+
+    public Object clearOrgListSelectedItemsList() {
+        orgFilterOfSelectOrgListSelectPage = "";
+        orgListSelectPage.deselectAllItems();
+        updateOrgListSelectPage();
+        return null;
+    }
+
+    public Object selectAllOrgListSelectedItemsList() {
+        orgListSelectPage.selectAllItems();
+        updateOrgListSelectPage();
+        return null;
     }
 }

@@ -225,6 +225,10 @@
         <c:import url="include/option/user/select.jsp" />
     </f:subview>
 
+    <f:subview id="orgMainBuildingListSelectSubView">
+        <c:import url="include/org/select_mainbuilding_list.jsp" />
+    </f:subview>
+
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">

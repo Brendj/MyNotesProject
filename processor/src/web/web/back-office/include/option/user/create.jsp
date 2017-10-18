@@ -88,6 +88,16 @@
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.orgFilterCanceled}}" />
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Список организаций" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDirector}" />
+    <h:panelGroup rendered="#{mainPage.userCreatePage.isDirector}">
+        <a4j:commandButton value="..." action="#{mainPage.userCreatePage.showOrgListPage}" reRender="modalOrgMainbuildingListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgMainbuildingListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px">
+            <%--<f:setPropertyActionListener value="#{mainPage.userCreatePage.orgIds}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />--%>
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.organizationsFilter}}" />
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Регион" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.userCreatePage.region}" styleClass="input-text">
         <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />

@@ -81,6 +81,7 @@
             <element id="library" level="project" name="axetta_smpp" />
             <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
             <element id="library" level="project" name="xades" />
+            <element id="library" level="project" name="jfreechart-1.5.0" />
           </element>
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
           <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
@@ -543,49 +544,36 @@
       <option name="myName" value="ecafe" />
       <option name="myLocal" value="true" />
     </copyright>
-    <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="1454460246">
-    <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+  <component name="DataSourceManagerImpl" format="xml" hash="3771474690">
+    <data-source source="LOCAL" name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
+      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://172.18.16.14:5432/amoscow</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>amoscow.public</schema-pattern>
-      <default-schemas>amoscow.public</default-schemas>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Kazan Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+    <data-source source="LOCAL" name="Kazan Stand VM" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
+      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://192.168.15.158:5432/akazan</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>akazan.public</schema-pattern>
-      <default-schemas>akazan.public</default-schemas>
       <libraries>
         <library>
           <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.3.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+    <data-source source="LOCAL" name="Local MoscowDB" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/moscow_141_14-07</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow.public</schema-pattern>
-      <default-schemas>moscow.public</default-schemas>
       <default-dialect>PostgreSQL</default-dialect>
       <libraries>
         <library>
@@ -593,42 +581,33 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Local Stand Data Source" product="PostgreSQL" version="9.2.3" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+    <data-source source="LOCAL" name="Local Stand Data Source" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
+      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_moscow_db_1</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="SPB Data Base Source" product="PostgreSQL" version="9.2.3" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+    <data-source source="LOCAL" name="SPB Data Base Source" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
+      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/aspb</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>aspb.public</schema-pattern>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Moscow Last" product="PostgreSQL" version="9.3.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
-      <identifier-quote-string>&quot;</identifier-quote-string>
+    <data-source source="LOCAL" name="Moscow Last" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
+      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://172.18.16.24:5432/moscow_15_09_24</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow_15_09_24.public</schema-pattern>
-      <default-schemas>moscow_15_09_24.public</default-schemas>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
@@ -908,34 +887,6 @@
   </component>
   <component name="IdProvider" IDEtalkID="18F2146BFFA68BDCCC8665BD3D587E9B" />
   <component name="InspectionProjectProfileManager">
-    <profiles>
-      <profile version="1.0" is_locked="false">
-        <option name="myName" value="Project Default" />
-        <option name="myLocal" value="false" />
-        <inspection_tool class="HibernateMappingDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="myValues">
-            <value>
-              <list size="7">
-                <item index="0" class="java.lang.String" itemvalue="nobr" />
-                <item index="1" class="java.lang.String" itemvalue="noembed" />
-                <item index="2" class="java.lang.String" itemvalue="comment" />
-                <item index="3" class="java.lang.String" itemvalue="noscript" />
-                <item index="4" class="java.lang.String" itemvalue="embed" />
-                <item index="5" class="java.lang.String" itemvalue="script" />
-                <item index="6" class="java.lang.String" itemvalue="div" />
-              </list>
-            </value>
-          </option>
-          <option name="myCustomValuesEnabled" value="true" />
-        </inspection_tool>
-        <inspection_tool class="JpaAttributeMemberSignatureInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="JpaAttributeTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
-      </profile>
-    </profiles>
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_PROFILE" value="true" />
-    <version value="1.0" />
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
       <item index="1" class="java.lang.String" itemvalue="WEAK WARNING" />
@@ -1194,15 +1145,12 @@
           </indentOptions>
         </codeStyleSettings>
         <codeStyleSettings language="Groovy">
-          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
-          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
           <option name="KEEP_LINE_BREAKS" value="false" />
           <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
           <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
           <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
           <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
           <option name="ALIGN_MULTILINE_FOR" value="false" />
-          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
           <option name="CALL_PARAMETERS_WRAP" value="1" />
           <option name="METHOD_PARAMETERS_WRAP" value="1" />
           <option name="EXTENDS_LIST_WRAP" value="5" />
@@ -1211,14 +1159,8 @@
           <option name="THROWS_KEYWORD_WRAP" value="1" />
           <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
           <option name="BINARY_OPERATION_WRAP" value="1" />
-          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
           <option name="TERNARY_OPERATION_WRAP" value="1" />
-          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
-          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
-          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
-          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
           <option name="IF_BRACE_FORCE" value="3" />
-          <option name="DOWHILE_BRACE_FORCE" value="3" />
           <option name="WHILE_BRACE_FORCE" value="3" />
           <option name="FOR_BRACE_FORCE" value="3" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
@@ -1377,7 +1319,7 @@
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="JBoss shared" type="JBossConfiguration" factoryName="Local" APPLICATION_SERVER_NAME="JBoss 7.1.1.Final">
+    <configuration default="false" name="JBoss shared" type="JBossConfiguration" factoryName="Local" APPLICATION_SERVER_NAME="JBoss 7.1.1.Final" ALTERNATIVE_JRE_ENABLED="false">
       <option name="OPEN_IN_BROWSER_URL" value="https://localhost:8443/processor/back-office/index.faces" />
       <option name="COMMON_VM_ARGUMENTS" value="-XX:+TieredCompilation -Dprogram.name=standalone.bat -Xms2048M -Xmx4096M -XX:MaxPermSize=512M -Dsun.rmidgc.client.gcInterval=3600000 -Dsun.rmidgc.server.gcInterval=3600000 -Djava.net.preferIPv4Stack=true -Dorg.jboss.resolver.warning=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djboss.server.default.config=standalone-ha.xml -Dorg.apache.catalina.STRICT_SERVLET_COMPLIANCE=false -Djgroups.bind_addr=127.0.0.1" />
       <option name="UPDATING_POLICY" value="restart-server" />
@@ -1389,6 +1331,8 @@
       <server-settings>
         <option name="SERVER" />
         <option name="BINDING_SET_NAME" value="" />
+        <option name="DOMAIN" value="false" />
+        <option name="SERVER_GROUP" value="" />
         <option name="USERNAME" value="" />
         <option name="PASSWORD" value="" />
       </server-settings>
@@ -1654,6 +1598,41 @@
     <option name="flattenInnerClasses" value="true" />
     <option name="cycleTableSpecificationString" value="" />
     <option name="shortCycleTableSpecificationString" value="" />
+  </component>
+  <component name="dataSourceStorageLocal">
+    <data-source name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>amoscow.public</schema-pattern>
+      <default-schemas>amoscow.public</default-schemas>
+    </data-source>
+    <data-source name="Kazan Stand VM" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>akazan.public</schema-pattern>
+      <default-schemas>akazan.public</default-schemas>
+    </data-source>
+    <data-source name="Local MoscowDB" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>moscow.public</schema-pattern>
+      <default-schemas>moscow.public</default-schemas>
+    </data-source>
+    <data-source name="Local Stand Data Source" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+    </data-source>
+    <data-source name="SPB Data Base Source" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>aspb.public</schema-pattern>
+    </data-source>
+    <data-source name="Moscow Last" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>moscow_15_09_24.public</schema-pattern>
+      <default-schemas>moscow_15_09_24.public</default-schemas>
+    </data-source>
   </component>
   <component name="ideadoc.IdeaDocConfigurationGUI">
     <doccer class="nl.piraya.ideadoc.doccer.DoccerForOverridingMethod" enabled="true">
@@ -1935,6 +1914,13 @@
         <root url="jar://$USER_HOME$/.ideaLibSources/jboss-servlet-api_3.0_spec-1.0.0.Final-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="jfreechart-1.5.0">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jfreechart-1.5.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="jsf-impl-1.2_15-jbossorg-2">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/jsf12/jsf-impl-1.2_15-jbossorg-2.jar!/" />
@@ -2017,4 +2003,3 @@
     </library>
   </component>
 </project>
-
