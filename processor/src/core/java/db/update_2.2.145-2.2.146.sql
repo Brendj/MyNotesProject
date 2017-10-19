@@ -20,3 +20,5 @@ ALTER TABLE cf_user_director_org
   OWNER TO postgres;
 COMMENT ON TABLE cf_user_director_org
 IS 'связь пользователей с ролью директор с главным корпусом ОО';
+
+--! ФИНАЛИЗИРОВАН (Семенов, 171019) НЕ МЕНЯТЬ
