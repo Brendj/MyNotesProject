@@ -27,10 +27,10 @@
                  style="display: none;" />
     <a4j:commandButton id="setCardNoByHidden" action="#{mainPage.cardRegistrationAndIssuePage.onCardRead}"  reRender="cardNo"
                        style="display: none;"/>
-    <h:outputText escape="true" value="Клиент" styleClass="output-text long-field" />
+    <h:outputText escape="true" value="Клиент" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.client.shortName}" readonly="true"
-                     styleClass="input-text" style="margin-right: 2px;" />
+                     styleClass="input-text long-field" style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />

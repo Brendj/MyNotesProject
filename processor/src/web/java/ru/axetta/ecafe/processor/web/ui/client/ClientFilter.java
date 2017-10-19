@@ -8,6 +8,8 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -372,9 +374,17 @@ public class ClientFilter {
                 criteria.add(Restrictions.eq(cgFieldName, clientGroupId));
             }
         }
+        //Для роли оператора карт разрешаем включение клиентов из группы выбывших
+        User user = DAOReadonlyService.getInstance().getUserFromSession();
+        Object[] condition;
+        if (user.getIdOfRole() == User.DefaultRole.CARD_OPERATOR.ordinal()) {
+            condition = new Long[] {ClientGroupMenu.CLIENT_DELETED};
+        } else {
+            condition = new Long[]{ClientGroupMenu.CLIENT_DELETED, ClientGroupMenu.CLIENT_LEAVING};
+        }
         if (!showDeleted && clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
             criteria.add(Restrictions.or(Restrictions.not(Restrictions
-                    .in(cgFieldName, new Long[]{ClientGroupMenu.CLIENT_DELETED, ClientGroupMenu.CLIENT_LEAVING})),
+                    .in(cgFieldName, condition)),
                     Restrictions.isNull(cgFieldName)));
         }
        criteria.addOrder(Order.asc("contractId"));

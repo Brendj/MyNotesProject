@@ -34,17 +34,20 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
 
         private final Long idOfOrg;
         private final String shortName;
+        private final String shortNameInfoService;
         private final String officialName;
 
         public OrgItem() {
             this.idOfOrg = null;
             this.shortName = null;
+            shortNameInfoService = null;
             this.officialName = null;
         }
 
         public OrgItem(Org org) {
             this.idOfOrg = org.getIdOfOrg();
             this.shortName = org.getShortName();
+            this.shortNameInfoService = org.getShortNameInfoService();
             this.officialName = org.getOfficialName();
         }
 
@@ -58,6 +61,10 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
 
         public String getOfficialName() {
             return officialName;
+        }
+
+        public String getShortNameInfoService() {
+            return shortNameInfoService;
         }
     }
 
@@ -130,6 +137,8 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
         private Date contractTime;
         private Integer contractState;
         private Date updateTime;
+        private Long balance;
+        private String groupName;
 
         public Long getIdOfClient() {
             return idOfClient;
@@ -213,6 +222,8 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             this.contractTime = client.getContractTime();
             this.contractState = client.getContractState();
             this.updateTime = client.getUpdateTime();
+            this.balance = client.getBalance();
+            this.groupName = client.getClientGroup() == null ? "" : client.getClientGroup().getGroupName();
         }
 
         public Item() {
@@ -225,6 +236,8 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             this.contractTime = null;
             this.contractState = null;
             this.updateTime = null;
+            this.balance = null;
+            this.groupName = "";
         }
 
         public String getCaption() {
@@ -235,6 +248,22 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             stringBuilder.append(ContractIdFormat.format(contractId)).append(" (").append(contractPerson.getCaption())
                     .append("): ").append(person.getCaption());
             return stringBuilder.toString();
+        }
+
+        public Long getBalance() {
+            return balance;
+        }
+
+        public void setBalance(Long balance) {
+            this.balance = balance;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
         }
     }
 

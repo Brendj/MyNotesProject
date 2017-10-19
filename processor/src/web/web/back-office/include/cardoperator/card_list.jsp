@@ -58,7 +58,7 @@
                 <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel,selectedClientList"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
-                <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                <h:outputText styleClass="output-text long-field" escape="true" id="selectedClientList"
                               value=" {#{mainPage.cardOperatorListPage.cardOperatorFilter.client.shortName}}" />
             </h:panelGroup>
 

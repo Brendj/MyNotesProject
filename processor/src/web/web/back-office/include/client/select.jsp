@@ -19,7 +19,7 @@
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid styleClass="borderless-grid">
-                        <h:inputText value="#{mainPage.clientSelectPage.selectedItem.caption}" size="64" readonly="true"
+                        <h:inputText value="#{mainPage.clientSelectPage.selectedItem.caption}" size="100" readonly="true"
                                      styleClass="input-text" />
                     </h:panelGrid>
                 </td>
@@ -35,7 +35,7 @@
                             <h:panelGroup styleClass="borderless-div">
                                 <h:inputText id="modalClientSelectorOrgFilter"
                                              value="#{mainPage.clientSelectPage.clientFilter.org.shortName}"
-                                             readonly="true" styleClass="input-text" style="margin-right: 2px;" />
+                                             readonly="true" styleClass="input-text long-field" style="margin-right: 2px;" />
                                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
                                                    reRender="modalOrgSelectorPanel"
                                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
@@ -76,7 +76,28 @@
                                                          target="#{mainPage.clientSelectPage.selectedItem}" />
                         </a4j:support>
                         <rich:column headerClass="column-header">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="ФИО" />
+                            </f:facet>
                             <h:outputText escape="true" value="#{item.caption}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="Организация" />
+                            </f:facet>
+                            <h:outputText escape="true" value="#{item.org.shortNameInfoService}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="Группа" />
+                            </f:facet>
+                            <h:outputText escape="true" value="#{item.groupName}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="Баланс" />
+                            </f:facet>
+                            <h:outputText escape="true" value="#{item.balance}" styleClass="output-text" converter="copeckSumConverter" />
                         </rich:column>
                         <f:facet name="footer">
                             <rich:datascroller for="modalClientSelectorTable" renderIfSinglePage="false" maxPages="5"
