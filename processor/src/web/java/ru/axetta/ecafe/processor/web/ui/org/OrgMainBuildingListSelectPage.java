@@ -8,14 +8,21 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.option.user.UserCreatePage;
+import ru.axetta.ecafe.processor.web.ui.option.user.UserEditPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
 
 public class OrgMainBuildingListSelectPage extends BasicPage {
 
@@ -119,6 +126,16 @@ public class OrgMainBuildingListSelectPage extends BasicPage {
             if (isSelected) {
                 selectedMainOrgId = idOfOrg;
                 MainPage.getSessionInstance().getUserEditPage().setOrganizationId(idOfOrg);
+
+                MainPage mainPage = MainPage.getSessionInstance();
+
+                if (mainPage.getCurrentWorkspacePage() instanceof UserCreatePage) {
+                    mainPage.getUserCreatePage().setOrganizationId(idOfOrg);
+                }
+
+                if (mainPage.getCurrentWorkspacePage() instanceof UserEditPage) {
+                    mainPage.getUserEditPage().setOrganizationId(idOfOrg);
+                }
             } else {
                 selectedMainOrgId = -1L;
             }
