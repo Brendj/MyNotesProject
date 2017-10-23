@@ -20,13 +20,16 @@ public class GroupOrganizationItem {
     private Boolean isMiddleGroup;
     private String parentGroupName;
     private Boolean isNeedDeleteMiddleGroups;
+    private Boolean isSixDaysWorkWeek;
 
-    public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg, Boolean isNeedDeleteMiddleGroups) {
+    public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg,
+            Boolean isNeedDeleteMiddleGroups, Boolean isSixDaysWorkWeek) {
 
         this.name = name;
         this.idOfOrg = idOfOrg;
         this.bindingToOrg = bindingToOrg;
         this.isNeedDeleteMiddleGroups = isNeedDeleteMiddleGroups;
+        this.isSixDaysWorkWeek = isSixDaysWorkWeek;
     }
 
     public GroupOrganizationItem(String name, long idOfOrg, Long bindingToOrg, Boolean middleGroup,
@@ -58,7 +61,15 @@ public class GroupOrganizationItem {
             }
         }
 
-        return new GroupOrganizationItem(name, idOfOrg, bindingToOrg, isNeedDeleteMiddleGroups);
+        String isSixDaysWorkWeekString = XMLUtils.getAttributeValue(node, "Is6DaysWorkWeek");
+        boolean isSixDaysWorkWeek = false;
+        if (isSixDaysWorkWeekString != null) {
+            if (isSixDaysWorkWeekString.equals("1")) {
+                isSixDaysWorkWeek = true;
+            }
+        }
+
+        return new GroupOrganizationItem(name, idOfOrg, bindingToOrg, isNeedDeleteMiddleGroups, isSixDaysWorkWeek);
     }
 
     public static GroupOrganizationItem buildSubGroup(Node node, long idOfOrg, String parentGroupName) throws Exception {
@@ -106,5 +117,13 @@ public class GroupOrganizationItem {
 
     public void setNeedDeleteMiddleGroups(Boolean needDeleteMiddleGroups) {
         isNeedDeleteMiddleGroups = needDeleteMiddleGroups;
+    }
+
+    public Boolean getSixDaysWorkWeek() {
+        return isSixDaysWorkWeek;
+    }
+
+    public void setSixDaysWorkWeek(Boolean sixDaysWorkWeek) {
+        isSixDaysWorkWeek = sixDaysWorkWeek;
     }
 }

@@ -21,6 +21,7 @@ public class GroupNamesToOrgs {
     private Long version;
     private String parentGroupName;
     private Boolean isMiddleGroup;
+    private Boolean isSixDaysWorkWeek;
 
 
     public GroupNamesToOrgs() {
@@ -111,5 +112,13 @@ public class GroupNamesToOrgs {
 
     public void setIsMiddleGroup(Boolean middleGroup) {
         isMiddleGroup = middleGroup;
+    }
+
+    public Boolean getIsSixDaysWorkWeek() {
+        return isSixDaysWorkWeek;
+    }
+
+    public void setIsSixDaysWorkWeek(Boolean sixDaysWorkWeek) {
+        isSixDaysWorkWeek = sixDaysWorkWeek;
     }
 }

@@ -18,5 +18,6 @@
         <property name="version" column="Version" type="long"/>
         <property name="parentGroupName" column="ParentGroupName" type="string"/>
         <property name="isMiddleGroup" column="IsMiddleGroup" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="isSixDaysWorkWeek" column="IsSixDaysWorkWeek" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
     </class>
 </hibernate-mapping>

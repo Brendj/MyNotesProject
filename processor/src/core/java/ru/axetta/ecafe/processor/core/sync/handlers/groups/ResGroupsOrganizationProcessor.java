@@ -154,6 +154,7 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
                 savedGroupNamesToOrgs.setIdOfMainOrg(mainOrg.getIdOfOrg());
                 savedGroupNamesToOrgs.setParentGroupName(groupItem.getParentGroupName());
                 savedGroupNamesToOrgs.setIsMiddleGroup(groupItem.getMiddleGroup());
+                savedGroupNamesToOrgs.setIsSixDaysWorkWeek(groupItem.getSixDaysWorkWeek());
                 savedGroupNamesToOrgs.setMainBuilding(1);
                 savedGroupNamesToOrgs.setVersion(nextVersion);
             } else {
@@ -162,6 +163,7 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
                 savedGroupNamesToOrgs.setIdOfMainOrg(mainOrg.getIdOfOrg());
                 savedGroupNamesToOrgs.setParentGroupName(groupItem.getParentGroupName());
                 savedGroupNamesToOrgs.setIsMiddleGroup(groupItem.getMiddleGroup());
+                savedGroupNamesToOrgs.setIsSixDaysWorkWeek(groupItem.getSixDaysWorkWeek());
                 savedGroupNamesToOrgs.setVersion(nextVersion);
                 savedGroupNamesToOrgs.setMainBuilding(1);
             }

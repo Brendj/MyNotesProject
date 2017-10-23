@@ -13,6 +13,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
@@ -137,6 +138,13 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
                         }
                     }
                 }
+                int day = CalendarUtils.getDayOfWeek(currentDate);
+                if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
+                    //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
+                    Object[] weekendByGroup = isWeekendByGroups(session, orgId);
+                    isWeekend = (Boolean) weekendByGroup[0];
+                    comment = (String) weekendByGroup[1];
+                }
                 String dateStr = getDayOfWeekString(CalendarUtils.getDayOfWeek(currentDate) - 1) + " " + CalendarUtils.dateShortToString(currentDate);
 
                 list.add(new SpecialDatesReportItem(orgId, dateStr, org.getShortName(), isWeekend, comment));
@@ -146,6 +154,23 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
         }
 
         return new JRBeanCollectionDataSource(list);
+    }
+
+    private Object[] isWeekendByGroups(Session session, Long idOfOrg) {
+        Boolean isWeekend = true;
+        String desc = "";
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("isSixDaysWorkWeek", true));
+        List<GroupNamesToOrgs> list = criteria.list();
+        if (list != null && list.size() > 0) {
+            isWeekend = false;
+            for (GroupNamesToOrgs group : list) {
+                desc += group.getGroupName() + ", ";
+            }
+            if (desc.length() > 2) desc = desc.substring(0, desc.length()-2);
+        }
+        return new Object[] {isWeekend, desc};
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(Session session, List<Long> idOfOrgList,
