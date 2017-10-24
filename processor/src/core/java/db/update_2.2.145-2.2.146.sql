@@ -16,8 +16,6 @@ CREATE TABLE cf_user_director_org
 WITH (
 OIDS=FALSE
 );
-ALTER TABLE cf_user_director_org
-  OWNER TO postgres;
 COMMENT ON TABLE cf_user_director_org
 IS 'связь пользователей с ролью директор с главным корпусом ОО';
 
