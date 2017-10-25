@@ -1879,7 +1879,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PhotoURLResult getPhotoURL(Long contractId, int size, boolean isNew) {
+    public PhotoURLResult getPhotoURL(Long contractId, String guid, int size, boolean isNew) {
         PhotoURLResult result = new PhotoURLResult();
         Session session = null;
         Transaction transaction = null;
@@ -1887,7 +1887,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             try {
                 session = RuntimeContext.getInstance().createPersistenceSession();
                 transaction = session.beginTransaction();
-                Client client = findClient(session, contractId, null, result);
+                Client client = null;
+                if (contractId != null && contractId > 0) {
+                    client = findClient(session, contractId, null, result);
+                } else if (!StringUtils.isEmpty(guid)) {
+                    client = DAOUtils.findClientByGuid(session, guid);
+                    if (client == null) {
+                        result.resultCode = RC_CLIENT_NOT_FOUND;
+                        result.description = RC_CLIENT_NOT_FOUND_DESC;
+                    }
+                } else {
+                    throw new IllegalArgumentException("Не указан номер лицевого счета либо GUID клиента");
+                }
                 if (client == null) {
                     return result;
                 }
@@ -1898,6 +1909,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 HibernateUtils.rollback(transaction, logger);
                 HibernateUtils.close(session, logger);
             }
+        } catch (IllegalArgumentException e) {
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = e.getMessage();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             result.resultCode = RC_INTERNAL_ERROR;

@@ -51,7 +51,8 @@ public interface ClientRoomController {
     ClientSummaryResult getSummaryByTypedId(@WebParam(name = "id") String id, @WebParam(name = "idType") int idType);
 
     @WebMethod(operationName = "getPhotoURL")
-    PhotoURLResult getPhotoURL(@WebParam(name = "contractId") Long contractId, @WebParam(name = "size") int size, @WebParam(name = "isNew") boolean isNew);
+    PhotoURLResult getPhotoURL(@WebParam(name = "contractId") Long contractId, @WebParam(name = "GUID") String guid,
+            @WebParam(name = "size") int size, @WebParam(name = "isNew") boolean isNew);
 
     @WebMethod(operationName = "uploadPhoto")
     PhotoURLResult uploadPhoto(@WebParam(name = "contractId") Long contractId,
