@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
+import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 
 import java.util.Collections;
@@ -77,7 +79,12 @@ public class AccountTransaction {
         this.source = source;
         this.sourceType = sourceType;
         this.transactionTime = transactionTime;
-        this.sendToExternal = sourceType == CLIENT_ORDER_TRANSACTION_SOURCE_TYPE || !MealManager.isSendToExternal;
+        boolean isSpb = RuntimeContext.RegistryType.isSpb();
+        boolean sendBySupplierCondition = FinManager.getInstance().ORG_LIST == null ? false
+                                          : FinManager.getInstance().ORG_LIST.contains(client.getOrg().getIdOfOrg());
+        this.sendToExternal = isSpb ? sourceType == CLIENT_ORDER_TRANSACTION_SOURCE_TYPE || !MealManager.isSendToExternal
+                                    : !((sourceType == CLIENT_ORDER_TRANSACTION_SOURCE_TYPE || sourceType == CANCEL_TRANSACTION_SOURCE_TYPE)
+                                            && FinManager.getInstance().sendToExternal() && sendBySupplierCondition);
     }
 
     public Long getIdOfTransaction() {

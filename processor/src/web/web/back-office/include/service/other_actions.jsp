@@ -89,14 +89,19 @@
         </rich:calendar>
     </rich:panel>
 
+    <a4j:commandButton value="Тест Meal Service" action="#{otherActionsPage.runMealTest}" id="runMealTest"
+                       styleClass="command-button" />
+    <a4j:commandButton value="Загрузка файла НСИ" action="#{otherActionsPage.loadNSIFile}" id="loadNSIFile"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <rich:panel>
-        <a4j:commandButton value="Тест Meal Service" action="#{otherActionsPage.runMealTest}" id="runMealTest"
-                           styleClass="command-button" /><br/>
-    </rich:panel>
-
-    <rich:panel>
-        <a4j:commandButton value="Загрузка файла НСИ" action="#{otherActionsPage.loadNSIFile}" id="loadNSIFile"
-                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
+        <a4j:commandButton value="Выгрузка транзакций для Фин Оператора" action="#{otherActionsPage.runGenerateSummaryFinOperatorFile}"
+                       title="Файл с выгрузкой за выбранную дату будет создан в папке, заданной в конфигурации"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
+        <h:outputText value="Дата:"/>
+        <rich:calendar value="#{otherActionsPage.summaryFinOperatorDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" >
+            <a4j:support event="onchanged" />
+        </rich:calendar>
     </rich:panel>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">

@@ -50,6 +50,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -8281,5 +8282,44 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
     }
+
+    @Override
+    public TransactionInfoListResult getOrderTransactions() {
+        authenticateRequest(null);
+        TransactionInfoListResult result = new TransactionInfoListResult();
+        List<Long> ids = new ArrayList<Long>();
+        try {
+            List transactions = FinManager.getInstance().getOrdersAndTransactions();
+            TransactionInfoList list = new TransactionInfoList();
+            for (Object o : transactions) {
+                Object[] row = (Object[]) o;
+                Long idOfTransaction = ((BigInteger) row[0]).longValue();
+                Long transactionSum = ((BigInteger) row[1]).longValue();
+                Integer sourceType = (Integer) row[2];
+                Date transactionDate = new Date(((BigInteger) row[3]).longValue());
+                Long balanceBefore = ((BigInteger) row[4]).longValue();
+                Long balanceAfter = ((BigInteger) row[5]).longValue();
+                Long idOfOrder = ((BigInteger) row[6]).longValue();
+                Long contractId = ((BigInteger) row[7]).longValue();
+                TransactionInfo info = new TransactionInfo(idOfTransaction, transactionSum, sourceType, toXmlDateTime(transactionDate),
+                        balanceBefore, balanceAfter, idOfOrder, contractId);
+                list.getItems().add(info);
+                ids.add(idOfTransaction);
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            result.transactionItems = list;
+            return result;
+        } catch (Exception e) {
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        } finally {
+            if (result.resultCode.equals(RC_OK)) {
+                FinManager.getInstance().markTransactionsAsSentToExternal(ids);
+            }
+        }
+    }
+
 
 }

@@ -510,4 +510,6 @@ public interface ClientRoomController {
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
     @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
+
+    @WebMethod TransactionInfoListResult getOrderTransactions();
 }

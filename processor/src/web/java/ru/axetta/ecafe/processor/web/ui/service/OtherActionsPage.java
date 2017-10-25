@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
+import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -39,6 +40,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     private String orgsForGenerateGuardians;
     private List<Long> clientsIds = null;
     private Date summaryDate;
+    private Date summaryFinOperatorDate;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -53,6 +55,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public OtherActionsPage() {
         super();
         summaryDate = new Date();
+        summaryFinOperatorDate = new Date();
     }
 
     public void rubBIExport() throws Exception {
@@ -243,6 +246,18 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void runGenerateSummaryFinOperatorFile() {
+        summaryFinOperatorDate = CalendarUtils.addMinute(summaryFinOperatorDate, 60 * 12);
+        Date endDate = CalendarUtils.endOfDay(summaryFinOperatorDate);
+        Date startDate = CalendarUtils.truncateToDayOfMonth(summaryFinOperatorDate);
+        try {
+            RuntimeContext.getAppContext().getBean(FinManagerService.class).run(startDate, endDate);
+            printMessage("Файл сгенерирован.");
+        } catch (Exception e) {
+            printError(String.format("Не удалось сгенерировать файл. Текст ошибки: %s", e.getMessage()));
+        }
+    }
+
     private List<Long> getOrgs() throws Exception {
         if (orgsForGenerateGuardians.equals("ALL")) {
             return null;
@@ -325,5 +340,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void setSummaryDate(Date summaryDate) {
         this.summaryDate = summaryDate;
+    }
+
+    public Date getSummaryFinOperatorDate() {
+        return summaryFinOperatorDate;
+    }
+
+    public void setSummaryFinOperatorDate(Date summaryFinOperatorDate) {
+        this.summaryFinOperatorDate = summaryFinOperatorDate;
     }
 }
