@@ -160,7 +160,7 @@
     <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.externalId}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text" readonly="true"/>
+    <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Пол" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.clientViewPage.gender}" styleClass="input-text" readonly="true">
         <f:selectItems value="#{mainPage.clientViewPage.clientGenderMenu.items}" />

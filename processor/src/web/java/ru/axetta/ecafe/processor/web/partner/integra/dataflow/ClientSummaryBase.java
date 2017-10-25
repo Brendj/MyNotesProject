@@ -39,6 +39,8 @@ public class ClientSummaryBase {
     protected Long orgId;
     @XmlAttribute(name = "isInside")
     private Integer isInside;
+    @XmlAttribute(name = "GUID")
+    protected String guid;
 
     @XmlAttribute(name = "GuardianCreatedWhere")
     protected Integer guardianCreatedWhere;
@@ -297,5 +299,13 @@ public class ClientSummaryBase {
 
     public void setGroupPredefined(Integer groupPredefined) {
         this.groupPredefined = groupPredefined;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

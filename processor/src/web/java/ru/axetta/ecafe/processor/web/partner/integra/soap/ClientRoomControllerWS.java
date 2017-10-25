@@ -1768,6 +1768,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryBase.setMobilePhone(client.getMobile());
         clientSummaryBase.setOrgId(client.getOrg().getIdOfOrg());
         clientSummaryBase.setOrgType(client.getOrg().getType());
+        clientSummaryBase.setGuid(client.getClientGUID());
         return clientSummaryBase;
     }
 
