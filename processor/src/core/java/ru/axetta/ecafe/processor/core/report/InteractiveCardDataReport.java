@@ -230,7 +230,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             String sqlActive = "SELECT count(cfc.cardno) FROM cf_cards cfc "
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
+                    + " WHERE cfc.cardtype IN (1,2,9,10,11) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs) "
                     + " AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 
@@ -248,7 +248,7 @@ public class InteractiveCardDataReport extends BasicReportForAllOrgJob {
             String sqlFin = "SELECT count(cfc.cardno) FROM cf_cards cfc"
                     + " LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                     + " LEFT OUTER JOIN cf_clientgroups cfcl ON cl.idoforg = cfcl.idoforg AND cl.IdOfClientGroup = cfcl.IdOfClientGroup"
-                    + " WHERE cfc.cardtype IN (1,2) AND cfc.state IN (0,4) "
+                    + " WHERE cfc.cardtype IN (1,2,9,10,11) AND cfc.state IN (0,4) "
                     + " AND cfc.idoforg = :idoforg AND cl.idoforg IN (:friendlyOrgs)"
                     + " AND cfc.validdate < :validdate AND cfcl.idofclientgroup NOT IN (1100000060, 1100000070)";
 

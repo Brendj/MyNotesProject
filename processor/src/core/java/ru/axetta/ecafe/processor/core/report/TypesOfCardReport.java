@@ -188,8 +188,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                 Long stateScmAct = service.getStatByDistrictName(district, "7", ac, startTime, groupRestrict, orgList);
                 Long stateScmActNot = service.getStatByDistrictName(district, "7", lc, startTime, groupRestrict, orgList);
 
-                Long stateClockAct = service.getStatByDistrictName(district, "9,10", ac, startTime, groupRestrict, orgList);
-                Long stateClockActNot = service.getStatByDistrictName(district, "9,10", lc, startTime, groupRestrict, orgList);
+                Long stateClockAct = service.getStatByDistrictName(district, "9,10,11", ac, startTime, groupRestrict, orgList);
+                Long stateClockActNot = service.getStatByDistrictName(district, "9,10,11", lc, startTime, groupRestrict, orgList);
 
                 Long stateOthAct = service.getStatByDistrictName(district, "0,2,4,5,6", ac, startTime, groupRestrict, orgList);
                 Long stateOthActNot = service.getStatByDistrictName(district, "0,2,4,5,6", lc, startTime, groupRestrict, orgList);
@@ -231,9 +231,9 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "7", lc, startTime, groupRestrict);
 
                         Long stateClockActSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "9,10", ac, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "9,10,11", ac, startTime, groupRestrict);
                         Long stateClockActNotSub = service
-                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "9,10", lc, startTime, groupRestrict);
+                                .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "9,10,11", lc, startTime, groupRestrict);
 
                         Long stateOthActSub = service
                                 .getStatByOrgId(typesOfCardOrgItem.getIdOfOrg(), "0,2,4,5,6", ac, startTime, groupRestrict);
