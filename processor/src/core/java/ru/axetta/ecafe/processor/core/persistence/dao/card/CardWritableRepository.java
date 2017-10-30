@@ -57,13 +57,18 @@ public class CardWritableRepository extends WritableJpaDao {
         entityManager.merge(card);
     }
 
-    private void checkVerifyCardSign(Org org, Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
+    private void checkVerifyCardSign(Org org, Integer cardSignVerifyRes, Integer cardSignCertNum, int type) throws Exception {
         if (!org.getNeedVerifyCardSign()) {
             return;
         }
         if (cardSignVerifyRes == null || cardSignCertNum == null) throw new IllegalStateException("Ошибка регистрации");
         switch (CardSignVerifyType.fromInteger(cardSignVerifyRes)) {
             case NOT_PROCESSED:
+                if (type == 6 || type == 7 || type == 8) {
+                    return;
+                } else {
+                    throw new IllegalStateException("Ошибка регистрации");
+                }
             case VERIFY_FAIL:
                 throw new IllegalStateException("Ошибка регистрации");
             case VERIFY_SUCCESS:
@@ -76,7 +81,7 @@ public class CardWritableRepository extends WritableJpaDao {
 
     public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
-        checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum);
+        checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type);
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());

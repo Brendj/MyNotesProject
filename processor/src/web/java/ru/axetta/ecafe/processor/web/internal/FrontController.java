@@ -1209,9 +1209,16 @@ public class FrontController extends HttpServlet {
         //checkRequestValidity(idOfOrg);
 
         CardService cardService = CardService.getInstance();
+        if (!(type >=0 && type < Card.TYPE_NAMES.length)) {
+            return new ResponseItem(ResponseItem.ERROR_INVALID_TYPE, ResponseItem.ERROR_INVALID_TYPE_MESSAGE);
+        }
         try{
             cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum);
         }catch (Exception e){
+            if (e.getMessage() == null) {
+                logger.error("Error in register card", e);
+                return new ResponseItem(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+            }
             if (e.getMessage().contains("ConstraintViolationException")) {
                 return new ResponseItem(ResponseItem.ERROR_DUPLICATE, ResponseItem.ERROR_DUPLICATE_CARD_MESSAGE);
             } else if (e instanceof IllegalStateException) {
