@@ -27,7 +27,7 @@ public class DirectorLoader {
         User currentUser = DAOReadonlyService.getInstance().getUserFromSession();
 
         String sqlQuery =
-                "SELECT o.idoforg, o.shortname, o.mainbuilding "
+                "SELECT o.idoforg, o.shortname, o.shortAddress, o.mainbuilding "
                         + "FROM cf_user_director_org udo "
                         + "INNER JOIN cf_friendly_organization fo ON fo.currentorg=udo.idoforg "
                         + "INNER JOIN cf_orgs o ON fo.friendlyorg=o.idoforg "
@@ -44,7 +44,7 @@ public class DirectorLoader {
             Object vals[]=(Object[])o;
 
             DirectorLoader.OrgItem item = new DirectorLoader.OrgItem(((BigInteger)vals[0]).longValue(),
-                    (String)vals[1], ((Integer)vals[2] == 1) ? Boolean.TRUE : Boolean.FALSE);
+                    (String)vals[1], (String)vals[2], ((Integer)vals[3] == 1) ? Boolean.TRUE : Boolean.FALSE);
             resultList.add(item);
         }
         return resultList;
@@ -53,21 +53,24 @@ public class DirectorLoader {
     public static class OrgItem {
         private final Long idOfOrg;
         private final String shortName;
+        private final String shortAddress;
         private final Boolean mainBuilding;
 
         OrgItem(Org org) {
-            this(org.getIdOfOrg(), org.getShortName(), org.isMainBuilding());
+            this(org.getIdOfOrg(), org.getShortName(), org.getShortAddress(), org.isMainBuilding());
         }
 
-        public OrgItem(Long idOfOrg, String shortName) {
+        public OrgItem(Long idOfOrg, String shortName, String shortAddress) {
             this.idOfOrg = idOfOrg;
             this.shortName = shortName;
+            this.shortAddress = shortAddress;
             this.mainBuilding = Boolean.FALSE;
         }
 
-        public OrgItem(Long idOfOrg, String shortName, Boolean mainBuilding) {
+        public OrgItem(Long idOfOrg, String shortName, String shortAddress, Boolean mainBuilding) {
             this.idOfOrg = idOfOrg;
             this.shortName = shortName;
+            this.shortAddress = shortAddress;
             this.mainBuilding = mainBuilding;
         }
 
@@ -77,6 +80,10 @@ public class DirectorLoader {
 
         public String getShortName() {
             return shortName;
+        }
+
+        public String getShortAddress() {
+            return shortAddress;
         }
     }
 }

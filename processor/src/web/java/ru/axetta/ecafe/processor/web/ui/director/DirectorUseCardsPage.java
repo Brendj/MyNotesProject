@@ -4,11 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.director;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.statistic.DirectorLoader;
 import ru.axetta.ecafe.processor.core.statistic.DirectorUseCardsReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -42,6 +41,10 @@ public class DirectorUseCardsPage extends OnlineReportPage {
     private CalendarModel endCalendarModel = new CalendarModel();
 
     private List<DirectorLoader.OrgItem> organizations = new ArrayList<DirectorLoader.OrgItem>();
+
+    private Integer reportType = 0;         // 0 - graph, 1 - table
+
+    private List<String> chartData;
 
     public DirectorUseCardsPage() {
         selectedOrgs.add(SELECT_ALL_OO);
@@ -78,6 +81,10 @@ public class DirectorUseCardsPage extends OnlineReportPage {
                 }
             }
 
+            if (orgList.isEmpty()) {
+                throw new Exception("не выбрано ниодной организации");
+            }
+
             buildReport(persistenceSession, this.startDate, this.endDate, orgList, selectedOrgs.contains(SELECT_ALL_OO));
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -88,6 +95,9 @@ public class DirectorUseCardsPage extends OnlineReportPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+
+        if (0 == reportType)
+            loadChartData();
         return null;
     }
 
@@ -102,9 +112,7 @@ public class DirectorUseCardsPage extends OnlineReportPage {
     }
 
     public List<String> getChartData() {
-        if (null == directorUseCardsReport)
-            return Collections.emptyList();
-        return directorUseCardsReport.chartData();
+        return chartData;
     }
 
     public Boolean getShowReport() {
@@ -174,7 +182,27 @@ public class DirectorUseCardsPage extends OnlineReportPage {
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endDate = CalendarUtils.endOfDay(endDate);
         startCalendarModel.updateEndDate(this.endDate);
+    }
+
+    public String getReportType() {
+        return reportType.toString();
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = Integer.parseInt(reportType);
+    }
+
+    public void loadChartData() {
+        if (null == directorUseCardsReport) {
+            chartData = Collections.emptyList();
+            return;
+        }
+        chartData = directorUseCardsReport.chartData();
+    }
+
+    public String showDirectorUseCards() {
+        return "showDirectorUseCards";
     }
 }

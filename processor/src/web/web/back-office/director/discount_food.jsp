@@ -22,25 +22,19 @@
     .out-of-date {
         color: gray;
     }
+    .director-grid > tbody > tr:first-child > td:first-child {
+        vertical-align: top;
+        padding-top: 7px;
+    }
 </style>
 
-<h:panelGrid id="directorDiscountFoodGrid" binding="#{directorPage.directorDiscountFoodPage.pageComponent}" styleClass="borderless-grid"
+<h:panelGrid id="directorDiscountFoodGrid" binding="#{directorPage.directorDiscountFoodPage.pageComponent}" styleClass="borderless-grid, director-grid"
              columns="2">
     <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
-<%--<h:panelGroup>--%>
-<%--<a4j:commandButton value="..." action="#{directorPage.showOrgListSelectPage}"--%>
-                   <%--reRender="directorDiscountFoodGrid, modalOrgListSelectorOrgTable"--%>
-                   <%--oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"--%>
-                   <%--styleClass="command-link" style="width: 25px;">--%>
-    <%--<f:setPropertyActionListener value="#{directorPage.directorDiscountFoodPage.getStringIdOfOrgList}"--%>
-                                 <%--target="#{directorPage.orgFilterOfSelectOrgListSelectPage}" />--%>
-<%--</a4j:commandButton>--%>
-    <%--<h:outputText styleClass="output-text" escape="true" value=" #{directorPage.directorDiscountFoodPage.filter}" />--%>
-<%--</h:panelGroup>--%>
     <h:selectManyCheckbox value="#{directorPage.directorDiscountFoodPage.selectedOrgs}" id="directorDiscountFoodGridSelectionPanel" styleClass="output-text" layout="pageDirection">
         <f:selectItem itemValue="-1" itemLabel="весь комплекс ОО"/>
         <c:forEach items="#{directorPage.directorDiscountFoodPage.organizations}" var="item">
-            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName}" itemDisabled="#{directorPage.directorDiscountFoodPage.selectedOrgs.contains('-1')}"/>
+            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName} - #{item.shortAddress}" itemDisabled="#{directorPage.directorDiscountFoodPage.selectedOrgs.contains('-1')}"/>
         </c:forEach>
         <a4j:support event="onchange" reRender="directorDiscountFoodGridSelectionPanel"/>
     </h:selectManyCheckbox>
@@ -56,21 +50,241 @@
                    mode="ajax" boundaryDatesMode="scroll">
         <a4j:support event="onchanged" reRender="directorDiscountFoodGrid" ajaxSingle="true"/>
     </rich:calendar>
+    <h:outputText styleClass="output-text" escape="true" value="Тип отчета"/>
+    <h:selectOneMenu styleClass="input-text"
+                     value="#{directorPage.directorDiscountFoodPage.reportType}">
+        <f:selectItem itemValue="0" itemLabel="графический"/>
+        <f:selectItem itemValue="1" itemLabel="табличный"/>
+    </h:selectOneMenu>
     <a4j:commandButton value="Генерировать отчет" action="#{directorPage.directorDiscountFoodPage.buildDiscountFoodReport}"
                        reRender="workspaceTogglePanel, directorDiscountFoodGrid" styleClass="command-button"
                        status="idReportGenerateStatus"/>
-<a4j:status id="idReportGenerateStatus">
-<f:facet name="start">
-    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-</f:facet>
-</a4j:status>
+    <a4j:status id="idReportGenerateStatus">
+    <f:facet name="start">
+        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+    </f:facet>
+    </a4j:status>
+    <h:outputText styleClass="output-text" escape="true" value=""/>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
-<h:panelGroup id="directorDiscountFoodReportGrid" styleClass="borderless-grid">
-    <c:forEach items="#{directorPage.directorDiscountFoodPage.chartData}" var="item">
-        <div class="report-holder">
+<h:panelGrid id="directorDiscountFoodGraphReportGrid" styleClass="borderless-grid" columns="1"
+              rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '0')}">
+    <c:forEach items="#{directorPage.directorDiscountFoodPage.chartData}" var="item" varStatus="var">
+        <h:panelGroup id="report-holder-${var.index}" styleClass="borderless-grid"
+                      rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '0')}">
             <h:graphicImage value="#{item}" width="800" height="400" rendered="#{directorPage.directorDiscountFoodPage.showReport}" />
-        </div>
+        </h:panelGroup>
     </c:forEach>
-</h:panelGroup>
+</h:panelGrid>
+<c:if test="${directorPage.directorDiscountFoodPage.directorDiscountFoodReport.allOO ne true}">
+    <c:forEach items="#{directorPage.directorDiscountFoodPage.directorDiscountFoodReport.items}" var="item" varStatus="var">
+        <h:panelGrid id="directorDiscountFoodTableReportGrid-${var.index}" styleClass="borderless-grid" columns="1"
+                      rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '1')}">
+            <rich:dataTable value="#{item}" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <c:if test="${item.isSOSH() eq true}">
+                            <rich:column headerClass="center-aligned-column" colspan="6">
+                                <h:outputText styleClass="column-header" value="Предоставление льготного питания #{item.shortNameInfoService}"/>
+                                <h:panelGroup rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '1')}">
+                                    <br />
+                                </h:panelGroup>
+                                <h:outputText styleClass="column-header" value="(#{item.address})" />
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" breakBefore="true" colspan="2">
+                                <h:outputText styleClass="column-header" escape="true" value="Начальные"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" colspan="2">
+                                <h:outputText styleClass="column-header" escape="true" value="Средние"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" colspan="2">
+                                <h:outputText styleClass="column-header" escape="true" value="Старшие"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" breakBefore="true">
+                                <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                            </rich:column>
+                        </c:if>
+                        <c:if test="${item.isDOU() eq true}">
+                            <rich:column headerClass="center-aligned-column" colspan="4">
+                                <h:outputText styleClass="column-header" value="Предоставление льготного питания #{item.shortNameInfoService}"/>
+                                <h:panelGroup rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '1')}">
+                                    <br />
+                                </h:panelGroup>
+                                <h:outputText styleClass="column-header" value="(#{item.address})" />
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" breakBefore="true" colspan="2">
+                                <h:outputText styleClass="column-header" escape="true" value="1,5 - 3 (ДОУ)"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" colspan="2">
+                                <h:outputText styleClass="column-header" escape="true" value="3 - 7 (ДОУ)"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column" breakBefore="true">
+                                <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="center-aligned-column">
+                                <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                            </rich:column>
+                        </c:if>
+                    </rich:columnGroup>
+                </f:facet>
+                <c:if test="${item.isSOSH() eq true}">
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.privilegeYoungValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.reserveYoungValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.privilegeMiddleValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.reserveMiddleValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.privilegeElderValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.reserveElderValue}" styleClass="output-text" />
+                    </rich:column>
+                </c:if>
+                <c:if test="${item.isDOU() eq true}">
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.privilegeDOUYoungValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.reserveDOUYoungValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.privilegeDOUElderValue}" styleClass="output-text" />
+                    </rich:column>
+                    <rich:column styleClass="center-aligned-column">
+                        <h:outputText value="#{item.reserveDOUElderValue}" styleClass="output-text" />
+                    </rich:column>
+                </c:if>
+            </rich:dataTable>
+            <h:panelGroup rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '1')}">
+                <br />
+            </h:panelGroup>
+        </h:panelGrid>
+    </c:forEach>
+</c:if>
+<c:if test="${directorPage.directorDiscountFoodPage.directorDiscountFoodReport.allOO eq true}">
+    <c:forEach items="#{directorPage.directorDiscountFoodPage.directorDiscountFoodReport.allOOItem}" var="item">
+        <h:panelGrid id="directorDiscountFoodTableReportAllGrid" styleClass="borderless-grid" columns="1"
+                      rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '1')}">
+            <rich:dataTable value="#{item}" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column" colspan="10">
+                            <h:outputText styleClass="column-header" value="Предоставление льготного питания #{item.shortNameInfoService}"/>
+                            <h:panelGroup rendered="#{directorPage.directorDiscountFoodPage.showReport && (directorPage.directorDiscountFoodPage.reportType == '1')}">
+                                <br />
+                            </h:panelGroup>
+                            <h:outputText styleClass="column-header" value="весь комплекс" />
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Начальные"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Средние"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Старшие"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="1,5 - 3 (ДОУ)"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="3 - 7 (ДОУ)"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true">
+                            <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Льготная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Резервная категория"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.privilegeYoungValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.reserveYoungValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.privilegeMiddleValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.reserveMiddleValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.privilegeElderValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.reserveElderValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.privilegeDOUYoungValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.reserveDOUYoungValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.privilegeDOUElderValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.reserveDOUElderValue}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
+            <h:panelGroup rendered="#{directorPage.directorUseCardsPage.showReport && (directorPage.directorUseCardsPage.reportType == '1')}">
+                <br />
+            </h:panelGroup>
+        </h:panelGrid>
+    </c:forEach>
+</c:if>

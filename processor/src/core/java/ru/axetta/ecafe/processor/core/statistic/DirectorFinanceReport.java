@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.statistic;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.report.BasicReport;
 
@@ -15,10 +13,13 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.Range;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
@@ -27,164 +28,172 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.List;
 
 public class DirectorFinanceReport extends BasicReport {
 
-    private final Map<Long, DirectorFinanceEntry> items;
+    private final List<DirectorFinanceEntry> items;
     private Boolean allOO;
+    private static final Double barTopMargin = 2.D;
 
     public static class Builder {
         public DirectorFinanceReport build(Session session, Date startDate, Date endDate, List<Long> idsOfOrg, Boolean allOO) throws Exception {
             Date generateTime = new Date();
 
-            String abonementPlan = "горячее питание по абонементу";
-            String payPlan = "горячее питание по платному плану";
-            String buffetPlan = "горячее питание, приобретенное в буфете";
-            String buffetVendingPlan = "буфетная продукция (в т.ч. вендинг)";
+            List<DirectorFinanceEntry> entries = new ArrayList<DirectorFinanceEntry>();
 
-            String sqlQuery =
-                    "SELECT o.idoforg, o.shortnameinfoservice, o.shortaddress, "
-                  + "   CASE WHEN e.ordertype=:abonementOrder THEN :abonementPlan "
-                  + "       WHEN e.ordertype=:paidOrder THEN :payPlan "
-                  + "       WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype BETWEEN :complexMin AND :compexMax) THEN :buffetPlan "
-                  + "       WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype NOT BETWEEN :complexMin AND :compexMax) THEN :buffetVendingPlan "
-                  + "   END AS TIP, "
-                  + "   sum (CASE WHEN e.idofclientgroup <:employees AND od.rprice>0 THEN (od.rprice * od.qty) END) / 100 AS s2_FIN_OBUCH, "
-                  + "   sum (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) AND od.rprice>0 THEN "
-                  + "           (od.rprice * od.qty) END) / 100 AS s2_FIN_SOTR, "
-                  + "   count (DISTINCT (CASE WHEN e.idofclientgroup <:employees  THEN e.idofclient END)) AS Kol_OBUCH, "
-                  + "   count (DISTINCT (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) THEN "
-                  + "           e.idofclient END)) AS Kol_SOTR, "
-                  + "   count (DISTINCT (CASE WHEN e.idofclientgroup <:employees  THEN e.idoforder END)) AS Kol_ZAKAZ_OBUCH, "
-                  + "   count (DISTINCT (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) THEN "
-                  + "           e.idoforder END)) AS Kol_ZAKAZ_SOTR "
-                  + "FROM cf_orgs o "
-                  + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND e.socdiscount=0 AND e.state=:state_commited AND e.createddate>=:startDate "
-                  + "   AND e.createddate<:endDate "
-                  + "LEFT JOIN cf_orderdetails od ON o.idoforg=od.idoforg AND od.idoforder=e.idoforder "
-                  + "WHERE o.idoforg IN (:idsOfOrg) "
-                  + "GROUP BY o.shortnameinfoservice, TIP, o.shortaddress, o.idoforg, e.ordertype "
-                  + "ORDER BY e.ordertype, tip";
+            //String sqlQuery =
+            //        "SELECT o.idoforg, o.shortnameinfoservice, o.shortaddress, "
+            //      + "   CASE WHEN e.ordertype=:abonementOrder THEN :abonementPlan "
+            //      + "       WHEN e.ordertype=:paidOrder THEN :payPlan "
+            //      + "       WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype BETWEEN :complexMin AND :compexMax) THEN :buffetPlan "
+            //      + "       WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype NOT BETWEEN :complexMin AND :compexMax) THEN :buffetVendingPlan "
+            //      + "   END AS TIP, "
+            //      + "   sum (CASE WHEN e.idofclientgroup <:employees AND od.rprice>0 THEN (od.rprice * od.qty) END) / 100 AS s2_FIN_OBUCH, "
+            //      + "   sum (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) AND od.rprice>0 THEN "
+            //      + "           (od.rprice * od.qty) END) / 100 AS s2_FIN_SOTR, "
+            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup <:employees  THEN e.idofclient END)) AS Kol_OBUCH, "
+            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) THEN "
+            //      + "           e.idofclient END)) AS Kol_SOTR, "
+            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup <:employees  THEN e.idoforder END)) AS Kol_ZAKAZ_OBUCH, "
+            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) THEN "
+            //      + "           e.idoforder END)) AS Kol_ZAKAZ_SOTR "
+            //      + "FROM cf_orgs o "
+            //      + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND e.socdiscount=0 AND e.state=:state_commited AND e.createddate>=:startDate "
+            //      + "   AND e.createddate<:endDate "
+            //      + "LEFT JOIN cf_orderdetails od ON o.idoforg=od.idoforg AND od.idoforder=e.idoforder "
+            //      + "WHERE o.idoforg IN (:idsOfOrg) "
+            //      + "GROUP BY o.shortnameinfoservice, TIP, o.shortaddress, o.idoforg, e.ordertype "
+            //      + "ORDER BY e.ordertype, tip";
 
-            Query query = session.createSQLQuery(sqlQuery);
-            query.setParameter("abonementOrder", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
-            query.setParameter("abonementPlan", abonementPlan);
-            query.setParameter("paidOrder", OrderTypeEnumType.PAY_PLAN.ordinal());
-            query.setParameter("payPlan", payPlan);
-            query.setParameter("unknownPlan", OrderTypeEnumType.UNKNOWN.ordinal());
-            query.setParameter("defaultPlan", OrderTypeEnumType.DEFAULT.ordinal());
-            query.setParameter("vending", OrderTypeEnumType.VENDING.ordinal());
-            query.setParameter("buffetPlan", buffetPlan);
-            query.setParameter("buffetVendingPlan", buffetVendingPlan);
-            query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
-            query.setParameter("compexMax", OrderDetail.TYPE_COMPLEX_MAX);
-            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-            query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-            query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-            query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
-            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-            query.setParameter("state_commited", Order.STATE_COMMITED);
-            query.setParameter("startDate", startDate.getTime());
-            query.setParameter("endDate", endDate.getTime());
-            query.setParameterList("idsOfOrg", idsOfOrg);
+            for (Long idOfOrg : idsOfOrg) {
+                String sqlQuery =
+                        "SELECT s.idoforg, s.shortnameinfoservice, s.shortaddress, sum(s.abonement_fin_students) AS abonement_fin_students, "
+                      + "       sum (s.adonement_fin_staff) AS adonement_fin_staff, sum(s.abonement_count_students) AS abonement_count_students, "
+                      + "       sum(s.abonement_count_staff) AS abonement_count_staff, sum(s.pay_plan_fin_students) AS pay_plan_fin_students, "
+                      + "       sum(s.pay_plan_fin_staff) AS pay_plan_fin_staff, sum(s.pay_plan_count_students) AS pay_plan_count_students, "
+                      + "       sum(s.pay_plan_count_staff) AS pay_plan_count_staff, sum(s.buffet_fin_students) AS buffet_fin_students, "
+                      + "       sum(s.buffet_fin_staff) AS buffet_fin_staff, sum(s.buffet_count_students) AS buffet_count_students, "
+                      + "       sum(s.buffet_count_staff) AS buffet_count_staff, sum(s.vending_fin_students) AS vending_fin_students, "
+                      + "       sum(s.vending_fin_staff) AS vending_fin_staff, sum(s.vending_count_students) AS vending_count_students, "
+                      + "       sum(s.vending_count_staff) AS vending_count_staff "
+                      + "FROM ( "
+                      + "   SELECT o.idoforg, o.shortnameinfoservice, o.shortaddress, "
+                      + "       CASE WHEN e.ordertype=:abonementOrder AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) "
+                      + "           AND od.rprice>0 THEN sum(od.rprice * od.qty)/100 ELSE 0.0 END AS abonement_fin_students, "
+                      + "       CASE WHEN e.ordertype=:abonementOrder AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN sum(od.rprice * od.qty)/100 ELSE 0.0 END AS adonement_fin_staff, "
+                      + "       CASE WHEN e.ordertype=:abonementOrder AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) "
+                      + "           THEN count(DISTINCT e.idoforder) ELSE 0 END AS abonement_count_students, "
+                      + "       CASE WHEN e.ordertype=:abonementOrder AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN count(DISTINCT e.idoforder) ELSE 0 END AS abonement_count_staff, "
 
-            List resultList = query.list();
+                      + "       CASE WHEN e.ordertype=:paidOrder AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) "
+                      + "           THEN sum(od.rprice * od.qty)/100 ELSE 0.0 END AS pay_plan_fin_students, "
+                      + "       CASE WHEN e.ordertype=:paidOrder AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN sum(od.rprice * od.qty)/100 ELSE 0.0 END AS pay_plan_fin_staff, "
+                      + "       CASE WHEN e.ordertype=:paidOrder AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) "
+                      + "           THEN count(DISTINCT e.idoforder) ELSE 0 END AS pay_plan_count_students, "
+                      + "       CASE WHEN e.ordertype=:paidOrder AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN count(DISTINCT e.idoforder) ELSE 0 END AS pay_plan_count_staff, "
 
-            HashMap<Long, DirectorFinanceEntry> entryHashMap = new HashMap<Long, DirectorFinanceEntry>();
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype>=:complexMin AND od.menutype<=:compexMax) AND "
+                      + "           (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) THEN sum(od.rprice * od.qty)/100 "
+                      + "           ELSE 0.0 END AS buffet_fin_students, "
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype>=:complexMin AND od.menutype<=:compexMax) "
+                      + "           AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN sum(od.rprice * od.qty)/100 ELSE 0.0 END AS buffet_fin_staff, "
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype>=:complexMin AND od.menutype<=:compexMax) "
+                      + "           AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) THEN count(DISTINCT e.idoforder) "
+                      + "           ELSE 0 END AS buffet_count_students, "
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype>=:complexMin AND od.menutype<=:compexMax) "
+                      + "           AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN count(DISTINCT e.idoforder) ELSE 0 END AS buffet_count_staff, "
 
-            for (Object o : resultList) {
-                Object vals[] = (Object[])o;
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype<:complexMin OR od.menutype>:compexMax) "
+                      + "           AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) THEN sum(od.rprice * od.qty)/100 ELSE 0.0 "
+                      + "           END AS vending_fin_students, "
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype<:complexMin OR od.menutype>:compexMax) "
+                      + "           AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN sum(od.rprice * od.qty)/100 ELSE 0.0 END AS vending_fin_staff, "
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype<:complexMin OR od.menutype>:compexMax) "
+                      + "           AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) THEN count(DISTINCT e.idoforder) "
+                      + "           ELSE 0 END AS vending_count_students, "
+                      + "       CASE WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype<:complexMin OR od.menutype>:compexMax) "
+                      + "           AND e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) "
+                      + "           THEN count(DISTINCT e.idoforder) ELSE 0 END AS vending_count_staff "
+                      + "   FROM cf_orgs o "
+                      + "   LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND e.socdiscount=0 AND e.state=:state_commited "
+                      + "       AND e.createddate>=:startDate AND e.createddate<:endDate AND e.rsum IS NOT NULL AND e.rsum>0 "
+                      + "   LEFT JOIN cf_orderdetails od ON e.idoforg=od.idoforg AND od.idoforder=e.idoforder AND od.rprice>0 AND od.socdiscount=0 "
+                      + "   WHERE o.idoforg=:idOfOrg "
+                      //+ "IN (:idsOfOrg) "
+                      + "   GROUP BY o.idoforg, o.shortnameinfoservice, o.shortaddress, e.ordertype, e.idofclientgroup, od.rprice, od.menutype "
+                      + ") s "
+                      + "GROUP BY s.idoforg, s.shortnameinfoservice, s.shortaddress";
 
-                DirectorFinanceEntry entry;
-                Long idOfOrg = ((BigInteger)vals[0]).longValue();
-                String typeOfOrder = (String)vals[3];
+                Query query = session.createSQLQuery(sqlQuery);
+                query.setParameter("abonementOrder", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
+                query.setParameter("paidOrder", OrderTypeEnumType.PAY_PLAN.ordinal());
+                query.setParameter("unknownPlan", OrderTypeEnumType.UNKNOWN.ordinal());
+                query.setParameter("defaultPlan", OrderTypeEnumType.DEFAULT.ordinal());
+                query.setParameter("vending", OrderTypeEnumType.VENDING.ordinal());
+                query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
+                query.setParameter("compexMax", OrderDetail.TYPE_COMPLEX_MAX);
+                query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+                query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+                query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+                query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+                query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+                query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+                query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+                query.setParameter("state_commited", Order.STATE_COMMITED);
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("idOfOrg", idOfOrg);
 
-                if (entryHashMap.containsKey(idOfOrg)) {
-                    entry = entryHashMap.get(idOfOrg);
-                } else {
-                    entry = new DirectorFinanceEntry();
-                    entry.setIdOfOrg(idOfOrg);
-                    entry.setShortNameInfoService((String)vals[1]);
-                    entry.setShortAddress((String)vals[2]);
-                    entryHashMap.put(idOfOrg, entry);
-                }
+                List resultList = query.list();
 
-                if (buffetVendingPlan.equals(typeOfOrder)) {
-                    if (null != vals[4]) {
-                        entry.setStudentsFinanceVending(((BigDecimal) vals[4]).doubleValue());
-                    } else {
-                        entry.setStudentsFinanceVending(0D);
-                    }
-                    if (null != vals[5]) {
-                        entry.setStaffFinanceVending(((BigDecimal) vals[5]).doubleValue());
-                    } else {
-                        entry.setStaffFinanceVending(0D);
-                    }
-                    entry.setStudentsCountVending(((BigInteger)vals[6]).longValue());
-                    entry.setStaffCountVending(((BigInteger)vals[7]).longValue());
-                    entry.setStudentsOrdersCountVending(((BigInteger)vals[8]).longValue());
-                    entry.setStaffOrdersCountVending(((BigInteger)vals[9]).longValue());
-                } else if (buffetPlan.equals(typeOfOrder)) {
-                    if (null != vals[4]) {
-                        entry.setStudentsFinanceBuffet(((BigDecimal) vals[4]).doubleValue());
-                    } else {
-                        entry.setStudentsFinanceBuffet(0D);
-                    }
-                    if (null != vals[5]) {
-                        entry.setStaffFinanceBuffet(((BigDecimal) vals[5]).doubleValue());
-                    } else {
-                        entry.setStaffFinanceBuffet(0D);
-                    }
-                    entry.setStudentsCountBuffet(((BigInteger)vals[6]).longValue());
-                    entry.setStaffCountBuffet(((BigInteger)vals[7]).longValue());
-                    entry.setStudentsOrdersCountBuffet(((BigInteger)vals[8]).longValue());
-                    entry.setStaffOrdersCountBuffet(((BigInteger)vals[9]).longValue());
-                } else if (payPlan.equals(typeOfOrder)) {
-                    if (null != vals[4]) {
-                        entry.setStudentsFinancePayPlan(((BigDecimal) vals[4]).doubleValue());
-                    } else {
-                        entry.setStudentsFinancePayPlan(0D);
-                    }
-                    if (null != vals[5]) {
-                        entry.setStaffFinancePayPlan(((BigDecimal) vals[5]).doubleValue());
-                    } else {
-                        entry.setStaffFinancePayPlan(0D);
-                    }
-                    entry.setStudentsCountPayPlan(((BigInteger)vals[6]).longValue());
-                    entry.setStaffCountPayPlan(((BigInteger)vals[7]).longValue());
-                    entry.setStudentsOrdersCountPayPlan(((BigInteger)vals[8]).longValue());
-                    entry.setStaffOrdersCountPayPlan(((BigInteger)vals[9]).longValue());
-                } else if (abonementPlan.equals(typeOfOrder)) {
-                    if (null != vals[4]) {
-                        entry.setStudentsFinanceAbonement(((BigDecimal) vals[4]).doubleValue());
-                    } else {
-                        entry.setStudentsFinanceAbonement(0D);
-                    }
-                    if (null != vals[5]) {
-                        entry.setStaffFinanceAbonement(((BigDecimal) vals[5]).doubleValue());
-                    } else {
-                        entry.setStaffFinanceAbonement(0D);
-                    }
-                    entry.setStudentsCountAbonement(((BigInteger)vals[6]).longValue());
-                    entry.setStaffCountAbonement(((BigInteger)vals[7]).longValue());
-                    entry.setStudentsOrdersCountAbonement(((BigInteger)vals[8]).longValue());
-                    entry.setStaffOrdersCountAbonement(((BigInteger)vals[9]).longValue());
+                for (Object o : resultList) {
+                    Object vals[] = (Object[]) o;
+
+                    DirectorFinanceEntry entry = new DirectorFinanceEntry();
+                    entry.setIdOfOrg(((BigInteger) vals[0]).longValue());
+                    entry.setShortNameInfoService((String) vals[1]);
+                    entry.setShortAddress((String) vals[2]);
+                    entry.setStudentsFinanceAbonement(((BigDecimal) vals[3]).doubleValue());
+                    entry.setStaffFinanceAbonement(((BigDecimal) vals[4]).doubleValue());
+                    entry.setStudentsCountAbonement(((BigDecimal) vals[5]).longValue());
+                    entry.setStaffCountAbonement(((BigDecimal) vals[6]).longValue());
+                    entry.setStudentsFinancePayPlan(((BigDecimal) vals[7]).doubleValue());
+                    entry.setStaffFinancePayPlan(((BigDecimal) vals[8]).doubleValue());
+                    entry.setStudentsCountPayPlan(((BigDecimal) vals[9]).longValue());
+                    entry.setStaffCountPayPlan(((BigDecimal) vals[10]).longValue());
+                    entry.setStudentsFinanceBuffet(((BigDecimal) vals[11]).doubleValue());
+                    entry.setStaffFinanceBuffet(((BigDecimal) vals[12]).doubleValue());
+                    entry.setStudentsCountBuffet(((BigDecimal) vals[13]).longValue());
+                    entry.setStaffCountBuffet(((BigDecimal) vals[14]).longValue());
+                    entry.setStudentsFinanceVending(((BigDecimal) vals[15]).doubleValue());
+                    entry.setStaffFinanceVending(((BigDecimal) vals[16]).doubleValue());
+                    entry.setStudentsCountVending(((BigDecimal) vals[17]).longValue());
+                    entry.setStaffCountVending(((BigDecimal) vals[18]).longValue());
+
+                    entries.add(entry);
                 }
             }
 
-            return new DirectorFinanceReport(generateTime, new Date().getTime() - generateTime.getTime(), entryHashMap, allOO);
+            return new DirectorFinanceReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, allOO);
         }
     }
 
     public DirectorFinanceReport() {
         super();
-        this.items = Collections.emptyMap();
+        this.items = Collections.emptyList();
         this.allOO = false;
     }
 
-    public DirectorFinanceReport(Date generateTime, long generateDuration,  Map<Long, DirectorFinanceEntry> entries, Boolean allOO) {
+    public DirectorFinanceReport(Date generateTime, long generateDuration,  List<DirectorFinanceEntry> entries, Boolean allOO) {
         super(generateTime, generateDuration);
         this.items = entries;
         this.allOO = allOO;
@@ -212,8 +221,7 @@ public class DirectorFinanceReport extends BasicReport {
 
         String orgName = "";
 
-        for (Long key : items.keySet()) {
-            DirectorFinanceEntry entry = items.get(key);
+        for (DirectorFinanceEntry entry : items) {
 
             if (orgName.isEmpty())
                 orgName = entry.getShortNameInfoService();
@@ -260,13 +268,9 @@ public class DirectorFinanceReport extends BasicReport {
                     studentsFinanceVending, "итого (обучающиеся)", "");
 
             JFreeChart barChart = ChartFactory
-                    .createBarChart(String.format("Финансовые показатели по обучающимся %s(весь комплекс)", orgName),
+                    .createBarChart(String.format("Финансовые показатели по обучающимся %s\n(весь комплекс)", orgName),
                             "", "", dataset, PlotOrientation.VERTICAL, true,true, false);
-
-            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+            configureBarChart(barChart, dataset);
             BufferedImage image = barChart.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
 
@@ -281,13 +285,9 @@ public class DirectorFinanceReport extends BasicReport {
                     staffFinanceVending, "итого (сотрудники)", "");
 
             JFreeChart barChartStaff = ChartFactory
-                    .createBarChart(String.format("Финансовые показатели по сотрудникам %s(весь комплекс)", orgName),
+                    .createBarChart(String.format("Финансовые показатели по сотрудникам %s\n(весь комплекс)", orgName),
                             "", "", datasetStaff, PlotOrientation.VERTICAL, true,true, false);
-
-            barChartStaff.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-            barChartStaff.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+            configureBarChart(barChartStaff, datasetStaff);
             BufferedImage imageStaff = barChartStaff.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(imageStaff, "png")));
 
@@ -302,13 +302,9 @@ public class DirectorFinanceReport extends BasicReport {
                     studentsCountVending, "итого (обучающиеся)", "");
 
             JFreeChart barChartCount = ChartFactory
-                    .createBarChart(String.format("Количественные показатели по обучающимся %s(весь комплекс)", orgName),
+                    .createBarChart(String.format("Количественные показатели по обучающимся %s\n(весь комплекс)", orgName),
                             "", "", datasetCount, PlotOrientation.VERTICAL, true,true, false);
-
-            barChartCount.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-            barChartCount.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+            configureBarChart(barChartCount, datasetCount);
             BufferedImage imageCount = barChartCount.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(imageCount, "png")));
 
@@ -322,18 +318,14 @@ public class DirectorFinanceReport extends BasicReport {
             datasetCountStaff.addValue(staffCountAbonement + staffCountPayPlan + staffCountBuffet +
                     staffCountVending, "итого (сотрудники)", "");
 
+            barChart.getCategoryPlot().getRangeAxis().setRange(calcRange(dataset));
             JFreeChart barChartCountStaff = ChartFactory
-                    .createBarChart(String.format("Количественные показатели по сотрудникам %s(весь комплекс)", orgName),
+                    .createBarChart(String.format("Количественные показатели по сотрудникам %s\n(весь комплекс)", orgName),
                             "", "", datasetCountStaff, PlotOrientation.VERTICAL, true,true, false);
-
-            barChartCountStaff.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-            barChartCountStaff.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+            configureBarChart(barChartCountStaff, datasetCountStaff);
             BufferedImage imageCountStaff = barChartCountStaff.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(imageCountStaff, "png")));
         }
-
         return resultList;
     }
 
@@ -360,13 +352,9 @@ public class DirectorFinanceReport extends BasicReport {
                 entry.getStudentsFinanceBuffet() + entry.getStudentsFinanceVending(), "итого", "");
 
         JFreeChart barChart = ChartFactory
-                .createBarChart(String.format("Финансовые показатели по обучающимся %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                .createBarChart(String.format("Финансовые показатели по обучающимся %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                     "", "", dataset, PlotOrientation.VERTICAL, true,true, false);
-
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+        configureBarChart(barChart, dataset);
         BufferedImage image = barChart.createBufferedImage(800, 400);
         return String.format("data:image/png;base64,%s", imgToBase64String(image, "png"));
     }
@@ -382,13 +370,9 @@ public class DirectorFinanceReport extends BasicReport {
                 entry.getStaffFinanceBuffet() + entry.getStaffFinanceVending(), "итого", "");
 
         JFreeChart barChart = ChartFactory
-                .createBarChart(String.format("Финансовые показатели по сотрудникам %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                .createBarChart(String.format("Финансовые показатели по сотрудникам %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                         "", "", dataset, PlotOrientation.VERTICAL, true,true, false);
-
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+        configureBarChart(barChart, dataset);
         BufferedImage image = barChart.createBufferedImage(800, 400);
         return String.format("data:image/png;base64,%s", imgToBase64String(image, "png"));
     }
@@ -404,13 +388,9 @@ public class DirectorFinanceReport extends BasicReport {
                 entry.getStudentsCountBuffet() + entry.getStudentsCountVending(), "итого", "");
 
         JFreeChart barChart = ChartFactory
-                .createBarChart(String.format("Количественные показатели по обучающимся %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                .createBarChart(String.format("Количественные показатели по обучающимся %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                         "", "", dataset, PlotOrientation.VERTICAL, true,true, false);
-
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+        configureBarChart(barChart, dataset);
         BufferedImage image = barChart.createBufferedImage(800, 400);
         return String.format("data:image/png;base64,%s", imgToBase64String(image, "png"));
     }
@@ -426,15 +406,96 @@ public class DirectorFinanceReport extends BasicReport {
                 entry.getStaffCountBuffet() + entry.getStaffCountVending(), "итого", "");
 
         JFreeChart barChart = ChartFactory
-                .createBarChart(String.format("Количественные показатели по сотрудникам %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                .createBarChart(String.format("Количественные показатели по сотрудникам %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                         "", "", dataset, PlotOrientation.VERTICAL, true,true, false);
+        configureBarChart(barChart, dataset);
+        BufferedImage image = barChart.createBufferedImage(800, 400);
+        return String.format("data:image/png;base64,%s", imgToBase64String(image, "png"));
+    }
 
+    public List<DirectorFinanceEntry> getItems() {
+        return items;
+    }
+
+    public Boolean getAllOO() {
+        return allOO;
+    }
+
+    public List<DirectorFinanceEntry> getAllOOItem() {
+        DirectorFinanceEntry entry = new DirectorFinanceEntry();
+        for (DirectorFinanceEntry e : items) {
+            if (null == entry.getShortNameInfoService()) {
+                entry.setShortNameInfoService(e.getShortNameInfoService());
+            }
+
+            entry.setStudentsFinanceVending(entry.getStudentsFinanceVending() + e.getStudentsFinanceVending());
+            entry.setStudentsFinanceBuffet(entry.getStudentsFinanceBuffet() + e.getStudentsFinanceBuffet());
+            entry.setStudentsFinancePayPlan(entry.getStudentsFinancePayPlan() + e.getStudentsFinancePayPlan());
+            entry.setStudentsFinanceAbonement(entry.getStudentsFinanceAbonement() + e.getStudentsFinanceAbonement());
+
+            entry.setStaffFinanceVending(entry.getStaffFinanceVending() + e.getStaffFinanceVending());
+            entry.setStaffFinanceBuffet(entry.getStaffFinanceBuffet() + e.getStaffFinanceBuffet());
+            entry.setStaffFinancePayPlan(entry.getStaffFinancePayPlan() + e.getStaffFinancePayPlan());
+            entry.setStaffFinanceAbonement(entry.getStaffFinanceAbonement() + e.getStaffFinanceAbonement());
+
+            entry.setStudentsCountVending(entry.getStudentsCountVending() + e.getStudentsCountVending());
+            entry.setStudentsCountBuffet(entry.getStudentsCountBuffet() + e.getStudentsCountBuffet());
+            entry.setStudentsCountPayPlan(entry.getStudentsCountPayPlan() + e.getStudentsCountPayPlan());
+            entry.setStudentsCountAbonement(entry.getStudentsCountAbonement() + e.getStudentsCountAbonement());
+
+            entry.setStaffCountVending(entry.getStaffCountVending() + e.getStaffCountVending());
+            entry.setStaffCountBuffet(entry.getStaffCountBuffet() + e.getStaffCountBuffet());
+            entry.setStaffCountPayPlan(entry.getStaffCountPayPlan() + e.getStaffCountPayPlan());
+            entry.setStaffCountAbonement(entry.getStaffCountAbonement() + e.getStaffCountAbonement());
+
+            entry.setStudentsOrdersCountVending(entry.getStudentsOrdersCountVending() + e.getStudentsOrdersCountVending());
+            entry.setStudentsOrdersCountBuffet(entry.getStudentsOrdersCountBuffet() + e.getStudentsOrdersCountBuffet());
+            entry.setStudentsOrdersCountPayPlan(entry.getStudentsOrdersCountPayPlan() + e.getStudentsOrdersCountPayPlan());
+            entry.setStudentsOrdersCountAbonement(entry.getStudentsOrdersCountAbonement() + e.getStudentsOrdersCountAbonement());
+
+            entry.setStaffOrdersCountVending(entry.getStaffOrdersCountVending() + e.getStaffOrdersCountVending());
+            entry.setStaffOrdersCountBuffet(entry.getStaffOrdersCountBuffet() + e.getStaffOrdersCountBuffet());
+            entry.setStaffOrdersCountPayPlan(entry.getStaffOrdersCountPayPlan() + e.getStaffOrdersCountPayPlan());
+            entry.setStaffOrdersCountAbonement(entry.getStaffOrdersCountAbonement() + e.getStaffOrdersCountAbonement());
+        }
+
+        List<DirectorFinanceEntry> resultList = new ArrayList<DirectorFinanceEntry>();
+        resultList.add(entry);
+        return resultList;
+    }
+
+    private Range calcRange(CategoryDataset dataset) {
+        List rowKeys = dataset.getRowKeys();
+        List columnKeys = dataset.getColumnKeys();
+
+        Double minValue = 0.D;
+        Double maxValue = 8.D;
+
+        for (Object rowKey : rowKeys) {
+            for (Object colKey : columnKeys) {
+                Double value = dataset.getValue((Comparable)rowKey, (Comparable)colKey).doubleValue();
+
+                if (minValue > value)
+                    minValue = value;
+
+                if (maxValue < value)
+                    maxValue = value;
+            }
+        }
+        return new Range(minValue, maxValue + maxValue / 8.D);
+    }
+
+    private void configureBarChart(JFreeChart barChart, DefaultCategoryDataset dataset) {
+        barChart.getCategoryPlot().getRangeAxis().setRange(calcRange(dataset));
+        Color color = new Color(243,243,242);
+        barChart.getCategoryPlot().setBackgroundPaint(color);
+        barChart.setBackgroundPaint(color);
+        barChart.getLegend().setBackgroundPaint(color);
+        barChart.getCategoryPlot().setRangeGridlinePaint(Color.GRAY);
         barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
                 new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
         barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
-        BufferedImage image = barChart.createBufferedImage(800, 400);
-        return String.format("data:image/png;base64,%s", imgToBase64String(image, "png"));
+        barChart.getCategoryPlot().setNoDataMessage("Нет данных");
     }
 
     public static class DirectorFinanceEntry {
@@ -710,5 +771,24 @@ public class DirectorFinanceReport extends BasicReport {
             this.staffOrdersCountAbonement = staffOrdersCountAbonement;
         }
 
+        public Double getStudentsFinanceSum() {
+            return this.studentsFinanceAbonement + this.studentsFinancePayPlan +
+                    this.studentsFinanceBuffet + this.studentsFinanceVending;
+        }
+
+        public Double getStaffFinanceSum() {
+            return this.staffFinanceAbonement + this.staffFinancePayPlan +
+                    this.staffFinanceBuffet + this.staffFinanceVending;
+        }
+
+        public Long getStudentsCountSum() {
+            return this.studentsCountAbonement + this.studentsCountPayPlan +
+                    this.studentsCountBuffet + this.studentsCountVending;
+        }
+
+        public Long getStaffCountSum() {
+            return this.staffCountAbonement + this.staffCountPayPlan +
+                    this.staffCountBuffet + this.staffCountVending;
+        }
     }
 }

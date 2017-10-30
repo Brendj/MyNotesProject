@@ -13,10 +13,13 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.Range;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.List;
 
 public class DirectorDiscountFoodReport extends BasicReport {
 
@@ -38,6 +42,8 @@ public class DirectorDiscountFoodReport extends BasicReport {
     private static final Long elderDOU1     = 106L; // 3-7 ДОУ
     private static final Long elderDOU2     = 124L; // 3-7 ДОУ
 
+    private static final Double barTopMargin = 2.D;
+
     private Boolean allOO;
 
     public static class Builder {
@@ -45,120 +51,135 @@ public class DirectorDiscountFoodReport extends BasicReport {
             Date generateTime = new Date();
             List<DirectorDiscountFoodEntry> entries = new ArrayList<DirectorDiscountFoodEntry>();
 
-            String sqlQuery =
-                        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, dr.categoriesdiscounts "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced) THEN e.idofclient END)) AS s2_LGOTNOE "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve) THEN e.idofclient END)) AS s3_RESERV "
+            //String sqlQuery =
+            //            "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, dr.categoriesdiscounts "
+            //          + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced) THEN e.idofclient END)) AS s2_LGOTNOE "
+            //          + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve) THEN e.idofclient END)) AS s3_RESERV "
+            //          + "FROM cf_orgs o "
+            //          + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND (e.idofclientgroup<:employees OR e.idofclientgroup > :deleted) "
+            //          + "           AND e.ordertype IN (:reduced,:reserve) AND e.createddate>=:startDate AND e.createddate<:endDate "
+            //          + "LEFT JOIN cf_orderdetails od ON e.idoforder=od.idoforder AND e.idoforg=od.idoforg AND e.state=:state_commited AND od.state=0 AND od.idofrule IS NOT NULL "
+            //          + "LEFT JOIN cf_discountrules dr ON dr.idofrule=od.idofrule "
+            //          + "LEFT JOIN cf_clients c ON e.idofclient=c.idofclient "
+            //          + "WHERE o.idoforg IN (:idsOfOrg) "
+            //          + "GROUP BY o.idoforg, o.shortnameinfoservice, o.shortaddress, o.shortname, o.organizationtype, dr.categoriesdiscounts";
+
+            for (Long idOfOrg : idsOfOrg) {
+                String sqlQuery =
+                        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :youngSOSH OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :youngSOSH || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN e.idofclient END)) AS privilege_young "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :middleSOSH OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN e.idofclient END)) AS privilege_middle "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :elderSOSH OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN e.idofclient END)) AS privilege_elder "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :youngDOU2 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN e.idofclient END)) AS privilege_dou_young "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :elderDOU2 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
+                      + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN e.idofclient END)) AS privilege_dou_elder "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :youngSOSH OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :youngSOSH || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN e.idofclient END)) AS reserve_young "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :middleSOSH OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN e.idofclient END)) AS reserve_middle "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :elderSOSH OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN e.idofclient END)) AS reserve_elder "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :youngDOU2 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN e.idofclient END)) AS reserve_dou_young "
+                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :elderDOU2 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
+                      + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN e.idofclient END)) AS reserve_dou_elder "
                       + "FROM cf_orgs o "
-                      + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND (e.idofclientgroup<:employees OR e.idofclientgroup > :deleted) "
-                      + "           AND e.ordertype IN (:reduced,:reserve) AND e.createddate>=:startDate AND e.createddate<:endDate "
-                      + "LEFT JOIN cf_orderdetails od ON e.idoforder=od.idoforder AND e.idoforg=od.idoforg AND e.state=:state_commited AND od.state=0 AND od.idofrule IS NOT NULL "
+                      + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND (e.idofclientgroup<:employees OR e.idofclientgroup>:deleted) "
+                      + "                       AND e.ordertype IN (:reduced,:reserve,:correction,:change,:recycling) "
+                      + "AND e.createddate>=:startDate AND e.createddate<:endDate "
+                      + "LEFT JOIN cf_orderdetails od ON e.idoforder=od.idoforder AND e.idoforg=od.idoforg AND e.state=:state_commited AND od.state=:state_commited_details "
+                      + "                       AND od.idofrule IS NOT NULL "
                       + "LEFT JOIN cf_discountrules dr ON dr.idofrule=od.idofrule "
                       + "LEFT JOIN cf_clients c ON e.idofclient=c.idofclient "
-                      + "WHERE o.idoforg IN (:idsOfOrg) "
-                      + "GROUP BY o.idoforg, o.shortnameinfoservice, o.shortaddress, o.shortname, o.organizationtype, dr.categoriesdiscounts";
+                      + "WHERE o.idoforg=:idOfOrg "
+                      + "GROUP BY o.idoforg, o.shortnameinfoservice, o.shortaddress, o.shortname, o.organizationtype";
 
-            Query query = session.createSQLQuery(sqlQuery);
-            query.setParameter("reduced", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
-            query.setParameter("reserve", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
-            query.setParameter("state_commited", Order.STATE_COMMITED);
-            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
-            query.setParameter("startDate", startDate.getTime());
-            query.setParameter("endDate", endDate.getTime());
-            query.setParameterList("idsOfOrg", idsOfOrg);
+                Query query = session.createSQLQuery(sqlQuery);
+                query.setParameter("reduced", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
+                query.setParameter("reserve", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
+                query.setParameter("correction", OrderTypeEnumType.CORRECTION_TYPE.ordinal());
+                query.setParameter("recycling", OrderTypeEnumType.RECYCLING_RETIONS.ordinal());
+                query.setParameter("change", OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal());
+                query.setParameter("state_commited", Order.STATE_COMMITED);
+                query.setParameter("state_commited_details", OrderDetail.STATE_COMMITED);
+                query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("idOfOrg", idOfOrg);
+                query.setParameter("youngSOSH", youngSOSH.toString());
+                query.setParameter("middleSOSH", middleSOSH.toString());
+                query.setParameter("elderSOSH", elderSOSH.toString());
+                query.setParameter("youngDOU1", youngDOU1.toString());
+                query.setParameter("elderDOU1", elderDOU1.toString());
+                query.setParameter("youngDOU2", youngDOU2.toString());
+                query.setParameter("elderDOU2", elderDOU2.toString());
 
-            List resultList = query.list();
+                List resultList = query.list();
 
-            HashMap<Long, DirectorDiscountFoodEntry> entryHashMap = new HashMap<Long, DirectorDiscountFoodEntry>();
+                for (Object o : resultList) {
+                    Object vals[] = (Object[]) o;
 
-            for (Object o : resultList) {
-                Object vals[] = (Object[]) o;
+                    DirectorDiscountFoodEntry entry = new DirectorDiscountFoodEntry();
+                    entry.setIdOfOrg(((BigInteger) vals[0]).longValue());
+                    entry.setOrganizationType(((Integer) vals[1]).longValue());
+                    entry.setShortNameInfoService((String) vals[2]);
+                    entry.setShortName((String) vals[3]);
+                    entry.setAddress((String) vals[4]);
+                    entry.setPrivilegeYoungValue(((BigInteger) vals[5]).longValue());
+                    entry.setPrivilegeMiddleValue(((BigInteger) vals[6]).longValue());
+                    entry.setPrivilegeElderValue(((BigInteger) vals[7]).longValue());
+                    entry.setPrivilegeDOUYoungValue(((BigInteger) vals[8]).longValue());
+                    entry.setPrivilegeDOUElderValue(((BigInteger) vals[9]).longValue());
+                    entry.setReserveYoungValue(((BigInteger) vals[10]).longValue());
+                    entry.setReserveMiddleValue(((BigInteger) vals[11]).longValue());
+                    entry.setReserveElderValue(((BigInteger) vals[12]).longValue());
+                    entry.setReserveDOUYoungValue(((BigInteger) vals[13]).longValue());
+                    entry.setReserveDOUElderValue(((BigInteger) vals[14]).longValue());
 
-
-                DirectorDiscountFoodEntry entry;
-                List<String> categoryDiscounts = Collections.emptyList();
-
-                if (null != vals[5]) {
-                    categoryDiscounts = Arrays.asList(((String) vals[5]).split(","));
-                }
-                Long orgType = ((Integer)vals[1]).longValue();
-                Long idOfOrg = ((BigInteger)vals[0]).longValue();
-
-                if (categoryDiscounts.isEmpty()) {
-                    entry = new DirectorDiscountFoodEntry();
-                    entry.setShortNameInfoService((String)vals[2]);
-                    entry.setShortName((String)vals[3]);
-                    entry.setAddress((String)vals[4]);
-                    entry.setOrganizationType(orgType);
-                    entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
-                    entryHashMap.put(entry.getIdOfOrg(), entry);
-                }
-
-                for (String discount : categoryDiscounts) {
-                    Long discountL = Long.parseLong(discount);
-
-                    if (entryHashMap.containsKey(idOfOrg)) {
-                        entry = entryHashMap.get(idOfOrg);
-
-                        if (entry.getOrganizationType().equals(orgType)) {
-                            if (youngSOSH.equals(discountL)) {                                // начальные СОШ
-                                entry.setPrivilegeYoungValue(entry.getPrivilegeYoungValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setReserveYoungValue(entry.getReserveYoungValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (middleSOSH.equals(discountL)) {                         // средние СОШ
-                                entry.setPrivilegeMiddleValue(entry.getPrivilegeMiddleValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setReserveMiddleValue(entry.getReserveMiddleValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (elderSOSH.equals(discountL)) {                         // старшие СОШ
-                                entry.setPrivilegeElderValue(entry.getPrivilegeElderValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setReserveElderValue(entry.getReserveElderValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (youngDOU1.equals(discountL) || youngDOU2.equals(discountL)) {    // 1.5-3 ДОУ
-                                entry.setPrivilegeDOUYoungValue(entry.getPrivilegeDOUYoungValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setReserveDOUYoungValue(entry.getReserveDOUYoungValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (elderDOU1.equals(discountL) || elderDOU2.equals(discountL)) {    // 3-7 ДОУ
-                                entry.setPrivilegeDOUElderValue(entry.getPrivilegeElderValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setReserveDOUElderValue(entry.getReserveDOUElderValue() + ((BigInteger) vals[7]).longValue());
-                            }
-                        }
-                    } else {
-                        entry = new DirectorDiscountFoodEntry();
-                        entry.setShortNameInfoService((String)vals[2]);
-                        entry.setShortName((String)vals[3]);
-                        entry.setAddress((String)vals[4]);
-                        entry.setOrganizationType(orgType);
-                        entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
-
-                        if (youngSOSH.equals(discountL)) {                                // начальные СОШ
-                            entry.setPrivilegeYoungValue(((BigInteger)vals[6]).longValue());
-                            entry.setReserveYoungValue(((BigInteger)vals[7]).longValue());
-                            entry.setDescription(discountL, "начальные классы");
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (middleSOSH.equals(discountL)) {                         // средние СОШ
-                            entry.setPrivilegeMiddleValue(((BigInteger)vals[6]).longValue());
-                            entry.setReserveElderValue(((BigInteger)vals[7]).longValue());
-                            entry.setDescription(discountL,"средние классы");
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (elderSOSH.equals(discountL)) {                         // старшие СОШ
-                            entry.setPrivilegeElderValue(((BigInteger)vals[6]).longValue());
-                            entry.setReserveElderValue(((BigInteger)vals[7]).longValue());
-                            entry.setDescription(discountL,"старшие классы");
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (youngDOU1.equals(discountL) || youngDOU2.equals(discountL)) {    // 1.5-3 ДОУ
-                            entry.setPrivilegeDOUYoungValue(((BigInteger)vals[6]).longValue());
-                            entry.setReserveDOUYoungValue(((BigInteger)vals[7]).longValue());
-                            entry.setDescription(discountL,"дошкольное отделение 1.5-3");
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (elderDOU1.equals(discountL) || elderDOU2.equals(discountL)) {    // 3-7 ДОУ
-                            entry.setPrivilegeDOUElderValue(((BigInteger)vals[6]).longValue());
-                            entry.setReserveDOUElderValue(((BigInteger)vals[7]).longValue());
-                            entry.setDescription(discountL,"дошкольное отделение 3-7");
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        }
-                    }
+                    entries.add(entry);
                 }
             }
-
-            for (Long key : entryHashMap.keySet())
-                entries.add(entryHashMap.get(key));
 
             return new DirectorDiscountFoodReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, allOO);
         }
@@ -243,13 +264,9 @@ public class DirectorDiscountFoodReport extends BasicReport {
             // если строим отчет не для всего комплекса ОО
             if (!this.allOO) {
                 JFreeChart barChart = ChartFactory.createBarChart(
-                        String.format("Предоставление льготного питания %s(%s)", entry.getShortNameInfoService(), entry.getAddress()),
+                        String.format("Предоставление льготного питания %s\n(%s)", entry.getShortNameInfoService(), entry.getAddress()),
                         "", "", dataset, PlotOrientation.VERTICAL, true, true, false);
-
-                barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                        new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-                barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+                configureBarChart(barChart, dataset);
                 BufferedImage image = barChart.createBufferedImage(800, 400);
                 resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
             }
@@ -273,13 +290,9 @@ public class DirectorDiscountFoodReport extends BasicReport {
             dataset.addValue(reserveDOUElder.doubleValue(), "резервная категория", "3-7 (ДОУ)");
 
             JFreeChart barChart = ChartFactory.createBarChart(
-                    String.format("Предоставление льготного питания %s(весь комплекс)", items.get(0).getShortNameInfoService()),
+                    String.format("Предоставление льготного питания %s\n(весь комплекс)", items.get(0).getShortNameInfoService()),
                     "", "", dataset, PlotOrientation.VERTICAL, true, true, false);
-
-            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+            configureBarChart(barChart, dataset);
             BufferedImage image = barChart.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
         }
@@ -299,6 +312,73 @@ public class DirectorDiscountFoodReport extends BasicReport {
         return base64String;
     }
 
+    public List<DirectorDiscountFoodEntry> getItems() {
+        return items;
+    }
+
+    public Boolean getAllOO() {
+        return allOO;
+    }
+
+    public List<DirectorDiscountFoodEntry> getAllOOItem() {
+        DirectorDiscountFoodEntry entry = new DirectorDiscountFoodEntry();
+        for (DirectorDiscountFoodEntry e : items) {
+            if (null == entry.getShortNameInfoService()) {
+                entry.setShortNameInfoService(e.getShortNameInfoService());
+            }
+
+            entry.setPrivilegeYoungValue(entry.getPrivilegeYoungValue() + e.getPrivilegeYoungValue());
+            entry.setPrivilegeMiddleValue(entry.getPrivilegeMiddleValue() + e.getPrivilegeMiddleValue());
+            entry.setPrivilegeElderValue(entry.getPrivilegeElderValue() + e.getPrivilegeElderValue());
+            entry.setPrivilegeDOUYoungValue(entry.getPrivilegeDOUYoungValue() + e.getPrivilegeDOUYoungValue());
+            entry.setPrivilegeDOUElderValue(entry.getPrivilegeDOUElderValue() + e.getPrivilegeDOUElderValue());
+
+            entry.setReserveYoungValue(entry.getReserveYoungValue() + e.getReserveYoungValue());
+            entry.setReserveMiddleValue(entry.getReserveMiddleValue() + e.getReserveMiddleValue());
+            entry.setReserveElderValue(entry.getReserveElderValue() + e.getReserveElderValue());
+            entry.setReserveDOUYoungValue(entry.getReserveDOUYoungValue() + e.getReserveDOUYoungValue());
+            entry.setReserveDOUElderValue(entry.getReserveDOUElderValue() + e.getReserveDOUElderValue());
+        }
+
+        List<DirectorDiscountFoodEntry> resultList = new ArrayList<DirectorDiscountFoodEntry>();
+        resultList.add(entry);
+        return resultList;
+    }
+
+    private Range calcRange(CategoryDataset dataset) {
+        List rowKeys = dataset.getRowKeys();
+        List columnKeys = dataset.getColumnKeys();
+
+        Double minValue = 0.D;
+        Double maxValue = 8.D;
+
+        for (Object rowKey : rowKeys) {
+            for (Object colKey : columnKeys) {
+                Double value = dataset.getValue((Comparable)rowKey, (Comparable)colKey).doubleValue();
+
+                if (minValue > value)
+                    minValue = value;
+
+                if (maxValue < value)
+                    maxValue = value;
+            }
+        }
+        return new Range(minValue, maxValue + maxValue / 8.D);
+    }
+
+    private void configureBarChart(JFreeChart barChart, DefaultCategoryDataset dataset) {
+        barChart.getCategoryPlot().getRangeAxis().setRange(calcRange(dataset));
+        Color color = new Color(243,243,242);
+        barChart.getCategoryPlot().setBackgroundPaint(color);
+        barChart.setBackgroundPaint(color);
+        barChart.getLegend().setBackgroundPaint(color);
+        barChart.getCategoryPlot().setRangeGridlinePaint(Color.GRAY);
+        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
+                new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
+        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
+        barChart.getCategoryPlot().setNoDataMessage("Нет данных");
+    }
+
     public static class DirectorDiscountFoodEntry {
         private Long idOfOrg;
         private Long organizationType;
@@ -315,7 +395,6 @@ public class DirectorDiscountFoodReport extends BasicReport {
         private Long privilegeDOUElderValue;    // ДОУ 3-7 льготники
         private Long reserveDOUYoungValue;      // ДОУ 1.5-3 резервники
         private Long reserveDOUElderValue;      // ДОУ 3-7 резервники
-        private HashMap<Long, String> descriptions;
 
         public DirectorDiscountFoodEntry() {
             idOfOrg                 = -1L;
@@ -330,7 +409,6 @@ public class DirectorDiscountFoodReport extends BasicReport {
             privilegeDOUElderValue  = 0L;
             reserveDOUElderValue    = 0L;
             reserveDOUYoungValue    = 0L;
-            descriptions = new HashMap<Long, String>();
         }
 
         public Long getIdOfOrg() {
@@ -393,10 +471,6 @@ public class DirectorDiscountFoodReport extends BasicReport {
             return reserveDOUYoungValue;
         }
 
-        public String getDescription(Long idOfCategoryDiscount) {
-            return descriptions.get(idOfCategoryDiscount);
-        }
-
         public void setIdOfOrg(Long idOfOrg) {
             this.idOfOrg = idOfOrg;
         }
@@ -457,8 +531,12 @@ public class DirectorDiscountFoodReport extends BasicReport {
             this.reserveDOUYoungValue = reserveDOUYoungValue;
         }
 
-        public void setDescription(Long idOfCategoryDiscount, String description) {
-            this.descriptions.put(idOfCategoryDiscount, description);
+        public Boolean isSOSH() {
+            return ((Long)OrganizationType.SCHOOL.getCode().longValue()).equals(this.organizationType);
+        }
+
+        public Boolean isDOU() {
+            return ((Long)OrganizationType.KINDERGARTEN.getCode().longValue()).equals(this.organizationType);
         }
     }
 }

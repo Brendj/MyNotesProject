@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.statistic;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.report.BasicReport;
 
@@ -14,17 +15,22 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.Range;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.List;
 
 public class DirectorStudentAttendanceReport extends BasicReport {
 
@@ -48,95 +54,140 @@ public class DirectorStudentAttendanceReport extends BasicReport {
             Date generateTime = new Date();
             List<DirectorStudentAttendanceEntry> entries = new ArrayList<DirectorStudentAttendanceEntry>();
 
-            String sqlQuery =
-                    "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, c.categoriesdiscounts, "
-                            + "count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL  THEN e.idofclient END)) AS PRISHLO, "
-                            + "count (DISTINCT (CASE WHEN e.idofenterevent IS  NULL  THEN c.idofclient END)) AS NE_PRISHLO "
-                            + "FROM cf_orgs o "
-                            + "LEFT JOIN cf_clients c ON c.idoforg=o.idoforg "
-                            + "LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
-                            + "WHERE (c.idofclientgroup<:employees OR c.idofclientgroup > :deleted) "
-                            + "AND o.idoforg IN (:idsOfOrg) AND c.categoriesdiscounts <> '' "
-                            + "GROUP BY o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress, c.categoriesdiscounts";
+            //String sqlQuery =
+            //        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, c.categoriesdiscounts, "
+            //                + "count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL  THEN e.idofclient END)) AS PRISHLO, "
+            //                + "count (DISTINCT (CASE WHEN e.idofenterevent IS  NULL  THEN c.idofclient END)) AS NE_PRISHLO "
+            //                + "FROM cf_orgs o "
+            //                + "LEFT JOIN cf_clients c ON c.idoforg=o.idoforg "
+            //                + "LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
+            //                + "WHERE (c.idofclientgroup<:employees OR c.idofclientgroup > :deleted) "
+            //                + "AND o.idoforg IN (:idsOfOrg) AND c.categoriesdiscounts <> '' "
+            //                + "GROUP BY o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress, c.categoriesdiscounts";
 
-            Query query = session.createSQLQuery(sqlQuery);
-            query.setParameter("startDate", startDate.getTime());
-            query.setParameter("endDate", endDate.getTime());
-            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
-            query.setParameterList("idsOfOrg", idsOfOrg);
+            for (Long idOfOrg : idsOfOrg) {
+                String sqlQuery =
+                        "SELECT s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress, "
+                      + "       sum(come_in_young) AS come_in_young, sum(come_in_middle) AS come_in_middle, sum(come_in_elder) AS come_in_elder, "
+                      + "       sum(come_in_dou_young) AS come_in_dou_young, sum(come_in_dou_elder) AS come_in_dou_elder, "
+                      + "       sum(ex_come_in_young) AS ex_come_in_young, sum(ex_come_in_middle) AS ex_come_in_middle, "
+                      + "       sum(ex_come_in_elder) AS ex_come_in_elder, sum(ex_come_in_dou_young) AS ex_come_in_dou_young, "
+                      + "       sum(ex_come_in_dou_elder) AS ex_come_in_dou_elder "
+                      + "FROM ( "
+                      + "   SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, "
+                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :youngSOSH OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :youngSOSH || ',%' OR"
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN e.idofclient END)) AS come_in_young, "
+                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :middleSOSH OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN e.idofclient END)) AS come_in_middle, "
+                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :elderSOSH OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN e.idofclient END)) AS come_in_elder, "
+                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR"
+                      + "                                                                        c.categoriesdiscounts LIKE :youngDOU2 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN e.idofclient END)) AS come_in_dou_young, "
+                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :elderDOU2 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
+                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN e.idofclient END)) AS come_in_dou_elder, "
+                      + "           0 AS ex_come_in_young, 0 AS ex_come_in_middle, 0 AS ex_come_in_elder, 0 AS ex_come_in_dou_young, 0 AS ex_come_in_dou_elder "
+                      + "   FROM cf_orgs o "
+                      + "   LEFT JOIN cf_enterevents e ON e.idoforg=o.idoforg AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate AND e.passdirection=:direction "
+                      + "   LEFT JOIN cf_clients c ON c.idofclient=e.idofclient AND (c.idofclientgroup<:employees OR c.idofclientgroup>:deleted) AND c.categoriesdiscounts <> '' "
+                      + "   WHERE o.idoforg=:idOfOrg "
+                      + "   GROUP BY o.idoforg, o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress "
+                      + "   UNION ALL "
+                      + "   SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, 0 AS come_in_young, "
+                      + "           0 AS come_in_middle, 0 AS come_in_elder, 0 AS come_in_dou_young, 0 AS come_in_dou_elder, "
+                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :youngSOSH OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :youngSOSH || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN c.idofclient END)) AS ex_come_in_young, "
+                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :middleSOSH OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN c.idofclient END)) AS ex_come_in_middle, "
+                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :elderSOSH OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN c.idofclient END)) AS ex_come_in_elder, "
+                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR"
+                      + "                                                                     c.categoriesdiscounts LIKE :youngDOU2 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN c.idofclient END)) AS ex_come_in_dou_young, "
+                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :elderDOU2 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
+                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN c.idofclient END)) AS ex_come_in_dou_elder "
+                      + "   FROM cf_orgs o "
+                      + "   LEFT JOIN cf_clients c ON c.idoforg=o.idoforg AND (c.idofclientgroup<:employees OR c.idofclientgroup>:deleted) AND c.categoriesdiscounts <> '' "
+                      + "   LEFT JOIN cf_enterevents ne ON ne.idofclient=c.idofclient AND ne.idoforg=c.idoforg AND ne.evtdatetime>=:startDate AND ne.evtdatetime<:endDate AND ne.passdirection=:direction "
+                      + "   WHERE o.idoforg=:idOfOrg "
+                      + "   GROUP BY o.idoforg, o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress "
+                      + ") s "
+                      + "GROUP BY s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress";
 
-            List resultList = query.list();
+                Query query = session.createSQLQuery(sqlQuery);
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+                query.setParameter("idOfOrg", idOfOrg);
+                query.setParameter("direction", EnterEvent.ENTRY);
+                query.setParameter("youngSOSH", youngSOSH.toString());
+                query.setParameter("middleSOSH", middleSOSH.toString());
+                query.setParameter("elderSOSH", elderSOSH.toString());
+                query.setParameter("youngDOU1", youngDOU1.toString());
+                query.setParameter("elderDOU1", elderDOU1.toString());
+                query.setParameter("youngDOU2", youngDOU2.toString());
+                query.setParameter("elderDOU2", elderDOU2.toString());
 
-            HashMap<Long, DirectorStudentAttendanceEntry> entryHashMap = new HashMap<Long, DirectorStudentAttendanceEntry>();
+                List resultList = query.list();
 
-            for (Object o : resultList) {
-                Object vals[] = (Object[]) o;
+                for (Object o : resultList) {
+                    Object vals[] = (Object[]) o;
 
-                DirectorStudentAttendanceEntry entry;
-                String categoryDiscounts[] = ((String) vals[5]).split(",");
-                Integer orgType = (Integer) vals[1];
-                Long idOfOrg = ((BigInteger) vals[0]).longValue();
+                    DirectorStudentAttendanceEntry entry = new DirectorStudentAttendanceEntry();
+                    entry.setIdOfOrg(((BigInteger) vals[0]).longValue());
+                    entry.setOrganizationType((Integer) vals[1]);
+                    entry.setShortNameInfoService((String) vals[2]);
+                    entry.setShortName((String) vals[3]);
+                    entry.setShortAddress((String) vals[4]);
+                    entry.setComeInYoungSOSHValue(((BigDecimal) vals[5]).longValue());
+                    entry.setComeInMiddleSOSHValue(((BigDecimal) vals[6]).longValue());
+                    entry.setComeInElderSOSHValue(((BigDecimal) vals[7]).longValue());
+                    entry.setComeInYoungDOUValue(((BigDecimal) vals[8]).longValue());
+                    entry.setComeInElderDOUValue(((BigDecimal) vals[9]).longValue());
+                    entry.setExComeInYoungSOSHValue(((BigDecimal) vals[10]).longValue());
+                    entry.setExComeInMiddleSOSHValue(((BigDecimal) vals[11]).longValue());
+                    entry.setExComeInElderSOSHValue(((BigDecimal) vals[12]).longValue());
+                    entry.setExComeInYoungDOUValue(((BigDecimal) vals[13]).longValue());
+                    entry.setExComeInElderDOUValue(((BigDecimal) vals[14]).longValue());
 
-                for (String discount : categoryDiscounts) {
-                    Long discountL = Long.parseLong(discount);
-
-                    if (entryHashMap.containsKey(idOfOrg)) {
-                        entry = entryHashMap.get(idOfOrg);
-
-                        if (entry.getOrganizationType().equals(orgType)) {
-                            if (youngSOSH.equals(discountL)) {                                          // начальные СОШ
-                                entry.setComeInYoungSOSHValue(entry.getComeInYoungSOSHValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setExComeInYoungSOSHValue(entry.getExComeInYoungSOSHValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (middleSOSH.equals(discountL)) {                                  // средние СОШ
-                                entry.setComeInMiddleSOSHValue(entry.getComeInMiddleSOSHValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setExComeInMiddleSOSHValue(entry.getExComeInMiddleSOSHValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (elderSOSH.equals(discountL)) {                                   // старшие СОШ
-                                entry.setComeInElderSOSHValue(entry.getComeInElderSOSHValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setExComeInElderSOSHValue(entry.getExComeInElderSOSHValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (youngDOU1.equals(discountL) || youngDOU2.equals(discountL)) {    // 1.5-3 ДОУ
-                                entry.setComeInYoungDOUValue(entry.getExComeInYoungDOUValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setExComeInYoungDOUValue(entry.getExComeInYoungDOUValue() + ((BigInteger) vals[7]).longValue());
-                            } else if (elderDOU1.equals(discountL) || elderDOU2.equals(discountL)) {    // 3-7 ДОУ
-                                entry.setComeInElderDOUValue(entry.getComeInElderDOUValue() + ((BigInteger) vals[6]).longValue());
-                                entry.setExComeInElderDOUValue(entry.getExComeInElderDOUValue() + ((BigInteger) vals[7]).longValue());
-                            }
-                        }
-                    } else {
-                        entry = new DirectorStudentAttendanceEntry();
-                        entry.setIdOfOrg(((BigInteger) vals[0]).longValue());
-                        entry.setOrganizationType(orgType);
-                        entry.setShortNameInfoService((String) vals[2]);
-                        entry.setShortName((String) vals[3]);
-                        entry.setShortAddress((String) vals[4]);
-
-                        if (youngSOSH.equals(discountL)) {                                      // начальные СОШ
-                            entry.setComeInYoungSOSHValue(((BigInteger) vals[6]).longValue());
-                            entry.setExComeInYoungSOSHValue(((BigInteger) vals[7]).longValue());
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (middleSOSH.equals(discountL)) {                               // средние СОШ
-                            entry.setComeInMiddleSOSHValue(((BigInteger) vals[6]).longValue());
-                            entry.setExComeInMiddleSOSHValue(((BigInteger) vals[7]).longValue());
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (elderSOSH.equals(discountL)) {                               // старшие СОШ
-                            entry.setComeInElderSOSHValue(((BigInteger) vals[6]).longValue());
-                            entry.setExComeInElderSOSHValue(((BigInteger) vals[7]).longValue());
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (youngDOU1.equals(discountL) || youngDOU2.equals(discountL)) {    // 1.5-3 ДОУ
-                            entry.setComeInYoungDOUValue(((BigInteger) vals[6]).longValue());
-                            entry.setExComeInElderDOUValue(((BigInteger) vals[7]).longValue());
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        } else if (elderDOU1.equals(discountL) || elderDOU2.equals(discountL)) {    // 3-7 ДОУ
-                            entry.setComeInElderDOUValue(((BigInteger) vals[6]).longValue());
-                            entry.setExComeInElderDOUValue(((BigInteger) vals[7]).longValue());
-                            entryHashMap.put(entry.getIdOfOrg(), entry);
-                        }
-                    }
+                    entries.add(entry);
                 }
             }
-
-            for (Long key : entryHashMap.keySet())
-                entries.add(entryHashMap.get(key));
 
             return new DirectorStudentAttendanceReport(generateTime, new Date().getTime() - generateTime.getTime(),
                     entries, allOO);
@@ -210,13 +261,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
             // если строим отчет не для всего комплекса ОО
             if (!this.allOO) {
                 JFreeChart barChart = ChartFactory.createBarChart(
-                        String.format("Посещаемость обучающихся %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                        String.format("Посещаемость обучающихся %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                         "", "", dataset, PlotOrientation.VERTICAL, true, true, false);
-
-                barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                        new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-                barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+                configureBarChart(barChart, dataset);
                 BufferedImage image = barChart.createBufferedImage(800, 400);
                 resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
             }
@@ -240,13 +287,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
             dataset.addValue(exComeInElderDOU.doubleValue(), "отсутствуют", "3-7 (ДОУ)");
 
             JFreeChart barChart = ChartFactory.createBarChart(
-                    String.format("Посещаемость обучающихся %s(весь комплекс)", items.get(0).getShortNameInfoService()),
+                    String.format("Посещаемость обучающихся %s\n(весь комплекс)", items.get(0).getShortNameInfoService()),
                     "", "", dataset, PlotOrientation.VERTICAL, true, true, false);
-
-            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
-                    new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
-            barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
-
+            configureBarChart(barChart, dataset);
             BufferedImage image = barChart.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
         }
@@ -264,6 +307,79 @@ public class DirectorStudentAttendanceReport extends BasicReport {
             System.out.println(e.toString());
         }
         return base64String;
+    }
+
+    public List<DirectorStudentAttendanceEntry> getItems() {
+        return items;
+    }
+
+    public Boolean getAllOO() {
+        return allOO;
+    }
+
+    public List<DirectorStudentAttendanceEntry> getAllOOItem() {
+        DirectorStudentAttendanceEntry entry = new DirectorStudentAttendanceEntry();
+        for (DirectorStudentAttendanceEntry e : items) {
+            if (null == entry.getShortNameInfoService()) {
+                entry.setShortNameInfoService(e.getShortNameInfoService());
+            }
+
+            if (e.getOrganizationType().equals(OrganizationType.SCHOOL.getCode())) {
+                entry.setComeInYoungSOSHValue(entry.getComeInYoungSOSHValue() + e.getComeInYoungSOSHValue());
+                entry.setComeInMiddleSOSHValue(entry.getComeInMiddleSOSHValue() + e.getComeInMiddleSOSHValue());
+                entry.setComeInElderSOSHValue(entry.getComeInElderSOSHValue() + e.getComeInElderSOSHValue());
+
+                entry.setExComeInYoungSOSHValue(entry.getExComeInYoungSOSHValue() + e.getExComeInYoungSOSHValue());
+                entry.setExComeInMiddleSOSHValue(entry.getExComeInMiddleSOSHValue() + e.getExComeInMiddleSOSHValue());
+                entry.setExComeInElderSOSHValue(entry.getExComeInElderSOSHValue() + e.getExComeInElderSOSHValue());
+            }
+
+            if (e.getOrganizationType().equals(OrganizationType.KINDERGARTEN.getCode())) {
+                entry.setComeInYoungDOUValue(entry.getComeInYoungDOUValue() + e.getComeInYoungDOUValue());
+                entry.setComeInElderDOUValue(entry.getComeInElderDOUValue() + e.getComeInElderDOUValue());
+
+                entry.setExComeInYoungDOUValue(entry.getExComeInYoungDOUValue() + e.getExComeInYoungDOUValue());
+                entry.setExComeInElderDOUValue(entry.getExComeInElderDOUValue() + e.getExComeInElderDOUValue());
+            }
+        }
+
+        List<DirectorStudentAttendanceEntry> resultList = new ArrayList<DirectorStudentAttendanceEntry>();
+        resultList.add(entry);
+        return resultList;
+    }
+
+    private Range calcRange(CategoryDataset dataset) {
+        List rowKeys = dataset.getRowKeys();
+        List columnKeys = dataset.getColumnKeys();
+
+        Double minValue = 0.D;
+        Double maxValue = 8.D;
+
+        for (Object rowKey : rowKeys) {
+            for (Object colKey : columnKeys) {
+                Double value = dataset.getValue((Comparable)rowKey, (Comparable)colKey).doubleValue();
+
+                if (minValue > value)
+                    minValue = value;
+
+                if (maxValue < value)
+                    maxValue = value;
+            }
+        }
+        return new Range(minValue, maxValue + maxValue / 8.D);
+    }
+
+    private void configureBarChart(JFreeChart barChart, DefaultCategoryDataset dataset) {
+        barChart.getCategoryPlot().getRangeAxis().setRange(calcRange(dataset));
+        Color color = new Color(243,243,242);
+        barChart.getCategoryPlot().setBackgroundPaint(color);
+        barChart.setBackgroundPaint(color);
+        barChart.getLegend().setBackgroundPaint(color);
+        barChart.getCategoryPlot().setRangeGridlinePaint(Color.GRAY);
+        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelGenerator(
+                new StandardCategoryItemLabelGenerator("{2}", NumberFormat.getNumberInstance()));
+        barChart.getCategoryPlot().getRenderer().setDefaultItemLabelsVisible(true);
+        barChart.getCategoryPlot().setNoDataMessage("Нет данных");
     }
 
     public static class DirectorStudentAttendanceEntry {
@@ -339,7 +455,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getComeInYoungSOSHValue() {
-            return comeInYoungSOSHValue;
+            if (organizationType < 0 || OrganizationType.SCHOOL.getCode().equals(organizationType))
+                return comeInYoungSOSHValue;
+            return 0L;
         }
 
         public void setComeInYoungSOSHValue(Long comeInYoungSOSHValue) {
@@ -347,7 +465,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getComeInMiddleSOSHValue() {
-            return comeInMiddleSOSHValue;
+            if (organizationType < 0 || OrganizationType.SCHOOL.getCode().equals(organizationType))
+                return comeInMiddleSOSHValue;
+            return 0L;
         }
 
         public void setComeInMiddleSOSHValue(Long comeInMiddleSOSHValue) {
@@ -355,7 +475,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getComeInElderSOSHValue() {
-            return comeInElderSOSHValue;
+            if (organizationType < 0 || OrganizationType.SCHOOL.getCode().equals(organizationType))
+                return comeInElderSOSHValue;
+            return 0L;
         }
 
         public void setComeInElderSOSHValue(Long comeIntElderSOSHValue) {
@@ -363,7 +485,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getComeInYoungDOUValue() {
-            return comeInYoungDOUValue;
+            if (organizationType < 0 || OrganizationType.KINDERGARTEN.getCode().equals(organizationType))
+                return comeInYoungDOUValue;
+            return 0L;
         }
 
         public void setComeInYoungDOUValue(Long comeInYoungDOUValue) {
@@ -371,7 +495,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getComeInElderDOUValue() {
-            return comeInElderDOUValue;
+            if (organizationType < 0 || OrganizationType.KINDERGARTEN.getCode().equals(organizationType))
+                return comeInElderDOUValue;
+            return 0L;
         }
 
         public void setComeInElderDOUValue(Long comeInElderDOUValue) {
@@ -379,7 +505,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getExComeInYoungSOSHValue() {
-            return exComeInYoungSOSHValue;
+            if (organizationType < 0 || OrganizationType.SCHOOL.getCode().equals(organizationType))
+                return exComeInYoungSOSHValue;
+            return 0L;
         }
 
         public void setExComeInYoungSOSHValue(Long exComeInYoungSOSHValue) {
@@ -387,7 +515,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getExComeInMiddleSOSHValue() {
-            return exComeInMiddleSOSHValue;
+            if (organizationType < 0 || OrganizationType.SCHOOL.getCode().equals(organizationType))
+                return exComeInMiddleSOSHValue;
+            return 0L;
         }
 
         public void setExComeInMiddleSOSHValue(Long exComeInMiddleSOSHValue) {
@@ -395,7 +525,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getExComeInElderSOSHValue() {
-            return exComeInElderSOSHValue;
+            if (organizationType < 0 || OrganizationType.SCHOOL.getCode().equals(organizationType))
+                return exComeInElderSOSHValue;
+            return 0L;
         }
 
         public void setExComeInElderSOSHValue(Long exComeInElderSOSHValue) {
@@ -403,7 +535,9 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getExComeInYoungDOUValue() {
-            return exComeInYoungDOUValue;
+            if (organizationType < 0 || OrganizationType.KINDERGARTEN.getCode().equals(organizationType))
+                return exComeInYoungDOUValue;
+            return 0L;
         }
 
         public void setExComeInYoungDOUValue(Long exComeInYoungDOUValue) {
@@ -411,11 +545,21 @@ public class DirectorStudentAttendanceReport extends BasicReport {
         }
 
         public Long getExComeInElderDOUValue() {
-            return exComeInElderDOUValue;
+            if (organizationType < 0 || OrganizationType.KINDERGARTEN.getCode().equals(organizationType))
+                return exComeInElderDOUValue;
+            return 0L;
         }
 
         public void setExComeInElderDOUValue(Long exComeInElderDOUValue) {
             this.exComeInElderDOUValue = exComeInElderDOUValue;
+        }
+
+        public Boolean isSOSH() {
+            return OrganizationType.SCHOOL.getCode().equals(this.organizationType);
+        }
+
+        public Boolean isDOU() {
+            return OrganizationType.KINDERGARTEN.getCode().equals(this.organizationType);
         }
     }
 }

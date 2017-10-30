@@ -21,26 +21,22 @@
     .out-of-date {
         color: gray;
     }
+    .rich-table tr + tr {
+        background-position: 0 80% !important;
+    }
+    .director-grid > tbody > tr:first-child > td:first-child {
+        vertical-align: top;
+        padding-top: 7px;
+    }
 </style>
 
-<h:panelGrid id="directorStaffAttendanceGrid" binding="#{directorPage.directorStaffAttendancePage.pageComponent}" styleClass="borderless-grid"
+<h:panelGrid id="directorStaffAttendanceGrid" binding="#{directorPage.directorStaffAttendancePage.pageComponent}" styleClass="borderless-grid, director-grid"
              columns="2">
     <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
-    <%--<h:panelGroup>--%>
-        <%--<a4j:commandButton value="..." action="#{directorPage.showOrgListSelectPage}"--%>
-                           <%--reRender="directorStaffAttendanceGrid, modalOrgListSelectorOrgTable"--%>
-                           <%--oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"--%>
-                           <%--styleClass="command-link" style="width: 25px;">--%>
-            <%--<f:setPropertyActionListener value="#{directorPage.directorStaffAttendancePage.getStringIdOfOrgList}"--%>
-                                         <%--target="#{directorPage.orgFilterOfSelectOrgListSelectPage}" />--%>
-        <%--</a4j:commandButton>--%>
-        <%--<h:outputText styleClass="output-text" escape="true" value=" #{directorPage.directorStaffAttendancePage.filter}" />--%>
-    <%--</h:panelGroup>--%>
-
     <h:selectManyCheckbox value="#{directorPage.directorStaffAttendancePage.selectedOrgs}" id="directorStaffAttendanceGridSelectionPanel" styleClass="output-text" layout="pageDirection">
         <f:selectItem itemValue="-1" itemLabel="весь комплекс ОО"/>
         <c:forEach items="#{directorPage.directorStaffAttendancePage.organizations}" var="item">
-            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName}" itemDisabled="#{directorPage.directorStaffAttendancePage.selectedOrgs.contains('-1')}"/>
+            <f:selectItem itemValue="#{item.idOfOrg}" itemLabel="#{item.shortName} - #{item.shortAddress}" itemDisabled="#{directorPage.directorStaffAttendancePage.selectedOrgs.contains('-1')}"/>
         </c:forEach>
         <a4j:support event="onchange" reRender="directorStaffAttendanceGridSelectionPanel"/>
     </h:selectManyCheckbox>
@@ -57,6 +53,12 @@
                    mode="ajax" boundaryDatesMode="scroll">
         <a4j:support event="onchanged" reRender="directorStaffAttendanceGrid" ajaxSingle="true"/>
     </rich:calendar>
+    <h:outputText styleClass="output-text" escape="true" value="Тип отчета"/>
+    <h:selectOneMenu styleClass="input-text"
+                     value="#{directorPage.directorStaffAttendancePage.reportType}">
+        <f:selectItem itemValue="0" itemLabel="графический"/>
+        <f:selectItem itemValue="1" itemLabel="табличный"/>
+    </h:selectOneMenu>
     <a4j:commandButton value="Генерировать отчет" action="#{directorPage.directorStaffAttendancePage.buildStaffAttendanceReport}"
                        reRender="workspaceTogglePanel, directorStaffAttendanceGrid" styleClass="command-button"
                        status="idReportGenerateStatus"/>
@@ -65,13 +67,146 @@
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
+    <h:outputText styleClass="output-text" escape="true" value=""/>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
-<h:panelGroup id="directorStaffAttendanceReportGrid" styleClass="borderless-grid">
-    <c:forEach items="#{directorPage.directorStaffAttendancePage.chartData}" var="item">
-        <div class="report-holder">
+<h:panelGrid id="directorStaffAttendanceGraphReportGrid" styleClass="borderless-grid" columns="1"
+              rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '0')}">
+    <c:forEach items="#{directorPage.directorStaffAttendancePage.chartData}" var="item" varStatus="var">
+        <h:panelGroup id="report-holder-${var.index}" styleClass="borderless-grid"
+                      rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '0')}">
             <h:graphicImage value="#{item}" width="800" height="400" rendered="#{directorPage.directorStaffAttendancePage.showReport}"/>
-        </div>
+        </h:panelGroup>
     </c:forEach>
-</h:panelGroup>
+</h:panelGrid>
+<c:if test="${directorPage.directorStaffAttendancePage.directorStaffAttendanceReport.allOO ne true}">
+    <c:forEach items="#{directorPage.directorStaffAttendancePage.directorStaffAttendanceReport.items}" var="item" varStatus="var">
+        <h:panelGrid id="directorStaffAttendanceTableReportGrid-${var.index}" styleClass="borderless-grid" columns="1"
+                      rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '1')}">
+            <rich:dataTable value="#{item}" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column" colspan="6">
+                            <h:outputText styleClass="column-header" value="Посещаемость сотрудников  #{item.shortNameInfoService}"/>
+                            <h:panelGroup rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '1')}">
+                                <br />
+                            </h:panelGroup>
+                            <h:outputText styleClass="column-header" value="(#{item.shortAddress})" />
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Педагогический состав и администрация"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Тех.персонал, сотрудники и другие"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" rowspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Посетители"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" rowspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Родители"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true">
+                            <h:outputText styleClass="column-header" escape="true" value="Вошли"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Не вошли"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Вошли"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" >
+                            <h:outputText styleClass="column-header" escape="true" value="Не вошли"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.administrationValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.exAdministrationValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.techpersonalValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.exTechpersonalValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.parentValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.visitorValue}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
+            <h:panelGroup rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '1')}">
+                <br />
+            </h:panelGroup>
+        </h:panelGrid>
+    </c:forEach>
+</c:if>
+<c:if test="${directorPage.directorStaffAttendancePage.directorStaffAttendanceReport.allOO eq true}">
+    <c:forEach items="#{directorPage.directorStaffAttendancePage.directorStaffAttendanceReport.allOOItem}" var="item">
+        <h:panelGrid id="directorStaffAttendanceTableReportAllGrid" styleClass="borderless-grid" columns="1"
+                      rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '1')}">
+            <rich:dataTable value="#{item}" footerClass="data-table-footer">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="center-aligned-column" colspan="6">
+                            <h:outputText styleClass="column-header" value="Посещаемость сотрудников  #{item.shortNameInfoService}"/>
+                            <h:panelGroup rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '1')}">
+                                <br />
+                            </h:panelGroup>
+                            <h:outputText styleClass="column-header" value="весь комплекс" />
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Педагогический состав и администрация"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" colspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Тех.персонал, сотрудники и другие"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" rowspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Посетители"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" rowspan="2">
+                            <h:outputText styleClass="column-header" escape="true" value="Родители"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" breakBefore="true">
+                            <h:outputText styleClass="column-header" escape="true" value="Вошли"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Не вошли"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column">
+                            <h:outputText styleClass="column-header" escape="true" value="Вошли"/>
+                        </rich:column>
+                        <rich:column headerClass="center-aligned-column" >
+                            <h:outputText styleClass="column-header" escape="true" value="Не вошли"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.administrationValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.exAdministrationValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.techpersonalValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.exTechpersonalValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.parentValue}" styleClass="output-text" />
+                </rich:column>
+                <rich:column styleClass="center-aligned-column">
+                    <h:outputText value="#{item.visitorValue}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
+            <h:panelGroup rendered="#{directorPage.directorStaffAttendancePage.showReport && (directorPage.directorStaffAttendancePage.reportType == '1')}">
+                <br />
+            </h:panelGroup>
+        </h:panelGrid>
+    </c:forEach>
+</c:if>

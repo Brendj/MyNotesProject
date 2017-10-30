@@ -14,13 +14,16 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -38,52 +41,87 @@ public class DirectorStaffAttendanceReport extends BasicReport {
             Date generateTime = new Date();
             List<DirectorStaffAttendanceEntry> entries = new ArrayList<DirectorStaffAttendanceEntry>();
 
-            String sqlQuery =
-                    "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress "
-                  + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:employees,:administration) THEN e.idofclient END)) AS s2_VOSHLI_SOTR "
-                  + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:tech_employees,:others,:employee) THEN e.idofclient END)) AS s3_VOSHLI_TEHPERS "
-                  + " ,count (DISTINCT (CASE WHEN c.idofclientgroup IN (:employees,:administration) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS s4_NE_VOSHLI_SOTR "
-                  + " ,count (DISTINCT (CASE WHEN c.idofclientgroup IN (:tech_employees,:others,:employee) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS s5_NE_VOSHLI_TEHPERS "
-                  + " ,count (DISTINCT (CASE WHEN e.idofclientgroup IN (:visitors)  THEN e.idofclient END)) AS s6_VOSHLI_POSETITELI "
-                  + " ,count (DISTINCT (CASE WHEN e.idofclientgroup IN (:parents) THEN e.idofclient END)) AS s7_VOSHLI_RODITELI "
-                  + "FROM cf_clients c "
-                  + "LEFT JOIN cf_orgs o ON c.idoforg=o.idoforg "
-                  + "LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
-                  + "WHERE (c.idofclientgroup >=:employees OR e.idofclientgroup <= :deleted) AND o.idoforg IN (:idsOfOrg) "
-                  + "GROUP BY o.shortnameinfoservice, o.idoforg, o.organizationtype, o.shortname, o.shortaddress";
+            //String sqlQuery =
+            //        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress "
+            //      + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:employees,:administration) THEN e.idofclient END)) AS s2_VOSHLI_SOTR "
+            //      + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:tech_employees,:others,:employee) THEN e.idofclient END)) AS s3_VOSHLI_TEHPERS "
+            //      + " ,count (DISTINCT (CASE WHEN c.idofclientgroup IN (:employees,:administration) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS s4_NE_VOSHLI_SOTR "
+            //      + " ,count (DISTINCT (CASE WHEN c.idofclientgroup IN (:tech_employees,:others,:employee) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS s5_NE_VOSHLI_TEHPERS "
+            //      + " ,count (DISTINCT (CASE WHEN e.idofclientgroup IN (:visitors)  THEN e.idofclient END)) AS s6_VOSHLI_POSETITELI "
+            //      + " ,count (DISTINCT (CASE WHEN e.idofclientgroup IN (:parents) THEN e.idofclient END)) AS s7_VOSHLI_RODITELI "
+            //      + "FROM cf_clients c "
+            //      + "LEFT JOIN cf_orgs o ON c.idoforg=o.idoforg "
+            //      + "LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
+            //      + "WHERE (c.idofclientgroup >=:employees OR e.idofclientgroup <= :deleted) AND o.idoforg IN (:idsOfOrg) "
+            //      + "GROUP BY o.shortnameinfoservice, o.idoforg, o.organizationtype, o.shortname, o.shortaddress";
 
-            Query query = session.createSQLQuery(sqlQuery);
-            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-            query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-            query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-            query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
-            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-            query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
-            query.setParameter("startDate", startDate.getTime());
-            query.setParameter("endDate", endDate.getTime());
-            query.setParameterList("idsOfOrg", idsOfOrg);
+            for (Long idOfOrg : idsOfOrg) {
+                String sqlQuery =
+                        "SELECT s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress, sum(s.administration) AS administration, "
+                      + "       sum(s.techpersonal) AS techpersonal, sum(s.ex_administration) AS ex_administration, sum(s.ex_techpersonal) AS ex_techpersonal, "
+                      + "       sum(s.visitor) AS visitor, sum(s.parent) AS parent "
+                      + "FROM ( "
+                      + "   SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, "
+                      + "       count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:employees,:administration) THEN e.idofclient END)) AS administration, "
+                      + "       count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:tech_employees,:others,:employee) THEN e.idofclient END)) AS techpersonal,"
+                      + "       0 AS ex_administration, 0 AS ex_techpersonal, "
+                      + "       count (DISTINCT (CASE WHEN e.idofclientgroup IN (:visitors)  THEN e.idofclient END)) AS visitor, "
+                      + "       count (DISTINCT (CASE WHEN e.idofclientgroup IN (:parents) THEN e.idofclient END)) AS parent "
+                      + "   FROM cf_orgs o "
+                      + "   LEFT JOIN cf_enterevents e ON e.idoforg=o.idoforg AND e.evtdatetime>=:startDate "
+                      + "                              AND e.evtdatetime<:endDate  AND e.passdirection=0 "
+                      + "                              AND (e.idofclientgroup>=:employees AND e.idofclientgroup<=:deleted) "
+                      + "   LEFT JOIN cf_clients c ON c.idofclient=e.idofclient AND (c.idofclientgroup >=:employees AND c.idofclientgroup <= :deleted) "
+                      + "   WHERE o.idoforg=:idOfOrg "
+                      + "   GROUP BY o.shortnameinfoservice, o.idoforg, o.organizationtype, o.shortname, o.shortaddress "
+                      + "   UNION ALL "
+                      + "   SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, 0 AS administration, 0 AS techpersonal, "
+                      + "       count (DISTINCT (CASE WHEN c.idofclientgroup IN (:employees,:administration) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS ex_administration, "
+                      + "       count (DISTINCT (CASE WHEN c.idofclientgroup IN (:tech_employees,:others,:employee) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS ex_techpersonal, "
+                      + "       0 AS visitor, 0 AS parent "
+                      + "   FROM cf_orgs o "
+                      + "   LEFT JOIN cf_clients c ON c.idoforg=o.idoforg AND (c.idofclientgroup>=:employees AND c.idofclientgroup<=:deleted) "
+                      + "   LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate "
+                      + "                              AND e.evtdatetime<:endDate  AND e.passdirection=0 "
+                      + "                              AND (e.idofclientgroup>=:employees AND e.idofclientgroup<=:deleted) "
+                      + "   WHERE o.idoforg=:idOfOrg "
+                      + "   GROUP BY o.shortnameinfoservice, o.idoforg, o.organizationtype, o.shortname, o.shortaddress "
+                      + ") s "
+                      + "GROUP BY s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress";
 
-            List resultList = query.list();
+                Query query = session.createSQLQuery(sqlQuery);
+                query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+                query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+                query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+                query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+                query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+                query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+                query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("idOfOrg", idOfOrg);
 
-            for (Object o : resultList) {
-                DirectorStaffAttendanceEntry entry = new DirectorStaffAttendanceEntry();
-                Object vals[]=(Object[])o;
+                List resultList = query.list();
 
-                entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
-                entry.setOrganizationType(((Integer)vals[1]).longValue());
-                entry.setShortNameInfoService((String)vals[2]);
-                entry.setShortName((String)vals[3]);
-                entry.setShortAddress((String)vals[4]);
-                entry.setAdministrationValue(((BigInteger)vals[5]).longValue());
-                entry.setTechpersonalValue(((BigInteger)vals[6]).longValue());
-                entry.setExAdministrationValue(((BigInteger)vals[7]).longValue());
-                entry.setExTechpersonalValue(((BigInteger)vals[8]).longValue());
-                entry.setVisitorValue(((BigInteger)vals[9]).longValue());
-                entry.setParentValue(((BigInteger)vals[10]).longValue());
+                for (Object o : resultList) {
+                    DirectorStaffAttendanceEntry entry = new DirectorStaffAttendanceEntry();
+                    Object vals[] = (Object[]) o;
 
-                entries.add(entry);
+                    entry.setIdOfOrg(((BigInteger) vals[0]).longValue());
+                    entry.setOrganizationType(((Integer) vals[1]).longValue());
+                    entry.setShortNameInfoService((String) vals[2]);
+                    entry.setShortName((String) vals[3]);
+                    entry.setShortAddress((String) vals[4]);
+                    entry.setAdministrationValue(((BigDecimal) vals[5]).longValue());
+                    entry.setTechpersonalValue(((BigDecimal) vals[6]).longValue());
+                    entry.setExAdministrationValue(((BigDecimal) vals[7]).longValue());
+                    entry.setExTechpersonalValue(((BigDecimal) vals[8]).longValue());
+                    entry.setVisitorValue(((BigDecimal) vals[9]).longValue());
+                    entry.setParentValue(((BigDecimal) vals[10]).longValue());
+
+                    entries.add(entry);
+                }
             }
 
             return new DirectorStaffAttendanceReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, allOO);
@@ -135,11 +173,9 @@ public class DirectorStaffAttendanceReport extends BasicReport {
 
 
                 JFreeChart pieChart = ChartFactory.createPieChart(
-                        String.format("Посещаемость сотрудников %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                        String.format("Посещаемость сотрудников %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                         dataset, true, true, false);
-                ((PiePlot) pieChart.getPlot()).setLabelGenerator(
-                        new StandardPieSectionLabelGenerator("{1}({2})", new DecimalFormat("0"), new DecimalFormat("0.00%")));
-
+                configuratePieChart(pieChart);
                 BufferedImage image = pieChart.createBufferedImage(800, 400);
                 resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
             }
@@ -156,11 +192,9 @@ public class DirectorStaffAttendanceReport extends BasicReport {
             dataset.setValue("родители", parent);
 
             JFreeChart pieChart = ChartFactory.createPieChart(
-                    String.format("Посещаемость сотрудников %s(весь комплекс)", items.get(0).getShortNameInfoService()),
+                    String.format("Посещаемость сотрудников %s\n(весь комплекс)", items.get(0).getShortNameInfoService()),
                     dataset, true, true, false);
-            ((PiePlot) pieChart.getPlot()).setLabelGenerator(
-                    new StandardPieSectionLabelGenerator("{1}({2})", new DecimalFormat("0"), new DecimalFormat("0.00%")));
-
+            configuratePieChart(pieChart);
             BufferedImage image = pieChart.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
         }
@@ -180,6 +214,55 @@ public class DirectorStaffAttendanceReport extends BasicReport {
         return base64String;
     }
 
+    public List<DirectorStaffAttendanceEntry> getItems() {
+        return items;
+    }
+
+    public Boolean getAllOO() {
+        return allOO;
+    }
+
+
+    public List<DirectorStaffAttendanceEntry> getAllOOItem() {
+        DirectorStaffAttendanceEntry entry = new DirectorStaffAttendanceEntry();
+        for (DirectorStaffAttendanceEntry e : items) {
+            if (null == entry.getShortNameInfoService()) {
+                entry.setShortNameInfoService(e.getShortNameInfoService());
+            }
+
+            entry.setAdministrationValue(entry.getAdministrationValue() + e.getAdministrationValue());
+            entry.setTechpersonalValue(entry.getTechpersonalValue() + e.getTechpersonalValue());
+            entry.setExAdministrationValue(entry.getExAdministrationValue() + e.getExAdministrationValue());
+            entry.setExTechpersonalValue(entry.getExTechpersonalValue() + e.getExTechpersonalValue());
+            entry.setVisitorValue(entry.getVisitorValue() + e.getVisitorValue());
+            entry.setParentValue(entry.getParentValue() + e.getParentValue());
+        }
+
+        List<DirectorStaffAttendanceEntry> resultList = new ArrayList<DirectorStaffAttendanceEntry>();
+        resultList.add(entry);
+        return resultList;
+    }
+
+    private void configuratePieChart(JFreeChart pieChart) {
+        Color color = new Color(243,243,242);
+        pieChart.getPlot().setBackgroundPaint(color);
+        pieChart.setBackgroundPaint(color);
+        pieChart.getLegend().setBackgroundPaint(color);
+        ((PiePlot) pieChart.getPlot()).setLabelGenerator(
+                new StandardPieSectionLabelGenerator("{1}({2})", new DecimalFormat("0"), new DecimalFormat("0.00%")) {
+
+                    @Override
+                    public String generateSectionLabel(PieDataset dataset, Comparable key) {
+                        if (dataset.getValue(key).doubleValue() <= 0.D) {
+                            return null;
+                        }
+                        return super.generateSectionLabel(dataset, key);
+                    }
+                }
+        );
+        pieChart.getPlot().setNoDataMessage("Нет данных");
+    }
+
     public static class DirectorStaffAttendanceEntry {
         private Long idOfOrg;
         private Long organizationType;
@@ -192,6 +275,17 @@ public class DirectorStaffAttendanceReport extends BasicReport {
         private Long exTechpersonalValue;
         private Long visitorValue;
         private Long parentValue;
+
+        public DirectorStaffAttendanceEntry() {
+            idOfOrg = -1L;
+            organizationType = -1L;
+            administrationValue = 0L;
+            techpersonalValue = 0L;
+            exAdministrationValue = 0L;
+            exTechpersonalValue = 0L;
+            visitorValue = 0L;
+            parentValue = 0L;
+        }
 
         public Long getIdOfOrg() {
             return idOfOrg;

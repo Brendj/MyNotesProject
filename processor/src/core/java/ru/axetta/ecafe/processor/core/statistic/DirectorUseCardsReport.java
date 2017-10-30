@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.statistic;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.BasicReport;
 
 import org.hibernate.Query;
@@ -16,9 +15,11 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.List;
 
 public class DirectorUseCardsReport extends BasicReport {
 
@@ -38,49 +40,50 @@ public class DirectorUseCardsReport extends BasicReport {
             Date generateTime = new Date();
             List<DirectorUseCardsEntry> entries = new ArrayList<DirectorUseCardsEntry>();
 
-            String sqlQuery =
+            for (Long idOfOrg : idsOfOrg) {
+                String sqlQuery =
                         "SELECT o.idoforg, o.shortnameinfoservice, o.shortname, o.shortaddress, o.organizationtype "
-                      + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofcard IS NOT NULL THEN e.idofclient END)) AS s2_VSE "
+                      + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL THEN e.idofclient END)) AS s2_VSE "
                       + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND ca.cardtype IN (0,1,2,9,10) AND e.guardianid IS NULL THEN e.idofclient END)) AS s2_VOSHLI_SS_CARD "
                       + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND ca.cardtype IN (3,7,8) AND e.guardianid IS NULL THEN e.idofclient END)) AS s3_VOSHLI_SOC_CARD "
                       + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND ca.cardtype IN (5,6,4) AND e.guardianid IS NULL THEN e.idofclient END)) AS s4_VOSHLI_ATHER_CARD "
                       + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofcard IS NULL AND e.guardianid IS NULL THEN e.idofclient END)) AS s5_VOSHLI_BES_CARD_SOSH "
                       + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.guardianid IS NOT NULL THEN e.idofclient END)) AS s6_VOSHLI_BES_CARD_DOU "
-                      + " FROM cf_orgs o"
+                      + " FROM cf_orgs o "
                       + " LEFT JOIN cf_enterevents e ON e.idoforg=o.idoforg AND (e.idofclientgroup < :employees OR e.idofclientgroup > :deleted) "
-                      + "               AND e.evtdatetime BETWEEN :startDate AND :endDate AND e.passdirection NOT IN (:checked_ext, :checked_int) "
+                      + "               AND e.evtdatetime BETWEEN :startDate AND :endDate AND e.passdirection=:entry "
                       + " LEFT JOIN cf_cards ca ON ca.cardno=e.idofcard "
-                      + " WHERE o.idoforg IN (:idsOfOrg) "
+                      + " WHERE o.idoforg=:idOfOrg "
                       + " GROUP BY o.shortnameinfoservice, o.shortname, o.idoforg, o.shortaddress, o.organizationtype";
 
-            Query query = session.createSQLQuery(sqlQuery);
+                Query query = session.createSQLQuery(sqlQuery);
 
-            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
-            query.setParameter("startDate", startDate.getTime());
-            query.setParameter("endDate", endDate.getTime());
-            query.setParameterList("idsOfOrg", idsOfOrg);
-            query.setParameter("checked_ext", EnterEvent.CHECKED_BY_TEACHER_EXT);
-            query.setParameter("checked_int", EnterEvent.CHECKED_BY_TEACHER_INT);
+                query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("idOfOrg", idOfOrg);
+                query.setParameter("entry", EnterEvent.ENTRY);
 
-            List resultList = query.list();
+                List resultList = query.list();
 
-            for (Object o : resultList) {
-                DirectorUseCardsEntry entry = new DirectorUseCardsEntry();
-                Object vals[]=(Object[])o;
+                for (Object o : resultList) {
+                    DirectorUseCardsEntry entry = new DirectorUseCardsEntry();
+                    Object vals[]=(Object[])o;
 
-                entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
-                entry.setShortNameInfoService((String)vals[1]);
-                entry.setShortName((String)vals[2]);
-                entry.setShortAddress((String)vals[3]);
-                entry.setOrganizationType(((Integer)vals[4]).longValue());
-                entry.setServiceValue(((BigInteger)vals[6]).longValue());
-                entry.setSocialValue(((BigInteger)vals[7]).longValue());
-                entry.setTransportValue(((BigInteger)vals[8]).longValue());
-                entry.setWithoutSOSHValue(((BigInteger)vals[9]).longValue());
-                entry.setWithoutDOUValue(((BigInteger)vals[10]).longValue());
+                    entry.setIdOfOrg(((BigInteger)vals[0]).longValue());
+                    entry.setShortNameInfoService((String)vals[1]);
+                    entry.setShortName((String)vals[2]);
+                    entry.setShortAddress((String)vals[3]);
+                    entry.setOrganizationType(((Integer)vals[4]).longValue());
+                    entry.setServiceValue(((BigInteger)vals[6]).longValue());
+                    entry.setSocialValue(((BigInteger)vals[7]).longValue());
+                    entry.setTransportValue(((BigInteger)vals[8]).longValue());
+                    entry.setWithoutSOSHValue(((BigInteger)vals[9]).longValue());
+                    entry.setWithoutDOUValue(((BigInteger)vals[10]).longValue());
 
-                entries.add(entry);
+                    entries.add(entry);
+                }
             }
 
             return new DirectorUseCardsReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, allOO);
@@ -129,12 +132,9 @@ public class DirectorUseCardsReport extends BasicReport {
                 dataset.setValue("без электронных носителей (ДОУ)", entry.getWithoutDOUValue());
 
                 JFreeChart pieChart = ChartFactory.createPieChart(
-                        String.format("Использование электронных носителей при посещении здания ОО %s(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
+                        String.format("Использование электронных носителей при посещении здания ОО %s\n(%s)", entry.getShortNameInfoService(), entry.getShortAddress()),
                         dataset, true, true, false);
-
-                ((PiePlot) pieChart.getPlot()).setLabelGenerator(
-                        new StandardPieSectionLabelGenerator("{1}({2})", new DecimalFormat("0"), new DecimalFormat("0.00%")));
-
+                configuratePieChart(pieChart);
                 BufferedImage image = pieChart.createBufferedImage(800, 400);
                 resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
             }
@@ -150,12 +150,9 @@ public class DirectorUseCardsReport extends BasicReport {
             dataset.setValue("без электронных носителей (ДОУ)", withoutDOUCards);
 
             JFreeChart pieChart = ChartFactory.createPieChart(
-                    String.format("Использование электронных носителей при посещении здания ОО %s(весь комплекс)",
+                    String.format("Использование электронных носителей при посещении здания ОО %s\n(весь комплекс)",
                             items.get(0).getShortNameInfoService()), dataset, true, true, false);
-
-            ((PiePlot) pieChart.getPlot()).setLabelGenerator(
-                    new StandardPieSectionLabelGenerator("{1}({2})", new DecimalFormat("0"), new DecimalFormat("0.00%")));
-
+            configuratePieChart(pieChart);
             BufferedImage image = pieChart.createBufferedImage(800, 400);
             resultList.add(String.format("data:image/png;base64,%s", imgToBase64String(image, "png")));
         }
@@ -175,6 +172,53 @@ public class DirectorUseCardsReport extends BasicReport {
         return base64String;
     }
 
+    public List<DirectorUseCardsEntry> getItems() {
+        return items;
+    }
+
+    public Boolean getAllOO() {
+        return allOO;
+    }
+
+    public List<DirectorUseCardsEntry> getAllOOItem() {
+        DirectorUseCardsEntry entry = new DirectorUseCardsEntry();
+        for (DirectorUseCardsEntry e : items) {
+            if (null == entry.getShortNameInfoService()) {
+                entry.setShortNameInfoService(e.getShortNameInfoService());
+            }
+
+            entry.setServiceValue(entry.getServiceValue() + e.getServiceValue());
+            entry.setSocialValue(entry.getSocialValue() + e.getSocialValue());
+            entry.setTransportValue(entry.getTransportValue() + e.getTransportValue());
+            entry.setWithoutSOSHValue(entry.getWithoutSOSHValue() + e.getWithoutSOSHValue());
+            entry.setWithoutDOUValue(entry.getWithoutDOUValue() + e.getWithoutDOUValue());
+        }
+
+        List<DirectorUseCardsEntry> resultList = new ArrayList<DirectorUseCardsEntry>();
+        resultList.add(entry);
+        return resultList;
+    }
+
+    private void configuratePieChart(JFreeChart pieChart) {
+        Color color = new Color(243,243,242);
+        pieChart.getPlot().setBackgroundPaint(color);
+        pieChart.setBackgroundPaint(color);
+        pieChart.getLegend().setBackgroundPaint(color);
+        ((PiePlot) pieChart.getPlot()).setLabelGenerator(
+                new StandardPieSectionLabelGenerator("{1}({2})", new DecimalFormat("0"), new DecimalFormat("0.00%")) {
+
+                    @Override
+                    public String generateSectionLabel(PieDataset dataset, Comparable key) {
+                        if (dataset.getValue(key).doubleValue() <= 0.D) {
+                            return null;
+                        }
+                        return super.generateSectionLabel(dataset, key);
+                    }
+                }
+        );
+        pieChart.getPlot().setNoDataMessage("Нет данных");
+    }
+
     public static class DirectorUseCardsEntry {
         private String shortNameInfoService;
         private String shortName;
@@ -186,6 +230,16 @@ public class DirectorUseCardsReport extends BasicReport {
         private Long transportValue;  // Транспортная, Банковская, УЭК
         private Long withoutSOSHValue; // БЕЗ карты СОШ
         private Long withoutDOUValue; // БЕЗ карты ДОУ
+
+        public DirectorUseCardsEntry() {
+            idOfOrg = -1L;
+            organizationType = -1L;
+            serviceValue = 0L;
+            socialValue = 0L;
+            transportValue = 0L;
+            withoutSOSHValue = 0L;
+            withoutDOUValue = 0L;
+        }
 
         public String getShortName() {
             return shortName;

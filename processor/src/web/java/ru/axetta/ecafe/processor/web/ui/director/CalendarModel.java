@@ -70,6 +70,6 @@ public class CalendarModel implements CalendarDataModel {
     }
 
     public void updateEndDate(Date endDate) {
-        this.endDate = CalendarUtils.endOfDay(endDate);
+        this.endDate = endDate;
     }
 }

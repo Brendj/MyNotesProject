@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.director;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.statistic.DirectorFinanceReport;
 import ru.axetta.ecafe.processor.core.statistic.DirectorLoader;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -24,6 +25,10 @@ public class DirectorFinancePage extends OnlineReportPage{
     private DirectorFinanceReport directorFinanceReport;
     private DirectorLoader directorLoader = new DirectorLoader();
 
+    public DirectorFinanceReport getDirectorFinanceReport() {
+        return directorFinanceReport;
+    }
+
     private static final String SELECT_ALL_OO = "-1";
 
     private Boolean showReport = false;
@@ -33,6 +38,10 @@ public class DirectorFinancePage extends OnlineReportPage{
     private CalendarModel endCalendarModel = new CalendarModel();
 
     private List<DirectorLoader.OrgItem> organizations = new ArrayList<DirectorLoader.OrgItem>();
+
+    private Integer reportType = 0;         // 0 - graph, 1 - table
+
+    private List<String> chartData;
 
     public DirectorFinancePage() {
         selectedOrgs.add(SELECT_ALL_OO);
@@ -70,6 +79,10 @@ public class DirectorFinancePage extends OnlineReportPage{
                 }
             }
 
+            if (orgList.isEmpty()) {
+                throw new Exception("не выбрано ниодной организации");
+            }
+
             buildReport(session, this.startDate, this.endDate, orgList, selectedOrgs.contains(SELECT_ALL_OO));
             transaction.commit();
             transaction = null;
@@ -80,6 +93,9 @@ public class DirectorFinancePage extends OnlineReportPage{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+
+        if (0 == reportType)
+            loadChartData();
         return null;
     }
 
@@ -94,9 +110,7 @@ public class DirectorFinancePage extends OnlineReportPage{
     }
 
     public List<String> getChartData() {
-        if (null == directorFinanceReport)
-            return Collections.emptyList();
-        return directorFinanceReport.chartData();
+        return chartData;
     }
 
     public Boolean getShowReport() {
@@ -166,7 +180,23 @@ public class DirectorFinancePage extends OnlineReportPage{
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endDate = CalendarUtils.endOfDay(endDate);
         startCalendarModel.updateEndDate(this.endDate);
+    }
+
+    public String getReportType() {
+        return reportType.toString();
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = Integer.parseInt(reportType);
+    }
+
+    public void loadChartData() {
+        if (null == directorFinanceReport) {
+            chartData = Collections.emptyList();
+            return;
+        }
+        chartData = directorFinanceReport.chartData();
     }
 }

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.director;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.statistic.DirectorLoader;
 import ru.axetta.ecafe.processor.core.statistic.DirectorStudentAttendanceReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -24,6 +25,10 @@ public class DirectorStudentAttendancePage extends OnlineReportPage {
     private DirectorStudentAttendanceReport directorStudentAttendanceReport;
     private DirectorLoader directorLoader = new DirectorLoader();
 
+    public DirectorStudentAttendanceReport getDirectorStudentAttendanceReport() {
+        return directorStudentAttendanceReport;
+    }
+
     private static final String SELECT_ALL_OO = "-1";
 
     private Boolean showReport = false;
@@ -34,6 +39,8 @@ public class DirectorStudentAttendancePage extends OnlineReportPage {
 
     private List<DirectorLoader.OrgItem> organizations = new ArrayList<DirectorLoader.OrgItem>();
 
+    private Integer reportType = 0;         // 0 - graph, 1 - table
+    private List<String> chartData;
 
     public DirectorStudentAttendancePage() {
         selectedOrgs.add(SELECT_ALL_OO);
@@ -70,6 +77,11 @@ public class DirectorStudentAttendancePage extends OnlineReportPage {
                         orgList.add(Long.parseLong(id));
                 }
             }
+
+            if (orgList.isEmpty()) {
+                throw new Exception("не выбрано ниодной организации");
+            }
+
             buildReport(session, this.startDate, this.endDate, orgList, selectedOrgs.contains(SELECT_ALL_OO));
             transaction.commit();
             transaction = null;
@@ -80,6 +92,9 @@ public class DirectorStudentAttendancePage extends OnlineReportPage {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+
+        if (0 == reportType)
+            loadChartData();
         return null;
     }
 
@@ -94,15 +109,7 @@ public class DirectorStudentAttendancePage extends OnlineReportPage {
     }
 
     public List<String> getChartData() {
-        try {
-            if (null == directorStudentAttendanceReport)
-                return Collections.emptyList();
-            return directorStudentAttendanceReport.chartData();
-        } catch (NullPointerException e) {
-            logger.error("Failed to build director student attendance report", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        }
-        return Collections.emptyList();
+        return chartData;
     }
 
     public Boolean getShowReport() {
@@ -172,7 +179,23 @@ public class DirectorStudentAttendancePage extends OnlineReportPage {
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endDate = CalendarUtils.endOfDay(endDate);
         startCalendarModel.updateEndDate(this.endDate);
+    }
+
+    public String getReportType() {
+        return reportType.toString();
+    }
+
+    public void setReportType(String reportType) {
+        this.reportType = Integer.parseInt(reportType);
+    }
+
+    public void loadChartData() {
+        if (null == directorStudentAttendanceReport) {
+            chartData = Collections.emptyList();
+            return;
+        }
+        chartData = directorStudentAttendanceReport.chartData();
     }
 }
