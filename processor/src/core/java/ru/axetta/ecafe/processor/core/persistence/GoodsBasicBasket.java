@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
 public class GoodsBasicBasket {
 
@@ -25,6 +24,7 @@ public class GoodsBasicBasket {
     private GoodBasicBasketPrice goodBasicBasketPrice;
     private Set<Good> good;
     private Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal;
+    private Set<ConfigurationProvider> configurationProviders;
 
     public Set<GoodBasicBasketPrice> getGoodBasicBasketPriceInternal() {
         return goodBasicBasketPriceInternal;
@@ -178,4 +178,11 @@ public class GoodsBasicBasket {
         }
     }
 
+    public Set<ConfigurationProvider> getConfigurationProviders() {
+        return configurationProviders;
+    }
+
+    public void setConfigurationProviders(Set<ConfigurationProvider> configurationProviders) {
+        this.configurationProviders = configurationProviders;
+    }
 }

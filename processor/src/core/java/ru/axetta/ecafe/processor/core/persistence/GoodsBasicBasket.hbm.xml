@@ -33,6 +33,10 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice" />
         </set>
 
+        <set name="configurationProviders" table="cf_basicbasketgood_provider" lazy="true">
+            <key column="idOfbasicGood"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" column="idOfConfigurationProvider"/>
+        </set>
 
     </class>
 </hibernate-mapping>

@@ -4,12 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
 
+import org.apache.cxf.common.util.StringUtils;
+
 import javax.persistence.EntityManager;
-import java.util.*;
+import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,6 +34,7 @@ public class BasicGoodItem extends AbstractEntityItem<GoodsBasicBasket> {
         nameOfGood = goodsBasicBasket.getNameOfGood();
         unitsScale = goodsBasicBasket.getUnitsScale();
         netWeight = goodsBasicBasket.getNetWeight();
+        configurationProviders = goodsBasicBasket.getConfigurationProviders();
     }
 
     @Override
@@ -49,7 +55,8 @@ public class BasicGoodItem extends AbstractEntityItem<GoodsBasicBasket> {
 
     @Override
     public GoodsBasicBasket getEntity(EntityManager entityManager) {
-        return entityManager.find(GoodsBasicBasket.class, idOfBasicGood);
+        GoodsBasicBasket basket = entityManager.find(GoodsBasicBasket.class, idOfBasicGood);
+        return basket;
     }
     @Override
     public GoodsBasicBasket createEmptyEntity() {
@@ -64,6 +71,7 @@ public class BasicGoodItem extends AbstractEntityItem<GoodsBasicBasket> {
     private String nameOfGood;
     private UnitScale unitsScale;
     private Long netWeight;
+    private Set<ConfigurationProvider> configurationProviders;
 
     /* Getter and Setters */
     public Long getIdOfBasicGood() {
@@ -80,6 +88,10 @@ public class BasicGoodItem extends AbstractEntityItem<GoodsBasicBasket> {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Boolean getIsGuidEmpty() {
+        return StringUtils.isEmpty(guid);
     }
 
     public Date getCreatedDate() {
@@ -125,5 +137,13 @@ public class BasicGoodItem extends AbstractEntityItem<GoodsBasicBasket> {
     @Override
     public String toString() {
         return  nameOfGood;
+    }
+
+    public Set<ConfigurationProvider> getConfigurationProviders() {
+        return configurationProviders;
+    }
+
+    public void setConfigurationProviders(Set<ConfigurationProvider> configurationProviders) {
+        this.configurationProviders = configurationProviders;
     }
 }

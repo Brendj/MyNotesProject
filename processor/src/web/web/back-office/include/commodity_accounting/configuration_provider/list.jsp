@@ -30,9 +30,9 @@
                  rows="15" footerClass="data-table-footer">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="№" styleClass="output-text" escape="true"/>
+                <h:outputText value="Ид." styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{row+1}" />
+            <h:outputText styleClass="output-text" value="#{configurationProvider.idOfConfigurationProvider}" />
         </rich:column>
 
         <rich:column headerClass="column-header" width="250px">

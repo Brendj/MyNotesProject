@@ -1496,15 +1496,37 @@ public class DAOService {
     }
 
 
-    public boolean updateBasicGood(Long idOfBasicGood, String nameOfGood, UnitScale unitsScale, Long netWeight) {
-        Query query = entityManager.createQuery(
-                "update GoodsBasicBasket set nameOfGood=:nameOfGood, unitsScale=:unitsScale, netWeight=:netWeight, lastUpdate=:lastUpdate where idOfBasicGood=:idOfBasicGood");
-        query.setParameter("idOfBasicGood", idOfBasicGood);
-        query.setParameter("nameOfGood", nameOfGood);
-        query.setParameter("unitsScale", unitsScale);
-        query.setParameter("netWeight", netWeight);
-        query.setParameter("lastUpdate", new Date());
-        return query.executeUpdate() != 0;
+    public boolean updateBasicGood(Long idOfBasicGood, String nameOfGood, UnitScale unitsScale, Long netWeight, List<Long> idOfProviders) {
+        GoodsBasicBasket goodsBasicBasket = entityManager.find(GoodsBasicBasket.class, idOfBasicGood);
+        Set<ConfigurationProvider> set = new HashSet<ConfigurationProvider>();
+        for (Long id : idOfProviders) {
+            ConfigurationProvider provider = entityManager.find(ConfigurationProvider.class, id);
+            set.add(provider);
+        }
+        goodsBasicBasket.setNameOfGood(nameOfGood);
+        goodsBasicBasket.setUnitsScale(unitsScale);
+        goodsBasicBasket.setNetWeight(netWeight);
+        goodsBasicBasket.setLastUpdate(new Date());
+        goodsBasicBasket.setConfigurationProviders(set);
+        entityManager.persist(goodsBasicBasket);
+        return true;
+    }
+
+    public boolean createBasicGood(String nameOfGood, UnitScale unitsScale, Long netWeight, List<Long> idOfProviders) throws Exception {
+        GoodsBasicBasket goodsBasicBasket = new GoodsBasicBasket(UUID.randomUUID().toString());
+        Set<ConfigurationProvider> set = new HashSet<ConfigurationProvider>();
+        for (Long id : idOfProviders) {
+            ConfigurationProvider provider = entityManager.find(ConfigurationProvider.class, id);
+            if (provider == null) throw new Exception("Не найдена производственная конфигурация с ид.=" + id);
+            set.add(provider);
+        }
+        goodsBasicBasket.setNameOfGood(nameOfGood);
+        goodsBasicBasket.setUnitsScale(unitsScale);
+        goodsBasicBasket.setNetWeight(netWeight);
+        goodsBasicBasket.setLastUpdate(new Date());
+        goodsBasicBasket.setConfigurationProviders(set);
+        entityManager.persist(goodsBasicBasket);
+        return true;
     }
 
     // не рекомендуется к использованию
