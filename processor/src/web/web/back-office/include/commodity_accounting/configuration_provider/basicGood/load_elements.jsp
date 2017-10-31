@@ -18,9 +18,9 @@
              styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText value="Загрузите файл формата .csv, разделитель в файле ';'" />
+        <h:outputText value="Загрузите файл формата .csv, кодировка UTF-8, " />
         <h:outputText
-                value="вида: 'Производственная конфигурация'; 'Наименование базового товара'; 'Единица измерения'; 'Масса нетто (грамм)'" />
+                value="в формате: 'Ид. производственных конфигураций через запятую'; 'Наименование базового товара'; 'Единица измерения'; 'Масса нетто (грамм)'" />
         <rich:fileUpload id="loadingElementsFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                          addButtonClassDisabled="upload-command-button-diasbled"
                          cleanButtonClass="upload-command-button"

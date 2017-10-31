@@ -5,22 +5,18 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.apache.commons.lang.StringUtils;
 import org.richfaces.model.UploadItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,6 +26,7 @@ import java.util.List;
 public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadingElementsOfBasicGoodsPage.class);
+    public static final String UTF8_BOM = "\uFEFF";
 
     public UploadItem uploadItem;
 
@@ -66,6 +63,13 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
         this.loadingElementsOfBasicGoodsItems = loadingElementsOfBasicGoodsItems;
     }
 
+    private String removeUTF8BOM(String s) {
+        if (s.startsWith(UTF8_BOM)) {
+            s = s.substring(1);
+        }
+        return s;
+    }
+
     public void loadingElementsOfBasicGoodsGenerate(UploadItem item, RuntimeContext runtimeContext) throws Exception {
 
         LoadingElementsOfBasicGoodsService loadingElementsOfBasicGoodsService = new LoadingElementsOfBasicGoodsService();
@@ -86,77 +90,43 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
             try {
                 while ((line = bufferedReader.readLine()) != null) {
                     ++rowNum;
-                    Session persistenceSession = runtimeContext.createPersistenceSession();
-                    Transaction persistenceTransaction = null;
+                    line = removeUTF8BOM(line);
+                    String[] separatedData = line.split(csvSplitBy);
                     try {
-                        persistenceTransaction = persistenceSession.beginTransaction();
-                        String[] separatedData = line.split(csvSplitBy);
-
                         if (separatedData.length < 4) {
+                            throw new Exception("Неверный формат файла");
+                        }
+                        String cpString = separatedData[0].trim();
+                        String[] cp = cpString.split(",");
+                        String nameOfGood = separatedData[1].trim();
+                        String netWeight = separatedData[3].trim();
+                        String unitScale = separatedData[2].trim().toLowerCase();
+                        if (StringUtils.isEmpty(cpString) || StringUtils.isEmpty(nameOfGood) || StringUtils.isEmpty(netWeight) || StringUtils.isEmpty(unitScale)) {
+                            throw new Exception("Поля с пустыми значениями не допускаются");
+                        }
+                        UnitScale unitScaleType = UnitScale.fromString(unitScale);
+                        if (unitScaleType == null) throw new Exception("Единица измерения не распознана");
+
+                        List<Long> list = new ArrayList<Long>();
+                        for (String str : cp) {
+                            list.add(Long.valueOf(str.trim()));
+                        }
+                        Boolean result = DAOService.getInstance()
+                                .createBasicGood(nameOfGood, unitScaleType, Long.valueOf(netWeight), list);
+
+                        if (result)
                             loadingElementsOfBasicGoodsItems
-                                    .add(new LoadingElementsOfBasicGoodsItem(rowNum, separatedData[0], separatedData[1],
-                                            separatedData[2], separatedData[3], "Неверный формат, вид .csv файла"));
-                        } else {
-                            ConfigurationProvider configurationProvider = loadingElementsOfBasicGoodsService
-                                    .findConfigurationProviderByName(persistenceSession, separatedData[0].trim());
-
-                            String nameOfGood = separatedData[1].trim();
-                            String netWeight = separatedData[3].trim();
-
-                            if (nameOfGood != null || netWeight != null) {
-                                String unitScale = separatedData[2].trim().toLowerCase();
-                                UnitScale unitScaleType = null;
-
-                                for (UnitScale type : unitScaleType.values()) {
-                                    if (unitScale.equalsIgnoreCase(type.toString())) {
-                                        unitScaleType = type;
-                                    }
-                                }
-
-                                BasicGoodItem basicGoodItem = new BasicGoodItem();
-                                basicGoodItem.createEmptyEntity();
-
-                                basicGoodItem.setLastUpdate(new Date());
-                                basicGoodItem.setNameOfGood(nameOfGood);
-                                basicGoodItem.setUnitsScale(unitScaleType);
-                                basicGoodItem.setNetWeight(Long.valueOf(netWeight));
-
-                                persistenceSession.save(basicGoodItem);
-
-                                loadingElementsOfBasicGoodsItems
-                                        .add(new LoadingElementsOfBasicGoodsItem(rowNum, separatedData[0],
-                                                separatedData[1], separatedData[2], separatedData[3],
-                                                "Базовый продукт загружен."));
-
-                            } else {
-                                if (nameOfGood == null) {
-                                    loadingElementsOfBasicGoodsItems
-                                            .add(new LoadingElementsOfBasicGoodsItem(rowNum, separatedData[0],
-                                                    separatedData[1], separatedData[2], separatedData[3],
-                                                    "Пустое наименование продукта."));
-                                }
-                                if (netWeight == null) {
-                                    loadingElementsOfBasicGoodsItems
-                                            .add(new LoadingElementsOfBasicGoodsItem(rowNum, separatedData[0],
-                                                    separatedData[1], separatedData[2], separatedData[3],
-                                                    "Пустое масса нетто (грамм)."));
-                                }
-                            }
-                        } persistenceTransaction.commit();
-                    } catch (Exception ex) {
-                        HibernateUtils.rollback(persistenceTransaction, logger);
-                    } finally {
-                        HibernateUtils.close(persistenceSession, logger);
+                                    .add(new LoadingElementsOfBasicGoodsItem(rowNum, separatedData[0],
+                                            separatedData[1], separatedData[2], separatedData[3],
+                                            "Базовый продукт загружен."));
+                    } catch (Exception e) {
+                        loadingElementsOfBasicGoodsItems
+                                .add(new LoadingElementsOfBasicGoodsItem(rowNum, separatedData[0], separatedData[1], separatedData[2], separatedData[3],
+                                        e.getMessage()));
                     }
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                printError("Файл не был найден");
-            } catch (PersistenceException ex) {
-                ex.printStackTrace();
-                printError("Файл неверного формата");
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error load basic basket file: ", e);
                 printError(e.getMessage());
             } finally {
                 if (bufferedReader != null) {
@@ -169,7 +139,7 @@ public class LoadingElementsOfBasicGoodsPage extends BasicWorkspacePage {
                 }
             }
         } else {
-            printError("Сделайте загрузку файла");
+            printError("Выполните загрузку файла");
         }
     }
 }
