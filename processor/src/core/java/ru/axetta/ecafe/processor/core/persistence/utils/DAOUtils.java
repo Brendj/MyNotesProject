@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -2789,5 +2790,41 @@ public class DAOUtils {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) criteria.uniqueResult();
 
         return configurationProvider;
+    }
+
+    public static List<Org> findOrgs(Session session, List<Long> orgIds){
+        if(orgIds.size() == 0) {
+            return new ArrayList<Org>();
+        }
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.in("idOfOrg", orgIds));
+        return criteria.list();
+    }
+
+    public static List<OrgFile> findOrgFiles(Session session, List<Org> orgs){
+        if(orgs == null || orgs.isEmpty()) {
+            return new ArrayList<OrgFile>();
+        }
+        Criteria criteria = session.createCriteria(OrgFile.class);
+        criteria.add(Restrictions.in("orgOwner", orgs));
+        List<OrgFile> result = criteria.list();
+        return result != null ? result : new ArrayList<OrgFile>();
+    }
+
+    public static List<OrgFile> getOrgFilesForFriendlyOrgs(Session session, Long idOfOrg,
+            List<OrgFilesItem> idsOfOrgFile) throws Exception {
+        Org org1 = (Org) session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(OrgFile.class);
+        criteria.add(Property.forName("orgOwner").in(org1.getFriendlyOrg()));
+        if (null != idsOfOrgFile && !idsOfOrgFile.isEmpty()) {
+            Junction conditionGroup = Restrictions.disjunction();
+            for (OrgFilesItem i : idsOfOrgFile) {
+                Org org2 = (Org) session.load(Org.class, i.getIdOfOrg());
+                conditionGroup.add(Restrictions.and(Restrictions.eq("idOfOrgFile", i.getIdOfOrgFile()),
+                        Restrictions.eq("orgOwner", org2)));
+            }
+            criteria.add(conditionGroup);
+        }
+        return criteria.list();
     }
 }

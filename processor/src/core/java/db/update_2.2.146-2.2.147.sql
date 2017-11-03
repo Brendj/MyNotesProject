@@ -24,3 +24,25 @@ create table cf_basicbasketgood_provider
 
 --Убираем уникальность по названию товара
 alter table cf_goods_basicbasket drop constraint cf_goods_basicbasket_nameofgood_key;
+
+--таблица описания файлов организаций
+CREATE TABLE cf_orgfile
+(
+  idoforgfile bigserial NOT NULL,
+  idoforg bigint NOT NULL,
+  name character varying(16) NOT NULL DEFAULT ''::character varying,
+  ext character varying(5) NOT NULL DEFAULT ''::character varying,
+  displayname character varying(16) NOT NULL DEFAULT ''::character varying,
+  date bigint NOT NULL,
+  idofarm bigint NOT NULL,
+  size bigint NOT NULL,
+  CONSTRAINT cf_orgfile_pk PRIMARY KEY (idoforgfile),
+  CONSTRAINT cf_orgfile_idoforg_fk FOREIGN KEY (idoforg)
+      REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+COMMENT ON TABLE cf_orgfile
+  IS 'описание файлов организации';

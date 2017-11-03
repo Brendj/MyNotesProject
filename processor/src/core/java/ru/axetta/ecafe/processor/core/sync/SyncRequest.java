@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
+import ru.axetta.ecafe.processor.core.sync.request.OrgFilesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
@@ -2533,6 +2534,7 @@ public class SyncRequest {
             builders.add(new GroupsOrganizationRequest.Builder(idOfOrg));
             builders.add(new InfoMessageRequest.InfoMessageRequestBuilder());
             builders.add(new ListComplexSchedules.Builder(idOfOrg));
+            builders.add(new OrgFilesRequestBuilder(idOfOrg));
             return builders;
         }
 
@@ -2781,6 +2783,10 @@ public class SyncRequest {
             }
         }
         return null;
+    }
+
+    public OrgFilesRequest getOrgFilesRequest() {
+        return this.<OrgFilesRequest>findSection(OrgFilesRequest.class);
     }
 
     @Override

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
+import ru.axetta.ecafe.processor.core.file.FileUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
@@ -91,6 +92,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -854,6 +856,8 @@ public class Processor implements SyncProcessor {
 
         //info messages
         processInfoMessageSections(request, responseSections);
+
+        fullProcessingOrgFiles(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -5345,4 +5349,170 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    private OrgFiles getOrgFiles(Session session, Org org, OrgFilesRequest.Operation operation) throws Exception {
+        return getOrgFiles(session, org, operation, null);
+    }
+
+    private OrgFiles getOrgFiles(Session session, Org org, OrgFilesRequest.Operation operation,
+            List<OrgFilesItem> orgFilesItems) throws Exception {
+        OrgFiles orgFiles = new OrgFiles();
+        List<OrgFile> orgFileList = DAOUtils.getOrgFilesForFriendlyOrgs(session, org.getIdOfOrg(), orgFilesItems);
+        orgFiles.addOrgFilesInfo(orgFileList, operation);
+        return orgFiles;
+    }
+
+    private ResOrgFiles getResOrgFiles(Session session, List<OrgFilesItem> orgFilesItemList, OrgFilesRequest.Operation operation) {
+        ResOrgFiles resOrgFiles = new ResOrgFiles(operation);
+        List<ResOrgFilesItem> items = new ArrayList<ResOrgFilesItem>();
+        List<Long> orgIdList = new ArrayList<Long>();
+        for (OrgFilesItem item : orgFilesItemList) {
+            orgIdList.add(item.getIdOfOrg());
+        }
+        List<Org> orgList = DAOUtils.findOrgs(session, orgIdList);
+        Map<Long, Org> orgMap = new HashMap<Long, Org>();
+        for (Org org : orgList) {
+            orgMap.put(org.getIdOfOrg(), org);
+        }
+        List<OrgFile> orgFilesList = DAOUtils.findOrgFiles(session, orgList);
+        Map<Long, OrgFile> orgFileMap = new HashMap<Long, OrgFile>();
+        for (OrgFile orgFile : orgFilesList) {
+            orgFileMap.put(orgFile.getIdOfOrgFile(), orgFile);
+        }
+
+        ResOrgFilesItem resItem;
+        for (OrgFilesItem item : orgFilesItemList) {
+            if (item.getResCode().equals(OrgFilesItem.ERROR_CODE_ALL_OK)) {
+                Org org = orgMap.get(item.getIdOfOrg());
+                OrgFile orgFile = orgFileMap.get(item.getIdOfOrgFile());
+
+                // add
+                if (OrgFilesRequest.Operation.ADD == operation) {
+                    if (null == orgFile) {
+                        try {
+                            String fileName = FileUtils
+                                    .saveFile(org.getIdOfOrg(), FileUtils.decodeFromeBase64(item.getFileData()), item.getFileExt());
+                            Long fileSize = FileUtils.fileSize(org.getIdOfOrg(), fileName, item.getFileExt());
+                            orgFile = new OrgFile(fileName, item.getFileExt(), item.getDisplayName(), org, new Date(),
+                                    item.getIdOfArm(), fileSize);
+                            session.save(orgFile);
+                        } catch (IOException e) {
+                            logger.error("Error saving OrgFiles:", e);
+                            item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_SAVED);
+                            item.setErrorMessage("Не удалось сохранить файл");
+                        }
+                    } else {
+                        try {
+                            FileUtils.saveFile(org.getIdOfOrg(), FileUtils.decodeFromeBase64(item.getFileData()),
+                                    item.getFileName(), item.getFileExt());
+                            Long fileSize = FileUtils.fileSize(org.getIdOfOrg(), item.getFileName(), item.getFileExt());
+                            orgFile.setSize(fileSize);
+                            orgFile.setDisplayName(item.getDisplayName());
+                            orgFile.setExt(item.getFileExt());
+                            orgFile.setDate(new Date());
+                            orgFile.setIdOfArm(item.getIdOfArm());
+                            session.update(orgFile);
+                        } catch (IOException e) {
+                            logger.error("Error saving OrgFiles:", e);
+                            item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_SAVED);
+                            item.setErrorMessage("Не удалось сохранить файл");
+                        }
+                    }
+                } else if (OrgFilesRequest.Operation.DELETE == operation) {     // delete
+                    if (null == orgFile) {
+                        logger.error("Error removing OrgFiles: file not exist");
+                        item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_DELETED);
+                        item.setErrorMessage("Не удалось удалить файл");
+                    } else {
+                        try {
+                            if (!FileUtils.removeFile(org.getIdOfOrg(), orgFile.getName(), orgFile.getExt())) {
+                                logger.error("Error removing OrgFiles: unexpected error");
+                                item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_DELETED);
+                                item.setErrorMessage("Не удалось удалить файл");
+                            }
+                            session.delete(orgFile);
+                        } catch (SecurityException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                    }
+                }
+
+                if (item.getResCode().equals(OrgFilesItem.ERROR_CODE_ALL_OK)) {
+                    resItem = new ResOrgFilesItem(orgFile);
+                    resItem.setResCode(item.getResCode());
+                } else {
+                    resItem = new ResOrgFilesItem();
+                    resItem.setIdOfOrg(item.getIdOfOrg());
+                    resItem.setResCode(item.getResCode());
+                    resItem.setErrorMessage(item.getErrorMessage());
+                }
+            } else {
+                resItem = new ResOrgFilesItem();
+                resItem.setIdOfOrg(item.getIdOfOrg());
+                resItem.setResCode(item.getResCode());
+                resItem.setErrorMessage(item.getErrorMessage());
+            }
+            items.add(resItem);
+            session.flush();
+        }
+        resOrgFiles.setItems(items);
+        return resOrgFiles;
+    }
+
+    private void fullProcessingOrgFiles(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            OrgFilesRequest orgFilesRequest = request.getOrgFilesRequest();
+            ResOrgFiles resOrgFiles = null;
+            OrgFiles orgFiles = null;
+
+            if (orgFilesRequest != null) {
+                switch (orgFilesRequest.getOperation()) {
+                    case ADD:
+                        resOrgFiles = getResOrgFiles(persistenceSession, orgFilesRequest.getItems(),
+                                orgFilesRequest.getOperation());
+                        break;
+                    case LIST:
+                        orgFiles = getOrgFiles(persistenceSession, request.getOrg(), orgFilesRequest.getOperation());
+                        break;
+                    case DOWNLOAD:
+                        orgFiles = getOrgFiles(persistenceSession, request.getOrg(), orgFilesRequest.getOperation(),
+                                orgFilesRequest.getItems());
+                        break;
+                    case DELETE:
+                        //idsOfOrgFile = new ArrayList<Long>();
+                        //for (OrgFilesItem i : orgFilesRequest.getItems())
+                        //    idsOfOrgFile.add(i.getIdOfOrgFile());
+
+                        resOrgFiles = getResOrgFiles(persistenceSession, orgFilesRequest.getItems(),
+                                orgFilesRequest.getOperation());
+                        break;
+                    default:
+                    /* nope */
+                        break;
+                }
+
+                if (null != resOrgFiles)
+                    addToResponseSections(resOrgFiles, responseSections);
+
+                if (null != orgFiles)
+                    addToResponseSections(orgFiles, responseSections);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+        } catch (Exception e) {
+            String message = String
+                    .format("Failed to build organization files, IdOfOrg == %s", request.getIdOfOrg());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
 }

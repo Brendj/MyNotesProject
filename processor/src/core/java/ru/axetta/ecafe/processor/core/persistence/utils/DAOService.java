@@ -2409,4 +2409,8 @@ public class DAOService {
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
     }
+
+    public Org findOrgById(Long idOfOrg) {
+        return entityManager.find(Org.class, idOfOrg);
+    }
 }
