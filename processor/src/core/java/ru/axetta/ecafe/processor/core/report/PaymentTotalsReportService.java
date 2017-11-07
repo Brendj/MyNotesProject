@@ -5,10 +5,12 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -17,6 +19,8 @@ import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -89,6 +93,11 @@ public class PaymentTotalsReportService {
 
             Long endCash2 = getAllOrdersSum(idOfOrg, startTime, endTime);
 
+            Map<Long, Long> ordersOtherOrgs = getOrdersByClientsFromOtherOrgs(idOfOrg, startTime, endTime);
+            Long debtOwn = getDebtSum(idOfOrg, ordersOtherOrgs, true);
+
+            Long debtOther = getDebtSum(idOfOrg, ordersOtherOrgs, false);
+
             String comment = getStatusDetail(idOfOrg);
 
             TreeMap<Long, AccountTransaction> transactions = getTransactions(idOfOrg, startTime, endTime);
@@ -98,7 +107,7 @@ public class PaymentTotalsReportService {
 
 
             Item item = new Item(orgNum, orgID, orgName, lastSyncTime, startCash, income, paid, paidSnack,
-                    paidTotal, paidByCash, repayment, cashMoved, endCash, endCash1, endCash2, comment);
+                    paidTotal, paidByCash, repayment, cashMoved, endCash, endCash1, endCash2, debtOwn, debtOther, comment);
             if (!zeroCash(item) || !hideNullRows) {
                 reportItems.add(item);
             }
@@ -156,8 +165,7 @@ public class PaymentTotalsReportService {
      * @return
      */
 
-    private Set<Client>
-    getOrgClientsToDate(Long idOfOrg, Date toDate) {
+    private Set<Client> getOrgClientsToDate(Long idOfOrg, Date toDate) {
 
         HashMap<Client, List<ClientMigration>> clientMigrationListsMap = getClientMigrationsListHashMap(idOfOrg,
                 toDate);
@@ -419,6 +427,91 @@ public class PaymentTotalsReportService {
         return allOrdersSum;
     }
 
+    private Map<Long, Long> getOrdersByClientsFromOtherOrgs(Long idOfOrg, Date startTime, Date endTime) {
+        Query query = session.createSQLQuery("SELECT c.idoforg, sum(od.rprice * od.qty) FROM cf_orderdetails od "
+                + "INNER JOIN cf_orders o ON o.idoforg = od.idoforg AND o.idoforder = od.idoforder "
+                + "INNER JOIN cf_clients c ON c.idofclient = o.idofclient "
+                + "WHERE o.idoforg = :idOfOrg AND o.CreatedDate BETWEEN :begDate AND :endDate "
+                + "AND o.idoforg <> c.idoforg group by c.idoforg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("begDate", startTime.getTime());
+        query.setParameter("endDate", endTime.getTime());
+        List list = query.list();
+        Map<Long, Long> map = new HashMap<Long, Long>();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            Long orgId = ((BigInteger)row[0]).longValue();
+            Long sum = ((BigDecimal)row[1]).longValue();
+            Long ss = map.get(orgId);
+            if (ss == null) ss = 0L;
+            map.put(orgId, sum + ss);
+        }
+        return map;
+    }
+
+    /*
+    * Список клиентов, у которых есть миграции в периоде запроса, либо не совпадает ОО клиента и ОО в заказе
+    * */
+    /*private List getClientsWithOrdersFromOtherOrgs(Long idOfOrg, Date startTime, Date endTime) {
+        List<Long> result = new ArrayList<Long>();
+        Query query = session.createSQLQuery("SELECT c.idofclient FROM cf_orderdetails od "
+                + "INNER JOIN cf_orders o ON o.idoforg = od.idoforg AND o.idoforder = od.idoforder "
+                + "INNER JOIN cf_clients c ON c.idofclient = o.idofclient "
+                + "WHERE o.idoforg = :idOfOrg AND o.CreatedDate BETWEEN :begDate AND :endDate "
+                + "AND ((o.idoforg <> c.idoforg AND NOT exists "
+                + "(SELECT * FROM cf_clientmigrationhistory mh WHERE mh.idofclient = c.idofclient AND mh.registrationdate BETWEEN :begDate AND :endDate) ) "
+                + "OR exists (SELECT * FROM cf_clientmigrationhistory mh WHERE mh.idofclient = c.idofclient AND mh.registrationdate BETWEEN :begDate AND :endDate))");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("begDate", startTime.getTime());
+        query.setParameter("endDate", endTime.getTime());
+        List list = query.list();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            result.add(((BigInteger) row[0]).longValue());
+        }
+        return result;
+    }
+
+    private List<ClientGroupMigrationHistory> getClientMigrationHistoryList(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = session.createCriteria(ClientGroupMigrationHistory.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.gt("registrationDate", startTime));
+        criteria.add(Restrictions.lt("registrationDate", endTime));
+        return criteria.list();
+    }*/
+
+    private Long getDebtSum(Long idOfOrg, Map<Long, Long> ordersOtherOrgs, boolean friendly) {
+        Long res = 0L;
+        for (Map.Entry<Long, Long> entry : ordersOtherOrgs.entrySet()) {
+            if (friendly && DAOService.getInstance().isOrgFriendly(entry.getKey(), idOfOrg)) {
+                res += entry.getValue();
+                continue;
+            }
+            if (!friendly && !DAOService.getInstance().isOrgFriendly(entry.getKey(), idOfOrg)) {
+                res += entry.getValue();
+            }
+        }
+        return res;
+
+        /*List<Long> badClients = getClientsWithOrdersFromOtherOrgs(idOfOrg, startTime, endTime);
+        Integer[] orderTypes = new Integer[] {OrderTypeEnumType.UNKNOWN.ordinal(), OrderTypeEnumType.DEFAULT.ordinal(),
+                                              OrderTypeEnumType.VENDING.ordinal(), OrderTypeEnumType.PAY_PLAN.ordinal(),
+                                              OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal()};
+
+        Query query = session.createSQLQuery("select o.idoforg, o.idofclient, od.rprice, od.qty from cf_orderdetails od "
+                + "inner join cf_orders o on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
+                + "inner join cf_clients c on c.idofclient = o.idofclient "
+                + "where o.idoforg = :idoforg and o.CreatedDate BETWEEN :startDate and :endDate "
+                + "and o.idofclient in (:badClients) and o.OrderType in (:orderTypes)");
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startDate", startTime.getTime());
+        query.setParameter("endDate", endTime.getTime());
+        query.setParameterList("badClients", badClients);
+        query.setParameterList("orderTypes", orderTypes);
+        List list = query.list();
+         return 0L;*/
+    }
+
     /**
      * Сумма оплат за буфетную продукцию в ОО за период
      *
@@ -546,10 +639,12 @@ public class PaymentTotalsReportService {
         private Long endCash1;
         private Long endCash2;
         private String comment;
+        private Long debtOwnOrg;
+        private Long debtOtherOrgs;
 
         protected Item(Long orgNum, Long orgID, String orgName, String lastSyncTime, Long startCash, Long income,
                 Long paid,  Long paidSnack, Long paidTotal, Long paidByCash, Long repayment, Long cashMoved,
-                Long endCash, Long endCash1, Long endCash2, String comment) {
+                Long endCash, Long endCash1, Long endCash2, Long debtOwnOrg, Long debtOtherOrgs, String comment) {
             this.orgNum = orgNum;
             this.orgID = orgID;
             this.orgName = orgName;
@@ -565,6 +660,8 @@ public class PaymentTotalsReportService {
             this.endCash = endCash;
             this.endCash1 = endCash1;
             this.endCash2 = endCash2;
+            this.debtOwnOrg = debtOwnOrg;
+            this.debtOtherOrgs = debtOtherOrgs;
             this.comment = comment;
         }
 
@@ -719,6 +816,22 @@ public class PaymentTotalsReportService {
 
         public void setComment(String comment) {
             this.comment = comment;
+        }
+
+        public Long getDebtOwnOrg() {
+            return debtOwnOrg;
+        }
+
+        public void setDebtOwnOrg(Long debtOwnOrg) {
+            this.debtOwnOrg = debtOwnOrg;
+        }
+
+        public Long getDebtOtherOrgs() {
+            return debtOtherOrgs;
+        }
+
+        public void setDebtOtherOrgs(Long debtOtherOrgs) {
+            this.debtOtherOrgs = debtOtherOrgs;
         }
     }
 }
