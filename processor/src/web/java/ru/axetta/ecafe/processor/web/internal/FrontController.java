@@ -1207,7 +1207,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum) throws FrontControllerException {
         //checkRequestValidity(idOfOrg);
-
+        logger.info(String.format("Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s",
+                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum));
         CardService cardService = CardService.getInstance();
         if (!(type >=0 && type < Card.TYPE_NAMES.length)) {
             return new ResponseItem(ResponseItem.ERROR_INVALID_TYPE, ResponseItem.ERROR_INVALID_TYPE_MESSAGE);

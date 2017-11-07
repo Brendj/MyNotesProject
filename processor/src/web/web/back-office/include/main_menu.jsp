@@ -1320,6 +1320,7 @@
 
     </rich:panelMenuGroup>
     <%--@elvariable id="salesReportGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.SalesReportGroupPage"--%>
+
     <rich:panelMenuGroup id="salesReportGroupMenu" binding="#{salesReportGroupPage.mainMenuComponent}"
                          label="Отчеты по продажам"
                          rendered="#{mainPage.eligibleToViewSalesReport}">
@@ -1348,6 +1349,11 @@
         <rich:panelMenuItem id="generateOrgOrderReportMenuItem"
                             binding="#{mainPage.orgOrderReportPage.mainMenuComponent}" label="Отчет по покупкам"
                             action="#{mainPage.showOrgOrderReportPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="basicBasketReportMenuItem"
+                            binding="#{basicBasketReportPage.mainMenuComponent}" label="Отчет по базовой корзине"
+                            action="#{basicBasketReportPage.show}" reRender="workspaceForm"/>
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="cardGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardGroupPage"--%>

@@ -105,6 +105,10 @@
         <c:import url="include/commodity_accounting/configuration_provider/select_list.jsp" />
     </f:subview>
 
+    <f:subview id="basicGoodSelectListSubView">
+        <c:import url="include/commodity_accounting/configuration_provider/basicGood/select_list.jsp" />
+    </f:subview>
+
     <f:subview id="goodSelectSubView">
         <c:import url="include/commodity_accounting/configuration_provider/good/confirm_delete.jsp" />
     </f:subview>

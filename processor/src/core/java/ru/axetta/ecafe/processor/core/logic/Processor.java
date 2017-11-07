@@ -4638,6 +4638,10 @@ public class Processor implements SyncProcessor {
             for (MenuDetail menuDetail : menu.getMenuDetails()) {
                 exists = areMenuDetailsEqual(menuDetail, reqMenuDetail);
                 if (exists) {
+                    if (reqMenuDetail.getgBasket() != null) {
+                        linkBasket(persistenceSession, menuDetail, reqMenuDetail.getgBasket(),
+                                menu.getOrg().getIdOfOrg());
+                    }
                     localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), menuDetail);
                     break;
                 }
@@ -4687,6 +4691,8 @@ public class Processor implements SyncProcessor {
             GoodBasicBasketPrice basicBasketPrice = DAOUtils.findGoodBasicBasketPrice(session, basicBasket, idOfOrg);
             if (basicBasketPrice != null) {
                 basicBasketPrice.setMenuDetail(menuDetail);
+                basicBasketPrice.setPrice(menuDetail.getPrice());
+                basicBasketPrice.setLastUpdate(new Date());
                 GoodBasicBasketPrice.save(session, basicBasketPrice);
             }
         }

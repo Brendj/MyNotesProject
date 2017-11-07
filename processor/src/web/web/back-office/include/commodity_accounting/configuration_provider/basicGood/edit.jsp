@@ -13,18 +13,23 @@
 
 <%-- Панель создания организации --%>
 <%--@elvariable id="basicGoodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodEditPage"--%>
+<%--@elvariable id="basicGoodCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodCreatePage"--%>
 <h:panelGrid id="basicGoodEditGrid" binding="#{basicGoodEditPage.ap.pageComponent}" styleClass="borderless-grid" columns="2">
 
     <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
     <h:panelGroup styleClass="borderless-div">
-        <h:outputText value="#{basicGoodEditPage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
-        <a4j:commandButton value="..." action="#{basicGoodEditPage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+        <h:outputText value="#{basicGoodEditPage.selectedProvidersString}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+        <a4j:commandButton value="..." action="#{basicGoodEditPage.selectConfigurationProviderList}" reRender="configurationProviderSelectListModalPanel, basicGoodEditGrid"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectListModalPanel')}.show();"
                            styleClass="command-link" style="width: 25px; float: right;"
-                           disabled="#{basicGoodEditPage.ap.readonly}"/>
+                           disabled="#{basicGoodEditPage.ap.readonly}" rendered="#{!basicGoodEditPage.ap.currentEntity.isGuidEmpty}"/>
+        <a4j:commandButton value="..." action="#{basicGoodCreatePage.selectConfigurationProviderList}" reRender="configurationProviderSelectListModalPanel, basicGoodEditGrid"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectListModalPanel')}.show();"
+                           styleClass="command-link" style="width: 25px; float: right;"
+                           disabled="#{basicGoodEditPage.ap.readonly}" rendered="#{basicGoodEditPage.ap.currentEntity.isGuidEmpty}"/>
     </h:panelGroup>
 
-    <h:outputText escape="true" value="GUID" styleClass="output-text" rendered="#{!basicGoodEditPage.ap.createMode}"/>
+    <h:outputText escape="true" value="GUID" styleClass="output-text long-field" rendered="#{!basicGoodEditPage.ap.createMode}"/>
     <h:inputText value="#{basicGoodEditPage.ap.currentEntity.guid}" styleClass="input-text" readonly="true" disabled="true" rendered="#{!basicGoodEditPage.ap.createMode}"/>
 
     <h:outputText escape="true" value="Дата регистрации" styleClass="output-text" rendered="#{!basicGoodEditPage.ap.createMode}"/>
