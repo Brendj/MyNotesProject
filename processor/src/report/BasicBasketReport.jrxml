@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BasicBasketReport" language="groovy" pageWidth="900" pageHeight="842" columnWidth="860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="18130f6b-d62b-45e2-8686-2b29dfa44354">
+	<property name="ireport.zoom" value="0.75"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Crosstab Data Text" hAlign="Center" fontSize="10" isItalic="false">
+		<box>
+			<pen lineWidth="1.0"/>
+			<topPen lineWidth="1.0"/>
+			<leftPen lineWidth="1.0"/>
+			<bottomPen lineWidth="1.0"/>
+			<rightPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<parameter name="startDate" class="java.util.Date" isForPrompting="false"/>
+	<parameter name="endDate" class="java.util.Date" isForPrompting="false"/>
+	<field name="nameOfGood" class="java.lang.String"/>
+	<field name="unitsScale" class="java.lang.String"/>
+	<field name="netWeight" class="java.lang.Long"/>
+	<field name="nameOfConfigurationProvider" class="java.lang.String"/>
+	<field name="menuDetailName" class="java.lang.String"/>
+	<field name="rprice" class="java.lang.Long"/>
+	<variable name="startDate" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
+	</variable>
+	<variable name="endDate" class="java.lang.String" calculation="First">
+		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></variableExpression>
+		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="46b274c8-1ee2-4508-88e3-ab1156ffc58c" x="205" y="0" width="451" height="38"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[Сверка элементов базовой корзины]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="42ce77d2-7a52-406b-9041-c598de4bc8d7" x="205" y="38" width="451" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["С "+$V{startDate}+" по "+$V{endDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="18" splitType="Stretch"/>
+	</detail>
+	<summary>
+		<band height="153" splitType="Stretch">
+			<crosstab ignoreWidth="true">
+				<reportElement uuid="5aa6d9fe-3094-42fa-85ab-352deb52588e" x="0" y="0" width="500" height="131"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<crosstabHeaderCell>
+					<cellContents>
+						<textField>
+							<reportElement uuid="ecf1d38e-c552-41c6-8212-9878afbc6729" style="Crosstab Data Text" x="0" y="1" width="261" height="28"/>
+							<box>
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Элемент базовой корзины"]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="nameOfGood" width="262">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{nameOfGood}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement uuid="c407e192-0a32-435b-bc5b-36c79fad55f0" style="Crosstab Data Text" x="0" y="42" width="135" height="21"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Left" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{nameOfGood}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="ed0b9379-d163-49f7-b8b6-4ea196b8dc29" style="Crosstab Data Text" x="135" y="42" width="62" height="21"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{unitsScaleMeasure}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="74a5b4be-87cd-439b-95f4-7063a6a99e15" style="Crosstab Data Text" x="197" y="42" width="64" height="21"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{netWeightMeasure}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="68419af1-53ab-4826-baad-b314e467a3e7" style="Crosstab Data Text" x="0" y="0" width="135" height="42"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement>
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Наименование базового товара"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="47705d7e-d9c9-4ea6-b808-0e3f08d0b759" style="Crosstab Data Text" x="135" y="0" width="62" height="42"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement>
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Единица измерения"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="35ac51a5-a35e-463e-88c4-b6e7b9f83cab" style="Crosstab Data Text" x="197" y="0" width="64" height="42"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement>
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Масса нетто"]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="nameOfConfigurationProvider" height="29">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{nameOfConfigurationProvider}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+							</box>
+							<textField>
+								<reportElement uuid="9d26a64a-94cc-4f89-8aee-750c083842b9" style="Crosstab Data Text" x="0" y="1" width="322" height="28"/>
+								<box>
+									<pen lineWidth="1.0"/>
+									<topPen lineWidth="1.0"/>
+									<leftPen lineWidth="1.0"/>
+									<bottomPen lineWidth="1.0"/>
+									<rightPen lineWidth="1.0"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA["Конфигурация поставщика питания"]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="unitsScaleMeasure" class="java.lang.String">
+					<measureExpression><![CDATA[$F{unitsScale}]]></measureExpression>
+				</measure>
+				<measure name="netWeightMeasure" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{netWeight}]]></measureExpression>
+				</measure>
+				<measure name="menuDetailNameMeasure" class="java.lang.String" calculation="Count">
+					<measureExpression><![CDATA[$F{menuDetailName}]]></measureExpression>
+				</measure>
+				<measure name="rpriceMeasure" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{rprice}]]></measureExpression>
+				</measure>
+				<crosstabCell width="322" height="151">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+						</box>
+						<textField>
+							<reportElement uuid="fedecc19-a6bd-4dec-a4db-df834a861e83" style="Crosstab Data Text" x="0" y="0" width="322" height="21"/>
+							<box leftPadding="0">
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{nameOfConfigurationProvider}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="baf6c32a-b085-4543-85b7-36bd841a53da" style="Crosstab Data Text" x="0" y="21" width="161" height="21"/>
+							<box>
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Название блюда"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="3a0ec566-3912-43dd-9b99-a89003606ba4" style="Crosstab Data Text" x="161" y="21" width="161" height="21"/>
+							<box>
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Цена (р.)"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="802300ea-d839-40a4-9aa5-958588354b43" style="Crosstab Data Text" x="0" y="42" width="161" height="21"/>
+							<box>
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{menuDetailNameMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="066351db-8bac-43aa-ad59-c14075fce54e" style="Crosstab Data Text" x="161" y="42" width="161" height="21"/>
+							<box>
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<textElement verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[Double.parseDouble(Long.toString($V{rpriceMeasure})) / 100.00]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="nameOfGood">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+						</box>
+						<textField>
+							<reportElement uuid="b35cbff4-f960-4efd-887c-cb4c9644c9ea" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{nameOfGood}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="nameOfConfigurationProvider">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+						</box>
+						<textField>
+							<reportElement uuid="1bf405c8-ce43-4f8e-9ad6-3b07bc8bb17f" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{nameOfConfigurationProvider}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="nameOfGood" columnTotalGroup="nameOfConfigurationProvider">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
+						</box>
+						<textField>
+							<reportElement uuid="b35012f1-62d5-4043-ad9e-24f1aa884a1d" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{nameOfConfigurationProvider}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>
