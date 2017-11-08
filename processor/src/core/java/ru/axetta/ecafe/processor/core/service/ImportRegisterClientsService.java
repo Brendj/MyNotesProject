@@ -1489,10 +1489,10 @@ public class ImportRegisterClientsService {
         if (!DAOService.getInstance().isSverkaEnabled()) {
             throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
         }
+        /*Убираем ограничение на выполнение сверки не чаще, чем раз в час
         if (!DAOService.getInstance().isSverkaEnabledByOrg(idOfOrg)) {
-            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
             throw new RegistryTimeDeltaException("Запрос не разрешен. Повторите попытку не ранее, чем через час");
-        }
+        }*/
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         Org org = em.find(Org.class, idOfOrg);
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
@@ -1506,7 +1506,7 @@ public class ImportRegisterClientsService {
         boolean isSuccessEnd = true;
 
         try {
-            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
+            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
             ClientMskNSIService service = getNSIService();
             List<String> list = service.getBadGuids(orgGuids.orgGuids);
@@ -1528,10 +1528,10 @@ public class ImportRegisterClientsService {
             //  !!!!!!!!!!
             //  !!!!!!!!!!
             saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
-            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, new Date().getTime());
+            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, new Date().getTime());
             return logBuffer;
         } catch (Exception e) {
-            DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
+            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
             isSuccessEnd = false;
             throw e;
         } finally {

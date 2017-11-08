@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -2297,7 +2296,7 @@ public class DAOService {
         }
     }
 
-    @Transactional
+    /*@Transactional
     public Boolean isSverkaEnabledByOrg(long idOfOrg) {
         try {
             String str_query = "select lastsyncstart, lastsyncend from cf_org_syncs_registry where idoforg = :idOfOrg";
@@ -2343,13 +2342,7 @@ public class DAOService {
         } catch (Exception e) {
             logger.error("Can't save org last sync registry: ", e);
         }
-    }
-
-    @Transactional
-    public void clearOrgSyncsRegistryTable() {
-        javax.persistence.Query q = entityManager.createNativeQuery("TRUNCATE TABLE cf_org_syncs_registry");
-        q.executeUpdate(); //при старте приложения обнуляем таблицу
-    }
+    }*/
 
     @Transactional
     public Boolean isSverkaEnabled() {
