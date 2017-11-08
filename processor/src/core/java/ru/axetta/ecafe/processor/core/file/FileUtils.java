@@ -5,12 +5,14 @@
 package ru.axetta.ecafe.processor.core.file;
 
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
+import ru.axetta.ecafe.processor.core.persistence.OrgFile;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.image.ImageUtils.generateHashFileName;
 
@@ -21,6 +23,9 @@ public class FileUtils {
     private static final String FILES_DIRECTORY = "files";
     private static final String DELIMITER = "/";
     private static final String DOT = ".";
+
+    public static final Long FILES_SIZE_LIMIT = 104857600L;     // 100MB
+    public static final Long MAX_FILE_SIZE = 3145728L;          // 3MB
 
     public static String formFilePath(Long idOfOrg, String hashFileName, String fileExt) {
         return System.getProperty("jboss.server.base.dir") + DELIMITER + FILES_DIRECTORY + DELIMITER +
@@ -35,12 +40,15 @@ public class FileUtils {
         return tmp.toString();
     }
 
-    public static String saveFile(Long idOfOrg, byte[] file, String fileExt) throws IOException {
+    public static String saveFile(Long idOfOrg, byte[] file, String fileExt) throws IOException, FileIsTooBigException {
         String hashFileName = generateHashFileName(16);
         return saveFile(idOfOrg, file, hashFileName, fileExt);
     }
 
-    public static String saveFile(Long idOfOrg, byte[] file, String fileName, String fileExt) throws IOException {
+    public static String saveFile(Long idOfOrg, byte[] file, String fileName, String fileExt) throws IOException,
+            FileIsTooBigException {
+        if (file.length > MAX_FILE_SIZE)
+            throw new FileIsTooBigException("file is too big (max size - 3MB)");
         writeByteArraysToFile(formFilePath(idOfOrg, fileName, fileExt), file);
         return fileName;
     }
@@ -108,5 +116,37 @@ public class FileUtils {
         if (file.exists())
             return file.length();
         return -1L;
+    }
+
+    public static Long getFilesSizeByOrgList(List<OrgFile> orgFileList) {
+        Long result = 0L;
+        for (OrgFile o : orgFileList) {
+            result += fileSize(o.getOrgOwner().getIdOfOrg(), o.getName(), o.getExt());
+        }
+        return  result;
+    }
+
+    public static class FileUtilsException extends Exception {
+        public FileUtilsException() {}
+
+        public FileUtilsException(String message) {
+            super(message);
+        }
+    }
+
+    public static class NotEnoughFreeSpaceException extends FileUtilsException {
+        public NotEnoughFreeSpaceException() {}
+
+        public NotEnoughFreeSpaceException(String message) {
+            super(message);
+        }
+    }
+
+    public static class FileIsTooBigException extends FileUtilsException {
+        public FileIsTooBigException() {}
+
+        public FileIsTooBigException(String message) {
+            super(message);
+        }
     }
 }

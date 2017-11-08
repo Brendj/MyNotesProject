@@ -5367,7 +5367,8 @@ public class Processor implements SyncProcessor {
         return orgFiles;
     }
 
-    private ResOrgFiles getResOrgFiles(Session session, List<OrgFilesItem> orgFilesItemList, OrgFilesRequest.Operation operation) {
+    private ResOrgFiles getResOrgFiles(Session session, List<OrgFilesItem> orgFilesItemList, OrgFilesRequest.Operation operation,
+            Long idOfOrgOwner) throws Exception {
         ResOrgFiles resOrgFiles = new ResOrgFiles(operation);
         List<ResOrgFilesItem> items = new ArrayList<ResOrgFilesItem>();
         List<Long> orgIdList = new ArrayList<Long>();
@@ -5385,6 +5386,9 @@ public class Processor implements SyncProcessor {
             orgFileMap.put(orgFile.getIdOfOrgFile(), orgFile);
         }
 
+        List<OrgFile> friendlyOrgList = DAOUtils.getOrgFilesForFriendlyOrgs(session, idOfOrgOwner, null);
+        Long filesSize = FileUtils.getFilesSizeByOrgList(friendlyOrgList);
+
         ResOrgFilesItem resItem;
         for (OrgFilesItem item : orgFilesItemList) {
             if (item.getResCode().equals(OrgFilesItem.ERROR_CODE_ALL_OK)) {
@@ -5395,8 +5399,11 @@ public class Processor implements SyncProcessor {
                 if (OrgFilesRequest.Operation.ADD == operation) {
                     if (null == orgFile) {
                         try {
+                            byte fileData[] = FileUtils.decodeFromeBase64(item.getFileData());
+                            if ((fileData.length + filesSize) >= FileUtils.FILES_SIZE_LIMIT)
+                                throw new FileUtils.NotEnoughFreeSpaceException("not enough free space");
                             String fileName = FileUtils
-                                    .saveFile(org.getIdOfOrg(), FileUtils.decodeFromeBase64(item.getFileData()), item.getFileExt());
+                                    .saveFile(org.getIdOfOrg(), fileData, item.getFileExt());
                             Long fileSize = FileUtils.fileSize(org.getIdOfOrg(), fileName, item.getFileExt());
                             orgFile = new OrgFile(fileName, item.getFileExt(), item.getDisplayName(), org, new Date(),
                                     item.getIdOfArm(), fileSize);
@@ -5405,10 +5412,21 @@ public class Processor implements SyncProcessor {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_SAVED);
                             item.setErrorMessage("Не удалось сохранить файл");
+                        } catch (FileUtils.NotEnoughFreeSpaceException e) {
+                            logger.error("Error saving OrgFiles:", e);
+                            item.setResCode(OrgFilesItem.ERROR_CODE_OUT_OF_SPACE);
+                            item.setErrorMessage("Не удалось сохранить файл: недостаточно свободного места");
+                        } catch (FileUtils.FileIsTooBigException e) {
+                            logger.error("Error saving OrgFiles:", e);
+                            item.setResCode(OrgFilesItem.ERROR_CODE_FILE_IS_TOO_BIG);
+                            item.setErrorMessage("Не удалось сохранить файл: файл слишком большой (максимальный размер файла - 3MB)");
                         }
                     } else {
                         try {
-                            FileUtils.saveFile(org.getIdOfOrg(), FileUtils.decodeFromeBase64(item.getFileData()),
+                            byte fileData[] = FileUtils.decodeFromeBase64(item.getFileData());
+                            if ((fileData.length + filesSize) >= FileUtils.FILES_SIZE_LIMIT)
+                                throw new FileUtils.NotEnoughFreeSpaceException("not enough free space");
+                            FileUtils.saveFile(org.getIdOfOrg(), fileData,
                                     item.getFileName(), item.getFileExt());
                             Long fileSize = FileUtils.fileSize(org.getIdOfOrg(), item.getFileName(), item.getFileExt());
                             orgFile.setSize(fileSize);
@@ -5421,13 +5439,21 @@ public class Processor implements SyncProcessor {
                             logger.error("Error saving OrgFiles:", e);
                             item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_SAVED);
                             item.setErrorMessage("Не удалось сохранить файл");
+                        } catch (FileUtils.NotEnoughFreeSpaceException e) {
+                            logger.error("Error saving OrgFiles:", e);
+                            item.setResCode(OrgFilesItem.ERROR_CODE_OUT_OF_SPACE);
+                            item.setErrorMessage("Не удалось сохранить файл: недостаточно свободного места");
+                        } catch (FileUtils.FileIsTooBigException e) {
+                            logger.error("Error saving OrgFiles:", e);
+                            item.setResCode(OrgFilesItem.ERROR_CODE_FILE_IS_TOO_BIG);
+                            item.setErrorMessage("Не удалось сохранить файл: файл слишком большой (максимальный размер файла - 3MB)");
                         }
                     }
                 } else if (OrgFilesRequest.Operation.DELETE == operation) {     // delete
                     if (null == orgFile) {
                         logger.error("Error removing OrgFiles: file not exist");
                         item.setResCode(OrgFilesItem.ERROR_CODE_FILE_NOT_DELETED);
-                        item.setErrorMessage("Не удалось удалить файл");
+                        item.setErrorMessage("Не удалось удалить файл: файл не существует");
                     } else {
                         try {
                             if (!FileUtils.removeFile(org.getIdOfOrg(), orgFile.getName(), orgFile.getExt())) {
@@ -5444,18 +5470,27 @@ public class Processor implements SyncProcessor {
 
                 if (item.getResCode().equals(OrgFilesItem.ERROR_CODE_ALL_OK)) {
                     resItem = new ResOrgFilesItem(orgFile);
+                    resItem.setIdOfOrgFile(item.getIdOfOrgFile());
                     resItem.setResCode(item.getResCode());
+                    resItem.setDisplayName(item.getDisplayName());
+                    resItem.setFileExt(item.getFileExt());
                 } else {
                     resItem = new ResOrgFilesItem();
                     resItem.setIdOfOrg(item.getIdOfOrg());
                     resItem.setResCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());
+                    resItem.setIdOfOrgFile(item.getIdOfOrgFile());
+                    resItem.setDisplayName(item.getDisplayName());
+                    resItem.setFileExt(item.getFileExt());
                 }
             } else {
                 resItem = new ResOrgFilesItem();
                 resItem.setIdOfOrg(item.getIdOfOrg());
+                resItem.setIdOfOrgFile(item.getIdOfOrgFile());
                 resItem.setResCode(item.getResCode());
                 resItem.setErrorMessage(item.getErrorMessage());
+                resItem.setDisplayName(item.getDisplayName());
+                resItem.setFileExt(item.getFileExt());
             }
             items.add(resItem);
             session.flush();
@@ -5479,7 +5514,7 @@ public class Processor implements SyncProcessor {
                 switch (orgFilesRequest.getOperation()) {
                     case ADD:
                         resOrgFiles = getResOrgFiles(persistenceSession, orgFilesRequest.getItems(),
-                                orgFilesRequest.getOperation());
+                                orgFilesRequest.getOperation(), request.getIdOfOrg());
                         break;
                     case LIST:
                         orgFiles = getOrgFiles(persistenceSession, request.getOrg(), orgFilesRequest.getOperation());
@@ -5494,7 +5529,7 @@ public class Processor implements SyncProcessor {
                         //    idsOfOrgFile.add(i.getIdOfOrgFile());
 
                         resOrgFiles = getResOrgFiles(persistenceSession, orgFilesRequest.getItems(),
-                                orgFilesRequest.getOperation());
+                                orgFilesRequest.getOperation(), request.getIdOfOrg());
                         break;
                     default:
                     /* nope */

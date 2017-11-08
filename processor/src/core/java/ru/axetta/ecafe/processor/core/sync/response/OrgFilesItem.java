@@ -22,6 +22,8 @@ public class OrgFilesItem {
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
     public static final Integer ERROR_CODE_FILE_NOT_SAVED = 110;
     public static final Integer ERROR_CODE_FILE_NOT_DELETED = 111;
+    public static final Integer ERROR_CODE_OUT_OF_SPACE = 112;
+    public static final Integer ERROR_CODE_FILE_IS_TOO_BIG = 113;
 
     private final Long idOfOrgFile;
     private final String fileName;

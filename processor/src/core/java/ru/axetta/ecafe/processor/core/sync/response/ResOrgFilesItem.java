@@ -46,18 +46,26 @@ public class ResOrgFilesItem {
         XMLUtils.setAttributeIfNotNull(element, "id", idOfOrgFile);
         XMLUtils.setAttributeIfNotNull(element, "idOfOrg", idOfOrg);
         //XMLUtils.setAttributeIfNotNull(element, "name", name);
-        XMLUtils.setAttributeIfNotNull(element, "data", fileData);
-        //XMLUtils.setAttributeIfNotNull(element, "ext", fileExt);
-        XMLUtils.setAttributeIfNotNull(element, "displayname", displayName);
+        if (null != fileData && !fileData.isEmpty())
+            element.setAttribute("data", fileData);
+        if (null != fileExt && !fileExt.isEmpty())
+           element.setAttribute("ext", fileExt);
+        if (null != displayName && !displayName.isEmpty())
+            element.setAttribute("displayname", displayName);
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
 
         if (resCode != null && resCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
         }
 
-        XMLUtils.setAttributeIfNotNull(element, "size", size.toString());
-        XMLUtils.setAttributeIfNotNull(element, "date", date.toString());
-        XMLUtils.setAttributeIfNotNull(element, "idOfArm", idOfArm.toString());
+        if (null != size)
+            element.setAttribute("size", size.toString());
+
+        if (null != date)
+            element.setAttribute("date", date.toString());
+
+        if (null != idOfArm)
+            element.setAttribute("idOfArm", idOfArm.toString());
 
         return element;
     }
