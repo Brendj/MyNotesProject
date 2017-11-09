@@ -52,3 +52,6 @@ ALTER TABLE cf_client_guardian ADD COLUMN lastupdate bigint NOT NULL DEFAULT (da
 
 --Заполняем колонку lastupdate в cf_client_guardian текущей датой
 UPDATE cf_client_guardian SET lastupdate=(date_part('epoch'::text, current_date) * (1000)::double precision);
+
+--Создаем индекс на поле lastupdate в таблице cf_client_guardian 
+CREATE INDEX cf_client_guardian_lastupdate_idx ON cf_client_guardian USING btree (lastupdate);

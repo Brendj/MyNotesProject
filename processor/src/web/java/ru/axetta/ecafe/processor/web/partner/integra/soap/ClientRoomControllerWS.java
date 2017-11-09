@@ -8343,7 +8343,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             String sqlQuery =
