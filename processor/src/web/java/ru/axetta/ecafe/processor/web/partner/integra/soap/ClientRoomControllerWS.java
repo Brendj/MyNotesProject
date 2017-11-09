@@ -4838,6 +4838,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
                     cg.setDisabled(value);
                     cg.setVersion(getClientGuardiansResultVersion(session));
+                    cg.setLastUpdate(new Date());
                     session.persist(cg);
                 }
             }
@@ -8336,5 +8337,70 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
+    @Override
+    public GuardianInfoListResult getGuardiansFromDate(Long dateTime) {
+        GuardianInfoListResult result = new GuardianInfoListResult();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
 
+            String sqlQuery =
+                    "SELECT p.surname, p.firstname, p.secondname, c.mobile, c.ssoid, c.contractdate, c.createdfrom AS guardiancreatedfrom, "
+                  + "       cg.lastupdate, cg.createdfrom clientguardiancreatedfrom, cg.relation,  c2.clientguid, c.contractid, "
+                  + "       cg.deletedstate, cg.disabled "
+                  + "FROM cf_client_guardian cg "
+                  + "INNER JOIN cf_clients c ON c.idofclient=cg.idofguardian AND c.ssoid IS NOT NULL AND c.ssoid "
+                  + "           SIMILAR TO '_{8}-_{4}-_{4}-_{4}-_{12}' AND (c.mobile = '') IS NOT TRUE "
+                  + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
+                  + "INNER JOIN cf_clients c2 ON c2.idofclient=cg.idofchildren "
+                  + "WHERE cg.lastupdate>=:lastUpdate";
+
+            Query query = session.createSQLQuery(sqlQuery);
+            query.setParameter("lastUpdate", dateTime);
+
+            GuardianInfoList guardianInfoList = new GuardianInfoList();
+            List list = query.list();
+            for (Object o : list) {
+                Object vals[] = (Object[])o;
+
+                String surname = (String)vals[0];
+                String firstname = (String)vals[1];
+                String secondname = (String)vals[2];
+                String mobile = (String)vals[3];
+                String ssoid = (String)vals[4];
+                Date contractDate = new Date(((BigInteger)vals[5]).longValue());
+                Integer guardianCreatedFrom = (Integer)vals[6];
+                Date lastUpdate = new Date(((BigInteger)vals[7]).longValue());
+                Integer createdFrom = (Integer)vals[8];
+                Integer relation = (Integer)vals[9];
+                String guid = (String)vals[10];
+                Long contractID = ((BigInteger)vals[11]).longValue();
+                Boolean isDeleted = (Boolean)vals[12];
+                Integer isDisabled = (Integer)vals[13];
+
+                GuardianInfo guardianInfo = new GuardianInfo(surname, firstname, secondname, mobile, ssoid,
+                        toXmlDateTime(contractDate), guardianCreatedFrom, createdFrom, relation, guid, contractID, isDeleted,
+                        (isDisabled == 0) ? Boolean.FALSE : Boolean.TRUE, toXmlDateTime(lastUpdate));
+
+                guardianInfoList.getItems().add(guardianInfo);
+            }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            result.guardianItems = guardianInfoList;
+            return result;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
 }

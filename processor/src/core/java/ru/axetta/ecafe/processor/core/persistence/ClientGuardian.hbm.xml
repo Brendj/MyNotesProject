@@ -38,5 +38,6 @@
             <key column="IdOfClientGuardian" not-null="true"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting"/>
         </set>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
     </class>
 </hibernate-mapping>

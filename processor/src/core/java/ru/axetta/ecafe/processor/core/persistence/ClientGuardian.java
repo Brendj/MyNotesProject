@@ -26,6 +26,7 @@ public class ClientGuardian {
     private ClientGuardianRelationType relation;
     private Set<ClientGuardianNotificationSetting> notificationSettings = new HashSet<ClientGuardianNotificationSetting>();
     private ClientCreatedFromType createdFrom;
+    private Date lastUpdate;
 
     protected ClientGuardian() {}
 
@@ -86,6 +87,7 @@ public class ClientGuardian {
         this.setDisabled(true);
         this.setDeleteDate(RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime());
         this.setVersion(version);
+        this.setLastUpdate(new Date());
     }
 
     public void restore(Long version) {
@@ -93,6 +95,7 @@ public class ClientGuardian {
         this.setDisabled(false);
         this.setDeleteDate(null);
         this.setVersion(version);
+        this.setLastUpdate(new Date());
     }
 
     public Boolean isDisabled() {
@@ -141,6 +144,14 @@ public class ClientGuardian {
 
     public void setNotificationSettings(Set<ClientGuardianNotificationSetting> notificationSettings) {
         this.notificationSettings = notificationSettings;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     @Override

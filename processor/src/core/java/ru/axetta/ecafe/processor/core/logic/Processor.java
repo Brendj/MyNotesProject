@@ -2979,6 +2979,7 @@ public class Processor implements SyncProcessor {
                         if (item.isDeleted()) {
                             clientGuardian.delete(resultClientGuardianVersion);
                         }
+                        clientGuardian.setLastUpdate(new Date());
                         persistenceSession.save(clientGuardian);
                         resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
@@ -2990,6 +2991,7 @@ public class Processor implements SyncProcessor {
                         dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
                         dbClientGuardian.setDisabled(item.getDisabled());
+                        dbClientGuardian.setLastUpdate(new Date());
                         persistenceSession.update(dbClientGuardian);
                         resultClientGuardian.addItem(dbClientGuardian, 0, null);
                     }

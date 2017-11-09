@@ -513,4 +513,7 @@ public interface ClientRoomController {
     @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
 
     @WebMethod TransactionInfoListResult getOrderTransactions();
+
+    @WebMethod(operationName = "getGuardiansFromDate")
+    GuardianInfoListResult getGuardiansFromDate(@WebParam(name="dateTime")Long dateTime);
 }

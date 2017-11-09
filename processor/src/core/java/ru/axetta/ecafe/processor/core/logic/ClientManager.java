@@ -978,6 +978,7 @@ public class ClientManager {
                                 clientGuardian.setDisabled(true);
                                 clientGuardian.setDeletedState(false);
                                 clientGuardian.setRelation(relationType);
+                                clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
                                 persistenceSession.flush();
 
@@ -1087,6 +1088,7 @@ public class ClientManager {
             settings.add(new ClientGuardianNotificationSetting(clientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
             clientGuardian.setNotificationSettings(settings);
         }
+        clientGuardian.setLastUpdate(new Date());
         session.persist(clientGuardian);
     }
 
@@ -1653,6 +1655,7 @@ public class ClientManager {
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
             attachNotifications(clientGuardian, notificationItems);
+            clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
             Client guardian = (Client)session.get(Client.class, idOfGuardian);
             try {
@@ -1667,6 +1670,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             attachNotifications(clientGuardian, notificationItems);
+            clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
         }
     }

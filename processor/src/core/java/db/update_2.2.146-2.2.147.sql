@@ -46,3 +46,9 @@ WITH (
 );
 COMMENT ON TABLE cf_orgfile
   IS 'описание файлов организации';
+
+--Добавляем колонку lastupdate в cf_client_guardian
+ALTER TABLE cf_client_guardian ADD COLUMN lastupdate bigint NOT NULL DEFAULT (date_part('epoch'::text, '2000-01-01'::date) * (1000)::double precision);
+
+--Заполняем колонку lastupdate в cf_client_guardian текущей датой
+UPDATE cf_client_guardian SET lastupdate=(date_part('epoch'::text, current_date) * (1000)::double precision);
