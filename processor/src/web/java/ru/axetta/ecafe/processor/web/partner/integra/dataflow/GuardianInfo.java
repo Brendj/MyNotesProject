@@ -48,7 +48,7 @@ public class GuardianInfo {
     @XmlAttribute(name = "isDeleted")
     protected Boolean isDeleted;
 
-    @XmlAttribute(name = "idDisabled")
+    @XmlAttribute(name = "isDisabled")
     protected Boolean isDisabled;
 
     @XmlAttribute(name = "lastUpdate")
