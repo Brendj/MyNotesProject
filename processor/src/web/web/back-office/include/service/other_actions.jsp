@@ -91,7 +91,9 @@
 
     <a4j:commandButton value="Тест Meal Service" action="#{otherActionsPage.runMealTest}" id="runMealTest"
                        styleClass="command-button" />
-    <a4j:commandButton value="Загрузка файла НСИ" action="#{otherActionsPage.loadNSIFile}" id="loadNSIFile"
+    <a4j:commandButton value="Загрузка файла НСИ по контингенту" action="#{otherActionsPage.loadNSIFile}" id="loadNSIFile"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <a4j:commandButton value="Загрузка файла НСИ по сотрудникам" action="#{otherActionsPage.loadNSIEmployeeFile}" id="loadNSIEmployeeFile"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <rich:panel>
         <a4j:commandButton value="Выгрузка транзакций для Фин Оператора" action="#{otherActionsPage.runGenerateSummaryFinOperatorFile}"

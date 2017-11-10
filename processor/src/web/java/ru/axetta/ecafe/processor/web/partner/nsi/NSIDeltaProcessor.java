@@ -132,7 +132,7 @@ public class NSIDeltaProcessor {
             Map<Org, List<ImportRegisterClientsService.ExpandedPupilInfo>> pupils = mergePupilByOrg(items);
             for(Org org : pupils.keySet()) {
                 try {
-                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).saveClients
+                    RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).saveClients
                             (synchDate, date, ts, org, pupils.get(org), logBuffer);
                 } catch (Exception e) {
                     ImportRegisterClientsService.logError(synchDate + "При синхронизации произошла ошибка", e,
@@ -185,6 +185,7 @@ public class NSIDeltaProcessor {
     @Transactional
     public void saveClientTrustedComparison(String synchDate, String date, long ts,
                                                StringBuffer logBuffer, DeltaItem item) throws NSIDeltaException {
+        ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
         if(item.getAction() == Action.ADDED.ordinal()) {
             Org org = DAOService.getInstance().getOrgByGuid(item.getOrgGuid());
             if(org == null) {
@@ -200,7 +201,7 @@ public class NSIDeltaProcessor {
                         item.getSecondName() + ", " + item.getGroup(), logBuffer);
                 //  exec
                 FieldProcessor.Config fieldConfig = buildFieldConfig(item, new ClientManager.ClientFieldConfig());
-                ImportRegisterClientsService.addClientChange(em, ts, org.getIdOfOrg(), null, fieldConfig, null,
+                service.addClientChange(ts, org.getIdOfOrg(), null, fieldConfig, null,
                         ImportRegisterClientsService.CREATE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), org.getChangesDSZN());
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);
@@ -244,7 +245,7 @@ public class NSIDeltaProcessor {
                             emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
                             + " в школу " + newOrg.getIdOfOrg(), logBuffer);
                     //  exec
-                    ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl,
+                    service.addClientChange(ts, cl.getOrg().getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl,
                             ImportRegisterClientsService.MOVE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
                 } else {
                     //  log
@@ -257,7 +258,7 @@ public class NSIDeltaProcessor {
                             + emptyIfNull(item.getFirstName()) + " " +
                             emptyIfNull(item.getSecondName()) + ", " + emptyIfNull(item.getGroup()), logBuffer);
                     //  exec
-                    ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), null, fieldConfig, cl,
+                    service.addClientChange(ts, cl.getOrg().getIdOfOrg(), null, fieldConfig, cl,
                             ImportRegisterClientsService.MODIFY_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
                 }
             } catch (Exception e) {
@@ -279,7 +280,7 @@ public class NSIDeltaProcessor {
                         + ", " +
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()), logBuffer);
                 //  exec
-                ImportRegisterClientsService.addClientChange(em, ts, cl.getOrg().getIdOfOrg(), cl,
+                service.addClientChange(ts, cl.getOrg().getIdOfOrg(), cl,
                         ImportRegisterClientsService.DELETE_OPERATION, RegistryChange.CHANGES_UPDATE, item.getNotificationId(), cl.getOrg().getChangesDSZN());
             } catch (Exception e) {
                 throw new NSIDeltaException(String.format("Failed to create FieldConfig for client %s", item), e);

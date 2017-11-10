@@ -37,15 +37,20 @@ import java.util.Set;
 public class ImportRegisterFileService extends ClientMskNSIService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterFileService.class);
 
-    public static final String FILENAME_PROPERTY = "ecafe.processor.nsi.registry.filename";
-    public static final String NODE_PROPERTY = "ecafe.processor.nsi.registry.node";
+    public final String FILENAME_PROPERTY = "ecafe.processor.nsi.registry.filename";
+    public final String NODE_PROPERTY = "ecafe.processor.nsi.registry.node";
     public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service" или отсутствие настройки
 
-    private static final String INITIAL_INSERT_STATEMENT = "insert into cf_registry_file(guidofclient, "
+    protected final String INITIAL_INSERT_STATEMENT = "insert into cf_registry_file(guidofclient, "
             + "  guidoforg, firstname, secondname, surname, birthdate, gender, benefit, parallel, "
             + "  letter, clazz, currentclassorgroup, status, rep_firstname, rep_secondname, rep_surname, rep_phone, "
             + "  rep_who, agegrouptype) values ";
-    private static final String REGEXP = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+    protected static final String REGEXP = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+
+    protected Integer LINE_SIZE = 19;
+    protected String TRUNCATE_STATEMENT = "truncate table cf_registry_file";
+    protected String DROP_INDEX = "drop index if exists cf_registry_file_guidoforg_idx";
+    protected String CREATE_INDEX = "create index cf_registry_file_guidoforg_idx on cf_registry_file using btree (guidoforg)";
 
     public void run() throws Exception {
         if (isOn()) {
@@ -53,10 +58,10 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         }
     }
 
-    private boolean isOn() {
+    protected boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
-        String reqInstance = runtimeContext.getConfigProperties().getProperty(NODE_PROPERTY);
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(getNodeProperty());
         if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
                 reqInstance.trim())) {
             return false;
@@ -74,9 +79,9 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
         try {
-            String filename = RuntimeContext.getInstance().getPropertiesValue(FILENAME_PROPERTY, null);
+            String filename = RuntimeContext.getInstance().getPropertiesValue(getFilenameProperty(), null);
             if (filename == null) {
-                throw new Exception(String.format("Not found property %s in application config", FILENAME_PROPERTY));
+                throw new Exception(String.format("Not found property %s in application config", getFilenameProperty()));
             }
             File file = new File(filename);
             if (!file.exists()) {
@@ -95,21 +100,53 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         }
     }
 
+    protected String getInitialInsertStatement() {
+        return INITIAL_INSERT_STATEMENT;
+    }
+
+    protected String getTruncateStatement() {
+        return TRUNCATE_STATEMENT;
+    }
+
+    protected String getDropIndexStatement() {
+        return DROP_INDEX;
+    }
+
+    protected String getCreateIndexStatement() {
+        return CREATE_INDEX;
+    }
+
+    protected Integer getLineSizeValue() {
+        return LINE_SIZE;
+    }
+
+    protected String getNodeProperty() {
+        return NODE_PROPERTY;
+    }
+
+    protected String getFilenameProperty() {
+        return FILENAME_PROPERTY;
+    }
+
+    protected org.slf4j.Logger getLogger() {
+        return logger;
+    }
+
     public void fillTable(BufferedReader bufferedReader) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
             DAOService.getInstance().setSverkaEnabled(false);
             session = RuntimeContext.getInstance().createPersistenceSession();
-            Query query = session.createSQLQuery("truncate table cf_registry_file");
+            Query query = session.createSQLQuery(getTruncateStatement());
             query.executeUpdate();
-            query = session.createSQLQuery("drop index if exists cf_registry_file_guidoforg_idx");
+            query = session.createSQLQuery(getDropIndexStatement());
             query.executeUpdate();
 
             String s;
-            String str_query = INITIAL_INSERT_STATEMENT;
+            String str_query = getInitialInsertStatement();
             int counter = 0;
-            logger.info("Start fill temp table");
+            getLogger().info("Start fill temp table");
             long begin = System.currentTimeMillis();
             int processed = 0;
             int errors = 0;
@@ -118,7 +155,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 if (counter == 0 && !session.getTransaction().isActive()) transaction = session.beginTransaction();
                 try {
                     String[] arr = s.split(REGEXP, -1);
-                    while (arr.length < 19) {
+                    while (arr.length < getLineSizeValue()) {
                         s += bufferedReader.readLine();
                         arr = s.split(REGEXP, -1);
                     }
@@ -126,7 +163,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 } catch (Exception e) {
                     errors++;
                     processed++;
-                    logger.error(String.format("Error in process NSI file. Line %s ", processed), e);
+                    getLogger().error(String.format("Error in process NSI file. Line %s ", processed), e);
                     continue;
                 }
                 str_query += "(" + one_str + "), ";
@@ -137,8 +174,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                     query.executeUpdate();
                     transaction.commit();
                     counter = 0;
-                    str_query = INITIAL_INSERT_STATEMENT;
-                    logger.info(String.format("Lines processed: %s", processed));
+                    str_query = getInitialInsertStatement();
+                    getLogger().info(String.format("Lines processed: %s", processed));
                 }
                 processed++;
             }
@@ -147,22 +184,22 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 query = session.createSQLQuery(str_query);
                 query.executeUpdate();
                 transaction.commit();
-                logger.info(String.format("Lines processed: %s", processed));
+                getLogger().info(String.format("Lines processed: %s", processed));
             }
             transaction = null;
 
-            query = session.createSQLQuery("create index cf_registry_file_guidoforg_idx on cf_registry_file using btree (guidoforg)");
+            query = session.createSQLQuery(getCreateIndexStatement());
             query.executeUpdate();
 
-            logger.info(String.format("End fill temp table. Time taken %s ms, processed %s lines, error lines: %s", System.currentTimeMillis() - begin, processed, errors));
+            getLogger().info(String.format("End fill temp table. Time taken %s ms, processed %s lines, error lines: %s", System.currentTimeMillis() - begin, processed, errors));
         } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
+            HibernateUtils.rollback(transaction, getLogger());
+            HibernateUtils.close(session, getLogger());
             DAOService.getInstance().setSverkaEnabled(true);
         }
     }
 
-    private String buildOneInsertValue(String[] arr) {
+    protected String buildOneInsertValue(String[] arr) {
         //0-Фамилия, 1-Имя, 2-Отчество, 3-Дата рождения, 4-Пол, 5-Льгота, 6-Параллель, 7-Буква, 8-Класс, 9-Текущий класс или группа
         //10-GUID, 11-GUID школы, 12-Статус записи, 13-Фамилия представителя, 14-Имя представителя, 15-Отчество представителя
         //16-Телефон представителя, 17-Представитель - кем приходится, 18-Тип возрастной группы
@@ -190,7 +227,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         return sb.toString();
     }
 
-    private String getQuotedStr(String str) {
+    protected String getQuotedStr(String str) {
         if (str.startsWith("\"") && str.endsWith("\"")) {
             str = str.substring(1, str.length()-1);
         }
@@ -212,7 +249,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     public List<String> getBadGuids(Set<String> orgGuids) throws Exception {
         List<String> result = new ArrayList<String>();
         Boolean guidOK;
-        ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class);
+        ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -242,8 +279,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             transaction = null;
             return result;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
+            HibernateUtils.rollback(transaction, getLogger());
+            HibernateUtils.close(session, getLogger());
         }
     }
 
@@ -331,8 +368,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
 
             return pupils;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
+            HibernateUtils.rollback(transaction, getLogger());
+            HibernateUtils.close(session, getLogger());
         }
     }
 }

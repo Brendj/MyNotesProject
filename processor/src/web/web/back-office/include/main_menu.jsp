@@ -870,6 +870,13 @@
 
         </rich:panelMenuGroup>
 
+        <rich:panelMenuGroup id="nsiGroupEmployee" binding="#{mainPage.nsiGroupEmployeePage.mainMenuComponent}" label="Сверка сотрудников"
+                             rendered="#{mainPage.eligibleToServiceAdmin}">
+            <rich:panelMenuItem id="nsiOrgRegistryEmployeeSync" binding="#{NSIOrgRegistryEmployeeSynchPage.mainMenuComponent}"
+                                label="Интерактивная сверка" action="#{NSIOrgRegistryEmployeeSynchPage.show}"
+                                reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="spbGroup" binding="#{mainPage.spbGroupPage.mainMenuComponent}" label="Сверка"

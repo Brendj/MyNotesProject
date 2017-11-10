@@ -14,9 +14,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -80,9 +80,9 @@ public class RegisterSynchTest extends TestCase {
             pupils2.add(pupil); // массив второй школы
 
             System.out.println("---               Синхронизация с массивом данных                   ---");
-            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).
+            RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).
                                     parseClients("test", "test", org, pupils, true, null, false);
-            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).
+            RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).
                     parseClients("test", "test", org2, pupils2, true, null, false);
             System.out.println("---               Синхронизация окончена                            ---");
 

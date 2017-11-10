@@ -63,7 +63,7 @@ public class NSIRegistrySyncPage extends BasicWorkspacePage implements OrgSelect
             return;
         }
         try {
-            StringBuffer log = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+            StringBuffer log = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
                     .runSyncForOrg(org.getIdOfOrg(), performChanges);
             syncLog = log == null ? "" : log.toString();
         } catch (Exception e) {

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2017. Axetta LLC. All Rights Reserved.
   -->
 
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.RegistryChange" table="CF_RegistryChange" optimistic-lock="version" polymorphism="explicit">
+    <class name="ru.axetta.ecafe.processor.core.persistence.RegistryChangeEmployee" table="CF_RegistryChange_Employee" optimistic-lock="version">
         <id name="idOfRegistryChange" column="IdOfRegistryChange" type="long">
             <generator class="identity"/>
         </id>
@@ -46,10 +46,6 @@
         <property name="guardiansCount" column="GuardiansCount" type="int"/>
         <property name="ageTypeGroup" column="AgeTypeGroup" type="string" length="128"/>
         <property name="ageTypeGroupFrom" column="AgeTypeGroupFrom" type="string" length="128"/>
-        <set name="registryChangeGuardiansSet" table="cf_registrychange_guardians" cascade="all" inverse="true">
-            <key column="IdOfRegistryChange" not-null="true"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.RegistryChangeGuardians"/>
-        </set>
     </class>
 </hibernate-mapping>
 

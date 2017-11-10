@@ -1642,12 +1642,8 @@ public class DAOService {
         return false;
     }
 
-    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate) throws Exception {
-        return getLastRegistryChanges(idOfOrg, revisionDate, null, null);
-    }
-
     public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
-            String nameFilter) throws Exception {
+            String nameFilter, String className) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastRegistryChangeUpdate(idOfOrg);
         }
@@ -1663,9 +1659,10 @@ public class DAOService {
         if (actionFilter != null && actionFilter > 0) {
             actionStatement = " and operation=:operation ";
         }
-        String q = "from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate" + nameStatement
+        String q = "from " + className + " where idOfOrg=:idOfOrg and createDate=:lastUpdate" + nameStatement
                 + actionStatement + " order by groupName, surname, firstName, secondName";
-        TypedQuery<RegistryChange> query = entityManager.createQuery(q, RegistryChange.class);
+        //TypedQuery<RegistryChange> query = entityManager.createQuery(q, RegistryChange.class);
+        Query query = entityManager.createQuery(q);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("lastUpdate", revisionDate);
         if (actionFilter != null && actionFilter > 0) {
@@ -1682,9 +1679,9 @@ public class DAOService {
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
     }
 
-    public List getRegistryChangeRevisions(long idOfOrg) throws Exception {
+    public List getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
         Query query = entityManager.createQuery(
-                "select distinct createDate, type from RegistryChange where idOfOrg=:idOfOrg order by createDate desc");
+                "select distinct createDate, type from " + className + " where idOfOrg=:idOfOrg order by createDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         return query.getResultList();
     }

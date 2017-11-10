@@ -65,9 +65,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     protected String errorMessages;
     protected String infoMessages;
     Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
-    private long revisionCreateDate;
-    private int actionFilter;
-    private List<RevisionItem> revisions;
+    protected long revisionCreateDate;
+    protected int actionFilter;
+    protected List<RevisionItem> revisions;
     private List<RegistryChangeErrorItem> errors;
     private static Map<Integer, String> ACTION_FILTERS = new HashMap<Integer, String>();
     private long idOfSelectedError;
@@ -77,7 +77,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private String errorComment;
     private List<SelectItem> displayModes;
     private int displayMode;
-    private String nameFilter;
+    protected String nameFilter;
     private long loadedOrgRevisions = -1L;
     boolean showOnlyClientGoups = true;
 
@@ -229,7 +229,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         if (list.size() < 1) {
             return;
         }
-        List<RegistryChangeCallback> result = controller.proceedRegitryChangeItemInternal(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
+        //List<RegistryChangeCallback> result = controller.proceedRegitryChangeItemInternal(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
+        List<RegistryChangeCallback> result = proceedRegitryChangeItemInternal(controller, list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
         doUpdate();
         if (result == null) {
         } else {
@@ -243,6 +244,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 errorMessages += cb.getError();
             }
         }
+    }
+
+    protected List<RegistryChangeCallback> proceedRegitryChangeItemInternal(FrontController controller, List<Long> list, int operation, boolean fullNameValidation) {
+        return controller.proceedRegitryChangeItemInternal(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
     }
 
     public void doRefresh() {
@@ -330,7 +335,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
     }
 
-    private void load(boolean refresh) {
+    protected void load(boolean refresh) {
         resetMessages();
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 0L) {
@@ -353,15 +358,12 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         //  Выполнение запроса к службе
         List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> changedItems = null;
         if (!refresh) {
-            //changedItems = controller
-            //        .loadRegistryChangeItemsInternalV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
-            changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                    loadRegistryChangeItemsV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
+            changedItems = loadChangedItems();
         } else {
             try {
                 //changedItems = controller.refreshRegistryChangeItemsInternalV2(getIdOfOrg());
-                changedItems = RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                refreshRegistryChangeItemsV2(idOfOrg);
+                changedItems = refreshRegistryChangeItemsV2(idOfOrg); //RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                //refreshRegistryChangeItemsV2(idOfOrg);
             } catch (ServiceTemporaryUnavailableException e) {
                 errorMessages = e.getMessage();
                 return;
@@ -421,6 +423,15 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
     }
 
+    protected List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> refreshRegistryChangeItemsV2(long idOfOrg) throws Exception {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).refreshRegistryChangeItemsV2(idOfOrg);
+    }
+
+    protected List<ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItemV2> loadChangedItems() {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeItemsV2(getIdOfOrg(), revisionCreateDate, actionFilter, nameFilter);
+    }
+
     private void loadErrors() {
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 0L) {
@@ -441,7 +452,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         errors = controller.loadRegistryChangeErrorItemsInternal(getIdOfOrg());
     }
 
-    private List<RevisionItem> loadRevisions () {
+    protected List<RevisionItem> loadRevisions () {
         //  Создание соединения со службой
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 1L) {
@@ -460,12 +471,16 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         //  Выполнение запроса к службе
-        List<RegistryChangeRevisionItem> res = controller.loadRegistryChangeRevisionsInternal(getIdOfOrg());
+        List<RegistryChangeRevisionItem> res = loadRevisionsFromController(controller, getIdOfOrg());
         List<RevisionItem> result = new ArrayList<RevisionItem>();
         for(RegistryChangeRevisionItem i : res) {
             result.add(new RevisionItem(i.getDate(), i.getType()));
         }
         return result;
+    }
+
+    protected List<RegistryChangeRevisionItem> loadRevisionsFromController (FrontController controller, Long idOfOrg) {
+        return controller.loadRegistryChangeRevisionsInternal(idOfOrg);
     }
 
 

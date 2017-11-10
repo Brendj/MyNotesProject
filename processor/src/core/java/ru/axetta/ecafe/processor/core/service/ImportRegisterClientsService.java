@@ -23,6 +23,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,7 +47,8 @@ import java.util.concurrent.Executors;
  * Time: 11:40
  * To change this template use File | Settings | File Templates.
  */
-@Component
+@Primary
+@Component("importRegisterClientsService")
 @Scope("singleton")
 public class ImportRegisterClientsService {
 
@@ -59,7 +61,7 @@ public class ImportRegisterClientsService {
 
     private static final int MAX_CLIENTS_PER_TRANSACTION = 50;
     @PersistenceContext(unitName = "processorPU")
-    private EntityManager em;
+    protected EntityManager em;
 
     @Autowired
     ClientMskNSIService nsiService;
@@ -76,6 +78,10 @@ public class ImportRegisterClientsService {
             DAOService.getInstance().clearOrgSyncsRegistryTable();
         }
     }*/
+
+    protected RegistryChange getRegistryChangeClassInstance() {
+        return new RegistryChange();
+    }
 
     public static boolean isOn() {
         return RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
@@ -114,7 +120,7 @@ public class ImportRegisterClientsService {
         }
 
         StringBuffer logBuffer = new StringBuffer();
-        return RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+        return RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
                 .syncClientsWithRegistry(idOfOrg, performChanges, logBuffer, true);
     }
 
@@ -154,7 +160,7 @@ public class ImportRegisterClientsService {
                     int attempt = 0;
                     while (attempt < maxAttempts) {
                         try {
-                            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                            RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
                                     .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
                         } catch (SocketTimeoutException ste) {
                         } catch (Exception e) {
@@ -221,7 +227,7 @@ public class ImportRegisterClientsService {
             return;
         }
 
-        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).checkRegistryChangesValidity();
+        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).checkRegistryChangesValidity();
 
         if (!isOn()) {
             return;
@@ -251,7 +257,7 @@ public class ImportRegisterClientsService {
             return;
         }
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
-        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
                 .checkRegistryChangesValidity();
 
         int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
@@ -262,7 +268,7 @@ public class ImportRegisterClientsService {
             int attempt = 0;
             while (attempt < maxAttempts) {
                 try {
-                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                    RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
                             .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
                     break;
                 } catch (SocketTimeoutException ste) {
@@ -312,6 +318,46 @@ public class ImportRegisterClientsService {
         q.executeUpdate();
     }
 
+    public List <Client> findClientsWithoutPredefinedForOrgAndFriendly (Org organization) throws Exception {
+        List <Org> orgs = DAOUtils.findFriendlyOrgs (em, organization);
+        //return findClientsForOrgAndFriendly (em, organization, orgs);
+
+        String orgsClause = " where (client.org = :org0 ";
+        for (int i=0; i < orgs.size(); i++) {
+            if (orgsClause.length() > 0) {
+                orgsClause += " or ";
+            }
+            orgsClause += "client.org = :org" + (i + 1);
+        }
+        orgsClause += ") " + " and (not (client.idOfClientGroup >= " +
+                ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and client.idOfClientGroup < " +
+                ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ") or client.idOfClientGroup is null)";
+
+        javax.persistence.Query query = em.createQuery(
+                "from Client client " + orgsClause);
+        query.setParameter("org0", organization);
+        for (int i=0; i < orgs.size(); i++) {
+            query.setParameter("org" + (i + 1), orgs.get(i));
+        }
+        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        List <Client> cls = (List <Client>)query.getResultList();
+        return cls;
+    }
+
+    public List<Client> findClientsByGuids(List<String> guids) {
+        if(guids.size() == 0){
+            return new ArrayList<Client>();
+        }
+        javax.persistence.Query q = em.createQuery("from Client where clientGUID in :guids");
+        q.setParameter("guids", guids);
+        List<Client> result = (List<Client>) q.getResultList();
+        return result != null ? result : new ArrayList<Client>();
+    }
+
+    protected String getPupilGuid(String guid) {
+        return guid;
+    }
+
     @Transactional
     public void saveClients(String synchDate, String date, long ts, Org org, List<ExpandedPupilInfo> pupils,
             StringBuffer logBuffer) throws Exception {
@@ -326,17 +372,17 @@ public class ImportRegisterClientsService {
 
         //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
         Session session = (Session) em.getDelegate();
-        List<Client> currentClients = DAOUtils.findClientsWithoutPredefinedForOrgAndFriendly(em, org);
+        List<Client> currentClients = findClientsWithoutPredefinedForOrgAndFriendly(org);
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
         List<String> pupilsGuidList = new ArrayList<String>();
         for (ExpandedPupilInfo pupil : pupils) {
             if(pupil.getGuid() != null && !pupil.getGuid().isEmpty()) {
-                pupilsGuidList.add(pupil.getGuid());
+                pupilsGuidList.add(getPupilGuid(pupil.getGuid()));
             }
         }
 
-        List<Client> findByGuidsList = DAOUtils.findClientsByGuids(em, pupilsGuidList);
+        List<Client> findByGuidsList = findClientsByGuids(pupilsGuidList);
         Map<String, Client> guidMap = new HashMap<String, Client>();
         for(Client client : findByGuidsList){
             guidMap.put(client.getClientGUID(), client);
@@ -383,7 +429,7 @@ public class ImportRegisterClientsService {
                                 dbClient.getPerson().getSecondName()) + ", " +
                                 emptyIfNull(dbClient.getClientGroup() == null ? ""
                                         : dbClient.getClientGroup().getGroupName()), logBuffer);
-                        addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
+                        addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
                                 RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                     }
                 } catch (Exception e) {
@@ -405,7 +451,7 @@ public class ImportRegisterClientsService {
                             emptyIfNull(
                                     dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
                             logBuffer);
-                    addClientChange(em, ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
+                    addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
                             RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                 }
             }
@@ -493,7 +539,7 @@ public class ImportRegisterClientsService {
                         emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " +
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
                         + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
-                addClientChange(em, ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
+                addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
                         RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
                 continue;
             }
@@ -658,15 +704,15 @@ public class ImportRegisterClientsService {
 
     private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, Client currentClient,
             int operation, int type, Boolean checkBenefits) throws Exception {
-        addClientChange(em, ts, idOfOrg, null, fieldConfig, currentClient, operation, type, checkBenefits);
+        addClientChange(ts, idOfOrg, null, fieldConfig, currentClient, operation, type, checkBenefits);
     }
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
+    public void addClientChange(long ts, long idOfOrg, Long idOfMigrateOrg,
             FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type, Boolean checkBenefits) throws Exception {
-        addClientChange(em, ts, idOfOrg, idOfMigrateOrg, fieldConfig, currentClient, operation, type, null, checkBenefits);
+        addClientChange(ts, idOfOrg, idOfMigrateOrg, fieldConfig, currentClient, operation, type, null, checkBenefits);
     }
 
-    public static boolean isRegistryChangeExist(String notificationId, Client client, int operation, Session session) {
+    public boolean isRegistryChangeExist(String notificationId, Client client, int operation, Session session) {
         Query q = session.createSQLQuery("SELECT 1 " + "FROM cf_registrychange "
                 + "where notificationId=:notificationId and operation=:operation");
         q.setParameter("notificationId", notificationId);
@@ -679,7 +725,7 @@ public class ImportRegisterClientsService {
         }
     }
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Long idOfMigrateOrg,
+    public void addClientChange(long ts, long idOfOrg, Long idOfMigrateOrg,
             FieldProcessor.Config fieldConfig, Client currentClient, int operation, int type, String notificationId, Boolean checkBenefits)
             throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
@@ -704,7 +750,8 @@ public class ImportRegisterClientsService {
         List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
         String ageTypeGroup = trim(fieldConfig.getValue(ClientManager.FieldId.AGE_TYPE_GROUP), 128, clientGuid, "Тип возрастной группы");
 
-        RegistryChange ch = new RegistryChange();
+        //RegistryChange ch = new RegistryChange();
+        RegistryChange ch = getRegistryChangeClassInstance();
         ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
         ch.setSecondName(secondname);
@@ -741,7 +788,7 @@ public class ImportRegisterClientsService {
         }
 
         if (operation == CREATE_OPERATION) {
-            if (guardiansCount != null) {
+            if (!StringUtils.isEmpty(guardiansCount)) {
                 ch.setGuardiansCount(Integer.valueOf(guardiansCount));
             }
 
@@ -855,12 +902,12 @@ public class ImportRegisterClientsService {
         return source;
     }
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
+    public void addClientChange(long ts, long idOfOrg, Client currentClient, int operation,
             int type, Boolean checkBenefits) throws Exception {
-        addClientChange(em, ts, idOfOrg, currentClient, operation, type, null, checkBenefits);
+        addClientChange(ts, idOfOrg, currentClient, operation, type, null, checkBenefits);
     }
 
-    public static void addClientChange(EntityManager em, long ts, long idOfOrg, Client currentClient, int operation,
+    public void addClientChange(long ts, long idOfOrg, Client currentClient, int operation,
             int type, String notificationId, Boolean checkBenefits) throws Exception {
         //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
         Session sess = (Session) em.getDelegate();
@@ -872,7 +919,8 @@ public class ImportRegisterClientsService {
             return;
         }
 
-        RegistryChange ch = new RegistryChange();
+        //RegistryChange ch = new RegistryChange();
+        RegistryChange ch = getRegistryChangeClassInstance();
         ch.setClientGUID(emptyIfNull(currentClient.getClientGUID()));
         ch.setFirstName(currentClient.getPerson().getFirstName());
         ch.setSecondName(currentClient.getPerson().getSecondName());
@@ -1217,7 +1265,7 @@ public class ImportRegisterClientsService {
         return result;
     }
 
-    private List<RegistryChange> getRegistryChangeList(Session session, List<Long> changesList) {
+    protected List<RegistryChange> getRegistryChangeList(Session session, List<Long> changesList) {
         Criteria criteria = session.createCriteria(RegistryChange.class);
         criteria.add(Restrictions.in("idOfRegistryChange", changesList));
         return criteria.list();
@@ -1229,6 +1277,10 @@ public class ImportRegisterClientsService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    protected void setGuidFromChange(FieldProcessor.Config createConfig, RegistryChange change) throws Exception {
+        createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
     }
 
     //@Transactional
@@ -1255,7 +1307,8 @@ public class ImportRegisterClientsService {
                     if (contractId != null) {
                         createConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
                     }
-                    createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                    setGuidFromChange(createConfig, change);
+                    //createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
                     createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
@@ -1567,7 +1620,7 @@ public class ImportRegisterClientsService {
         fieldConfig.setValueList(fieldID, reesterValue);
     }
 
-    private static String emptyIfNull(String str) {
+    public static String emptyIfNull(String str) {
         return str == null ? "" : str;
     }
 

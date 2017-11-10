@@ -66,13 +66,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void runProjectStateGenerator() throws Exception {
         RuntimeContext.getAppContext().getBean(ProjectStateReportService.class).run(); //DEF
         //RuntimeContext.getAppContext().getBean(SignHandlerService.class).testCall();
-        //RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).run();
+        //RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).run();
         //RuntimeContext.getAppContext().getBean(BIDataExportService.class).run();
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
     public void runImportRegisterClients() throws Exception {
-        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).run(); //DEF
+        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
     }
 
@@ -226,7 +226,17 @@ public class OtherActionsPage extends BasicWorkspacePage {
             return;
         }
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterFileService.class).loadNSIFile();
+            RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class).loadNSIFile();
+            printMessage("Файл загружен");
+        } catch (Exception e) {
+            getLogger().error("Error run load NSI file: ", e);
+            printError("Во время загрузки из файла произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void loadNSIEmployeeFile() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("ImportRegisterEmployeeFileService", ImportRegisterEmployeeFileService.class).loadNSIFile();
             printMessage("Файл загружен");
         } catch (Exception e) {
             getLogger().error("Error run load NSI file: ", e);

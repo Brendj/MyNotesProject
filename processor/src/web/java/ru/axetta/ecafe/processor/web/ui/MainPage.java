@@ -286,6 +286,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupOrgPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage nsiGroupEmployeePage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
@@ -10092,5 +10093,9 @@ public class MainPage implements Serializable {
                     "Ошибка при обработке выбора списка организаций: " + e.getMessage(), null));
         }
         return null;
+    }
+
+    public BasicWorkspacePage getNsiGroupEmployeePage() {
+        return nsiGroupEmployeePage;
     }
 }

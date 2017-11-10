@@ -54,3 +54,61 @@ UPDATE cf_client_guardian SET lastupdate=(date_part('epoch'::text, current_date)
 
 --Создаем индекс на поле lastupdate в таблице cf_client_guardian 
 CREATE INDEX cf_client_guardian_lastupdate_idx ON cf_client_guardian USING btree (lastupdate);
+
+--Сверка по сотрудникам из файла
+CREATE TABLE cf_registry_employee_file
+(
+  firstname character varying(64),
+  secondname character varying(128),
+  surname character varying(128),
+  birthdate character varying(32),
+  gender character varying(10),
+  snils character varying(32),
+  guidoforg character varying(40)
+)
+WITH (
+OIDS=FALSE
+);
+
+CREATE INDEX cf_registry_employee_file_guidoforg_idx ON cf_registry_employee_file USING btree (guidoforg COLLATE pg_catalog."default");
+
+--Разногласия по сотрудникам
+CREATE TABLE cf_registrychange_employee
+(
+  idofregistrychange bigserial NOT NULL,
+  idoforg bigint NOT NULL,
+  createdate bigint NOT NULL,
+  clientguid character varying(40),
+  firstname character varying(64) NOT NULL,
+  secondname character varying(128) NOT NULL,
+  surname character varying(128) NOT NULL,
+  groupname character varying(64) NOT NULL,
+  firstnamefrom character varying(64),
+  secondnamefrom character varying(128),
+  surnamefrom character varying(128),
+  groupnamefrom character varying(64),
+  idofmigrateorgto bigint,
+  idofmigrateorgfrom bigint,
+  idofclient bigint,
+  operation integer NOT NULL,
+  applied boolean NOT NULL DEFAULT false,
+  error character varying(256) DEFAULT NULL::character varying,
+  type integer NOT NULL DEFAULT 1,
+  notificationid character varying(15) DEFAULT NULL::character varying,
+  gender integer,
+  birthdate bigint,
+  genderfrom integer,
+  birthdatefrom bigint,
+  guardianscount integer,
+  agetypegroup character varying(128),
+  agetypegroupfrom character varying(128),
+  checkbenefits integer NOT NULL DEFAULT 0,
+  benefitdszn character varying(128),
+  benefitdsznfrom character varying(128),
+  newdiscounts character varying(128),
+  olddiscounts character varying(128),
+  CONSTRAINT cf_registrychange_employee_pk PRIMARY KEY (idofregistrychange)
+)
+WITH (
+OIDS=FALSE
+);

@@ -256,7 +256,7 @@ public class FrontController extends HttpServlet {
         try {
             if(changesList != null && changesList.size() > 0) {
                 if(RuntimeContext.RegistryType.isMsk()) {
-                    RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(changesList.get(0));
+                    RegistryChange change = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).getRegistryChange(changesList.get(0));
                     checkRequestValidity(change.getIdOfOrg());
                 } else if(RuntimeContext.RegistryType.isSpb()) {
                     RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).getRegistryChange(changesList.get(0));
@@ -290,6 +290,23 @@ public class FrontController extends HttpServlet {
                 proceedRegitryChangeItem(changesList, operation, fullNameValidation);
     }
 
+    @WebMethod(operationName = "proceedRegitryChangeEmployeeItemInternal")
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItemInternal(@WebParam(name = "changesList") List<Long> changesList,
+            @WebParam(name = "operation") int operation,
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+        if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
+            return Collections.EMPTY_LIST;
+        }
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            logger.error("Failed to pass ip check", fce);
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                proceedRegitryEmployeeChangeItem(changesList, operation, fullNameValidation);
+    }
+
     @WebMethod(operationName = "loadRegistryChangeRevisions")
     public List<RegistryChangeRevisionItem> loadRegistryChangeRevisions(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
@@ -311,6 +328,17 @@ public class FrontController extends HttpServlet {
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeRevisions(idOfOrg);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeEmployeeRevisionsInternal")
+    public List<RegistryChangeRevisionItem> loadRegistryChangeEmployeeRevisionsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryEmployeeChangeRevisions(idOfOrg);
     }
 
     @WebMethod(operationName = "loadRegistryChangeErrorItems")
@@ -373,7 +401,7 @@ public class FrontController extends HttpServlet {
                                              @WebParam(name = "author") String author) {
         RegistryChangeError e = null;
         if(RuntimeContext.RegistryType.isMsk()) {
-            e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
+            e = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
         } else if(RuntimeContext.RegistryType.isSpb()) {
             e = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
         }

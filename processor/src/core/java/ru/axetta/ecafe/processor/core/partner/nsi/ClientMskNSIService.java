@@ -74,7 +74,7 @@ public class ClientMskNSIService extends MskNSIService {
             searchPredicateInfo.addSearchPredicate(search);
 
             List<Item> queryResults = executeQuery(searchPredicateInfo, -1);
-            ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class);
+            ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
             for (Item i : queryResults) {
                 for(Attribute attr : i.getAttribute()) {
                     if (attr.getName().equals("GUID Образовательного учреждения")) {
