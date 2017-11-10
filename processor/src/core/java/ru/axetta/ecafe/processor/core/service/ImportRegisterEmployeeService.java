@@ -212,4 +212,17 @@ public class ImportRegisterEmployeeService extends ImportRegisterClientsService 
         return guid.replaceAll(" ", "").replaceAll("-", "");
     }
 
+    @Override
+    protected String getClientGuid(Client client) {
+        return client.getSan();
+    }
+
+    @Override
+    protected Boolean belongToProperGroup(Client cl) {
+        return !(cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                .Predefined.CLIENT_EMPLOYEES.getValue().longValue()
+                && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
+                < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue());
+    }
+
 }

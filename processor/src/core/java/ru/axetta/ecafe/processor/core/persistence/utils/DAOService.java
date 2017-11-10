@@ -1645,7 +1645,7 @@ public class DAOService {
     public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate, Integer actionFilter,
             String nameFilter, String className) throws Exception {
         if (revisionDate < 1L) {
-            revisionDate = getLastRegistryChangeUpdate(idOfOrg);
+            revisionDate = getLastRegistryChangeUpdate(idOfOrg, className);
         }
         if (revisionDate < 1) {
             return Collections.EMPTY_LIST;
@@ -1671,9 +1671,10 @@ public class DAOService {
         return query.getResultList();
     }
 
-    public long getLastRegistryChangeUpdate(long idOfOrg) throws Exception {
+    public long getLastRegistryChangeUpdate(long idOfOrg, String className) throws Exception {
+        String tableName = className.equals("RegistryChange") ? "cf_registrychange" : "cf_registrychange_employee";
         Query q = entityManager
-                .createNativeQuery("SELECT max(createDate) FROM cf_RegistryChange WHERE idOfOrg=:idOfOrg");
+                .createNativeQuery("SELECT max(createDate) FROM " + tableName + " WHERE idOfOrg=:idOfOrg");
         q.setParameter("idOfOrg", idOfOrg);
         Object res = q.getSingleResult();
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));

@@ -358,6 +358,17 @@ public class ImportRegisterClientsService {
         return guid;
     }
 
+    protected String getClientGuid(Client client) {
+        return client.getClientGUID();
+    }
+
+    protected Boolean belongToProperGroup(Client cl) {
+        return cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                .Predefined.CLIENT_EMPLOYEES.getValue().longValue()
+                && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
+                < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue();
+    }
+
     @Transactional
     public void saveClients(String synchDate, String date, long ts, Org org, List<ExpandedPupilInfo> pupils,
             StringBuffer logBuffer) throws Exception {
@@ -385,7 +396,7 @@ public class ImportRegisterClientsService {
         List<Client> findByGuidsList = findClientsByGuids(pupilsGuidList);
         Map<String, Client> guidMap = new HashMap<String, Client>();
         for(Client client : findByGuidsList){
-            guidMap.put(client.getClientGUID(), client);
+            guidMap.put(getClientGuid(client), client);
         }
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
@@ -464,21 +475,17 @@ public class ImportRegisterClientsService {
         for (ExpandedPupilInfo pupil : pupils) {
             FieldProcessor.Config fieldConfig;
             boolean updateClient = false;
-            Client cl = guidMap.get(emptyIfNull(pupil.getGuid()));
+            Client cl = guidMap.get(getPupilGuid(emptyIfNull(pupil.getGuid())));
             if (cl == null) {
                 fieldConfig = new ClientManager.ClientFieldConfig();
             } else {
-                if (cl.getClientGroup() != null &&
-                    cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
-                        .Predefined.CLIENT_EMPLOYEES.getValue().longValue()
-                        && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
-                        < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue()) {
+                if (cl.getClientGroup() != null && belongToProperGroup(cl)) {
                     continue;
                 }
                 fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
             }
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
-                    cl == null ? null : cl.getClientGUID(), updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, getPupilGuid(pupil.getGuid()),
+                    cl == null ? null : getClientGuid(cl), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
                     cl == null ? null : cl.getPerson().getSurname(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
