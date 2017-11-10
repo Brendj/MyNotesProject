@@ -50,7 +50,7 @@ public class ResOrgFilesItem {
         if (null != fileExt && !fileExt.isEmpty())
            element.setAttribute("ext", fileExt);
         if (null != displayName && !displayName.isEmpty())
-            element.setAttribute("displayname", displayName);
+            element.setAttribute("displayName", displayName);
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
 
         if (resCode != null && resCode != 0) {

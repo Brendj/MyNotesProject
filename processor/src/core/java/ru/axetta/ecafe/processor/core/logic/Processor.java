@@ -5471,10 +5471,13 @@ public class Processor implements SyncProcessor {
 
                 if (item.getResCode().equals(OrgFilesItem.ERROR_CODE_ALL_OK)) {
                     resItem = new ResOrgFilesItem(orgFile);
-                    resItem.setIdOfOrgFile(item.getIdOfOrgFile());
+                    if (null != item.getIdOfOrgFile())
+                        resItem.setIdOfOrgFile(item.getIdOfOrgFile());
                     resItem.setResCode(item.getResCode());
-                    resItem.setDisplayName(item.getDisplayName());
-                    resItem.setFileExt(item.getFileExt());
+                    if (null != item.getDisplayName() && !item.getDisplayName().isEmpty())
+                        resItem.setDisplayName(item.getDisplayName());
+                    if (null != item.getFileExt() && !item.getFileExt().isEmpty())
+                        resItem.setFileExt(item.getFileExt());
                 } else {
                     resItem = new ResOrgFilesItem();
                     resItem.setIdOfOrg(item.getIdOfOrg());
