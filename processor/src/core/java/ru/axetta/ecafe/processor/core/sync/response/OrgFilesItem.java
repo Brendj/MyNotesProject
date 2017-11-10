@@ -34,7 +34,6 @@ public class OrgFilesItem {
     private String errorMessage;
     private Integer resCode;
     private Long size;
-    private final Long idOfArm;
     private Date date;
 
     public static OrgFilesItem build(Node nodeItem, Long idOfOrgOwner, OrgFilesRequest.Operation operation) throws Exception {
@@ -44,7 +43,6 @@ public class OrgFilesItem {
         String displayName;
         Long idOfFile;
         Long idOfOrg;
-        Long idOfArm;
 
         EMSetter emSetter = new EMSetter("");
 
@@ -67,33 +65,32 @@ public class OrgFilesItem {
         }
 
         fileData = XMLUtils.getAttributeValue(nodeItem, "data");
-        idOfArm = XMLUtils.getLongAttributeValue(nodeItem, "idOfArm");
 
         OrgFilesItem orgFilesItem = null;
 
         switch (operation) {
             case LIST:
                 orgFilesItem = new OrgFilesItem(idOfFile, fileName, fileExt, displayName, idOfOrg, emSetter.getStr(),
-                        idOfArm, null, -1L);
+                        null, -1L);
                 break;
             case ADD:
                 orgFilesItem = new OrgFilesItem(idOfFile, fileName, fileExt, displayName, idOfOrg, fileData,
-                        emSetter.getStr(), idOfArm, null, -1L);
+                        emSetter.getStr(), null, -1L);
                 break;
             case DOWNLOAD:
                 orgFilesItem = new OrgFilesItem(idOfFile, fileName, fileExt, displayName, idOfOrg, emSetter.getStr(),
-                        idOfArm, null, -1L);
+                        null, -1L);
                 break;
             case DELETE:
                 orgFilesItem = new OrgFilesItem(idOfFile, "", "", "", idOfOrg,
-                        emSetter.getStr(), idOfArm, null, -1L);
+                        emSetter.getStr(), null, -1L);
                 break;
         }
         return orgFilesItem;
     }
 
     public OrgFilesItem(Long idOfOrgFile, String fileName, String fileExt, String displayName, Long idOfOrg,
-            String errorMessage, Long idOfArm, Date date, Long size) {
+            String errorMessage, Date date, Long size) {
         this.idOfOrgFile = idOfOrgFile;
         this.fileName = fileName;
         this.fileExt = fileExt;
@@ -101,7 +98,6 @@ public class OrgFilesItem {
         this.idOfOrg = idOfOrg;
         this.fileData = "";
         this.errorMessage = errorMessage;
-        this.idOfArm = idOfArm;
         this.date = date;
         this.size = size;
 
@@ -113,7 +109,7 @@ public class OrgFilesItem {
     }
 
     public OrgFilesItem(Long idOfOrgFile, String fileName, String fileExt, String displayName, Long idOfOrg,
-            String fileData, String errorMessage, Long idOfArm, Date date, Long size) {
+            String fileData, String errorMessage, Date date, Long size) {
         this.idOfOrgFile = idOfOrgFile;
         this.fileName = fileName;
         this.fileExt = fileExt;
@@ -121,7 +117,6 @@ public class OrgFilesItem {
         this.idOfOrg = idOfOrg;
         this.fileData = fileData;
         this.errorMessage = errorMessage;
-        this.idOfArm = idOfArm;
         this.date = date;
         this.size = size;
 
@@ -145,7 +140,6 @@ public class OrgFilesItem {
         }
 
         element.setAttribute("size", size.toString());
-        element.setAttribute("idOfArm", idOfArm.toString());
         element.setAttribute("date", date.toString());
 
         return element;
@@ -197,10 +191,6 @@ public class OrgFilesItem {
 
     public void setSize(Long size) {
         this.size = size;
-    }
-
-    public Long getIdOfArm() {
-        return idOfArm;
     }
 
     public Date getDate() {

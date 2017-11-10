@@ -48,7 +48,7 @@ public class OrgFiles implements AbstractToElement {
             switch (operation) {
                 case LIST:
                     item = new OrgFilesItem(of.getIdOfOrgFile(), of.getName(), of.getExt(), of.getDisplayName(),
-                            of.getOrgOwner().getIdOfOrg(), "", of.getIdOfArm(), of.getDate(), of.getSize());
+                            of.getOrgOwner().getIdOfOrg(), "", of.getDate(), of.getSize());
                     break;
                 case ADD:
                     /* nope */
@@ -57,7 +57,7 @@ public class OrgFiles implements AbstractToElement {
                     item = new OrgFilesItem(of.getIdOfOrgFile(), of.getName(), of.getExt(), of.getDisplayName(),
                             of.getOrgOwner().getIdOfOrg(),
                             FileUtils.loadFile(of.getOrgOwner().getIdOfOrg(), of.getName(), of.getExt()),
-                            "", of.getIdOfArm(), of.getDate(), of.getSize());
+                            "", of.getDate(), of.getSize());
                     break;
                 case DELETE:
                     /* nope */

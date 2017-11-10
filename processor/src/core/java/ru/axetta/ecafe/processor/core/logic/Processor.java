@@ -5408,7 +5408,7 @@ public class Processor implements SyncProcessor {
                                     .saveFile(org.getIdOfOrg(), fileData, item.getFileExt());
                             Long fileSize = FileUtils.fileSize(org.getIdOfOrg(), fileName, item.getFileExt());
                             orgFile = new OrgFile(fileName, item.getFileExt(), item.getDisplayName(), org, new Date(),
-                                    item.getIdOfArm(), fileSize);
+                                    fileSize);
                             session.save(orgFile);
                         } catch (IOException e) {
                             logger.error("Error saving OrgFiles:", e);
@@ -5435,7 +5435,6 @@ public class Processor implements SyncProcessor {
                             orgFile.setDisplayName(item.getDisplayName());
                             orgFile.setExt(item.getFileExt());
                             orgFile.setDate(new Date());
-                            orgFile.setIdOfArm(item.getIdOfArm());
                             session.update(orgFile);
                         } catch (IOException e) {
                             logger.error("Error saving OrgFiles:", e);

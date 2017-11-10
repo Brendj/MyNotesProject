@@ -13,20 +13,18 @@ public class OrgFile {
     private String ext;
     private String displayName;
     private Date date;
-    private Long idOfArm;
     private Long size;
 
     public OrgFile() {
 
     }
 
-    public OrgFile(String name, String ext, String displayName, Org org, Date date, Long idOfArm, Long size) {
+    public OrgFile(String name, String ext, String displayName, Org org, Date date, Long size) {
         this.name = name;
         this.orgOwner = org;
         this.ext = ext;
         this.displayName = displayName;
         this.date = date;
-        this.idOfArm = idOfArm;
         this.size = size;
     }
 
@@ -76,14 +74,6 @@ public class OrgFile {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public Long getIdOfArm() {
-        return idOfArm;
-    }
-
-    public void setIdOfArm(Long idOfArm) {
-        this.idOfArm = idOfArm;
     }
 
     public Long getSize() {

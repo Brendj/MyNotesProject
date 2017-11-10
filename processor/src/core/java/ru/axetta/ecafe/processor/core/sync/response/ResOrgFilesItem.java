@@ -23,7 +23,6 @@ public class ResOrgFilesItem {
     private String fileExt;
     private String displayName;
     private Long size;
-    private Long idOfArm;
     private Date date;
 
     public ResOrgFilesItem() {
@@ -38,7 +37,6 @@ public class ResOrgFilesItem {
         this.displayName = orgFile.getDisplayName();
         this.date = orgFile.getDate();
         this.size = orgFile.getSize();
-        this.idOfArm = orgFile.getIdOfArm();
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
@@ -63,9 +61,6 @@ public class ResOrgFilesItem {
 
         if (null != date)
             element.setAttribute("date", date.toString());
-
-        if (null != idOfArm)
-            element.setAttribute("idOfArm", idOfArm.toString());
 
         return element;
     }
@@ -140,14 +135,6 @@ public class ResOrgFilesItem {
 
     public void setSize(Long size) {
         this.size = size;
-    }
-
-    public Long getIdOfArm() {
-        return idOfArm;
-    }
-
-    public void setIdOfArm(Long idOfArm) {
-        this.idOfArm = idOfArm;
     }
 
     public Date getDate() {

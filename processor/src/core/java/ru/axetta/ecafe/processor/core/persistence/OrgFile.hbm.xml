@@ -16,7 +16,6 @@
         <property name="ext" column="ext" type="string" not-null="true"/>
         <property name="displayName" column="displayname" type="string" not-null="true"/>
         <property name="date" column="date" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
-        <property name="idOfArm" column="idofarm" type="long"/>
         <property name="size" column="size" type="long"/>
     </class>
 </hibernate-mapping>
