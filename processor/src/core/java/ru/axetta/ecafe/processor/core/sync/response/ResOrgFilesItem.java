@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ResOrgFilesItem {
@@ -59,8 +60,10 @@ public class ResOrgFilesItem {
         if (null != size)
             element.setAttribute("size", size.toString());
 
-        if (null != date)
-            element.setAttribute("date", date.toString());
+        if (null != date) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            element.setAttribute("date", dateFormat.format(date));
+        }
 
         return element;
     }

@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -140,7 +141,8 @@ public class OrgFilesItem {
         }
 
         element.setAttribute("size", size.toString());
-        element.setAttribute("date", date.toString());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        element.setAttribute("date", dateFormat.format(date));
 
         return element;
     }
