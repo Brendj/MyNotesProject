@@ -30,9 +30,9 @@ CREATE TABLE cf_orgfile
 (
   idoforgfile bigserial NOT NULL,
   idoforg bigint NOT NULL,
-  name character varying(16) NOT NULL DEFAULT ''::character varying,
-  ext character varying(5) NOT NULL DEFAULT ''::character varying,
-  displayname character varying(256) NOT NULL DEFAULT ''::character varying,
+  name character varying(16) NOT NULL DEFAULT '',
+  ext character varying(5) NOT NULL DEFAULT '',
+  displayname character varying(256) NOT NULL DEFAULT '',
   date bigint NOT NULL,
   size bigint NOT NULL,
   CONSTRAINT cf_orgfile_pk PRIMARY KEY (idoforgfile),
@@ -47,12 +47,9 @@ COMMENT ON TABLE cf_orgfile
   IS 'описание файлов организации';
 
 --Добавляем колонку lastupdate в cf_client_guardian
-ALTER TABLE cf_client_guardian ADD COLUMN lastupdate bigint NOT NULL DEFAULT (date_part('epoch'::text, '2000-01-01'::date) * (1000)::double precision);
+ALTER TABLE cf_client_guardian ADD COLUMN lastupdate bigint NOT NULL DEFAULT (extract(epoch from now()) * 1000);
 
---Заполняем колонку lastupdate в cf_client_guardian текущей датой
-UPDATE cf_client_guardian SET lastupdate=(date_part('epoch'::text, current_date) * (1000)::double precision);
-
---Создаем индекс на поле lastupdate в таблице cf_client_guardian 
+--Создаем индекс на поле lastupdate в таблице cf_client_guardian
 CREATE INDEX cf_client_guardian_lastupdate_idx ON cf_client_guardian USING btree (lastupdate);
 
 --Сверка по сотрудникам из файла
@@ -92,9 +89,9 @@ CREATE TABLE cf_registrychange_employee
   idofclient bigint,
   operation integer NOT NULL,
   applied boolean NOT NULL DEFAULT false,
-  error character varying(256) DEFAULT NULL::character varying,
+  error character varying(256) DEFAULT NULL,
   type integer NOT NULL DEFAULT 1,
-  notificationid character varying(15) DEFAULT NULL::character varying,
+  notificationid character varying(15) DEFAULT NULL,
   gender integer,
   birthdate bigint,
   genderfrom integer,
@@ -112,3 +109,5 @@ CREATE TABLE cf_registrychange_employee
 WITH (
 OIDS=FALSE
 );
+
+--! ФИНАЛИЗИРОВАН (Семенов, 171110) НЕ МЕНЯТЬ
