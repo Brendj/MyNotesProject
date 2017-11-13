@@ -225,4 +225,12 @@ public class ImportRegisterEmployeeService extends ImportRegisterClientsService 
                 < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue());
     }
 
+    @Override
+    protected Boolean isProperGroup(ClientGroup currGroup) {
+        return !(currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                .Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
+                currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup
+                        .Predefined.CLIENT_LEAVING.getValue().longValue());
+    }
+
 }

@@ -369,6 +369,13 @@ public class ImportRegisterClientsService {
                 < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue();
     }
 
+    protected Boolean isProperGroup(ClientGroup currGroup) {
+        return currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
+                .Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
+                currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup
+                        .Predefined.CLIENT_LEAVING.getValue().longValue();
+    }
+
     @Transactional
     public void saveClients(String synchDate, String date, long ts, Org org, List<ExpandedPupilInfo> pupils,
             StringBuffer logBuffer) throws Exception {
@@ -408,19 +415,15 @@ public class ImportRegisterClientsService {
             for (Client dbClient : currentClients) {
                 boolean found = false;
                 for (ExpandedPupilInfo pupil : pupils) {
-                    if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
-                            .equals(dbClient.getClientGUID())) {
+                    if (!StringUtils.isEmpty(getPupilGuid(emptyIfNull(pupil.getGuid()))) && getClientGuid(dbClient) != null && getPupilGuid(pupil.getGuid())
+                            .equals(getClientGuid(dbClient))) {
                         found = true;
                         break;
                     }
                 }
                 try {
                     ClientGroup currGroup = dbClient.getClientGroup();
-                    if (currGroup != null &&
-                            currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
-                                    .Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
-                            currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup
-                                    .Predefined.CLIENT_LEAVING.getValue().longValue()) {
+                    if (currGroup != null && isProperGroup(currGroup)) {
                         break;
                     }
                     //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
@@ -432,9 +435,9 @@ public class ImportRegisterClientsService {
                         currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
                         continue;
                     }
-                    if (emptyIfNull(dbClient.getClientGUID()).equals("") || !found) {
+                    if (emptyIfNull(getClientGuid(dbClient)).equals("") || !found) {
                         log(synchDate + "Удаление " +
-                                emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
+                                emptyIfNull(getClientGuid(dbClient)) + ", " + emptyIfNull(
                                 dbClient.getPerson().getSurname()) + " " +
                                 emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
                                 dbClient.getPerson().getSecondName()) + ", " +
