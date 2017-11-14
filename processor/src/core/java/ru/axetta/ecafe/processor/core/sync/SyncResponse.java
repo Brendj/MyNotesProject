@@ -354,6 +354,7 @@ public class SyncResponse {
             private final String categoriesDiscountsDSZN;
             private final Date lastDiscountsUpdate;
             private final Date disablePlanCreationDate;
+            private final Date disablePlanEndDate;
             private final String ageTypeGroup;
             private final Long balanceToNotify;
 
@@ -392,6 +393,7 @@ public class SyncResponse {
                 this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
                 this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
                 this.disablePlanCreationDate = client.getDisablePlanCreationDate();
+                this.disablePlanEndDate = client.getDisablePlanEndDate();
                 this.ageTypeGroup = client.getAgeTypeGroup();
                 this.balanceToNotify = client.getBalanceToNotify();
             }
@@ -481,6 +483,10 @@ public class SyncResponse {
                 return disablePlanCreationDate;
             }
 
+            public Date getDisablePlanEndDate() {
+                return disablePlanEndDate;
+            }
+
             public Date getBirthDate() {
                 return birthDate;
             }
@@ -554,6 +560,10 @@ public class SyncResponse {
                 if (this.disablePlanCreationDate != null) {
                     DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                     element.setAttribute("DisablePlanCreationDate", timeFormat.format(this.disablePlanCreationDate));
+                }
+                if (this.disablePlanEndDate != null) {
+                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    element.setAttribute("DisablePlanEndDate", timeFormat.format(this.disablePlanEndDate));
                 }
                 if (this.ageTypeGroup != null) {
                     element.setAttribute("AgeTypeGroup", this.ageTypeGroup);

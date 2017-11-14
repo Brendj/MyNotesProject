@@ -65,6 +65,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.balanceToNotify = balanceToNotify;
     }
 
+    public Date getDisablePlanEndDate() {
+        return disablePlanEndDate;
+    }
+
+    public void setDisablePlanEndDate(Date disablePlanEndDate) {
+        this.disablePlanEndDate = disablePlanEndDate;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -254,6 +262,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Date lastDiscountsUpdate;
     private Boolean disablePlanCreation;
     private Date disablePlanCreationDate;
+    private Date disablePlanEndDate;
     private String ageTypeGroup;
     private Long balanceToNotify;
     private Date lastConfirmMobile;
@@ -1144,6 +1153,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.birthDate = client.getBirthDate();
         this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
         this.disablePlanCreationDate = client.getDisablePlanCreationDate();
+        this.disablePlanEndDate = client.getDisablePlanEndDate();
         this.disablePlanCreation = this.disablePlanCreationDate != null;
         this.ageTypeGroup = client.getAgeTypeGroup();
         removeListGuardianItems.clear();

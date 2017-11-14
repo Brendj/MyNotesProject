@@ -38,6 +38,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.balanceToNotify = balanceToNotify;
     }
 
+    public Date getDisablePlanEndDate() {
+        return disablePlanEndDate;
+    }
+
+    public void setDisablePlanEndDate(Date disablePlanEndDate) {
+        this.disablePlanEndDate = disablePlanEndDate;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -131,6 +139,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Date lastDiscountsUpdate;
     private Boolean disablePlanCreation;
     private Date disablePlanCreationDate;
+    private Date disablePlanEndDate;
     private String ageTypeGroup;
     private String photoURL;
     private Long balanceToNotify;
@@ -455,6 +464,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
         this.disablePlanCreationDate = client.getDisablePlanCreationDate();
         this.disablePlanCreation = this.disablePlanCreationDate != null;
+        this.disablePlanEndDate = client.getDisablePlanEndDate();
         this.ageTypeGroup = client.getAgeTypeGroup();
         this.balanceToNotify = client.getBalanceToNotify();
         this.lastConfirmMobile = client.getLastConfirmMobile();

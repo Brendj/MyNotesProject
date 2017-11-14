@@ -184,6 +184,9 @@
     <h:outputText escape="true" value="Дата исключения из плана питания" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.disablePlanCreationDate}" escape="true" converter="timeConverter"
                   styleClass="output-text" />
+    <h:outputText escape="true" value="Дата окончания срока исключения из плана питания" styleClass="output-text" />
+    <h:outputText value="#{mainPage.clientEditPage.disablePlanEndDate}" escape="true" converter="timeConverter"
+                  styleClass="output-text" />
 
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />

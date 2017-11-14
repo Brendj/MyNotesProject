@@ -21,7 +21,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
-import ru.axetta.ecafe.processor.core.sync.request.OrgFilesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
@@ -89,6 +88,10 @@ public class SyncRequest {
                 return orgOwner;
             }
 
+            public Date getDisablePlanEndDate() {
+                return disablePlanEndDate;
+            }
+
             public static class Builder {
 
                 public Builder() {
@@ -139,6 +142,12 @@ public class SyncRequest {
                         disablePlanCreationDate = loadContext.getTimeFormat()
                                 .parse(namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent());
                     }
+                    String disablePlanEndDateSt = getStringValueNullSafe(namedNodeMap, "DisablePlanEndDate");
+                    Date disablePlanEndDate = null;
+                    if(StringUtils.isNotEmpty(disablePlanEndDateSt)) {
+                        disablePlanEndDate = loadContext.getTimeFormat()
+                                .parse(namedNodeMap.getNamedItem("DisablePlanEndDate").getTextContent());
+                    }
                     Long orgOwner = getLongValueNullSafe(namedNodeMap, "OrgId");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
@@ -147,7 +156,7 @@ public class SyncRequest {
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
-                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, orgOwner);
+                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner);
                 }
 
 
@@ -171,6 +180,7 @@ public class SyncRequest {
             private final Long version;
             private final Long balanceToNotify;
             private final Date disablePlanCreationDate;
+            private final Date disablePlanEndDate;
             private final Long orgOwner;
 
 
@@ -179,7 +189,7 @@ public class SyncRequest {
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
-                    Date disablePlanCreationDate, Long orgOwner) {
+                    Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -209,6 +219,7 @@ public class SyncRequest {
                 this.version = version;
                 this.balanceToNotify = balanceToNotify;
                 this.disablePlanCreationDate = disablePlanCreationDate;
+                this.disablePlanEndDate = disablePlanEndDate;
                 this.orgOwner = orgOwner;
             }
 

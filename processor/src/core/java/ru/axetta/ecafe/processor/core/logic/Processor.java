@@ -3553,6 +3553,7 @@ public class Processor implements SyncProcessor {
                 client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
                 client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
                 client.setDisablePlanCreationDate(clientParamItem.getDisablePlanCreationDate());
+                client.setDisablePlanEndDate(clientParamItem.getDisablePlanEndDate());
                 if (clientParamItem.getExpenditureLimit() != null) {
                     client.setExpenditureLimit(clientParamItem.getExpenditureLimit());
                 }

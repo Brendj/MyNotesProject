@@ -94,6 +94,7 @@ public class Client {
     private String categoriesDiscountsDSZN;
     private Date lastDiscountsUpdate;
     private Date disablePlanCreationDate;
+    private Date disablePlanEndDate;
     private String san;
     private Set<GuardSan> guardSan;
     private Long externalId;
@@ -165,6 +166,7 @@ public class Client {
         this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
         this.disablePlanCreationDate = null;
+        this.disablePlanEndDate = null;
         this.createdFrom = ClientCreatedFromType.DEFAULT;
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
@@ -1053,5 +1055,13 @@ public class Client {
 
     public void setCreatedFromDesc(String createdFromDesc) {
         this.createdFromDesc = createdFromDesc;
+    }
+
+    public Date getDisablePlanEndDate() {
+        return disablePlanEndDate;
+    }
+
+    public void setDisablePlanEndDate(Date disablePlanEndDate) {
+        this.disablePlanEndDate = disablePlanEndDate;
     }
 }
