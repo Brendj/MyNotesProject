@@ -85,24 +85,12 @@ public class BasicBasketReportBuilder extends BasicReportForAllOrgJob.Builder {
             idOfBBGoodsList.add(Long.parseLong(idOfOrg));
         }
 
-        //Query query = session.createQuery("select gbb from GoodsBasicBasket gbb where gbb.idOfBasicGood in :idOfGbb order by gbb.nameOfGood");
-        //query.setParameterList("idOfGbb", idOfBBGoodsList);
-
-        //List<GoodsBasicBasket> list = query.list(); //список выбранных для отчета базовых товаров
         List<BasicBasketReportItem> result_list = new ArrayList<BasicBasketReportItem>();
 
-
-        /*Query query = session.createSQLQuery("SELECT b.nameofgood, b.unitsscale, b.netweight, p.nameofconfigurationprovider, od.menudetailname, od.rprice "
-                + "FROM cf_orders o JOIN cf_orderdetails od ON o.idoforg = od.idoforg AND o.idoforder = od.idoforder "
-                + "JOIN cf_goods g ON od.idofgood = g.idofgood "
-                + "JOIN cf_goods_basicbasket b ON g.idofbasicgood = b.idofbasicgood "
-                + "JOIN cf_basicbasketgood_provider bp ON b.idofbasicgood = bp.idofbasicgood "
-                + "JOIN cf_provider_configurations p ON p.idofconfigurationprovider = bp.idofconfigurationprovider "
-                + "where o.CreatedDate between :startDate and :endDate and b.IdOfBasicGood in (:bbGoods) "
-                + "order by b.NameOfGood");*/
         Query query = session.createSQLQuery("select b.nameofgood, b.unitsscale, b.netweight, p.nameofconfigurationprovider, od.menudetailname, od.rprice "
                 + "from cf_orders o join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "join cf_menudetails md on od.idofmenufromsync = md.idofmenufromsync "
+                + "join cf_menu m on m.idofmenu = md.idofmenu and m.idoforg = o.idoforg "
                 + "join cf_good_basic_basket_price bp on bp.idofmenudetail = md.idofmenudetail "
                 + "join cf_goods_basicbasket b on bp.idofbasicgood = b.idofbasicgood "
                 + "join cf_provider_configurations p on p.idofconfigurationprovider = bp.idofconfigurationprovider "
