@@ -54,8 +54,8 @@
 	</detail>
 	<summary>
 		<band height="153" splitType="Stretch">
-			<crosstab ignoreWidth="true">
-				<reportElement x="0" y="0" width="500" height="131" uuid="5aa6d9fe-3094-42fa-85ab-352deb52588e"/>
+			<crosstab isRepeatColumnHeaders="false" isRepeatRowHeaders="false" ignoreWidth="true">
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="500" height="131" uuid="5aa6d9fe-3094-42fa-85ab-352deb52588e"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0" lineStyle="Solid"/>
@@ -184,7 +184,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
 							</box>
 							<textField>
-								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="322" height="28" uuid="9d26a64a-94cc-4f89-8aee-750c083842b9"/>
+								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="321" height="28" uuid="9d26a64a-94cc-4f89-8aee-750c083842b9"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -203,25 +203,39 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
+				<columnGroup name="menuDetailName" height="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{menuDetailName}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents/>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
 				<measure name="unitsScaleMeasure" class="java.lang.String">
 					<measureExpression><![CDATA[$F{unitsScale}]]></measureExpression>
 				</measure>
 				<measure name="netWeightMeasure" class="java.lang.Long">
 					<measureExpression><![CDATA[$F{netWeight}]]></measureExpression>
 				</measure>
-				<measure name="menuDetailNameMeasure" class="java.lang.String" calculation="Count">
+				<measure name="menuDetailNameMeasure" class="java.lang.String">
 					<measureExpression><![CDATA[$F{menuDetailName}]]></measureExpression>
 				</measure>
 				<measure name="rpriceMeasure" class="java.lang.Long">
 					<measureExpression><![CDATA[$F{rprice}]]></measureExpression>
+				</measure>
+				<measure name="nameOfConfigurationProviderMeasure" class="java.lang.String">
+					<measureExpression><![CDATA[$F{nameOfConfigurationProvider}]]></measureExpression>
 				</measure>
 				<crosstabCell width="322" height="151">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
 						</box>
-						<textField>
-							<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="322" height="20" uuid="fedecc19-a6bd-4dec-a4db-df834a861e83"/>
+						<textField isBlankWhenNull="true">
+							<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="321" height="20" uuid="fedecc19-a6bd-4dec-a4db-df834a861e83"/>
 							<box leftPadding="0">
 								<pen lineWidth="1.0"/>
 								<topPen lineWidth="1.0"/>
@@ -249,7 +263,7 @@
 							<textFieldExpression><![CDATA["Название блюда"]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="161" y="21" width="161" height="21" uuid="3a0ec566-3912-43dd-9b99-a89003606ba4"/>
+							<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="161" y="21" width="160" height="21" uuid="3a0ec566-3912-43dd-9b99-a89003606ba4"/>
 							<box>
 								<pen lineWidth="1.0"/>
 								<topPen lineWidth="1.0"/>
@@ -277,7 +291,7 @@
 							<textFieldExpression><![CDATA[$V{menuDetailNameMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement style="Crosstab Data Text" x="161" y="42" width="161" height="21" uuid="066351db-8bac-43aa-ad59-c14075fce54e"/>
+							<reportElement style="Crosstab Data Text" x="161" y="42" width="160" height="21" uuid="066351db-8bac-43aa-ad59-c14075fce54e"/>
 							<box>
 								<pen lineWidth="1.0"/>
 								<topPen lineWidth="1.0"/>
@@ -324,6 +338,12 @@
 							<textFieldExpression><![CDATA[$V{nameOfConfigurationProvider}]]></textFieldExpression>
 						</textField>
 					</cellContents>
+				</crosstabCell>
+				<crosstabCell columnTotalGroup="menuDetailName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="nameOfGood" columnTotalGroup="menuDetailName">
+					<cellContents/>
 				</crosstabCell>
 			</crosstab>
 		</band>
