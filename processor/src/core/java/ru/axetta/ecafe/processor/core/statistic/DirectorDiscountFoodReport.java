@@ -42,8 +42,6 @@ public class DirectorDiscountFoodReport extends BasicReport {
     private static final Long elderDOU1     = 106L; // 3-7 ДОУ
     private static final Long elderDOU2     = 124L; // 3-7 ДОУ
 
-    private static final Double barTopMargin = 2.D;
-
     private Boolean allOO;
 
     public static class Builder {
@@ -51,35 +49,22 @@ public class DirectorDiscountFoodReport extends BasicReport {
             Date generateTime = new Date();
             List<DirectorDiscountFoodEntry> entries = new ArrayList<DirectorDiscountFoodEntry>();
 
-            //String sqlQuery =
-            //            "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, dr.categoriesdiscounts "
-            //          + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced) THEN e.idofclient END)) AS s2_LGOTNOE "
-            //          + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve) THEN e.idofclient END)) AS s3_RESERV "
-            //          + "FROM cf_orgs o "
-            //          + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND (e.idofclientgroup<:employees OR e.idofclientgroup > :deleted) "
-            //          + "           AND e.ordertype IN (:reduced,:reserve) AND e.createddate>=:startDate AND e.createddate<:endDate "
-            //          + "LEFT JOIN cf_orderdetails od ON e.idoforder=od.idoforder AND e.idoforg=od.idoforg AND e.state=:state_commited AND od.state=0 AND od.idofrule IS NOT NULL "
-            //          + "LEFT JOIN cf_discountrules dr ON dr.idofrule=od.idofrule "
-            //          + "LEFT JOIN cf_clients c ON e.idofclient=c.idofclient "
-            //          + "WHERE o.idoforg IN (:idsOfOrg) "
-            //          + "GROUP BY o.idoforg, o.shortnameinfoservice, o.shortaddress, o.shortname, o.organizationtype, dr.categoriesdiscounts";
-
             for (Long idOfOrg : idsOfOrg) {
                 String sqlQuery =
                         "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :youngSOSH OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :youngSOSH OR "
                       + "                                                         dr.categoriesdiscounts LIKE :youngSOSH || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN e.idofclient END)) AS privilege_young "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :middleSOSH OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :middleSOSH OR "
                       + "                                                         dr.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN e.idofclient END)) AS privilege_middle "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :elderSOSH OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :elderSOSH OR "
                       + "                                                         dr.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN e.idofclient END)) AS privilege_elder "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :youngDOU1 OR "
                       + "                                                         dr.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR "
@@ -87,7 +72,7 @@ public class DirectorDiscountFoodReport extends BasicReport {
                       + "                                                         dr.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN e.idofclient END)) AS privilege_dou_young "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reduced,:correction,:recycling) AND (dr.categoriesdiscounts LIKE :elderDOU1 OR "
                       + "                                                         dr.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
@@ -95,19 +80,19 @@ public class DirectorDiscountFoodReport extends BasicReport {
                       + "                                                         dr.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
                       + "                                                         dr.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN e.idofclient END)) AS privilege_dou_elder "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :youngSOSH OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :youngSOSH OR "
                       + "                                                       dr.categoriesdiscounts LIKE :youngSOSH || ',%' OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN e.idofclient END)) AS reserve_young "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :middleSOSH OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :middleSOSH OR "
                       + "                                                       dr.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN e.idofclient END)) AS reserve_middle "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :elderSOSH OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :elderSOSH OR "
                       + "                                                       dr.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN e.idofclient END)) AS reserve_elder "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :youngDOU1 OR "
                       + "                                                       dr.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR "
@@ -115,7 +100,7 @@ public class DirectorDiscountFoodReport extends BasicReport {
                       + "                                                       dr.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN e.idofclient END)) AS reserve_dou_young "
-                      + ",count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "   ,count (DISTINCT (CASE WHEN e.ordertype IN (:reserve,:change) AND (dr.categoriesdiscounts LIKE :elderDOU1 OR "
                       + "                                                       dr.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
                       + "                                                       dr.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "

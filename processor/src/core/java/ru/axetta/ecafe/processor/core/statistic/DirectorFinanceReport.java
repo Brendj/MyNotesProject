@@ -34,37 +34,12 @@ public class DirectorFinanceReport extends BasicReport {
 
     private final List<DirectorFinanceEntry> items;
     private Boolean allOO;
-    private static final Double barTopMargin = 2.D;
 
     public static class Builder {
         public DirectorFinanceReport build(Session session, Date startDate, Date endDate, List<Long> idsOfOrg, Boolean allOO) throws Exception {
             Date generateTime = new Date();
 
             List<DirectorFinanceEntry> entries = new ArrayList<DirectorFinanceEntry>();
-
-            //String sqlQuery =
-            //        "SELECT o.idoforg, o.shortnameinfoservice, o.shortaddress, "
-            //      + "   CASE WHEN e.ordertype=:abonementOrder THEN :abonementPlan "
-            //      + "       WHEN e.ordertype=:paidOrder THEN :payPlan "
-            //      + "       WHEN e.ordertype IN (:unknownPlan,:defaultPlan) AND (od.menutype BETWEEN :complexMin AND :compexMax) THEN :buffetPlan "
-            //      + "       WHEN e.ordertype IN (:unknownPlan,:defaultPlan,:vending) AND (od.menutype NOT BETWEEN :complexMin AND :compexMax) THEN :buffetVendingPlan "
-            //      + "   END AS TIP, "
-            //      + "   sum (CASE WHEN e.idofclientgroup <:employees AND od.rprice>0 THEN (od.rprice * od.qty) END) / 100 AS s2_FIN_OBUCH, "
-            //      + "   sum (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) AND od.rprice>0 THEN "
-            //      + "           (od.rprice * od.qty) END) / 100 AS s2_FIN_SOTR, "
-            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup <:employees  THEN e.idofclient END)) AS Kol_OBUCH, "
-            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) THEN "
-            //      + "           e.idofclient END)) AS Kol_SOTR, "
-            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup <:employees  THEN e.idoforder END)) AS Kol_ZAKAZ_OBUCH, "
-            //      + "   count (DISTINCT (CASE WHEN e.idofclientgroup IN (:employees,:administration,:tech_employees,:others,:employee,:parents,:visitors) THEN "
-            //      + "           e.idoforder END)) AS Kol_ZAKAZ_SOTR "
-            //      + "FROM cf_orgs o "
-            //      + "LEFT JOIN cf_orders e ON o.idoforg=e.idoforg AND e.idofclient IS NOT NULL AND e.socdiscount=0 AND e.state=:state_commited AND e.createddate>=:startDate "
-            //      + "   AND e.createddate<:endDate "
-            //      + "LEFT JOIN cf_orderdetails od ON o.idoforg=od.idoforg AND od.idoforder=e.idoforder "
-            //      + "WHERE o.idoforg IN (:idsOfOrg) "
-            //      + "GROUP BY o.shortnameinfoservice, TIP, o.shortaddress, o.idoforg, e.ordertype "
-            //      + "ORDER BY e.ordertype, tip";
 
             for (Long idOfOrg : idsOfOrg) {
                 String sqlQuery =

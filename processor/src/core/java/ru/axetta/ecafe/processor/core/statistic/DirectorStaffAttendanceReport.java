@@ -41,20 +41,6 @@ public class DirectorStaffAttendanceReport extends BasicReport {
             Date generateTime = new Date();
             List<DirectorStaffAttendanceEntry> entries = new ArrayList<DirectorStaffAttendanceEntry>();
 
-            //String sqlQuery =
-            //        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress "
-            //      + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:employees,:administration) THEN e.idofclient END)) AS s2_VOSHLI_SOTR "
-            //      + " ,count (DISTINCT (CASE WHEN e.idofclient IS NOT NULL AND e.idofclientgroup IN (:tech_employees,:others,:employee) THEN e.idofclient END)) AS s3_VOSHLI_TEHPERS "
-            //      + " ,count (DISTINCT (CASE WHEN c.idofclientgroup IN (:employees,:administration) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS s4_NE_VOSHLI_SOTR "
-            //      + " ,count (DISTINCT (CASE WHEN c.idofclientgroup IN (:tech_employees,:others,:employee) AND e.idofenterevent IS NULL THEN c.idofclient END)) AS s5_NE_VOSHLI_TEHPERS "
-            //      + " ,count (DISTINCT (CASE WHEN e.idofclientgroup IN (:visitors)  THEN e.idofclient END)) AS s6_VOSHLI_POSETITELI "
-            //      + " ,count (DISTINCT (CASE WHEN e.idofclientgroup IN (:parents) THEN e.idofclient END)) AS s7_VOSHLI_RODITELI "
-            //      + "FROM cf_clients c "
-            //      + "LEFT JOIN cf_orgs o ON c.idoforg=o.idoforg "
-            //      + "LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
-            //      + "WHERE (c.idofclientgroup >=:employees OR e.idofclientgroup <= :deleted) AND o.idoforg IN (:idsOfOrg) "
-            //      + "GROUP BY o.shortnameinfoservice, o.idoforg, o.organizationtype, o.shortname, o.shortaddress";
-
             for (Long idOfOrg : idsOfOrg) {
                 String sqlQuery =
                         "SELECT s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress, sum(s.administration) AS administration, "
@@ -81,7 +67,7 @@ public class DirectorStaffAttendanceReport extends BasicReport {
                       + "       0 AS visitor, 0 AS parent "
                       + "   FROM cf_orgs o "
                       + "   LEFT JOIN cf_clients c ON c.idoforg=o.idoforg AND (c.idofclientgroup>=:employees AND c.idofclientgroup<=:deleted) "
-                      + "   LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate "
+                      + "   LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.idoforg=o.idoforg AND e.evtdatetime>=:startDate "
                       + "                              AND e.evtdatetime<:endDate  AND e.passdirection=0 "
                       + "                              AND (e.idofclientgroup>=:employees AND e.idofclientgroup<=:deleted) "
                       + "   WHERE o.idoforg=:idOfOrg "

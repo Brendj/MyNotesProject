@@ -36,10 +36,6 @@ public class DirectorStudentAttendanceReport extends BasicReport {
 
     private final List<DirectorStudentAttendanceEntry> items;
 
-    private static final Long youngSOSH = -90L; // начальные СОШ
-    private static final Long middleSOSH = -91L; // средние СОШ
-    private static final Long elderSOSH = -92L; // старшие СОШ
-
     private static final Long youngDOU1 = 105L; // 1.5-3 ДОУ
     private static final Long youngDOU2 = 123L; // 1.5-3 ДОУ
     private static final Long elderDOU1 = 106L; // 3-7 ДОУ
@@ -53,20 +49,8 @@ public class DirectorStudentAttendanceReport extends BasicReport {
                 throws Exception {
             Date generateTime = new Date();
             List<DirectorStudentAttendanceEntry> entries = new ArrayList<DirectorStudentAttendanceEntry>();
-
-            //String sqlQuery =
-            //        "SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, c.categoriesdiscounts, "
-            //                + "count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL  THEN e.idofclient END)) AS PRISHLO, "
-            //                + "count (DISTINCT (CASE WHEN e.idofenterevent IS  NULL  THEN c.idofclient END)) AS NE_PRISHLO "
-            //                + "FROM cf_orgs o "
-            //                + "LEFT JOIN cf_clients c ON c.idoforg=o.idoforg "
-            //                + "LEFT JOIN cf_enterevents e ON e.idofclient=c.idofclient AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
-            //                + "WHERE (c.idofclientgroup<:employees OR c.idofclientgroup > :deleted) "
-            //                + "AND o.idoforg IN (:idsOfOrg) AND c.categoriesdiscounts <> '' "
-            //                + "GROUP BY o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress, c.categoriesdiscounts";
-
             for (Long idOfOrg : idsOfOrg) {
-                String sqlQuery =
+                 String sqlQuery =
                         "SELECT s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress, "
                       + "       sum(come_in_young) AS come_in_young, sum(come_in_middle) AS come_in_middle, sum(come_in_elder) AS come_in_elder, "
                       + "       sum(come_in_dou_young) AS come_in_dou_young, sum(come_in_dou_elder) AS come_in_dou_elder, "
@@ -74,94 +58,99 @@ public class DirectorStudentAttendanceReport extends BasicReport {
                       + "       sum(ex_come_in_elder) AS ex_come_in_elder, sum(ex_come_in_dou_young) AS ex_come_in_dou_young, "
                       + "       sum(ex_come_in_dou_elder) AS ex_come_in_dou_elder "
                       + "FROM ( "
-                      + "   SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, "
-                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :youngSOSH OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :youngSOSH || ',%' OR"
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN e.idofclient END)) AS come_in_young, "
-                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :middleSOSH OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN e.idofclient END)) AS come_in_middle, "
-                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :elderSOSH OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN e.idofclient END)) AS come_in_elder, "
-                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :youngDOU1 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR"
-                      + "                                                                        c.categoriesdiscounts LIKE :youngDOU2 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN e.idofclient END)) AS come_in_dou_young, "
-                      + "           count (DISTINCT (CASE WHEN e.idofenterevent IS NOT NULL AND (c.categoriesdiscounts LIKE :elderDOU1 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :elderDOU2 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
-                      + "                                                                        c.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN e.idofclient END)) AS come_in_dou_elder, "
-                      + "           0 AS ex_come_in_young, 0 AS ex_come_in_middle, 0 AS ex_come_in_elder, 0 AS ex_come_in_dou_young, 0 AS ex_come_in_dou_elder "
+                      + "   SELECT DISTINCT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:sosh AND "
+                      + "                       (CAST ((SELECT SUBSTRING(g.groupname, '(\\d{1,2})-{0,1}[А-Яа-я{1}]')) AS INTEGER) BETWEEN 1 AND 4) "
+                      + "                       THEN e.idofclient END)) AS come_in_young, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:sosh AND "
+                      + "                       (CAST ((SELECT SUBSTRING(g.groupname, '(\\d{1,2})-{0,1}[А-Яа-я{1}]')) AS INTEGER) BETWEEN 5 AND 9) "
+                      + "                       THEN e.idofclient END)) AS come_in_middle, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:sosh AND "
+                      + "                       (CAST ((SELECT SUBSTRING(g.groupname, '(\\d{1,2})-{0,1}[А-Яа-я{1}]')) AS INTEGER) BETWEEN 10 AND 11) "
+                      + "                       THEN e.idofclient END)) AS come_in_elder, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:dou AND (c.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :youngDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') "
+                      + "                       THEN e.idofclient END)) AS come_in_dou_young, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:dou AND (c.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :elderDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') "
+                      + "                       THEN e.idofclient END)) AS come_in_dou_elder, "
+                      + "       0 AS ex_come_in_young, 0 AS ex_come_in_middle, 0 AS ex_come_in_elder, 0 AS ex_come_in_dou_young, 0 AS ex_come_in_dou_elder "
                       + "   FROM cf_orgs o "
-                      + "   LEFT JOIN cf_enterevents e ON e.idoforg=o.idoforg AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate AND e.passdirection=:direction "
-                      + "   LEFT JOIN cf_clients c ON c.idofclient=e.idofclient AND (c.idofclientgroup<:employees OR c.idofclientgroup>:deleted) AND c.categoriesdiscounts <> '' "
+                      + "   LEFT JOIN cf_enterevents e ON e.idoforg=o.idoforg AND e.evtdatetime>=:startDate AND e.evtdatetime<:endDate "
+                      + "       AND e.passdirection=:direction AND e.idofenterevent IS NOT NULL "
+                      + "   LEFT JOIN cf_clients c ON c.idofclient=e.idofclient AND c.idofclientgroup<:employees "
+                      + "   INNER JOIN cf_clientgroups g ON g.idofclientgroup=c.idofclientgroup AND c.idoforg=g.idoforg "
+                      + "       AND g.groupname SIMILAR TO '\\d{1,2}-{0,1}[А-Яа-я{1}]' "
+                      + "   INNER JOIN cf_orgs co ON co.idoforg=c.idoforg "
                       + "   WHERE o.idoforg=:idOfOrg "
                       + "   GROUP BY o.idoforg, o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress "
                       + "   UNION ALL "
                       + "   SELECT o.idoforg, o.organizationtype, o.shortnameinfoservice, o.shortname, o.shortaddress, 0 AS come_in_young, "
-                      + "           0 AS come_in_middle, 0 AS come_in_elder, 0 AS come_in_dou_young, 0 AS come_in_dou_elder, "
-                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :youngSOSH OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :youngSOSH || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngSOSH OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngSOSH || ',%') THEN c.idofclient END)) AS ex_come_in_young, "
-                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :middleSOSH OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :middleSOSH || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :middleSOSH OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :middleSOSH || ',%') THEN c.idofclient END)) AS ex_come_in_middle, "
-                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :elderSOSH OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :elderSOSH || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderSOSH OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderSOSH || ',%') THEN c.idofclient END)) AS ex_come_in_elder, "
-                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :youngDOU1 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR"
-                      + "                                                                     c.categoriesdiscounts LIKE :youngDOU2 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') THEN c.idofclient END)) AS ex_come_in_dou_young, "
-                      + "           count (DISTINCT (CASE WHEN ne.idofenterevent IS NULL AND (c.categoriesdiscounts LIKE :elderDOU1 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :elderDOU2 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
-                      + "                                                                     c.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') THEN c.idofclient END)) AS ex_come_in_dou_elder "
+                      + "       0 AS come_in_middle, 0 AS come_in_elder, 0 AS come_in_dou_young, 0 AS come_in_dou_elder, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:sosh AND "
+                      + "                       (CAST ((SELECT SUBSTRING(g.groupname, '(\\d{1,2})-{0,1}[А-Яа-я{1}]')) AS INTEGER) BETWEEN 1 AND 4) "
+                      + "                       THEN c.idofclient END)) AS ex_come_in_young, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:sosh AND "
+                      + "                       (CAST ((SELECT SUBSTRING(g.groupname, '(\\d{1,2})-{0,1}[А-Яа-я{1}]')) AS INTEGER) BETWEEN 5 AND 9) "
+                      + "                       THEN c.idofclient END)) AS ex_come_in_middle, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:sosh AND "
+                      + "                       (CAST ((SELECT SUBSTRING(g.groupname, '(\\d{1,2})-{0,1}[А-Яа-я{1}]')) AS INTEGER) BETWEEN 10 AND 11) "
+                      + "                       THEN c.idofclient END)) AS ex_come_in_elder,"
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:dou AND (c.categoriesdiscounts LIKE :youngDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :youngDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :youngDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :youngDOU2 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :youngDOU2 || ',%') "
+                      + "                       THEN c.idofclient END)) AS ex_come_in_dou_young, "
+                      + "       count (DISTINCT (CASE WHEN co.organizationtype=:dou AND (c.categoriesdiscounts LIKE :elderDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :elderDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU1 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU1 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :elderDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE :elderDOU2 || ',%' OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU2 OR "
+                      + "                                                                    c.categoriesdiscounts LIKE '%,' || :elderDOU2 || ',%') "
+                      + "                       THEN c.idofclient END)) AS ex_come_in_dou_elder "
                       + "   FROM cf_orgs o "
-                      + "   LEFT JOIN cf_clients c ON c.idoforg=o.idoforg AND (c.idofclientgroup<:employees OR c.idofclientgroup>:deleted) AND c.categoriesdiscounts <> '' "
-                      + "   LEFT JOIN cf_enterevents ne ON ne.idofclient=c.idofclient AND ne.idoforg=c.idoforg AND ne.evtdatetime>=:startDate AND ne.evtdatetime<:endDate AND ne.passdirection=:direction "
+                      + "   LEFT JOIN cf_clients c ON c.idoforg=o.idoforg AND c.idofclientgroup<:employees "
+                      + "   LEFT JOIN cf_enterevents ne ON ne.idofclient=c.idofclient AND ne.idoforg=c.idoforg "
+                      + "       AND ne.evtdatetime>=:startDate AND ne.evtdatetime<:endDate AND ne.passdirection=:direction "
+                      + "       AND ne.idofenterevent IS NULL "
+                      + "   INNER JOIN cf_clientgroups g ON g.idofclientgroup=c.idofclientgroup AND c.idoforg=g.idoforg "
+                      + "       AND g.groupname SIMILAR TO '\\d{1,2}-{0,1}[А-Яа-я{1}]' "
+                      + "   INNER JOIN cf_orgs co ON co.idoforg=c.idoforg "
                       + "   WHERE o.idoforg=:idOfOrg "
                       + "   GROUP BY o.idoforg, o.organizationtype, o.shortnameinfoservice, o.idoforg, o.shortname, o.shortaddress "
                       + ") s "
-                      + "GROUP BY s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress";
+                      + "GROUP BY s.idoforg, s.organizationtype, s.shortnameinfoservice, s.shortname, s.shortaddress;";
 
                 Query query = session.createSQLQuery(sqlQuery);
                 query.setParameter("startDate", startDate.getTime());
                 query.setParameter("endDate", endDate.getTime());
                 query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                query.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
                 query.setParameter("idOfOrg", idOfOrg);
                 query.setParameter("direction", EnterEvent.ENTRY);
-                query.setParameter("youngSOSH", youngSOSH.toString());
-                query.setParameter("middleSOSH", middleSOSH.toString());
-                query.setParameter("elderSOSH", elderSOSH.toString());
                 query.setParameter("youngDOU1", youngDOU1.toString());
                 query.setParameter("elderDOU1", elderDOU1.toString());
                 query.setParameter("youngDOU2", youngDOU2.toString());
                 query.setParameter("elderDOU2", elderDOU2.toString());
+                query.setParameter("sosh", OrganizationType.SCHOOL.getCode());
+                query.setParameter("dou", OrganizationType.KINDERGARTEN.getCode());
 
                 List resultList = query.list();
 
