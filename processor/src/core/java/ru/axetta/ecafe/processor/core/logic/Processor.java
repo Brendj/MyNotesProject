@@ -4691,8 +4691,8 @@ public class Processor implements SyncProcessor {
     private void linkBasket(Session session, MenuDetail menuDetail, String guidBasket, Long idOfOrg) {
         GoodsBasicBasket basicBasket = DAOUtils.findBasicGood(session, guidBasket);
         if (basicBasket != null) {
-            GoodBasicBasketPrice basicBasketPrice = DAOUtils.findGoodBasicBasketPrice(session, basicBasket, idOfOrg);
-            if (basicBasketPrice != null) {
+            List<GoodBasicBasketPrice> basicBasketPriceList = DAOUtils.findGoodBasicBasketPrice(session, basicBasket, idOfOrg);
+            for (GoodBasicBasketPrice basicBasketPrice : basicBasketPriceList) {
                 basicBasketPrice.setMenuDetail(menuDetail);
                 basicBasketPrice.setPrice(menuDetail.getPrice());
                 basicBasketPrice.setLastUpdate(new Date());

@@ -294,14 +294,14 @@ public class DAOUtils {
         return findClientBySan(em.unwrap(Session.class), san);
     }
 
-    public static GoodBasicBasketPrice findGoodBasicBasketPrice(Session persistenceSession, GoodsBasicBasket basicBasket, Long idOfOrg) {
+    public static List<GoodBasicBasketPrice> findGoodBasicBasketPrice(Session persistenceSession, GoodsBasicBasket basicBasket, Long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(GoodBasicBasketPrice.class);
         criteria.add(Restrictions.eq("goodsBasicBasket", basicBasket));
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.ne("deletedState", true));
         criteria.addOrder(org.hibernate.criterion.Order.desc("globalVersion"));
         criteria.setMaxResults(1); //возвращаем максимальную по номеру версии запись, если записей несколько
-        return (GoodBasicBasketPrice)criteria.uniqueResult();
+        return criteria.list();
     }
 
     public static GoodsBasicBasket findBasicGood(Session persistenceSession, String guidOfBasicGood) {

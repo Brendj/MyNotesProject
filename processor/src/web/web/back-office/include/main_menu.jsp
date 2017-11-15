@@ -1361,6 +1361,10 @@
                             binding="#{basicBasketReportPage.mainMenuComponent}" label="Отчет по базовой корзине"
                             action="#{basicBasketReportPage.show}" reRender="workspaceForm"/>
 
+        <rich:panelMenuItem id="paymentsBetweenContragentsReportMenuItem"
+                            binding="#{paymentsBetweenContragentsReportPage.mainMenuComponent}" label="Отчет по объемам оплат между поставщиками питания"
+                            action="#{paymentsBetweenContragentsReportPage.show}" reRender="workspaceForm"/>
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="cardGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardGroupPage"--%>

@@ -139,14 +139,13 @@ public class SyncRequest {
                     String disablePlanCreationDateSt = getStringValueNullSafe(namedNodeMap, "DisablePlanCreationDate");
                     Date disablePlanCreationDate = null;
                     if(StringUtils.isNotEmpty(disablePlanCreationDateSt)) {
-                        disablePlanCreationDate = loadContext.getTimeFormat()
-                                .parse(namedNodeMap.getNamedItem("DisablePlanCreationDate").getTextContent());
+                        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                        disablePlanCreationDate = df.parse(disablePlanCreationDateSt);
                     }
                     String disablePlanEndDateSt = getStringValueNullSafe(namedNodeMap, "DisablePlanEndDate");
                     Date disablePlanEndDate = null;
                     if(StringUtils.isNotEmpty(disablePlanEndDateSt)) {
-                        disablePlanEndDate = loadContext.getTimeFormat()
-                                .parse(namedNodeMap.getNamedItem("DisablePlanEndDate").getTextContent());
+                        disablePlanEndDate = loadContext.getTimeFormat().parse(disablePlanEndDateSt);
                     }
                     Long orgOwner = getLongValueNullSafe(namedNodeMap, "OrgId");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
