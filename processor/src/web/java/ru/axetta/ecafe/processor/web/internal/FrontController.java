@@ -138,6 +138,26 @@ public class FrontController extends HttpServlet {
                 loadRegistryChangeItemsV2(idOfOrg, revisionDate, af, nameFilter);
     }
 
+    @WebMethod(operationName = "loadRegistryChangeEmployeeItemsV2")
+    public List<RegistryChangeItemV2> loadRegistryChangeEmployeeItemsV2(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+            @WebParam(name = "nameFilter") String nameFilter) {
+        try {
+            checkRequestValidity(idOfOrg);
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
+        Integer af = actionFilter;
+        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            af = null;
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeItemsEmployeeV2(idOfOrg, revisionDate, af, nameFilter);
+    }
+
     @WebMethod(operationName = "loadRegistryChangeItemsInternal")
     public List<RegistryChangeItem> loadRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg,
             @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
@@ -328,6 +348,18 @@ public class FrontController extends HttpServlet {
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeRevisions(idOfOrg);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeEmployeeRevisions")
+    public List<RegistryChangeRevisionItem> loadRegistryChangeEmployeeRevisions(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            checkRequestValidity(idOfOrg);
+        } catch(FrontControllerException fce) {
+            logger.error("Failed to pass auth", fce);
+            return Collections.EMPTY_LIST;
+        }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryEmployeeChangeRevisions(idOfOrg);
     }
 
     @WebMethod(operationName = "loadRegistryChangeEmployeeRevisionsInternal")
