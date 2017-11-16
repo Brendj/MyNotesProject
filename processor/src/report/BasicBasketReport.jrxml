@@ -64,22 +64,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 				<crosstabHeaderCell>
-					<cellContents>
-						<textField>
-							<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="261" height="28" uuid="ecf1d38e-c552-41c6-8212-9878afbc6729"/>
-							<box>
-								<pen lineWidth="1.0"/>
-								<topPen lineWidth="1.0"/>
-								<leftPen lineWidth="1.0"/>
-								<bottomPen lineWidth="1.0"/>
-								<rightPen lineWidth="1.0"/>
-							</box>
-							<textElement verticalAlignment="Middle">
-								<font size="11"/>
-							</textElement>
-							<textFieldExpression><![CDATA["Элемент базовой корзины"]]></textFieldExpression>
-						</textField>
-					</cellContents>
+					<cellContents/>
 				</crosstabHeaderCell>
 				<rowGroup name="nameOfGood" width="262">
 					<bucket class="java.lang.String">
@@ -127,7 +112,7 @@
 								<textFieldExpression><![CDATA[$V{netWeightMeasure}]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="0" width="135" height="42" uuid="68419af1-53ab-4826-baad-b314e467a3e7"/>
+								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="135" height="41" uuid="68419af1-53ab-4826-baad-b314e467a3e7"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -141,7 +126,7 @@
 								<textFieldExpression><![CDATA["Наименование базового товара"]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="135" y="0" width="62" height="42" uuid="47705d7e-d9c9-4ea6-b808-0e3f08d0b759"/>
+								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="135" y="1" width="62" height="41" uuid="47705d7e-d9c9-4ea6-b808-0e3f08d0b759"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -155,7 +140,7 @@
 								<textFieldExpression><![CDATA["Единица измерения"]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="197" y="0" width="64" height="42" uuid="35ac51a5-a35e-463e-88c4-b6e7b9f83cab"/>
+								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="197" y="1" width="64" height="41" uuid="35ac51a5-a35e-463e-88c4-b6e7b9f83cab"/>
 								<box>
 									<pen lineWidth="1.0"/>
 									<topPen lineWidth="1.0"/>
@@ -183,20 +168,6 @@
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#FFFFFF"/>
 							</box>
-							<textField>
-								<reportElement style="Crosstab Data Text" isPrintRepeatedValues="false" x="0" y="1" width="321" height="28" uuid="9d26a64a-94cc-4f89-8aee-750c083842b9"/>
-								<box>
-									<pen lineWidth="1.0"/>
-									<topPen lineWidth="1.0"/>
-									<leftPen lineWidth="1.0"/>
-									<bottomPen lineWidth="1.0"/>
-									<rightPen lineWidth="1.0"/>
-								</box>
-								<textElement verticalAlignment="Middle">
-									<font size="11"/>
-								</textElement>
-								<textFieldExpression><![CDATA["Конфигурация поставщика питания"]]></textFieldExpression>
-							</textField>
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
@@ -226,7 +197,7 @@
 				<measure name="rpriceMeasure" class="java.lang.Long">
 					<measureExpression><![CDATA[$F{rprice}]]></measureExpression>
 				</measure>
-				<measure name="nameOfConfigurationProviderMeasure" class="java.lang.String">
+				<measure name="nameOfConfigurationProviderMeasure" class="java.lang.String" calculation="First">
 					<measureExpression><![CDATA[$F{nameOfConfigurationProvider}]]></measureExpression>
 				</measure>
 				<crosstabCell width="322" height="151">
