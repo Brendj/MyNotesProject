@@ -6,3 +6,5 @@
 
 --Дата окончания блокировки плана
 ALTER TABLE cf_clients ADD COLUMN disablePlanEndDate bigint;
+
+--! ФИНАЛИЗИРОВАН (Семенов, 171116) НЕ МЕНЯТЬ
