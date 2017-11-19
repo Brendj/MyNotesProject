@@ -297,6 +297,8 @@ public class TotalServicesReport extends BasicReport {
             loadCurrentClientsCount();
             // Получение количества учеников получивших льготное питание
             loadBenefitClientsGotFeed();
+            // Получение количества учеников их чужих школ, получивших льготное питание
+            loadBenefitClientsOtherOrgsGotFeed();
             // Получение количества получивших платное комплексное питание
             loadPaidClientsGotFeed();
             // Получение количества клиентов получивших платное питание в буфете
@@ -418,17 +420,6 @@ public class TotalServicesReport extends BasicReport {
 
         private void loadBenefitClientsGotFeed() {
 
-            //String realBenefitClientsCountForBuilingsPQ =
-            //        "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " + " FROM cf_orders "
-            //                + " LEFT JOIN cf_orderdetails ON cf_orders.idoforder = cf_orderdetails.idoforder and cf_orders.idoforg = cf_orderdetails.idoforg "
-            //                + " LEFT JOIN cf_clients ON cf_clients.idofclient = cf_orders.idofclient " + " WHERE "
-            //                + "     cf_orderdetails.menutype between " + OrderDetail.TYPE_COMPLEX_MIN + " and "
-            //                + OrderDetail.TYPE_COMPLEX_MAX + "     AND cf_orders.state = 0 "
-            //                + "     AND cf_orders.ordertype in (4, 6) " + "     AND cf_clients.idOfClientGroup < "
-            //                + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-            //                + "     AND cf_orders.createddate between " + startDate.getTime() + " and " + endDate
-            //                .getTime() + "     AND " + orgConditionWithCFORDERS + "group by cf_orders.idoforg";
-
             Criteria criteria = session.createCriteria(OrderDetail.class);
             criteria.createAlias("order", "o");
             criteria.createAlias("order.client", "cl");
@@ -451,6 +442,33 @@ public class TotalServicesReport extends BasicReport {
             criteria.setProjection(Projections.countDistinct("cl.idOfClient"));
             List resultList = criteria.list();
             totalEntry.setRealBenefitClientsCount((Long) resultList.get(0));
+        }
+
+        private void loadBenefitClientsOtherOrgsGotFeed() {
+
+            Criteria criteria = session.createCriteria(OrderDetail.class);
+            criteria.createAlias("order", "o");
+            criteria.createAlias("order.client", "cl");
+            criteria.add(Restrictions.between("menuType", OrderDetail.TYPE_COMPLEX_MIN, OrderDetail.TYPE_COMPLEX_MAX));
+            criteria.add(Restrictions.eq("o.state", 0));
+            criteria.add(Restrictions.in("o.orderType", getBenefitOrderTypes()));
+            criteria.add(Restrictions.lt("cl.idOfClientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()));
+            criteria.add(Restrictions.between("o.createTime", startDate, endDate));
+            criteria.add(Restrictions.in("o.org.idOfOrg", idOfOrgList));
+            criteria.add(Restrictions.not(Restrictions.in("cl.org.idOfOrg", idOfOrgList)));
+            criteria.setProjection(Projections.projectionList()
+                    .add(Projections.groupProperty("o.org.idOfOrg"))
+                    .add(Projections.countDistinct("cl.idOfClient")));
+            if (showBuildingDetails) {
+                List resultList = criteria.list();
+                for (Object result : resultList) {
+                    Object e[] = (Object[]) result;
+                    entries.get(e[0]).setRealBenefitClientsOtherOrgsCount((Long) e[1]);
+                }
+            }
+            criteria.setProjection(Projections.countDistinct("cl.idOfClient"));
+            List resultList = criteria.list();
+            totalEntry.setRealBenefitClientsOtherOrgsCount((Long) resultList.get(0));
         }
 
         private void loadPaidClientsGotFeed() {
@@ -578,6 +596,7 @@ public class TotalServicesReport extends BasicReport {
         private String per_currentClientsCount = "0,00 %";
         private Long realBenefitClientsCount = 0L;
         private String per_realBenefitClientsCount = "0,00 %";
+        private Long realBenefitClientsOtherOrgsCount = 0L;
         private Long realPaidClientsCount = 0L;
         private String per_realPaidClientsCount = "0,00 %";
         private Long realSnackPaidClientsCount = 0L;
@@ -729,6 +748,14 @@ public class TotalServicesReport extends BasicReport {
             this.per_uniqueClientsCount =
                     new BigDecimal(totalClientsCount == 0 ? 0 : uniqueClientsCount.doubleValue() / totalClientsCount * 100).
                             setScale(2, BigDecimal.ROUND_HALF_DOWN).toString() + "%";
+        }
+
+        public Long getRealBenefitClientsOtherOrgsCount() {
+            return realBenefitClientsOtherOrgsCount;
+        }
+
+        public void setRealBenefitClientsOtherOrgsCount(Long realBenefitClientsOtherOrgsCount) {
+            this.realBenefitClientsOtherOrgsCount = realBenefitClientsOtherOrgsCount;
         }
     }
 }

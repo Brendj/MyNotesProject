@@ -50,28 +50,31 @@
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="№" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3">
                         <h:outputText styleClass="column-header" escape="true" value="Организация" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3">
                         <h:outputText styleClass="column-header" escape="true" value="Число учащихся" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Число льготников" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Зафиксирован проход" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Получили льготное питание" />
+                    <rich:column headerClass="center-aligned-column" rowspan="3" colspan="2">
+                        <h:outputText styleClass="column-header" escape="true" value="Получили льготное питание всего" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3">
+                        <h:outputText styleClass="column-header" escape="true" value="Получили льготное питание временно обучающиеся в данной ОО" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="3" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Получили комплексное питание" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Получили питание в буфете" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="3" colspan="2">
                         <h:outputText styleClass="column-header" escape="true" value="Получили питание (льготное + платное)" />
                     </rich:column>
                 </rich:columnGroup>
@@ -102,6 +105,9 @@
             </rich:column>
             <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.per_realBenefitClientsCount}" />
+            </rich:column>
+            <rich:column styleClass="center-aligned-column">
+                <h:outputText styleClass="output-text" value="#{item.realBenefitClientsOtherOrgsCount}" />
             </rich:column>
             <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{item.realPaidClientsCount}" />
