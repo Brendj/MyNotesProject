@@ -94,6 +94,7 @@ public class BasicGoodEditPage extends AbstractEditPage<BasicGoodItem> implement
             }
             Boolean result = daoService.updateBasicGood(currentItem.getIdOfBasicGood(), currentItem.getNameOfGood(), currentItem.getUnitsScale(), currentItem.getNetWeight(), list);
             if(result){
+                reload();
                 getSelectedEntityGroupPage().setCurrentEntityItem(currentItem);
                 printMessage(currentItem + " успешно изменен.");
             }

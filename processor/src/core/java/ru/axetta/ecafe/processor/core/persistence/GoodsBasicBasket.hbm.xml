@@ -9,15 +9,15 @@
         </id>
         <property name="guid" column="Guid" type="string" not-null="true" update="false"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
-        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
-        <property name="nameOfGood" column="NameOfGood" type="string" not-null="true" update="false" length="512"/>
+        <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="nameOfGood" column="NameOfGood" type="string" not-null="true" length="512"/>
         <property name="unitsScale" column="UnitsScale">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
                 <param name="type">4</param>
             </type>
         </property>
-        <property name="netWeight" column="NetWeight" type="long" not-null="true" update="false"/>
+        <property name="netWeight" column="NetWeight" type="long" not-null="true" />
 
         <set name="good" lazy="true" inverse="true">
             <key>
