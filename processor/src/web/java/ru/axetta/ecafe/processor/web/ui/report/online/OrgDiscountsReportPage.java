@@ -40,6 +40,7 @@ public class OrgDiscountsReportPage extends OnlineReportPage implements Complete
     private String htmlReport;
     private Boolean showReserve = false;
     private Boolean showPayComplex = false;
+    private Boolean showDSZN = false;
     private String orgFilter;
 
     public String getHtmlReport() {
@@ -70,6 +71,7 @@ public class OrgDiscountsReportPage extends OnlineReportPage implements Complete
         builder.getReportProperties().setProperty("showReserve", Boolean.toString(showReserve));
         builder.getReportProperties().setProperty("showPayComplex", Boolean.toString(showPayComplex));
         builder.getReportProperties().setProperty("orgFilter", orgFilter);
+        builder.getReportProperties().setProperty("showDSZN", Boolean.toString(showDSZN));
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
@@ -178,5 +180,13 @@ public class OrgDiscountsReportPage extends OnlineReportPage implements Complete
 
     public void setShowPayComplex(Boolean showPayComplex) {
         this.showPayComplex = showPayComplex;
+    }
+
+    public Boolean getShowDSZN() {
+        return showDSZN;
+    }
+
+    public void setShowDSZN(Boolean showDSZN) {
+        this.showDSZN = showDSZN;
     }
 }

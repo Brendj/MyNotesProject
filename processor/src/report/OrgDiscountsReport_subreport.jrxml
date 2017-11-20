@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport_subreport" pageWidth="600" pageHeight="550" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6d9975e9-71de-477b-b056-b6d098216c93">
-	<property name="ireport.zoom" value="1.3310000000000004"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport_subreport" pageWidth="640" pageHeight="550" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="640" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="6d9975e9-71de-477b-b056-b6d098216c93">
+	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
@@ -46,6 +46,8 @@
 	<subDataset name="Table Dataset 1" uuid="6e86434a-18b1-4dcc-a09d-283991821722">
 		<field name="name" class="java.lang.String"/>
 		<field name="category" class="java.lang.String"/>
+		<field name="dsznDiscount" class="java.lang.String"/>
+		<field name="number" class="java.lang.Integer"/>
 	</subDataset>
 	<subDataset name="Table Dataset 2" uuid="cb80af3c-bc6d-41fc-b04b-ec2b984e3219">
 		<field name="category" class="java.lang.String"/>
@@ -58,6 +60,9 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\projects\\jboss7\\processor\\src\\report\\"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="showDSZN" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+	</parameter>
 	<field name="groupName" class="java.lang.String"/>
 	<field name="categoryItemGroup" class="java.util.List"/>
 	<field name="clientItemList" class="java.util.List"/>
@@ -67,7 +72,7 @@
 	<columnHeader>
 		<band height="20">
 			<staticText>
-				<reportElement uuid="c51cf688-38d5-4727-8cec-eba2107f8f8e" x="0" y="0" width="600" height="20">
+				<reportElement uuid="c51cf688-38d5-4727-8cec-eba2107f8f8e" x="0" y="0" width="640" height="20">
 					<printWhenExpression><![CDATA[new Boolean($F{groupName}==null)]]></printWhenExpression>
 				</reportElement>
 				<box leftPadding="15">
@@ -87,27 +92,80 @@
 	<detail>
 		<band height="25" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="46927850-db00-411d-97fc-ca1ec93ff0fc" style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="600" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
+				<reportElement uuid="46927850-db00-411d-97fc-ca1ec93ff0fc" style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="40" y="0" width="600" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.FALSE )]]></printWhenExpression>
+				</reportElement>
 				<box leftPadding="15"/>
-				<textElement verticalAlignment="Bottom">
+				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Группа " + $F{groupName}]]></textFieldExpression>
 			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="46927850-db00-411d-97fc-ca1ec93ff0fc" style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="40" y="0" width="870" height="25" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Группа " + $F{groupName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="db285a90-fc62-4710-b01f-7995083f2dbc" style="table" x="0" y="0" width="40" height="25"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
 		</band>
 		<band height="40">
 			<componentElement>
-				<reportElement uuid="cf65e38b-e791-4dec-a17c-f5f6f6769020" key="table 1" style="table 1" stretchType="RelativeToTallestObject" x="0" y="0" width="600" height="40" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="cf65e38b-e791-4dec-a17c-f5f6f6769020" key="table 1" style="table 1" stretchType="RelativeToTallestObject" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
 					<datasetRun subDataset="Table Dataset 1" uuid="7bd649fc-1747-412b-9556-23028c1124b3">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{clientItemList})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="330" uuid="8a43159c-61a3-4aca-a87e-6205a12f23cf">
-						<jr:columnHeader style="table" height="20" rowSpan="1">
+					<jr:column uuid="e9af922c-d8e9-4455-9d25-8e89d1aef81b" width="40">
+						<jr:columnHeader height="40" rowSpan="1">
+							<box>
+								<pen lineWidth="1.0"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
 							<staticText>
-								<reportElement uuid="fd8e5678-372c-4957-b422-de71dbc9ab2f" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="9a97c261-177a-4c32-868f-790794b70cb5" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="40" isPrintWhenDetailOverflows="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14"/>
+								</textElement>
+								<text><![CDATA[№
+пп]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+								<reportElement uuid="4fc7d830-f37b-4962-9f3d-a981c95d4c88" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="40" height="20" isPrintWhenDetailOverflows="true" forecolor="#000000" backcolor="#FFFFFF"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None">
+									<font fontName="SansSerif" size="14" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+									<paragraph lineSpacing="Single"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="8a43159c-61a3-4aca-a87e-6205a12f23cf" width="330">
+						<jr:columnHeader style="table" height="40" rowSpan="1">
+							<staticText>
+								<reportElement uuid="fd8e5678-372c-4957-b422-de71dbc9ab2f" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="40" isPrintWhenDetailOverflows="true"/>
+								<box leftPadding="15"/>
+								<textElement verticalAlignment="Middle">
 									<font size="14"/>
 								</textElement>
 								<text><![CDATA[ФИО]]></text>
@@ -117,32 +175,68 @@
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="4fc7d830-f37b-4962-9f3d-a981c95d4c88" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="270" uuid="2646d8fd-cfb6-4804-a2a2-8d81c58aad98">
-						<jr:columnHeader style="table" height="20" rowSpan="1">
+					<jr:column uuid="2646d8fd-cfb6-4804-a2a2-8d81c58aad98" width="270">
+						<jr:columnHeader style="table" height="40" rowSpan="1">
 							<staticText>
-								<reportElement uuid="65c3e866-e85f-4377-badd-d49a641cca52" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="65c3e866-e85f-4377-badd-d49a641cca52" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="40" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14"/>
 								</textElement>
-								<text><![CDATA[Категории льгот]]></text>
+								<text><![CDATA[Категории льгот ИС ПП]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="889ccd60-4432-4a81-85f4-de9c17ec3ce0" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{category}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="d785afbc-e56d-42e3-9873-08810f3a716d" width="270">
+						<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+						<jr:columnHeader height="40" rowSpan="1">
+							<box>
+								<pen lineWidth="0.25"/>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<staticText>
+								<reportElement uuid="65c3e866-e85f-4377-badd-d49a641cca52" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="40" isPrintWhenDetailOverflows="true"/>
+								<box leftPadding="15"/>
+								<textElement verticalAlignment="Middle">
+									<font size="14" isUnderline="false"/>
+								</textElement>
+								<text><![CDATA[Категории льгот ДСЗН]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="889ccd60-4432-4a81-85f4-de9c17ec3ce0" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
+								<box leftPadding="15"/>
+								<textElement verticalAlignment="Middle">
+									<font size="14"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{dsznDiscount}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
@@ -151,17 +245,35 @@
 		</band>
 		<band height="40">
 			<componentElement>
-				<reportElement uuid="c596e66d-e0d8-4d32-9228-5462bcc0e003" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="600" height="40" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="c596e66d-e0d8-4d32-9228-5462bcc0e003" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
 					<datasetRun subDataset="Table Dataset 2" uuid="8e1de5e1-95cb-4ff0-84c5-0c65aae8dabb">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{categoryItemGroup})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="330" uuid="95d342fc-91bc-40ad-ac23-7f4bcdb06c19">
+					<jr:column uuid="b934c48a-c6c1-44cb-9a92-2c658717a5a3" width="40">
+						<jr:columnHeader height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="95d342fc-91bc-40ad-ac23-7f4bcdb06c19" width="330">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
 								<reportElement uuid="2cdc64ff-6320-4596-953f-a1a2718dd441" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Итого:]]></text>
@@ -171,19 +283,19 @@
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="1379d604-fe90-4053-9a40-9629e4b13942" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{category}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="270" uuid="c81fe89a-e8b0-4db1-b1d7-d83ff44ec2de">
+					<jr:column uuid="c81fe89a-e8b0-4db1-b1d7-d83ff44ec2de" width="270">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField evaluationTime="Report">
 								<reportElement uuid="a02e9c6a-f626-46c3-84e6-3c5283ea4a86" x="0" y="0" width="270" height="20"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{count}]]></textFieldExpression>
@@ -193,11 +305,44 @@
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="4d78882b-3312-400c-95b1-8c3428ef7542" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{totalByCategory}]]></textFieldExpression>
 							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="513f424c-1f0f-419f-a9db-7b6af7cb8828" width="270">
+						<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+						<jr:columnHeader height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="1.0"/>
+								<leftPen lineWidth="1.0"/>
+								<bottomPen lineWidth="1.0"/>
+								<rightPen lineWidth="1.0"/>
+							</box>
+							<staticText>
+								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" x="0" y="0" width="270" height="20"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+								</textElement>
+								<text><![CDATA[X]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<staticText>
+								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" x="0" y="0" width="270" height="20"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+								</textElement>
+								<text><![CDATA[X]]></text>
+							</staticText>
 						</jr:detailCell>
 					</jr:column>
 				</jr:table>

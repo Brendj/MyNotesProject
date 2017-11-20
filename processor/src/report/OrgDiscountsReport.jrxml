@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport" pageWidth="600" pageHeight="595" orientation="Landscape" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f49c8ced-6f09-41b2-b4d8-04261304d63d">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgDiscountsReport" pageWidth="640" pageHeight="595" orientation="Landscape" columnWidth="640" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f49c8ced-6f09-41b2-b4d8-04261304d63d">
 	<property name="ireport.zoom" value="1.3310000000000004"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -31,6 +31,7 @@
 			<parameterDescription><![CDATA[]]></parameterDescription>
 			<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
 		</parameter>
+		<parameter name="showDSZN" class="java.lang.Boolean"/>
 		<field name="category" class="java.lang.String"/>
 		<field name="totalByCategory" class="java.lang.Integer"/>
 		<variable name="count" class="java.lang.Integer" calculation="Sum">
@@ -53,6 +54,9 @@
 	<parameter name="isOneOrg" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
 	</parameter>
+	<parameter name="showDSZN" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[Boolean.FALSE]]></defaultValueExpression>
+	</parameter>
 	<field name="shortName" class="java.lang.String"/>
 	<field name="groupItemList" class="java.util.List"/>
 	<field name="categoryItemOrg" class="java.util.List"/>
@@ -66,14 +70,37 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="060ad62c-067d-406d-8813-d32eac3e3b08" x="0" y="0" width="600" height="30"/>
+				<reportElement uuid="060ad62c-067d-406d-8813-d32eac3e3b08" x="0" y="0" width="640" height="30">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.FALSE )]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="false" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Отчет по количеству льготников в организации]]></text>
 			</staticText>
 			<textField evaluationTime="Report">
-				<reportElement uuid="b1cb8a4f-a1c2-4fc3-89aa-5f7f2f11e8cc" x="0" y="30" width="600" height="20"/>
+				<reportElement uuid="b1cb8a4f-a1c2-4fc3-89aa-5f7f2f11e8cc" x="0" y="30" width="640" height="20">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.FALSE )]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+					<paragraph spacingBefore="-2"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{generateTime}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="060ad62c-067d-406d-8813-d32eac3e3b08" x="0" y="0" width="910" height="30">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true" isItalic="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Отчет по количеству льготников в организации]]></text>
+			</staticText>
+			<textField evaluationTime="Report">
+				<reportElement uuid="b1cb8a4f-a1c2-4fc3-89aa-5f7f2f11e8cc" x="0" y="30" width="910" height="20">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14"/>
 					<paragraph spacingBefore="-2"/>
@@ -85,28 +112,48 @@
 	<detail>
 		<band height="55" splitType="Stretch">
 			<textField>
-				<reportElement uuid="fa85721c-83c4-4e9e-8265-92136fd9727b" style="table" x="0" y="0" width="600" height="35" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="fa85721c-83c4-4e9e-8265-92136fd9727b" mode="Transparent" x="0" y="0" width="640" height="35" isPrintWhenDetailOverflows="true">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.FALSE )]]></printWhenExpression>
+				</reportElement>
 				<box leftPadding="15">
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
 					<leftPen lineColor="#FFFFFF"/>
 					<rightPen lineColor="#FFFFFF"/>
 				</box>
-				<textElement verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="a977c04c-9c46-4017-83f4-ebc234c06d19" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="35" width="600" height="20" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="a977c04c-9c46-4017-83f4-ebc234c06d19" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="35" width="640" height="20" isPrintWhenDetailOverflows="true"/>
 				<subreportParameter name="SUBREPORT_DIR"/>
+				<subreportParameter name="showDSZN">
+					<subreportParameterExpression><![CDATA[$P{showDSZN}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{groupItemList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "OrgDiscountsReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
+			<textField>
+				<reportElement uuid="fa85721c-83c4-4e9e-8265-92136fd9727b" mode="Transparent" x="0" y="0" width="910" height="35" isPrintWhenDetailOverflows="true">
+					<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+				</reportElement>
+				<box leftPadding="15">
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					<leftPen lineColor="#FFFFFF"/>
+					<rightPen lineColor="#FFFFFF"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
+			</textField>
 		</band>
 		<band height="40">
 			<componentElement>
-				<reportElement uuid="27e13be5-cba0-4d07-a4ed-5dfb4703c140" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="600" height="40" isPrintWhenDetailOverflows="true"/>
+				<reportElement uuid="27e13be5-cba0-4d07-a4ed-5dfb4703c140" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
 					<datasetRun subDataset="Table Dataset 1" uuid="c3df62cb-0578-46ba-abae-33e0f4c5648e">
 						<datasetParameter name="shortName">
@@ -117,12 +164,23 @@
 						</datasetParameter>
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{categoryItemOrg})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="330" uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e">
+					<jr:column uuid="3647b40f-08cb-4640-aac0-56fa3f767564" width="40">
+						<jr:columnHeader style="table" height="20" rowSpan="1"/>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e" width="330">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="1414e57c-70d0-4d4b-b968-4f21a504025f" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$P{isOneOrg} > 0 ? "Итого" : "Итого по " + $P{shortName}]]></textFieldExpression>
@@ -132,19 +190,19 @@
 							<textField isStretchWithOverflow="true" isBlankWhenNull="false">
 								<reportElement uuid="a2bc3962-50d3-420b-ae82-dd3cd33e7b0b" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{category}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="270" uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0">
+					<jr:column uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0" width="270">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true" evaluationTime="Report">
 								<reportElement uuid="ce48ea07-87af-4999-922d-920d5f1f2d0f" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{count}]]></textFieldExpression>
@@ -154,11 +212,38 @@
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="6f36c7be-fb98-4920-8cb1-9ea2ec57cd04" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true"/>
 								<box leftPadding="15"/>
-								<textElement>
+								<textElement verticalAlignment="Middle">
 									<font size="14" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{totalByCategory}]]></textFieldExpression>
 							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="d1f4b967-5ded-40f5-95db-a2b68ee875e3" width="270">
+						<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+						<jr:columnHeader style="table" height="20" rowSpan="1">
+							<staticText>
+								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="270" height="20" backcolor="#CCCCCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+								</textElement>
+								<text><![CDATA[X]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<staticText>
+								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" positionType="Float" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="270" height="20" backcolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+								</textElement>
+								<text><![CDATA[X]]></text>
+							</staticText>
 						</jr:detailCell>
 					</jr:column>
 				</jr:table>
@@ -168,14 +253,25 @@
 	<summary>
 		<band height="40" splitType="Stretch">
 			<componentElement>
-				<reportElement uuid="27e13be5-cba0-4d07-a4ed-5dfb4703c140" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="600" height="40" isPrintWhenDetailOverflows="true">
+				<reportElement uuid="27e13be5-cba0-4d07-a4ed-5dfb4703c140" key="table" style="table" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="640" height="40" isPrintWhenDetailOverflows="true">
 					<printWhenExpression><![CDATA[$V{countOrgs} > 1]]></printWhenExpression>
 				</reportElement>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" whenNoDataType="AllSectionsNoDetail">
 					<datasetRun subDataset="Table Dataset 1" uuid="c3df62cb-0578-46ba-abae-33e0f4c5648e">
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($P{categoryItemAllOrg})]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="330" uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e">
+					<jr:column uuid="d1172d10-ab6c-4c3b-aef6-e7e67ecfe72b" width="40">
+						<jr:columnHeader style="table" height="20" rowSpan="1"/>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="36b3a30f-ed6f-4af2-88ec-ba642182e21e" width="330">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<staticText>
 								<reportElement uuid="48c90670-2e52-4e33-a168-8b4a1190418b" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="330" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
@@ -197,7 +293,7 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="270" uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0">
+					<jr:column uuid="7a790a1a-21e4-43c3-8718-0f5964bb86d0" width="270">
 						<jr:columnHeader style="table" height="20" rowSpan="1">
 							<textField isStretchWithOverflow="true" evaluationTime="Report">
 								<reportElement uuid="ac8f9779-1103-4679-a15d-34746130c268" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="270" height="20" isPrintWhenDetailOverflows="true" backcolor="#CCCCCC"/>
@@ -217,6 +313,26 @@
 								</textElement>
 								<textFieldExpression><![CDATA[$F{totalByCategory}]]></textFieldExpression>
 							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column uuid="3cd8bde7-4ca0-4d0b-b20c-d980f04f5f36" width="270">
+						<printWhenExpression><![CDATA[$P{showDSZN}.equals( Boolean.TRUE )]]></printWhenExpression>
+						<jr:columnHeader style="table" height="20" rowSpan="1">
+							<staticText>
+								<reportElement uuid="b8e6177b-976e-4fec-ab70-333640fe417d" positionType="Float" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="270" height="20" backcolor="#CCCCCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="14" isBold="true"/>
+								</textElement>
+								<text><![CDATA[X]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="20" rowSpan="1">
+							<box>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
 						</jr:detailCell>
 					</jr:column>
 				</jr:table>

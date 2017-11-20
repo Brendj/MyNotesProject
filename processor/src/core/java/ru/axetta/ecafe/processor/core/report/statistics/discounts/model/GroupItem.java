@@ -54,8 +54,8 @@ public class GroupItem implements Comparable<GroupItem> {
         }
     }
 
-    public ClientItem addClientItem(String name, String category) {
-        ClientItem newClient = new ClientItem(name, category);
+    public ClientItem addClientItem(String name, String category, String dsznDiscount) {
+        ClientItem newClient = new ClientItem(name, category, dsznDiscount);
         clientItemList.add(newClient);
         return newClient;
     }

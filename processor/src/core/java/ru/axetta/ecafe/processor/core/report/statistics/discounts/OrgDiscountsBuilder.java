@@ -23,9 +23,11 @@ import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.OrgItem;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -60,6 +62,7 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
         Boolean showReserve = Boolean.valueOf(getReportProperties().getProperty("showReserve"));
         Boolean showPayComplex = Boolean.valueOf(getReportProperties().getProperty("showPayComplex"));
         String orgFilter = StringUtils.trimToEmpty(getReportProperties().getProperty("orgFilter"));
+        Boolean showDSZN = Boolean.valueOf(getReportProperties().getProperty("showDSZN"));
 
         Date generateBeginTime = new Date();
 
@@ -77,6 +80,7 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
                 showPayComplex);
 
         parameterMap.put("categoryItemAllOrg", categoryTotal);
+        parameterMap.put("showDSZN", showDSZN);
 
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -109,13 +113,29 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
     private List<GroupItem> getGroupItemsByOrgId(Session session, Long idOfOrg, Boolean showReserve,
             Boolean showPayComplex) {
         List<GroupItem> groupItems = new ArrayList<GroupItem>();
+        //String q =
+        //        "select c.idOfClient, c.idOfClientGroup, c.clientGroup.groupName, c.person.firstName, c.person.secondName, c.person.surname, cd.categoryName "
+        //                + " from Client c, ClientsCategoryDiscount cc, CategoryDiscount cd"
+        //                + " where c.idOfClient=cc.idOfClient and " + " cc.idOfCategoryDiscount >= 0 and "
+        //                + " cd.idOfCategoryDiscount=cc.idOfCategoryDiscount and " + " c.org.idOfOrg = " + idOfOrg
+        //                + " order by c.idOfClientGroup, c.person.secondName";
         String q =
-                "select c.idOfClient, c.idOfClientGroup, c.clientGroup.groupName, c.person.firstName, c.person.secondName, c.person.surname, cd.categoryName "
-                        + " from Client c, ClientsCategoryDiscount cc, CategoryDiscount cd"
-                        + " where c.idOfClient=cc.idOfClient and " + " cc.idOfCategoryDiscount >= 0 and "
-                        + " cd.idOfCategoryDiscount=cc.idOfCategoryDiscount and " + " c.org.idOfOrg = " + idOfOrg
-                        + " order by c.idOfClientGroup, c.person.secondName";
-        List clientList = session.createQuery(q).list();
+                "SELECT c.idofclient, c.idofclientgroup, cg.groupname, p.firstname, p.secondname, p.surname, cd.categoryname, "
+              + "   string_agg(concat(dszn.code, CASE WHEN (dszn.code IS NULL OR dszn.description IS NULL) THEN '' ELSE  '-' END, dszn.description), ',') "
+              + "FROM cf_clients c "
+              + "INNER JOIN cf_clients_categorydiscounts cc ON c.idofclient=cc.idofclient AND cc.idofcategorydiscount>=0 "
+              + "INNER JOIN cf_categorydiscounts cd ON cd.idofcategorydiscount=cc.idofcategorydiscount "
+              + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
+              + "INNER JOIN cf_clientgroups cg ON cg.idoforg=c.idoforg AND cg.idofclientgroup=c.idofclientgroup "
+              + "INNER JOIN cf_orgs o ON c.idoforg=o.idoforg "
+              + "LEFT JOIN cf_categorydiscounts_dszn dszn ON cd.idofcategorydiscount=dszn.idofcategorydiscount "
+              + "WHERE o.idoforg=:idOfOrg "
+              + "GROUP BY c.idofclient, c.idofclientgroup, cg.groupname, p.firstname, p.secondname, p.surname, cd.categoryname "
+              + "ORDER BY c.idofclientgroup, p.secondname;";
+
+        Query query = session.createSQLQuery(q);
+        query.setParameter("idOfOrg", idOfOrg);
+        List clientList = query.list();
         Long lastClientId = -1L;
         ClientItem lastClientItem = null;
         Long lastIdGroup = -1L;
@@ -124,27 +144,28 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
             Object[] client = (Object[]) record;
 
             GroupItem groupItem = null;
-            if (!lastIdGroup.equals((Long) client[1])) {
+            if (!lastIdGroup.equals(((BigInteger)client[1]).longValue())) {
                 groupItem = new GroupItem((String) client[2]);
                 groupItems.add(groupItem);
                 lastGroupItem = groupItem;
-                lastIdGroup = (Long) client[1];
+                lastIdGroup = ((BigInteger)client[1]).longValue();
             } else {
                 groupItem = lastGroupItem;
             }
 
             String name = String.format("%s %s %s", (String) client[5], (String) client[3], (String) client[4]);
             String category = (String) client[6];
+            String dsznDicsount = (String) client[7];
             if (!showReserve && category.equals("Резерв")) {
                 continue;
             }
             if (!showPayComplex && category.contains("Платное")) {
                 continue;
             }
-            if (!lastClientId.equals((Long) client[0])) {
-                lastClientItem = groupItem.addClientItem(name, category);
+            if (!lastClientId.equals(((BigInteger)client[0]).longValue())) {
+                lastClientItem = groupItem.addClientItem(name, category, dsznDicsount);
                 groupItem.countCategory(category);
-                lastClientId = (Long) client[0];
+                lastClientId = ((BigInteger)client[0]).longValue();
             } else {
                 lastClientItem.addCategory(category);
                 groupItem.countCategory(category);
@@ -153,6 +174,11 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
         for (GroupItem groupItem : groupItems) {
             groupItem.sortClients();
             Collections.sort(groupItem.getCategoryItemGroup());
+
+            Integer count = 1;
+            for (ClientItem clientItem : groupItem.getClientItemList()) {
+                clientItem.setNumber(count++);
+            }
         }
         return groupItems;
     }

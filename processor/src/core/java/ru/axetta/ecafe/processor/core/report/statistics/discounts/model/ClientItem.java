@@ -14,13 +14,17 @@ public class ClientItem {
 
     private String name;
     private String category;
+    private Integer number;
+    private String dsznDiscount;
 
     public ClientItem() {
     }
 
-    public ClientItem(String name, String category) {
+    public ClientItem(String name, String category, String dsznDiscount) {
+        this.number = 0;
         this.name = name;
         this.category = category + ", ";
+        this.dsznDiscount = dsznDiscount;
     }
 
     public void addCategory(String category) {
@@ -41,5 +45,21 @@ public class ClientItem {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public String getDsznDiscount() {
+        return dsznDiscount;
+    }
+
+    public void setDsznDiscount(String dsznDicsount) {
+        this.dsznDiscount = dsznDicsount;
     }
 }
