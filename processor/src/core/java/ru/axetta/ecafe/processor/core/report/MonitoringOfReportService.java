@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -120,6 +121,9 @@ public class MonitoringOfReportService {
         monitoringOfItem.setNumberOfReserve(
                 numberOfReserve(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
 
+        monitoringOfItem.setNumberOfChangeAndRecycling(
+                numberOfChangeAndRecycling(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
+
         monitoringOfItem.setNumberOfBuffetStudent(
                 numberOfBuffetStudent(idOfOrg, datePeriod.getStartDate(), datePeriod.getEndDate(), session));
 
@@ -226,17 +230,26 @@ public class MonitoringOfReportService {
     }
 
     public Long numberOfReserve(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        return getNumberOf(idOfOrg, startTime, endTime, session, new Integer[] {OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal()});
+    }
+
+    public Long numberOfChangeAndRecycling(Long idOfOrg, Date startTime, Date endTime, Session session) {
+        return getNumberOf(idOfOrg, startTime, endTime, session, new Integer[] {OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal(), OrderTypeEnumType.RECYCLING_RETIONS.ordinal()});
+    }
+
+    private Long getNumberOf(Long idOfOrg, Date startTime, Date endTime, Session session, Integer[] orderTypes) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
-                + "WHERE cfo.ordertype IN (6) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
+                + "WHERE cfo.ordertype IN (:orderTypes) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType AND cfod.idofrule >= 0");
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
         query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameterList("orderTypes", orderTypes);
 
         Long result = ((BigInteger) query.uniqueResult()).longValue();
 
@@ -700,6 +713,7 @@ public class MonitoringOfReportService {
         private Long numberOfLgotnoeFriendlyOrg;
         private Long numberOfLgotnoeOtherOrg;
         private Long numberOfReserve;
+        private Long numberOfChangeAndRecycling;
         private Long numberOfBuffetStudent;
         private Long numberOfBuffetGuardians;
         private Long numberOfSubFeedStudents;
@@ -713,7 +727,7 @@ public class MonitoringOfReportService {
         public MonitoringOfItem(Date sDate, Long numberOfPassesStudents, Long numberOfPassesEmployees,
                 Long numberOfPassesGuardians, Long summaryOfPasses, Long numberOfLgotnoe, Long numberOfReserve,
                 Long numberOfBuffetStudent, Long numberOfBuffetGuardians, Long numberOfSubFeedStudents,
-                Long numberOfSubFeedGuardians, Long numberOfPaidStudents, Long numberOfPaidGuardians) {
+                Long numberOfSubFeedGuardians, Long numberOfPaidStudents, Long numberOfPaidGuardians, Long numberOfChangeAndRecycling) {
             this.sDate = sDate;
             this.numberOfPassesStudents = numberOfPassesStudents;
             this.numberOfPassesEmployees = numberOfPassesEmployees;
@@ -727,6 +741,7 @@ public class MonitoringOfReportService {
             this.numberOfSubFeedGuardians = numberOfSubFeedGuardians;
             this.numberOfPaidStudents = numberOfPaidStudents;
             this.numberOfPaidGuardians = numberOfPaidGuardians;
+            this.numberOfChangeAndRecycling = numberOfChangeAndRecycling;
         }
 
         public Date getsDate() {
@@ -847,6 +862,14 @@ public class MonitoringOfReportService {
 
         public void setNumberOfLgotnoeOtherOrg(Long numberOfLgotnoeOtherOrg) {
             this.numberOfLgotnoeOtherOrg = numberOfLgotnoeOtherOrg;
+        }
+
+        public Long getNumberOfChangeAndRecycling() {
+            return numberOfChangeAndRecycling;
+        }
+
+        public void setNumberOfChangeAndRecycling(Long numberOfChangeAndRecycling) {
+            this.numberOfChangeAndRecycling = numberOfChangeAndRecycling;
         }
     }
 
