@@ -109,8 +109,11 @@
                     <rich:column>
                         <h:outputText value="Продано"/>
                     </rich:column>
-                    <rich:column>
+                    <rich:column rendered="false">
                         <h:outputText value="Продано, резервникам"/>
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="Утилизировано"/>
                     </rich:column>
                     <rich:column>
                         <h:outputText value="% несоответствия"/>
@@ -213,8 +216,11 @@
                     <rich:column>
                         <h:outputText value="Продано" />
                     </rich:column>
-                    <rich:column>
+                    <rich:column rendered="false">
                         <h:outputText value="Продано, резервникам" />
+                    </rich:column>
+                    <rich:column>
+                        <h:outputText value="Утилизировано" />
                     </rich:column>
                     <rich:column>
                         <h:outputText value="% несоответствия" />

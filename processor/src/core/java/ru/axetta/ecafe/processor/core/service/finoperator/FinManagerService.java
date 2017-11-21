@@ -31,7 +31,7 @@ public class FinManagerService extends SummaryDownloadBaseService {
         String filename = RuntimeContext.getInstance().getPropertiesValue(FOLDER_OPTION, null);
         if (filename == null) {
             logger.error(String.format("Not found property %s in application config", FOLDER_OPTION));
-            return;
+            throw new RuntimeException(String.format("Не найдена опция %s в конфигурации", FOLDER_OPTION));
         }
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
         filename += "/ispp_transactions_" + df.format(startDate) + ".csv";

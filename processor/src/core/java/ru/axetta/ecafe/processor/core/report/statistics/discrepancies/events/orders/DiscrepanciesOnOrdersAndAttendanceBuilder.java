@@ -13,7 +13,9 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -349,13 +351,14 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
-                //+ " cf_clients.discountmode = 3 and "  /* берем только льготников */
-                + " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
+                //+ " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
+                + " cf_orders.ordertype = :orderType and "/* Утилизация */
                 + " cf_orders.state = 0" + str;/* Учитываем только пробитые заказы */
 
         query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());
         query.setLong("endDate", endTime.getTime());
+        query.setInteger("orderType", OrderTypeEnumType.RECYCLING_RETIONS.ordinal());
         if (!CollectionUtils.isEmpty(idOfSupplier)) {
             query.setParameterList("idOfSupplier", idOfSupplier);
         }
