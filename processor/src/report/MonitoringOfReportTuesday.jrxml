@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3720" pageHeight="30000" columnWidth="3680" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3600" pageHeight="30000" columnWidth="3560" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.8264462809917359"/>
-	<property name="ireport.x" value="753"/>
+	<property name="ireport.x" value="1895"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -207,7 +207,7 @@
 				<text><![CDATA[Учащихся с картами]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="1880" y="0" width="900" height="25" uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6"/>
+				<reportElement x="1880" y="0" width="840" height="25" uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -234,7 +234,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2480" y="25" width="60" height="110" uuid="c795c38c-35bc-4871-8b70-499baa6cebdb"/>
+				<reportElement x="2420" y="25" width="60" height="110" uuid="c795c38c-35bc-4871-8b70-499baa6cebdb"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -298,7 +298,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2660" y="25" width="60" height="110" uuid="4580c109-2ac0-4004-9e33-76967d243981"/>
+				<reportElement x="2600" y="25" width="60" height="110" uuid="4580c109-2ac0-4004-9e33-76967d243981"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -325,7 +325,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв
+				<text><![CDATA[Резерв и замена
 
 ]]></text>
 			</staticText>
@@ -346,7 +346,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2600" y="25" width="60" height="110" uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd"/>
+				<reportElement x="2540" y="25" width="60" height="110" uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -362,7 +362,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2420" y="25" width="60" height="110" uuid="6969d820-1e66-4446-911e-b071c4c972a6"/>
+				<reportElement x="2360" y="25" width="60" height="110" uuid="6969d820-1e66-4446-911e-b071c4c972a6"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -378,7 +378,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2720" y="25" width="60" height="110" uuid="47e1da98-1757-4751-a692-80f71b601562"/>
+				<reportElement x="2660" y="25" width="60" height="110" uuid="47e1da98-1757-4751-a692-80f71b601562"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -394,7 +394,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2540" y="25" width="60" height="110" uuid="feef20f9-190a-4a84-8202-212d628f40a4"/>
+				<reportElement x="2480" y="25" width="60" height="110" uuid="feef20f9-190a-4a84-8202-212d628f40a4"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -410,7 +410,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3560" y="25" width="60" height="110" uuid="f01f97d4-0188-49d5-a7bc-b7100255859a"/>
+				<reportElement x="3440" y="25" width="60" height="110" uuid="f01f97d4-0188-49d5-a7bc-b7100255859a"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -426,7 +426,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3320" y="25" width="60" height="110" uuid="ed1d5045-0268-4b91-a9d7-736fe72e22ea"/>
+				<reportElement x="3200" y="25" width="60" height="110" uuid="ed1d5045-0268-4b91-a9d7-736fe72e22ea"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -442,7 +442,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3500" y="25" width="60" height="110" uuid="1d6ad6a4-6448-4683-8911-b48dba0a3673"/>
+				<reportElement x="3380" y="25" width="60" height="110" uuid="1d6ad6a4-6448-4683-8911-b48dba0a3673"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -458,7 +458,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2900" y="25" width="60" height="110" uuid="a104daae-54f2-41c3-a52b-828b692326e0"/>
+				<reportElement x="2840" y="25" width="60" height="110" uuid="a104daae-54f2-41c3-a52b-828b692326e0"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -474,7 +474,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3440" y="25" width="60" height="110" uuid="f04eaeaf-7541-41f7-b8dc-50fe44ca7cd8"/>
+				<reportElement x="3320" y="25" width="60" height="110" uuid="f04eaeaf-7541-41f7-b8dc-50fe44ca7cd8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -490,7 +490,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3620" y="25" width="59" height="110" uuid="73ea81cd-b8e5-4cb0-8035-c35d04b474bd"/>
+				<reportElement x="3500" y="25" width="59" height="110" uuid="73ea81cd-b8e5-4cb0-8035-c35d04b474bd"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -506,7 +506,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3200" y="25" width="60" height="110" uuid="ffc4453f-9871-4a1a-9819-8e4baae8ae65"/>
+				<reportElement x="3140" y="25" width="60" height="110" uuid="ffc4453f-9871-4a1a-9819-8e4baae8ae65"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -517,12 +517,12 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв
+				<text><![CDATA[Резерв и замена
 
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2840" y="25" width="60" height="110" uuid="b0797b39-4fd5-49d1-988d-c9053c114304"/>
+				<reportElement x="2780" y="25" width="60" height="110" uuid="b0797b39-4fd5-49d1-988d-c9053c114304"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -538,7 +538,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2780" y="25" width="60" height="110" uuid="4a750a90-98ea-44cf-8d18-859fe5f514a9"/>
+				<reportElement x="2720" y="25" width="60" height="110" uuid="4a750a90-98ea-44cf-8d18-859fe5f514a9"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -554,7 +554,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="2960" y="25" width="60" height="110" uuid="57b40707-3d06-4ad7-ad17-8db3fc115b02"/>
+				<reportElement x="2900" y="25" width="60" height="110" uuid="57b40707-3d06-4ad7-ad17-8db3fc115b02"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -570,7 +570,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3380" y="25" width="60" height="110" uuid="920939ac-1624-4637-a207-152dd94e34a6"/>
+				<reportElement x="3260" y="25" width="60" height="110" uuid="920939ac-1624-4637-a207-152dd94e34a6"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -586,7 +586,7 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="2780" y="0" width="900" height="25" uuid="9690d7a0-6815-409b-9655-f62a2d17eace"/>
+				<reportElement x="2720" y="0" width="839" height="25" uuid="9690d7a0-6815-409b-9655-f62a2d17eace"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -628,7 +628,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3140" y="25" width="60" height="110" uuid="65c0ee59-b8ee-435f-8e55-c2da7d63ff70"/>
+				<reportElement x="3080" y="25" width="60" height="110" uuid="65c0ee59-b8ee-435f-8e55-c2da7d63ff70"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -643,7 +643,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3080" y="25" width="60" height="110" uuid="116b4d6e-3cc5-4cb6-9e35-d8573f281c86"/>
+				<reportElement x="3020" y="25" width="60" height="110" uuid="116b4d6e-3cc5-4cb6-9e35-d8573f281c86"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -658,7 +658,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3020" y="25" width="60" height="110" uuid="b6ddaf98-7602-40ec-96dc-9e141abd8e2e"/>
+				<reportElement x="2960" y="25" width="60" height="110" uuid="b6ddaf98-7602-40ec-96dc-9e141abd8e2e"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -670,38 +670,6 @@
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Льготное питание итого
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="3260" y="25" width="60" height="110" uuid="6f18af21-d98a-467e-94bc-c224cfd9d4bb"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Замена и утилизация
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="2360" y="25" width="60" height="110" uuid="eece188a-7084-48b3-a3fb-875cd49bc3ff"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Замена и утилизация
-
 ]]></text>
 			</staticText>
 		</band>
@@ -852,12 +820,12 @@
 				<textFieldExpression><![CDATA[$F{otherEmployees}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement x="1880" y="0" width="900" height="26" uuid="99810182-8432-4f01-91ec-f75e42ae953e"/>
+				<reportElement x="1880" y="0" width="840" height="26" uuid="99810182-8432-4f01-91ec-f75e42ae953e"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsMonday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement x="2780" y="0" width="900" height="26" uuid="26ad9157-69ea-4a09-88a5-2ed59d2a31a1"/>
+				<reportElement x="2720" y="0" width="839" height="26" uuid="26ad9157-69ea-4a09-88a5-2ed59d2a31a1"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsTuesday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
