@@ -85,8 +85,8 @@ public class PaymentsBetweenContragentsReportBuilder extends BasicReportForAllOr
         String idOfOrgStr = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrg"));
         Long idOfOrg = Long.valueOf(idOfOrgStr);
         List<Long> orgs = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
-        String query_str = "select c.contragentName, org.shortNameInfoService, org.shortAddress, od.menuDetailName, od.rPrice, "
-                + "count(od.qty) as qty, sum(od.rPrice*od.qty) as summa, "
+        String query_str = "select c.contragentName, org.shortNameInfoService, org.shortAddress, od.menuDetailName, (od.rPrice+od.socdiscount) as rPrice, "
+                + "count(od.qty) as qty, sum(od.rPrice*od.qty) as summa, sum(od.SocDiscount*od.qty) as summaDiscount, "
                 + "org2.shortnameinfoservice as name2, org2.shortAddress as address2, c2.contragentName as cn2 "
                 + "from cf_orders o join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "join cf_orgs org on org.idoforg = o.idoforg "
@@ -96,7 +96,7 @@ public class PaymentsBetweenContragentsReportBuilder extends BasicReportForAllOr
                 + "join cf_contragents c2 on org2.defaultsupplier = c2.idofcontragent "
                 + "where o.CreatedDate between :startDate and :endDate and org.idoforg in (:orgs) "
                 + "and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) "
-                + "group by c.contragentName, org.shortNameInfoService, org.shortAddress, od.menuDetailName, od.rPrice, "
+                + "group by c.contragentName, org.shortNameInfoService, org.shortAddress, od.menuDetailName, od.rPrice, od.socdiscount, "
                 + "org2.shortnameinfoservice, org2.shortAddress, c2.contragentName "
                 + "order by c.contragentName, org.shortNameInfoService, org.shortAddress, od.menuDetailName";
         Query query = session.createSQLQuery(query_str);
@@ -116,11 +116,12 @@ public class PaymentsBetweenContragentsReportBuilder extends BasicReportForAllOr
             Long rprice = ((BigInteger) row[4]).longValue();
             Long qty = ((BigInteger) row[5]).longValue();
             Long sum = ((BigDecimal) row[6]).longValue();
-            String shortNameInfoServiceOrgClient = (String) row[7];
-            String shortAddressOrgClient = (String) row[8];
-            String contragentNameOrgClient = (String) row[9];
+            Long sumDiscount = ((BigDecimal) row[7]).longValue();
+            String shortNameInfoServiceOrgClient = (String) row[8];
+            String shortAddressOrgClient = (String) row[9];
+            String contragentNameOrgClient = (String) row[10];
             PaymentsBetweenContragentsReportItem item = new PaymentsBetweenContragentsReportItem(contragentName, shortNameInfoService,
-                    shortAddress, menuDetailName, rprice, qty, sum, shortNameInfoServiceOrgClient, shortAddressOrgClient, contragentNameOrgClient);
+                    shortAddress, menuDetailName, rprice, qty, sum, sumDiscount, shortNameInfoServiceOrgClient, shortAddressOrgClient, contragentNameOrgClient);
             result_list.add(item);
         }
 

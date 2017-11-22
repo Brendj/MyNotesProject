@@ -15,12 +15,13 @@ public class PaymentsBetweenContragentsReportItem {
     private Long rprice;
     private Long qty;
     private Long sum;
+    private Long sumDiscount;
     private String shortNameInfoServiceOrgClient;
     private String shortAddressOrgClient;
     private String contragentNameOrgClient;
 
     public PaymentsBetweenContragentsReportItem(String contragentName, String shortNameInfoService,
-            String shortAddress, String menuDetailName, Long rprice, Long qty, Long sum,
+            String shortAddress, String menuDetailName, Long rprice, Long qty, Long sum, Long sumDiscount,
             String shortNameInfoServiceOrgClient, String shortAddressOrgClient, String contragentNameOrgClient) {
         this.contragentName = contragentName;
         this.shortNameInfoService = shortNameInfoService;
@@ -29,6 +30,7 @@ public class PaymentsBetweenContragentsReportItem {
         this.rprice = rprice;
         this.qty = qty;
         this.sum = sum;
+        this.sumDiscount = sumDiscount;
         this.shortNameInfoServiceOrgClient = shortNameInfoServiceOrgClient;
         this.shortAddressOrgClient = shortAddressOrgClient;
         this.contragentNameOrgClient = contragentNameOrgClient;
@@ -112,5 +114,13 @@ public class PaymentsBetweenContragentsReportItem {
 
     public void setContragentNameOrgClient(String contragentNameOrgClient) {
         this.contragentNameOrgClient = contragentNameOrgClient;
+    }
+
+    public Long getSumDiscount() {
+        return sumDiscount;
+    }
+
+    public void setSumDiscount(Long sumDiscount) {
+        this.sumDiscount = sumDiscount;
     }
 }

@@ -428,7 +428,7 @@ public class PaymentTotalsReportService {
     }
 
     private Map<Long, Long> getOrdersByClientsFromOtherOrgs(Long idOfOrg, Date startTime, Date endTime) {
-        Query query = session.createSQLQuery("SELECT c.idoforg, sum(od.rprice * od.qty) FROM cf_orderdetails od "
+        Query query = session.createSQLQuery("SELECT c.idoforg, sum((od.rprice+od.socdiscount) * od.qty) FROM cf_orderdetails od "
                 + "INNER JOIN cf_orders o ON o.idoforg = od.idoforg AND o.idoforder = od.idoforder "
                 + "INNER JOIN cf_clients c ON c.idofclient = o.idofclient "
                 + "WHERE o.idoforg = :idOfOrg AND o.CreatedDate BETWEEN :begDate AND :endDate "
