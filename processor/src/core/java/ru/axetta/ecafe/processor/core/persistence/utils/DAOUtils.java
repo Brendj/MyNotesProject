@@ -310,6 +310,22 @@ public class DAOUtils {
         return (GoodsBasicBasket) criteria.uniqueResult();
     }
 
+    public static GoodBBMenuPrice findBBMenuPrice(Session persistenceSession, Long idOfBasicGood,
+            Long idOfConfigurationProvider, Date menuDate, String menuDetailName) {
+        Criteria criteria = persistenceSession.createCriteria(GoodBBMenuPrice.class);
+        criteria.add(Restrictions.eq("idOfBasicGood", idOfBasicGood));
+        criteria.add(Restrictions.eq("idOfConfigurationProvider", idOfConfigurationProvider));
+        criteria.add(Restrictions.eq("menuDate", menuDate));
+        criteria.add(Restrictions.eq("menuDetailName", menuDetailName));
+        return (GoodBBMenuPrice) criteria.uniqueResult();
+    }
+
+    public static Long getOrgConfigurationProvider(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("select coalesce(IdOfConfigurationProvider, 0) as id from cf_orgs where IdOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        return ((BigInteger)query.uniqueResult()).longValue();
+    }
+
     public static List<String> getRegions(Session session) {
         Query q = session.createSQLQuery("select distinct district from cf_orgs where trim(both ' ' from district)<>''");
         return (List<String>) q.list();

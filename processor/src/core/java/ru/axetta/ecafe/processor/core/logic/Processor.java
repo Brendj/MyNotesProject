@@ -4636,8 +4636,6 @@ public class Processor implements SyncProcessor {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
             boolean exists = false;
 
-            /*if ((bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu()) == null) ||
-            (!bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByPathAndPrice(persistenceSession, menu, reqMenuDetail.getPath(), reqMenuDetail.getPrice()) == null)) {*/
             for (MenuDetail menuDetail : menu.getMenuDetails()) {
                 exists = areMenuDetailsEqual(menuDetail, reqMenuDetail);
                 if (exists) {
@@ -4685,6 +4683,8 @@ public class Processor implements SyncProcessor {
 
                 localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), newMenuDetail);
             }
+            //Заполнение новой таблицы cf_good_bb_menu_price
+            saveBasicBasketPriceHistoryByMenu(persistenceSession, menu, reqMenuDetail);
         }
     }
 
@@ -4698,6 +4698,37 @@ public class Processor implements SyncProcessor {
                 basicBasketPrice.setLastUpdate(new Date());
                 GoodBasicBasketPrice.save(session, basicBasketPrice);
             }
+        }
+    }
+
+    private void saveBasicBasketPriceHistoryByMenu(Session session, Menu menu, SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail) {
+        try {
+            if (reqMenuDetail.getgBasket() != null) {
+                GoodsBasicBasket basicBasket = DAOUtils.findBasicGood(session, reqMenuDetail.getgBasket());
+                if (basicBasket != null) {
+                    Long idOfConfigurationProvider = DAOUtils
+                            .getOrgConfigurationProvider(session, menu.getOrg().getIdOfOrg());
+                    if (idOfConfigurationProvider > 0) {
+                        GoodBBMenuPrice goodBBMenuPrice = DAOUtils
+                                .findBBMenuPrice(session, basicBasket.getIdOfBasicGood(), idOfConfigurationProvider,
+                                        menu.getMenuDate(), reqMenuDetail.getName());
+                        if (goodBBMenuPrice == null) {
+                            goodBBMenuPrice = new GoodBBMenuPrice();
+                            goodBBMenuPrice.setIdOfBasicGood(basicBasket.getIdOfBasicGood());
+                            goodBBMenuPrice.setIdOfConfigurationProvider(idOfConfigurationProvider);
+                            goodBBMenuPrice.setMenuDate(menu.getMenuDate());
+                            goodBBMenuPrice.setPrice(reqMenuDetail.getPrice());
+                            goodBBMenuPrice.setMenuDetailName(reqMenuDetail.getName());
+                            session.save(goodBBMenuPrice);
+                        } else {
+                            goodBBMenuPrice.setPrice(reqMenuDetail.getPrice());
+                            session.update(goodBBMenuPrice);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in save basic basket price history: ", e);
         }
     }
 

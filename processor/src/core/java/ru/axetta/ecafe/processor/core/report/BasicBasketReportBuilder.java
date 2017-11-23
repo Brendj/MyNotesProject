@@ -87,7 +87,7 @@ public class BasicBasketReportBuilder extends BasicReportForAllOrgJob.Builder {
 
         List<BasicBasketReportItem> result_list = new ArrayList<BasicBasketReportItem>();
 
-        Query query = session.createSQLQuery("select b.nameofgood, b.unitsscale, b.netweight, p.nameofconfigurationprovider, od.menudetailname, od.rprice "
+        /*Query query = session.createSQLQuery("select b.nameofgood, b.unitsscale, b.netweight, p.nameofconfigurationprovider, od.menudetailname, od.rprice "
                 + "from cf_orders o join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "join cf_menudetails md on od.idofmenufromsync = md.idofmenufromsync "
                 + "join cf_menu m on m.idofmenu = md.idofmenu and m.idoforg = o.idoforg "
@@ -95,6 +95,11 @@ public class BasicBasketReportBuilder extends BasicReportForAllOrgJob.Builder {
                 + "join cf_goods_basicbasket b on bp.idofbasicgood = b.idofbasicgood "
                 + "join cf_provider_configurations p on p.idofconfigurationprovider = bp.idofconfigurationprovider "
                 + "where o.CreatedDate between :startDate and :endDate and b.IdOfBasicGood in (:bbGoods) "
+                + "order by b.NameOfGood");*/
+        Query query = session.createSQLQuery("select b.nameofgood, b.unitsscale, b.netweight, p.nameofconfigurationprovider, bb.menudetailname, bb.price "
+                + "from CF_Goods_BasicBasket b join cf_good_bb_menu_price bb on b.IdOfBasicGood = bb.idOfBasicGood "
+                + "join cf_provider_configurations p on p.IdOfConfigurationProvider = bb.IdOfConfigurationProvider "
+                + "where bb.menuDate between :startDate and :endDate and b.IdOfBasicGood in (:bbGoods) "
                 + "order by b.NameOfGood");
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
