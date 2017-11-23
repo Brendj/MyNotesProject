@@ -7,6 +7,11 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\axRep\\processor\\src\\report\\"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="organizationName" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="group" class="java.lang.String"/>
+	<parameter name="clientName" class="java.lang.String"/>
+	<parameter name="personalAccount" class="java.lang.String"/>
 	<field name="idOfOrg" class="java.lang.Long"/>
 	<field name="contragent" class="java.lang.String"/>
 	<field name="operationType" class="java.lang.String"/>
@@ -18,30 +23,99 @@
 	<field name="orgNames" class="java.util.List"/>
 	<field name="addresses" class="java.util.List"/>
 	<title>
-		<band height="616">
-			<subreport>
-				<reportElement uuid="dfc5b99e-4a46-4430-af18-c534c5a45f86" positionType="Float" x="0" y="0" width="605" height="576"/>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{orgNames})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ClientTransactionsConditionOrgSubreport.jasper"]]></subreportExpression>
-			</subreport>
+		<band height="120">
 			<staticText>
-				<reportElement uuid="6d07dac0-7b7f-4526-9df6-18d3f016bc18" stretchType="RelativeToBandHeight" x="0" y="576" width="1210" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement uuid="a4987e0c-973a-4f7b-9c65-ec455e35a6a5" x="0" y="0" width="80" height="20">
+					<printWhenExpression><![CDATA[$P{organizationName} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[Тип операции
-]]></text>
+				<text><![CDATA[Организация]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dab49ed9-2022-4410-b25b-de27c5854e91" x="0" y="20" width="80" height="20">
+					<printWhenExpression><![CDATA[$P{address} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Адрес]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="71964ce7-0935-433c-8551-d38a5cbead19" x="0" y="40" width="80" height="20">
+					<printWhenExpression><![CDATA[$P{group} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Группа]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ca54bf96-5345-4bb5-9d06-4cc571293e39" x="0" y="60" width="80" height="20">
+					<printWhenExpression><![CDATA[$P{clientName} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Клиент]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9ec7c693-9935-4179-a183-de771cb55052" x="0" y="80" width="80" height="20">
+					<printWhenExpression><![CDATA[$P{personalAccount} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Лицевой счет]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7d71c3f5-b13e-4984-af1e-3d17cf265158" x="0" y="100" width="80" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Тип операции]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="c542748a-03ee-478b-b20a-7dfd68398aa1" stretchType="RelativeToBandHeight" x="0" y="596" width="1210" height="20"/>
-				<textElement/>
+				<reportElement uuid="e1fdb52e-cd01-448e-92bc-08d24b300c30" x="80" y="0" width="1130" height="20">
+					<printWhenExpression><![CDATA[$P{organizationName} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{organizationName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1fdb52e-cd01-448e-92bc-08d24b300c30" x="80" y="20" width="1130" height="20">
+					<printWhenExpression><![CDATA[$P{address} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1fdb52e-cd01-448e-92bc-08d24b300c30" x="80" y="40" width="1130" height="20">
+					<printWhenExpression><![CDATA[$P{group} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{group}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1fdb52e-cd01-448e-92bc-08d24b300c30" x="80" y="60" width="1130" height="20">
+					<printWhenExpression><![CDATA[$P{clientName} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{clientName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1fdb52e-cd01-448e-92bc-08d24b300c30" x="80" y="80" width="1130" height="20">
+					<printWhenExpression><![CDATA[$P{personalAccount} != null]]></printWhenExpression>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{personalAccount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e1fdb52e-cd01-448e-92bc-08d24b300c30" x="80" y="100" width="1130" height="20"/>
+				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{operationType}]]></textFieldExpression>
 			</textField>
-			<subreport>
-				<reportElement uuid="db1427da-9fc0-4d05-b6af-28b62734f6b9" positionType="Float" x="605" y="0" width="605" height="576"/>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{addresses})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ClientTransactionsConditionAddressSubreport.jasper"]]></subreportExpression>
-			</subreport>
 		</band>
 	</title>
 	<columnHeader>

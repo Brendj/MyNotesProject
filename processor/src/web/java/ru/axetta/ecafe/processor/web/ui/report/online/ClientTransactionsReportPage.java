@@ -146,9 +146,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
-        if (orgsEmpty() == null) {
-            return null;
-        }
+
         ClientTransactionsReport.Builder builder = new ClientTransactionsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -197,9 +195,6 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) {
-            return;
-        }
-        if (orgsEmpty() == null) {
             return;
         }
         Date generateTime = new Date();
@@ -263,21 +258,19 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         return templateFilename;
     }
 
-    private String orgsEmpty() {
-        if (idOfOrgList.isEmpty()) {
-            printError(String.format("Выберите организацию, или список организаций", ""));
-            return null;
-        }
-        return "";
-    }
+    //private String orgsEmpty() {
+    //    if (idOfOrgList.isEmpty()) {
+    //        printError(String.format("Выберите организацию, или список организаций", ""));
+    //        return null;
+    //    }
+    //    return "";
+    //}
 
     private Properties buildProperties() {
         Properties properties = new Properties();
-        String idOfOrgString = "";
-        if (idOfOrgList != null) {
-            idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+        if (idOfOrg != null) {
+            properties.setProperty("idOfOrg", idOfOrg.toString());
         }
-        properties.setProperty("idOfOrgList", idOfOrgString);
         String clientListString = "";
         if (clientList != null) {
             for (ClientSelectListPage.Item client : clientList) {

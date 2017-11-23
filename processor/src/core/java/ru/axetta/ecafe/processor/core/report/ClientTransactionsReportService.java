@@ -70,9 +70,9 @@ public class ClientTransactionsReportService {
 
         if (!operationTypeString.equals("Все")) {
             for (ClientTransactionsReportItem clientTransactionsReportItem : clientTransactionsReportItemList) {
-                if (clientTransactionsReportItem.getOperationType().equals(operationTypeString)) {
+                if (clientTransactionsReportItem.getTransactionDescription().equals(operationTypeString)) {
                     clientTransactionsReportItems.add(clientTransactionsReportItem);
-                } else if (clientTransactionsReportItem.getOperationType().equals(operationTypeString)) {
+                } else if (clientTransactionsReportItem.getTransactionDescription().equals(operationTypeString)) {
                     clientTransactionsReportItems.add(clientTransactionsReportItem);
                 }
             }

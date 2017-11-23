@@ -47,17 +47,24 @@
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.clientTransactionsReportPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+            <%--<a4j:commandButton value="..." action="#{mainPage.clientTransactionsReportPage.showOrgListSelectPage}"--%>
+                               <%--reRender="modalOrgListSelectorPanel"--%>
+                               <%--oncomplete="if (#{facesContext.maximumSeverity == null})--%>
+                                        <%--#{rich:component('modalOrgListSelectorPanel')}.show();"--%>
+                               <%--styleClass="command-link" style="width: 25px;">--%>
+                <%--<f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />--%>
+                <%--<f:setPropertyActionListener value="#{mainPage.clientTransactionsReportPage.getStringIdOfOrgList}"--%>
+                                             <%--target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />--%>
+            <%--</a4j:commandButton>--%>
+            <%--<h:outputText styleClass="output-text" escape="true"--%>
+                          <%--value=" {#{mainPage.clientTransactionsReportPage.filter}}" />--%>
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
                 <f:setPropertyActionListener value="#{mainPage.clientTransactionsReportPage.getStringIdOfOrgList}"
-                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                    target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{mainPage.clientTransactionsReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.clientTransactionsReportPage.filter}}" />
         </h:panelGroup>
         <h:outputText escape="false" value="Включать все корпуса" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.clientTransactionsReportPage.showAllBuildings}" styleClass="output-text">

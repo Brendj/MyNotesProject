@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -39,8 +40,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
         * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
         */
     public static final String REPORT_NAME = "Транзакции клиента";
-    public static final String[] TEMPLATE_FILE_NAMES = {
-            "ClientTransactionsReport.jasper", "ClientTransactionsOrgSubreport.jasper", "ClientTransactionsAddressSubreport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {"ClientTransactionsReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = false;
     public static final int[] PARAM_HINTS = new int[]{};
 
@@ -75,20 +75,98 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             parameterMap.put("reportName", REPORT_NAME);
             parameterMap.put("SUBREPORT_DIR", subReportDir);
 
-            String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty("idOfOrgList"));
-            String[] idOfOrgStringList = idOfOrgString.split(",");
-
+            Boolean showAllBuildings = Boolean
+                    .valueOf(StringUtils.trimToEmpty(reportProperties.getProperty("showAllBuildings")));
+            String organizationIDString = reportProperties.getProperty("idOfOrg");
+            String clientListString = StringUtils.trimToEmpty(reportProperties.getProperty("clientList"));
+            List<Client> clientList = new ArrayList<Client>();
             List<Long> idOfOrgList = new ArrayList<Long>();
 
-            for (String id : idOfOrgStringList) {
-                idOfOrgList.add(Long.valueOf(id));
+            // выбрана организация
+            if (null != organizationIDString) {
+                Long organizationID = Long.parseLong(organizationIDString);
+                Org organization = null;
+
+                if (showAllBuildings) {
+                    List<Org> orgList = DAOUtils.findAllFriendlyOrgs(session, organizationID);
+                    if (!orgList.isEmpty()) {
+                        for (Org o : orgList) {
+                            if (o.isMainBuilding()) {
+                                organization = o;
+                            }
+                            idOfOrgList.add(o.getIdOfOrg());
+                        }
+                    }
+                } else {
+                    organization = (Org) session.load(Org.class, organizationID);
+                    idOfOrgList.add(organizationID);
+                }
+                parameterMap.put("organizationName", organization.getShortName());
+                parameterMap.put("address", organization.getAddress());
+            } else if (!clientListString.isEmpty()) {   // выбраны клиенты
+                String[] clientStringList = clientListString.split(",");
+
+                for (String id : clientStringList) {
+                    Client client = (Client) session.load(Client.class, Long.parseLong(id));
+                    clientList.add(client);
+                }
+
+                // если выбран один клиент
+                if (1 == clientList.size()) {
+                    String personalAccount = clientList.get(0).getContractId().toString();
+                    parameterMap.put("personalAccount", personalAccount);
+                    parameterMap.put("organizationName", clientList.get(0).getOrg().getShortName());
+                    parameterMap.put("address", clientList.get(0).getOrg().getAddress());
+                }
+                // формируем список клиентов и их групп
+                StringBuilder clientNameBuilder = new StringBuilder();
+                StringBuilder clientGroupBuilder = new StringBuilder();
+                List<String> groupList = new ArrayList<String>();
+                String orgName = "";
+                String orgAddres = "";
+                Boolean isOneOrg = Boolean.TRUE;
+                Long orgId = -1L;
+                if (!clientList.isEmpty())
+                    orgId = clientList.get(0).getOrg().getIdOfOrg();
+
+                for (Client c : clientList) {
+                    clientNameBuilder.append(c.getPerson().getSurnameAndFirstLetters());
+                    clientNameBuilder.append(", ");
+
+                    if (!groupList.contains(c.getClientGroup().getGroupName()))
+                        groupList.add(c.getClientGroup().getGroupName());
+
+                    // проверяем в одной ли ОО выбранные клиенты
+                    if (orgId.equals(c.getOrg().getIdOfOrg()) && isOneOrg.equals(Boolean.TRUE)) {
+                        Org o = c.getOrg();
+                        isOneOrg |= Boolean.TRUE;
+                        orgName = o.getShortName();
+                        orgAddres = o.getAddress();
+                    } else {
+                        isOneOrg = Boolean.FALSE;
+                        orgName = "";
+                        orgAddres = "";
+                    }
+                }
+
+                // если клиенты в одной ОО - укажем название и адрес
+                if (isOneOrg) {
+                    parameterMap.put("organizationName", orgName);
+                    parameterMap.put("address", orgAddres);
+                }
+
+                for (String groupName : groupList) {
+                    clientGroupBuilder.append(groupName + ", ");
+                }
+
+                parameterMap.put("clientName", clientNameBuilder.toString().substring(0, clientNameBuilder.toString().length() - 2));
+                parameterMap.put("group", clientGroupBuilder.toString().substring(0, clientGroupBuilder.toString().length() - 2));
             }
 
             String operationTypeString = null;
 
             int operationType = Integer
                     .parseInt(StringUtils.trimToEmpty(reportProperties.getProperty("operationType")));
-
 
             if (operationType == 0) {
                 operationTypeString = "Все";
@@ -100,39 +178,6 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
 
             parameterMap.put("operationType", operationTypeString);
 
-            String clientListString = StringUtils.trimToEmpty(reportProperties.getProperty("clientList"));
-
-            List<Client> clientList = new ArrayList<Client>();
-
-            if (!clientListString.isEmpty() && clientListString != null) {
-
-                String[] clientStringList = clientListString.split(",");
-
-                for (String id : clientStringList) {
-                    Client client = (Client) session.load(Client.class, Long.parseLong(id));
-                    clientList.add(client);
-                }
-            }
-
-            Boolean showAllBuildings = Boolean
-                    .valueOf(StringUtils.trimToEmpty(reportProperties.getProperty("showAllBuildings")));
-
-            Set<Org> idOfOrgSet = new HashSet<Org>();
-
-            if (showAllBuildings) {
-                for (Long idOfOrg : idOfOrgList) {
-                    Org org = (Org) session.load(Org.class, idOfOrg);
-                    idOfOrgSet.addAll(org.getFriendlyOrg());
-                }
-
-                List<Long> showIdOfOrgList = new ArrayList<Long>();
-
-                for (Org org : idOfOrgSet) {
-                    showIdOfOrgList.add(org.getIdOfOrg());
-                }
-
-                idOfOrgList = showIdOfOrgList;
-            }
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, clientList,
                     operationTypeString);
