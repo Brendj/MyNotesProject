@@ -113,25 +113,23 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
     private List<GroupItem> getGroupItemsByOrgId(Session session, Long idOfOrg, Boolean showReserve,
             Boolean showPayComplex) {
         List<GroupItem> groupItems = new ArrayList<GroupItem>();
-        //String q =
-        //        "select c.idOfClient, c.idOfClientGroup, c.clientGroup.groupName, c.person.firstName, c.person.secondName, c.person.surname, cd.categoryName "
-        //                + " from Client c, ClientsCategoryDiscount cc, CategoryDiscount cd"
-        //                + " where c.idOfClient=cc.idOfClient and " + " cc.idOfCategoryDiscount >= 0 and "
-        //                + " cd.idOfCategoryDiscount=cc.idOfCategoryDiscount and " + " c.org.idOfOrg = " + idOfOrg
-        //                + " order by c.idOfClientGroup, c.person.secondName";
         String q =
-                "SELECT c.idofclient, c.idofclientgroup, cg.groupname, p.firstname, p.secondname, p.surname, cd.categoryname, "
-              + "   string_agg(concat(dszn.code, CASE WHEN (dszn.code IS NULL OR dszn.description IS NULL) THEN '' ELSE  '-' END, dszn.description), ',') "
-              + "FROM cf_clients c "
-              + "INNER JOIN cf_clients_categorydiscounts cc ON c.idofclient=cc.idofclient AND cc.idofcategorydiscount>=0 "
-              + "INNER JOIN cf_categorydiscounts cd ON cd.idofcategorydiscount=cc.idofcategorydiscount "
-              + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
-              + "INNER JOIN cf_clientgroups cg ON cg.idoforg=c.idoforg AND cg.idofclientgroup=c.idofclientgroup "
-              + "INNER JOIN cf_orgs o ON c.idoforg=o.idoforg "
-              + "LEFT JOIN cf_categorydiscounts_dszn dszn ON cd.idofcategorydiscount=dszn.idofcategorydiscount "
-              + "WHERE o.idoforg=:idOfOrg "
-              + "GROUP BY c.idofclient, c.idofclientgroup, cg.groupname, p.firstname, p.secondname, p.surname, cd.categoryname "
-              + "ORDER BY c.idofclientgroup, p.secondname;";
+                "SELECT t.idofclient, t.idofclientgroup, t.groupname, t.firstname, t.secondname, t.surname, t.categoryname, "
+              + "   string_agg(concat(dszn.code, CASE WHEN (dszn.code IS NULL OR dszn.description IS NULL) THEN '' ELSE  '-' END, dszn.description), ',') AS dsznval "
+              + "FROM ("
+              + "   SELECT c.idofclient, c.idofclientgroup, cg.groupname, p.firstname, p.secondname, p.surname, cd.categoryname, "
+              + "       CASE WHEN c.categoriesdiscountsdszn='' THEN '-1' ELSE CAST(unnest(string_to_array(c.categoriesdiscountsdszn, ',')) AS INTEGER) END AS discount_dszn_code "
+              + "   FROM cf_clients c "
+              + "   INNER JOIN cf_clients_categorydiscounts cc ON c.idofclient=cc.idofclient AND cc.idofcategorydiscount>=0 "
+              + "   INNER JOIN cf_categorydiscounts cd ON cd.idofcategorydiscount=cc.idofcategorydiscount "
+              + "   INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
+              + "   INNER JOIN cf_clientgroups cg ON cg.idoforg=c.idoforg AND cg.idofclientgroup=c.idofclientgroup "
+              + "   INNER JOIN cf_orgs o ON c.idoforg=o.idoforg "
+              + "   WHERE o.idoforg=:idOfOrg "
+              + "   ORDER BY c.idofclientgroup, p.secondname "
+              + ") t "
+              + "LEFT JOIN cf_categorydiscounts_dszn dszn ON dszn.code=t.discount_dszn_code "
+              + "GROUP BY t.idofclient, t.idofclientgroup, t.groupname, t.firstname, t.secondname, t.surname, t.categoryname;";
 
         Query query = session.createSQLQuery(q);
         query.setParameter("idOfOrg", idOfOrg);
