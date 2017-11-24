@@ -292,6 +292,10 @@
         <rich:panelMenuItem id="caReconcileMenuItem" label="Сверка реестров"
                             binding="#{reconciliationPage.mainMenuComponent}" action="#{reconciliationPage.show}"
                             reRender="workspaceForm" />
+        <%--@elvariable id="paymentStatsPage" type="ru.axetta.ecafe.processor.web.ui.contragent.PaymentStatsPage"--%>
+        <rich:panelMenuItem id="caPaymentStatsMenuItem" label="Статистика платежей"
+                            binding="#{paymentStatsPage.mainMenuComponent}" action="#{paymentStatsPage.show}"
+                            reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 
