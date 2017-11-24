@@ -258,13 +258,14 @@ public class EnterEventsRepository extends AbstractJpaDao<Org> {
 
 
     @Transactional(readOnly = true)
-    public List<EnterEvent> findLastNEnterEvent(long orgId,Date date, int n){
+    public List<EnterEvent> findLastNEnterEvent(long orgId,Date minDate, Date maxDate, int n){
         TypedQuery<EnterEvent> query = entityManager.createQuery(
-                "from EnterEvent where evtDateTime <= :date and org.idOfOrg = :idOfOrg order by evtDateTime desc ",
+                "from EnterEvent where evtDateTime between :minDate and :maxDate and org.idOfOrg = :idOfOrg order by evtDateTime desc ",
                 EnterEvent.class);
         query.setMaxResults(n);
         query.setParameter("idOfOrg",orgId);
-        query.setParameter("date",date);
+        query.setParameter("minDate",minDate);
+        query.setParameter("maxDate",maxDate);
         return query.getResultList();
     }
 }

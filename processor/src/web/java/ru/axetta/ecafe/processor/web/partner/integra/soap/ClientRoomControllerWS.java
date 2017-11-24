@@ -3232,12 +3232,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public EnterEventListResult getNEnterEventList(@WebParam(name = "orgId") long orgId,@WebParam(name = "startDate") final Date startDate,
-            @WebParam(name = "N") final int n) {
+    public EnterEventListResult getNEnterEventList(@WebParam(name = "orgId") long orgId,@WebParam(name = "minDate") final Date minDate,
+            @WebParam(name = "maxDate") final Date maxDate, @WebParam(name = "N") final int n) {
         Data data = null;
         EnterEventListResult enterEventListResult = new EnterEventListResult();
         try {
-            data = processNEnterEventList( orgId,startDate, n);
+            data = processNEnterEventList( orgId,minDate,maxDate, n);
             enterEventListResult.enterEventList = data.getEnterEventList();
             enterEventListResult.resultCode = data.getResultCode();
             enterEventListResult.description = data.getDescription();
@@ -3446,13 +3446,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         data.setEnterEventList(enterEventList);
     }
 
-    private Data processNEnterEventList(long orgId,Date date, int n) throws Exception {
+    private Data processNEnterEventList(long orgId,Date minDate, Date maxDate, int n) throws Exception {
 
         Data data = new Data();
         data.setResultCode(RC_OK);
         data.setDescription(RC_OK_DESC);
 
-        List<EnterEvent> lastNEnterEvent = EnterEventsRepository.getInstance().findLastNEnterEvent(orgId, date, n);
+        List<EnterEvent> lastNEnterEvent = EnterEventsRepository.getInstance().findLastNEnterEvent(orgId, minDate, maxDate, n);
 
         Locale locale = new Locale("ru", "RU");
         Calendar calendar = Calendar.getInstance(locale);
