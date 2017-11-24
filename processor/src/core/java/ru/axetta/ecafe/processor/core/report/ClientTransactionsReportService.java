@@ -149,6 +149,9 @@ public class ClientTransactionsReportService {
                 for (Order order : oSet) {
                     Set<OrderDetail> orderDetails = order.getOrderDetails();
                     for (OrderDetail orderDetail : orderDetails) {
+                        // пропускаем родителя составного комплекса с ценой 0р
+                        if (orderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_ITEM_MIN && orderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_ITEM_MAX)
+                            continue;
 
                         ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
 
