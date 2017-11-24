@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -569,6 +570,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         RuntimeContext runtimeContext  = RuntimeContext.getInstance();
         if(this.org.getIdOfOrg() == null) {
             throw new IllegalArgumentException();
+        }
+        if (StringUtils.isEmpty(this.person.surname) || StringUtils.isEmpty(this.person.firstName)) {
+            throw new Exception("Укажите фамилия и имя обслуживаемого лица");
         }
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         if (autoContractId) {
