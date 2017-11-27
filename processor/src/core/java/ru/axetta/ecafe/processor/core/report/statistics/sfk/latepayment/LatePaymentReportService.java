@@ -75,7 +75,9 @@ public class LatePaymentReportService {
         query.setParameterList("order_types", Arrays.asList(new Integer[] {
                 OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal(),
                 OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal(),
-                OrderTypeEnumType.CORRECTION_TYPE.ordinal()
+                OrderTypeEnumType.CORRECTION_TYPE.ordinal(),
+                OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal(),
+                OrderTypeEnumType.RECYCLING_RETIONS.ordinal()
         }));
 
         List resultList = query.list();
