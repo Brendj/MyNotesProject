@@ -217,7 +217,7 @@ public class MonitoringOfReportService {
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg = :idoforg AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0 "
-                + (friendly == null ? "" : ("and c.idoforg " + (friendly ? "" : "not ") + "in (select friendlyorg from cf_friendly_organization where currentorg = :idoforg)")));
+                + (friendly == null ? "" : ("and cfo.idoforg " + (friendly ? "" : "not ") + "in (select friendlyorg from cf_friendly_organization where currentorg = :idoforg)")));
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
@@ -240,8 +240,8 @@ public class MonitoringOfReportService {
     private Long getNumberOf(Long idOfOrg, Date startTime, Date endTime, Session session, Integer[] orderTypes) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfod.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (:orderTypes) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType AND cfod.idofrule >= 0");
         query.setParameter("idoforg", idOfOrg);
@@ -259,8 +259,8 @@ public class MonitoringOfReportService {
     public Long numberOfBuffetStudent(Long idOfOrg, Date startTime, Date endTime, Session session) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfod.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (1, 2, 0) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime");
         query.setParameter("idoforg", idOfOrg);
@@ -275,8 +275,8 @@ public class MonitoringOfReportService {
     public Long numberOfBuffetGuardians(Long idOfOrg, Date startTime, Date endTime, Session session) {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfod.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (0, 1, 2) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup in (1100000000, 1100000010, 1100000020,1100000030, 1100000040, 1100000050, 1100000080) AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime");
         query.setParameter("idoforg", idOfOrg);
@@ -292,8 +292,8 @@ public class MonitoringOfReportService {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM CF_OrderDetails cfod LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
                 + " cfod.MenuType <= :maxType AND g.idofclientgroup < 1100000000");
@@ -313,8 +313,8 @@ public class MonitoringOfReportService {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM CF_OrderDetails cfod LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND "
                 + "cfod.MenuType <= :maxType AND g.idofclientgroup  IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050)");
@@ -334,8 +334,8 @@ public class MonitoringOfReportService {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM CF_OrderDetails cfod LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
                 + " cfod.MenuType <= :maxType AND g.idofclientgroup < 1100000000");
@@ -356,8 +356,8 @@ public class MonitoringOfReportService {
                 + "FROM CF_OrderDetails cfod LEFT OUTER JOIN cf_goods cfg ON cfod.IdOfGood = cfg.IdOfGood "
                 + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
-                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfo.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfo.idoforg = c.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND (cfod.IdOfGood IS NOT NULL) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
                 + " cfod.MenuType <= :maxType AND g.idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050)");

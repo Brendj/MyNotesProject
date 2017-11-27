@@ -20,7 +20,7 @@
 	<detail>
 		<band height="26" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="60" height="26" uuid="4e59fb83-d052-49b1-a98b-95d27478ebde"/>
+				<reportElement uuid="4e59fb83-d052-49b1-a98b-95d27478ebde" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -32,7 +32,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPassesStudents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="60" y="0" width="60" height="26" uuid="8d87c11f-9b8c-4488-8706-d86eb1c1e855"/>
+				<reportElement uuid="8d87c11f-9b8c-4488-8706-d86eb1c1e855" positionType="Float" stretchType="RelativeToBandHeight" x="60" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -44,7 +44,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPassesEmployees}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="120" y="0" width="60" height="26" uuid="d03b7d3a-d9d3-451f-a13c-bd6df56c17e1"/>
+				<reportElement uuid="d03b7d3a-d9d3-451f-a13c-bd6df56c17e1" positionType="Float" stretchType="RelativeToBandHeight" x="120" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -56,7 +56,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPassesGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="180" y="0" width="60" height="26" uuid="b90681fe-58f0-4db2-ba60-e3bd332c985a"/>
+				<reportElement uuid="b90681fe-58f0-4db2-ba60-e3bd332c985a" positionType="Float" stretchType="RelativeToBandHeight" x="180" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -68,7 +68,7 @@
 				<textFieldExpression><![CDATA[$F{summaryOfPasses}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="780" y="0" width="60" height="26" uuid="ab0094f9-4274-4791-a65c-83eba43ff7b3"/>
+				<reportElement uuid="ab0094f9-4274-4791-a65c-83eba43ff7b3" positionType="Float" stretchType="RelativeToBandHeight" x="780" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -80,7 +80,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPaidGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="720" y="0" width="60" height="26" uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2"/>
+				<reportElement uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2" positionType="Float" stretchType="RelativeToBandHeight" x="720" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -92,7 +92,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPaidStudents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="660" y="0" width="60" height="26" uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6"/>
+				<reportElement uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6" positionType="Float" stretchType="RelativeToBandHeight" x="660" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -104,7 +104,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfSubFeedGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="600" y="0" width="60" height="26" uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9"/>
+				<reportElement uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9" positionType="Float" stretchType="RelativeToBandHeight" x="600" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -116,7 +116,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfSubFeedStudents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="240" y="0" width="60" height="26" uuid="d0f31606-6e4a-4339-b966-27ff01758cf6"/>
+				<reportElement uuid="d0f31606-6e4a-4339-b966-27ff01758cf6" positionType="Float" stretchType="RelativeToBandHeight" x="240" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -128,7 +128,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfLgotnoe}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="420" y="0" width="60" height="26" uuid="093ece74-6707-40f2-a8bd-32382c98cf07"/>
+				<reportElement uuid="093ece74-6707-40f2-a8bd-32382c98cf07" positionType="Float" stretchType="RelativeToBandHeight" x="420" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -140,7 +140,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfReserve}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="60" height="26" uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7"/>
+				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -152,7 +152,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfBuffetStudent}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="540" y="0" width="60" height="26" uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad"/>
+				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" positionType="Float" stretchType="RelativeToBandHeight" x="540" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -164,7 +164,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="60" height="26" uuid="42019b29-3830-46d6-8e48-5446f7179f43"/>
+				<reportElement uuid="42019b29-3830-46d6-8e48-5446f7179f43" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -176,7 +176,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfLgotnoeFriendlyOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="360" y="0" width="60" height="26" uuid="c585bb5a-fcc8-4385-ba83-49d6d5a7d778"/>
+				<reportElement uuid="c585bb5a-fcc8-4385-ba83-49d6d5a7d778" positionType="Float" stretchType="RelativeToBandHeight" x="360" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
