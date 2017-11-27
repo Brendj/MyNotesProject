@@ -35,12 +35,12 @@ public class LatePaymentDetailedReportService {
     }
 
     public List<LatePaymentDetailedReportModel> getMainData(Session session, Long idOfOrg, Date startDate, Date endDate,
-            Boolean showReverse) throws Exception {
+            Boolean showReserve, Boolean showRecycling) throws Exception {
 
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = new ArrayList<LatePaymentDetailedReportModel>();
 
         String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
-        if (showReverse) {
+        if (showReserve) {
             cats += ", 50";
         }
         Query query = session.createSQLQuery(
@@ -56,7 +56,7 @@ public class LatePaymentDetailedReportService {
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
-        query.setParameterList("order_types", getOrderTypes(showReverse));
+        query.setParameterList("order_types", getOrderTypes(showReserve, showRecycling));
 
         List resultList = query.list();
 
@@ -76,7 +76,7 @@ public class LatePaymentDetailedReportService {
 
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = getExtraData(session,
                     idOfOrg, CalendarUtils.parseDate(latePaymentDetailedReportModel.getPaymentDate()), startDate,
-                    endDate, showReverse);
+                    endDate, showReserve, showRecycling);
 
             latePaymentDetailedReportModel
                     .setLatePaymentDetailedSubReportModelList(latePaymentDetailedSubReportModelList);
@@ -87,21 +87,27 @@ public class LatePaymentDetailedReportService {
         return latePaymentDetailedReportModelList;
     }
 
-    private List<Integer> getOrderTypes(Boolean showReverse) {
+    private List<Integer> getOrderTypes(Boolean showReserve, Boolean showRecycling) {
         List<Integer> order_types = new ArrayList<Integer>();
         order_types.add(OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
         order_types.add(OrderTypeEnumType.CORRECTION_TYPE.ordinal());
-        if (showReverse) {
+        if (showReserve) {
             order_types.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
+            order_types.add(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal());
         }
+
+        if (showRecycling) {
+            order_types.add(OrderTypeEnumType.RECYCLING_RETIONS.ordinal());
+        }
+
         return order_types;
     }
 
     public List<LatePaymentDetailedSubReportModel> getExtraData(Session session, Long idOfOrg, Date paymentDate,
-            Date startDate, Date endDate, Boolean showReverse) {
+            Date startDate, Date endDate, Boolean showReserve, Boolean showRecycling) {
 
         String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
-        if (showReverse) {
+        if (showReserve) {
             cats += ", 50";
         }
         String orderTypeCondition = " and ((o.ordertype in (:order_types) and cc.idOfCategoryDiscount IN (" + cats + "))) ";
@@ -126,7 +132,7 @@ public class LatePaymentDetailedReportService {
         query.setParameter("paymentDate", paymentDate);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
-        query.setParameterList("order_types", getOrderTypes(showReverse));
+        query.setParameterList("order_types", getOrderTypes(showReserve, showRecycling));
 
         List resultList = query.list();
 

@@ -50,8 +50,11 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
 
         Long idOfOrg = Long.parseLong(idOfOrgString);
 
-        Boolean showReverse = Boolean
+        Boolean showReserve = Boolean
                 .valueOf(StringUtils.trimToEmpty(getReportProperties().getProperty("showReserve")));
+
+        Boolean showRecycling = Boolean.
+                valueOf(StringUtils.trimToEmpty(getReportProperties().getProperty("showRecycling")));
 
         Date generateBeginTime = new Date();
 
@@ -61,7 +64,7 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         parameterMap.put("IS_IGNORE_PAGINATION", true);
         parameterMap.put("SUBREPORT_DIR", subReportDir);
-        JRDataSource dataSource = buildDataSource(session, idOfOrg, startTime, endTime, showReverse);
+        JRDataSource dataSource = buildDataSource(session, idOfOrg, startTime, endTime, showReserve, showRecycling);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
@@ -69,12 +72,12 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
     }
 
     private JRDataSource buildDataSource(Session session, Long idOfOrg, Date startTime, Date endTime,
-            Boolean showReverse) throws Exception {
+            Boolean showReverse, Boolean showRecycling) throws Exception {
 
         LatePaymentDetailedReportService latePaymentDetailedReportService = new LatePaymentDetailedReportService();
 
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = latePaymentDetailedReportService
-                .getMainData(session, idOfOrg, startTime, endTime, showReverse);
+                .getMainData(session, idOfOrg, startTime, endTime, showReverse, showRecycling);
 
         return new JRBeanCollectionDataSource(latePaymentDetailedReportModelList);
     }

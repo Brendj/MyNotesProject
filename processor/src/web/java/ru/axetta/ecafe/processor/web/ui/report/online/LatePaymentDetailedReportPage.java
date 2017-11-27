@@ -44,6 +44,7 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
     private static final Logger logger = LoggerFactory.getLogger(LatePaymentDetailedReportPage.class);
 
     private Boolean showReserve = false;
+    private Boolean showRecycling = false;
 
     public Boolean getShowReserve() {
         return showReserve;
@@ -170,6 +171,7 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
         String idOfOrgString = String.valueOf(idOfOrg);
         builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         builder.getReportProperties().setProperty("showReserve", showReserve.toString());
+        builder.getReportProperties().setProperty("showRecycling", showRecycling.toString());
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
@@ -237,6 +239,14 @@ public class LatePaymentDetailedReportPage extends OnlineReportPage {
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при выгрузке отчета:", e);
         }
+    }
+
+    public Boolean getShowRecycling() {
+        return showRecycling;
+    }
+
+    public void setShowRecycling(Boolean showRecycling) {
+        this.showRecycling = showRecycling;
     }
 
     // Очистить

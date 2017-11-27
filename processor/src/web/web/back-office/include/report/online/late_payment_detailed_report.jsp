@@ -25,8 +25,13 @@
                                    styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
 
-            <h:outputText value="Показывать резервников: " styleClass="output-text" />
+            <h:outputText value="Показывать резервников/замену" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.latePaymentDetailedReportPage.showReserve}">
+                <a4j:support event="onchange" reRender="latePaymentDetailedReportPanelGrid" />
+            </h:selectBooleanCheckbox>
+
+            <h:outputText value="Показывать утилизацию" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.latePaymentDetailedReportPage.showRecycling}">
                 <a4j:support event="onchange" reRender="latePaymentDetailedReportPanelGrid" />
             </h:selectBooleanCheckbox>
 
