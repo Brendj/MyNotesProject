@@ -44,6 +44,7 @@ public class DetailedDeviationsWithoutCorpsService {
             Date startTime, Date endTime) {
         List<PlanOrderItem> resultPlanOrder = new ArrayList<PlanOrderItem>();
 
+        String ruleCondition = orderType.equals("12") ? "" : "AND cfod.idofrule >= 0";
         Query query = session.createSQLQuery(
                 "SELECT cfo.idofclient, (p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fullname, (cfod.menutype -50) AS complexid, cfod.idofrule, cfo.createddate, g.groupname, cfod.menudetailname "
                         + "FROM cf_orders cfo "
@@ -53,7 +54,7 @@ public class DetailedDeviationsWithoutCorpsService {
                         + "LEFT JOIN cf_persons p ON c.idofperson = p.idofperson WHERE cfo.ordertype IN (" + orderType
                         + ") AND cfo.idoforg in (:idOfOrgList) AND cfo.state = 0 "
                         + "AND cfo.createddate >= :startTime AND cfo.createddate < :endTime "
-                        + "AND cfod.menutype >= 50 AND cfod.menutype <100 AND cfod.idofrule >= 0");
+                        + "AND cfod.menutype >= 50 AND cfod.menutype <100 " + ruleCondition);
         query.setParameter("startTime", startTime.getTime());
         query.setParameterList("idOfOrgList", idOfOrgList);
         query.setParameter("endTime", endTime.getTime());
@@ -81,8 +82,10 @@ public class DetailedDeviationsWithoutCorpsService {
                 groupName = (String) resultPlanOrderItem[5];
             }
 
+            Long idOfRule = resultPlanOrderItem[3] == null ? null : ((BigInteger) resultPlanOrderItem[3]).longValue();
+
             PlanOrderItem planOrderItem = new PlanOrderItem(((BigInteger) resultPlanOrderItem[0]).longValue(),
-                    clientName, (Integer) resultPlanOrderItem[2], ((BigInteger) resultPlanOrderItem[3]).longValue(),
+                    clientName, (Integer) resultPlanOrderItem[2], idOfRule,
                     CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) resultPlanOrderItem[4]).longValue())),
                     groupName, (String) resultPlanOrderItem[6]);
             resultPlanOrder.add(planOrderItem);

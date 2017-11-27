@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DetailedDeviationsWithoutCorpsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
@@ -85,6 +86,18 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 startTime, endTime);
     }
 
+    private String getOrderTypes() {
+        return OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal() + ", " + OrderTypeEnumType.CORRECTION_TYPE.ordinal();
+    }
+
+    private String getOrderTypeReserve() {
+        return OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal() + ", " + OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal();
+    }
+
+    private String getOrderTypeRecycle() {
+        return "" + OrderTypeEnumType.RECYCLING_RETIONS.ordinal();
+    }
+
     private JRDataSource buildDataSource(Session session,
             Set<FriendlyOrganizationsInfoModel> friendlyOrganizationsInfoModels, List<Long> selectedIdOfOrg,
             Date startTime, Date endTime) {
@@ -93,11 +106,12 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         List<DeviationPaymentNewItem> deviationPaymentNewItemList = new ArrayList<DeviationPaymentNewItem>();
 
         // План питания льготники
-        String orderTypeLgotnick = "4,8"; // 6 - резерв
+        String orderTypeLgotnick = getOrderTypes();
 
         String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
         String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
-        String conditionReserve = "Обучающиеся из группы резерва, получившие питание";
+        String conditionReserve = "Обучающиеся, получившие питание по функционалу замены";
+        String conditionRecycle = "Утилизированное питание";
 
         HashMap<Long, List<DiscountRule>> rulesForOrgMap = new HashMap<Long, List<DiscountRule>>();
         HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap = new HashMap<Long, List<ComplexInfoItem>>();
@@ -142,7 +156,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentNewSubReportItem>();
 
                 collectingReportItems(session, orderTypeLgotnick, startTime, addOneDayEndTime, conditionDetectedNotEat,
-                        conditionNotDetectedEat, conditionReserve, idOfOrgList, deviationPaymentSubReportItemList,
+                        conditionNotDetectedEat, conditionReserve, conditionRecycle, idOfOrgList, deviationPaymentSubReportItemList,
                         rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -185,7 +199,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentNewSubReportItem>();
 
                 collectingReportItemsInterval(session, orderTypeLgotnick, startTime, endTime, conditionDetectedNotEat,
-                        conditionNotDetectedEat, conditionReserve, deviationPaymentSubReportItemList, idOfOrgList,
+                        conditionNotDetectedEat, conditionReserve, conditionRecycle, deviationPaymentSubReportItemList, idOfOrgList,
                         rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -208,7 +222,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
     }
 
     public void collectingReportItems(Session session, String orderType, Date startTime, Date addOneDayEndTime,
-            String conditionDetectedNotEat, String conditionNotDetectedEat, String conditionReserve,
+            String conditionDetectedNotEat, String conditionNotDetectedEat, String conditionReserve, String conditionRecycle,
             List<Long> idOfOrgList, List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList,
             HashMap<Long, List<DiscountRule>> rulesForOrgMap,
             HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap, List<Long> onlyPaidCategories) {
@@ -220,9 +234,13 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         List<PlanOrderItem> planOrderItemsPaidByOneDay = DetailedDeviationsWithoutCorpsService.
                 loadPaidPlanOrderInfo(session, orderType, idOfOrgList, startTime, addOneDayEndTime);
 
-        // План льготного питания, резерв - ordertype = 6
+        // План льготного питания, резерв - ordertype = 6 + 11
         List<PlanOrderItem> planOrderItemsReserveByOneDay = DetailedDeviationsWithoutCorpsService.
-                loadPaidPlanOrderInfo(session, "6", idOfOrgList, startTime, addOneDayEndTime);
+                loadPaidPlanOrderInfo(session, getOrderTypeReserve(), idOfOrgList, startTime, addOneDayEndTime);
+
+        // Утилизация
+        List<PlanOrderItem> planOrderItemsRecycleByOneDay = DetailedDeviationsWithoutCorpsService.
+                loadPaidPlanOrderInfo(session, getOrderTypeRecycle(), idOfOrgList, startTime, addOneDayEndTime);
 
         // План начальные классы без льгот, но которые питаются как льготники (проход не зафиксирован)
         List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefitsNotDetected = DetailedDeviationsWithoutCorpsService
@@ -271,6 +289,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(resultSubtraction);
         Collections.sort(planOrderItemsReserveByOneDay);
         Collections.sort(planOrderItemsPrimaryClassesWithoutBenefitsNotDetected);
+        Collections.sort(planOrderItemsRecycleByOneDay);
 
         if (!resultSubtraction.isEmpty()) {
             fill(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
@@ -294,10 +313,13 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 fill(planOrderItemsContains, conditionNotDetectedEat, deviationPaymentSubReportItemList);
             }
         }
+        if (!planOrderItemsRecycleByOneDay.isEmpty()) {
+            fill(planOrderItemsRecycleByOneDay, conditionRecycle, deviationPaymentSubReportItemList);
+        }
     }
 
     public void collectingReportItemsInterval(Session session, String orderTypeLgotnick, Date startTime, Date endTime,
-            String conditionDetectedNotEat, String conditionNotDetectedEat, String conditionReserve,
+            String conditionDetectedNotEat, String conditionNotDetectedEat, String conditionReserve, String conditionRecycle,
             List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList, List<Long> idOfOrgList,
             HashMap<Long, List<DiscountRule>> rulesForOrgMap,
             HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap, List<Long> onlyPaidCategories) {
@@ -316,7 +338,11 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
 
         // План льготного питания, резерв - ordertype = 6
         List<PlanOrderItem> planOrderItemsReserveByInterval = DetailedDeviationsWithoutCorpsService.
-                loadPaidPlanOrderInfo(session, "6", idOfOrgList, startTime, endTime);
+                loadPaidPlanOrderInfo(session, getOrderTypeReserve(), idOfOrgList, startTime, endTime);
+
+        // Утилизация
+        List<PlanOrderItem> planOrderItemsRecycleByInterval = DetailedDeviationsWithoutCorpsService.
+                loadPaidPlanOrderInfo(session, getOrderTypeRecycle(), idOfOrgList, startTime, endTime);
 
         // План начальные классы без льгот, но которые питаются как льготники (проход не зафиксирован)
         List<PlanOrderItem> planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval = DetailedDeviationsWithoutCorpsService
@@ -392,6 +418,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(resultIntersectionInterval);
         Collections.sort(planOrderItemsReserveByInterval);
         Collections.sort(planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval);
+        Collections.sort(planOrderItemsRecycleByInterval);
 
         if (!resultSubtractionInterval.isEmpty()) {
             fill(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
@@ -414,6 +441,9 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
             if (!planOrderItemsContains.isEmpty()) {
                 fill(planOrderItemsContains, conditionNotDetectedEat, deviationPaymentSubReportItemList);
             }
+        }
+        if (!planOrderItemsRecycleByInterval.isEmpty()) {
+            fill(planOrderItemsRecycleByInterval, conditionRecycle, deviationPaymentSubReportItemList);
         }
     }
 
