@@ -312,7 +312,9 @@ public class RequestsAndOrdersReportService {
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE))
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.SUBSCRIPTION_FEEDING))
                         .add(Restrictions.eq("o.orderType", OrderTypeEnumType.CORRECTION_TYPE))
-                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.WATER_ACCOUNTING)));
+                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.WATER_ACCOUNTING))
+                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.DISCOUNT_PLAN_CHANGE))
+                        .add(Restrictions.eq("o.orderType", OrderTypeEnumType.RECYCLING_RETIONS)));
         orderDetailsCriteria.add(Restrictions.between("menuType", 50, 99));
         //orderDetailsCriteria.add(Restrictions.in("org", orgMapFull.values()));
         orderDetailsCriteria.add(Restrictions.in("o.org.idOfOrg", orgMapFull.keySet()));
