@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesOnOrdersAndAttendanceJasperReport" pageWidth="974" pageHeight="595" orientation="Landscape" columnWidth="934" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesOnOrdersAndAttendanceJasperReport" pageWidth="905" pageHeight="595" orientation="Landscape" columnWidth="865" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
 	<property name="ireport.zoom" value="1.126972201352367"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="1"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
 	<parameter name="beginDate" class="java.lang.String"/>
@@ -25,14 +25,14 @@
 	<title>
 		<band height="98" splitType="Stretch">
 			<textField>
-				<reportElement uuid="571e7f1b-b8e0-48b8-a703-5d7bbbbec024" x="0" y="0" width="934" height="20"/>
+				<reportElement uuid="571e7f1b-b8e0-48b8-a703-5d7bbbbec024" x="0" y="0" width="865" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Статистика расхождения данных по заказам и оплате"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="729cd781-a5b1-4538-b323-8d10702949f1" x="0" y="20" width="934" height="20"/>
+				<reportElement uuid="729cd781-a5b1-4538-b323-8d10702949f1" x="0" y="20" width="865" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -79,14 +79,9 @@
 				<text><![CDATA[Продано]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ce3d8771-d459-4805-b967-042dddcd005e" x="831" y="47" width="103" height="41"/>
+				<reportElement uuid="ce3d8771-d459-4805-b967-042dddcd005e" x="762" y="47" width="103" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[% несоответствия]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="81e58680-4655-4592-9694-80a36b701a77" x="762" y="47" width="69" height="41"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Продано, резервникам]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -139,17 +134,12 @@
 				<textFieldExpression><![CDATA[$F{requestCount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" x="831" y="0" width="103" height="41"/>
+				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" x="762" y="0" width="103" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[($F{requestCount}==null ||
     $F{orderCount}==null ||
     $F{requestCount}==0.0)?0.0:
 ($F{requestCount}-$F{orderCount})*100.0/($F{requestCount}*1.0)]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="c7747b8d-c15a-4404-9705-99c5755fd43c" x="762" y="0" width="69" height="41"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{orderReserveCount}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

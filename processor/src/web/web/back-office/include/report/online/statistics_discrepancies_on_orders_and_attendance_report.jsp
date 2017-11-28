@@ -112,9 +112,9 @@
                     <rich:column rendered="false">
                         <h:outputText value="Продано, резервникам"/>
                     </rich:column>
-                    <rich:column>
-                        <h:outputText value="Утилизировано"/>
-                    </rich:column>
+                    <%--<rich:column>--%>
+                        <%--<h:outputText value="Утилизировано"/>--%>
+                    <%--</rich:column>--%>
                     <rich:column>
                         <h:outputText value="% несоответствия"/>
                     </rich:column>
@@ -147,9 +147,9 @@
             <rich:column>
                 <h:outputText value="#{item.orderCount==null?0:item.orderCount}"/>
             </rich:column>
-            <rich:column>
-                <h:outputText value="#{item.orderReserveCount==null?0:item.orderReserveCount}"/>
-            </rich:column>
+            <%--<rich:column>--%>
+                <%--<h:outputText value="#{item.orderReserveCount==null?0:item.orderReserveCount}"/>--%>
+            <%--</rich:column>--%>
             <rich:column>
                 <h:outputText value="#{item.percent}">
                     <f:convertNumber pattern="#0.00"/>
@@ -219,9 +219,9 @@
                     <rich:column rendered="false">
                         <h:outputText value="Продано, резервникам" />
                     </rich:column>
-                    <rich:column>
-                        <h:outputText value="Утилизировано" />
-                    </rich:column>
+                    <%--<rich:column>--%>
+                        <%--<h:outputText value="Утилизировано" />--%>
+                    <%--</rich:column>--%>
                     <rich:column>
                         <h:outputText value="% несоответствия" />
                     </rich:column>
@@ -251,9 +251,9 @@
             <rich:column>
                 <h:outputText value="#{itemTotals.totalOrderCount==null?0:itemTotals.totalOrderCount}" />
             </rich:column>
-            <rich:column>
-                <h:outputText value="#{itemTotals.totalOrderReserveCount==null?0:itemTotals.totalOrderReserveCount}" />
-            </rich:column>
+            <%--<rich:column>--%>
+                <%--<h:outputText value="#{itemTotals.totalOrderReserveCount==null?0:itemTotals.totalOrderReserveCount}" />--%>
+            <%--</rich:column>--%>
             <rich:column>
                 <h:outputText value="#{itemTotals.percent}">
                     <f:convertNumber pattern="#0.00" />
