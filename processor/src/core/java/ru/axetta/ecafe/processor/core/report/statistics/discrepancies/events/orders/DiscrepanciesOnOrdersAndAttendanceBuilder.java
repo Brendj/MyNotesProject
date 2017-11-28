@@ -296,10 +296,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
-        String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM order_data.d) * 1000, order_data.org "
+        String sql = "SELECT count(distinct client), order_data.d, order_data.org "
                 + "FROM ("
-                + " SELECT cf_orders.idofclient AS client, "
-                + "  date_trunc('day', to_timestamp(cf_orders.createddate/1000)) AS d, "
+                + " SELECT cf_orders.idofclient AS client, cf_orders.createddate AS d, "
                 + "  cf_orders.idoforg AS org "
                 + " FROM cf_orders "
                 + " join cf_clients on cf_clients.idofclient=cf_orders.idofclient "
@@ -321,8 +320,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         for (Object[] row : res) {
             Long idOfOrg = ((BigInteger) row[2]).longValue();
             Long totalCount = ((BigInteger) row[0]).longValue();
-            long d = ((Double) row[1]).longValue();
+            long d = ((BigInteger) row[1]).longValue();
             calendar.setTimeInMillis(d);
+            CalendarUtils.truncateToDayOfMonth(calendar);
             Date date = calendar.getTime();
             Map<Date, OrderCountItem> dateOrderCountItemMap = orderCountMap.get(idOfOrg);
             if(dateOrderCountItemMap == null){
@@ -340,10 +340,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
 
-        sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM order_data.d) * 1000, order_data.org "
+        sql = "SELECT count(distinct client), order_data.d, order_data.org "
                 + "FROM ("
-                + " SELECT cf_orders.idofclient AS client, "
-                + "  date_trunc('day', to_timestamp(cf_orders.createddate/1000)) AS d, "
+                + " SELECT cf_orders.idofclient AS client, cf_orders.createddate AS d, "
                 + "  cf_orders.idoforg AS org "
                 + " FROM cf_orders "
                 + " join cf_clients on cf_clients.idofclient=cf_orders.idofclient "
@@ -368,8 +367,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         for (Object[] row : res) {
             Long idOfOrg = ((BigInteger) row[2]).longValue();
             Long totalCount = ((BigInteger) row[0]).longValue();
-            long d = ((Double) row[1]).longValue();
+            long d = ((BigInteger) row[1]).longValue();
             calendar.setTimeInMillis(d);
+            CalendarUtils.truncateToDayOfMonth(calendar);
             Date date = calendar.getTime();
             Map<Date, OrderCountItem> dateOrderCountItemMap = orderReserveCountMap.get(idOfOrg);
             if(dateOrderCountItemMap == null){
