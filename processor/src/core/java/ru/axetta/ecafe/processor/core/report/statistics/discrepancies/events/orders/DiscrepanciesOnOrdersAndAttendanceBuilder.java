@@ -306,7 +306,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 //+ " cf_clients.discountmode = 3 and "  /* берем только льготников */
-                + " cf_orders.ordertype in (4, 6) and cf_orders.state=0 and "/* смотрим плану льготного питания */
+                + " cf_orders.ordertype in (4, 6, 11) and cf_orders.state=0 and "/* смотрим плану льготного питания */
                 + " cf_orders.state = 0" + str; /* Учитываем только пробитые заказы */
         Query query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());
@@ -349,7 +349,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 //+ " join cf_orgs on cf_orgs.idoforg=cf_orders.idoforg "
                 + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
-                + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
+                + " cf_clients.idofclientgroup<1100000010 and "  /* берем только детей + админов */
                 //+ " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
                 + " cf_orders.ordertype = :orderType and "/* Утилизация */
                 + " cf_orders.state = 0" + str;/* Учитываем только пробитые заказы */
