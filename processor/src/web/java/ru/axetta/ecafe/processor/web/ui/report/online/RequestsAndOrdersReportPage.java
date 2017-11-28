@@ -292,9 +292,7 @@ public class RequestsAndOrdersReportPage extends OnlineReportWithContragentPage 
                 logger.error("Failed build report ", e);
             }
         } else {
-            String errorMsg = String.format(
-                    "Ошибка построения отчета \"%s\". В указанный период времени (\"%s - \"%s) данные по организации отсутствуют. Попробуйте изменить параметры отчета.",
-                    this.getClass().getCanonicalName(), startDate.toString(), endDate.toString());
+            String errorMsg = "Данные за указанный период отсутствуют. Попробуйте изменить параметры отчета.";
             logger.warn(errorMsg);
             printWarn(errorMsg);
         }

@@ -196,6 +196,7 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
             Date generateTime = new Date();
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime);
+            if (dataSource == null) return null;
 
             boolean useColorAccent = Boolean
                     .parseBoolean(getReportProperties().getProperty(P_USE_COLOR_ACCENT, "false"));
@@ -246,9 +247,12 @@ public class RequestsAndOrdersReport extends BasicReportForAllOrgJob {
 
             RequestsAndOrdersReportService service;
             service = new RequestsAndOrdersReportService(session, OVERALL, OVERALL_TITLE);
-            return new JRBeanCollectionDataSource(
-                    service.buildReportItems(startTime, endTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns,
-                            useColorAccent, showOnlyDivergence, feedingPlanTypes, noNullReport));
+            List list = service.buildReportItems(startTime, endTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns,
+                    useColorAccent, showOnlyDivergence, feedingPlanTypes, noNullReport);
+            if (list == null)
+                return null;
+            else
+                return new JRBeanCollectionDataSource(list);
         }
     }
 

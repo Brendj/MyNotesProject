@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.requestsAndOrdersReport;
 
-import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -92,15 +89,17 @@ public class RequestsAndOrdersReportService {
                         }
                     }
                 }
-                final Long complexGoodGlobalId = complexInfo.getGood().getGlobalId();
+                final Long complexGoodGlobalId = complexInfo.getGood() == null ? null : complexInfo.getGood().getGlobalId();
                 final Long complexOrgId = complexInfo.getOrg().getIdOfOrg();
                 ComplexInfoItem complexInfoItem = orgsComplexDictionary.get(complexOrgId);
                 if (complexInfoItem == null) {
                     complexInfoItem = new ComplexInfoItem(complexOrgId);
                 }
-                GoodInfo complexGoodInfo = new GoodInfo(complexGoodGlobalId, "", complexFeedingPlanType);
-                complexInfoItem.goodInfos.put(complexGoodGlobalId, complexGoodInfo);
-                orgsComplexDictionary.put(complexOrgId, complexInfoItem);
+                if (complexGoodGlobalId != null) {
+                    GoodInfo complexGoodInfo = new GoodInfo(complexGoodGlobalId, "", complexFeedingPlanType);
+                    complexInfoItem.goodInfos.put(complexGoodGlobalId, complexGoodInfo);
+                    orgsComplexDictionary.put(complexOrgId, complexInfoItem);
+                }
             }
             getRequestGoodsInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
             getPaidOrdersInfo(orgMap, reportDataMap, beginDate, endDate, orgsComplexDictionary);
@@ -111,7 +110,7 @@ public class RequestsAndOrdersReportService {
             }
         }
         populateDataList(reportDataMap, itemList, useColorAccent, showOnlyDivergence, orgMap, feedingPlanTypes, noNullReport);
-        return itemList;
+        return itemList.size() == 0 ? null : itemList;
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> getOrgMap(List<Long> idOfOrgList,
@@ -329,7 +328,7 @@ public class RequestsAndOrdersReportService {
             Long totalCount = detail.getQty();
 
             String orgName = getOrgName(org);
-            FeedingPlanType feedingPlanType = getFeedingPlanType(complexOrgDictionary, detail);
+            FeedingPlanType feedingPlanType = getFeedingPlanType(detail);
             String complexName = detail.getGood().getFullName() != null ? detail.getGood().getFullName()
                     : detail.getGood().getNameOfGood();
             Date date = detail.getOrder().getCreateTime();
@@ -350,6 +349,19 @@ public class RequestsAndOrdersReportService {
         }
     }
 
+    private FeedingPlanType getFeedingPlanType(OrderDetail detail) {
+        Order order = detail.getOrder();
+        OrderTypeEnumType type = order.getOrderType();
+        if (type.equals(OrderTypeEnumType.DEFAULT) || type.equals(OrderTypeEnumType.PAY_PLAN)
+                || type.equals(OrderTypeEnumType.DAILY_SAMPLE) || type.equals(OrderTypeEnumType.CORRECTION_TYPE)) {
+            return FeedingPlanType.PAY_PLAN;
+        } else if (type.equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)) {
+            return FeedingPlanType.SUBSCRIPTION_FEEDING;
+        } else {
+            return FeedingPlanType.REDUCED_PRICE_PLAN;
+        }
+    }
+
     private String getOrgName(BasicReportJob.OrgShortItem org) {
         return org.getShortName();
     }
@@ -357,7 +369,7 @@ public class RequestsAndOrdersReportService {
     private List getComplexList(HashMap<Long, BasicReportJob.OrgShortItem> orgMap, Date beginDate, Date endDate) {
         Criteria criteriaComplex = session.createCriteria(ComplexInfo.class);
         criteriaComplex.createAlias("org", "o");
-        criteriaComplex.add(Restrictions.isNotNull("good"));
+        //criteriaComplex.add(Restrictions.isNotNull("good"));
         criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
         criteriaComplex.add(Restrictions.between("menuDate", beginDate, endDate));
         return criteriaComplex.list();
