@@ -16,7 +16,7 @@
 		<groupExpression><![CDATA[$F{condition}]]></groupExpression>
 		<groupHeader>
 			<band height="20">
-				<textField>
+				<textField isStretchWithOverflow="true">
 					<reportElement uuid="e97c91e1-2879-421b-a4a8-50efc275cb49" mode="Opaque" x="0" y="0" width="620" height="20" backcolor="#CCCCCC"/>
 					<box>
 						<pen lineWidth="1.0"/>

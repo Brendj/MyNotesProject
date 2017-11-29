@@ -110,7 +110,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
 
         String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
         String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
-        String conditionReserve = "Обучающиеся, получившие питание по функционалу замены";
+        String conditionReserve = "Обучающиеся из группы резерва, получившие питание. Обучающиеся, получившие питание по функционалу замены";
         String conditionRecycle = "Утилизированное питание";
 
         HashMap<Long, List<DiscountRule>> rulesForOrgMap = new HashMap<Long, List<DiscountRule>>();
