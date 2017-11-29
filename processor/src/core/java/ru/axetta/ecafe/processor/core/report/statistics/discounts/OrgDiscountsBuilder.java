@@ -129,7 +129,8 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
               + "   ORDER BY c.idofclientgroup, p.secondname "
               + ") t "
               + "LEFT JOIN cf_categorydiscounts_dszn dszn ON dszn.code=t.discount_dszn_code "
-              + "GROUP BY t.idofclient, t.idofclientgroup, t.groupname, t.firstname, t.secondname, t.surname, t.categoryname;";
+              + "GROUP BY t.idofclient, t.idofclientgroup, t.groupname, t.firstname, t.secondname, t.surname, t.categoryname "
+              + "ORDER BY t.idofclientgroup, t.secondname;";
 
         Query query = session.createSQLQuery(q);
         query.setParameter("idOfOrg", idOfOrg);
