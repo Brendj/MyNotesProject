@@ -46,8 +46,10 @@ public class DirectiveElement implements AbstractToElement{
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
 
-        //Boolean infoMessageSync = DAOUtils.needInfoMessageSync(session, org.getIdOfOrg());
-        //directiveItemList.add(new DirectiveItem("InfoMessageSync",infoMessageSync?"1":"0"));
+        Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
+        if (feedingSettingLimit != null) {
+            directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
+        }
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {
