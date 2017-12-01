@@ -3343,7 +3343,7 @@ public class Processor implements SyncProcessor {
                             payment.getOrderType().equals(OrderTypeEnumType.RECYCLING_RETIONS)) {
                         values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
                     }
-                    String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
+                    String date = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(payment.getTime());
                     values = EventNotificationService.attachToValues(EventNotificationService.PARAM_ORDER_EVENT_TIME, date, values);
                     values = EventNotificationService.attachToValues(EventNotificationService.PARAM_COMPLEX_NAME, getComplexName(payment), values);
                     values = EventNotificationService.attachTargetIdToValues(payment.getIdOfOrder(), values);
