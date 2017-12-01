@@ -27,6 +27,8 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -267,7 +269,12 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             long l = System.currentTimeMillis();
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
-            List<String> dates = CalendarUtils.datesBetween(startTime, endTime);
+            List<String> datesStringList = CalendarUtils.datesBetween(startTime, endTime);
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            List<Date> dates = new ArrayList<Date>();
+            for (String date : datesStringList) {
+                dates.add(dateFormat.parse(date));
+            }
             Map<Long, List<TotalSalesItem>> totalListMap = new HashMap<Long, List<TotalSalesItem>>();
             //Получаем список всех школ, заполняем ими списов
             List<Long> idOfOrgsList = new LinkedList<Long>();
@@ -480,7 +487,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                     groupName.startsWith("11")) && b2);
         }
 
-        private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<String> dates,
+        private void retreiveAllOrgs(Map<Long, List<TotalSalesItem>> totalSalesItemMap, List<Date> dates,
                 List<Long> idOfOrgsList, List<String> titleComplexes, boolean showAgeGroups) {
             OrgRepository orgRepository = RuntimeContext.getAppContext().getBean(OrgRepository.class);
 
@@ -498,7 +505,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             for (OrgItem orgItem : allNames) {
                 totalSalesItemList = new ArrayList<TotalSalesItem>();
                 for(String ageGroup : ageGroups) {
-                    for (String date : dates) {
+                    for (Date date : dates) {
                         totalSalesItemList
                                 .add(new TotalSalesItem(orgItem.getOfficialName(), orgItem.getDistrict(), date, 0L,
                                         NAME_BUFFET, ageGroup, false, 0L, 0L));

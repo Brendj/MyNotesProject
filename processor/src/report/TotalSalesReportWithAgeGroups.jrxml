@@ -57,7 +57,7 @@
 		<queryString>
 			<![CDATA[]]>
 		</queryString>
-		<field name="date" class="java.lang.String">
+		<field name="date" class="java.util.Date">
 			<fieldDescription><![CDATA[date]]></fieldDescription>
 		</field>
 		<field name="name" class="java.lang.String">
@@ -213,7 +213,7 @@
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="date" width="87" totalPosition="End">
-					<bucket class="java.lang.String">
+					<bucket class="java.util.Date">
 						<bucketExpression><![CDATA[$F{date}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
@@ -221,7 +221,7 @@
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
-							<textField>
+							<textField pattern="dd.MM.yy">
 								<reportElement uuid="38ffb258-83b7-46e1-98db-f4bdcd0afc11" style="Crosstab Data Text" mode="Transparent" x="0" y="0" width="87" height="25"/>
 								<textElement verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{date}]]></textFieldExpression>

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report.model.totalsales;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
 public class TotalSalesItem {
     private String name;
     private String disctrict;
-    private String date;
+    private Date date;
     private long sum;
     private String type;
     private Boolean count;
@@ -28,7 +29,7 @@ public class TotalSalesItem {
     private long sumDiscount;
 
 
-    public TotalSalesItem(String name,String disctrict , String date, long sum, String type, String ageGroup,
+    public TotalSalesItem(String name,String disctrict , Date date, long sum, String type, String ageGroup,
             Boolean count, long sumPay, long sumDiscount) {
         this.name = name;
         this.disctrict = disctrict;
@@ -59,11 +60,11 @@ public class TotalSalesItem {
         this.disctrict = disctrict;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

@@ -590,6 +590,8 @@ public class TotalSalesPage extends OnlineReportPage implements ContragentSelect
             throws Exception {
         if (null != idOfContragent) {
             this.contragent = (Contragent) session.get(Contragent.class, idOfContragent);
+            this.idOfOrgList.clear();
+            this.filter = "Не выбрано";
         }
     }
 
