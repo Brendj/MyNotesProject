@@ -3525,17 +3525,6 @@ public class Processor implements SyncProcessor {
                 return;
             }
 
-            Long orgOwner = clientParamItem.getOrgOwner();
-            if (orgOwner != null) {
-                Org org = (Org)persistenceSession.get(Org.class, orgOwner);
-                if (!orgSet.contains(org)) {
-                    errorClientIds.add(client.getIdOfClient());
-                    throw new IllegalArgumentException(String.format("OrgId not belongs to friendly set. IdOfClient=%s, clientParamItem=%s, OrgId=%s",
-                            client.getIdOfClient(), clientParamItem, orgOwner));
-                }
-                client.setOrg(org);
-            }
-
             if (!orgMap.keySet().contains(client.getOrg().getIdOfOrg())) {
                 if(!(MigrantsUtils.getActiveMigrantsByIdOfClient(persistenceSession, clientParamItem.getIdOfClient()).size() > 0)){
                     if(!allocatedClients.contains(clientParamItem.getIdOfClient())) {
@@ -3546,9 +3535,11 @@ public class Processor implements SyncProcessor {
                     }
                 }
             } else {
-            /*if (!client.getOrg().getIdOfOrg().equals(idOfOrg)) {
-                throw new IllegalArgumentException("Client from another organization");
-            }*/
+                Long orgOwner = clientParamItem.getOrgOwner();
+                if (orgOwner != null) {
+                    Org org = (Org)persistenceSession.get(Org.class, orgOwner);
+                    client.setOrg(org);
+                }
                 client.setFreePayCount(clientParamItem.getFreePayCount());
                 client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
                 client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
