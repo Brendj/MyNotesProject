@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.sfk.latepayment;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentByOneDayCountType;
 import ru.axetta.ecafe.processor.core.persistence.LatePaymentDaysCountType;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
@@ -41,17 +42,33 @@ public class LatePaymentReportService {
         LatePaymentReportModelByDays latePaymentReportModelByDays;
 
         Query query = session.createSQLQuery(
-                "WITH a AS (SELECT count (DISTINCT cast(to_timestamp(o.createddate / 1000) AS DATE)) daycount, "
-                        + "count (DISTINCT o.idoforder) feedcount, "
-                        + "cast (to_timestamp(o.createddate/1000) AS DATE), o.idoforg FROM cf_orders o "
+                "WITH a AS ("
+                        //+ "SELECT count (DISTINCT cast(to_timestamp(o.createddate / 1000) AS DATE)) daycount, "
+                        //+ "count (DISTINCT o.idoforder) feedcount, "
+                        //+ "cast (to_timestamp(o.createddate/1000) AS DATE), o.idoforg FROM cf_orders o "
+                        //+ "INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient "
+                        //+ "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
+                        //+ "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> cast(to_timestamp(o.orderdate / 1000)AS DATE) "
+                        //+ "AND o.ordertype in (:order_types) AND o.state = 0 AND o.createddate BETWEEN :startDate "
+                        //+ "AND :endDate AND cc.idOfCategoryDiscount "
+                        //+ "IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124, 50) "
+                        //+ "AND (cl.idofclientgroup < 1100000000 or cl.idofclientgroup is null) AND o.idoforg IN (:idOfOrgList)"
+                        //+ "GROUP BY o.idoforg,  cast (to_timestamp(o.createddate/1000) AS DATE) ORDER BY o.idoforg"
+                        + "SELECT count (DISTINCT cast(to_timestamp(o.createddate / 1000) AS DATE)) daycount, "
+                        + "       count (DISTINCT o.idoforder) feedcount, "
+                        + "       cast (to_timestamp(o.createddate/1000) AS DATE), o.idoforg "
+                        + "FROM cf_orders o "
                         + "INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient "
-                        + "INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
+                        + "LEFT JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient "
                         + "WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> cast(to_timestamp(o.orderdate / 1000)AS DATE) "
-                        + "AND o.ordertype in (:order_types) AND o.state = 0 AND o.createddate BETWEEN :startDate "
-                        + "AND :endDate AND cc.idOfCategoryDiscount "
-                        + "IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124, 50) "
-                        + "AND (cl.idofclientgroup < 1100000000 or cl.idofclientgroup is null) AND o.idoforg IN (:idOfOrgList)"
-                        + "GROUP BY o.idoforg,  cast (to_timestamp(o.createddate/1000) AS DATE) ORDER BY o.idoforg), "
+                        + "     AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate "
+                        + "     AND ((cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124, 50) "
+                        + "             AND cl.idofclientgroup < 1100000000 AND o.ordertype in (:order_types)) "
+                        + "         OR (o.ordertype=:recycling AND cl.idofclientgroup=:administration))"
+                        + "     AND o.idoforg IN (:idOfOrgList) "
+                        + "GROUP BY o.idoforg,  cast (to_timestamp(o.createddate/1000) AS DATE) "
+                        + "ORDER BY o.idoforg "
+                        + "), "
                         + "b AS (SELECT cfo.shortnameinfoservice as orgname, cfo.address, "
                         + "count(DISTINCT  cl.idOfClient) benefitcount, cfo.idoforg FROM cf_orgs cfo "
                         + "INNER JOIN cf_clients cl ON cl.idoforg = cfo.idoforg "
@@ -72,13 +89,14 @@ public class LatePaymentReportService {
         query.setParameterList("idOfOrgList", idOfOrgList);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
-        query.setParameterList("order_types", Arrays.asList(new Integer[] {
+        query.setParameterList("order_types", Arrays.asList(
                 OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal(),
                 OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal(),
                 OrderTypeEnumType.CORRECTION_TYPE.ordinal(),
-                OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal(),
-                OrderTypeEnumType.RECYCLING_RETIONS.ordinal()
-        }));
+                OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal()
+        ));
+        query.setParameter("recycling", OrderTypeEnumType.RECYCLING_RETIONS.ordinal());
+        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
 
         List resultList = query.list();
 
