@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.sfk.detailed;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -43,20 +44,27 @@ public class LatePaymentDetailedReportService {
         if (showReserve) {
             cats += ", 50";
         }
+
+        String orderRecycle = "";
+        if (showRecycling) {
+            orderRecycle = "OR (cl.idofclientgroup=" + ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue() +
+                    " AND o.ordertype=" + OrderTypeEnumType.RECYCLING_RETIONS.ordinal() + ")";
+        }
+
         Query query = session.createSQLQuery(
                 "SELECT cfo.shortnameinfoservice as orgnum, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE) paymentDate"
                         + " FROM cf_orders o INNER JOIN cf_orgs cfo ON cfo.idoforg = o.idoforg"
                         + " INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
-                        + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
+                        + " LEFT JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
                         + " WHERE cast (to_timestamp(o.createddate/1000) AS DATE) <> cast (to_timestamp(o.orderdate/1000) AS DATE)"
-                        + " AND o.ordertype IN (:order_types) AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate"
-                        + " AND o.idoforg = :idOfOrg AND cc.idOfCategoryDiscount IN (" + cats + ")"
+                        + " AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate AND o.idoforg = :idOfOrg"
+                        + " AND ((cc.idOfCategoryDiscount IN (" + cats + ") AND o.ordertype IN (:order_types)) " + orderRecycle + " )"
                         + " GROUP BY cfo.shortnameinfoservice, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE), o.idoforg"
                         + " ORDER BY cfo.shortnameinfoservice, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE)");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
-        query.setParameterList("order_types", getOrderTypes(showReserve, showRecycling));
+        query.setParameterList("order_types", getOrderTypes(showReserve));
 
         List resultList = query.list();
 
@@ -87,7 +95,7 @@ public class LatePaymentDetailedReportService {
         return latePaymentDetailedReportModelList;
     }
 
-    private List<Integer> getOrderTypes(Boolean showReserve, Boolean showRecycling) {
+    private List<Integer> getOrderTypes(Boolean showReserve) {
         List<Integer> order_types = new ArrayList<Integer>();
         order_types.add(OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
         order_types.add(OrderTypeEnumType.CORRECTION_TYPE.ordinal());
@@ -95,11 +103,6 @@ public class LatePaymentDetailedReportService {
             order_types.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
             order_types.add(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal());
         }
-
-        if (showRecycling) {
-            order_types.add(OrderTypeEnumType.RECYCLING_RETIONS.ordinal());
-        }
-
         return order_types;
     }
 
@@ -110,7 +113,9 @@ public class LatePaymentDetailedReportService {
         if (showReserve) {
             cats += ", 50";
         }
-        String orderTypeCondition = " and ((o.ordertype in (:order_types) and cc.idOfCategoryDiscount IN (" + cats + "))) ";
+        String orderTypeCondition = " and ((o.ordertype in (:order_types) and cc.idOfCategoryDiscount IN (" + cats + "))" +
+                ((showRecycling) ? "OR (cl.idofclientgroup = " + ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue()
+                        + " AND o.ordertype=" + OrderTypeEnumType.RECYCLING_RETIONS.ordinal() + ")) " : ") ");
 
         List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = new ArrayList<LatePaymentDetailedSubReportModel>();
 
@@ -121,18 +126,18 @@ public class LatePaymentDetailedReportService {
                         + " FROM cf_orders o INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
                         + " INNER JOIN cf_persons p ON cl.idofperson = p.idofperson"
                         + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg"
-                        + " INNER JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
+                        + " LEFT JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
                         + " left join CF_ClientGroups cg on cl.idoforg = cg.IdOfOrg and cl.IdOfClientGroup = cg.IdOfClientGroup"
                         + " WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
                         + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
                         + " AND o.state = 0 AND o.idoforg = :idOfOrg " + orderTypeCondition
                         + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, cg.groupname, od.menudetailname, o.ordertype"
-                        + " ORDER BY o.createddate, cg.GroupName");
+                        + " ORDER BY foodDate, client, groupname");
         query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("paymentDate", paymentDate);
+        query.setParameter("paymentDate", CalendarUtils.truncateToDayOfMonth(paymentDate));
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
-        query.setParameterList("order_types", getOrderTypes(showReserve, showRecycling));
+        query.setParameterList("order_types", getOrderTypes(showReserve));
 
         List resultList = query.list();
 
