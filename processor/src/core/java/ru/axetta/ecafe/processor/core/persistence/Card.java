@@ -22,6 +22,7 @@ public class Card {
     public static final String[] TYPE_NAMES = {UNKNOWN_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК",
             "Транспортная карта", "Банковская карта", "Соц. карта москвича", "Соц. карта учащегося", "Браслет (Mifare)", "Часы (Mifare)", "Брелок (Mifare)"};
     public static final int TYPE_UEC=4;
+    public static final Integer[] DEPRECATED_TYPES = {2, 3, 4}; //Устаревшие типы карт, скрываем из списка типов на странице регистрации карты
 
     public static final String[] STATE_NAMES = {"Активна", "Временно заблокирована", "Окончательно заблокирована"};
     public static final int ACTIVE_STATE = 0;

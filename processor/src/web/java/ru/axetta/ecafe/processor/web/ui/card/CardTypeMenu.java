@@ -6,7 +6,11 @@ package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.persistence.Card;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import javax.faces.model.SelectItem;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,11 +24,14 @@ public class CardTypeMenu {
     private SelectItem[] items = readAllItems();
 
     private static SelectItem[] readAllItems() {
-        SelectItem[] items = new SelectItem[Card.TYPE_NAMES.length];
-        for (int i = 0; i < items.length; ++i) {
-            items[i] = new SelectItem(i, Card.TYPE_NAMES[i]);
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        for (int i = 0; i < Card.TYPE_NAMES.length; ++i) {
+            if (ArrayUtils.contains(Card.DEPRECATED_TYPES, i)) continue;
+            items.add(new SelectItem(i, Card.TYPE_NAMES[i]));
         }
-        return items;
+        SelectItem[] itemsArray = new SelectItem[items.size()];
+        itemsArray = items.toArray(itemsArray);
+        return itemsArray;
     }
 
     public SelectItem[] getItems() {
