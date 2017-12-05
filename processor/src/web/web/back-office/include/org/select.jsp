@@ -36,19 +36,19 @@
                             <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.filter}" size="48" maxlength="128"
                                          styleClass="input-text">
-                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
                                              reRender="modalOrgSelectorOrgTable" />
                             </h:inputText>
                             <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.tagFilter}" size="48" maxlength="128"
                                          styleClass="input-text">
-                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
                                              reRender="modalOrgSelectorOrgTable" />
                             </h:inputText>
                             <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.idFilter}" size="48" maxlength="128"
                                          styleClass="input-text">
-                                <a4j:support event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
+                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgSelectPage}"
                                              reRender="modalOrgSelectorOrgTable" />
                             </h:inputText>
                             <h:outputText escape="true" value="Фильтр по округу: " styleClass="output-text" />

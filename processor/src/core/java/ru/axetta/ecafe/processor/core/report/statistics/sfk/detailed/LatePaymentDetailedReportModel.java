@@ -22,6 +22,7 @@ public class LatePaymentDetailedReportModel {
 
     private List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList;
     private List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportRecyclingModelList;
+    private List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportChangeModelList;
 
     public LatePaymentDetailedReportModel(String orgnum, String address, String paymentDate, Long idOfOrg) {
         this.orgnum = orgnum;
@@ -81,5 +82,14 @@ public class LatePaymentDetailedReportModel {
     public void setLatePaymentDetailedSubReportRecyclingModelList(
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportRecyclingModelList) {
         this.latePaymentDetailedSubReportRecyclingModelList = latePaymentDetailedSubReportRecyclingModelList;
+    }
+
+    public List<LatePaymentDetailedSubReportModel> getLatePaymentDetailedSubReportChangeModelList() {
+        return latePaymentDetailedSubReportChangeModelList;
+    }
+
+    public void setLatePaymentDetailedSubReportChangeModelList(
+            List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportChangeModelList) {
+        this.latePaymentDetailedSubReportChangeModelList = latePaymentDetailedSubReportChangeModelList;
     }
 }

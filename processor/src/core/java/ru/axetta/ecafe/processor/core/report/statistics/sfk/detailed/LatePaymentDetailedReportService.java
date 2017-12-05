@@ -40,8 +40,10 @@ public class LatePaymentDetailedReportService {
         List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = new ArrayList<LatePaymentDetailedReportModel>();
 
         String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
+        String orderChange = "";
         if (showReserve) {
             cats += ", 50";
+            orderChange = " OR (o.ordertype=11 AND cc.idOfCategoryDiscount is NULL)";
         }
 
         String orderRecycle = "";
@@ -50,6 +52,7 @@ public class LatePaymentDetailedReportService {
                     " AND o.ordertype=" + OrderTypeEnumType.RECYCLING_RETIONS.ordinal() + ")";
         }
 
+
         Query query = session.createSQLQuery(
                 "SELECT cfo.shortnameinfoservice as orgnum, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE) paymentDate"
                         + " FROM cf_orders o INNER JOIN cf_orgs cfo ON cfo.idoforg = o.idoforg"
@@ -57,7 +60,7 @@ public class LatePaymentDetailedReportService {
                         + " LEFT JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
                         + " WHERE cast (to_timestamp(o.createddate/1000) AS DATE) <> cast (to_timestamp(o.orderdate/1000) AS DATE)"
                         + " AND o.state = 0 AND o.createddate BETWEEN :startDate AND :endDate AND o.idoforg = :idOfOrg"
-                        + " AND ((cc.idOfCategoryDiscount IN (" + cats + ") AND o.ordertype IN (:order_types)) " + orderRecycle + " )"
+                        + " AND ((cc.idOfCategoryDiscount IN (" + cats + ") AND o.ordertype IN (:order_types)) " + orderRecycle + orderChange + " )"
                         + " GROUP BY cfo.shortnameinfoservice, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE), o.idoforg"
                         + " ORDER BY cfo.shortnameinfoservice, cfo.address, cast (to_timestamp(o.orderdate/1000) AS DATE)");
         query.setParameter("idOfOrg", idOfOrg);
@@ -71,6 +74,7 @@ public class LatePaymentDetailedReportService {
         String address;
         Date paymentDate;
         List<LatePaymentDetailedSubReportModel> recyclingElements = new ArrayList<LatePaymentDetailedSubReportModel>();
+        List<LatePaymentDetailedSubReportModel> changeElements = new ArrayList<LatePaymentDetailedSubReportModel>();
 
         for (Object res : resultList) {
             Object[] result = (Object[]) res;
@@ -84,7 +88,7 @@ public class LatePaymentDetailedReportService {
 
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = getExtraData(session,
                     idOfOrg, CalendarUtils.parseDate(latePaymentDetailedReportModel.getPaymentDate()), startDate,
-                    endDate, showReserve, showRecycling, recyclingElements);
+                    endDate, showReserve, showRecycling, recyclingElements, changeElements);
 
             latePaymentDetailedReportModel
                     .setLatePaymentDetailedSubReportModelList(latePaymentDetailedSubReportModelList);
@@ -93,8 +97,10 @@ public class LatePaymentDetailedReportService {
         }
 
         Collections.sort(recyclingElements);
+        Collections.sort(changeElements);
         LatePaymentDetailedReportModel latePaymentDetailedReportModel = new LatePaymentDetailedReportModel("",
                 "", "", -1L);
+        latePaymentDetailedReportModel.setLatePaymentDetailedSubReportChangeModelList(changeElements);
         latePaymentDetailedReportModel.setLatePaymentDetailedSubReportRecyclingModelList(recyclingElements);
         latePaymentDetailedReportModelList.add(latePaymentDetailedReportModel);
 
@@ -114,7 +120,8 @@ public class LatePaymentDetailedReportService {
 
     public List<LatePaymentDetailedSubReportModel> getExtraData(Session session, Long idOfOrg, Date paymentDate,
             Date startDate, Date endDate, Boolean showReserve, Boolean showRecycling,
-            List<LatePaymentDetailedSubReportModel> recyclingElements) {
+            List<LatePaymentDetailedSubReportModel> recyclingElements,
+            List<LatePaymentDetailedSubReportModel> changeElements) {
 
         String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
         if (showReserve) {
@@ -122,7 +129,9 @@ public class LatePaymentDetailedReportService {
         }
         String orderTypeCondition = " and ((o.ordertype in (:order_types) and cc.idOfCategoryDiscount IN (" + cats + "))" +
                 ((showRecycling) ? "OR (cl.idofclientgroup = " + ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue()
-                        + " AND o.ordertype=" + OrderTypeEnumType.RECYCLING_RETIONS.ordinal() + ")) " : ") ");
+                        + " AND o.ordertype=" + OrderTypeEnumType.RECYCLING_RETIONS.ordinal() + ") " : " ") +
+                ((showReserve) ? "OR (o.ordertype=" + OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal() + " AND cc.idOfCategoryDiscount is NULL)" : " ") +
+                ") ";
 
         List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = new ArrayList<LatePaymentDetailedSubReportModel>();
 
@@ -171,17 +180,14 @@ public class LatePaymentDetailedReportService {
 
             if (OrderTypeEnumType.CORRECTION_TYPE.ordinal() == orderType ||
                     OrderTypeEnumType.RECYCLING_RETIONS.ordinal() == orderType) {
-
-                Boolean isExist = false;
-                for (LatePaymentDetailedSubReportModel model : recyclingElements) {
-                    isExist |= (model.getIdOfClient().equals(idOfClient) && model.getMenuType().equals(menuType));
-                }
-
-                if (!isExist) {
-                    latePaymentDetailedSubReportModel.setGroupName("");
-                    latePaymentDetailedSubReportModel.setFoodDate("");
-                    recyclingElements.add(latePaymentDetailedSubReportModel);
-                }
+                latePaymentDetailedSubReportModel.setGroupName("");
+                latePaymentDetailedSubReportModel.setFoodDate("");
+                recyclingElements.add(latePaymentDetailedSubReportModel);
+            } else if (OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal() == orderType ||
+                    OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal() == orderType) {
+                latePaymentDetailedSubReportModel.setGroupName("");
+                latePaymentDetailedSubReportModel.setFoodDate("");
+                changeElements.add(latePaymentDetailedSubReportModel);
             } else {
                 latePaymentDetailedSubReportModelList.add(latePaymentDetailedSubReportModel);
             }
