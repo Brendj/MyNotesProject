@@ -16,11 +16,15 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
     private String foodDate;
     private String client;
     private String groupName;
+    private Long idOfClient;
+    private Integer menuType;
 
-    public LatePaymentDetailedSubReportModel(String foodDate, String client, String groupName) {
+    public LatePaymentDetailedSubReportModel(Long idOfClient, String foodDate, String client, String groupName, Integer menuType) {
         this.foodDate = foodDate;
         this.client = client;
         this.groupName = groupName;
+        this.menuType = menuType;
+        this.idOfClient = idOfClient;
     }
 
     public LatePaymentDetailedSubReportModel() {
@@ -44,7 +48,8 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
 
     @Override
     public int compareTo(LatePaymentDetailedSubReportModel o) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        // -1 - less than, 1 - greater than, 0 - equal
+        return this.getClient().compareTo(o.getClient());
     }
 
     public String getGroupName() {
@@ -53,5 +58,21 @@ public class LatePaymentDetailedSubReportModel implements Comparable<LatePayment
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
+    }
+
+    public Integer getMenuType() {
+        return menuType;
+    }
+
+    public void setMenuType(Integer menuType) {
+        this.menuType = menuType;
     }
 }

@@ -38,7 +38,9 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 		<groupHeader>
 			<band height="30">
 				<textField>
-					<reportElement uuid="a6f36032-0177-4d61-9258-58683c56294d" isPrintRepeatedValues="false" x="0" y="0" width="555" height="30"/>
+					<reportElement uuid="a6f36032-0177-4d61-9258-58683c56294d" isPrintRepeatedValues="false" x="0" y="0" width="555" height="30">
+						<printWhenExpression><![CDATA[!$F{foodDate}.isEmpty()]]></printWhenExpression>
+					</reportElement>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -54,7 +56,9 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 			</band>
 			<band height="30">
 				<textField>
-					<reportElement uuid="992b17ba-5cda-4b86-a3bb-5fae20c75661" x="0" y="0" width="555" height="30"/>
+					<reportElement uuid="992b17ba-5cda-4b86-a3bb-5fae20c75661" x="0" y="0" width="555" height="30">
+						<printWhenExpression><![CDATA[!$F{groupName}.isEmpty()]]></printWhenExpression>
+					</reportElement>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>

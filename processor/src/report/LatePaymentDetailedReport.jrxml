@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LatePaymentDetailedReport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="73c4be4f-ba04-484b-8ef4-74100423f375">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LatePaymentDetailedReport" pageWidth="595" pageHeight="1000" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="73c4be4f-ba04-484b-8ef4-74100423f375">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -18,12 +18,15 @@
 	<field name="address" class="java.lang.String"/>
 	<field name="latePaymentDetailedSubReportModelList" class="java.util.List"/>
 	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="latePaymentDetailedSubReportRecyclingModelList" class="java.util.List"/>
 	<group name="test">
 		<groupExpression><![CDATA[$F{paymentDate}]]></groupExpression>
 		<groupHeader>
 			<band height="30">
 				<textField>
-					<reportElement uuid="10f94ecb-cdb3-4717-9dc0-6024d00edc4f" mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#99CCFF"/>
+					<reportElement uuid="10f94ecb-cdb3-4717-9dc0-6024d00edc4f" mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#99CCFF">
+						<printWhenExpression><![CDATA[!$F{paymentDate}.isEmpty()]]></printWhenExpression>
+					</reportElement>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -61,44 +64,44 @@
 		</band>
 	</title>
 	<columnHeader>
-		<band height="66">
+		<band height="73">
 			<staticText>
-				<reportElement uuid="d10fa4bc-9a26-432e-947a-055c63be9651" x="11" y="0" width="100" height="20"/>
+				<reportElement uuid="d10fa4bc-9a26-432e-947a-055c63be9651" x="11" y="0" width="129" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Организация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="25297548-7a42-4399-aa7f-007d8af2ac8b" x="11" y="20" width="100" height="20"/>
+				<reportElement uuid="25297548-7a42-4399-aa7f-007d8af2ac8b" x="11" y="20" width="129" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Адрес]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="003d9f71-1437-4e14-9bc3-7e09d5bd9143" x="111" y="0" width="303" height="20"/>
+				<reportElement uuid="003d9f71-1437-4e14-9bc3-7e09d5bd9143" x="140" y="0" width="415" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{orgnum}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="c347bf42-acd5-4a49-a002-d213cec8a4c6" x="111" y="20" width="444" height="20"/>
+				<reportElement uuid="c347bf42-acd5-4a49-a002-d213cec8a4c6" x="140" y="20" width="415" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="fe1dbf12-20ed-467c-8818-ad9b7c5fdd5d" x="11" y="40" width="100" height="20"/>
+				<reportElement uuid="fe1dbf12-20ed-467c-8818-ad9b7c5fdd5d" stretchType="RelativeToTallestObject" x="11" y="40" width="129" height="33" isPrintWhenDetailOverflows="true"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[Ид. ОУ]]></text>
+				<text><![CDATA[Идентификатор организации]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="79e94339-40a2-4d9d-819e-3d16beff9454" x="111" y="40" width="444" height="20"/>
+				<reportElement uuid="79e94339-40a2-4d9d-819e-3d16beff9454" x="140" y="40" width="415" height="33"/>
 				<textElement verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
@@ -109,7 +112,9 @@
 	<detail>
 		<band height="25" splitType="Stretch">
 			<subreport>
-				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="0" width="555" height="25"/>
+				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="0" width="555" height="25">
+					<printWhenExpression><![CDATA[!$F{paymentDate}.isEmpty()]]></printWhenExpression>
+				</reportElement>
 				<subreportParameter name="id">
 					<subreportParameterExpression><![CDATA[]]></subreportParameterExpression>
 				</subreportParameter>
@@ -120,5 +125,34 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
+		<band height="55">
+			<subreport>
+				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="30" width="555" height="25" isRemoveLineWhenBlank="true"/>
+				<subreportParameter name="d_payment">
+					<subreportParameterExpression><![CDATA[$F{paymentDate}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportRecyclingModelList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="30" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF">
+					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportRecyclingModelList} && !$F{latePaymentDetailedSubReportRecyclingModelList}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[ Распределенные порции, утилизация]]></text>
+			</staticText>
+		</band>
 	</detail>
+	<pageFooter>
+		<band height="55"/>
+	</pageFooter>
 </jasperReport>
