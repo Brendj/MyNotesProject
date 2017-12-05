@@ -33,7 +33,7 @@
                              styleClass="input-text" style="margin-right: 2px; width: 275px;" />
                 <a4j:commandButton value="..."
                                    action="#{mainPage.showContragentSelectPage}"
-                                   reRender="modalContragentSelectorPanel"
+                                   reRender="modalContragentSelectorPanel,registerStampReportPanelGrid"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
