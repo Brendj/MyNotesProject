@@ -64,6 +64,8 @@ public class EventNotificationService {
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
+    private static Boolean ignoreEmptyMobile = null;
+    private static final String IGNORE_EMPTY_MOBILE_OPTION = "ecafe.processor.sms.service.emp.ignoreEmptyMobile";
 
     public static final String GUARDIAN_VALUES_KEY = "guardianId";
     public static final String TARGET_VALUES_KEY   = "targetId";
@@ -434,8 +436,15 @@ public class EventNotificationService {
                 || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue());
     }
 
+    public static boolean isIgnoreEmptyMobile() {
+        if (ignoreEmptyMobile == null) {
+            ignoreEmptyMobile = RuntimeContext.getInstance().getConfigProperties().getProperty(IGNORE_EMPTY_MOBILE_OPTION, "false").equals("true");
+        }
+        return ignoreEmptyMobile;
+    }
+
     public boolean sendSMS(Client destClient, Client dataClient, String type, String[] values, boolean sendAsync, Integer direction, Client guardian, Date eventTime) {
-        if (destClient.getMobile() == null || destClient.getMobile().length() == 0 || isLeavingGroup(destClient)) {
+        if ((StringUtils.isEmpty(destClient.getMobile()) && !isIgnoreEmptyMobile()) || isLeavingGroup(destClient)) {
             return false;
         }
         String text = getNotificationText(type, TYPE_SMS);

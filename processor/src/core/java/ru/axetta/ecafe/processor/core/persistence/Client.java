@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Li
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -178,6 +179,12 @@ public class Client {
         if (enableNotifications) {
             notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue()));
             notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue()));
+            if (EventNotificationService.isIgnoreEmptyMobile()) {
+                notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_ORDERS.getValue()));
+                notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_PAY.getValue()));
+                notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue()));
+                notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_NOTIFY_LOW_BALANCE.getValue()));
+            }
         } else {
             notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
         }

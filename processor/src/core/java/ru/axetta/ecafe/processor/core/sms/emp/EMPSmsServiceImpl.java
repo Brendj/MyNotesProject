@@ -9,6 +9,7 @@ import generated.emp_events.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
@@ -172,7 +173,7 @@ public class EMPSmsServiceImpl extends ISmsService {
     }
 
     private boolean ignoreMobileTest(EMPEventType event) {
-        return event instanceof EMPInfoMailingEventType;
+        return (event instanceof EMPInfoMailingEventType || EventNotificationService.isIgnoreEmptyMobile());
     }
 
     public String sendEvent(ru.axetta.ecafe.processor.core.persistence.Client client, EMPEventType event)

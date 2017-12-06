@@ -130,7 +130,7 @@ public class SMSService {
         }
 
         private boolean ignoreMobileTest(int messageType) {
-            return messageType == ClientSms.TYPE_INFO_MAILING_NOTIFICATION;
+            return (messageType == ClientSms.TYPE_INFO_MAILING_NOTIFICATION) || EventNotificationService.isIgnoreEmptyMobile();
         }
 
         public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
