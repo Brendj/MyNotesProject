@@ -2159,7 +2159,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseElementExt.setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                 purchaseElementExt.setAmount(od.getQty());
                 purchaseElementExt.setName(od.getMenuDetailName());
-                purchaseElementExt.setSum(od.getRPrice());
+                purchaseElementExt.setSum(od.getRPrice() * od.getQty());
                 purchaseElementExt.setMenuType(od.getMenuType());
                 if (od.isComplex()) {
                     purchaseElementExt.setType(1);
