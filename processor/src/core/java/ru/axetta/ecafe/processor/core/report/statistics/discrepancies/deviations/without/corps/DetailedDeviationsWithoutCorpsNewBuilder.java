@@ -108,11 +108,6 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         // План питания льготники
         String orderTypeLgotnick = getOrderTypes();
 
-        String conditionDetectedNotEat = "Проход по карте зафиксирован, питание не предоставлено";
-        String conditionNotDetectedEat = "Проход по карте не зафиксирован, питание предоставлено";
-        String conditionReserve = "Обучающиеся из группы резерва, получившие питание. Обучающиеся, получившие питание по функционалу замены";
-        String conditionRecycle = "Утилизированное питание";
-
         HashMap<Long, List<DiscountRule>> rulesForOrgMap = new HashMap<Long, List<DiscountRule>>();
         HashMap<Long, List<ComplexInfoItem>> complexInfoItemListByPlanMap = new HashMap<Long, List<ComplexInfoItem>>();
 
@@ -155,8 +150,12 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 DeviationPaymentNewItem deviationPaymentNewItem = new DeviationPaymentNewItem();
                 List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentNewSubReportItem>();
 
-                collectingReportItems(session, orderTypeLgotnick, startTime, addOneDayEndTime, conditionDetectedNotEat,
-                        conditionNotDetectedEat, conditionReserve, conditionRecycle, idOfOrgList, deviationPaymentSubReportItemList,
+                collectingReportItems(session, orderTypeLgotnick, startTime, addOneDayEndTime,
+                        DeviationPaymentNewSubReportItem.Condition.DETECTED_NOT_EAT.toString(),
+                        DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT.toString(),
+                        DeviationPaymentNewSubReportItem.Condition.RESERVE.toString(),
+                        DeviationPaymentNewSubReportItem.Condition.RECYCLE.toString(),
+                        idOfOrgList, deviationPaymentSubReportItemList,
                         rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -198,8 +197,12 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 DeviationPaymentNewItem deviationPaymentNewItem = new DeviationPaymentNewItem();
                 List<DeviationPaymentNewSubReportItem> deviationPaymentSubReportItemList = new ArrayList<DeviationPaymentNewSubReportItem>();
 
-                collectingReportItemsInterval(session, orderTypeLgotnick, startTime, endTime, conditionDetectedNotEat,
-                        conditionNotDetectedEat, conditionReserve, conditionRecycle, deviationPaymentSubReportItemList, idOfOrgList,
+                collectingReportItemsInterval(session, orderTypeLgotnick, startTime, endTime,
+                        DeviationPaymentNewSubReportItem.Condition.DETECTED_NOT_EAT.toString(),
+                        DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT.toString(),
+                        DeviationPaymentNewSubReportItem.Condition.RESERVE.toString(),
+                        DeviationPaymentNewSubReportItem.Condition.RECYCLE.toString(),
+                        deviationPaymentSubReportItemList, idOfOrgList,
                         rulesForOrgMap, complexInfoItemListByPlanMap, onlyPaidCategories);
 
                 if (!deviationPaymentSubReportItemList.isEmpty()) {
@@ -215,7 +218,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         }
 
         for (DeviationPaymentNewItem dev : deviationPaymentNewItemList) {
-            Collections.sort(dev.getDeviationPaymentNewSubReportItemList(), Collections.reverseOrder());
+            Collections.sort(dev.getDeviationPaymentNewSubReportItemList());
         }
 
         return new JRBeanCollectionDataSource(deviationPaymentNewItemList);
@@ -292,13 +295,13 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(planOrderItemsRecycleByOneDay);
 
         if (!resultSubtraction.isEmpty()) {
-            fill(resultSubtraction, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+            fill(resultSubtraction, DeviationPaymentNewSubReportItem.Condition.DETECTED_NOT_EAT, deviationPaymentSubReportItemList);
         }
         if (!resultIntersection.isEmpty()) {
-            fill(resultIntersection, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+            fill(resultIntersection, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
         }
         if (!planOrderItemsReserveByOneDay.isEmpty()) {
-            fill(planOrderItemsReserveByOneDay, conditionReserve, deviationPaymentSubReportItemList);
+            fill(planOrderItemsReserveByOneDay, DeviationPaymentNewSubReportItem.Condition.RESERVE, deviationPaymentSubReportItemList);
         }
         if (!planOrderItemsPrimaryClassesWithoutBenefitsNotDetected.isEmpty()) {
             List<PlanOrderItem> planOrderItemsContains = new ArrayList<PlanOrderItem>();
@@ -310,11 +313,11 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
             }
 
             if (!planOrderItemsContains.isEmpty()) {
-                fill(planOrderItemsContains, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                fill(planOrderItemsContains, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
             }
         }
         if (!planOrderItemsRecycleByOneDay.isEmpty()) {
-            fill(planOrderItemsRecycleByOneDay, conditionRecycle, deviationPaymentSubReportItemList);
+            fill(planOrderItemsRecycleByOneDay, DeviationPaymentNewSubReportItem.Condition.RECYCLE, deviationPaymentSubReportItemList);
         }
     }
 
@@ -421,13 +424,13 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         Collections.sort(planOrderItemsRecycleByInterval);
 
         if (!resultSubtractionInterval.isEmpty()) {
-            fill(resultSubtractionInterval, conditionDetectedNotEat, deviationPaymentSubReportItemList);
+            fill(resultSubtractionInterval, DeviationPaymentNewSubReportItem.Condition.DETECTED_NOT_EAT, deviationPaymentSubReportItemList);
         }
         if (!resultIntersectionInterval.isEmpty()) {
-            fill(resultIntersectionInterval, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+            fill(resultIntersectionInterval, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
         }
         if (!planOrderItemsReserveByInterval.isEmpty()) {
-            fill(planOrderItemsReserveByInterval, conditionReserve, deviationPaymentSubReportItemList);
+            fill(planOrderItemsReserveByInterval, DeviationPaymentNewSubReportItem.Condition.RESERVE, deviationPaymentSubReportItemList);
         }
         if (!planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval.isEmpty()) {
             List<PlanOrderItem> planOrderItemsContains = new ArrayList<PlanOrderItem>();
@@ -439,15 +442,15 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
             }
 
             if (!planOrderItemsContains.isEmpty()) {
-                fill(planOrderItemsContains, conditionNotDetectedEat, deviationPaymentSubReportItemList);
+                fill(planOrderItemsContains, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
             }
         }
         if (!planOrderItemsRecycleByInterval.isEmpty()) {
-            fill(planOrderItemsRecycleByInterval, conditionRecycle, deviationPaymentSubReportItemList);
+            fill(planOrderItemsRecycleByInterval, DeviationPaymentNewSubReportItem.Condition.RECYCLE, deviationPaymentSubReportItemList);
         }
     }
 
-    public void fill(List<PlanOrderItem> result, String condition,
+    public void fill(List<PlanOrderItem> result, DeviationPaymentNewSubReportItem.Condition condition,
             List<DeviationPaymentNewSubReportItem> deviationPaymentNewSubReportItemList) {
         Long rowNum = 0L;
         String groupName = result.get(0).getGroupName();
@@ -465,7 +468,7 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         }
     }
 
-    public DeviationPaymentNewSubReportItem createReportItem(Long rowNum, String condition,
+    public DeviationPaymentNewSubReportItem createReportItem(Long rowNum, DeviationPaymentNewSubReportItem.Condition condition,
             PlanOrderItem planOrderItem) {
         DeviationPaymentNewSubReportItem deviationPaymentNewSubReportItem = new DeviationPaymentNewSubReportItem(rowNum,
                 condition, planOrderItem.getGroupName(), planOrderItem.getClientName(), planOrderItem.getOrderDate(),

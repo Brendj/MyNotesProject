@@ -189,6 +189,8 @@ public class PlanOrderItem implements Comparable<PlanOrderItem> {
         int retCode = this.groupName.compareTo(o.getGroupName());
         if (retCode == 0)
             retCode = this.orderDate.compareTo(o.getOrderDate());
+        if (0 == retCode)
+            retCode = this.clientName.compareTo(o.getClientName());
 
         return retCode;
     }
