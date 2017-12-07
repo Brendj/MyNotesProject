@@ -8,7 +8,7 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<property name="id" value="$F{id}"/>
 		<parameterDescription><![CDATA[]]></parameterDescription>
-		<defaultValueExpression><![CDATA["D:\\Отчеты\\EP-194\\"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["D:\\work\\jboss-jsf2\\processor\\src\\report\\"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[]]>
@@ -26,7 +26,7 @@
 			<band height="30">
 				<textField>
 					<reportElement uuid="10f94ecb-cdb3-4717-9dc0-6024d00edc4f" mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#99CCFF">
-						<printWhenExpression><![CDATA[!$F{paymentDate}.isEmpty()]]></printWhenExpression>
+						<printWhenExpression><![CDATA[!$F{latePaymentDetailedSubReportModelList}.isEmpty()]]></printWhenExpression>
 					</reportElement>
 					<box>
 						<pen lineWidth="0.5"/>
@@ -126,19 +126,19 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="65">
+		<band height="85">
 			<subreport>
-				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="40" width="555" height="25" isRemoveLineWhenBlank="true">
+				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="60" width="555" height="25" isRemoveLineWhenBlank="true">
 					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportChangeModelList} && !$F{latePaymentDetailedSubReportChangeModelList}.isEmpty()]]></printWhenExpression>
 				</reportElement>
 				<subreportParameter name="d_payment">
 					<subreportParameterExpression><![CDATA[$F{paymentDate}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportChangeModelList})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReportWithoutDateAndGroup.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="40" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF">
+				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="60" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#99CCFF">
 					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportChangeModelList} && !$F{latePaymentDetailedSubReportChangeModelList}.isEmpty()]]></printWhenExpression>
 				</reportElement>
 				<box>
@@ -156,7 +156,7 @@
 		</band>
 		<band height="55">
 			<staticText>
-				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="30" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF">
+				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="30" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#99CCFF">
 					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportRecyclingModelList} && !$F{latePaymentDetailedSubReportRecyclingModelList}.isEmpty()]]></printWhenExpression>
 				</reportElement>
 				<box>
@@ -179,7 +179,7 @@
 					<subreportParameterExpression><![CDATA[$F{paymentDate}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportRecyclingModelList})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReportWithoutDateAndGroup.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

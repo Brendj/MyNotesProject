@@ -36,7 +36,8 @@ public class LatePaymentDetailedReport extends BasicReportForAllOrgJob {
    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
    */
     public static final String REPORT_NAME = "Детализированный отчет по несвоевременной оплате питания";
-    public static final String[] TEMPLATE_FILE_NAMES = {"LatePaymentDetailedReport.jasper", "LatePaymentDetailedSubReport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {"LatePaymentDetailedReport.jasper", "LatePaymentDetailedSubReport.jasper",
+                                                        "LatePaymentDetailedSubReportWithoutDateAndGroup.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{-3, -32, -49};
 
