@@ -82,8 +82,10 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             parameterMap.put("contractDate", getReportProperties().getProperty("contractDate"));
 
             calendar.setTime(startTime);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+            JRDataSource dataSource = createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap);
+            if (null == dataSource)
+                return null;
+            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             return new RegisterStampNewReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
@@ -194,7 +196,8 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                     }
                 }
 
-                addWaterCategory(headerMap);
+                if (!addWaterCategory(headerMap))
+                    return null;
 
                 calendar.add(Calendar.DATE,1);
             }
@@ -266,7 +269,11 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         }
     }
 
-    public static void addWaterCategory (Map<String, RegisterStampReportItem> headerMap) {
+    public static Boolean addWaterCategory (Map<String, RegisterStampReportItem> headerMap) {
+
+        if (headerMap.values().isEmpty())
+            return false;
+
         String waterName = "Вода питьевая";
 
         List<RegisterStampReportItem> headerList = new ArrayList<RegisterStampReportItem>(headerMap.values());
@@ -284,6 +291,8 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
         waterItem.setDatePlusNumber(headerList.get(0).getDatePlusNumber());
 
         headerMap.put(waterItem.getLevel4(), waterItem);
+
+        return true;
     }
 
     public static List<RegisterStampReportItem> totals (List<RegisterStampReportItem> headerList, List<RegisterStampReportItem> mainList) {

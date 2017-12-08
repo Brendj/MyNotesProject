@@ -168,8 +168,10 @@ public class RegisterStampNewPage extends OnlineReportPage {
                 exporter.exportReport();
                 htmlReport = os.toString("UTF-8");
                 os.close();
+                printMessage("Реестр талонов построен");
+            } else {
+                printMessage("Недостаточно данных по запрошенным параметрам");
             }
-            printMessage("Реестр талонов построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: " + e.getMessage());
             logger.error("Failed build report ", e);

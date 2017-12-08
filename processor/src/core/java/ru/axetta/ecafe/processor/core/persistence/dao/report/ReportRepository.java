@@ -373,7 +373,7 @@ public class ReportRepository extends BaseJpaDao {
 
     private BasicJasperReport buildRegisterStampReport(ReportParameters reportParameters) throws Exception {
         String templateFilename = getAutoReportGenerator().getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
-        RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
+        RegisterStampNewReport.Builder builder = new RegisterStampNewReport.Builder(templateFilename);
         return buildCommonRegisterStampReport(builder,reportParameters);
     }
 
