@@ -149,15 +149,17 @@ public class RegisterStampElectronicCollationPage extends OnlineReportPage {
         Properties properties = new Properties();
         properties
                 .setProperty(RegisterStampElectronicCollationReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
-        builder.setReportProperties(properties);
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             Org org = (Org) session.load(Org.class, idOfOrg);
+            addContractProperties(properties, org);
+            builder.setReportProperties(properties);
             builder.setOrg(
-                    new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+                    new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getShortNameInfoService(),
+                            org.getAddress()));
             BasicReportJob report = builder.build(session, startDate, endDate, localCalendar);
 
             b = builder.confirmMessage(session, startDate, endDate, org.getIdOfOrg());

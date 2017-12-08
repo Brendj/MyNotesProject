@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RegisterStampReport" pageWidth="70" pageHeight="45" whenNoDataType="AllSectionsNoDetail" columnWidth="70" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RegisterStampReport" pageWidth="536" pageHeight="1000" whenNoDataType="AllSectionsNoDetail" columnWidth="496" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -27,6 +27,9 @@
 	<parameter name="endTime" class="java.lang.Long"/>
 	<parameter name="startDate" class="java.util.Date"/>
 	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="contractNumber" class="java.lang.String"/>
+	<parameter name="contractDate" class="java.lang.String"/>
+	<parameter name="orgAddress" class="java.lang.String"/>
 	<field name="level1" class="java.lang.String"/>
 	<field name="level2" class="java.lang.String"/>
 	<field name="level3" class="java.lang.String"/>
@@ -36,7 +39,59 @@
 	<field name="number" class="java.lang.String"/>
 	<field name="dateTime" class="java.util.Date"/>
 	<title>
-		<band splitType="Stretch"/>
+		<band height="176" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" positionType="Float" x="0" y="0" width="496" height="56"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Реестр талонов
+услуг по организации питания и обеспечения питьевого режима обучающихся]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="dd2fb70b-13e5-41cc-86e6-ecc00c220968" positionType="Float" x="0" y="56" width="496" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="14" isBold="true" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%s", $P{orgName})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6c7e9d4a-32bd-4db8-82e3-053ee62188ec" positionType="Float" x="0" y="75" width="496" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[(наименование образовательной организации)]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="740c35aa-f164-461e-b2da-7df88a1685d2" positionType="Float" x="0" y="95" width="496" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Контракт № %s от %s", $P{contractNumber}, $P{contractDate})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" positionType="Float" x="0" y="115" width="496" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Период оказания услуг с %s по %s", new SimpleDateFormat("dd.MM.yyyy").format($P{startDate}),new SimpleDateFormat("dd.MM.yyyy").format($P{endDate}))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="35423792-5e5c-4560-9704-88958d4ab749" positionType="Float" mode="Transparent" x="0" y="135" width="496" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Место оказания услуг (адрес объекта образовательной организации):]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="431739f6-8292-4b00-9e13-0671fa21f3f1" positionType="Float" x="0" y="155" width="496" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="false" isUnderline="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%s", $P{orgAddress})]]></textFieldExpression>
+			</textField>
+		</band>
 	</title>
 	<pageHeader>
 		<band/>
@@ -51,7 +106,7 @@
 		<band/>
 	</lastPageFooter>
 	<summary>
-		<band height="45" splitType="Stretch">
+		<band height="245" splitType="Stretch">
 			<crosstab>
 				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" style="table" mode="Transparent" x="0" y="0" width="70" height="44" backcolor="#EAF0F8"/>
 				<crosstabHeaderCell>

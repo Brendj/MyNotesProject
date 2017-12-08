@@ -129,14 +129,16 @@ public class RegisterStampPage extends OnlineReportPage{
         RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
         Properties properties = new Properties();
         properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
-        builder.setReportProperties(properties);
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
             Org org = (Org) session.load(Org.class, idOfOrg);
-            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            addContractProperties(properties, org);
+            builder.setReportProperties(properties);
+            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getShortNameInfoService(),
+                    org.getAddress()));
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
