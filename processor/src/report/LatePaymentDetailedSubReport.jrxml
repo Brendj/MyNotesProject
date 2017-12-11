@@ -38,7 +38,7 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 		<groupHeader>
 			<band height="30">
 				<textField>
-					<reportElement isPrintRepeatedValues="false" x="0" y="0" width="555" height="30" uuid="a6f36032-0177-4d61-9258-58683c56294d"/>
+					<reportElement uuid="a6f36032-0177-4d61-9258-58683c56294d" isPrintRepeatedValues="false" x="0" y="0" width="555" height="30"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -54,7 +54,7 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 			</band>
 			<band height="30">
 				<textField>
-					<reportElement isPrintRepeatedValues="false" x="0" y="0" width="555" height="30" uuid="992b17ba-5cda-4b86-a3bb-5fae20c75661"/>
+					<reportElement uuid="992b17ba-5cda-4b86-a3bb-5fae20c75661" isPrintRepeatedValues="false" x="0" y="0" width="555" height="30"/>
 					<box>
 						<pen lineWidth="0.5"/>
 						<topPen lineWidth="0.5"/>
@@ -76,7 +76,7 @@ and cast (to_timestamp(o.orderdate/1000) as date) = $P{paymentdate}
 	<detail>
 		<band height="30" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="555" height="30" uuid="fea66af3-e599-4a4f-903e-39937de5c07a"/>
+				<reportElement uuid="fea66af3-e599-4a4f-903e-39937de5c07a" x="0" y="0" width="555" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1_subreport1" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="042ce3d5-ef68-4075-a0cb-740c00b0bc76">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="latePaymentDetailedSubReportRecyclingModelList" class="java.util.List"/>
+	<field name="paymentDate" class="java.lang.String"/>
+	<field name="latePaymentDetailedSubReportChangeModelList" class="java.util.List"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="55">
+			<subreport isUsingCache="false">
+				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="30" width="555" height="25"/>
+				<dataSourceExpression><![CDATA[(null == $F{latePaymentDetailedSubReportRecyclingModelList}) ? new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportChangeModelList}) :
+new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportRecyclingModelList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement uuid="10f94ecb-cdb3-4717-9dc0-6024d00edc4f" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#99CCFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Дата произведения оплаты " + $F{paymentDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

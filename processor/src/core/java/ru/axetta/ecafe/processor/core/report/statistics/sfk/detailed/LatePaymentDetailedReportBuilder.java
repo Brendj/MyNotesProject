@@ -64,7 +64,21 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         parameterMap.put("IS_IGNORE_PAGINATION", true);
         parameterMap.put("SUBREPORT_DIR", subReportDir);
-        JRDataSource dataSource = buildDataSource(session, idOfOrg, startTime, endTime, showReserve, showRecycling);
+        JRDataSource recyclingDS = null;
+        JRDataSource changeDS = null;
+        List<LatePaymentDetailedReportModel> recyclingModelList = new ArrayList<LatePaymentDetailedReportModel>();
+        List<LatePaymentDetailedReportModel> changeModelList = new ArrayList<LatePaymentDetailedReportModel>();
+        JRDataSource dataSource = buildDataSource(session, idOfOrg, startTime, endTime, showReserve, showRecycling,
+                recyclingModelList, changeModelList);
+
+        if (!recyclingModelList.isEmpty())
+            recyclingDS = new JRBeanCollectionDataSource(recyclingModelList);
+
+        if (!changeModelList.isEmpty())
+            changeDS = new JRBeanCollectionDataSource(changeModelList);
+
+        parameterMap.put("recyclingDS", recyclingDS);
+        parameterMap.put("changeDS", changeDS);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
@@ -72,12 +86,15 @@ public class LatePaymentDetailedReportBuilder extends BasicReportForAllOrgJob.Bu
     }
 
     private JRDataSource buildDataSource(Session session, Long idOfOrg, Date startTime, Date endTime,
-            Boolean showReverse, Boolean showRecycling) throws Exception {
+            Boolean showReverse, Boolean showRecycling, List<LatePaymentDetailedReportModel> recyclingModelList,
+            List<LatePaymentDetailedReportModel> changeModelList) throws Exception {
 
         LatePaymentDetailedReportService latePaymentDetailedReportService = new LatePaymentDetailedReportService();
 
-        List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = latePaymentDetailedReportService
-                .getMainData(session, idOfOrg, startTime, endTime, showReverse, showRecycling);
+        List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = new ArrayList<LatePaymentDetailedReportModel>();
+
+        latePaymentDetailedReportService.getMainData(session, idOfOrg, startTime, endTime, showReverse, showRecycling,
+                        latePaymentDetailedReportModelList, recyclingModelList, changeModelList);
 
         return new JRBeanCollectionDataSource(latePaymentDetailedReportModelList);
     }

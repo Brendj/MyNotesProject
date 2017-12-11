@@ -34,10 +34,10 @@ public class LatePaymentDetailedReportService {
     public LatePaymentDetailedReportService() {
     }
 
-    public List<LatePaymentDetailedReportModel> getMainData(Session session, Long idOfOrg, Date startDate, Date endDate,
-            Boolean showReserve, Boolean showRecycling) throws Exception {
-
-        List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList = new ArrayList<LatePaymentDetailedReportModel>();
+    public void getMainData(Session session, Long idOfOrg, Date startDate, Date endDate, Boolean showReserve, Boolean showRecycling,
+            List<LatePaymentDetailedReportModel> latePaymentDetailedReportModelList,
+            List<LatePaymentDetailedReportModel> recyclingModelList,
+            List<LatePaymentDetailedReportModel> changeModelList) throws Exception {
 
         String cats = "2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124";
         String orderChange = "";
@@ -73,8 +73,6 @@ public class LatePaymentDetailedReportService {
         String orgNum;
         String address;
         Date paymentDate;
-        List<LatePaymentDetailedSubReportModel> recyclingElements = new ArrayList<LatePaymentDetailedSubReportModel>();
-        List<LatePaymentDetailedSubReportModel> changeElements = new ArrayList<LatePaymentDetailedSubReportModel>();
 
         for (Object res : resultList) {
             Object[] result = (Object[]) res;
@@ -86,6 +84,9 @@ public class LatePaymentDetailedReportService {
             LatePaymentDetailedReportModel latePaymentDetailedReportModel = new LatePaymentDetailedReportModel(orgNum,
                     address, dateFormat.format(paymentDate), idOfOrg);
 
+            List<LatePaymentDetailedSubReportModel> recyclingElements = new ArrayList<LatePaymentDetailedSubReportModel>();
+            List<LatePaymentDetailedSubReportModel> changeElements = new ArrayList<LatePaymentDetailedSubReportModel>();
+
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = getExtraData(session,
                     idOfOrg, CalendarUtils.parseDate(latePaymentDetailedReportModel.getPaymentDate()), startDate,
                     endDate, showReserve, showRecycling, recyclingElements, changeElements);
@@ -94,17 +95,23 @@ public class LatePaymentDetailedReportService {
                     .setLatePaymentDetailedSubReportModelList(latePaymentDetailedSubReportModelList);
 
             latePaymentDetailedReportModelList.add(latePaymentDetailedReportModel);
+
+
+            if (!recyclingElements.isEmpty()) {
+                LatePaymentDetailedReportModel latePaymentDetailedReportRecyclingModel = new LatePaymentDetailedReportModel(
+                        orgNum, address, dateFormat.format(paymentDate), idOfOrg);
+                latePaymentDetailedReportRecyclingModel
+                        .setLatePaymentDetailedSubReportRecyclingModelList(recyclingElements);
+                recyclingModelList.add(latePaymentDetailedReportRecyclingModel);
+            }
+
+            if (!changeElements.isEmpty()) {
+                LatePaymentDetailedReportModel latePaymentDetailedReportChangeModel = new LatePaymentDetailedReportModel(
+                        orgNum, address, dateFormat.format(paymentDate), idOfOrg);
+                latePaymentDetailedReportChangeModel.setLatePaymentDetailedSubReportChangeModelList(changeElements);
+                changeModelList.add(latePaymentDetailedReportChangeModel);
+            }
         }
-
-        Collections.sort(recyclingElements);
-        Collections.sort(changeElements);
-        LatePaymentDetailedReportModel latePaymentDetailedReportModel = new LatePaymentDetailedReportModel("",
-                "", "", -1L);
-        latePaymentDetailedReportModel.setLatePaymentDetailedSubReportChangeModelList(changeElements);
-        latePaymentDetailedReportModel.setLatePaymentDetailedSubReportRecyclingModelList(recyclingElements);
-        latePaymentDetailedReportModelList.add(latePaymentDetailedReportModel);
-
-        return latePaymentDetailedReportModelList;
     }
 
     private List<Integer> getOrderTypes(Boolean showReserve) {
@@ -180,13 +187,9 @@ public class LatePaymentDetailedReportService {
 
             if (OrderTypeEnumType.CORRECTION_TYPE.ordinal() == orderType ||
                     OrderTypeEnumType.RECYCLING_RETIONS.ordinal() == orderType) {
-                latePaymentDetailedSubReportModel.setGroupName("");
-                latePaymentDetailedSubReportModel.setFoodDate("");
                 recyclingElements.add(latePaymentDetailedSubReportModel);
             } else if (OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal() == orderType ||
                     OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal() == orderType) {
-                latePaymentDetailedSubReportModel.setGroupName("");
-                latePaymentDetailedSubReportModel.setFoodDate("");
                 changeElements.add(latePaymentDetailedSubReportModel);
             } else {
                 latePaymentDetailedSubReportModelList.add(latePaymentDetailedSubReportModel);

@@ -10,6 +10,8 @@
 		<parameterDescription><![CDATA[]]></parameterDescription>
 		<defaultValueExpression><![CDATA["D:\\work\\jboss-jsf2\\processor\\src\\report\\"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="recyclingDS" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="changeDS" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -25,8 +27,8 @@
 		<groupHeader>
 			<band height="30">
 				<textField>
-					<reportElement uuid="10f94ecb-cdb3-4717-9dc0-6024d00edc4f" mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#99CCFF">
-						<printWhenExpression><![CDATA[!$F{latePaymentDetailedSubReportModelList}.isEmpty()]]></printWhenExpression>
+					<reportElement uuid="10f94ecb-cdb3-4717-9dc0-6024d00edc4f" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="555" height="30" backcolor="#99CCFF">
+						<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportModelList} && !$F{latePaymentDetailedSubReportModelList}.isEmpty()]]></printWhenExpression>
 					</reportElement>
 					<box>
 						<pen lineWidth="0.5"/>
@@ -126,20 +128,44 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReport.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="85">
-			<subreport>
-				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="60" width="555" height="25" isRemoveLineWhenBlank="true">
-					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportChangeModelList} && !$F{latePaymentDetailedSubReportChangeModelList}.isEmpty()]]></printWhenExpression>
+	</detail>
+	<summary>
+		<band height="140">
+			<staticText>
+				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" positionType="Float" mode="Opaque" x="0" y="85" width="555" height="30" forecolor="#000000" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[null != $P{recyclingDS}]]></printWhenExpression>
 				</reportElement>
-				<subreportParameter name="d_payment">
-					<subreportParameterExpression><![CDATA[$F{paymentDate}]]></subreportParameterExpression>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Распределенные порции, утилизация]]></text>
+			</staticText>
+			<subreport isUsingCache="false">
+				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" positionType="Float" x="0" y="115" width="555" height="25"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportChangeModelList})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReportWithoutDateAndGroup.jasper"]]></subreportExpression>
+				<dataSourceExpression><![CDATA[$P{recyclingDS}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReportRecyclingChange.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport isUsingCache="false">
+				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="60" width="555" height="25"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$P{changeDS}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReportRecyclingChange.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="60" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#99CCFF">
-					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportChangeModelList} && !$F{latePaymentDetailedSubReportChangeModelList}.isEmpty()]]></printWhenExpression>
+				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="60" forecolor="#000000" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[null != $P{changeDS}]]></printWhenExpression>
 				</reportElement>
 				<box>
 					<topPen lineWidth="0.5"/>
@@ -154,33 +180,5 @@
 				<text><![CDATA[Обучающиеся из группы резерва, получившие питание.Обучающиеся, получившие питание по функционалу замены]]></text>
 			</staticText>
 		</band>
-		<band height="55">
-			<staticText>
-				<reportElement uuid="3d869f60-12e1-417b-ad65-8869275ac96f" mode="Opaque" x="0" y="0" width="555" height="30" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#99CCFF">
-					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportRecyclingModelList} && !$F{latePaymentDetailedSubReportRecyclingModelList}.isEmpty()]]></printWhenExpression>
-				</reportElement>
-				<box>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Распределенные порции, утилизация]]></text>
-			</staticText>
-			<subreport>
-				<reportElement uuid="73440d49-3a00-44e3-989f-700e9079e01e" x="0" y="30" width="555" height="25" isRemoveLineWhenBlank="true">
-					<printWhenExpression><![CDATA[null != $F{latePaymentDetailedSubReportRecyclingModelList} && !$F{latePaymentDetailedSubReportRecyclingModelList}.isEmpty()]]></printWhenExpression>
-				</reportElement>
-				<subreportParameter name="d_payment">
-					<subreportParameterExpression><![CDATA[$F{paymentDate}]]></subreportParameterExpression>
-				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{latePaymentDetailedSubReportRecyclingModelList})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "LatePaymentDetailedSubReportWithoutDateAndGroup.jasper"]]></subreportExpression>
-			</subreport>
-		</band>
-	</detail>
+	</summary>
 </jasperReport>
