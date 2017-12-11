@@ -117,6 +117,12 @@ public class ImportRegisterEmployeeService extends ImportRegisterClientsService 
         }
     }
 
+    @Override
+    public String getCategoriesString(String categoriesDSZN, String clientCategories,
+            Map<Long, CategoryDiscount> categoryMap, Map<Integer, CategoryDiscountDSZN> categoryDSZNMap) {
+        return "";
+    }
+
     protected ClientMskNSIService getNSIService() {
         return RuntimeContext.getAppContext().getBean("ImportRegisterEmployeeFileService", ImportRegisterEmployeeFileService.class);
     }

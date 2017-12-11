@@ -37,15 +37,24 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeItem> loadRegistryChangeItems(long idOfOrg,
             long revisionDate) {
-        return loadRegistryChangeItems(idOfOrg, revisionDate, null, null);
+        return loadRegistryChangeItems_ForClassName(idOfOrg, revisionDate, null, null, "RegistryChange");
     }
 
+    public List<RegistryChangeItem> loadRegistryChangeEmployeeItems(long idOfOrg,
+            long revisionDate) {
+        return loadRegistryChangeItems_ForClassName(idOfOrg, revisionDate, null, null, "RegistryChangeEmployee");
+    }
 
     public List<RegistryChangeItem> loadRegistryChangeItems(long idOfOrg, long revisionDate,
-                                                            Integer actionFilter, String nameFilter) {
+            Integer actionFilter, String nameFilter) {
+        return loadRegistryChangeItems_ForClassName(idOfOrg, revisionDate, actionFilter, nameFilter, "RegistryChange");
+    }
+
+    public List<RegistryChangeItem> loadRegistryChangeItems_ForClassName(long idOfOrg, long revisionDate,
+                                                            Integer actionFilter, String nameFilter, String className) {
         try {
             List<RegistryChangeItem> items = new ArrayList<RegistryChangeItem>();
-            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter, "RegistryChange");
+            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter, className);
             for (RegistryChange c : changes) {
                 RegistryChangeItem i = new RegistryChangeItem(c.getIdOfOrg(),
                         c.getIdOfMigrateOrgTo() == null ? -1L : c.getIdOfMigrateOrgTo(),
@@ -235,6 +244,25 @@ public class FrontControllerProcessor {
         return loadRegistryChangeRevisionsByClassName(idOfOrg, "RegistryChange");
     }
 
+    public List<RegistryChangeItem> refreshRegistryChangeEmployeeItems(long idOfOrg) throws Exception {
+        try {
+                RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterEmployeeService.class)
+                        .syncEmployeesWithRegistry(idOfOrg, new StringBuffer());
+            return loadRegistryChangeEmployeeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
+        } catch (BadOrgGuidsException e) {
+            throw new FrontController.FrontControllerException(e.getMessage());
+        } catch (ServiceTemporaryUnavailableException e) {
+            logger.error("Failed to refresh registry change items", e);
+            throw new FrontController.FrontControllerException(e.getMessage());
+        } catch (RegistryTimeDeltaException e) {
+            logger.error("Failed to refresh registry change items", e);
+            throw new FrontController.FrontControllerException(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Failed to refresh registry change items", e);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
     public List<RegistryChangeItem> refreshRegistryChangeItems(long idOfOrg) throws Exception {
         try {
             if(RuntimeContext.RegistryType.isMsk()) {
@@ -345,6 +373,10 @@ public class FrontControllerProcessor {
             logger.error("Failed to commit registry change item", e);
         }
         return result;
+    }
+
+    public List<RegistryChangeErrorItem> loadRegistryChangeEmployeeErrorItems(long idOfOrg) {
+        return new ArrayList<RegistryChangeErrorItem>();
     }
 
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(long idOfOrg) {

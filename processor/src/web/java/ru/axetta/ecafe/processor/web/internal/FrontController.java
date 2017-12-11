@@ -216,6 +216,19 @@ public class FrontController extends HttpServlet {
                 loadRegistryChangeItemsV2(idOfOrg, revisionDate, af, nameFilter);
     }
 
+    @WebMethod(operationName = "refreshRegistryChangeEmployeeItems")
+    public List<RegistryChangeItem> refreshRegistryChangeEmployeeItems(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
+        try {
+            checkRequestValidity(idOfOrg);
+        } catch(FrontControllerException fce) {
+            logger.error("Failed to pass auth", fce);
+            return Collections.EMPTY_LIST;
+        }
+
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                refreshRegistryChangeEmployeeItems(idOfOrg);
+    }
+
     @WebMethod(operationName = "refreshRegistryChangeItems")
     public List<RegistryChangeItem> refreshRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg) throws Exception {
         try {
@@ -310,9 +323,9 @@ public class FrontController extends HttpServlet {
                 proceedRegitryChangeItem(changesList, operation, fullNameValidation);
     }
 
-    @WebMethod(operationName = "proceedRegitryChangeEmployeeItemInternal")
+    @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
     /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
-    public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItemInternal(@WebParam(name = "changesList") List<Long> changesList,
+    public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItem(@WebParam(name = "changesList") List<Long> changesList,
             @WebParam(name = "operation") int operation,
             @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
@@ -362,17 +375,6 @@ public class FrontController extends HttpServlet {
                 loadRegistryEmployeeChangeRevisions(idOfOrg);
     }
 
-    @WebMethod(operationName = "loadRegistryChangeEmployeeRevisionsInternal")
-    public List<RegistryChangeRevisionItem> loadRegistryChangeEmployeeRevisionsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
-        try {
-            checkIpValidity();
-        } catch (FrontControllerException fce) {
-            return Collections.EMPTY_LIST;
-        }
-        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                loadRegistryEmployeeChangeRevisions(idOfOrg);
-    }
-
     @WebMethod(operationName = "loadRegistryChangeErrorItems")
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
@@ -384,6 +386,19 @@ public class FrontController extends HttpServlet {
 
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeErrorItems(idOfOrg);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeEmployeeErrorItems")
+    public List<RegistryChangeErrorItem> loadRegistryChangeEmployeeErrorItems(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            checkRequestValidity(idOfOrg);
+        } catch(FrontControllerException fce) {
+            logger.error("Failed to pass auth", fce);
+            return Collections.EMPTY_LIST;
+        }
+
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeEmployeeErrorItems(idOfOrg);
     }
 
     @WebMethod(operationName = "loadRegistryChangeErrorItemsInternal")

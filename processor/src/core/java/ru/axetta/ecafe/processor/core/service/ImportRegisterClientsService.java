@@ -598,7 +598,7 @@ public class ImportRegisterClientsService {
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
     }
 
-    public static String getCategoriesString(String categoriesDSZN, String clientCategories,
+    public String getCategoriesString(String categoriesDSZN, String clientCategories,
             Map<Long, CategoryDiscount> categoryMap, Map<Integer, CategoryDiscountDSZN> categoryDSZNMap) {
         List<Long> categoriesList = new ArrayList<Long>();
         for(String c : clientCategories.split(",")) {

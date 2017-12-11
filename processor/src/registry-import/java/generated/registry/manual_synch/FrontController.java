@@ -213,9 +213,9 @@ public interface FrontController {
 
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "proceedRegitryChangeEmployeeItemInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeEmployeeItemInternal")
-    @ResponseWrapper(localName = "proceedRegitryChangeItemInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemInternalResponse")
-    public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItemInternal(
+    @RequestWrapper(localName = "proceedRegitryChangeEmployeeItem", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeEmployeeItem")
+    @ResponseWrapper(localName = "proceedRegitryChangeItemResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemResponse")
+    public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItem(
             @WebParam(name = "changesList", targetNamespace = "")
                     List<Long> changesList,
             @WebParam(name = "operation", targetNamespace = "")
@@ -562,9 +562,9 @@ public interface FrontController {
 
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "loadRegistryChangeEmployeeRevisionsInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeEmployeeRevisionsInternal")
-    @ResponseWrapper(localName = "loadRegistryChangeRevisionsInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsInternalResponse")
-    public List<RegistryChangeRevisionItem> loadRegistryChangeEmployeeRevisionsInternal(
+    @RequestWrapper(localName = "loadRegistryChangeEmployeeRevisions", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeEmployeeRevisions")
+    @ResponseWrapper(localName = "loadRegistryChangeRevisionsResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsResponse")
+    public List<RegistryChangeRevisionItem> loadRegistryChangeEmployeeRevisions(
             @WebParam(name = "idOfOrg", targetNamespace = "")
                     long idOfOrg);
 
