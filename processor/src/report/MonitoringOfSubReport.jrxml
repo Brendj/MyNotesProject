@@ -149,7 +149,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfBuffetStudent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" positionType="Float" stretchType="RelativeToBandHeight" x="540" y="0" width="60" height="26"/>
@@ -161,7 +161,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfBuffetStudent}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="42019b29-3830-46d6-8e48-5446f7179f43" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="60" height="26"/>
