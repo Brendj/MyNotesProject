@@ -270,7 +270,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
             endTime = CalendarUtils.endOfDay(endTime);
             List<String> datesStringList = CalendarUtils.datesBetween(startTime, endTime);
-            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
             List<Date> dates = new ArrayList<Date>();
             for (String date : datesStringList) {
                 dates.add(dateFormat.parse(date));
@@ -429,7 +429,7 @@ public class TotalSalesReport  extends BasicReportForContragentJob {
                 return 0L;
             }
             String ageGroup = showAgeGroups ? getAgeGroup(buffetOrder) : "";
-            String date = CalendarUtils.dateShortToString(buffetOrder.getOrderDate());
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date(buffetOrder.getOrderDate()));
             for (TotalSalesItem totalSalesItem : totalSalesItemList) {
                 if ((totalSalesItem.getDate().equals(date)) && (totalSalesItem.getType().equals(type))
                         && totalSalesItem.getAgeGroup().equals(ageGroup)) {
