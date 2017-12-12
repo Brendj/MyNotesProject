@@ -196,7 +196,7 @@ public class MonitoringOfReportService {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient AND cfod.idoforg = c.idoforg "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0");
         query.setParameter("idoforg", idOfOrg);
@@ -214,7 +214,7 @@ public class MonitoringOfReportService {
         Query query = session.createSQLQuery("SELECT count(DISTINCT (cfo.idofclient)) "
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
-                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND cfod.idoforg = g.idoforg "
+                + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.ordertype IN (4, 8) AND cfo.idoforg = :idoforg AND cfo.state = 0 AND g.idofclientgroup < 1100000000 AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime AND cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0 "
                 + (friendly == null ? "" : ("and cfo.idoforg " + (friendly ? "" : "not ") + "in (select friendlyorg from cf_friendly_organization where currentorg = :idoforg)")));
