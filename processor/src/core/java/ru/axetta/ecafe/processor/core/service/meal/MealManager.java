@@ -168,23 +168,27 @@ public class MealManager {
         criteria.setMaxResults(limit);
         List<OrderDetail> list = criteria.list();
         for(OrderDetail od : list) {
-            if(od.getOrder().getClient() != null && !StringUtils.isEmpty(od.getOrder().getOrg().getOGRN()) && !StringUtils.isEmpty(od.getOrder().getClient().getClientGUID())) {
+            if(sendOrderDetail(od)) {
                 Card card = od.getOrder().getCard();
-                if(card == null) {
-                    //card = od.getOrder().getClient().findActiveCard(session, null);
-                }
                 result.add(new TransactionDataItem(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail(), od.getOrg().getIdOfOrg(),
                         od.getOrg().getOGRN(), od.getOrder().getClient().getClientGUID(),
                         card == null ? null : card.getCardPrintedNo(), card == null ? null : card.getCardType(),
-                        od.getOrder().getTransaction() == null ? null : od.getOrder().getTransaction().getIdOfTransaction(),
-                        od.getOrder().getTransaction() == null ? od.getOrder().getCreateTime() : od.getOrder().getTransaction().getTransactionTime(),
-                        od.getOrder().getTransaction() == null ? null : od.getOrder().getTransaction().getBalanceAfterTransaction(),
+                        od.getOrder().getTransaction().getIdOfTransaction(),
+                        od.getOrder().getTransaction().getTransactionTime(),
+                        od.getOrder().getTransaction().getBalanceAfterTransaction(),
                         od.getMenuDetailName(), od.getQty(), od.getRPrice()));
             } else {
                 sendOrders.add(new TransactionDataItem(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail(), od.getCompositeIdOfOrderDetail().getIdOfOrg()));
             }
         }
         return result;
+    }
+
+    private boolean sendOrderDetail(OrderDetail od) {
+        return od.getOrder().getClient() != null
+                && !StringUtils.isEmpty(od.getOrder().getOrg().getOGRN())
+                && !StringUtils.isEmpty(od.getOrder().getClient().getClientGUID())
+                && od.getOrder().getTransaction() != null;
     }
 
     private void updateOrders(List<TransactionDataItem> sendOrders, Session session) {
