@@ -16,6 +16,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -51,11 +53,11 @@ public class OrgOrderReport extends BasicReport {
             return idDocument;
         }
 
-        public PersonItem(Person person) {
-            this.firstName = person.getFirstName();
-            this.surname = person.getSurname();
-            this.secondName = person.getSecondName();
-            this.idDocument = person.getIdDocument();
+        public PersonItem(String surname, String firstName, String secondName) {
+            this.firstName = firstName;
+            this.surname = surname;
+            this.secondName = secondName;
+            this.idDocument = "";
         }
     }
 
@@ -97,10 +99,10 @@ public class OrgOrderReport extends BasicReport {
             return totalOrderSumByCash;
         }
 
-        public ClientItem(Client client, long totalOrderSumByCard, long totalOrderSumByCash, long totalSocDiscount, long totalTrdDiscount,
-                long totalGrantSum) {
-            this.contractId = client.getContractId();
-            this.person = new PersonItem(client.getPerson());
+        public ClientItem(Long contractID, String surname, String firstName, String secondName, long totalOrderSumByCard,
+                long totalOrderSumByCash, long totalSocDiscount, long totalTrdDiscount, long totalGrantSum) {
+            this.contractId = contractID;
+            this.person = new PersonItem(surname, firstName, secondName);
             this.totalOrderSumByCard = totalOrderSumByCard;
             this.totalOrderSumByCash = totalOrderSumByCash;
             this.totalSocDiscount = totalSocDiscount;
@@ -109,7 +111,7 @@ public class OrgOrderReport extends BasicReport {
         }
     }
 
-    public static class ClientGroupItem {
+    public static class ClientGroupItem implements Comparable<ClientGroupItem> {
 
         private final Long idOfClientGroup;
         private final String groupName;
@@ -151,15 +153,10 @@ public class OrgOrderReport extends BasicReport {
             return clients;
         }
 
-        public ClientGroupItem(ClientGroup clientGroup, long totalOrderSumByCard, long totalOrderSumByCash,
+        public ClientGroupItem(Long goupID, String groupName, long totalOrderSumByCard, long totalOrderSumByCash,
                 long totalSocDiscount, long totalTrdDiscount, long totalGrantSum, List<ClientItem> clients) {
-            if (null == clientGroup) {
-                this.idOfClientGroup = null;
-                this.groupName = null;
-            } else {
-                this.idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
-                this.groupName = clientGroup.getGroupName();
-            }
+            this.idOfClientGroup = goupID;
+            this.groupName = groupName;
             this.totalOrderSumByCard = totalOrderSumByCard;
             this.totalOrderSumByCash = totalOrderSumByCash;
             this.totalSocDiscount = totalSocDiscount;
@@ -177,6 +174,11 @@ public class OrgOrderReport extends BasicReport {
             this.totalTrdDiscount = 0;
             this.totalGrantSum = 0;
             this.clients = Collections.emptyList();
+        }
+
+        @Override
+        public int compareTo(ClientGroupItem o) {
+            return this.getGroupName().compareTo(o.getGroupName());
         }
     }
 
@@ -401,73 +403,136 @@ public class OrgOrderReport extends BasicReport {
 
         private static GroupedClientsData buildGroupedClientsData(Session session, Date startTime, Date endTime,
                 Org org) throws Exception {
-            Criteria clientGroupsCriteria = session.createCriteria(ClientGroup.class);
-            clientGroupsCriteria.add(Restrictions.eq("org", org)).setFetchMode("org", FetchMode.JOIN);
-            HibernateUtils.addAscOrder(clientGroupsCriteria, "groupName");
-            List<ClientGroupItem> clientGroupItems = new LinkedList<ClientGroupItem>();
-            List clientGroups = clientGroupsCriteria.list();
+              String sql =
+                    "SELECT c.contractid, g.idofclientgroup, g.groupname, p.surname, p.firstname, p.secondname, "
+                  + "   CASE WHEN sum(o.sumbycard) IS NULL THEN 0 ELSE sum(o.sumbycard) END AS sumbycard, "
+                  + "   CASE WHEN sum(o.sumbycash) IS NULL THEN 0 ELSE sum(o.sumbycash) END AS sumbycash, "
+                  + "   CASE WHEN sum(o.socdiscount) IS NULL THEN 0 ELSE sum(o.socdiscount) END AS socdisocunt, "
+                  + "   CASE WHEN sum(o.trddiscount) IS NULL THEN 0 ELSE sum(o.trddiscount) END AS trddiscount, "
+                  + "   CASE WHEN sum(o.grantsum) IS NULL THEN 0 ELSE sum(o.grantsum) END AS grantsum "
+                  + "FROM cf_clientgroups g "
+                  + "INNER JOIN cf_clients c ON c.idoforg=g.idoforg AND c.idofclientgroup=g.idofclientgroup "
+                  + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
+                  + "LEFT JOIN cf_orders o ON o.idofclient=c.idofclient AND o.state=0 AND o.createddate >= :startDate AND o.createddate < :endDate "
+                  + "WHERE g.idoforg=:idOfOrg "
+                  + "GROUP BY c.contractid, g.idofclientgroup, g.groupname, p.surname, p.firstname, p.secondname "
+                  + "ORDER BY g.groupname, p.surname, p.firstname, p.secondname;";
+
+            Query sqlQuery = session.createSQLQuery(sql);
+            sqlQuery.setParameter("idOfOrg", org.getIdOfOrg());
+            sqlQuery.setParameter("startDate", startTime.getTime());
+            sqlQuery.setParameter("endDate", endTime.getTime());
+
+            List clients = sqlQuery.list();
+            HashMap<Long, List<GroupedClientItem>> clientItems = new HashMap<Long, List<GroupedClientItem>>();
+
+            for (Object o : clients) {
+                Object[] vals = (Object[])o;
+
+                GroupedClientItem groupedClientItem = new GroupedClientItem(((BigInteger)vals[0]).longValue(),
+                        ((BigInteger)vals[1]).longValue(), (String)vals[2], (String)vals[3], (String)vals[4],
+                        (String)vals[5], ((BigDecimal)vals[6]).longValue(), ((BigDecimal)vals[7]).longValue(),
+                        ((BigDecimal)vals[8]).longValue(), ((BigDecimal)vals[9]).longValue(),
+                        ((BigDecimal)vals[10]).longValue());
+
+                if (clientItems.containsKey(groupedClientItem.getIdOfGroup())) {
+                    List<GroupedClientItem> clientItemList = clientItems.get(groupedClientItem.getIdOfGroup());
+                    clientItemList.add(groupedClientItem);
+                } else {
+                    List<GroupedClientItem> clientItemList = new ArrayList<GroupedClientItem>();
+                    clientItemList.add(groupedClientItem);
+                    clientItems.put(groupedClientItem.getIdOfGroup(), clientItemList);
+                }
+            }
+
             long totalOrderSumByCard = 0;
             long totalOrderSumByCash = 0;
             long totalSocDiscount = 0, totalTrdDiscount = 0;
             long totalGrantSum = 0;
-            for (Object currObject : clientGroups) {
-                ClientGroup currClientGroup = (ClientGroup) currObject;
-                Criteria clientsCriteria = session.createCriteria(Client.class);
-                clientsCriteria.add(Restrictions.eq("clientGroup", currClientGroup));
-                clientsCriteria = clientsCriteria.createCriteria("person");
-                HibernateUtils.addAscOrder(clientsCriteria, "surname");
-                HibernateUtils.addAscOrder(clientsCriteria, "firstName");
-                HibernateUtils.addAscOrder(clientsCriteria, "secondName");
-                ClientGroupItem clientGroupItem = buildClientGroupItem(currClientGroup, session, startTime, endTime,
-                        clientsCriteria.list());
-                totalOrderSumByCard += clientGroupItem.getTotalOrderSumByCard();
-                totalOrderSumByCash += clientGroupItem.getTotalOrderSumByCash();
-                totalSocDiscount += clientGroupItem.getTotalSocDiscount();
-                totalTrdDiscount += clientGroupItem.getTotalTrdDiscount();
-                totalGrantSum += clientGroupItem.getTotalGrantSum();
-                clientGroupItems.add(clientGroupItem);
+            List<ClientGroupItem> clientGroupItems = new LinkedList<ClientGroupItem>();
+            for (Long idOfClientGroup : clientItems.keySet()) {
+                List<GroupedClientItem> groupedClientItemList = clientItems.get(idOfClientGroup);
+                ClientGroupItem groupItem = buildClientGroupItem(groupedClientItemList);
+                totalOrderSumByCard += groupItem.getTotalOrderSumByCard();
+                totalOrderSumByCash += groupItem.getTotalOrderSumByCash();
+                totalSocDiscount += groupItem.getTotalSocDiscount();
+                totalTrdDiscount += groupItem.getTotalTrdDiscount();
+                totalGrantSum += groupItem.getTotalGrantSum();
+                clientGroupItems.add(groupItem);
             }
+
+            Collections.sort(clientGroupItems);
+
             return new GroupedClientsData(totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount, totalGrantSum,
                     clientGroupItems);
         }
 
         private static ClientGroupItem buildUnGroupedClientsData(Session session, Date startTime, Date endTime, Org org) throws Exception {
-            Criteria clientsCriteria = session.createCriteria(Client.class);
-            clientsCriteria.add(Restrictions.eq("org", org)).setFetchMode("org", FetchMode.JOIN);
-            clientsCriteria.add(Restrictions.isNull("idOfClientGroup"));
-            clientsCriteria = clientsCriteria.createCriteria("person");
-            HibernateUtils.addAscOrder(clientsCriteria, "surname");
-            HibernateUtils.addAscOrder(clientsCriteria, "firstName");
-            HibernateUtils.addAscOrder(clientsCriteria, "secondName");
-            return buildClientGroupItem(null, session, startTime, endTime, clientsCriteria.list());
+            String sql =
+                    "SELECT c.contractid, p.surname, p.firstname, p.secondname, "
+                  + "   CASE WHEN sum(o.sumbycard) IS NULL THEN 0 ELSE sum(o.sumbycard) END AS sumbycard, "
+                  + "   CASE WHEN sum(o.sumbycash) IS NULL THEN 0 ELSE sum(o.sumbycash) END AS sumbycash, "
+                  + "   CASE WHEN sum(o.socdiscount) IS NULL THEN 0 ELSE sum(o.socdiscount) END AS socdisocunt, "
+                  + "   CASE WHEN sum(o.trddiscount) IS NULL THEN 0 ELSE sum(o.trddiscount) END AS trddiscount, "
+                  + "   CASE WHEN sum(o.grantsum) IS NULL THEN 0 ELSE sum(o.grantsum) END AS grantsum "
+                  + "FROM cf_clients c "
+                  + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
+                  + "LEFT JOIN cf_orders o ON o.idofclient=c.idofclient AND o.state=0 AND o.createddate >= :startDate AND o.createddate < :endDate "
+                  + "WHERE c.idoforg = :idOfOrg AND c.idofclientgroup IS NULL "
+                  + "GROUP BY c.contractid, p.surname, p.firstname, p.secondname "
+                  + "ORDER BY p.surname, p.firstname, p.secondname;";
+
+            Query sqlQuery = session.createSQLQuery(sql);
+            sqlQuery.setParameter("idOfOrg", org.getIdOfOrg());
+            sqlQuery.setParameter("startDate", startTime.getTime());
+            sqlQuery.setParameter("endDate", endTime.getTime());
+
+            List clients = sqlQuery.list();
+            List<GroupedClientItem> clientItems = new ArrayList<GroupedClientItem>();
+
+            for (Object o : clients) {
+                Object[] vals = (Object[])o;
+
+                GroupedClientItem groupedClientItem = new GroupedClientItem(((BigInteger)vals[0]).longValue(),
+                        null, null, (String)vals[1], (String)vals[2],
+                        (String)vals[3], ((BigDecimal)vals[4]).longValue(), ((BigDecimal)vals[5]).longValue(),
+                        ((BigDecimal)vals[6]).longValue(), ((BigDecimal)vals[7]).longValue(),
+                        ((BigDecimal)vals[8]).longValue());
+
+                clientItems.add(groupedClientItem);
+            }
+
+            return buildClientGroupItem(clientItems);
         }
 
-        private static ClientGroupItem buildClientGroupItem(ClientGroup clientGroup, Session session, Date startTime,
-                Date endTime, Collection clients) throws Exception {
+        private static ClientGroupItem buildClientGroupItem(List<GroupedClientItem> groupedClientItemList) throws Exception {
             List<ClientItem> clientItems = new LinkedList<ClientItem>();
             long totalOrderSumByCard = 0;
             long totalOrderSumByCash = 0;
             long totalSocDiscount = 0, totalTrdDiscount = 0;
             long totalGrantSum = 0;
-            for (Object currObject : clients) {
-                Client currClient = (Client) currObject;
-                ClientItem clientItem = buildClientItem(session, startTime, endTime, currClient);
+            Long groupId = -1L;
+            String groupName = "";
+            for (GroupedClientItem item : groupedClientItemList) {
+                ClientItem clientItem = buildClientItem(item);
                 clientItems.add(clientItem);
                 totalOrderSumByCard += clientItem.getTotalOrderSumByCard();
                 totalOrderSumByCash += clientItem.getTotalOrderSumByCash();
                 totalSocDiscount += clientItem.getTotalSocDiscount();
                 totalTrdDiscount += clientItem.getTotalTrdDiscount();
                 totalGrantSum += clientItem.getTotalGrantSum();
+                if (groupId < 0 || groupName.isEmpty()) {
+                    groupId = item.getIdOfGroup();
+                    groupName = item.getGroupName();
+                }
             }
-            return new ClientGroupItem(clientGroup, totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount,
+            return new ClientGroupItem(groupId, groupName, totalOrderSumByCard, totalOrderSumByCash, totalSocDiscount, totalTrdDiscount,
                     totalGrantSum, clientItems);
         }
 
-        private static ClientItem buildClientItem(Session session, Date startTime, Date endTime, Client client)
-                throws Exception {
-            TotalSums totalSums = getTotalOrderSums(session, startTime, endTime, client);
-            return new ClientItem(client, totalSums.getSumByCard(), totalSums.getSumByCash(), totalSums.getSocDiscount(), totalSums.getTrdDiscount(),
-                    totalSums.getTotalGrantSum());
+        private static ClientItem buildClientItem(GroupedClientItem item) throws Exception {
+            return new ClientItem(item.getContractID(), item.getSurname(), item.getFirstName(), item.getSecondName(),
+                    item.getSumByCard(), item.getSumByCash(), item.getSocDiscount(), item.getTrdDiscount(), item.getGrantSum());
         }
 
         private static TotalSums getTotalOrderSums(Session session, Date startTime, Date endTime, Client client)
@@ -491,6 +556,123 @@ public class OrgOrderReport extends BasicReport {
                 return 0L;
             }
             return value;
+        }
+
+        private static class GroupedClientItem {
+            private Long contractID;
+            private Long idOfGroup;
+            private String groupName;
+            private String surname;
+            private String firstName;
+            private String secondName;
+            private Long sumByCard;
+            private Long sumByCash;
+            private Long socDiscount;
+            private Long trdDiscount;
+            private Long grantSum;
+
+            private GroupedClientItem(Long contractID, Long idOfGroup, String groupName, String surname, String firstName, String secondName,
+                    Long sumByCard, Long sumByCash, Long socDiscount, Long trdDiscount, Long grantSum) {
+                this.contractID = contractID;
+                this.idOfGroup = idOfGroup;
+                this.groupName = groupName;
+                this.surname = surname;
+                this.firstName = firstName;
+                this.secondName = secondName;
+                this.sumByCard = sumByCard;
+                this.sumByCash = sumByCash;
+                this.socDiscount = socDiscount;
+                this.trdDiscount = trdDiscount;
+                this.grantSum = grantSum;
+            }
+
+            public Long getContractID() {
+                return contractID;
+            }
+
+            public void setContractID(Long contractID) {
+                this.contractID = contractID;
+            }
+
+            public Long getIdOfGroup() {
+                return idOfGroup;
+            }
+
+            public void setIdOfGroup(Long idOfGroup) {
+                this.idOfGroup = idOfGroup;
+            }
+
+            public String getGroupName() {
+                return groupName;
+            }
+
+            public void setGroupName(String groupName) {
+                this.groupName = groupName;
+            }
+
+            public String getSurname() {
+                return surname;
+            }
+
+            public void setSurname(String surname) {
+                this.surname = surname;
+            }
+
+            public String getFirstName() {
+                return firstName;
+            }
+
+            public void setFirstName(String firstName) {
+                this.firstName = firstName;
+            }
+
+            public String getSecondName() {
+                return secondName;
+            }
+
+            public void setSecondName(String secondName) {
+                this.secondName = secondName;
+            }
+
+            public Long getSumByCard() {
+                return sumByCard;
+            }
+
+            public void setSumByCard(Long sumByCard) {
+                this.sumByCard = sumByCard;
+            }
+
+            public Long getSumByCash() {
+                return sumByCash;
+            }
+
+            public void setSumByCash(Long sumByCash) {
+                this.sumByCash = sumByCash;
+            }
+
+            public Long getSocDiscount() {
+                return socDiscount;
+            }
+
+            public void setSocDiscount(Long socDiscount) {
+                this.socDiscount = socDiscount;
+            }
+
+            public Long getTrdDiscount() {
+                return trdDiscount;
+            }
+
+            public void setTrdDiscount(Long trdDiscount) {
+                this.trdDiscount = trdDiscount;
+            }
+
+            public Long getGrantSum() {
+                return grantSum;
+            }
+
+            public void setGrantSum(Long grantSum) {
+                this.grantSum = grantSum;
+            }
         }
 
     }

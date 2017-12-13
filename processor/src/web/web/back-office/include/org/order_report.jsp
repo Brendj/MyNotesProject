@@ -40,7 +40,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <rich:dataTable id="orgOrderReportTable" value="#{mainPage.orgOrderReportPage.orgOrderReport.org.clientGroups}"
-                        var="clientGroup"
+                        var="clientGroup" rows="5"
                         columnClasses="left-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column, right-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
@@ -156,6 +156,17 @@
                 </rich:column>
             </rich:subTable>
         </rich:dataTable>
+        <rich:datascroller id="orgOrderReportTableDatascroller" for="orgOrderReportTable"
+                           renderIfSinglePage="false" maxPages="10" fastControls="hide" stepControls="auto"
+                           boundaryControls="hide"
+                           style="border: solid 1px #C0C0C0; !important; background-color: white !important">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
