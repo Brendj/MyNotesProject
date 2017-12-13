@@ -238,16 +238,8 @@ public class Processor implements SyncProcessor {
     }
 
     private void saveLastProcessSectionDateSmart(SessionFactory sessionFactory, Long idOfOrg, SectionType sectionType) {
+        if (!(sectionType.equals(SectionType.ACC_INC_REGISTRY) || sectionType.equals(SectionType.LAST_TRANSACTION))) return;
         processorUtils.saveLastProcessSectionCustomDate(sessionFactory, idOfOrg, sectionType);
-        /*ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor)RuntimeContext.getAppContext().getBean("executorWithPoolSizeRange");
-        //Если размер очереди в пуле приближается к размеру самого пула, то выполнить операцию синхронно, иначе все ок и асинхронно
-        //ex.getCorePoolSize() = 5 текущее значение в настройке пула
-        if (ex == null || ex.getActiveCount() > ex.getCorePoolSize() || ex.getThreadPoolExecutor().getQueue().remainingCapacity() < MIN_REMAINING_CAPACITY_POOL) {
-            processorUtils.saveLastProcessSectionCustomDate(sessionFactory, idOfOrg, sectionType);
-            logger.error("queue size of asyncThreadPoolTaskExecutor is near to limit. Run synchronously");
-        } else {
-            processorUtils.saveLastProcessSectionDate(sessionFactory, idOfOrg, sectionType);
-        }*/
     }
 
     /* Do process full synchronization */

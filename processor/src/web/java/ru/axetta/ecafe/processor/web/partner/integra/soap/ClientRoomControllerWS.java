@@ -1805,8 +1805,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         /* контактный телефон и емайл адрес электронной почты */
         clientSummaryExt.setMobilePhone(client.getMobile());
         clientSummaryExt.setEmail(client.getEmail());
-        clientSummaryExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(client.getOrg().getIdOfOrg(),
-                typesForSummary)));
+        //clientSummaryExt.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(client.getOrg().getIdOfOrg(),
+        //        typesForSummary)));
         Contragent defaultMerchant = client.getOrg().getDefaultSupplier();
         if (defaultMerchant != null) {
             clientSummaryExt.setDefaultMerchantId(defaultMerchant.getIdOfContragent());
