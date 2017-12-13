@@ -22,14 +22,19 @@ public class ClientCreateByCardOperatorPage extends ClientCreatePage {
     public String getPageFilename() {
         return "client/createByCardOperator";
     }
+    public Long BALANCE_TO_NOTIFY_DEFAULT = 15000L;
 
     public Client createClient(Session persistenceSession) throws Exception {
         if (getIdOfClientGroup() == null) {
             throw new Exception("Выберите группу!");
         }
         this.setPlainPassword("");
-        setContractPerson(new PersonItem(new Person("", "", "")));
+        PersonItem pItem = new PersonItem(new Person("", "", ""));
+        pItem.setIdDocument("");
+        setContractPerson(pItem);
         setAddress("");
+        setBalanceToNotify(BALANCE_TO_NOTIFY_DEFAULT);
+        getPerson().setIdDocument("");
         Client client = super.createClient(persistenceSession);
         client.setCypheredPasswordByCardOperator(Client.encryptPassword("" + client.getContractId()));
         newContractId = client.getContractId();
