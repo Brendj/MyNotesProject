@@ -40,6 +40,7 @@ public class OrgOrderReportPage extends BasicWorkspacePage implements OrgSelectP
     private Date startDate;
     private Date endDate;
     private OrgOrderReport orgOrderReport;
+    private Boolean hideEmptyClients = Boolean.TRUE;
 
     public Long getIdOfOrg() {
         return idOfOrg;
@@ -89,6 +90,14 @@ public class OrgOrderReportPage extends BasicWorkspacePage implements OrgSelectP
 
     public OrgOrderReport getOrgOrderReport() {
         return orgOrderReport;
+    }
+
+    public Boolean getHideEmptyClients() {
+        return hideEmptyClients;
+    }
+
+    public void setHideEmptyClients(Boolean hideEmptyClients) {
+        this.hideEmptyClients = hideEmptyClients;
     }
 
     public OrgOrderReportPage() {
@@ -158,6 +167,6 @@ public class OrgOrderReportPage extends BasicWorkspacePage implements OrgSelectP
         this.orgOrderReport = new OrgOrderReport(this.startDate, this.endDate);
 
         OrgOrderReport.Builder orgOrderReportBuilder = new OrgOrderReport.Builder();
-        this.orgOrderReport = orgOrderReportBuilder.build(session, this.startDate, this.endDate, org);
+        this.orgOrderReport = orgOrderReportBuilder.build(session, this.startDate, this.endDate, org, this.hideEmptyClients);
     }
 }

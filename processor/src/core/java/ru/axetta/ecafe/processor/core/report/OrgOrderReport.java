@@ -5,16 +5,9 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
-import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -384,10 +377,10 @@ public class OrgOrderReport extends BasicReport {
             }
         }
 
-        public OrgOrderReport build(Session session, Date startTime, Date endTime, Org org) throws Exception {
+        public OrgOrderReport build(Session session, Date startTime, Date endTime, Org org, Boolean hideEmptyClients) throws Exception {
             Date generateTime = new Date();
-            GroupedClientsData groupedClientsData = buildGroupedClientsData(session, startTime, endTime, org);
-            ClientGroupItem unGroupedClientsData = buildUnGroupedClientsData(session, startTime, endTime, org);
+            GroupedClientsData groupedClientsData = buildGroupedClientsData(session, startTime, endTime, org, hideEmptyClients);
+            ClientGroupItem unGroupedClientsData = buildUnGroupedClientsData(session, startTime, endTime, org, hideEmptyClients);
             List<ClientGroupItem> clientGroupItems = groupedClientsData.getClientGroupItems();
             clientGroupItems.add(unGroupedClientsData);
             return new OrgOrderReport(generateTime, new Date().getTime() - generateTime.getTime(), startTime, endTime,
@@ -402,7 +395,7 @@ public class OrgOrderReport extends BasicReport {
         }
 
         private static GroupedClientsData buildGroupedClientsData(Session session, Date startTime, Date endTime,
-                Org org) throws Exception {
+                Org org, Boolean hideEmptyClients) throws Exception {
               String sql =
                     "SELECT c.contractid, g.idofclientgroup, g.groupname, p.surname, p.firstname, p.secondname, "
                   + "   CASE WHEN sum(o.sumbycard) IS NULL THEN 0 ELSE sum(o.sumbycard) END AS sumbycard, "
@@ -414,7 +407,7 @@ public class OrgOrderReport extends BasicReport {
                   + "INNER JOIN cf_clients c ON c.idoforg=g.idoforg AND c.idofclientgroup=g.idofclientgroup "
                   + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
                   + "LEFT JOIN cf_orders o ON o.idofclient=c.idofclient AND o.state=0 AND o.createddate >= :startDate AND o.createddate < :endDate "
-                  + "WHERE g.idoforg=:idOfOrg "
+                  + "WHERE g.idoforg=:idOfOrg " + (hideEmptyClients ? "AND o.idoforder IS NOT NULL " : "")
                   + "GROUP BY c.contractid, g.idofclientgroup, g.groupname, p.surname, p.firstname, p.secondname "
                   + "ORDER BY g.groupname, p.surname, p.firstname, p.secondname;";
 
@@ -467,7 +460,8 @@ public class OrgOrderReport extends BasicReport {
                     clientGroupItems);
         }
 
-        private static ClientGroupItem buildUnGroupedClientsData(Session session, Date startTime, Date endTime, Org org) throws Exception {
+        private static ClientGroupItem buildUnGroupedClientsData(Session session, Date startTime, Date endTime, Org org,
+                Boolean hideEmptyClients) throws Exception {
             String sql =
                     "SELECT c.contractid, p.surname, p.firstname, p.secondname, "
                   + "   CASE WHEN sum(o.sumbycard) IS NULL THEN 0 ELSE sum(o.sumbycard) END AS sumbycard, "
@@ -478,7 +472,7 @@ public class OrgOrderReport extends BasicReport {
                   + "FROM cf_clients c "
                   + "INNER JOIN cf_persons p ON p.idofperson=c.idofperson "
                   + "LEFT JOIN cf_orders o ON o.idofclient=c.idofclient AND o.state=0 AND o.createddate >= :startDate AND o.createddate < :endDate "
-                  + "WHERE c.idoforg = :idOfOrg AND c.idofclientgroup IS NULL "
+                  + "WHERE c.idoforg = :idOfOrg AND c.idofclientgroup IS NULL " + (hideEmptyClients ? "AND o.idoforder IS NOT NULL " : "")
                   + "GROUP BY c.contractid, p.surname, p.firstname, p.secondname "
                   + "ORDER BY p.surname, p.firstname, p.secondname;";
 

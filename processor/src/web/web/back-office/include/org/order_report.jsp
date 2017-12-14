@@ -22,13 +22,16 @@
         </h:panelGroup>
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="5">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
         <rich:calendar value="#{mainPage.orgOrderReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText escape="true" value="Конечная дата (не включая)" styleClass="output-text" />
         <rich:calendar value="#{mainPage.orgOrderReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
+        <h:outputText escape="true" value="Скрывать клиентов, по которым нет данных"
+                      styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.orgOrderReportPage.hideEmptyClients}" styleClass="output-text" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.orgOrderReportPage.buildOrgOrderReport}"
                            reRender="workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
                            status="orgOrderReportGenerateStatus"/>
