@@ -88,8 +88,8 @@ public class LatePaymentDetailedReportService {
             List<LatePaymentDetailedSubReportModel> changeElements = new ArrayList<LatePaymentDetailedSubReportModel>();
 
             List<LatePaymentDetailedSubReportModel> latePaymentDetailedSubReportModelList = getExtraData(session,
-                    idOfOrg, CalendarUtils.parseDate(latePaymentDetailedReportModel.getPaymentDate()), startDate,
-                    endDate, showReserve, showRecycling, recyclingElements, changeElements);
+                    idOfOrg, CalendarUtils.truncateToDayOfMonth(CalendarUtils.parseDate(latePaymentDetailedReportModel.getPaymentDate())),
+                    startDate, endDate, showReserve, showRecycling, recyclingElements, changeElements);
 
             latePaymentDetailedReportModel
                     .setLatePaymentDetailedSubReportModelList(latePaymentDetailedSubReportModelList);
@@ -144,19 +144,30 @@ public class LatePaymentDetailedReportService {
 
         Query query = session.createSQLQuery(
                 "SELECT cast (to_timestamp(o.createddate/1000) as date) foodDate, "
-                        + " p.surname ||' ' ||p.firstname ||' '|| p.secondname || ' (' || od.menudetailname ||')' client"
-                        + " , coalesce(cg.GroupName, '') as groupName, o.ordertype, o.idofclient, od.menutype "
-                        + " FROM cf_orders o INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
-                        + " INNER JOIN cf_persons p ON cl.idofperson = p.idofperson"
-                        + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg"
-                        + " LEFT JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
-                        + " left join CF_ClientGroups cg on cl.idoforg = cg.IdOfOrg and cl.IdOfClientGroup = cg.IdOfClientGroup"
-                        + " WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
-                        + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
-                        + " AND o.state = 0 AND o.idoforg = :idOfOrg " + orderTypeCondition
-                        + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, cg.groupname, od.menudetailname, o.ordertype, o.ordertype, o.idofclient, "
-                        + " od.menutype "
-                        + " ORDER BY foodDate, groupname, client");
+                 + " p.surname ||' ' ||p.firstname ||' '|| p.secondname || ' (' || od.menudetailname ||')' client, "
+                 + " CASE WHEN temp_groups.is_temp = TRUE THEN coalesce(cg.GroupName, '') || ' ' || '(временные)' ELSE coalesce(cg.GroupName, '') END AS groupName, "
+                 + " o.ordertype, o.idofclient, od.menutype "
+                 + " FROM cf_orders o INNER JOIN cf_clients cl ON cl.idofclient = o.idofclient"
+                 + " INNER JOIN cf_persons p ON cl.idofperson = p.idofperson"
+                 + " INNER JOIN cf_orderdetails od ON od.idoforder = o.idoforder AND od.idoforg = o.idoforg"
+                 + " LEFT JOIN CF_Clients_CategoryDiscounts cc ON cc.idofclient = cl.idofclient"
+                 + " left join CF_ClientGroups cg on cl.idoforg = cg.IdOfOrg and cl.IdOfClientGroup = cg.IdOfClientGroup"
+                 + " LEFT JOIN ("
+                 + "     WITH temp_groups AS ( "
+                 + "         SELECT r.idofsourceorg, trim(unnest(string_to_array(r.groupfilter, ','))) AS regexp "
+                 + "         FROM cf_clientallocationrule r "
+                 + "         WHERE r.istempclient=TRUE "
+                 + "     ) "
+                 + "     SELECT g.idoforg, g.idofclientgroup, true AS is_temp "
+                 + "     FROM cf_clientgroups g "
+                 + "     WHERE (g.idoforg,g.groupname) IN (SELECT idofsourceorg, regexp FROM temp_groups) "
+                 + " ) AS temp_groups ON temp_groups.idoforg=cl.idoforg AND temp_groups.idofclientgroup=cl.idofclientgroup "
+                 + " WHERE cast(to_timestamp(o.createddate / 1000)AS DATE) <> :paymentDate AND cast (to_timestamp(o.orderdate / 1000) AS DATE) = :paymentDate "
+                 + " AND o.createddate BETWEEN :startDate AND :endDate AND od.menutype BETWEEN '50' AND '99'"
+                 + " AND o.state = 0 AND o.idoforg = :idOfOrg " + orderTypeCondition
+                 + " GROUP BY o.createddate, p.surname, p.firstname, p.secondname, cg.groupname, od.menudetailname, o.ordertype, o.ordertype, o.idofclient, "
+                 + " od.menutype, temp_groups.is_temp "
+                 + " ORDER BY foodDate, groupname, client");
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("paymentDate", CalendarUtils.truncateToDayOfMonth(paymentDate));
         query.setParameter("startDate", startDate.getTime());
