@@ -44,7 +44,11 @@ public class Issuable extends LibraryDistributedObject {
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException{
         Instance i = DAOUtils.findDistributedObjectByRefGUID(Instance.class, session, guidInstance);
         JournalItem ji = DAOUtils.findDistributedObjectByRefGUID(JournalItem.class, session, guidJournalItem);
-        if((i==null && ji==null) || (i!=null && ji!=null)) throw new DistributedObjectException("NOT_FOUND_VALUE Instance");
+        if((i==null && ji==null) || (i!=null && ji!=null)) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("Issuable NOT_FOUND_VALUE Instance \"" + getGuidInstance() + "\"");
+            distributedObjectException.setData(getGuidInstance());
+            throw distributedObjectException;
+        }
         if(i!=null) setInstance(i);
         if(ji!=null) setJournalItem(ji);
     }

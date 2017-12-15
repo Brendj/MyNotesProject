@@ -99,7 +99,11 @@ public class Circulation extends LibraryDistributedObject {
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException{
         Issuable iss = DAOUtils.findDistributedObjectByRefGUID(Issuable.class, session, getGuidIssuable());
-        if(iss==null) throw new DistributedObjectException("Circulation NOT_FOUND_VALUE Issuable\"" + getGuidIssuable() +"\"");
+        if(iss==null) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("Circulation NOT_FOUND_VALUE Issuable \"" + getGuidIssuable() +"\"");
+            distributedObjectException.setData(getGuidIssuable());
+            throw distributedObjectException;
+        }
         setIssuable(iss);
 
         Circulation parentCirculation = DAOUtils.findDistributedObjectByRefGUID(Circulation.class, session, getGuidParentCirculation());
