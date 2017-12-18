@@ -5,6 +5,19 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<script type="text/javascript">
+    function onstartloading(){
+        jQuery(".command-button, .command-link").attr('disabled', 'disabled');
+    }
+    function onstoploading(){
+        jQuery(".command-button, .command-link").attr('disabled', '');
+        updateWidth();
+    }
+    jQuery(document).ready(function(){
+        updateWidth();
+    });
+</script>
+
 <h:panelGrid id="detailedDeviationsWithoutCorpsNewReportPageGrid"
              binding="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.pageComponent}"
              styleClass="borderless-grid">
@@ -52,7 +65,7 @@
         <h:commandButton value="Выгрузить в Excel"
                          actionListener="#{mainPage.detailedDeviationsWithoutCorpsNewReportPage.generateXLS}"
                          styleClass="command-button" />
-        <a4j:status id="reportGenerateStatus">
+        <a4j:status id="reportGenerateStatus" onstart="onstartloading()" onstop="onstoploading()">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>

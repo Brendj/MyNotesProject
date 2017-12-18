@@ -5,11 +5,11 @@
 	<property name="ireport.y" value="0"/>
 	<field name="groupName" class="java.lang.String"/>
 	<field name="personName" class="java.lang.String"/>
-	<field name="conditionText" class="java.lang.String">
-		<fieldDescription><![CDATA[]]></fieldDescription>
-	</field>
+	<field name="conditionText" class="java.lang.String"/>
 	<field name="complexName" class="java.lang.String"/>
 	<field name="rowNum" class="java.lang.Long"/>
+	<field name="orderDateShortFormat" class="java.lang.String"/>
+	<field name="orderDate" class="java.util.Date"/>
 	<variable name="conditionCount" class="java.lang.String" resetType="None">
 		<variableExpression><![CDATA["Итого:   " + $V{byCondition_COUNT}]]></variableExpression>
 		<initialValueExpression><![CDATA[]]></initialValueExpression>

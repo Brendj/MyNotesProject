@@ -288,7 +288,6 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
             }
         }
 
-        Collections.sort(resultIntersection);
         Collections.sort(resultSubtraction);
         Collections.sort(planOrderItemsReserveByOneDay);
         Collections.sort(planOrderItemsPrimaryClassesWithoutBenefitsNotDetected);
@@ -296,9 +295,6 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
 
         if (!resultSubtraction.isEmpty()) {
             fill(resultSubtraction, DeviationPaymentNewSubReportItem.Condition.DETECTED_NOT_EAT, deviationPaymentSubReportItemList);
-        }
-        if (!resultIntersection.isEmpty()) {
-            fill(resultIntersection, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
         }
         if (!planOrderItemsReserveByOneDay.isEmpty()) {
             fill(planOrderItemsReserveByOneDay, DeviationPaymentNewSubReportItem.Condition.RESERVE, deviationPaymentSubReportItemList);
@@ -312,8 +308,11 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 }
             }
 
-            if (!planOrderItemsContains.isEmpty()) {
-                fill(planOrderItemsContains, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
+            resultIntersection.addAll(planOrderItemsContains);
+            Collections.sort(resultIntersection);
+
+            if (!resultIntersection.isEmpty()) {
+                fill(resultIntersection, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
             }
         }
         if (!planOrderItemsRecycleByOneDay.isEmpty()) {
@@ -418,16 +417,11 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
         }
 
         Collections.sort(resultSubtractionInterval);
-        Collections.sort(resultIntersectionInterval);
         Collections.sort(planOrderItemsReserveByInterval);
-        Collections.sort(planOrderItemsPrimaryClassesWithoutBenefitsNotDetectedInterval);
         Collections.sort(planOrderItemsRecycleByInterval);
 
         if (!resultSubtractionInterval.isEmpty()) {
             fill(resultSubtractionInterval, DeviationPaymentNewSubReportItem.Condition.DETECTED_NOT_EAT, deviationPaymentSubReportItemList);
-        }
-        if (!resultIntersectionInterval.isEmpty()) {
-            fill(resultIntersectionInterval, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
         }
         if (!planOrderItemsReserveByInterval.isEmpty()) {
             fill(planOrderItemsReserveByInterval, DeviationPaymentNewSubReportItem.Condition.RESERVE, deviationPaymentSubReportItemList);
@@ -441,8 +435,11 @@ public class DetailedDeviationsWithoutCorpsNewBuilder extends BasicReportForAllO
                 }
             }
 
-            if (!planOrderItemsContains.isEmpty()) {
-                fill(planOrderItemsContains, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
+            resultIntersectionInterval.addAll(planOrderItemsContains);
+            Collections.sort(resultIntersectionInterval);
+
+            if (!resultIntersectionInterval.isEmpty()) {
+                fill(resultIntersectionInterval, DeviationPaymentNewSubReportItem.Condition.NOT_DETECTED_EAT, deviationPaymentSubReportItemList);
             }
         }
         if (!planOrderItemsRecycleByInterval.isEmpty()) {
