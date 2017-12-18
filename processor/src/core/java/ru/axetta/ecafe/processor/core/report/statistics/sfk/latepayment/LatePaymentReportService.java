@@ -51,7 +51,7 @@ public class LatePaymentReportService {
                         + "     AND ((cc.idOfCategoryDiscount IN (2, 5, 3, 4, 20, 1, 104, 105, 106, 108, 112, 121, 122, 123, 124, 50) "
                         + "             AND cl.idofclientgroup < 1100000000 AND o.ordertype in (:order_types)) "
                         + "         OR (o.ordertype=:recycling AND cl.idofclientgroup=:administration) "
-                        + "         OR (o.ordertype IN (:order_changes) AND cl.idofclientgroup < :administration)) "
+                        + "         OR (o.ordertype=:order_changes AND cl.idofclientgroup < :administration)) "
                         + "     AND o.idoforg IN (:idOfOrgList) "
                         + "GROUP BY o.idoforg,  cast (to_timestamp(o.createddate/1000) AS DATE) "
                         + "ORDER BY o.idoforg "
