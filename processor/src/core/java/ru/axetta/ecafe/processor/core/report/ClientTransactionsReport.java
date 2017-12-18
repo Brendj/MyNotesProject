@@ -54,6 +54,7 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
 
         private String templateFilename;
         private String subReportDir;
+        private FilterType filterType;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -83,7 +84,8 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
             List<Long> idOfOrgList = new ArrayList<Long>();
 
             // выбрана организация
-            if (null != organizationIDString) {
+            //if (null != organizationIDString) {
+            if (FilterType.Organization == filterType) {
                 Long organizationID = Long.parseLong(organizationIDString);
                 Org organization = null;
 
@@ -103,7 +105,8 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                 }
                 parameterMap.put("organizationName", organization.getShortName());
                 parameterMap.put("address", organization.getAddress());
-            } else if (!clientListString.isEmpty()) {   // выбраны клиенты
+                //} else if (!clientListString.isEmpty()) {   // выбраны клиенты
+            } else if (FilterType.Client == filterType) {
                 String[] clientStringList = clientListString.split(",");
 
                 for (String id : clientStringList) {
@@ -195,6 +198,14 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
                     service.buildReportItems(session, startTime, endTime, idOfOrgList, clientList,
                             operationTypeString));
         }
+
+        public FilterType getFilterType() {
+            return filterType;
+        }
+
+        public void setFilterType(FilterType filterType) {
+            this.filterType = filterType;
+        }
     }
 
     public ClientTransactionsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
@@ -225,5 +236,21 @@ public class ClientTransactionsReport extends BasicReportForAllOrgJob {
     @Override
     public int getDefaultReportPeriod() {
         return REPORT_PERIOD_PREV_PREV_PREV_DAY;
+    }
+
+    public enum FilterType {
+        Organization("clientTransactionsReportOrgTab"),
+        Client("clientTransactionsReportClientTab");
+
+        private final String description;
+
+        FilterType(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
     }
 }

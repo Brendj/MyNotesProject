@@ -56,6 +56,8 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
 
     protected Long selectedOperationType = 0L;
 
+    private ClientTransactionsReport.FilterType selectedTab = ClientTransactionsReport.FilterType.Organization;
+
     public Long getSelectedOperationType() {
         return selectedOperationType;
     }
@@ -149,6 +151,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
 
         ClientTransactionsReport.Builder builder = new ClientTransactionsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
+        builder.setFilterType(selectedTab);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -200,6 +203,7 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         Date generateTime = new Date();
         ClientTransactionsReport.Builder builder = new ClientTransactionsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
+        builder.setFilterType(selectedTab);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -383,5 +387,15 @@ public class ClientTransactionsReportPage extends OnlineReportPage implements Cl
         return items;
     }
 
+    public String getSelectedTab() {
+        return selectedTab.toString();
+    }
 
+    public void setSelectedTab(String selectedTab) {
+        if (selectedTab.equals(ClientTransactionsReport.FilterType.Organization.toString())) {
+            this.selectedTab = ClientTransactionsReport.FilterType.Organization;
+        } else if (selectedTab.equals(ClientTransactionsReport.FilterType.Client.toString())) {
+            this.selectedTab = ClientTransactionsReport.FilterType.Client;
+        }
+    }
 }
