@@ -3528,8 +3528,10 @@ public class Processor implements SyncProcessor {
                 }
             } else {
                 Long orgOwner = clientParamItem.getOrgOwner();
+                boolean changeOrg = false;
                 if (orgOwner != null) {
                     Org org = (Org)persistenceSession.get(Org.class, orgOwner);
+                    changeOrg = !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg());
                     client.setOrg(org);
                 }
                 client.setFreePayCount(clientParamItem.getFreePayCount());
@@ -3618,11 +3620,13 @@ public class Processor implements SyncProcessor {
                 }
 
             /* заносим клиента в группу */
-                if (clientParamItem.getGroupName() != null) {
-                    //TODO УБРАТЬ ВРЕМЕННЫЙ ЗАПРЕТ РЕДАКТИРОВАНИЯ ГРУППЫ В СИНХРЕ
-                    if (!(client.getOrg().getDisableEditingClientsFromAISReestr() && ClientGroup.Predefined.parse(clientParamItem.getGroupName()) == null)) {
-
-                    ClientGroup clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
+                if (StringUtils.isNotEmpty(clientParamItem.getGroupName())) {
+                    ClientGroup clientGroup;
+                    if (changeOrg) {
+                        clientGroup = findClientGroupByGroupNameAndIdOfOrg(persistenceSession, client.getOrg().getIdOfOrg(), clientParamItem.getGroupName());
+                    } else {
+                        clientGroup = orgMap.get(client.getOrg().getIdOfOrg()).get(clientParamItem.getGroupName());
+                    }
                     //если группы нет то создаем
                     if (clientGroup == null) {
                         clientGroup = createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(),
@@ -3631,24 +3635,20 @@ public class Processor implements SyncProcessor {
                         orgMap.get(client.getOrg().getIdOfOrg()).put(clientGroup.getGroupName(), clientGroup);
                     }
 
-                    if ((clientGroup != null) && (client.getClientGroup() != null) && (clientGroup.getCompositeIdOfClientGroup() != null)) {
-                        if (!clientGroup.getCompositeIdOfClientGroup().equals(client.getClientGroup().getCompositeIdOfClientGroup())) {
-                            ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(),
-                                    client);
-                            migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM.concat(String.format(" (ид. ОО=%s)", idOfOrg)));
-                            migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-                            migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+                    if (client.getClientGroup() == null || !clientGroup.equals(client.getClientGroup())) {
+                        ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(),
+                                client);
+                        migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM.concat(String.format(" (ид. ОО=%s)", idOfOrg)));
+                        migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
 
-                            migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                            migrationHistory.setNewGroupName(clientGroup.getGroupName());
+                        migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        migrationHistory.setNewGroupName(clientGroup.getGroupName());
 
-                            persistenceSession.save(migrationHistory);
-                        }
-
+                        persistenceSession.save(migrationHistory);
                     }
                     client.setClientGroup(clientGroup);
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-                    }
                 }
 
                 if (clientParamItem.getIsUseLastEEModeForPlan() != null) {
