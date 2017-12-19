@@ -179,7 +179,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 sb.append(org.getShortAddress()).append(", ");
             }
             parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
-            parameterMap.put("shortAddress", sb.substring(0, sb.length() - 2));
+            parameterMap.put("shortAddress", sb.length() == 0 ? orgLoad.getShortAddress() : sb.substring(0, sb.length() - 2));
             calendar.setTime(startTime);
 //            Calendar c = Calendar.getInstance();
 //            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
