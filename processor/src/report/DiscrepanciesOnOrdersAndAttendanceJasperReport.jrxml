@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesOnOrdersAndAttendanceJasperReport" pageWidth="905" pageHeight="595" orientation="Landscape" columnWidth="865" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
-	<property name="ireport.zoom" value="1.126972201352367"/>
-	<property name="ireport.x" value="1"/>
+	<property name="ireport.zoom" value="1.0245201830476065"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
 	<parameter name="beginDate" class="java.lang.String"/>
@@ -93,48 +93,64 @@
 	</columnHeader>
 	<detail>
 		<band height="51" splitType="Stretch">
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="e79f63cb-ff66-4dd6-b624-0fffe0938f6b" x="0" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e79f63cb-ff66-4dd6-b624-0fffe0938f6b" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="92c89d84-c2fb-4a8e-a791-75d7aad103a2" x="100" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="92c89d84-c2fb-4a8e-a791-75d7aad103a2" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgTypeCategory}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="a92321f4-4bc2-468e-8b5a-9144fcb2c71f" x="200" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a92321f4-4bc2-468e-8b5a-9144fcb2c71f" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="2039670d-88db-4653-8343-6178c97fff7b" x="300" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="2039670d-88db-4653-8343-6178c97fff7b" stretchType="RelativeToBandHeight" x="300" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="ce065575-982b-4c9d-a8fc-6433f54a8f7c" x="400" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ce065575-982b-4c9d-a8fc-6433f54a8f7c" stretchType="RelativeToBandHeight" x="400" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="50fe26f8-cf91-410f-b390-e08b8e31d459" x="700" y="0" width="62" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="50fe26f8-cf91-410f-b390-e08b8e31d459" stretchType="RelativeToBandHeight" x="700" y="0" width="62" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orderCount}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd.MM.yyyy" isBlankWhenNull="true">
-				<reportElement uuid="7f14b0ad-5841-41f7-b592-f8ab00f94614" x="500" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" pattern="dd.MM.yyyy" isBlankWhenNull="true">
+				<reportElement uuid="7f14b0ad-5841-41f7-b592-f8ab00f94614" stretchType="RelativeToBandHeight" x="500" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{currentDate}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="ee0cda4f-bab3-432c-989f-5cb17ea14fbd" x="600" y="0" width="100" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ee0cda4f-bab3-432c-989f-5cb17ea14fbd" stretchType="RelativeToBandHeight" x="600" y="0" width="100" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{requestCount}]]></textFieldExpression>
 			</textField>
-			<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" x="762" y="0" width="103" height="41"/>
+			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
+				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" stretchType="RelativeToBandHeight" x="762" y="0" width="103" height="41">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[($F{requestCount}==null ||
     $F{orderCount}==null ||

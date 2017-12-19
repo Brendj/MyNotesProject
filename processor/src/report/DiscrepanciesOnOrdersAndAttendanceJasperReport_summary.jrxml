@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesDataOnOrdersAndPaymentJasperReport_summary" language="groovy" pageWidth="905" pageHeight="595" columnWidth="865" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fecf667f-a072-49dd-9eae-2a309fbf5c0b">
-	<property name="ireport.zoom" value="1.2100000000000004"/>
-	<property name="ireport.x" value="78"/>
+	<property name="ireport.zoom" value="1.0000000000000002"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
@@ -74,8 +74,8 @@
 	</title>
 	<detail>
 		<band height="51" splitType="Stretch">
-			<textField isBlankWhenNull="true">
-				<reportElement uuid="ce065575-982b-4c9d-a8fc-6433f54a8f7c" x="400" y="0" width="200" height="41"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="ce065575-982b-4c9d-a8fc-6433f54a8f7c" positionType="Float" stretchType="RelativeToTallestObject" x="400" y="0" width="200" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
