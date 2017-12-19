@@ -158,6 +158,7 @@ public class Staff extends DistributedObject {
     }
 
     private List<DistributedObject> loadAdminStaffsForOrgs(Session session, Collection<Long> orgIds) {
+        if (orgIds.size() == 0) return new ArrayList<DistributedObject>();
         Criteria criteria = session.createCriteria(getClass());
         criteria.add(Restrictions.in("orgOwner", orgIds));
         criteria.add(Restrictions.in("idOfRole", Arrays.asList(Roles.ADMIN.getIdOfRole(), Roles.LIBRARY_ADMIN.getIdOfRole())));
