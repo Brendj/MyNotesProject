@@ -124,7 +124,8 @@ public class Publication extends LibraryDistributedObject {
         } else {
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("hash",hash));
-            Publication publication = (Publication) criteria.uniqueResult();
+            List<Publication> list = criteria.list();
+            Publication publication = list.isEmpty() ? null : list.get(0);
             session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
                 try {
