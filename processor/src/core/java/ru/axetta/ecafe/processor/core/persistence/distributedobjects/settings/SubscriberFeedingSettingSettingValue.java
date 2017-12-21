@@ -14,12 +14,21 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private int dayRequest; // Количество дней, на которые оформляются заявки на поставку
     private int dayDeActivate;   // Количество дней, пропустив которые, клиент приостанавливает свою подписку
     private boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
-    //private int dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
     private int hoursForbidChange; // Количество часов, в течение которых запрещено редактировать заявки
     private boolean sixWorkWeek; // Шестидневный план рабочих дней
     private int daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     private int dayCreateVP; //Количество дней, на которые создаются заявки вариативного питания
     private int hoursForbidVP; //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
+
+    //значения по умолчанию
+    private static final int DAY_REQUEST = 5; //5;2;0;1;0;3
+    private static final int DAY_DEACTIVATE = 2;
+    private static final boolean ENABLE_FEEDING = false;
+    private static final int HOURS_FORBID_CHANGE = 1;
+    private static final boolean SIX_WORK_WEEK = false;
+    private static final int DAYS_FORBID_CHANGE_POS = 3;
+    private static final int DAY_CREATE_VP = 0;
+    private static final int HOURS_FORBID_VP = 0;
 
     public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -27,34 +36,29 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
 
     @Override
     protected void parse(String[] values) throws ParseException {
-        this.dayRequest = Integer.parseInt(values[0]);
-        this.dayDeActivate = Integer.parseInt(values[1]);
-        this.enableFeeding = values[2].equals("1");
-        //this.dayForbidChange = Integer.parseInt(values[3]);
-        this.hoursForbidChange = Integer.parseInt(values[3]);
+        this.dayRequest = safeParseInt(values, 0, DAY_REQUEST);
+        this.dayDeActivate = safeParseInt(values, 1, DAY_DEACTIVATE);
+        this.enableFeeding = safeParseBoolean(values, 2, ENABLE_FEEDING);
+        this.hoursForbidChange = safeParseInt(values, 3, HOURS_FORBID_CHANGE);
+        this.sixWorkWeek = safeParseBoolean(values, 4, SIX_WORK_WEEK);
+        this.daysToForbidChangeInPos = safeParseInt(values, 5, DAYS_FORBID_CHANGE_POS);
+        this.dayCreateVP = safeParseInt(values, 6, DAY_CREATE_VP);
+        this.hoursForbidVP = safeParseInt(values, 7, HOURS_FORBID_VP);
+    }
 
+    private int safeParseInt(String[] values, int index, int default_value) {
         try {
-            this.sixWorkWeek = values[4].equals("1");
+            return Integer.parseInt(values[index]);
         } catch (Exception e) {
-            this.sixWorkWeek = false;
+            return default_value;
         }
+    }
 
+    private boolean safeParseBoolean(String[] values, int index, boolean default_value) {
         try {
-            this.daysToForbidChangeInPos = Integer.parseInt(values[5]);
+            return values[index].equals("1");
         } catch (Exception e) {
-            this.daysToForbidChangeInPos = 0;
-        }
-
-        try {
-            this.dayCreateVP = Integer.parseInt(values[6]);
-        } catch (Exception e) {
-            this.dayCreateVP = 0;
-        }
-
-        try {
-            this.hoursForbidVP = Integer.parseInt(values[7]);
-        } catch (Exception e) {
-            this.hoursForbidVP = 0;
+            return default_value;
         }
     }
 
