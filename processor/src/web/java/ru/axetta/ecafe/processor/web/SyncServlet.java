@@ -68,7 +68,6 @@ public class SyncServlet extends HttpServlet {
     }
 
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //Thread.currentThread().setName("SyncServlet-" + threadCounter.addAndGet(1));
         RuntimeContext runtimeContext = null;
         Long syncTime = new Date().getTime();
         SyncCollector.registerSyncStart(syncTime);
