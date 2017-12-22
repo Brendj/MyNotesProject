@@ -202,6 +202,7 @@ public class Org implements Serializable {
         this.isRecyclingEnabled = false;
         this.autoCreateCards = false;
         this.needVerifyCardSign = false;
+        this.denyPayPlanForTimeDifference = false;
         this.typeInitial = OrganizationType.SCHOOL;
     }
 
