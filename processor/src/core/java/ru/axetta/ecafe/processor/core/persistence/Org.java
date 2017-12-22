@@ -142,6 +142,7 @@ public class Org implements Serializable {
     private Boolean isRecyclingEnabled;
     private Boolean autoCreateCards;
     private Boolean needVerifyCardSign;
+    private Boolean denyPayPlanForTimeDifference;
 
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
@@ -1093,5 +1094,13 @@ public class Org implements Serializable {
 
     public void setNeedVerifyCardSign(Boolean needVerifyCardSign) {
         this.needVerifyCardSign = needVerifyCardSign;
+    }
+
+    public Boolean getDenyPayPlanForTimeDifference() {
+        return denyPayPlanForTimeDifference;
+    }
+
+    public void setDenyPayPlanForTimeDifference(Boolean denyPayPlanForTimeDifference) {
+        this.denyPayPlanForTimeDifference = denyPayPlanForTimeDifference;
     }
 }

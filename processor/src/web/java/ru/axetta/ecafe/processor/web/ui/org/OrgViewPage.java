@@ -89,6 +89,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean autoCreateCards;
     private Boolean needVirifyCardSign;
     private String registryUrl;
+    private Boolean denyPayPlanForTimeDifference;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -262,6 +263,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.isRecyclingEnabled = org.getIsRecyclingEnabled();
         this.needVirifyCardSign = org.getNeedVerifyCardSign();
         this.autoCreateCards = org.getAutoCreateCards();
+        this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
     }
 
     public String getFilterOrgs() {
@@ -686,5 +688,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setNeedVirifyCardSign(Boolean needVirifyCardSign) {
         this.needVirifyCardSign = needVirifyCardSign;
+    }
+
+    public Boolean getDenyPayPlanForTimeDifference() {
+        return denyPayPlanForTimeDifference;
+    }
+
+    public void setDenyPayPlanForTimeDifference(Boolean denyPayPlanForTimeDifference) {
+        this.denyPayPlanForTimeDifference = denyPayPlanForTimeDifference;
     }
 }

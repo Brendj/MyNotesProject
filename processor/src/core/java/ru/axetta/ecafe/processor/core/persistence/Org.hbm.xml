@@ -249,6 +249,7 @@
         <property name="isRecyclingEnabled" column="IsRecyclingEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="autoCreateCards" column="autoCreateCards" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="needVerifyCardSign" column="needVerifyCardSign" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="denyPayPlanForTimeDifference" column="denyPayPlanForTimeDifference" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
 
     </class>
 </hibernate-mapping>

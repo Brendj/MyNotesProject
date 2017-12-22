@@ -143,6 +143,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.payByCashier}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Реализация невостребованных порций" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.recyclingEnabled}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Запрет на оплату при расхождении времени" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.denyPayPlanForTimeDifference}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.cardLimit}" converter="copeckSumConverter"
                  styleClass="input-text" />
