@@ -1634,4 +1634,9 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
+
+    @WebMethod(operationName = "getServerDateTime")
+    public String getServerDateTime() {
+        return CalendarUtils.dateTimeToString(new Date());
+    }
 }
