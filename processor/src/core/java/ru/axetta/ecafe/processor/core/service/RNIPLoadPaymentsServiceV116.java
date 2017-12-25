@@ -457,8 +457,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter4.setReadonly(false);
         descriptionSimpleParameter4.setRequired(true);
         descriptionSimpleParameter4.setVisible(false);
-        //descriptionSimpleParameter4.setDefaultValue("0");
-        descriptionSimpleParameter4.setDefaultValue("13");
+        descriptionSimpleParameter4.setDefaultValue("00");
 
         DescriptionSimpleParameter descriptionSimpleParameter5 = catOf.createDescriptionSimpleParameter();
         descriptionSimpleParameter5.setForPayment(true);
