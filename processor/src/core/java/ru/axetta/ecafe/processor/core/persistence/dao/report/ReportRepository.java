@@ -486,6 +486,7 @@ public class ReportRepository extends BaseJpaDao {
             properties.setProperty("operationType", "0");
             properties.setProperty("showAllBuildings", "true");
             builder.setReportProperties(properties);
+            builder.setFilterType(ClientTransactionsReport.FilterType.Client);
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(),
                             new GregorianCalendar());
