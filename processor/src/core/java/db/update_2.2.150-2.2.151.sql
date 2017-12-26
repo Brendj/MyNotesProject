@@ -7,3 +7,5 @@
 --Новый флаг запрета на оплату при расхождении времени
 
 alter table cf_orgs add column denyPayPlanForTimeDifference integer not null default 0;
+
+--! ФИНАЛИЗИРОВАН, НЕ МЕНЯТЬ
