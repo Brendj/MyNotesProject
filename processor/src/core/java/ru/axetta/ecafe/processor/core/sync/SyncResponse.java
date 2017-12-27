@@ -357,6 +357,7 @@ public class SyncResponse {
             private final Date disablePlanEndDate;
             private final String ageTypeGroup;
             private final Long balanceToNotify;
+            private final String san;
 
 
             public Item(Client client, int clientType) {
@@ -396,6 +397,7 @@ public class SyncResponse {
                 this.disablePlanEndDate = client.getDisablePlanEndDate();
                 this.ageTypeGroup = client.getAgeTypeGroup();
                 this.balanceToNotify = client.getBalanceToNotify();
+                this.san = client.getSan();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -503,6 +505,10 @@ public class SyncResponse {
                 return balanceToNotify;
             }
 
+            public String getSan() {
+                return san;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("OrgOwner", Long.toString(this.orgOwner));
@@ -571,6 +577,7 @@ public class SyncResponse {
                 if (this.balanceToNotify != null) {
                     element.setAttribute("BalanceToNotify", String.valueOf(this.balanceToNotify));
                 }
+                element.setAttribute("San", this.san);
                 return element;
             }
 
