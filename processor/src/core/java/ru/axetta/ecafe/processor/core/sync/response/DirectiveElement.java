@@ -88,8 +88,10 @@ public class DirectiveElement implements AbstractToElement{
         directiveItemList.add(new DirectiveItem("IS_ALLOWED_PHOTO_REGISTRY", photoRegistryFlag.toString()));
 
         Boolean denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
-        if (denyPayPlanForTimeDifference)
-            directiveItemList.add(new DirectiveItem("DENY_PAY_PLAN_FOR_TIME_DIFFERENCE", denyPayPlanForTimeDifference ? "1" : "0"));
+        directiveItemList.add(new DirectiveItem("DENY_PAY_PLAN_FOR_TIME_DIFFERENCE", denyPayPlanForTimeDifference ? "1" : "0"));
+
+        Boolean allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
+        directiveItemList.add(new DirectiveItem("REGISTRY_CHANGE_EMPLOYEE", allowRegistryChangeEmployee ? "1" : "0"));
 
         Long feedingSettingLimit = OrgReadOnlyRepository.getInstance().getFeedingSettingLimit(org.getIdOfOrg());
         if (feedingSettingLimit != null) {

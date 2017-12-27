@@ -143,6 +143,7 @@ public class Org implements Serializable {
     private Boolean autoCreateCards;
     private Boolean needVerifyCardSign;
     private Boolean denyPayPlanForTimeDifference;
+    private Boolean allowRegistryChangeEmployee;
 
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
@@ -203,6 +204,7 @@ public class Org implements Serializable {
         this.autoCreateCards = false;
         this.needVerifyCardSign = false;
         this.denyPayPlanForTimeDifference = false;
+        this.allowRegistryChangeEmployee = false;
         this.typeInitial = OrganizationType.SCHOOL;
     }
 
@@ -1103,5 +1105,13 @@ public class Org implements Serializable {
 
     public void setDenyPayPlanForTimeDifference(Boolean denyPayPlanForTimeDifference) {
         this.denyPayPlanForTimeDifference = denyPayPlanForTimeDifference;
+    }
+
+    public Boolean getAllowRegistryChangeEmployee() {
+        return allowRegistryChangeEmployee;
+    }
+
+    public void setAllowRegistryChangeEmployee(Boolean allowRegistryChangeEmployee) {
+        this.allowRegistryChangeEmployee = allowRegistryChangeEmployee;
     }
 }

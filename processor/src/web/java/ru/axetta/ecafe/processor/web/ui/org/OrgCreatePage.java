@@ -87,6 +87,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean autoCreateCards = false;
     private Boolean needVerifyCardSign = false;
     private Boolean denyPayPlanForTimeDifference = false;
+    private Boolean allowRegistryChangeEmployee = false;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -261,6 +262,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setDenyPayPlanForTimeDifference(Boolean denyPayPlanForTimeDifference) {
         this.denyPayPlanForTimeDifference = denyPayPlanForTimeDifference;
+    }
+
+    public Boolean getAllowRegistryChangeEmployee() {
+        return allowRegistryChangeEmployee;
+    }
+
+    public void setAllowRegistryChangeEmployee(Boolean allowRegistryChangeEmployee) {
+        this.allowRegistryChangeEmployee = allowRegistryChangeEmployee;
     }
 
     public static class ContragentItem {
@@ -598,6 +607,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setAutoCreateCards(autoCreateCards);
         org.setNeedVerifyCardSign(needVerifyCardSign);
         org.setDenyPayPlanForTimeDifference(denyPayPlanForTimeDifference);
+        org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
 

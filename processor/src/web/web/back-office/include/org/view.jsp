@@ -188,6 +188,8 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.securityLevel}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.photoRegistry}"  styleClass="input-text" disabled="true"  />
+    <h:outputText escape="true" value="Разрешить проведение сверки сотрудников" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.allowRegistryChangeEmployee}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Главный корпус" styleClass="output-text" />
     <h:selectBooleanCheckbox readonly="true" disabled="true" value="#{mainPage.orgViewPage.mainBuidling}" styleClass="input-text" />
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />

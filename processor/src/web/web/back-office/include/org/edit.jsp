@@ -235,6 +235,8 @@
     <h:selectBooleanCheckbox id="disableEditingClientsFromAISReestrCheckbox" value="#{mainPage.orgEditPage.disableEditingClientsFromAISReestr}" />
     <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.photoRegistry}"  styleClass="input-text"  />
+    <h:outputText escape="true" value="Разрешить проведение сверки сотрудников" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.allowRegistryChangeEmployee}" styleClass="input-text" />
     <h:outputText id="fullSyncParamLabel" escape="true" value="Произвести полную синхронизацию" styleClass="output-text" />
     <h:selectBooleanCheckbox id="fullSyncParamCheckbox" value="#{mainPage.orgEditPage.fullSyncParam}" disabled="#{mainPage.orgEditPage.fullSyncParam}"/>
     <h:outputText escape="true" value="Главный корпус" styleClass="output-text" />

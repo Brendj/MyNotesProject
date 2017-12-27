@@ -125,6 +125,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean autoCreateCards;
     private Boolean needVerifyCardSign;
     private Boolean denyPayPlanForTimeDifference;
+    private Boolean allowRegistryChangeEmployee;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -361,6 +362,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setAutoCreateCards(autoCreateCards);
         org.setNeedVerifyCardSign(needVerifyCardSign);
         org.setDenyPayPlanForTimeDifference(denyPayPlanForTimeDifference);
+        org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -512,6 +514,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.autoCreateCards = org.getAutoCreateCards();
         this.needVerifyCardSign = org.getNeedVerifyCardSign();
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
+        this.allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1082,6 +1085,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setDenyPayPlanForTimeDifference(Boolean denyPayPlanForTimeDifference) {
         this.denyPayPlanForTimeDifference = denyPayPlanForTimeDifference;
+    }
+
+    public Boolean getAllowRegistryChangeEmployee() {
+        return allowRegistryChangeEmployee;
+    }
+
+    public void setAllowRegistryChangeEmployee(Boolean allowRegistryChangeEmployee) {
+        this.allowRegistryChangeEmployee = allowRegistryChangeEmployee;
     }
 
     public static class ContragentItem {
