@@ -523,10 +523,7 @@ public class ImportRegisterClientsService {
                         updateClient);
             } else {
                 //  Если группа у клиента не указана, то перемещаем его в Другие
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
-                        ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
-                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
-                        updateClient);
+                updateClient = doUpdateClientGroup(fieldConfig, cl, updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean crossFound = false;
@@ -596,6 +593,13 @@ public class ImportRegisterClientsService {
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
+    }
+
+    protected boolean doUpdateClientGroup(FieldProcessor.Config fieldConfig, Client cl, boolean updateClient) throws Exception {
+        return doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
+                ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
+                cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
+                updateClient);
     }
 
     public String getCategoriesString(String categoriesDSZN, String clientCategories,
@@ -1289,8 +1293,8 @@ public class ImportRegisterClientsService {
         }
     }
 
-    protected void setGuidFromChange(FieldProcessor.Config createConfig, RegistryChange change) throws Exception {
-        createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+    protected void setGuidFromChange(FieldProcessor.Config fieldConfig, RegistryChange change) throws Exception {
+        fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
     }
 
     //@Transactional
@@ -1318,7 +1322,6 @@ public class ImportRegisterClientsService {
                         createConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
                     }
                     setGuidFromChange(createConfig, change);
-                    //createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
                     createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
@@ -1394,7 +1397,7 @@ public class ImportRegisterClientsService {
 
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
-                    modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                    setGuidFromChange(modifyConfig, change);
                     modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());

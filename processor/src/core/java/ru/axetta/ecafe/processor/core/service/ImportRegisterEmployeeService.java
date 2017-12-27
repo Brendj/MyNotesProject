@@ -179,6 +179,13 @@ public class ImportRegisterEmployeeService extends ImportRegisterClientsService 
         }
     }
 
+    protected boolean doUpdateClientGroup(FieldProcessor.Config fieldConfig, Client cl, boolean updateClient) throws Exception {
+        return doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
+                cl == null || cl.getClientGroup() == null ? ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup() : cl.getClientGroup().getGroupName(),
+                cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
+                updateClient);
+    }
+
     public List <Client> findClientsWithoutPredefinedForOrgAndFriendly (Org organization) throws Exception {
         List <Org> orgs = DAOUtils.findFriendlyOrgs (em, organization);
         String orgsClause = " where (client.org = :org0 ";
@@ -190,7 +197,7 @@ public class ImportRegisterEmployeeService extends ImportRegisterClientsService 
         }
         orgsClause += ") " + " and (client.idOfClientGroup >= " +
                 ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and client.idOfClientGroup < " +
-                ClientGroup.Predefined.CLIENT_DISPLACED.getValue() + " )";
+                ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " )";
 
         javax.persistence.Query query = em.createQuery(
                 "from Client client " + orgsClause);
