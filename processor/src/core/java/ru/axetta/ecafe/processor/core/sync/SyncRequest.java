@@ -148,6 +148,7 @@ public class SyncRequest {
                         disablePlanEndDate = loadContext.getTimeFormat().parse(disablePlanEndDateSt);
                     }
                     Long orgOwner = getLongValueNullSafe(namedNodeMap, "OrgId");
+                    String san = getStringValueNullSafe(namedNodeMap, "San");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -155,7 +156,7 @@ public class SyncRequest {
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
-                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner);
+                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner, san);
                 }
 
 
@@ -181,6 +182,7 @@ public class SyncRequest {
             private final Date disablePlanCreationDate;
             private final Date disablePlanEndDate;
             private final Long orgOwner;
+            private final String san;
 
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
@@ -188,7 +190,7 @@ public class SyncRequest {
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
-                    Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner) {
+                    Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner, String san) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -220,6 +222,7 @@ public class SyncRequest {
                 this.disablePlanCreationDate = disablePlanCreationDate;
                 this.disablePlanEndDate = disablePlanEndDate;
                 this.orgOwner = orgOwner;
+                this.san = san;
             }
 
             public long getIdOfClient() {
@@ -329,6 +332,8 @@ public class SyncRequest {
             public Date getDisablePlanCreationDate() {
                 return disablePlanCreationDate;
             }
+
+            public String getSan() { return san; }
 
             @Override
             public String toString() {

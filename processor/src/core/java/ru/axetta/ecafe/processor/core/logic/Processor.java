@@ -3599,6 +3599,9 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getRemarks() != null) {
                     client.setRemarks(clientParamItem.getRemarks());
                 }
+                if (clientParamItem.getSan() != null) {
+                    client.setSan(clientParamItem.getSan());
+                }
                 if(!ignoreNotifyFlags) {
                     if (clientParamItem.getNotifyViaEmail() != null) {
                         client.setNotifyViaEmail(clientParamItem.getNotifyViaEmail());
