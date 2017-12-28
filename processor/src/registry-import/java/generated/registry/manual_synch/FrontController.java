@@ -221,7 +221,9 @@ public interface FrontController {
             @WebParam(name = "operation", targetNamespace = "")
                     int operation,
             @WebParam(name = "fullNameValidation", targetNamespace = "")
-                    boolean fullNameValidation);
+                    boolean fullNameValidation,
+            @WebParam(name = "groupName", targetNamespace = "")
+                    String groupName);
 
     /**
      * 

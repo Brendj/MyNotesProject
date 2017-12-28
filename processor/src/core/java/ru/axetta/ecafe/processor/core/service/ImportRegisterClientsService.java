@@ -1225,7 +1225,7 @@ public class ImportRegisterClientsService {
         return e;
     }
 
-    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation) throws Exception {
+    public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation, String groupName) throws Exception {
         Session session = null;
         Transaction transaction = null;
         List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
@@ -1254,7 +1254,7 @@ public class ImportRegisterClientsService {
             for (RegistryChange change : registryChangeList) {
                 try {
                     transaction = session.beginTransaction();
-                    applyRegistryChange(session, change, fullNameValidation, iterator);
+                    applyRegistryChange(session, change, fullNameValidation, iterator, groupName);
                     transaction.commit();
                     transaction = null;
                     if (change.getIdOfClient() != null) {
@@ -1297,8 +1297,7 @@ public class ImportRegisterClientsService {
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
     }
 
-    //@Transactional
-    public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation, Iterator<Long> iterator) throws Exception {
+    public void applyRegistryChange(Session session, RegistryChange change, boolean fullNameValidation, Iterator<Long> iterator, String groupName) throws Exception {
         Client afterSaveClient = null;
 
             Client dbClient = null;
@@ -1325,7 +1324,7 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
-                    createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                    createConfig.setValue(ClientManager.FieldId.GROUP, groupName == null ? change.getGroupName() : groupName);
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
                     if (change.getGender() != null) {
@@ -1473,6 +1472,7 @@ public class ImportRegisterClientsService {
 
             Set<RegistryChangeGuardians> registryChangeGuardiansSet = registryChange.getRegistryChangeGuardiansSet();
 
+            if (registryChangeGuardiansSet == null) return;
             for (RegistryChangeGuardians registryChangeGuardians : registryChangeGuardiansSet) {
 
                 Session session = null;

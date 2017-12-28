@@ -84,7 +84,7 @@ public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySynchPageBase
 
     @Override
     protected List<RegistryChangeCallback> proceedRegitryChangeItemInternal(FrontController controller, List<Long> list, int operation, boolean fullNameValidation) {
-        return controller.proceedRegitryChangeEmployeeItem(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
+        return controller.proceedRegitryChangeEmployeeItem(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation, null);
     }
 
     @Override

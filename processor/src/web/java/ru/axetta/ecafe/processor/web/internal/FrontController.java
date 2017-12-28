@@ -327,7 +327,8 @@ public class FrontController extends HttpServlet {
     /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
     public List<RegistryChangeCallback> proceedRegitryChangeEmployeeItem(@WebParam(name = "changesList") List<Long> changesList,
             @WebParam(name = "operation") int operation,
-            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation,
+            @WebParam(name = "groupName") String groupName) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -337,7 +338,7 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass ip check", fce);
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryEmployeeChangeItem(changesList, operation, fullNameValidation);
+                proceedRegitryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")

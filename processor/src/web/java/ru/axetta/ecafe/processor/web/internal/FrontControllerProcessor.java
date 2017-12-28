@@ -333,7 +333,7 @@ public class FrontControllerProcessor {
 
             if(RuntimeContext.RegistryType.isMsk()) {
                 result = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
-                        .applyRegistryChangeBatch(changesList, fullNameValidation);
+                        .applyRegistryChangeBatch(changesList, fullNameValidation, null);
             } else {
                 for (Long idOfRegistryChange : changesList) {
                     try {
@@ -356,7 +356,8 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeCallback> proceedRegitryEmployeeChangeItem(List<Long> changesList,
             int operation,
-            boolean fullNameValidation) {
+            boolean fullNameValidation,
+            String groupName) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
             return Collections.EMPTY_LIST;
         }
@@ -368,7 +369,7 @@ public class FrontControllerProcessor {
             }
 
                 result = RuntimeContext.getAppContext().getBean("importRegisterEmployeeService", ImportRegisterEmployeeService.class)
-                        .applyRegistryChangeBatch(changesList, fullNameValidation);
+                        .applyRegistryChangeBatch(changesList, fullNameValidation, groupName);
         } catch (Exception e) {
             logger.error("Failed to commit registry change item", e);
         }
