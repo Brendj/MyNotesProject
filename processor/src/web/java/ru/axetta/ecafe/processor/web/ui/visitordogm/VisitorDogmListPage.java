@@ -32,6 +32,7 @@ public class VisitorDogmListPage extends BasicWorkspacePage{
     private List<VisitorItem> visitorsDogm;
     // 0 - показывать всех, 1 - актуальных, 2 - удаленных.
     private int showMode = 1;
+    private String filter;
 
     public int getShowMode() {
         return showMode;
@@ -62,5 +63,20 @@ public class VisitorDogmListPage extends BasicWorkspacePage{
     public Object deleteVisitorDogm() {
         serviceBean.deleteVisitorDogm(visitorDogmGroupPage.getCurrentVisitorDogm().getIdOfVisitor());
         return null;
+    }
+
+    public Object clearFilter() throws Exception {
+        setFilter("");
+        onShow();
+        return null;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+        serviceBean.setFilter(filter);
     }
 }

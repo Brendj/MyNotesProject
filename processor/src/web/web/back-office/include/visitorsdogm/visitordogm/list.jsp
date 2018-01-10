@@ -25,6 +25,15 @@
         </h:selectOneMenu>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="4">
+        <h:outputText escape="true" value="Фильтр" styleClass="output-text" />
+        <h:inputText value="#{visitorDogmListPage.filter}" styleClass="input-text" id="visitorDogmFilterText" />
+        <a4j:commandButton value="Применить" action="#{visitorDogmListPage.show}"
+                           reRender="visitorDogmListTable" styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{visitorDogmListPage.clearFilter}"
+                           reRender="visitorDogmListTable,visitorDogmFilterText" ajaxSingle="true" styleClass="command-button" />
+    </h:panelGrid>
+
     <rich:dataTable id="visitorDogmListTable" value="#{visitorDogmListPage.visitorsDogm}" var="visitorDogm" rows="20" rowKeyVar="row"
                     columnClasses="right-aligned-column,
                     right-aligned-column, right-aligned-column, right-aligned-column,

@@ -30,6 +30,8 @@ public class EmployeeListPage extends BasicWorkspacePage{
     // 0 - показывать всех, 1 - актуальных, 2 - удаленных.
     private int showMode = 1;
 
+    private String filter;
+
     public int getShowMode() {
         return showMode;
     }
@@ -47,6 +49,12 @@ public class EmployeeListPage extends BasicWorkspacePage{
         }
     }
 
+    public Object clearFilter() throws Exception {
+        setFilter("");
+        onShow();
+        return null;
+    }
+
     public List<VisitorItem> getEmployees() {
         return employees;
     }
@@ -59,5 +67,14 @@ public class EmployeeListPage extends BasicWorkspacePage{
     public Object deleteEmployee() {
         serviceBean.deleteEmployee(employeeGroupPage.getCurrentEmployee().getIdOfVisitor());
         return null;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        serviceBean.setFilter(filter);
+        this.filter = filter;
     }
 }

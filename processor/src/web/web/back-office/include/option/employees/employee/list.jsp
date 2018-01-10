@@ -25,6 +25,15 @@
         </h:selectOneMenu>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="4">
+        <h:outputText escape="true" value="Фильтр" styleClass="output-text" />
+        <h:inputText value="#{employeeListPage.filter}" styleClass="input-text" id="employeeListPageFilterText" />
+        <a4j:commandButton value="Применить" action="#{employeeListPage.show}"
+                           reRender="employeeListTable" styleClass="command-button" />
+        <a4j:commandButton value="Очистить" action="#{employeeListPage.clearFilter}"
+                           reRender="employeeListTable,employeeListPageFilterText" ajaxSingle="true" styleClass="command-button" />
+    </h:panelGrid>
+
     <rich:dataTable id="employeeListTable" value="#{employeeListPage.employees}" var="employee" rows="20" rowKeyVar="row"
                     columnClasses="right-aligned-column,
                     right-aligned-column, right-aligned-column, right-aligned-column,

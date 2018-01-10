@@ -31,8 +31,8 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurre
 @Repository
 public class EmployeeServiceBean {
 
-    final String FIND_ALL_EMPLOYEE_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.idOfVisitor";
-    final String FIND_ALL_EMPLOYEE_ITEMS_BY_DELETED = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType = 1 and v.deleted = :deleted order by v.idOfVisitor";
+    final String FIND_ALL_EMPLOYEE_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 %s order by v.idOfVisitor";
+    final String FIND_ALL_EMPLOYEE_ITEMS_BY_DELETED = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType = 1 and v.deleted = :deleted %s order by v.idOfVisitor";
     final String FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.person.firstName";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.visitorType=2 order by ct.createDate desc";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct, ct.visitor) from CardTemp ct where ct.visitorType=2 order by ct.createDate desc";
@@ -41,14 +41,32 @@ public class EmployeeServiceBean {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
+    private String filter;
+
+    private String getCondition() {
+        return StringUtils.isEmpty(filter) ? "" : " and ("
+                + "LOWER(v.person.surname) like :filter "
+                + "or LOWER(v.person.firstName) like :filter "
+                + "or LOWER(v.person.secondName) like :filter "
+                + "or LOWER(v.position) like :filter "
+                + "or LOWER(v.passportNumber) like :filter "
+                + "or LOWER(v.driverLicenceNumber) like :filter "
+                + "or LOWER(v.warTicketNumber) like :filter"
+                + ") ";
+    }
+
     public List<VisitorItem> findAllEmployees(){
-        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS, VisitorItem.class);
+        String condition = getCondition();
+        TypedQuery<VisitorItem> query = entityManager.createQuery(String.format(FIND_ALL_EMPLOYEE_ITEMS, condition), VisitorItem.class);
+        if (!StringUtils.isEmpty(filter)) query.setParameter("filter", "%" + filter.trim().toLowerCase() + "%");
         return query.getResultList();
     }
 
     public List<VisitorItem> findAllEmployees(boolean deletedEmployees) {
-        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_BY_DELETED, VisitorItem.class)
+        String condition = getCondition();
+        TypedQuery<VisitorItem> query = entityManager.createQuery(String.format(FIND_ALL_EMPLOYEE_ITEMS_BY_DELETED, condition), VisitorItem.class)
                 .setParameter("deleted", deletedEmployees);
+        if (!StringUtils.isEmpty(filter)) query.setParameter("filter", "%" + filter.trim().toLowerCase() + "%");
         return query.getResultList();
     }
 
@@ -227,4 +245,11 @@ public class EmployeeServiceBean {
         }
     }
 
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
 }

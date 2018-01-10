@@ -30,8 +30,8 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurre
 @Repository
 public class VisitorDogmServiceBean {
 
-    final String FIND_ALL_VISITORDOGM_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.VisitorItem(v) from Visitor v where v.visitorType=2 order by v.idOfVisitor";
-    final String FIND_ALL_VISITORDOGM_ITEMS_BY_DELETED = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.VisitorItem(v) from Visitor v where v.visitorType = 2 and v.deleted = :deleted order by v.idOfVisitor";
+    final String FIND_ALL_VISITORDOGM_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.VisitorItem(v) from Visitor v where v.visitorType=2 %s order by v.idOfVisitor";
+    final String FIND_ALL_VISITORDOGM_ITEMS_BY_DELETED = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.VisitorItem(v) from Visitor v where v.visitorType = 2 and v.deleted = :deleted %s order by v.idOfVisitor";
     final String FIND_ALL_VISITORDOGM_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.VisitorItem(v) from Visitor v where v.visitorType=2 order by v.person.firstName";
     final String FIND_ALL_TEMP_CARD_BY_VISITORDOGM = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.visitorType=3 order by ct.createDate desc";
     final String FIND_ALL_TEMP_CARD_BY_VISITORDOGM_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.visitordogm.CardItem(ct, ct.visitor) from CardTemp ct where ct.visitorType=3 order by ct.createDate desc";
@@ -40,14 +40,32 @@ public class VisitorDogmServiceBean {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
+    private String filter;
+
+    private String getCondition() {
+        return StringUtils.isEmpty(filter) ? "" : " and ("
+                + "LOWER(v.person.surname) like :filter "
+                + "or LOWER(v.person.firstName) like :filter "
+                + "or LOWER(v.person.secondName) like :filter "
+                + "or LOWER(v.position) like :filter "
+                + "or LOWER(v.passportNumber) like :filter "
+                + "or LOWER(v.driverLicenceNumber) like :filter "
+                + "or LOWER(v.warTicketNumber) like :filter"
+                + ") ";
+    }
+
     public List<VisitorItem> findAllVisitorsDogm(){
-        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_VISITORDOGM_ITEMS, VisitorItem.class);
+        String condition = getCondition();
+        TypedQuery<VisitorItem> query = entityManager.createQuery(String.format(FIND_ALL_VISITORDOGM_ITEMS, condition), VisitorItem.class);
+        if (!StringUtils.isEmpty(filter)) query.setParameter("filter", "%" + filter.trim().toLowerCase() + "%");
         return query.getResultList();
     }
 
     public List<VisitorItem> findAllVisitorsDogm(boolean deletedVisitorsDogm) {
-        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_VISITORDOGM_ITEMS_BY_DELETED, VisitorItem.class)
+        String condition = getCondition();
+        TypedQuery<VisitorItem> query = entityManager.createQuery(String.format(FIND_ALL_VISITORDOGM_ITEMS_BY_DELETED, condition), VisitorItem.class)
                 .setParameter("deleted", deletedVisitorsDogm);
+        if (!StringUtils.isEmpty(filter)) query.setParameter("filter", "%" + filter.trim().toLowerCase() + "%");
         return query.getResultList();
     }
 
@@ -227,4 +245,11 @@ public class VisitorDogmServiceBean {
         }
     }
 
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
 }
