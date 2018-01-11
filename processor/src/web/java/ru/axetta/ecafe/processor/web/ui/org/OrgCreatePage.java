@@ -557,6 +557,9 @@ public class OrgCreatePage extends BasicWorkspacePage
         if (this.defaultSupplier.getIdOfContragent()==null) {
             throw new Exception("Не указан поставщик по умолчанию");
         }
+        if (StringUtils.isEmpty(this.shortName)) {
+            throw new Exception("Не указано наименование ОО для поставщика");
+        }
         Contragent defaultSupplier = (Contragent) session.load(Contragent.class,
                 this.defaultSupplier.getIdOfContragent());
 
