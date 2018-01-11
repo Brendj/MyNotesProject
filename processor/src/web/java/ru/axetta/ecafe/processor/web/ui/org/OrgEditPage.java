@@ -81,6 +81,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean usePlanOrders;
     private Boolean disableEditingClientsFromAISReestr;
     private Boolean usePaydableSubscriptionFeeding;
+    private Boolean workInSummerTime;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -330,6 +331,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setDisableEditingClientsFromAISReestr(disableEditingClientsFromAISReestr);
 
         org.setUsePaydableSubscriptionFeeding(usePaydableSubscriptionFeeding);
+        org.setIsWorkInSummerTime(workInSummerTime);
 
         org.setBtiUnom(btiUnom);
         org.setBtiUnad(btiUnad);
@@ -421,6 +423,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.usePlanOrders = org.getUsePlanOrders();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
+        this.workInSummerTime = org.getIsWorkInSummerTime();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -1093,6 +1096,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setAllowRegistryChangeEmployee(Boolean allowRegistryChangeEmployee) {
         this.allowRegistryChangeEmployee = allowRegistryChangeEmployee;
+    }
+
+    public Boolean getWorkInSummerTime() {
+        return workInSummerTime;
+    }
+
+    public void setWorkInSummerTime(Boolean workInSummerTime) {
+        this.workInSummerTime = workInSummerTime;
     }
 
     public static class ContragentItem {

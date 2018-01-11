@@ -19,6 +19,7 @@ public class DirectivesRequest implements SectionRequest {
     private final Boolean tradeConfigChangedSuccess;
     private final Integer isWorkInSummerTime;
     private final Integer recyclingEnabled;
+    private final Long orgStructureVersion;
 
     public DirectivesRequest(Node sectionElement) throws Exception {
         this.tradeConfigChangedSuccess =
@@ -28,8 +29,12 @@ public class DirectivesRequest implements SectionRequest {
             NamedNodeMap attributes = isWorkInSummerTimeNode.getAttributes();
             String value = attributes.getNamedItem("value").getTextContent();
             this.isWorkInSummerTime = Integer.parseInt(value);
-        } else
+            Node nodeVersion = attributes.getNamedItem("V");
+            this.orgStructureVersion = nodeVersion == null ? -1 : Long.parseLong(nodeVersion.getTextContent());
+        } else {
             this.isWorkInSummerTime = null;
+            this.orgStructureVersion = -1L;
+        }
 
         Node recyclingEnabled = XMLUtils.findFirstChildElement(sectionElement, "IS_RECYCLING_AND_CHANGE_MODE_ENABLED");
         if (recyclingEnabled != null) {
@@ -55,6 +60,10 @@ public class DirectivesRequest implements SectionRequest {
     @Override
     public String toString() {
         return SECTION_NAME;
+    }
+
+    public Long getOrgStructureVersion() {
+        return orgStructureVersion;
     }
 
     public static class Builder implements SectionRequestBuilder {

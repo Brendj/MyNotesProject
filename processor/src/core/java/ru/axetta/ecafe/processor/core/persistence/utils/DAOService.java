@@ -2388,15 +2388,12 @@ public class DAOService {
         q.executeUpdate();
     }
 
-    public void saveDirectives(Long idOfOrg, Integer isWorkInSummerTime, Integer recyclingEnabled) {
-        if (isWorkInSummerTime == null && recyclingEnabled == null) return;
-        String set = "lastUpdate = :lastUpdate";
-        if (isWorkInSummerTime != null) set += ", isWorkInSummerTime = :isWorkInSummerTime";
-        if (recyclingEnabled != null) set += ", isRecyclingEnabled = :isRecyclingEnabled";
-        Query q = entityManager.createNativeQuery("update cf_orgs set " + set + " where IdOfOrg = :idOfOrg");
-        q.setParameter("lastUpdate", new Date().getTime());
-        if (isWorkInSummerTime != null) q.setParameter("isWorkInSummerTime", isWorkInSummerTime);
-        if (recyclingEnabled != null) q.setParameter("isRecyclingEnabled", recyclingEnabled);
+    public void saveDirective(Long idOfOrg, String directiveName, Integer directiveValue) {
+        if (directiveValue == null) return;
+        String query_str = String.format("update Org set %s=:value, updateTime = :lastUpdate where idOfOrg = :idOfOrg", directiveName);
+        Query q = entityManager.createQuery(query_str);
+        q.setParameter("value", directiveValue == 1);
+        q.setParameter("lastUpdate", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
     }
