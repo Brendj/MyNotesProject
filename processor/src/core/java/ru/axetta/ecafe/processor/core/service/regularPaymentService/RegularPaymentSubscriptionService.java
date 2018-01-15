@@ -122,6 +122,14 @@ public class RegularPaymentSubscriptionService {
         return paymentResponse;
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public boolean subscriptionExistsByClient(Long idOfClient) {
+        Query query = em.createQuery("select bs from BankSubscription bs where bs.client.idOfClient = :idOfClient and bs.active = true and bs.activationDate is not null");
+        query.setParameter("idOfClient", idOfClient);
+        List list = query.getResultList();
+        return list != null && list.size() > 0;
+    }
+
     public void refillOneClientBalance(Long bsId) {
         sendSubscriptionRequest(bsId, regularPaymentRequest);
     }

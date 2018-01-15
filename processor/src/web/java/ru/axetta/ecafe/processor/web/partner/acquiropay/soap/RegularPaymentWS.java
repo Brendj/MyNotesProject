@@ -62,6 +62,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Subscription with id = %s not found.";
     private static final String RC_SUBSCRIPTION_CLIENT_NOT_VALID = "Subscription client not valid.";
     private static final String RC_INVALID_PARAMETERS_DESC = "Request has invalid parameters.";
+    private static final String RC_CLIENT_ALREADY_HAS_SUBSCRIPTION = "Client already has active subscription";
 
     private static final int CLIENT_ID_TYPE_CONTRACTID = 0;
     private static final int CLIENT_ID_TYPE_SAN = 1;
@@ -98,9 +99,6 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             tr = session.beginTransaction();
             Long contractId = ContractIdFormat.parse(contractID);
             Client c = DAOUtils.findClientByContractId(session, contractId);
-            // разобраться зачем была проверка по номеру телефона
-            //if (c == null || !(clientIDType == CLIENT_ID_TYPE_SAN ? c.getSan().equals(clientID)
-            //        : c.getMobile().equals(PhoneNumberCanonicalizator.canonicalize(clientID)))) {
             if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC,
@@ -110,6 +108,11 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (!(lowerLimitAmount > 0 && paymentAmount > 0 && period >= 1 && period <= 12)) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_INVALID_PARAMETERS_DESC);
+                return requestResult;
+            }
+            if (rpService.subscriptionExistsByClient(c.getIdOfClient())) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(RC_CLIENT_ALREADY_HAS_SUBSCRIPTION);
                 return requestResult;
             }
             HTTPData data = new HTTPData();
