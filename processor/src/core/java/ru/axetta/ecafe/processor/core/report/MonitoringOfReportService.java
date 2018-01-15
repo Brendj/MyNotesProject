@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -277,11 +278,19 @@ public class MonitoringOfReportService {
                 + "FROM cf_orders cfo LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfod.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-                + "WHERE cfo.ordertype IN (0, 1, 2) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND g.idofclientgroup in (1100000000, 1100000010, 1100000020,1100000030, 1100000040, 1100000050, 1100000080) AND "
+                + "WHERE cfo.ordertype IN (0, 1, 2) AND cfo.idoforg IN (:idoforg) AND cfo.state = 0 AND "
+                + "g.idofclientgroup in (:employees, :administration, :tech_employees,:parents, :visitors, :other, :displaced) AND "
                 + "cfo.createddate BETWEEN :startTime AND :endTime");
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
+        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+        query.setParameter("displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+        query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
 
         Long result = ((BigInteger) query.uniqueResult()).longValue();
 
@@ -317,13 +326,20 @@ public class MonitoringOfReportService {
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                 + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (7)) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND "
-                + "cfod.MenuType <= :maxType AND g.idofclientgroup  IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050)");
+                + "cfod.MenuType <= :maxType AND g.idofclientgroup  IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)");
 
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
         query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+        query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+        query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
 
         Long result = ((BigInteger) query.uniqueResult()).longValue();
 
@@ -358,15 +374,22 @@ public class MonitoringOfReportService {
                 + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
                 + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " //AND cfo.idoforg = c.idoforg "
                 + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND (cfod.IdOfGood IS NOT NULL) AND "
+                + "WHERE cfo.State = 0 AND cfod.State = 0 AND (cfo.OrderType IN (3)) AND " //(cfod.IdOfGood IS NOT NULL) AND "
                 + "org.IdOfOrg = :idoforg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) AND cfod.MenuType >= :minType AND"
-                + " cfod.MenuType <= :maxType AND g.idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050)");
+                + " cfod.MenuType <= :maxType AND g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)");
 
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
         query.setParameter("endTime", endTime.getTime());
         query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+        query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+        query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
 
         Long result = ((BigInteger) query.uniqueResult()).longValue();
 

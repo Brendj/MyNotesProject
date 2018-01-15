@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="6960" pageHeight="30000" columnWidth="6920" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.75"/>
-	<property name="ireport.x" value="816"/>
+	<property name="ireport.x" value="1159"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -365,7 +365,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -413,7 +413,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -520,7 +520,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -612,7 +612,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -644,7 +644,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -803,7 +803,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -847,7 +847,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -879,7 +879,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -1114,7 +1114,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -1305,7 +1305,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -1381,7 +1381,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -1428,7 +1428,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>

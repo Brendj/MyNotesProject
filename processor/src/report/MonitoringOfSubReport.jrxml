@@ -140,7 +140,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfReserve}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="60" height="26"/>
+				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" positionType="Float" stretchType="RelativeToBandHeight" x="540" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -152,7 +152,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" positionType="Float" stretchType="RelativeToBandHeight" x="540" y="0" width="60" height="26"/>
+				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="60" height="26"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

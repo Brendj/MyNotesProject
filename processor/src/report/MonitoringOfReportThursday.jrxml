@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="5280" pageHeight="30000" columnWidth="5240" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.75"/>
-	<property name="ireport.x" value="757"/>
+	<property name="ireport.x" value="2984"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -302,7 +302,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2600" y="25" width="60" height="110"/>
+				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2660" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -350,7 +350,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2660" y="25" width="60" height="110"/>
+				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2540" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -361,7 +361,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -382,7 +382,7 @@
 ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2540" y="25" width="60" height="110"/>
+				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2600" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -409,7 +409,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -536,7 +536,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -568,7 +568,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -644,7 +644,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
@@ -676,7 +676,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -894,7 +894,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (взрослые)
+				<text><![CDATA[Абонементный план (взрослые)
 
 ]]></text>
 			</staticText>
@@ -942,7 +942,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонментный план (обучающиеся)
+				<text><![CDATA[Абонементный план (обучающиеся)
 
 ]]></text>
 			</staticText>
