@@ -38,16 +38,15 @@ public class TypesOfCardService extends AbstractDAOService {
         return result;
     }
 
-    public Long getStatByOrgId(Long idOfOrg, String cardType, Integer cardState, Date starDate, String groupRestrict) {
+    public Long getStatByOrgId(Long idOfOrg, String cardType, String cardState, Date starDate, String groupRestrict) {
         Query query = getSession().createSQLQuery(
                 "SELECT count(cfc.idofclient) FROM cf_cards cfc LEFT JOIN cf_clients cl ON cfc.idofclient = cl.idofclient "
                         + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
                         + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                         + "WHERE cfo.idoforg = :idOfOrg AND cfc.cardtype IN(" + cardType
-                        + ") AND cfc.state IN(:cardState) AND cfc.createddate <= :startDate " + groupRestrict);
+                        + ") AND cfc.state IN(" + cardState + ") AND cfc.createddate <= :startDate " + groupRestrict);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("startDate", starDate.getTime());
-        query.setParameter("cardState", cardState);
 
         Long result = ((BigInteger) query.uniqueResult()).longValue();
 
@@ -55,7 +54,7 @@ public class TypesOfCardService extends AbstractDAOService {
     }
 
     // Сбор статистики по имени Округа например: САО, ЮВАО.
-    public Long getStatByDistrictName(String districtName, String cardType, Integer cardState, Date startDate,
+    public Long getStatByDistrictName(String districtName, String cardType, String cardState, Date startDate,
             String groupRestrict, List<Long> orgList) {
 
         Long result;
@@ -66,10 +65,9 @@ public class TypesOfCardService extends AbstractDAOService {
                             + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
                             + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                             + "where cfc.cardtype in (" + cardType
-                            + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate <= :startDate AND cfo.idoforg IN (:orgList) "
+                            + ") and cfc.state in (" + cardState + ") and cfo.district like :districtName and cfc.createddate <= :startDate AND cfo.idoforg IN (:orgList) "
                             + groupRestrict);
             query.setString("districtName", districtName);
-            query.setInteger("cardState", cardState);
             query.setLong("startDate", startDate.getTime());
             query.setParameterList("orgList", orgList);
 
@@ -80,10 +78,9 @@ public class TypesOfCardService extends AbstractDAOService {
                             + "LEFT JOIN cf_orgs cfo ON cl.idoforg = cfo.idoforg "
                             + "LEFT OUTER JOIN cf_clientgroups cfcl on cfo.idoforg = cfcl.idoforg and cl.IdOfClientGroup = cfcl.IdOfClientGroup "
                             + "where cfc.cardtype in (" + cardType
-                            + ") and cfc.state in (:cardState) and cfo.district like :districtName and cfc.createddate <= :startDate "
+                            + ") and cfc.state in (" + cardState + ") and cfo.district like :districtName and cfc.createddate <= :startDate "
                             + groupRestrict);
             query.setString("districtName", districtName);
-            query.setInteger("cardState", cardState);
             query.setLong("startDate", startDate.getTime());
 
             result = ((BigInteger) query.uniqueResult()).longValue();

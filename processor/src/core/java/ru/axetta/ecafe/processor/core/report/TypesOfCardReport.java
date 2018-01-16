@@ -10,7 +10,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -119,8 +118,8 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime) throws Exception {
             List<TypesOfCardReportItem> result = new ArrayList<TypesOfCardReportItem>();
 
-            int ac = Card.ACTIVE_STATE; // активная карта
-            int lc = CardState.TEMPBLOCKED.getValue(); // заблокированная карта
+            String ac = new Integer(CardState.ISSUED.getValue()).toString(); // активная карта
+            String lc = new Integer(CardState.TEMPBLOCKED.getValue()).toString() + ", " + new Integer(CardState.BLOCKED.getValue()).toString(); // заблокированная карта
 
             TypesOfCardService service = new TypesOfCardService();
             service.setSession(session);
