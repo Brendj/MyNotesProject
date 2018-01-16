@@ -109,7 +109,7 @@ public class TypesOfCardReport extends BasicReportForAllOrgJob {
             parameterMap.put("SUBREPORT_DIR", subReportDir);
             parameterMap.put("printDistrict", orgsList == null || orgsList.size() == 0);
 
-            calendar.setTime(startTime);
+            startTime = CalendarUtils.endOfDay(startTime); //на конец дня, чтобы отображать зареганные в этот день карты
             JasperPrint jasperPrint = JasperFillManager
                     .fillReport(templateFilename, parameterMap, createDataSource(session, startTime));
             long generateDuration = generateTime.getTime();
