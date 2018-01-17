@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -151,7 +152,7 @@ public class MonitoringOfReportService {
 
     public Long generateNumberOfPassesStudents(Session session, Date startTime, Date endTime, Long idOfOrg) {
         Query query = session.createSQLQuery(
-                "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup < 1100000000 "
+                "SELECT count(DISTINCT(idofclient)) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup < 1100000000 "
                         + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
 
         query.setParameter("idoforg", idOfOrg);
@@ -165,7 +166,7 @@ public class MonitoringOfReportService {
 
     public Long generateNumberOfPassesEmployees(Session session, Date startTime, Date endTime, Long idOfOrg) {
         Query query = session.createSQLQuery(
-                "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050) "
+                "SELECT count(DISTINCT(idofclient)) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050) "
                         + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
 
         query.setParameter("idoforg", idOfOrg);
@@ -179,7 +180,7 @@ public class MonitoringOfReportService {
 
     public Long generateNumberOfPassesGuardians(Session session, Date startTime, Date endTime, Long idOfOrg) {
         Query query = session.createSQLQuery(
-                "SELECT count(*) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup = 1100000030 "
+                "SELECT count(DISTINCT(idofclient)) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup = 1100000030 "
                         + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
 
         query.setParameter("idoforg", idOfOrg);
