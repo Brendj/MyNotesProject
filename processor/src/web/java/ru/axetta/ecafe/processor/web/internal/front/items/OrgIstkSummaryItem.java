@@ -14,17 +14,22 @@ public class OrgIstkSummaryItem {
     private Long version;
     private String guid;
     private String strDistrict;
+    private String shortNameInfoService;
+    private Long mainBuildingId;
+
 
     public OrgIstkSummaryItem() {
     }
 
-    public OrgIstkSummaryItem(String schoolName, Long isppId, String address, Long version, String guid, String strDistrict) {
+    public OrgIstkSummaryItem(String schoolName, Long isppId, String address, Long version, String guid, String strDistrict, String shortNameInfoService, Long mainBuildingId) {
         this.schoolName = schoolName;
         this.isppId = isppId;
         this.address = address;
         this.version = version;
         this.guid = guid;
         this.strDistrict = strDistrict;
+        this.shortNameInfoService = shortNameInfoService;
+        this.mainBuildingId = mainBuildingId;
     }
 
     public String getSchoolName() {
@@ -74,4 +79,21 @@ public class OrgIstkSummaryItem {
     public void setStrDistrict(String strDistrict) {
         this.strDistrict = strDistrict;
     }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
+    }
+
+    public Long getMainBuildingId() {
+        return mainBuildingId;
+    }
+
+    public void setMainBuildingId(Long mainBuildingId) {
+        this.mainBuildingId = mainBuildingId;
+    }
+
 }

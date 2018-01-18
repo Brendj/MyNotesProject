@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -1459,10 +1460,12 @@ public class FrontController extends HttpServlet {
             Criteria criteria = persistenceSession.createCriteria(Org.class);
             criteria.addOrder(org.hibernate.criterion.Order.asc("idOfOrg"));
 
+            OrgService orgService = OrgService.getInstance();
+
             List<Org> list = criteria.list();
             for (Org org : list) {
                 OrgIstkSummaryItem item = new OrgIstkSummaryItem(org.getShortName(), org.getIdOfOrg(), org.getAddress(),
-                        org.getVersion(), org.getGuid(), org.getDistrict());
+                        org.getVersion(), org.getGuid(), org.getDistrict(), org.getShortNameInfoService(), orgService.getMainBulding(org).getIdOfOrg());
                 listResult.add(item);
             }
             persistenceTransaction.commit();
