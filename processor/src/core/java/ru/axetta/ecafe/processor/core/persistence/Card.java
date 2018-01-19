@@ -64,6 +64,7 @@ public class Card {
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     private Set<Order> orders = new HashSet<Order>();
     private Set<HistoryCard> historyCards = new HashSet<HistoryCard>();
+    private Boolean isLongUid;
 
     protected Card() {
         // For Hibernate only
@@ -276,6 +277,14 @@ public class Card {
 
     public Set<HistoryCard> getHistoryCards() {
         return Collections.unmodifiableSet(getHistoryCardsInternal());
+    }
+
+    public Boolean getIsLongUid() {
+        return isLongUid;
+    }
+
+    public void setIsLongUid(Boolean longUid) {
+        isLongUid = longUid;
     }
 
     @Override

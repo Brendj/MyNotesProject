@@ -1282,16 +1282,17 @@ public class FrontController extends HttpServlet {
     public  ResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
-            @WebParam(name = "cardSignCertNum") Integer cardSignCertNum) throws FrontControllerException {
+            @WebParam(name = "cardSignCertNum") Integer cardSignCertNum, @WebParam(name = "isLongUid") boolean isLongUid)
+            throws FrontControllerException {
         checkRequestValidity(idOfOrg);
-        logger.info(String.format("Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s",
-                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum));
+        logger.info(String.format("Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
+                idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid));
         CardService cardService = CardService.getInstance();
         if (!(type >=0 && type < Card.TYPE_NAMES.length)) {
             return new ResponseItem(ResponseItem.ERROR_INVALID_TYPE, ResponseItem.ERROR_INVALID_TYPE_MESSAGE);
         }
         try{
-            cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum);
+            cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
         }catch (Exception e){
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);

@@ -61,9 +61,9 @@ public class CardService {
 
     //1. Регистрация карты
     public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type,
-            Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
+            Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
         Org org = orgRepository.findOne(idOfOrg);
-        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum);
+        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
     }
 
     public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type,

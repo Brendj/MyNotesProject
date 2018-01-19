@@ -45,6 +45,7 @@
             <key column="IdOfCard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HistoryCard"/>
         </set>
+        <property name="isLongUid" column="IsLongUid" type="boolean"/>
     </class>
 </hibernate-mapping>
 

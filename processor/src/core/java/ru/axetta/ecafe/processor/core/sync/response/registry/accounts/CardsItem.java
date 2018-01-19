@@ -36,10 +36,11 @@ public class CardsItem {
     private Long visistorId;      //Идентификатор посетителя – опционально
     private Long contractId;      //Номер лицевого счета клиента – опционально
     private Long printedNo;       //Номер, нанесенный на карту - опционально
+    private Boolean isLongUid;    //Признак длинного идентификатора карты - опционально
 
 
     public CardsItem(long cardNo, int cardType, int state, long idOfClient, String lockReason, Date validDate,
-            Date issueDate, long orgOwner, boolean temp, Long visistorId, Long contractId, Long printedNo) {
+            Date issueDate, long orgOwner, boolean temp, Long visistorId, Long contractId, Long printedNo, boolean isLongUid) {
         this.cardNo = cardNo;
         this.cardType = cardType;
         this.state = state;
@@ -81,6 +82,9 @@ public class CardsItem {
         this.issueDate = card.getIssueTime();
         isTemp = (card.getState() == CardState.TEMPISSUED.getValue());
         this.printedNo = card.getCardPrintedNo();
+        if (null != card.getIsLongUid()) {
+            this.isLongUid = card.getIsLongUid();
+        }
     }
 
     public CardsItem(Card card, Visitor visitor){
@@ -185,6 +189,14 @@ public class CardsItem {
         this.printedNo = printedNo;
     }
 
+    public boolean isLongUid() {
+        return isLongUid;
+    }
+
+    public void setLongUid(boolean longUid) {
+        isLongUid = longUid;
+    }
+
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement(SYNC_NAME);
         element.setAttribute("CardNo", Long.toString(this.cardNo));
@@ -214,6 +226,9 @@ public class CardsItem {
         }
         if (printedNo != null) {
             element.setAttribute("PrintedNo", this.printedNo.toString());
+        }
+        if (isLongUid != null) {
+            element.setAttribute("IsLongUid", "" + (this.isLongUid ? 1 : 0));
         }
 
         return element;

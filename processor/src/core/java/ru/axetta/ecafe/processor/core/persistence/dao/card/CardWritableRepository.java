@@ -96,26 +96,28 @@ public class CardWritableRepository extends WritableJpaDao {
     }
 
     public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,
-            Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
+            Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
         checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
-        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid);
     }
 
     public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignCertNum) throws Exception {
         if (cardExistsInSpecial(cardNo)) {
-            return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum);
+            return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, null);
         } else {
             throw new Exception("cardNo not found");
         }
     }
 
     private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
-            Integer cardSignCertNum) throws Exception {
+            Integer cardSignCertNum, Boolean isLongUid) throws Exception {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());
         card.setCreateTime(new Date());
+        if (null != isLongUid)
+            card.setIsLongUid(isLongUid);
         if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !isSocial(type))
             card.setCardSignCertNum(cardSignCertNum);
 

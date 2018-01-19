@@ -15,3 +15,6 @@ create table cf_cards_special (
   cardno bigint NOT NULL,
   CONSTRAINT cf_cards_special_pk PRIMARY KEY (cardno)
 );
+
+--Признак длинного идентификатора карты
+alter table cf_cards add column islonguid boolean;
