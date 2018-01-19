@@ -9,3 +9,9 @@ alter table cf_orgs add column allowRegistryChangeEmployee integer not null defa
 
 --Очистка флагов работы ОО в летний период
 update cf_orgs set isWorkInSummerTime = 0;
+
+--Таблица с номерами карт, по которым пропускаем проверку ЦП
+create table cf_cards_special (
+  cardno bigint NOT NULL,
+  CONSTRAINT cf_cards_special_pk PRIMARY KEY (cardno)
+);

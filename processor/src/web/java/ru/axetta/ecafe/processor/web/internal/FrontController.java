@@ -1283,7 +1283,7 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum) throws FrontControllerException {
-        //checkRequestValidity(idOfOrg);
+        checkRequestValidity(idOfOrg);
         logger.info(String.format("Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s",
                 idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum));
         CardService cardService = CardService.getInstance();

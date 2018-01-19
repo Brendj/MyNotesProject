@@ -66,6 +66,13 @@ public class CardService {
         return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum);
     }
 
+    public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type,
+            Integer cardSignCertNum) throws Exception {
+        Org org = orgRepository.findOne(idOfOrg);
+        if (org == null) throw new Exception("Org not found");
+        return cardWritableRepository.createCardSpecial(org, cardNo, cardPrintedNo, type, cardSignCertNum);
+    }
+
     //1. Регистрация карты
     public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
         Card card = cardWritableRepository.findByCardNoWithoutClient(o.getCardNo());

@@ -15,7 +15,9 @@ import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperatio
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -61,9 +63,12 @@ public class CardWritableRepository extends WritableJpaDao {
         return (type == 6 || type == 7 || type == 8);
     }
 
-    private void checkVerifyCardSign(Org org, Integer cardSignVerifyRes, Integer cardSignCertNum, int type) throws Exception {
+    private void checkVerifyCardSign(Org org, Integer cardSignVerifyRes, Integer cardSignCertNum, int type, long cardNo) throws Exception {
         if (!org.getNeedVerifyCardSign()) {
             return;
+        }
+        if (cardExistsInSpecial(cardNo)) {
+            return; //не проверяем подпись для карт с номерами из таблицы cf_cards_special
         }
         if (cardSignVerifyRes == null || cardSignCertNum == null) throw new IllegalStateException("Ошибка регистрации");
         switch (CardSignVerifyType.fromInteger(cardSignVerifyRes)) {
@@ -83,9 +88,30 @@ public class CardWritableRepository extends WritableJpaDao {
         }
     }
 
+    private boolean cardExistsInSpecial(long cardNo) {
+        Query query = entityManager.createNativeQuery("select count(cardno) from cf_cards_special cs where cs.cardno = :cardNo");
+        query.setParameter("cardNo", cardNo);
+        Long result = ((BigInteger) query.getSingleResult()).longValue();
+        return (result > 0);
+    }
+
     public Card createCard(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignVerifyRes, Integer cardSignCertNum) throws Exception {
-        checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type);
+        checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum);
+    }
+
+    public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type,
+            Integer cardSignCertNum) throws Exception {
+        if (cardExistsInSpecial(cardNo)) {
+            return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum);
+        } else {
+            throw new Exception("cardNo not found");
+        }
+    }
+
+    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
+            Integer cardSignCertNum) throws Exception {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());
