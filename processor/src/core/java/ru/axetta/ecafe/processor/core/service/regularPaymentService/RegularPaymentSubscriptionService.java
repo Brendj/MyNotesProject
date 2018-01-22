@@ -228,8 +228,8 @@ public class RegularPaymentSubscriptionService {
         BankSubscription bs = em.find(BankSubscription.class, bsId);
         bs.setPaymentAmount(paymentAmount);
         bs.setThresholdAmount(thresholdAmount);
-        bs.setMonthsCount(period);
-        bs.setValidToDate(CalendarUtils.addMonth(new Date(), period));
+        //bs.setMonthsCount(period);
+        //bs.setValidToDate(CalendarUtils.addMonth(new Date(), period)); //период подписки не трогаем
     }
 
     @Transactional(rollbackFor = Exception.class)
