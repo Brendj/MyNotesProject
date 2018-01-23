@@ -782,55 +782,6 @@ public class DashboardServiceBean {
         return paymentSystemStats;
     }
 
-    public DashboardResponse.OrgSyncStats getOrgSyncInfo() {
-        DashboardResponse.OrgSyncStats orgSyncStats = new DashboardResponse.OrgSyncStats();
-        ///// получение данных по сихронизации
-        TypedQuery<Org> query = entityManager.createQuery("from Org where state<>0 order by orgSync.lastSuccessfulBalanceSync ", Org.class);
-        List<Org> orgs = query.getResultList();
-        LinkedList<DashboardResponse.OrgSyncStatItem> items = new LinkedList<DashboardResponse.OrgSyncStatItem>();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        for (Org org : orgs) {
-            //items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
-            //        org.getLastUnSuccessfulBalanceSync(),
-            //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
-            String tags = parseTags(org.getTag());
-            Query q = entityManager.createNativeQuery("select count(idoforg) from cf_synchistory_exceptions where idoforg=:idoforg");
-            q.setParameter("idoforg", org.getIdOfOrg());
-            Long synchErrorsCount = ((BigInteger) q.getSingleResult()).longValue();
-            items.add(new DashboardResponse.OrgSyncStatItem(org.getIdOfOrg(), org.getShortName(), tags, org.getOrgSync().getLastSuccessfulBalanceSync(),
-                    org.getOrgSync().getLastUnSuccessfulBalanceSync(),org.getOrgSync().getRemoteAddress(), org.getOrgSync().getClientVersion(),
-                    synchErrorsCount, org.getDistrict()));
-
-        }
-        orgSyncStats.setOrgSyncStatItems(items);
-        return orgSyncStats;
-    }
-
-    public String parseTags(String orgTagsStr) {
-        if (StringUtils.isEmpty(orgTagsStr)) {
-            return "";
-        }
-        String allowedTagsStr = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
-        if (StringUtils.isEmpty(allowedTagsStr)) {
-            return "";
-        }
-        String allowedTags [] = allowedTagsStr.split(";");
-        String orgTags [] = orgTagsStr.split(";");
-        String result = "";
-        for (String allowedTag : allowedTags) {
-            for (String orgTag : orgTags) {
-                if (allowedTag.trim().equals(orgTag.trim())) {
-                    if (result.length() > 0) {
-                        result = result + "<br/>";
-                    }
-                    result = result + allowedTag;
-                }
-            }
-        }
-        return result;
-    }
-
-
     public DashboardResponse getInfoForDashboard() throws Exception {
         DashboardResponse dashboardResponse = prepareDashboardResponse();
         dashboardResponse = getOrgInfo(dashboardResponse, new Date(), null);

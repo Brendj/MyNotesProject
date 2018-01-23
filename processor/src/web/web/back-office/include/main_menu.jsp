@@ -964,9 +964,8 @@
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
                      label="Мониторинг" rendered="#{mainPage.eligibleToMonitor}">
     <a4j:support event="onclick" action="#{mainPage.showMonitoringGroupPage}" reRender="workspaceForm" />
-    <%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.SyncMonitorPage"--%>
-    <rich:panelMenuItem id="syncMonitorItem" binding="#{syncMonitorPage.mainMenuComponent}"
-                        label="Мониторинг синхронизации" action="#{syncMonitorPage.show}" reRender="workspaceForm" />
+    <rich:panelMenuItem id="syncMonitorItem" binding="#{mainPage.syncMonitorPage.mainMenuComponent}"
+                        label="Мониторинг синхронизации" action="#{mainPage.syncMonitorPage.show}" reRender="workspaceForm" />
 
     <%--@elvariable id="dashboardPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.DashboardPage"--%>
     <rich:panelMenuItem id="dashboardMenuItem" binding="#{dashboardPage.mainMenuComponent}"

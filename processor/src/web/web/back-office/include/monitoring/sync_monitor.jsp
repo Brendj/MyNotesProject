@@ -11,92 +11,122 @@
 <%@ taglib prefix="ui" uri="http://java.sun.com/jstl/fmt" %>
 
 
-<a4j:jsFunction name="updateList" action="#{syncMonitorPage.update}"
+<a4j:jsFunction name="updateList" action="#{mainPage.syncMonitorPage.buildReportHtml}"
                 reRender="orgUnsychMonitorListTable,lastOrgUpdateTime"></a4j:jsFunction>
 <script type="text/javascript">
     var inter = setInterval(updateList, 1000 * 120);
+
+    function onstartloading(){
+        jQuery(".command-button, input[type='checkbox']").attr('disabled', 'disabled');
+    }
+    function onstoploading(){
+        jQuery(".command-button, input[type='checkbox']").attr('disabled', '');
+    }
+
+    document.onload = updateList();
 </script>
 
 <%-- Панель просмотра списка организаций --%>
-<%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.SyncMonitorPage"--%>
-<%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractViewPage"--%>
-<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractEditPage"--%>
-<h:panelGrid id="contractListPanelGrid" binding="#{syncMonitorPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="syncMonitorPanelGrid" binding="#{mainPage.syncMonitorPage.pageComponent}" styleClass="borderless-grid">
 
+    <h:panelGrid styleClass="borderless-grid" columns="3">
+        <a4j:commandButton value="Обновить" action="#{mainPage.syncMonitorPage.buildReportHtml}"
+                           reRender="orgUnsychMonitorListTable,lastOrgUpdateTime" status="syncMonitorReportStatus"
+                           styleClass="command-button"/>
 
-    <a4j:commandButton value="Обновить" action="#{syncMonitorPage.update}"
-                       reRender="orgUnsychMonitorListTable,lastOrgUpdateTime"/>
-    <a4j:status>
-        <f:facet name="start">
-            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-        </f:facet>
-    </a4j:status>
-    <h:outputText styleClass="output-text" value="Последнее обновление произведено: " /><h:outputText
-        id="lastOrgUpdateTime" styleClass="output-text" value="#{syncMonitorPage.lastUpdate}"
-        converter="timeConverter" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.syncMonitorPage.buildReportXLS}" styleClass="command-button" />
 
-    <h:panelGrid columns="2" columnClasses="valign, valign">
-        <rich:dataTable id="orgUnsychMonitorListTable" value="#{syncMonitorPage.itemList}" var="item"
-                        footerClass="data-table-footer" columnClasses="center-aligned-column">
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Организация" />
-                </f:facet>
-                <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
-            </rich:column>
+        <a4j:status id="syncMonitorReportStatus" onstart="onstartloading()" onstop="onstoploading()">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText styleClass="output-text" value="Последнее обновление произведено: " />
+        <h:outputText id="lastOrgUpdateTime" styleClass="output-text" value="#{mainPage.syncMonitorPage.lastUpdate}"
+            converter="timeConverter" />
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:panelGrid id="syncMonitorVersionPanel" styleClass="borderless-grid" columns="1">
+            <h:panelGroup styleClass="borderless-div">
+                <h:outputText escape="true" value="Версия клиента"
+                              styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{mainPage.syncMonitorPage.showVersion}" styleClass="output-text">
+                    <a4j:support event="onclick" reRender="syncMonitorVersionPanel" ajaxSingle="true" />
+                </h:selectBooleanCheckbox>
+
+                <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                              rendered="#{mainPage.syncMonitorPage.showVersion}">
+                    <h:selectManyCheckbox id="versionTitles"
+                                          value="#{mainPage.syncMonitorPage.versionTitles}"
+                                          layout="pageDirection" styleClass="output-text"
+                                          rendered="#{mainPage.syncMonitorPage.showVersion}">
+                        <f:selectItems value="#{mainPage.syncMonitorPage.availableVersions.values()}" />
+                    </h:selectManyCheckbox>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:panelGrid>
+    </h:panelGrid>
+
+    <h:panelGrid columns="1" columnClasses="valign, valign">
+        <rich:dataTable id="orgUnsychMonitorListTable" value="#{mainPage.syncMonitorPage.itemList}" var="item" rows="50"
+                        footerClass="data-table-footer" columnClasses="center-aligned-column" reRender="lastOrgUpdateTime">
             <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Ид" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Тэги" />
+                    <h:outputText escape="true" value="Наименование" />
                 </f:facet>
-                <h:outputText escape="false" value="#{item.tags}" styleClass="output-text"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+                <%--<h:outputText escape="true" value="#{item.orgName}" styleClass="output-text"--%>
+                              <%--style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />--%>
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.orgName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link"
+                                 style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}">
+                    <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+                </a4j:commandLink>
             </rich:column>
-
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Адрес" />
+                </f:facet>
+                <h:outputText escape="false" value="#{item.address}" styleClass="output-text"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+            </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Округ" />
                 </f:facet>
                 <h:outputText escape="false" value="#{item.district}" styleClass="output-text"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
             </rich:column>
-
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Тип здания" />
+                </f:facet>
+                <h:outputText escape="false" value="#{item.organizationTypeName}" styleClass="output-text"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Очередь внедрения" />
+                </f:facet>
+                <h:outputText escape="false" value="#{item.introductionQueue}" styleClass="output-text"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+            </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="false" value="Посл. успешная <br/>синхр. балансов" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.lastSuccessfulBalanceSync}"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
                               styleClass="output-text" converter="timeConverter" />
-            </rich:column>
-
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="false" value="Посл. неудачная <br/>синхр. балансов" />
-                </f:facet>
-                <h:outputText escape="true" value="#{item.lastUnSuccessfulBalanceSync}"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
-                              styleClass="output-text" converter="timeConverter" />
-            </rich:column>
-
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="false" value="Количество ошибок <br/>при синхронизации" />
-                </f:facet>
-                <a4j:commandLink styleClass="output-text-mod" rendered="#{item.errorsCount > 0}">
-                    <a4j:support event="onclick" action="#{synchErrorsPage.show(item.idOfOrg)}"
-                                 status="feedPlanStatus" reRender="workspaceForm"/>
-                    <h:outputText value="#{item.errorsCount}" styleClass="output-text"
-                                  style="color: red"/>
-                </a4j:commandLink>
-                <h:outputText value="#{item.errorsCount}" styleClass="output-text" rendered="#{item.errorsCount < 1}"/>
             </rich:column>
 
             <rich:column headerClass="column-header">
@@ -104,7 +134,7 @@
                     <h:outputText escape="true" value="Версия клиента" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.version}"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
                               styleClass="output-text" />
             </rich:column>
 
@@ -113,76 +143,23 @@
                     <h:outputText escape="true" value="IP-адрес" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.remoteAddr}"
-                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
                               styleClass="output-text" />
             </rich:column>
+
+            <f:facet name="footer">
+                <rich:datascroller for="orgUnsychMonitorListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
+            </f:facet>
         </rich:dataTable>
-
-        <h:panelGrid>
-            <rich:dataTable id="paramsTable" value="#{syncMonitorPage.namedParams}" var="item"
-                            footerClass="data-table-footer" columnClasses="left-aligned-column">
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Наименование параметра" />
-                    </f:facet>
-                    <h:outputLink value="#" id="createGroupCommandLink" styleClass="command-button" rendered="#{not empty item.href}">
-                        <h:outputText value="#{item.paramName}" styleClass="output-text"/>
-                        <a4j:support event="onclick" action="#{item.hrefBean.show}" reRender="workspaceForm"/>
-                    </h:outputLink>
-                    <h:outputText escape="true" value="#{item.paramName}" styleClass="output-text" rendered="#{empty item.href}"/>
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Значение" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.stringValue}" styleClass="output-text" />
-                </rich:column>
-            </rich:dataTable>
-
-            <rich:dataTable id="payMonitorTable" value="#{syncMonitorPage.payStatItems}" var="item"
-                            footerClass="data-table-footer" columnClasses="center-aligned-column">
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Контрагент" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"/>
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Посл. транзакция" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.lastOperationTime}" styleClass="output-text" converter="timeConverter" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Транзакций сегодня" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.numOfOperations}" styleClass="output-text"/>
-                </rich:column>
-            </rich:dataTable>
-
-            <rich:dataTable id="menuLastLoad" value="#{syncMonitorPage.lastLoadItems}" var="item"
-                            footerClass="data-table-footer" columnClasses="left-aligned-column">
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Контрагент ТСП" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.contragent}" styleClass="output-text" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Посл. загрузка меню" />
-                    </f:facet>
-                    <h:outputText escape="true" value="#{item.lastLoadTime}" styleClass="output-text"
-                                  converter="timeConverter" />
-                </rich:column>
-            </rich:dataTable>
-
-        </h:panelGrid>
-
     </h:panelGrid>
-
-
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">

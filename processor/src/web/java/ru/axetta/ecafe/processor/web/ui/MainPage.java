@@ -34,6 +34,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
+import ru.axetta.ecafe.processor.web.ui.monitoring.SyncMonitorPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.SyncStatsPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
@@ -302,6 +303,7 @@ public class MainPage implements Serializable {
     private final MonitoringOfReportPage monitoringOfReportPage = new MonitoringOfReportPage();
     private final ClientTransactionsReportPage clientTransactionsReportPage = new ClientTransactionsReportPage();
     //private final BasicBasketReportPage basicBasketReportPage = new BasicBasketReportPage();
+    private final SyncMonitorPage syncMonitorPage = new SyncMonitorPage();
 
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
@@ -10097,5 +10099,9 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getNsiGroupEmployeePage() {
         return nsiGroupEmployeePage;
+    }
+
+    public SyncMonitorPage getSyncMonitorPage() {
+        return syncMonitorPage;
     }
 }

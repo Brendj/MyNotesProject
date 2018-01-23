@@ -405,27 +405,30 @@ public class DashboardResponse {
     public static class OrgSyncStatItem {
 
         private String orgName;
-        private String tags;
         private String district;
         private Date lastSuccessfulBalanceSync;
-        private Date lastUnSuccessfulBalanceSync;
         private String remoteAddr;
         private String version;
         private Long errorsCount;
         private Long idOfOrg;
+        private String address;
+        private String organizationTypeName;
+        private String introductionQueue;
         
 
-        public OrgSyncStatItem(Long idOfOrg, String orgName, String tags, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
-                String remoteAddr, String version, Long errorsCount, String district) {
+        public OrgSyncStatItem(Long idOfOrg, String orgName, String address, String organizationTypeName,
+                String introductionQueue, Date lastSuccessfulBalanceSync, String remoteAddr, String version,
+                Long errorsCount, String district) {
             this.idOfOrg = idOfOrg;
             this.orgName = orgName;
             this.district = district;
-            this.tags = tags;
             this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
-            this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
             this.remoteAddr = remoteAddr;
             this.version = version;
             this.errorsCount = errorsCount;
+            this.address = address;
+            this.organizationTypeName = organizationTypeName;
+            this.introductionQueue = introductionQueue;
         }
 
         public String getOrgName() {
@@ -436,9 +439,6 @@ public class DashboardResponse {
             return lastSuccessfulBalanceSync;
         }
 
-        public Date getLastUnSuccessfulBalanceSync() {
-            return lastUnSuccessfulBalanceSync;
-        }
 
         public String getRemoteAddr() {
             return remoteAddr;
@@ -446,10 +446,6 @@ public class DashboardResponse {
 
         public String getVersion() {
             return version;
-        }
-        
-        public String getTags() {
-            return tags;
         }
 
         public Long getErrorsCount() {
@@ -466,6 +462,18 @@ public class DashboardResponse {
 
         public void setDistrict(String district) {
             this.district = district;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public String getOrganizationTypeName() {
+            return organizationTypeName;
+        }
+
+        public String getIntroductionQueue() {
+            return introductionQueue;
         }
     }
 
