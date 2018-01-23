@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.monitoring;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceBean;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

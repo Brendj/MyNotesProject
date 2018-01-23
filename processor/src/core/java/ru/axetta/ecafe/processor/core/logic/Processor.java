@@ -172,7 +172,7 @@ public class Processor implements SyncProcessor {
                     break;
                 }
                 case TYPE_CONSTRUCTED:{
-                    response = buildUnivercalConstructedSectionsSyncResponse(request, syncStartTime, syncResult);
+                    response = buildUniversalConstructedSectionsSyncResponse(request, syncStartTime, syncResult);
                     break;
                 }
             }
@@ -298,7 +298,7 @@ public class Processor implements SyncProcessor {
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                request.getRemoteAddr());
+                request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
 
@@ -721,21 +721,19 @@ public class Processor implements SyncProcessor {
                 resSpecialDates, migrantsData, resMigrants, responseSections);
     }
 
-    private SyncResponse buildUnivercalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
+    private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
             int syncResult) throws Exception {
         Long idOfPacket = null;
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         List<Long> errorClientIds = new ArrayList<Long>();
 
-        if (request.isFullSync()) {
-            idOfPacket = generateIdOfPacket(request.getIdOfOrg());
-            // Register sync history
-            syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                    request.getRemoteAddr());
-            addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                    request.getRemoteAddr());
-        }
+        idOfPacket = generateIdOfPacket(request.getIdOfOrg());
+        // Register sync history
+        syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
+                request.getRemoteAddr(), request.getSyncType().getValue());
+        addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
+                request.getRemoteAddr());
 
         // мигранты
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
@@ -1409,7 +1407,7 @@ public class Processor implements SyncProcessor {
                         String clientVersion = (request.getClientVersion() == null ? "" : request.getClientVersion());
                         Long packet = (idOfPacket == null ? -1L : idOfPacket);
                         localSyncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
-                                request.getRemoteAddr());
+                                request.getRemoteAddr(), request.getSyncType().getValue());
                     }
                     final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available",
                             request.getIdOfOrg());
@@ -1622,21 +1620,24 @@ public class Processor implements SyncProcessor {
             List<AbstractToElement> responseSections, Boolean error, Long idOfPacket, List<Long> errorClientIds) {
         try {
             if (request.getPaymentRegistry() != null) {
-                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.PAYMENT_REGISTRY);
+                saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(),
+                        SectionType.PAYMENT_REGISTRY);
                 if (request.getPaymentRegistry().getPayments() != null) {
+
+                    String clientVersion = (request.getClientVersion() == null ? "" : request.getClientVersion());
+                    Long packet = (idOfPacket == null ? -1L : idOfPacket);
+                    if (syncHistory == null) {
+                        syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
+                                request.getRemoteAddr(), request.getSyncType().getValue());
+                    }
+
                     if (request.getPaymentRegistry().getPayments().hasNext()) {
                         if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
-                            String clientVersion = (request.getClientVersion() == null ? ""
-                                    : request.getClientVersion());
-                            Long packet = (idOfPacket == null ? -1L : idOfPacket);
-                            if(syncHistory == null) {
-                                syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
-                                        clientVersion, request.getRemoteAddr());
-                            }
                             final String s = String
                                     .format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available",
                                             request.getIdOfOrg());
-                            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, s);
+                            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(),
+                                    syncHistory, s);
                             throw new Exception("no license slots available");
                         }
                     }
@@ -1648,7 +1649,7 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to process Payment Registry, IdOfOrg == %s", request.getIdOfOrg()), e);
-            if(error != null) {
+            if (error != null) {
                 error = true;
             }
         }
@@ -3945,7 +3946,7 @@ public class Processor implements SyncProcessor {
     }
 
     public SyncHistory createSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
-            String remoteAddress) throws Exception {
+            String remoteAddress, Integer syncType) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -3954,7 +3955,7 @@ public class Processor implements SyncProcessor {
 
             Org organization = getOrgReference(persistenceSession, idOfOrg);
             SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
-                    remoteAddress);
+                    remoteAddress, syncType);
             persistenceSession.save(syncHistory);
             //Long idOfSync = syncHistory.getIdOfSync();
 
@@ -5573,6 +5574,30 @@ public class Processor implements SyncProcessor {
                     .format("Failed to build organization files, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    public SyncHistory createSyncHistoryIntegro(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
+            String remoteAddress) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org organization = getOrgReference(persistenceSession, idOfOrg);
+            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
+                    remoteAddress);
+            persistenceSession.save(syncHistory);
+            //Long idOfSync = syncHistory.getIdOfSync();
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return syncHistory;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

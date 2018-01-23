@@ -18,3 +18,5 @@ create table cf_cards_special (
 
 --Признак длинного идентификатора карты
 alter table cf_cards add column islonguid boolean;
+
+alter table cf_synchistory add column synctype integer;

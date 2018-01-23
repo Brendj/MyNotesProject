@@ -24,6 +24,7 @@ public class SyncHistory {
     private Long idOfPacket;
     private String clientVersion;
     private String remoteAddress;
+    private Integer syncType;
     private Set<SyncHistoryException> syncHistoryExceptions = new HashSet<SyncHistoryException>();
 
     public String getRemoteAddress() {
@@ -52,6 +53,15 @@ public class SyncHistory {
         this.idOfPacket = idOfPacket;
         this.clientVersion = clientVersion;
         this.remoteAddress = remoteAddress;
+    }
+
+    public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress, Integer syncType) {
+        this.org = org;
+        this.syncStartTime = syncStartTime;
+        this.idOfPacket = idOfPacket;
+        this.clientVersion = clientVersion;
+        this.remoteAddress = remoteAddress;
+        this.syncType = syncType;
     }
 
     public Long getIdOfSync() {
@@ -104,6 +114,14 @@ public class SyncHistory {
     private void setIdOfPacket(Long idOfPacket) {
         // For Hibernate only
         this.idOfPacket = idOfPacket;
+    }
+
+    public Integer getSyncType() {
+        return syncType;
+    }
+
+    public void setSyncType(Integer syncType) {
+        this.syncType = syncType;
     }
 
     public Set<SyncHistoryException> getSyncHistoryExceptions() {
