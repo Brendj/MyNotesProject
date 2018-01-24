@@ -6,6 +6,7 @@
         <datasource-map>
           <unit-entry name="sessionFactory" value="0e6b978e-3b8a-493b-86b2-bb312f07eec8" />
         </datasource-map>
+        <naming-strategy-map />
       </configuration>
     </facet>
     <facet type="Spring" name="Spring">
@@ -19,7 +20,9 @@
       <configuration>
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
-        <datasource-mapping />
+        <datasource-mapping>
+          <factory-entry name="entityManagerFactory" />
+        </datasource-mapping>
       </configuration>
     </facet>
   </component>
@@ -49,4 +52,3 @@
     <orderEntry type="module" module-name="core" />
   </component>
 </module>
-

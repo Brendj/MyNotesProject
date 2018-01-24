@@ -8,9 +8,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -85,24 +83,21 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         }
 
         Query query = session.createSQLQuery(
-                "SELECT CASE WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '10 minutes')AND (current_timestamp - lastsynctime <= INTERVAL '30 minutes') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more10Minutes' "
-                        + "WHEN (lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastsynctime <= INTERVAL '1 hour') AND (to_timestamp(syncendtime / 1000) IS NOT null) THEN 'more30Minutes' "
-                        + "WHEN ((lastsynctime IS NOT null) AND (current_timestamp - lastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastsynctime <= INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null)) THEN 'more60Minutes' "
-                        + "WHEN ((lastsynctime IS NOT null) AND (lastsynctime - current_timestamp > INTERVAL '3 hours') AND (to_timestamp(syncendtime / 1000) IS NOT null) OR (lastsynctime IS null AND to_timestamp(syncendtime / 1000) IS null)) THEN 'more3Hours' "
-                        + "ELSE 'other' END AS condition, nosynch.idoforg, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync, cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district, "
-                        + "to_timestamp(syncendtime / 1000) AS fullsyncendtime, lastsynctime "
-                        + "FROM cf_synchistory cfsh INNER JOIN (SELECT idoforg, max(syncstarttime) AS lastfullsynctime "
-                        + "FROM cf_synchistory cfs   WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', current_date) "
-                        + "GROUP BY idoforg) AS lastsyncbyorg  ON cfsh.idoforg = lastsyncbyorg.idoforg AND lastfullsynctime = cfsh.syncstarttime RIGHT JOIN (SELECT  idoforg, "
-                        + "max(to_timestamp(syncdate / 1000)) AS lastsynctime FROM cf_synchistory_daily WHERE to_timestamp(syncdate / 1000) > DATE_TRUNC('hour', current_date) "
-                        + "AND idoforg in (:idOfOrgList) "
-                        + "GROUP BY idoforg UNION SELECT idoforg, null AS lastsynctime FROM (SELECT idoforg FROM cf_orgs WHERE state = 1 "
-                        + "AND idoforg in (:idOfOrgList)  "
-                        + "EXCEPT (SELECT idoforg FROM cf_synchistory_daily WHERE to_timestamp(syncdate / 1000) > DATE_TRUNC('hour', current_date) "
-                        + "AND idoforg in (:idOfOrgList))) "
-                        + "AS noSynchOrgs)AS nosynch ON nosynch.idoforg = cfsh.idoforg INNER JOIN cf_orgs_sync cfos ON cfos.idoforg = nosynch.idoforg "
-                        + "INNER JOIN cf_orgs cfor ON cfor.idoforg = nosynch.idoforg where cfor.state = 1 AND cfor.idoforg in (:idOfOrgList) "
-                        + "ORDER BY cfos.lastsucbalancesync DESC NULLS LAST, cfor.statusdetailing DESC");
+                "SELECT CASE WHEN (current_timestamp - lastfastsynctime > INTERVAL '10 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '30 minutes') THEN 'more10Minutes' "
+                        + "WHEN (current_timestamp - lastfastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '1 hour') THEN 'more30Minutes' "
+                        + "WHEN ((current_timestamp - lastfastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastfastsynctime <= INTERVAL '3 hours')) THEN 'more60Minutes' "
+                        + "WHEN ((lastfastsynctime - current_timestamp > INTERVAL '3 hours')) THEN 'more3Hours' "
+                        + "ELSE 'other' END AS condition, cfsh.idoforg, cfor.shortname, cfor.address, "
+                        + "cfor.isworkinsummertime, cfos.lastsucbalancesync, cfos.clientversion, "
+                        + "cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, "
+                        + "cfor.district, lastFastSynctime FROM cf_synchistory cfsh "
+                        + "INNER JOIN (SELECT idoforg, max(to_timestamp(syncstarttime / 1000)) AS lastfastsynctime "
+                        + "FROM cf_synchistory cfs WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', current_date) "
+                        + "AND cfs.synctype = 1 GROUP BY idoforg) AS lastsyncbyorg ON cfsh.idoforg = lastsyncbyorg.idoforg "
+                        + "LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg "
+                        + "LEFT JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg "
+                        + "WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList) AND cfsh.synctype = 1 "
+                        + "GROUP BY cfsh.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync, cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         logger.info("OutOfSynchronizationReport start query");
@@ -118,28 +113,25 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         for (Object resultItem : result) {
             Object[] object = (Object[]) resultItem;
 
+            if (parseCondition((String) object[0]) != null) {
 
-
-                if (parseCondition((String) object[0]) != null) {
-
-                    OutOfSynchronizationItem outOfSynchronizationItem = new OutOfSynchronizationItem(
-                            parseCondition((String) object[0]),
-                            ((BigInteger) object[1]).longValue(),
-                            (String) object[2],
-                            (String) object[3],
-                            ((Integer) object[4]).equals(1),
-                            object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())),
-                            object[6] == null ? "" : (String) object[6],
-                            object[7] == null ? "" : (String) object[7],
-                            rowName((String) object[0]),
-                            (String) object[8],
-                            (String) object[9],
-                            (String) object[10]);
-                    outOfSynchronizationReportList.add(outOfSynchronizationItem);
-                }
+                OutOfSynchronizationItem outOfSynchronizationItem = new OutOfSynchronizationItem(
+                        parseCondition((String) object[0]),
+                        ((BigInteger) object[1]).longValue(),
+                        (String) object[2],
+                        (String) object[3],
+                        (object[4]).equals(1),
+                        object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())),
+                        object[6] == null ? "" : (String) object[6],
+                        object[7] == null ? "" : (String) object[7],
+                        rowName((String) object[0]),
+                        (String) object[8],
+                        (String) object[9],
+                        (String) object[10]);
+                outOfSynchronizationReportList.add(outOfSynchronizationItem);
             }
+        }
         logger.info("OutOfSynchronizationReport OK");
-//        Collections.sort(outOfSynchronizationReportList);
         return new JRBeanCollectionDataSource(outOfSynchronizationReportList);
     }
 
@@ -182,29 +174,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         return 0L;
     }
 
-
-    public String parseTags(String orgTagsStr) {
-        if (StringUtils.isEmpty(orgTagsStr)) {
-            return "";
-        }
-        String allowedTagsStr = RuntimeContext.getInstance()
-                .getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
-        if (StringUtils.isEmpty(allowedTagsStr)) {
-            return "";
-        }
-        String allowedTags[] = allowedTagsStr.split(";");
-        String orgTags[] = orgTagsStr.split(";");
-        String result = "";
-        for (String allowedTag : allowedTags) {
-            for (String orgTag : orgTags) {
-                if (allowedTag.trim().equals(orgTag.trim())) {
-                    if (result.length() > 0) {
-                        result = result + "<br/>";
-                    }
-                    result = result + allowedTag;
-                }
-            }
-        }
-        return result;
+    public String getTemplateFilename() {
+        return templateFilename;
     }
 }
