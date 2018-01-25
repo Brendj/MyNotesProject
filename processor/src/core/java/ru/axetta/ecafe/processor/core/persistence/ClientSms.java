@@ -35,7 +35,8 @@ public class ClientSms {
             "Уведомление о снижении баланса",  //13 - TYPE_LOW_BALANCE_NOTIFICATION
             "Вход в музей", //14 - TYPE_ENTER_MUSEUM_NOTIFICATION
             "Возврат билета в музей", //15 - TYPE_NOENTER_MUSEUM_NOTIFICATION
-            "Генерация нового пароля" //16 - TYPE_CLIENT_NEWPASSWORD_NOTIFICATION
+            "Генерация нового пароля", //16 - TYPE_CLIENT_NEWPASSWORD_NOTIFICATION
+            "Уведомление об окончании подписки на автопополнение л/с" //TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION
     };
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
