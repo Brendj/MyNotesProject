@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
+import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -120,10 +121,13 @@ public class DebugInfoPage extends BasicWorkspacePage {
     }
 
     public void runTest2() throws Exception {
-        for (Long w = 1499868946299L; w < 1499868946399L; w++) {
+        RegularPaymentSubscriptionService notificationService = RuntimeContext.getInstance()
+                .getRegularPaymentSubscriptionService();
+        notificationService.notifyClientsAboutExpiredSubscriptions();
+        /*for (Long w = 1499868946299L; w < 1499868946399L; w++) {
             DAOService.getInstance().registerSyncRequest(5, w.toString());
             Thread.sleep(500);
-        }
+        }*/
 
         //RuntimeContext.getAppContext().getBean(OrgSyncLockService.class).clean();
 

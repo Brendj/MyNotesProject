@@ -20,3 +20,6 @@ create table cf_cards_special (
 alter table cf_cards add column islonguid boolean;
 
 alter table cf_synchistory add column synctype integer;
+
+--Флаг, что по подписке отправлено уведомление об окончании срока действия
+alter table cf_bank_subscriptions add column notificationSent integer;

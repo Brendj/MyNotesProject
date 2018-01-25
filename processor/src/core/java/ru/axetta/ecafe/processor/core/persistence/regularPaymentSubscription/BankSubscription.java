@@ -42,6 +42,7 @@ public class BankSubscription {
     private Integer expYear;
     private Set<MfrRequest> mfrRequests = new HashSet<MfrRequest>();
     private Set<RegularPayment> regularPayments = new HashSet<RegularPayment>();
+    private Boolean notificationSent;
 
     public Long getIdOfSubscription() {
         return idOfSubscription;
@@ -242,5 +243,13 @@ public class BankSubscription {
     @Override
     public int hashCode() {
         return idOfSubscription != null ? idOfSubscription.hashCode() : 0;
+    }
+
+    public Boolean getNotificationSent() {
+        return notificationSent;
+    }
+
+    public void setNotificationSent(Boolean notificationSent) {
+        this.notificationSent = notificationSent;
     }
 }

@@ -61,6 +61,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_ENTER_MUSEUM = "enterMuseum";
     public static String NOTIFICATION_NOENTER_MUSEUM = "noEnterMuseum";
     public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
+    public static String NOTIFICATION_EXPIRED_REGULAR_PAYMENT = "regularPaymentExpired";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -504,6 +505,37 @@ public class EventNotificationService {
             return false;
         }
         return result;
+    }
+
+    public boolean sendNotificationExpiredSubscription(Client destClient, Client dataClient, String type, String[] values, Date eventTime) {
+        if (StringUtils.isEmpty(destClient.getMobile())) return true;
+        boolean result = false;
+        int clientSMSType = ClientSms.TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION;
+        try {
+            Object textObject = getExpiredRegularPaymentSubscriptionNotificationObject(type, destClient, dataClient, values);
+            if (textObject != null) {
+                smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
+                result = true;
+            }
+        } catch (Exception e) {
+            String message = String.format("Failed to send summary notification to client with contract_id = %s.", destClient.getContractId());
+            logger.error(message, e);
+            return false;
+        }
+
+        return result;
+    }
+
+    private Object getExpiredRegularPaymentSubscriptionNotificationObject(String type, Client destClient, Client dataClient, String[] values) {
+        EMPEventType empType = null;
+        if (dataClient != null)
+            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, dataClient, destClient);
+        else
+            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, destClient);
+        for (int i = 0; i < values.length-1; i=i+2) {
+            empType.getParameters().put(values[i], values[i+1]);
+        }
+        return empType;
     }
 
     public boolean sendNotificationSummary(Client destClient, Client dataClient, String type, String[] values, Date eventTime, int notificationType) {

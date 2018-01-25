@@ -31,6 +31,7 @@ public class EMPEventTypeFactory {
     public static final int LOW_BALANCE_EVENT         = 901240012;
     public static final int ENTER_MUSEUM_EVENT        = 901240013;
     public static final int NOENTER_MUSEUM_EVENT      = 901240014;
+    public static final int REGULAR_PAYMENT_EXPIRATION_EVENT  = 901240015;
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
 
@@ -104,6 +105,9 @@ public class EMPEventTypeFactory {
                 break;
             case CLIENT_NEWPASSWORD_EVENT:
                 event = new EMPClientNewPasswordEventType();
+                break;
+            case REGULAR_PAYMENT_EXPIRATION_EVENT:
+                event = new EMPRegularPaymentExpirationEventType();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

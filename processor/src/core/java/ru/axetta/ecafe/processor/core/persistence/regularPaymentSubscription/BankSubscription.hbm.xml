@@ -37,6 +37,8 @@
         <property name="cardHolder" column="CardHolder" type="string"/>
         <property name="expMonth" column="ExpMonth" type="integer"/>
         <property name="expYear" column="ExpYear" type="integer"/>
+        <property name="notificationSent" column="notificationSent"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <set name="mfrRequests" inverse="true" cascade="save-update" lazy="true">
             <key column="IdOfSubscription"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest"/>

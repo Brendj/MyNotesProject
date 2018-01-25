@@ -53,6 +53,7 @@ public class ClientSms {
     public static final int TYPE_ENTER_MUSEUM_NOTIFICATION = 14;
     public static final int TYPE_NOENTER_MUSEUM_NOTIFICATION = 15;
     public static final int TYPE_CLIENT_NEWPASSWORD_NOTIFICATION = 16;
+    public static final int TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION = 17;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;
