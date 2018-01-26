@@ -23,3 +23,26 @@ alter table cf_synchistory add column synctype integer;
 
 --Флаг, что по подписке отправлено уведомление об окончании срока действия
 alter table cf_bank_subscriptions add column notificationSent integer;
+
+--Таблица "заявки в службу помощи"
+CREATE TABLE cf_helprequests
+(
+  idofhelprequests bigint NOT NULL,
+  version bigint NOT NULL,
+  requestdate bigint NOT NULL, 
+  requestupdatedate bigint NOT NULL,
+  theme integer NOT NULL DEFAULT 0,
+  message character varying(2000),
+  declarer character varying(100),
+  phone character varying(11) NOT NULL,
+  status integer NOT NULL DEFAULT 0,
+  requestnumber character varying(15) NOT NULL,
+  idoforg bigint NOT NULL,
+  guid character varying(36) NOT NULL,
+  CONSTRAINT cf_helprequests_pk PRIMARY KEY (idofhelprequests),
+  CONSTRAINT cf_helprequests_idoforg_fk FOREIGN KEY (idoforg)
+      REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_helprequests_guid_uq UNIQUE (guid),
+  CONSTRAINT cf_helprequests_requestnumber_uq UNIQUE (requestnumber)
+);
