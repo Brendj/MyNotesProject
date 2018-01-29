@@ -27,8 +27,9 @@ alter table cf_bank_subscriptions add column notificationSent integer;
 --Таблица "заявки в службу помощи"
 CREATE TABLE cf_helprequests
 (
-  idofhelprequests bigint NOT NULL,
+  idofhelprequests bigserial NOT NULL,
   version bigint NOT NULL,
+  hibernateversion bigint NOT NULL,
   requestdate bigint NOT NULL, 
   requestupdatedate bigint NOT NULL,
   theme integer NOT NULL DEFAULT 0,
@@ -47,3 +48,9 @@ CREATE TABLE cf_helprequests
   CONSTRAINT cf_helprequests_guid_uq UNIQUE (guid),
   CONSTRAINT cf_helprequests_requestnumber_uq UNIQUE (requestnumber)
 );
+
+--Последовательность для таблицы "заявки в службу помощи"
+CREATE SEQUENCE cf_helprequests_idofhelprequests_seq;
+
+--Последовательность для таблицы "описание файлов организации"
+CREATE SEQUENCE cf_orgfile_idoforgfile_seq;

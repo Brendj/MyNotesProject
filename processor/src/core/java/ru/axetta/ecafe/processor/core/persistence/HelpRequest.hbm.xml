@@ -10,7 +10,7 @@
         <id name="idOfHelpRequest" column="IdOfHelpRequests" type="long">
             <generator class="identity"/>
         </id>
-        <version name="version" column="Version" type="long"/>
+        <version name="hibernateVersion" column="HibernateVersion" type="long"/>
         <property name="requestDate" column="RequestDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="requestUpdateDate" column="RequestUpdateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
@@ -36,5 +36,6 @@
         </many-to-one>
         <property name="guid" column="Guid" type="string" length="36" not-null="true" unique="true"/>
         <property name="comment" column="Comment" type="string" length="2000"/>
+        <property name="version" column="Version" type="long"/>
     </class>
 </hibernate-mapping>

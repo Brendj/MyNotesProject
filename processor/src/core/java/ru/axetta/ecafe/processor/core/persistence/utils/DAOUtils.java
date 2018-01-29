@@ -2843,4 +2843,22 @@ public class DAOUtils {
         }
         return criteria.list();
     }
+
+    public static long nextVersionByHelpRequests(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select r.version from cf_helprequests as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
+    public static List<HelpRequest> getHelpRequestsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Criteria criteria = session.createCriteria(HelpRequest.class);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        criteria.add(Restrictions.eq("org", org));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
 }

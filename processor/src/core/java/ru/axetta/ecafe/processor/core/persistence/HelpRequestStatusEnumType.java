@@ -32,6 +32,5 @@ public enum HelpRequestStatusEnumType {
     public static HelpRequestStatusEnumType fromInteger(Integer value){
         return map.get(value);
     }
-
 }
 

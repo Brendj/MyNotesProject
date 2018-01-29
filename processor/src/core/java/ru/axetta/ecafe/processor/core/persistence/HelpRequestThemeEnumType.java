@@ -35,5 +35,12 @@ public enum HelpRequestThemeEnumType {
         return map.get(value);
     }
 
+    public static HelpRequestThemeEnumType fromString(String description) {
+        for (HelpRequestThemeEnumType e : map.values()) {
+            if (e.description.equals(description))
+                return e;
+        }
+        return null;
+    }
 }
 

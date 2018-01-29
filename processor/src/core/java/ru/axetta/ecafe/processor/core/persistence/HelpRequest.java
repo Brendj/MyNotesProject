@@ -12,6 +12,7 @@ public class HelpRequest implements Serializable {
 
     private Long idOfHelpRequest;
     private long version;
+    private long hibernateVersion;
     private Date requestDate;
     private Date requestUpdateDate;
     private HelpRequestThemeEnumType theme;
@@ -50,7 +51,6 @@ public class HelpRequest implements Serializable {
         this.idOfHelpRequest = idOfHelpDeskRequest;
     }
 
-    @Version
     public long getVersion() {
         return version;
     }
@@ -170,5 +170,14 @@ public class HelpRequest implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    @Version
+    public long getHibernateVersion() {
+        return hibernateVersion;
+    }
+
+    public void setHibernateVersion(long hibernateVersion) {
+        this.hibernateVersion = hibernateVersion;
     }
 }

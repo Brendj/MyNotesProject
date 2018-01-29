@@ -443,4 +443,17 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public HelpRequest findHelpRequest(Long idOfOrg, String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT help from HelpRequest help "
+                    + "where help.org.idOfOrg = :idOfOrg "
+                    + "and help.guid = :guid ");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("guid", guid);
+            return (HelpRequest) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
