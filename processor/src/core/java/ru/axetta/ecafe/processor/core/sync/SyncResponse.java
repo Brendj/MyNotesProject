@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
@@ -1129,6 +1131,8 @@ public class SyncResponse {
     private  ResSpecialDates resSpecialDates;
     private  MigrantsData migrantsData;
     private  ResMigrants resMigrants;
+    private  ResHelpRequest resHelpRequest;
+    private HelpRequestData helpRequestData;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1147,7 +1151,8 @@ public class SyncResponse {
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
-            ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections) {
+            ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
+            ResHelpRequest resHelpRequest, HelpRequestData helpRequestData) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1195,6 +1200,8 @@ public class SyncResponse {
         this.migrantsData = migrantsData;
         this.resMigrants = resMigrants;
         this.responseSections = responseSections;
+        this.resHelpRequest = resHelpRequest;
+        this.helpRequestData = helpRequestData;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1428,6 +1435,14 @@ public class SyncResponse {
             for (AbstractToElement section : this.responseSections) {
                 envelopeElement.appendChild(section.toElement(document));
             }
+        }
+
+        if (resHelpRequest != null) {
+            envelopeElement.appendChild(resHelpRequest.toElement(document));
+        }
+
+        if (helpRequestData != null) {
+            envelopeElement.appendChild(helpRequestData.toElement(document));
         }
     }
 

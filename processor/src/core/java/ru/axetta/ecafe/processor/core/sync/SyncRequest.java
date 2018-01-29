@@ -17,6 +17,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosBuil
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
@@ -2550,6 +2552,7 @@ public class SyncRequest {
             builders.add(new InfoMessageRequest.InfoMessageRequestBuilder());
             builders.add(new ListComplexSchedules.Builder(idOfOrg));
             builders.add(new OrgFilesRequestBuilder(idOfOrg));
+            builders.add(new HelpRequestBuilder(idOfOrg));
             return builders;
         }
 
@@ -2789,6 +2792,10 @@ public class SyncRequest {
 
     public DirectivesRequest getDirectivesRequest() {
         return this.<DirectivesRequest>findSection(DirectivesRequest.class);
+    }
+
+    public HelpRequest getHelpRequest() {
+        return this.<HelpRequest>findSection(HelpRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

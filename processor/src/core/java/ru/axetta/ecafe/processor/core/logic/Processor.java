@@ -41,6 +41,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ComplexSche
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ResComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataProcessor;
@@ -171,6 +175,11 @@ public class Processor implements SyncProcessor {
                     response = buildMigrantsSyncResponse(request);
                     break;
                 }
+                case TYPE_HELP_REQUESTS:{
+                    //обработка запросов в службу помощи
+                    response = buildHelpRequestsSyncResponse(request);
+                    break;
+                }
                 case TYPE_CONSTRUCTED:{
                     response = buildUniversalConstructedSectionsSyncResponse(request, syncStartTime, syncResult);
                     break;
@@ -289,6 +298,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -305,7 +316,6 @@ public class Processor implements SyncProcessor {
         processMigrantsSections(request, syncHistory, responseSections, null);
 
         processAccountOperationsRegistrySections(request, syncHistory, responseSections, null);
-
 
         // Process paymentRegistry
         try {
@@ -709,6 +719,18 @@ public class Processor implements SyncProcessor {
         //info messages
         processInfoMessageSections(request, responseSections);
 
+        try {
+            HelpRequest helpRequest = request.getHelpRequest();
+            if (helpRequest != null) {
+                resHelpRequest = processHelpRequest(helpRequest);
+                helpRequestData = processHelpRequestData(helpRequest);
+            }
+        } catch (Exception e) {
+            String message = String.format("processHelpRequest: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
                 accRegistry, resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry,
@@ -718,7 +740,7 @@ public class Processor implements SyncProcessor {
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, migrantsData, resMigrants, responseSections);
+                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -1704,6 +1726,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1749,7 +1773,7 @@ public class Processor implements SyncProcessor {
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, migrantsData, resMigrants, responseSections);
+                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -1792,6 +1816,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1819,7 +1845,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -1862,6 +1889,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1889,7 +1918,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     private SyncResponse buildSpecialDatesSyncResponse(SyncRequest request) throws Exception {
@@ -1932,6 +1962,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1959,7 +1991,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -2002,6 +2035,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2064,7 +2099,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -2127,6 +2163,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2211,7 +2249,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -2258,6 +2297,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2331,7 +2372,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -2375,6 +2417,8 @@ public class Processor implements SyncProcessor {
         ResSpecialDates resSpecialDates = null;
         MigrantsData migrantsData = null;
         ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2479,7 +2523,8 @@ public class Processor implements SyncProcessor {
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections);
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -5602,5 +5647,114 @@ public class Processor implements SyncProcessor {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private ResHelpRequest processHelpRequest(HelpRequest helpRequest)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResHelpRequest resHelpRequest = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new HelpRequestProcessor(persistenceSession, helpRequest);
+            resHelpRequest = (ResHelpRequest) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resHelpRequest;
+    }
+
+    private HelpRequestData processHelpRequestData(HelpRequest helpRequest)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        HelpRequestData helpRequestData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            HelpRequestProcessor processor = new HelpRequestProcessor(persistenceSession, helpRequest);
+            helpRequestData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return helpRequestData;
+    }
+
+    private SyncResponse buildHelpRequestsSyncResponse(SyncRequest request) throws Exception {
+        SyncHistory syncHistory = null;
+        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        ComplexRoles complexRoles = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+        ResultClientGuardian resultClientGuardian = null;
+        ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
+        ZeroTransactionData zeroTransactionData = null;
+        ResZeroTransactions resZeroTransactions = null;
+        SpecialDatesData specialDatesData = null;
+        ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
+        try {
+            HelpRequest helpRequest = request.getHelpRequest();
+            if (helpRequest != null) {
+                resHelpRequest = processHelpRequest(helpRequest);
+                helpRequestData = processHelpRequestData(helpRequest);
+            }
+        } catch (Exception e) {
+            String message = String.format("processHelpRequest: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure,
+                resMenuExchange, resDiary, "", resEnterEvents, resTempCardsOperations, tempCardOperationData,
+                resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
+                questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
+                accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData);
     }
 }

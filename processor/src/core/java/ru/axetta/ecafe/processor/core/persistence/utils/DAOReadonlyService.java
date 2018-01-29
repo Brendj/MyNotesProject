@@ -456,4 +456,30 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public Boolean isHelpRequestGuidExists(String guid) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT help.idOfHelpRequest "
+                     + "FROM HelpRequest help "
+                     + "where help.guid = :guid");
+            query.setParameter("guid", guid);
+            return (null != query.getSingleResult());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Boolean isHelpRequestNumberExists(String number) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT help.idOfHelpRequest "
+                            + "FROM HelpRequest help "
+                            + "where help.requestNumber = :number");
+            query.setParameter("number", number);
+            return (null != query.getSingleResult());
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
