@@ -22,6 +22,7 @@ public class HelpRequest implements Serializable {
     private String requestNumber;
     private Org org;
     private String guid;
+    private String comment;
 
     public HelpRequest(Date requestDate, HelpRequestThemeEnumType theme, String message, String declarer,
             String phone, HelpRequestStatusEnumType status, String requestNumber, Org org, String guid) {
@@ -161,5 +162,13 @@ public class HelpRequest implements Serializable {
                 ", requestDate=" + requestDate + ", requestUpdateDate='" + requestUpdateDate + ", theme='" + theme
                 + ", message='" + message + ", declarer='" + declarer + ", phone='" + phone + ", status='" + status
                 + ", requestNumber='" + requestNumber + ", idOfOrg='" + org.getIdOfOrg() + '}';
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

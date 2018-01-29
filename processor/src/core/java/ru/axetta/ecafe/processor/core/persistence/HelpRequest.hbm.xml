@@ -13,6 +13,8 @@
         <version name="version" column="Version" type="long"/>
         <property name="requestDate" column="RequestDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
+        <property name="requestUpdateDate" column="RequestUpdateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true"/>
         <property name="theme" column="Theme" not-null="true">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.HelpRequestThemeEnumType</param>
@@ -33,5 +35,6 @@
             <column name="idOfOrg"/>
         </many-to-one>
         <property name="guid" column="Guid" type="string" length="36" not-null="true" unique="true"/>
+        <property name="comment" column="Comment" type="string" length="2000"/>
     </class>
 </hibernate-mapping>
