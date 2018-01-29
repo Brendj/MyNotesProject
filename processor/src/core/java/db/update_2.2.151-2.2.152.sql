@@ -39,6 +39,7 @@ CREATE TABLE cf_helprequests
   requestnumber character varying(15) NOT NULL,
   idoforg bigint NOT NULL,
   guid character varying(36) NOT NULL,
+  comment character varying(2000),
   CONSTRAINT cf_helprequests_pk PRIMARY KEY (idofhelprequests),
   CONSTRAINT cf_helprequests_idoforg_fk FOREIGN KEY (idoforg)
       REFERENCES cf_orgs (idoforg) MATCH SIMPLE
