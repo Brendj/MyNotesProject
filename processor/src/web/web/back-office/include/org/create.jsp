@@ -205,6 +205,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.photoRegistry}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Разрешить проведение сверки сотрудников" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.allowRegistryChangeEmployee}"  styleClass="input-text"  />
+    <h:outputText escape="true" value="Служба помощи" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.helpdeskEnabled}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.autoCreateCards}" styleClass="input-text" rendered="#{mainPage.isSpb}" />
 </h:panelGrid>
