@@ -76,6 +76,7 @@ public class FunctionSelector {
     private List<Item> serviceItems = Collections.emptyList();
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
+    private List<Item> helpdeskItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
     private static final String[] userFunctions = new String[]{"viewUser", "editUser", "deleteUser"};
     private static final String[] notAdminFunctions = new String[]{
@@ -124,6 +125,10 @@ public class FunctionSelector {
 
     public List<Item> getRepositoryItems() {
         return repositoryItems;
+    }
+
+    public List<Item> getHelpdeskItems() {
+        return helpdeskItems;
     }
 
     public List<Item> getOptionsItems() {
@@ -266,6 +271,7 @@ public class FunctionSelector {
         List<Item> serviceItems = new ArrayList<Item>();
         List<Item> monitorItems = new ArrayList<Item>();
         List<Item> repositoryItems = new ArrayList<Item>();
+        List<Item> helpdeskItems = new ArrayList<Item>();
         List<Item> optionsItems = new ArrayList<Item>();
         for (Object object : allFunctions) {
             Function function = (Function) object;
@@ -292,6 +298,8 @@ public class FunctionSelector {
                 monitorItems.add(item);
             } else if (item.getFunctionName().equals("showReportRepository")) {
                 repositoryItems.add(item);
+            } else if (item.getFunctionName().equals("helpdesk")) {
+                helpdeskItems.add(item);
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
@@ -329,6 +337,7 @@ public class FunctionSelector {
         Collections.sort(serviceItems);
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
+        this.helpdeskItems = helpdeskItems;
         this.optionsItems =optionsItems;
         Collections.sort(optionsItems);
     }
@@ -344,6 +353,7 @@ public class FunctionSelector {
         List<Item> serviceItems = new ArrayList<Item>();
         List<Item> monitorItems = new ArrayList<Item>();
         List<Item> repositoryItems = new ArrayList<Item>();
+        List<Item> helpdeskItems = new ArrayList<Item>();
         List<Item> optionsItems = new ArrayList<Item>();
         Criteria allFunctionsCriteria = session.createCriteria(Function.class);
         List allFunctions = allFunctionsCriteria.list();
@@ -401,6 +411,11 @@ public class FunctionSelector {
                     item.setSelected(true);
                 }
                 repositoryItems.add(item);
+            } else if (item.getFunctionName().equals("helpdesk")) {
+                if (selectedFunctions != null && selectedFunctions.contains(function)) {
+                    item.setSelected(true);
+                }
+                helpdeskItems.add(item);
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
@@ -444,6 +459,7 @@ public class FunctionSelector {
         Collections.sort(serviceItems);
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
+        this.helpdeskItems = helpdeskItems;
         this.optionsItems =optionsItems;
         Collections.sort(optionsItems);
     }
@@ -514,6 +530,13 @@ public class FunctionSelector {
         }
 
         for (Item item : repositoryItems) {
+            if (item.isSelected()) {
+                Function function = (Function) session.load(Function.class, item.getIdOfFunction());
+                selectedFunctions.add(function);
+            }
+        }
+
+        for (Item item : helpdeskItems) {
             if (item.isSelected()) {
                 Function function = (Function) session.load(Function.class, item.getIdOfFunction());
                 selectedFunctions.add(function);

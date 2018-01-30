@@ -133,6 +133,8 @@ public class Function {
     public static final String FUNCD_FEEDING_SETTINGS_SUPPLIER = "Настройки платного питания - поставщик";
     public static final String FUNC_FEEDING_SETTINGS_ADMIN = "feedingSettingsAdmin";
     public static final String FUNCD_FEEDING_SETTINGS_ADMIN = "Настройки платного питания - админ";
+    public static final String FUNC_HELPDESK = "helpdesk";
+    public static final String FUNCD_HELPDESK = "Заявки в службу помощи";
 
     private Long idOfFunction;
     private String functionName;

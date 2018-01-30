@@ -229,6 +229,18 @@
             <h:outputText escape="true" value="#{repositoryItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="Служба помощи" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
+    <rich:dataTable value="#{mainPage.userEditPage.functionSelector.helpdeskItems}" var="helpdeskItems" rendered="#{mainPage.userEditPage.isDefault}">
+        <rich:column>
+            <h:selectBooleanCheckbox value="#{helpdeskItems.selected}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{helpdeskItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{helpdeskItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
     <h:outputText escape="true" value="Настройки" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
     <rich:dataTable value="#{mainPage.userEditPage.functionSelector.optionsItems}" var="optionsItems" rendered="#{mainPage.userEditPage.isDefault}">
         <rich:column>

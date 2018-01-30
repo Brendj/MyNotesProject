@@ -1383,6 +1383,17 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
+    <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"
+                         rendered="#{mainPage.eligibleToViewHelpdesk}">
+        <a4j:support event="onclick" action="#{helpdeskGroupPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="helpdeskReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskReportPage"--%>
+        <rich:panelMenuItem id="helpdeskMenuItem" binding="#{helpdeskReportPage.mainMenuComponent}"
+                            label="Заявки в службу помощи" action="#{helpdeskReportPage.show}"
+                            reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />

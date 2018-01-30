@@ -512,7 +512,7 @@ public class EventNotificationService {
         boolean result = false;
         int clientSMSType = ClientSms.TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION;
         try {
-            Object textObject = getExpiredRegularPaymentSubscriptionNotificationObject(type, destClient, dataClient, values);
+            Object textObject = getExpiredRegularPaymentSubscriptionNotificationObject(destClient, dataClient, values);
             if (textObject != null) {
                 smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                 result = true;
@@ -526,7 +526,7 @@ public class EventNotificationService {
         return result;
     }
 
-    private Object getExpiredRegularPaymentSubscriptionNotificationObject(String type, Client destClient, Client dataClient, String[] values) {
+    private Object getExpiredRegularPaymentSubscriptionNotificationObject(Client destClient, Client dataClient, String[] values) {
         EMPEventType empType = null;
         if (dataClient != null)
             empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, dataClient, destClient);

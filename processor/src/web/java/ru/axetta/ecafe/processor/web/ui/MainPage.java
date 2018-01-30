@@ -9258,6 +9258,10 @@ public class MainPage implements Serializable {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_CARD_REPORTS);
     }
 
+    public boolean isEligibleToViewHelpdesk() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_HELPDESK);
+    }
+
     public boolean isEligibleToViewTotalServicesReport() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_TOTAL_SERVICES_REPORT);
     }

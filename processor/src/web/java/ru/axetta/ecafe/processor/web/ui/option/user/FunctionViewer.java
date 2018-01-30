@@ -7,7 +7,10 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +61,7 @@ public class FunctionViewer {
     private List<Item> serviceItems = Collections.emptyList();
     private List<Item> monitorItems = Collections.emptyList();
     private List<Item> repositoryItems = Collections.emptyList();
+    private List<Item> helpdeskItems = Collections.emptyList();
     private List<Item> optionsItems = Collections.emptyList();
     private List<Item> cardOperatorItems = Collections.emptyList();
 
@@ -101,6 +105,10 @@ public class FunctionViewer {
         return repositoryItems;
     }
 
+    public List<Item> getHelpdeskItems() {
+        return helpdeskItems;
+    }
+
     public List<Item> getOptionsItems() {
         return optionsItems;
     }
@@ -120,6 +128,7 @@ public class FunctionViewer {
         List<Item> serviceItems = new ArrayList<Item>();
         List<Item> monitorItems = new ArrayList<Item>();
         List<Item> repositoryItems = new ArrayList<Item>();
+        List<Item> helpdeskItems = new ArrayList<Item>();
         List<Item> optionsItems = new ArrayList<Item>();
         Set<Function> userFunctions = user.getFunctions();
         List<Item> cardOperatorItems = new ArrayList<Item>();
@@ -148,6 +157,8 @@ public class FunctionViewer {
                 monitorItems.add(item);
             } else if (item.getFunctionName().equals("showReportRepository")) {
                 repositoryItems.add(item);
+            } else if (item.getFunctionName().equals("helpdesk")) {
+                helpdeskItems.add(item);
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
@@ -186,6 +197,7 @@ public class FunctionViewer {
         Collections.sort(serviceItems);
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
+        this.helpdeskItems = helpdeskItems;
         this.optionsItems = optionsItems;
         this.cardOperatorItems = cardOperatorItems;
         Collections.sort(optionsItems);

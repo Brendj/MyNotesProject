@@ -102,6 +102,15 @@
             <h:outputText escape="true" value="#{repositoryItems.functionDesc}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
+    <h:outputText escape="true" value="Служба помощи" styleClass="output-text" rendered="#{mainPage.userViewPage.functionViewer.isEmpty(mainPage.userViewPage.functionViewer.helpdeskItems)}" />
+    <rich:dataTable value="#{mainPage.userViewPage.functionViewer.helpdeskItems}" var="helpdeskItems" rendered="#{mainPage.userViewPage.functionViewer.isEmpty(mainPage.userViewPage.functionViewer.helpdeskItems)}">
+        <rich:column>
+            <h:outputText escape="true" value="#{helpdeskItems.functionName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column>
+            <h:outputText escape="true" value="#{helpdeskItems.functionDesc}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
     <h:outputText escape="true" value="Настройки" styleClass="output-text" rendered="#{mainPage.userViewPage.functionViewer.isEmpty(mainPage.userViewPage.functionViewer.optionsItems)}" />
     <rich:dataTable value="#{mainPage.userViewPage.functionViewer.optionsItems}" var="optionsItems" rendered="#{mainPage.userViewPage.functionViewer.isEmpty(mainPage.userViewPage.functionViewer.optionsItems)}">
         <rich:column>
