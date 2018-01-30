@@ -54,3 +54,6 @@ CREATE SEQUENCE cf_helprequests_idofhelprequests_seq;
 
 --Последовательность для таблицы "описание файлов организации"
 CREATE SEQUENCE cf_orgfile_idoforgfile_seq;
+
+--Флаг службы помощи
+alter table cf_orgs add column helpdeskEnabled integer not null default 0;

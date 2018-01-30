@@ -239,6 +239,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.allowRegistryChangeEmployee}" styleClass="input-text" />
     <h:outputText id="fullSyncParamLabel" escape="true" value="Произвести полную синхронизацию" styleClass="output-text" />
     <h:selectBooleanCheckbox id="fullSyncParamCheckbox" value="#{mainPage.orgEditPage.fullSyncParam}" disabled="#{mainPage.orgEditPage.fullSyncParam}"/>
+    <h:outputText escape="true" value="Служба помощи" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.helpdeskEnabled}" styleClass="input-text" />
     <h:outputText escape="true" value="Главный корпус" styleClass="output-text" />
     <h:selectBooleanCheckbox disabled="#{mainPage.orgEditPage.mainBuilding}" value="#{mainPage.orgEditPage.mainBuilding}" styleClass="input-text" />
 

@@ -127,6 +127,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean needVerifyCardSign;
     private Boolean denyPayPlanForTimeDifference;
     private Boolean allowRegistryChangeEmployee;
+    private Boolean helpdeskEnabled;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -365,6 +366,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setNeedVerifyCardSign(needVerifyCardSign);
         org.setDenyPayPlanForTimeDifference(denyPayPlanForTimeDifference);
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
+        org.setHelpdeskEnabled(helpdeskEnabled);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -518,6 +520,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.needVerifyCardSign = org.getNeedVerifyCardSign();
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
         this.allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
+        this.helpdeskEnabled = org.getHelpdeskEnabled();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1104,6 +1107,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setWorkInSummerTime(Boolean workInSummerTime) {
         this.workInSummerTime = workInSummerTime;
+    }
+
+    public Boolean getHelpdeskEnabled() {
+        return helpdeskEnabled;
+    }
+
+    public void setHelpdeskEnabled(Boolean helpdeskEnabled) {
+        this.helpdeskEnabled = helpdeskEnabled;
     }
 
     public static class ContragentItem {

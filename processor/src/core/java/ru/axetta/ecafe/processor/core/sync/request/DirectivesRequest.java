@@ -19,7 +19,8 @@ public class DirectivesRequest implements SectionRequest {
     private final Boolean tradeConfigChangedSuccess;
     private final Integer isWorkInSummerTime;
     private final Integer recyclingEnabled;
-    private final Long orgStructureVersion;
+    private Long orgStructureVersion;
+    private final Integer helpdeskEnabled;
 
     public DirectivesRequest(Node sectionElement) throws Exception {
         this.tradeConfigChangedSuccess =
@@ -43,6 +44,18 @@ public class DirectivesRequest implements SectionRequest {
             this.recyclingEnabled = Integer.parseInt(value);
         } else
             this.recyclingEnabled = null;
+
+        Node isHelpdeskEnabledNode = XMLUtils.findFirstChildElement(sectionElement, "IS_HELP_REQUESTS_ENABLED");
+        if (isHelpdeskEnabledNode != null) {
+            NamedNodeMap attributes = isHelpdeskEnabledNode.getAttributes();
+            String value = attributes.getNamedItem("value").getTextContent();
+            this.helpdeskEnabled = Integer.parseInt(value);
+            Node nodeVersion = attributes.getNamedItem("V");
+            this.orgStructureVersion = nodeVersion == null ? -1 : Long.parseLong(nodeVersion.getTextContent());
+        } else {
+            this.helpdeskEnabled = null;
+            this.orgStructureVersion = -1L;
+        }
     }
 
     /*public DirectivesRequest(Node directivesRequestNode, Integer isWorkInSummerTime) throws Exception {
@@ -64,6 +77,10 @@ public class DirectivesRequest implements SectionRequest {
 
     public Long getOrgStructureVersion() {
         return orgStructureVersion;
+    }
+
+    public Integer getHelpdeskEnabled() {
+        return helpdeskEnabled;
     }
 
     public static class Builder implements SectionRequestBuilder {

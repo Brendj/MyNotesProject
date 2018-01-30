@@ -144,6 +144,7 @@ public class Org implements Serializable {
     private Boolean needVerifyCardSign;
     private Boolean denyPayPlanForTimeDifference;
     private Boolean allowRegistryChangeEmployee;
+    private Boolean helpdeskEnabled;
 
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
@@ -206,6 +207,7 @@ public class Org implements Serializable {
         this.denyPayPlanForTimeDifference = false;
         this.allowRegistryChangeEmployee = false;
         this.typeInitial = OrganizationType.SCHOOL;
+        this.helpdeskEnabled = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1113,5 +1115,13 @@ public class Org implements Serializable {
 
     public void setAllowRegistryChangeEmployee(Boolean allowRegistryChangeEmployee) {
         this.allowRegistryChangeEmployee = allowRegistryChangeEmployee;
+    }
+
+    public Boolean getHelpdeskEnabled() {
+        return helpdeskEnabled;
+    }
+
+    public void setHelpdeskEnabled(Boolean helpdeskEnabled) {
+        this.helpdeskEnabled = helpdeskEnabled;
     }
 }

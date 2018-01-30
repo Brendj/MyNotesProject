@@ -116,6 +116,14 @@ public class DirectiveElement implements AbstractToElement{
 
         directiveItemList.add(new DirectiveItem("IS_WORK_IN_SUMMER_TIME", isWorkInSummerTimeFlag ? "1" : "0"));
 
+        Boolean isHelpdeskEnabled = org.getHelpdeskEnabled();
+        if (directivesRequest.getHelpdeskEnabled() != null && directivesRequest.getOrgStructureVersion() >= org.getOrgStructureVersion()) {
+            DAOService.getInstance().saveDirective(org.getIdOfOrg(), "helpdeskEnabled", directivesRequest.getHelpdeskEnabled());
+            isHelpdeskEnabled = (directivesRequest.getHelpdeskEnabled() == 1);
+        }
+
+        directiveItemList.add(new DirectiveItem("IS_HELP_REQUESTS_ENABLED", isHelpdeskEnabled ? "1" : "0"));
+
         if (directivesRequest.getRecyclingEnabled() != null) {
             DAOService.getInstance().saveDirective(org.getIdOfOrg(), "isRecyclingEnabled", directivesRequest.getRecyclingEnabled());
         }

@@ -251,6 +251,7 @@
         <property name="needVerifyCardSign" column="needVerifyCardSign" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="denyPayPlanForTimeDifference" column="denyPayPlanForTimeDifference" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="allowRegistryChangeEmployee" column="allowRegistryChangeEmployee" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="helpdeskEnabled" column="helpdeskEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
 
     </class>
 </hibernate-mapping>

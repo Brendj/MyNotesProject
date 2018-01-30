@@ -88,6 +88,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private Boolean needVerifyCardSign = false;
     private Boolean denyPayPlanForTimeDifference = false;
     private Boolean allowRegistryChangeEmployee = false;
+    private Boolean helpdeskEnabled = false;
 
     public static final String DEFAULT_SUPPLIER = "DefaultSupplier";
     public static final String CO_SUPPLIER = "CoSupplier";
@@ -270,6 +271,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setAllowRegistryChangeEmployee(Boolean allowRegistryChangeEmployee) {
         this.allowRegistryChangeEmployee = allowRegistryChangeEmployee;
+    }
+
+    public Boolean getHelpdeskEnabled() {
+        return helpdeskEnabled;
+    }
+
+    public void setHelpdeskEnabled(Boolean helpdeskEnabled) {
+        this.helpdeskEnabled = helpdeskEnabled;
     }
 
     public static class ContragentItem {
@@ -611,6 +620,7 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setNeedVerifyCardSign(needVerifyCardSign);
         org.setDenyPayPlanForTimeDifference(denyPayPlanForTimeDifference);
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
+        org.setHelpdeskEnabled(helpdeskEnabled);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
 
