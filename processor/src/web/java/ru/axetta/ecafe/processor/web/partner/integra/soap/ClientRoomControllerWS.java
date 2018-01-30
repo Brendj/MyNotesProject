@@ -6078,25 +6078,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<Long> guardianIds = DAOReadonlyService.getInstance().findClientGuardiansByMobile(childId, Client.checkAndConvertMobile(guardianMobile));
 
             if (guardianIds == null || guardianIds.size() == 0) {
-                //Если нет представителей, то работаем по старому алгоритму (плюс удаляем из переданного списка новые типы уведомелений)
-                boolean order_types_removed = false;
-                boolean old_order_type_exists = false;
-                if (notificationTypes != null) {
-                    for (Iterator<Long> iterator = notificationTypes.iterator(); iterator.hasNext(); ) {
-                        Long type = iterator.next();
-                        if (type.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_FREE.getValue())
-                                || type.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_PAY.getValue())) {
-                            iterator.remove();
-                            order_types_removed = true;
-                        }
-                        if (type.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_BAR.getValue())) {
-                            old_order_type_exists = true;
-                        }
-                    }
-                    if (!old_order_type_exists && order_types_removed) {
-                        notificationTypes.add(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_ORDERS_BAR.getValue());
-                    }
-                }
                 return setClientNotificationSettings(childContractId, notificationTypes); //Если нет представителей, работаем по старому алгоритму
             }
             for (Long id : guardianIds) {
