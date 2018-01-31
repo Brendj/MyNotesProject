@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ResHelpRequestItem {
@@ -66,8 +67,10 @@ public class ResHelpRequestItem {
         XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
         if (null != org)
             XMLUtils.setAttributeIfNotNull(element, "OrgId", org.getIdOfOrg());
-        if (null != requestDate)
-            XMLUtils.setAttributeIfNotNull(element, "RequestDate", CalendarUtils.dateTimeToString(requestDate));
+        if (null != requestDate) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+            XMLUtils.setAttributeIfNotNull(element, "RequestDate", simpleDateFormat.format(requestDate));
+        }
         XMLUtils.setAttributeIfNotNull(element, "Number", number);
         if (null != theme)
             XMLUtils.setAttributeIfNotNull(element, "Theme", theme.toString());

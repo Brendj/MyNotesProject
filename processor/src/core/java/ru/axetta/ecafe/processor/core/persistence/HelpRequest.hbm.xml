@@ -8,7 +8,9 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.HelpRequest" table="CF_HelpRequests" optimistic-lock="version">
         <id name="idOfHelpRequest" column="IdOfHelpRequests" type="long">
-            <generator class="identity"/>
+            <generator class="sequence">
+                <param name="sequence">cf_helprequests_idofhelprequests_seq</param>
+            </generator>
         </id>
         <version name="hibernateVersion" column="HibernateVersion" type="long"/>
         <property name="requestDate" column="RequestDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"

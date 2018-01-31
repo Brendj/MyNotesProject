@@ -34,18 +34,20 @@ public class HelpRequestProcessor extends AbstractProcessor<ResHelpRequest> {
         List<ResHelpRequestItem> items = new ArrayList<ResHelpRequestItem>();
         try {
             ResHelpRequestItem resItem = null;
-            Long nextVersion = DAOUtils.nextVersionByHelpRequests(session);
             boolean errorFound = false;
             for (HelpRequestItem item : helpRequest.getItems()) {
+                Long nextVersion = DAOUtils.nextVersionByHelpRequests(session);
 
                 errorFound = !item.getResCode().equals(HelpRequestItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
-                    ru.axetta.ecafe.processor.core.persistence.HelpRequest helpRequest = DAOReadonlyService.getInstance().findHelpRequest(item.getOrgId(), item.getGuid());
+                    ru.axetta.ecafe.processor.core.persistence.HelpRequest helpRequest = DAOUtils.getHelpRequestForOrgByGuid(session, item.getOrgId(), item.getGuid());
 
-                    Org org = DAOReadonlyService.getInstance().findOrg(item.getOrgId());
+                    Org org = (Org)session.load(Org.class, item.getOrgId());//DAOReadonlyService.getInstance().findOrg(item.getOrgId());
                     if (null == helpRequest) {
                         helpRequest = new ru.axetta.ecafe.processor.core.persistence.HelpRequest(item.getRequestDate(), item.getTheme(), item.getMessage(), item.getDeclarer(),
                                 item.getPhone(), item.getRequestState(), item.getNumber(), org, item.getGuid());
+                        helpRequest.setVersion(nextVersion);
+                        session.save(helpRequest);
                     } else {
                         helpRequest.setRequestDate(item.getRequestDate());
                         helpRequest.setTheme(item.getTheme());
@@ -57,10 +59,10 @@ public class HelpRequestProcessor extends AbstractProcessor<ResHelpRequest> {
                         helpRequest.setOrg(org);
                         helpRequest.setGuid(item.getGuid());
                         helpRequest.setRequestUpdateDate(new Date());
+                        helpRequest.setVersion(nextVersion);
+                        session.update(helpRequest);
                     }
 
-                    helpRequest.setVersion(nextVersion);
-                    session.saveOrUpdate(helpRequest);
                     resItem = new ResHelpRequestItem(helpRequest, item.getResCode());
                 } else {
                     resItem = new ResHelpRequestItem();
@@ -69,8 +71,8 @@ public class HelpRequestProcessor extends AbstractProcessor<ResHelpRequest> {
                     resItem.setErrorMessage(item.getErrorMessage());
                 }
                 items.add(resItem);
+                session.flush();
             }
-            session.flush();
         }
         catch (Exception e) {
             logger.error("Error saving HelpRequest", e);

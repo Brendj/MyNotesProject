@@ -2861,4 +2861,12 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
+
+    public static HelpRequest getHelpRequestForOrgByGuid(Session session, Long idOfOrg, String guid) throws Exception {
+        Criteria criteria = session.createCriteria(HelpRequest.class);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        criteria.add(Restrictions.eq("org", org));
+        criteria.add(Restrictions.eq("guid", guid));
+        return (HelpRequest) criteria.uniqueResult();
+    }
 }

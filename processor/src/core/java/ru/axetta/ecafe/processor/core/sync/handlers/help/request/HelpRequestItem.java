@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class HelpRequestItem {
@@ -95,7 +96,8 @@ public class HelpRequestItem {
         String requestDateString = XMLUtils.getAttributeValue(itemNode, "RequestDate");
         if (StringUtils.isNotEmpty(requestDateString)) {
             try {
-                requestDate = CalendarUtils.parseDate(requestDateString);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                requestDate = simpleDateFormat.parse(requestDateString);
             } catch (Exception e){
                 errorMessage.append("Attribute RequestDate not found or incorrect");
             }
@@ -150,10 +152,14 @@ public class HelpRequestItem {
             errorMessage.append("Attribute RequestState not found");
         }
 
-        if ((DAOReadonlyService.getInstance().isHelpRequestNumberExists(number) ||
-            DAOReadonlyService.getInstance().isHelpRequestGuidExists(guid)) &&
-            (null == DAOReadonlyService.getInstance().findHelpRequest(orgId, guid))) {
-            errorMessage.append("Attribute Guid or RequestNumber incorrect");
+        if (null == DAOReadonlyService.getInstance().findHelpRequest(orgId, guid)) {
+            if (DAOReadonlyService.getInstance().isHelpRequestNumberExists(number)) {
+                errorMessage.append("Attribute RequestNumber incorrect (same number already exists)");
+            }
+
+            if (DAOReadonlyService.getInstance().isHelpRequestGuidExists(guid)) {
+                errorMessage.append("Attribute Guid incorrect (same guid already exists)");
+            }
         }
 
         return new HelpRequestItem(guid, orgId, requestDate, number, HelpRequestThemeEnumType.fromInteger(theme),
