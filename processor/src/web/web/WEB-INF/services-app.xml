@@ -163,6 +163,12 @@
                         cron="0 0 17 * * ?"/>
     </task:scheduled-tasks>
 
+    <task:scheduler id="regularPaymentExpireNotificationSchedule"/>
+    <task:scheduled-tasks scheduler="regularPaymentExpireNotificationSchedule">
+        <task:scheduled ref="regularPaymentSubscriptionService" method="notifyClientsAboutExpiredSubscriptions"
+                        cron="0 0 15 * * ?"/>
+    </task:scheduled-tasks>
+
     <task:scheduler id="summaryDownloadMakerSchedule"/>
     <task:scheduled-tasks scheduler="summaryDownloadMakerSchedule">
         <task:scheduled ref="summaryDownloadMakerService" method="run"

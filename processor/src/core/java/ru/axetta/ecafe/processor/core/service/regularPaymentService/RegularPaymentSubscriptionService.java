@@ -5,16 +5,11 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalProcess;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -79,8 +74,6 @@ public class RegularPaymentSubscriptionService {
     @Autowired
     private SubscriptionRegRequest subscriptionRegRequest;
 
-    private static final String VALUE_DATE_NEW_SUBSCRIPTION = "DateNewSubscription";
-
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
             int period) {
         return subscriptionRegRequest
@@ -91,54 +84,19 @@ public class RegularPaymentSubscriptionService {
         checkClientBalances(null);
     }
 
-    @Transactional
     public void notifyClientsAboutExpiredSubscriptions() {
-        /*if (!RuntimeContext.getInstance().isMainNode()) {
+        if (!RuntimeContext.getInstance().isMainNode() || !notifyAboutExpiredSubscription()) {
             return;
-        }*/
+        }
         logger.info("Start sending notifications for expired subscriptions");
-        final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
-                EventNotificationService.class);
-
+        final RegularPaymentNotificationService regularPaymentNotificationService = RuntimeContext.getAppContext().getBean(
+                RegularPaymentNotificationService.class);
         List<BankSubscription> list = getExpiredSubscriptionsList();
         for (BankSubscription subscription : list) {
             deactivateSubscription(subscription.getIdOfSubscription()); //отправляем запрос на деактивацию
-            sendNotification(notificationService, subscription);
+            regularPaymentNotificationService.sendNotification(subscription);
         }
         logger.info("End sending notifications for expired subscriptions");
-    }
-
-    private void sendNotification(EventNotificationService notificationService, BankSubscription subscription) {
-        Session session = em.unwrap(Session.class);
-        String type = EventNotificationService.NOTIFICATION_EXPIRED_REGULAR_PAYMENT;
-        Client client = (Client)session.load(Client.class, subscription.getClient().getIdOfClient());
-        String[] values = getValuesBySubscription(subscription);
-        try {
-            notificationService
-                    .sendNotificationExpiredSubscription(client, null, type, values, new Date(System.currentTimeMillis()));
-            List<Client> guardians = ClientManager
-                    .findGuardiansByClient(session, client.getIdOfClient(), null);
-            if (!(guardians == null || guardians.isEmpty())) {
-                for (Client destGuardian : guardians) {
-                    if (DAOReadonlyService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
-                        notificationService
-                                .sendNotificationExpiredSubscription(destGuardian, client, type, values, new Date(System.currentTimeMillis()));
-                    }
-                }
-            }
-            subscription.setNotificationSent(true);
-            em.merge(subscription);
-        } catch (Exception e) {
-            logger.error("Error sending notification expired regular payment: ", e);
-        }
-    }
-
-    private String[] getValuesBySubscription(BankSubscription bs) {
-        String[] result = new String[2];
-        result[0] = VALUE_DATE_NEW_SUBSCRIPTION;
-        result[1] = CalendarUtils.dateToString(CalendarUtils.addDays(bs.getValidToDate(), 1));
-        return result;
     }
 
     private List<BankSubscription> getExpiredSubscriptionsList() {
@@ -152,6 +110,10 @@ public class RegularPaymentSubscriptionService {
         return query.getResultList();
     }
 
+    protected boolean notifyAboutExpiredSubscription() {
+        return true;
+    }
+
     public void checkClientBalances(Long idOfOrg ) {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
@@ -163,11 +125,16 @@ public class RegularPaymentSubscriptionService {
         logger.info("RegularPaymentSubscriptionService work started.");
         List<Long> subIds = findSubscriptions(0, idOfOrg);
         Date today = new Date();
+        final RegularPaymentNotificationService regularPaymentNotificationService = RuntimeContext.getAppContext().getBean(
+                RegularPaymentNotificationService.class);
         for (Long id : subIds) {
             try {
                 BankSubscription bs = findBankSubscription(id);
                 if (bs.getValidToDate().before(today)) {
                     deactivateSubscription(id);
+                    if (notifyAboutExpiredSubscription()) {
+                        regularPaymentNotificationService.sendNotification(bs);
+                    }
                 } else {
                     refillOneClientBalance(id);
                 }

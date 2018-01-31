@@ -123,7 +123,7 @@ public class DebugInfoPage extends BasicWorkspacePage {
     public void runTest2() throws Exception {
         RegularPaymentSubscriptionService notificationService = RuntimeContext.getInstance()
                 .getRegularPaymentSubscriptionService();
-        notificationService.notifyClientsAboutExpiredSubscriptions();
+        //notificationService.notifyClientsAboutExpiredSubscriptions();
         /*for (Long w = 1499868946299L; w < 1499868946399L; w++) {
             DAOService.getInstance().registerSyncRequest(5, w.toString());
             Thread.sleep(500);

@@ -15,8 +15,6 @@ import java.util.Date;
  * Time: 16:40
  * To change this template use File | Settings | File Templates.
  */
-//Правила оповещения теперь принадлежат паре клиент-опекун, а не клиенту.
-@Deprecated
 public class ClientNotificationSetting {
 
     public enum Predefined {

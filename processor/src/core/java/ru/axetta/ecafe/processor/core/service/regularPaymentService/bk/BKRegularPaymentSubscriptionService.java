@@ -62,6 +62,11 @@ public class BKRegularPaymentSubscriptionService extends ru.axetta.ecafe.process
         }
     }
 
+    @Override
+    protected boolean notifyAboutExpiredSubscription() {
+        return false;
+    }
+
     private PaymentResponse sendSubscriptionRequest(Long subscriptionId, IRequestOperation operation) {
         MfrRequest mfrRequest = operation.createRequest(subscriptionId);
         Map<String, String> params = operation.getRequestParams(mfrRequest);
