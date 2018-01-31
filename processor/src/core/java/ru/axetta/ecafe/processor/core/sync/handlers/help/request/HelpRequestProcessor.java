@@ -35,9 +35,8 @@ public class HelpRequestProcessor extends AbstractProcessor<ResHelpRequest> {
         try {
             ResHelpRequestItem resItem = null;
             boolean errorFound = false;
+            Long nextVersion = DAOUtils.nextVersionByHelpRequests(session);
             for (HelpRequestItem item : helpRequest.getItems()) {
-                Long nextVersion = DAOUtils.nextVersionByHelpRequests(session);
-
                 errorFound = !item.getResCode().equals(HelpRequestItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
                     ru.axetta.ecafe.processor.core.persistence.HelpRequest helpRequest = DAOUtils.getHelpRequestForOrgByGuid(session, item.getOrgId(), item.getGuid());
