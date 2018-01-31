@@ -96,7 +96,7 @@ public class HelpRequestItem {
         String requestDateString = XMLUtils.getAttributeValue(itemNode, "RequestDate");
         if (StringUtils.isNotEmpty(requestDateString)) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
                 requestDate = simpleDateFormat.parse(requestDateString);
             } catch (Exception e){
                 errorMessage.append("Attribute RequestDate not found or incorrect");

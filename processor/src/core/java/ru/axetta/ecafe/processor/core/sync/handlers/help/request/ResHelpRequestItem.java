@@ -68,7 +68,7 @@ public class ResHelpRequestItem {
         if (null != org)
             XMLUtils.setAttributeIfNotNull(element, "OrgId", org.getIdOfOrg());
         if (null != requestDate) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             XMLUtils.setAttributeIfNotNull(element, "RequestDate", simpleDateFormat.format(requestDate));
         }
         XMLUtils.setAttributeIfNotNull(element, "Number", number);

@@ -871,6 +871,8 @@ public class Processor implements SyncProcessor {
 
         fullProcessingOrgFiles(request, syncHistory, responseSections);
 
+        fullProcessingHelpRequests(request, syncHistory, responseSections);
+
         // время окончания обработки
         Date syncEndTime = new Date();
 
@@ -5756,5 +5758,22 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData);
+    }
+
+    private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            HelpRequest helpRequest = request.getHelpRequest();
+            if (null != helpRequest) {
+                ResHelpRequest resHelpRequest = processHelpRequest(helpRequest);
+                addToResponseSections(resHelpRequest, responseSections);
+
+                HelpRequestData helpRequestData = processHelpRequestData(helpRequest);
+                addToResponseSections(helpRequestData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingHelpRequests: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
     }
 }
