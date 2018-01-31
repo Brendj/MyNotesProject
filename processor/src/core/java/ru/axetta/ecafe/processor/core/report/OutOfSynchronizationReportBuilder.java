@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -83,21 +84,25 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         }
 
         Query query = session.createSQLQuery(
-                "SELECT CASE WHEN (current_timestamp - lastfastsynctime > INTERVAL '10 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '30 minutes') THEN 'more10Minutes' "
-                        + "WHEN (current_timestamp - lastfastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '1 hour') THEN 'more30Minutes' "
-                        + "WHEN ((current_timestamp - lastfastsynctime > INTERVAL '1 hour') AND (current_timestamp - lastfastsynctime <= INTERVAL '3 hours')) THEN 'more60Minutes' "
-                        + "WHEN ((lastfastsynctime - current_timestamp > INTERVAL '3 hours')) THEN 'more3Hours' "
-                        + "ELSE 'other' END AS condition, cfsh.idoforg, cfor.shortname, cfor.address, "
-                        + "cfor.isworkinsummertime, cfos.lastsucbalancesync, cfos.clientversion, "
-                        + "cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, "
-                        + "cfor.district, lastFastSynctime FROM cf_synchistory cfsh "
-                        + "INNER JOIN (SELECT idoforg, max(to_timestamp(syncstarttime / 1000)) AS lastfastsynctime "
-                        + "FROM cf_synchistory cfs WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', current_date) "
-                        + "AND cfs.synctype = 1 GROUP BY idoforg) AS lastsyncbyorg ON cfsh.idoforg = lastsyncbyorg.idoforg "
-                        + "LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg "
-                        + "LEFT JOIN cf_orgs cfor ON cfor.idoforg = cfsh.idoforg "
-                        + "WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList) AND cfsh.synctype = 1 "
-                        + "GROUP BY cfsh.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync, cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district");
+                "SELECT CASE WHEN (current_timestamp - lastfastsynctime > INTERVAL '10 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '30 minutes')"
+                        + "    THEN 'more10Minutes' WHEN (current_timestamp - lastfastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '1 hour')"
+                        + "    THEN 'more30Minutes' WHEN ((current_timestamp - lastfastsynctime > INTERVAL '1 hour') AND"
+                        + "        (current_timestamp - lastfastsynctime <= INTERVAL '3 hours'))"
+                        + "    THEN 'more60Minutes' WHEN ((lastfastsynctime - current_timestamp > INTERVAL '3 hours'))"
+                        + "    THEN 'more3Hours'  ELSE 'other' END AS condition, cfor.idoforg,"
+                        + "  cfor.shortname, cfor.address, cfor.isworkinsummertime,"
+                        + "  cfos.lastsucbalancesync,  cfos.clientversion,  cfos.remoteaddress, "
+                        + "  cfor.statusdetailing, cfor.introductionqueue,  cfor.district, lastFastSynctime "
+                        + " FROM cf_orgs cfor LEFT JOIN cf_synchistory cfsh ON cfor.idoforg = cfsh.idoforg "
+                        + "                  LEFT JOIN (SELECT idoforg, max(to_timestamp(syncstarttime / 1000)) AS lastfastsynctime"
+                        + "                                     FROM cf_synchistory cfs WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', CURRENT_DATE) AND"
+                        + "                                           cfs.synctype = 1 AND idoforg IN (:idOfOrgList)"
+                        + "                                     GROUP BY idoforg) AS lastsyncbyorg ON cfsh.idoforg = lastsyncbyorg.idoforg"
+                        + "  LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg"
+                        + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList)"
+                        + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync,"
+                        + "  cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
+                        + " ORDER BY cfor.idoforg");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         logger.info("OutOfSynchronizationReport start query");
@@ -145,11 +150,8 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         if (condition.equals("more60Minutes")) {
             return "Синхронизация отсутствует более 60 минут";
         }
-        if (condition.equals("more3Hours")) {
+        if (condition.equals("more3Hours") || condition.equals("other")) {
             return "Синхронизация отсутствует 3 часа и более";
-        }
-        if (condition.equals("other")) {
-            return null;
         }
 
         return null;
@@ -169,7 +171,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
             return 4L;
         }
         if (condition.equals("other")) {
-            return 0L;
+            return 4L;
         }
         return 0L;
     }
