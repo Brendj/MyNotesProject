@@ -98,7 +98,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + "                                     FROM cf_synchistory cfs WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', CURRENT_DATE) AND"
                         + "                                           cfs.synctype = 1 AND idoforg IN (:idOfOrgList)"
                         + "                                     GROUP BY idoforg) AS lastsyncbyorg ON cfsh.idoforg = lastsyncbyorg.idoforg"
-                        + "  LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfsh.idoforg"
+                        + " LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfor.idoforg"
                         + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList)"
                         + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync,"
                         + "  cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
