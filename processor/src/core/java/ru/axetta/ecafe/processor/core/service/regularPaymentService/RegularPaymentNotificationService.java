@@ -42,7 +42,7 @@ public class RegularPaymentNotificationService {
 
     @Transactional
     public void sendNotification(BankSubscription subscription) {
-        if (subscription.getNotificationSent()) return;
+        if (subscription.getNotificationSent() != null && subscription.getNotificationSent()) return;
         Session session = em.unwrap(Session.class);
         String type = EventNotificationService.NOTIFICATION_EXPIRED_REGULAR_PAYMENT;
         Client client = (Client)session.load(Client.class, subscription.getClient().getIdOfClient());
