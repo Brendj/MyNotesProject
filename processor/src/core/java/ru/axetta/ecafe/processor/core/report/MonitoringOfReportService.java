@@ -404,7 +404,7 @@ public class MonitoringOfReportService {
             Org org = (Org) session.load(Org.class, idOfOrg);
             ReportItem reportItem = new ReportItem();
             reportItem.setOrgNum(org.getOrgNumberInName());
-            reportItem.setShortName(org.getOfficialName());
+            reportItem.setShortName(org.getShortNameInfoService());
             reportItem.setAddress(org.getAddress());
             reportItem.setIdOfOrg(String.valueOf(org.getIdOfOrg()));
             reportItem.setCode(String.valueOf(org.getUniqueAddressId()));
