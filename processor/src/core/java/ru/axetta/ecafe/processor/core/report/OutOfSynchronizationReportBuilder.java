@@ -84,7 +84,8 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         }
 
         Query query = session.createSQLQuery(
-                "SELECT CASE WHEN (current_timestamp - lastfastsynctime > INTERVAL '10 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '30 minutes')"
+                "SELECT CASE WHEN (current_timestamp - lastfastsynctime < INTERVAL '10 minutes') "
+                        + "    THEN 'less10Minutes' WHEN (current_timestamp - lastfastsynctime > INTERVAL '10 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '30 minutes')"
                         + "    THEN 'more10Minutes' WHEN (current_timestamp - lastfastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '1 hour')"
                         + "    THEN 'more30Minutes' WHEN ((current_timestamp - lastfastsynctime > INTERVAL '1 hour') AND"
                         + "        (current_timestamp - lastfastsynctime <= INTERVAL '3 hours'))"
