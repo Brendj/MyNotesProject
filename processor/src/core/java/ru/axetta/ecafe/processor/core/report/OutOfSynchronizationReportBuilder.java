@@ -91,7 +91,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + "    THEN 'more60Minutes' WHEN ((lastfastsynctime - current_timestamp > INTERVAL '3 hours'))"
                         + "    THEN 'more3Hours'  ELSE 'other' END AS condition, cfor.idoforg,"
                         + "  cfor.shortname, cfor.address, cfor.isworkinsummertime,"
-                        + "  cfos.lastsucbalancesync,  cfos.clientversion,  cfos.remoteaddress, "
+                        + "  cfos.lastAccRegistrySync,  cfos.clientversion,  cfos.remoteaddress, "
                         + "  cfor.statusdetailing, cfor.introductionqueue,  cfor.district, lastFastSynctime "
                         + " FROM cf_orgs cfor LEFT JOIN cf_synchistory cfsh ON cfor.idoforg = cfsh.idoforg "
                         + "                  LEFT JOIN (SELECT idoforg, max(to_timestamp(syncstarttime / 1000)) AS lastfastsynctime"
@@ -100,8 +100,8 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + "                                     GROUP BY idoforg) AS lastsyncbyorg ON cfsh.idoforg = lastsyncbyorg.idoforg"
                         + " LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfor.idoforg"
                         + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList)"
-                        + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastsucbalancesync,"
-                        + "  cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
+                        + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastAccRegistrySync,"
+                        + " cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
                         + " ORDER BY cfor.idoforg");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
