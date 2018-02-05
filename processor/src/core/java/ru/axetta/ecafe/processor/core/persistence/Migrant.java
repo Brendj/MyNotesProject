@@ -28,6 +28,7 @@ public class Migrant implements Serializable{
     private Date visitStartDate;
     private Date visitEndDate;
     private Integer syncState;
+    private MigrantInitiatorEnum initiator;
 
     public Migrant() {
     }
@@ -42,6 +43,7 @@ public class Migrant implements Serializable{
         this.visitStartDate = visitStartDate;
         this.visitEndDate = visitEndDate;
         this.syncState = syncState;
+        this.initiator = MigrantInitiatorEnum.INITIATOR_ORG;
     }
 
     public CompositeIdOfMigrant getCompositeIdOfMigrant() {
@@ -128,5 +130,13 @@ public class Migrant implements Serializable{
                 ", visitEndDate=" + visitEndDate +
                 ", syncState=" + syncState +
                 '}';
+    }
+
+    public MigrantInitiatorEnum getInitiator() {
+        return initiator;
+    }
+
+    public void setInitiator(MigrantInitiatorEnum initiator) {
+        this.initiator = initiator;
     }
 }

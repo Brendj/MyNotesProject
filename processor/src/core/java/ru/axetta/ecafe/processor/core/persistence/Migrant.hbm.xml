@@ -25,6 +25,12 @@
         <property name="visitEndDate" column="VisitEndDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="syncState" column="SyncState" type="integer" not-null="true"/>
+        <property name="initiator" column="initiator">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.MigrantInitiatorEnum</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
     </class>
 </hibernate-mapping>
 
