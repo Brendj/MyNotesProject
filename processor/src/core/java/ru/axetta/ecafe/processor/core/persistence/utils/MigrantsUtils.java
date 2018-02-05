@@ -23,6 +23,12 @@ import java.util.*;
  */
 
 public class MigrantsUtils {
+    private static final String[] resolutionNames = {"Создана",                                 //0
+                                                     "Подтверждена",                                   //1
+                                                     "Отклонена и сдана в архив",                      //2
+                                                     "Аннулирована и сдана в архив",                   //3
+                                                     "Сдана в архив по истечению срока действия",      //4
+                                                     "Сдана в архив по истечению срока действия"};     //5
 
     private MigrantsUtils() {
     }
@@ -145,12 +151,18 @@ public class MigrantsUtils {
         return new ArrayList<Long>(clientsIds);
     }
 
-    public static Integer getLastResolutionForMigrant(Session session, Migrant migrant){
-        Query query = session.createQuery("select resolution from VisitReqResolutionHist where migrant=:migrant and resolution <> 5 order by resolutionDateTime desc");
+    public static VisitReqResolutionHist getLastResolutionForMigrant(Session session, Migrant migrant){
+        Query query = session.createQuery("select res from VisitReqResolutionHist res where res.migrant=:migrant order by res.resolutionDateTime desc");
         query.setParameter("migrant", migrant);
         query.setMaxResults(1);
-        Object result = query.uniqueResult();
-        return result == null ? 0 : (Integer) result;
+        return (VisitReqResolutionHist) query.uniqueResult();
+    }
+
+    public static VisitReqResolutionHist getFirstResolutionForMigrant(Session session, Migrant migrant){
+        Query query = session.createQuery("select res from VisitReqResolutionHist res where res.migrant=:migrant order by res.resolutionDateTime asc");
+        query.setParameter("migrant", migrant);
+        query.setMaxResults(1);
+        return (VisitReqResolutionHist) query.uniqueResult();
     }
 
     public static List<Migrant> getCurrentMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
@@ -231,6 +243,27 @@ public class MigrantsUtils {
         criteria.add(Restrictions.or(Restrictions.between("visitStartDate", startDate, endDate),
                 Restrictions.between("visitEndDate", startDate, endDate)));
         return criteria.list();
+    }
+
+    public static List<Migrant> getAllMigrantsForOrgsByDate(Session session, List<Long> idOfOrgs,
+            Long contractId, Date startDate, Date endDate){
+        Criteria criteria = session.createCriteria(Migrant.class);
+        if (idOfOrgs.size() > 0) {
+            criteria.add(Restrictions.or(Restrictions.in("orgVisit.idOfOrg", idOfOrgs),
+                    Restrictions.in("orgRegistry.idOfOrg", idOfOrgs)));
+        }
+        if (contractId != null) {
+            criteria.createAlias("clientMigrate", "client", JoinType.INNER_JOIN);
+            criteria.add(Restrictions.eq("client.contractId", contractId));
+        }
+        criteria.add(Restrictions.or(Restrictions.between("visitStartDate", startDate, endDate),
+                Restrictions.between("visitEndDate", startDate, endDate)));
+        criteria.addOrder(Order.desc("visitStartDate"));
+        return criteria.list();
+    }
+
+    public static String getResolutionString(Integer resolution) {
+        return resolutionNames[resolution];
     }
 
     public enum MigrantsEnumType {

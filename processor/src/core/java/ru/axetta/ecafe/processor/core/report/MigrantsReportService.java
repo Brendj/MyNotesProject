@@ -24,12 +24,6 @@ import java.util.List;
 public class MigrantsReportService {
     private final Session session;
     private static final String NO_DATA = "-";
-    private static final String[] resolutionNames = {"Создана",                                 //0
-                                              "Подтверждена",                                   //1
-                                              "Отклонена и сдана в архив",                      //2
-                                              "Аннулирована и сдана в архив",                   //3
-                                              "Сдана в архив по истечению срока действия",      //4
-                                              "Сдана в архив по истечению срока действия"};     //5
 
     private static final String[] groupNamesInOrgVisit = {"Обучающиеся других ОО",              //0
                                                           "Родители обучающихся других ОО",     //1
@@ -152,7 +146,7 @@ public class MigrantsReportService {
             gtStartDate = startTime.after(migrant.getVisitStartDate());
             endDate = CalendarUtils.dateShortToStringFullYear(migrant.getVisitEndDate());
             gtEndDate = migrant.getVisitEndDate().after(endTime);
-            resolution = resolutionNames[resolutions.get(resolutions.size() - 1).getResolution()];
+            resolution = MigrantsUtils.getResolutionString(resolutions.get(resolutions.size() - 1).getResolution());
         }
 
         private static String getGroupNameForOrgVisitByClient(Client client, List<VisitReqResolutionHist> resolutions){
