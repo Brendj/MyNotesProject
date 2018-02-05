@@ -103,7 +103,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList)"
                         + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastAccRegistrySync,"
                         + " cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
-                        + " ORDER BY cfor.idoforg");
+                        + " ORDER BY condition");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         logger.info("OutOfSynchronizationReport start query");
