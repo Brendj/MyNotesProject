@@ -14,7 +14,7 @@
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
                 <param name="column">IdOfSyncHistoryException</param>
-                <param name="max_lo">32</param>
+                <param name="max_lo">128</param>
             </generator>
         </id>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
