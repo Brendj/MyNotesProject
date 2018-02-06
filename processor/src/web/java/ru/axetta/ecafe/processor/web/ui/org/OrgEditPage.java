@@ -170,6 +170,8 @@ public class OrgEditPage extends BasicWorkspacePage
 
     private String statusDetail;
 
+    private Boolean requestForVisitsToOtherOrg;
+
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         fill(org);
@@ -376,6 +378,8 @@ public class OrgEditPage extends BasicWorkspacePage
             o.setOrgStructureVersion(nextVersion);
             session.update(o);
         }
+
+        org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         
         session.update(org);
         fill(org);
@@ -521,6 +525,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
         this.allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
         this.helpdeskEnabled = org.getHelpdeskEnabled();
+        this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1287,5 +1292,13 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setRegistryUrl(String registryUrl) {
         this.registryUrl = registryUrl;
+    }
+
+    public Boolean getRequestForVisitsToOtherOrg() {
+        return requestForVisitsToOtherOrg;
+    }
+
+    public void setRequestForVisitsToOtherOrg(Boolean requestForVisitsToOtherOrg) {
+        this.requestForVisitsToOtherOrg = requestForVisitsToOtherOrg;
     }
 }

@@ -145,6 +145,7 @@ public class Org implements Serializable {
     private Boolean denyPayPlanForTimeDifference;
     private Boolean allowRegistryChangeEmployee;
     private Boolean helpdeskEnabled;
+    private Boolean requestForVisitsToOtherOrg;
 
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
@@ -208,6 +209,7 @@ public class Org implements Serializable {
         this.allowRegistryChangeEmployee = false;
         this.typeInitial = OrganizationType.SCHOOL;
         this.helpdeskEnabled = false;
+        this.requestForVisitsToOtherOrg = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1123,5 +1125,13 @@ public class Org implements Serializable {
 
     public void setHelpdeskEnabled(Boolean helpdeskEnabled) {
         this.helpdeskEnabled = helpdeskEnabled;
+    }
+
+    public Boolean getRequestForVisitsToOtherOrg() {
+        return requestForVisitsToOtherOrg;
+    }
+
+    public void setRequestForVisitsToOtherOrg(Boolean requestForVisitsToOtherOrg) {
+        this.requestForVisitsToOtherOrg = requestForVisitsToOtherOrg;
     }
 }

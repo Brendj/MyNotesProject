@@ -265,6 +265,8 @@
     </h:panelGrid>
     <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.workInSummerTime}" styleClass="input-text" />
+    <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.requestForVisitsToOtherOrg}" styleClass="input-text" />
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText value="#{mainPage.orgEditPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />

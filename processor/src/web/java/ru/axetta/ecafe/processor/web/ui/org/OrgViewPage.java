@@ -128,6 +128,8 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     private String statusDetail;
 
+    private Boolean requestForVisitsToOtherOrg;
+
     public String getRefectoryTypeStringRepresentation() {
         if ((refectoryType == null) || (refectoryType >= Org.REFECTORY_TYPE_NAMES.length)) {
             refectoryType = -1;
@@ -268,6 +270,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
         this.allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
         this.helpdeskEnabled = org.getHelpdeskEnabled();
+        this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
     }
 
     public String getFilterOrgs() {
@@ -716,5 +719,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setHelpdeskEnabled(Boolean helpdeskEnabled) {
         this.helpdeskEnabled = helpdeskEnabled;
+    }
+
+    public Boolean getRequestForVisitsToOtherOrg() {
+        return requestForVisitsToOtherOrg;
+    }
+
+    public void setRequestForVisitsToOtherOrg(Boolean requestForVisitsToOtherOrg) {
+        this.requestForVisitsToOtherOrg = requestForVisitsToOtherOrg;
     }
 }

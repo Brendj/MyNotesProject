@@ -21,6 +21,7 @@ public class DirectivesRequest implements SectionRequest {
     private final Integer recyclingEnabled;
     private Long orgStructureVersion;
     private final Integer helpdeskEnabled;
+    private final Integer requestForVisitsToOtherOrg;
 
     public DirectivesRequest(Node sectionElement) throws Exception {
         this.tradeConfigChangedSuccess =
@@ -54,6 +55,18 @@ public class DirectivesRequest implements SectionRequest {
             this.orgStructureVersion = nodeVersion == null ? -1 : Long.parseLong(nodeVersion.getTextContent());
         } else {
             this.helpdeskEnabled = null;
+            this.orgStructureVersion = -1L;
+        }
+
+        Node requestForVisitsToOtherOrgNode = XMLUtils.findFirstChildElement(sectionElement, "REQUEST_FOR_VISITS_TO_OTHER_ORG");
+        if (requestForVisitsToOtherOrgNode != null) {
+            NamedNodeMap attributes = requestForVisitsToOtherOrgNode.getAttributes();
+            String value = attributes.getNamedItem("value").getTextContent();
+            this.requestForVisitsToOtherOrg = Integer.parseInt(value);
+            Node nodeVersion = attributes.getNamedItem("V");
+            this.orgStructureVersion = nodeVersion == null ? -1 : Long.parseLong(nodeVersion.getTextContent());
+        } else {
+            this.requestForVisitsToOtherOrg = null;
             this.orgStructureVersion = -1L;
         }
     }
@@ -110,5 +123,9 @@ public class DirectivesRequest implements SectionRequest {
 
     public Integer getRecyclingEnabled() {
         return recyclingEnabled;
+    }
+
+    public Integer getRequestForVisitsToOtherOrg() {
+        return requestForVisitsToOtherOrg;
     }
 }

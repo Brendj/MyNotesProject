@@ -206,6 +206,8 @@
     </a4j:repeat>
     <h:outputText escape="true" value="Здание работает в летний период" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.workInSummerTime}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Заявки на посещение других ОО" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.requestForVisitsToOtherOrg}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />
