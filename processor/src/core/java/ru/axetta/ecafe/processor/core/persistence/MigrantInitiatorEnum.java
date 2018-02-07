@@ -18,7 +18,8 @@ public enum MigrantInitiatorEnum {
 
     /*0*/ INITIATOR_ORG("ОУ"),
     /*1*/ INITIATOR_ESZ("ЕСЗ"),
-    /*2*/ INITIATOR_NSI("НСИ");
+    /*2*/ INITIATOR_NSI("НСИ"),
+    /*3*/ INITIATOR_PROCESSING("Процессинг");
 
     private final String description;
     static Map<Integer,MigrantInitiatorEnum> map = new HashMap<Integer,MigrantInitiatorEnum>();
