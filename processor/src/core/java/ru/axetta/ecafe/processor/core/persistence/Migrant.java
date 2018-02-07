@@ -29,6 +29,7 @@ public class Migrant implements Serializable{
     private Date visitEndDate;
     private Integer syncState;
     private MigrantInitiatorEnum initiator;
+    private String section;
 
     public Migrant() {
     }
@@ -138,5 +139,13 @@ public class Migrant implements Serializable{
 
     public void setInitiator(MigrantInitiatorEnum initiator) {
         this.initiator = initiator;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 }

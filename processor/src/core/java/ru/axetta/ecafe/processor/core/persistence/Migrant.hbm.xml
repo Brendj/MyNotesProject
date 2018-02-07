@@ -31,6 +31,7 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
+        <property name="section" column="section" type="string" length="256"/>
     </class>
 </hibernate-mapping>
 
