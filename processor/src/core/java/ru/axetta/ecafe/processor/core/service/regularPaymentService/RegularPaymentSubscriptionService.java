@@ -140,7 +140,7 @@ public class RegularPaymentSubscriptionService {
                 }
             } catch (Exception ex) {
                 isSuccessEnd = false;
-                logger.error(ex.getMessage());
+                logger.error("Error in regular payment schedule: ", ex);
             }
         }
         logger.info("RegularPaymentSubscriptionService work is over.");
