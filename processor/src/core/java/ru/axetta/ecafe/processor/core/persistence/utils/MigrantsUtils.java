@@ -266,6 +266,21 @@ public class MigrantsUtils {
         return resolutionNames[resolution];
     }
 
+    public static List<ESZMigrantsRequest> getAllESZMigrantsRequests(Session session) {
+        Criteria criteria = session.createCriteria(ESZMigrantsRequest.class);
+        return criteria.list();
+    }
+
+    public static Migrant getMigrantRequestByGuidAndGroupId(Session session, String guid, Long groupId) {
+        Query query = session.createQuery("SELECT m FROM VisitReqResolutionHist h "
+                + "JOIN h.migrant m "
+                + "WHERE m.clientMigrate.clientGUID=:guid AND h.resolutionCodeGroup=:groupId");
+        query.setParameter("guid", guid);
+        query.setParameter("groupId", groupId);
+        return (Migrant)query.uniqueResult();
+    }
+
+
     public enum MigrantsEnumType {
         /*0*/ ALL("all", "По всем заявкам"),
         /*1*/ OUTCOME("outcome", "По исходящим заявкам"),

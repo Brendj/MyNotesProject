@@ -2869,4 +2869,11 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("guid", guid));
         return (HelpRequest) criteria.uniqueResult();
     }
+
+    public static Org getOrgByInnAndUnom(Session session, String inn, Integer unom) {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("INN", inn));
+        criteria.add(Restrictions.eq("btiUnom", Long.valueOf(unom)));
+        return (Org)criteria.uniqueResult();
+    }
 }
