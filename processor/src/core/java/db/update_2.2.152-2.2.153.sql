@@ -15,7 +15,7 @@ alter table cf_orgs add column requestForVisitsToOtherOrg integer not null defau
 alter table cf_visitreqresolutionhist add column initiator integer;
 
 --Поле для кода группы из заявки на посещение другой ОО
-alter table cf_visitreqresolutionhist add column resolutioncodegroup bigint NOT NULL DEFAULT (-1);
+alter table cf_migrants add column resolutioncodegroup bigint NOT NULL DEFAULT (-1);
 
 --Промежуточная таблица для обработки файлов мигрантов от ЕСЗ
 CREATE TABLE cf_esz_migrants_requests

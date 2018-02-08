@@ -30,6 +30,7 @@ public class Migrant implements Serializable{
     private Integer syncState;
     private MigrantInitiatorEnum initiator;
     private String section;
+    private Long resolutionCodeGroup;
 
     public Migrant() {
     }
@@ -147,5 +148,13 @@ public class Migrant implements Serializable{
 
     public void setSection(String section) {
         this.section = section;
+    }
+
+    public Long getResolutionCodeGroup() {
+        return resolutionCodeGroup;
+    }
+
+    public void setResolutionCodeGroup(Long resolutionCodeGroup) {
+        this.resolutionCodeGroup = resolutionCodeGroup;
     }
 }

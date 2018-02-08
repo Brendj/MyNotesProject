@@ -29,7 +29,6 @@
         <many-to-one name="clientResol" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClientResol"/>
         <property name="contactInfo" column="ContactInfo" type="string"/>
         <property name="syncState" column="SyncState" type="integer" not-null="true"/>
-        <property name="resolutionCodeGroup" column="ResolutionCodeGroup" type="long" not-null="true"/>
         <property name="initiator" column="initiator">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHistInitiatorEnum</param>

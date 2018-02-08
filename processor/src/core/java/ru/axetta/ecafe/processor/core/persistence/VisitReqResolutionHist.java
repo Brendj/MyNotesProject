@@ -34,7 +34,6 @@ public class VisitReqResolutionHist implements Serializable {
     private String contactInfo;
     private Integer syncState;
     private Migrant migrant;
-    private Long resolutionCodeGroup;
     private VisitReqResolutionHistInitiatorEnum initiator;
 
     public VisitReqResolutionHist() {
@@ -132,14 +131,6 @@ public class VisitReqResolutionHist implements Serializable {
 
     public void setMigrant(Migrant migrant) {
         this.migrant = migrant;
-    }
-
-    public Long getResolutionCodeGroup() {
-        return resolutionCodeGroup;
-    }
-
-    public void setResolutionCodeGroup(Long resolutionCodeGroup) {
-        this.resolutionCodeGroup = resolutionCodeGroup;
     }
 
     public VisitReqResolutionHistInitiatorEnum getInitiator() {
