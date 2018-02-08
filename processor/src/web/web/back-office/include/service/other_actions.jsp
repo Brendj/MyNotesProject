@@ -105,6 +105,13 @@
             <a4j:support event="onchanged" />
         </rich:calendar>
     </rich:panel>
+
+    <a4j:commandButton value="Загрузка файла ЕСЗ с мигрантами" action="#{otherActionsPage.loadESZMigrantsFile()}" id="loadESZMigrantsFile"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+
+    <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}" id="loadESZMigrants"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

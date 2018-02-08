@@ -316,12 +316,11 @@ public class MigrantsUtils {
     }
 
     public static Migrant getMigrantRequestByGuidAndGroupId(Session session, String guid, Long groupId) {
-        Query query = session.createQuery("SELECT m FROM VisitReqResolutionHist h "
-                + "JOIN h.migrant m "
-                + "WHERE m.clientMigrate.clientGUID=:guid AND h.resolutionCodeGroup=:groupId");
-        query.setParameter("guid", guid);
-        query.setParameter("groupId", groupId);
-        return (Migrant)query.uniqueResult();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.createAlias("clientMigrate", "client", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.eq("client.clientGUID", guid));
+        criteria.add(Restrictions.eq("resolutionCodeGroup", groupId));
+        return (Migrant)criteria.uniqueResult();
     }
 
 

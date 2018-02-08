@@ -359,4 +359,24 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void setSummaryFinOperatorDate(Date summaryFinOperatorDate) {
         this.summaryFinOperatorDate = summaryFinOperatorDate;
     }
+
+    public void loadESZMigrantsFile() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("ImportMigrantsFileService", ImportMigrantsFileService.class).loadMigrantsFile();
+            printMessage("Файл загружен");
+        } catch (Exception e) {
+            getLogger().error("Error run load ESZ migrants file: ", e);
+            printError("Во время загрузки из файла произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void loadESZMigrants() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("ImportMigrantsService", ImportMigrantsService.class).loadMigrants();
+            printMessage("Обработка мигрантов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error run load ESZ migrants: ", e);
+            printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
 }

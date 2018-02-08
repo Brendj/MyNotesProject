@@ -21,9 +21,9 @@
         <many-to-one name="orgVisit" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrgVisit"
                      not-null="true"/>
         <property name="visitStartDate" column="VisitStartDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true" update="false"/>
+                  not-null="true"/>
         <property name="visitEndDate" column="VisitEndDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true" update="false"/>
+                  not-null="true"/>
         <property name="syncState" column="SyncState" type="integer" not-null="true"/>
         <property name="initiator" column="initiator">
             <type name="org.hibernate.type.EnumType">
