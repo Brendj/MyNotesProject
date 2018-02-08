@@ -740,14 +740,14 @@ public class FrontController extends HttpServlet {
                             migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrgRegistry);
                     VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
                             VisitReqResolutionHist.RES_CREATED, date, migrateRequest.getResolutionCause(), clientResol,
-                            migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                            migrateRequest.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT);
 
                     Long idOfResol1 = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession, idOfOrg)-1;
                     CompositeIdOfVisitReqResolutionHist comIdOfHist1 = new CompositeIdOfVisitReqResolutionHist(idOfResol1,
                             migrant.getCompositeIdOfMigrant().getIdOfRequest(), idOfOrg);
                     VisitReqResolutionHist visitReqResolutionHist1 = new VisitReqResolutionHist(comIdOfHist1, client.getOrg(),
                             VisitReqResolutionHist.RES_CONFIRMED, after5Seconds, resolConfirmed, null,
-                            null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                            null, VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT);
                     persistenceSession.save(migrant);
                     persistenceSession.save(visitReqResolutionHist);
                     persistenceSession.save(visitReqResolutionHist1);

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfVisitReqResolutionHist;
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
 import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist;
+import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHistInitiatorEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -69,17 +70,18 @@ public class MigrantsManager {
                             migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
                     VisitReqResolutionHist hist1 = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
                             VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
-                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                    nextId--;
+                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+                    /*nextId--;
                     CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
                             migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
                     VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
                             VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
                             "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                    nextId--;
+                    nextId--;*/
                     persistenceSession.save(migrant);
                     persistenceSession.save(hist1);
-                    persistenceSession.save(hist2);
+                    //persistenceSession.save(hist2);
                 }
             }
 

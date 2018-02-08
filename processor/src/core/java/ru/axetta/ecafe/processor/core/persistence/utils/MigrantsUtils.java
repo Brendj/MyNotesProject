@@ -4,14 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -23,7 +29,8 @@ import java.util.*;
  */
 
 public class MigrantsUtils {
-    private static final String[] resolutionNames = {"Создана",                                 //0
+    private static final Logger logger = LoggerFactory.getLogger(MigrantsUtils.class);
+    public static final String[] resolutionNames = {"Создана",                                 //0
                                                      "Подтверждена",                                   //1
                                                      "Отклонена и сдана в архив",                      //2
                                                      "Аннулирована и сдана в архив",                   //3
@@ -246,20 +253,57 @@ public class MigrantsUtils {
     }
 
     public static List<Migrant> getAllMigrantsForOrgsByDate(Session session, List<Long> idOfOrgs,
-            Long contractId, Date startDate, Date endDate){
-        Criteria criteria = session.createCriteria(Migrant.class);
+            String guid, Date startDate, Date endDate, Boolean showAll){
+        String condition = "";
+
         if (idOfOrgs.size() > 0) {
-            criteria.add(Restrictions.or(Restrictions.in("orgVisit.idOfOrg", idOfOrgs),
-                    Restrictions.in("orgRegistry.idOfOrg", idOfOrgs)));
+            String orgs = StringUtils.join(idOfOrgs, ",");
+            condition += String.format(" and (m.orgVisit.idOfOrg in (%s) or m.orgRegistry.idOfOrg in (%s))", orgs, orgs);
         }
-        if (contractId != null) {
-            criteria.createAlias("clientMigrate", "client", JoinType.INNER_JOIN);
-            criteria.add(Restrictions.eq("client.contractId", contractId));
+        if (!StringUtils.isEmpty(guid)) {
+            condition += String.format(" and m.clientMigrate.clientGUID = '%s'", guid);
         }
-        criteria.add(Restrictions.or(Restrictions.between("visitStartDate", startDate, endDate),
-                Restrictions.between("visitEndDate", startDate, endDate)));
-        criteria.addOrder(Order.desc("visitStartDate"));
-        return criteria.list();
+        String str;
+        if (showAll) {
+            str = "select m from Migrant m where m.visitStartDate between :startDate and :endDate " + condition;
+        } else {
+            str = "select m from Migrant m "
+                    + " where not exists (select h from VisitReqResolutionHist h where h.migrant.compositeIdOfMigrant.idOfRequest = m.compositeIdOfMigrant.idOfRequest "
+                    + " and h.migrant.compositeIdOfMigrant.idOfOrgRegistry = m.compositeIdOfMigrant.idOfOrgRegistry and h.resolution > :resolution) "
+                    + " and m.visitStartDate between :startDate and :endDate " + condition;
+        }
+        Query query = session.createQuery(str);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        if (!showAll) query.setParameter("resolution", VisitReqResolutionHist.RES_CONFIRMED);
+        return query.list();
+    }
+
+    public static void disableMigrant(CompositeIdOfMigrant compositeIdOfMigrant) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Migrant migrant = (Migrant)session.load(Migrant.class, compositeIdOfMigrant);
+            Long nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, compositeIdOfMigrant.getIdOfOrgRegistry());
+            migrant.setSyncState(Migrant.CLOSED);
+            CompositeIdOfVisitReqResolutionHist compositeId1 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                    migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+            VisitReqResolutionHist hist = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
+                    VisitReqResolutionHist.RES_CANCELED, new Date(),
+                    resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
+                    VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+            session.update(migrant);
+            session.save(hist);
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Cannot disable migrant: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public static String getResolutionString(Integer resolution) {

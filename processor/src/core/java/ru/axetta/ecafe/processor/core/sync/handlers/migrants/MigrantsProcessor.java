@@ -242,7 +242,8 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             }
                             inMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgReqIss,
                                     inMigReqHisItem.getResolution(),inMigReqHisItem.getResolutionDateTime(),
-                                    inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(), VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                                    inMigReqHisItem.getResolutionCause(), clientResol, inMigReqHisItem.getContactInfo(),
+                                    VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT);
                             session.save(inMigReqHis);
                             resIncomeMigrationRequestsHistoryItem = new ResIncomeMigrationRequestsHistoryItem(inMigReqHis);
                             resIncomeMigrationRequestsHistoryItem.setResCode(inMigReqHisItem.getResCode());
@@ -308,7 +309,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                             Client clientResol = (Client)session.load(Client.class, outMigReqHisItem.getIdOfClientResol());
                             outMigReqHis = new VisitReqResolutionHist(compositeIdOfVisitReqResolutionHist, orgRegistry, outMigReqHisItem.getResolution(),
                                     outMigReqHisItem.getResolutionDateTime(), outMigReqHisItem.getResolutionCause(), clientResol, outMigReqHisItem.getContactInfo(),
-                                    VisitReqResolutionHist.NOT_SYNCHRONIZED);
+                                    VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_CLIENT);
                             resOutcomeMigrationRequestsHistoryItem = new ResOutcomeMigrationRequestsHistoryItem(outMigReqHis);
                             resOutcomeMigrationRequestsHistoryItem.setResCode(outMigReqHisItem.getResCode());
                             if(outMigReqHis.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)){

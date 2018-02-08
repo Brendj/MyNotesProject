@@ -327,6 +327,10 @@
     <rich:panelMenuItem id="createClientMenuItem" binding="#{mainPage.clientCreatePage.mainMenuComponent}"
                         label="Регистрация" action="#{mainPage.showClientCreatePage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="migrantsPage" type="ru.axetta.ecafe.processor.web.ui.client.MigrantsPage"--%>
+    <rich:panelMenuItem id="migrantsMenuItem" binding="#{migrantsPage.mainMenuComponent}"
+                        label="Клиенты из других ОО" action="#{migrantsPage.show}" reRender="workspaceForm" />
+
     <rich:panelMenuItem id="loadClientFromFileMenuItem" binding="#{mainPage.clientFileLoadPage.mainMenuComponent}"
                         label="Загрузить из файла" action="#{mainPage.showClientFileLoadPage}"
                         reRender="workspaceForm" />
