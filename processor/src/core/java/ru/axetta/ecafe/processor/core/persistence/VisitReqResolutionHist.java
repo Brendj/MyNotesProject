@@ -41,7 +41,7 @@ public class VisitReqResolutionHist implements Serializable {
 
     public VisitReqResolutionHist(CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist,
             Org orgRegistry, Integer resolution, Date resolutionDateTime, String resolutionCause, Client clientResol,
-            String contactInfo, Integer syncState) {
+            String contactInfo, Integer syncState, VisitReqResolutionHistInitiatorEnum initiator) {
         this.compositeIdOfVisitReqResolutionHist = compositeIdOfVisitReqResolutionHist;
         this.orgRegistry = orgRegistry;
         this.resolution = resolution;
@@ -50,6 +50,7 @@ public class VisitReqResolutionHist implements Serializable {
         this.clientResol = clientResol;
         this.contactInfo = contactInfo;
         this.syncState = syncState;
+        this.initiator = initiator;
     }
 
     public CompositeIdOfVisitReqResolutionHist getCompositeIdOfVisitReqResolutionHist() {
