@@ -90,6 +90,7 @@
         <task:scheduled ref="syncStatsManager" method="shortDataLog" cron="0 0/10 * * * ?"/>
         <task:scheduled ref="syncStatsManager" method="processLogData" cron="0 0 1 * * ?"/>
         <task:scheduled ref="migrantsManager" method="checkOverdueMigrants" cron="0 0 1 * * ?"/>
+        <task:scheduled ref="migrantsManager" method="checkMigrantsByClientGroup" cron="0 0 0 * * ?"/>
         <task:scheduled ref="mealManager" method="sendData" cron="0 * * * * ?"/>
         <task:scheduled ref="SMSResendingService" method="executeResending" fixed-delay="60000"/>
         <!--EP-320 <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup"

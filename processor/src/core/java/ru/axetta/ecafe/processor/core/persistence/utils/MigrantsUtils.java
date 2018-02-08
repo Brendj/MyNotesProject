@@ -358,4 +358,60 @@ public class MigrantsUtils {
             return null;
         }
     }
+
+    public static Set<Migrant> getAllVisitReqResolutionHist(Session session) {
+
+        List<Long> predefined = new ArrayList<Long>();
+        predefined.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        predefined.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
+
+        List<Integer> visitorResStatusNotIn = new ArrayList<Integer>();
+        visitorResStatusNotIn.add(VisitReqResolutionHist.RES_REJECTED);
+        visitorResStatusNotIn.add(VisitReqResolutionHist.RES_CANCELED);
+        visitorResStatusNotIn.add(VisitReqResolutionHist.RES_OVERDUE);
+        visitorResStatusNotIn.add(VisitReqResolutionHist.RES_OVERDUE_SERVER);
+
+        Set<Migrant> migrantList = new HashSet<Migrant>();
+
+        List<VisitReqResolutionHist> visitReqResolutionHists;
+
+        Criteria visitorCriteria = session.createCriteria(VisitReqResolutionHist.class, "visitor");
+        visitorCriteria.createAlias("visitor.migrant", "migrant", JoinType.LEFT_OUTER_JOIN);
+        visitorCriteria.createAlias("migrant.clientMigrate", "client", JoinType.LEFT_OUTER_JOIN);
+        visitorCriteria.add(Restrictions.not(Restrictions.in("visitor.resolution", visitorResStatusNotIn)));
+        visitorCriteria.add(Restrictions.in("client.idOfClientGroup", predefined));
+
+        visitReqResolutionHists = visitorCriteria.list();
+
+        for (VisitReqResolutionHist value : visitReqResolutionHists) {
+            migrantList.add(value.getMigrant());
+        }
+
+        return migrantList;
+    }
+
+    public static Set<Migrant> getAllVisitReqResolutionHistResFive(Session session) {
+        List<Long> predefined = new ArrayList<Long>();
+        predefined.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        predefined.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
+
+        Set<Migrant> migrantList = new HashSet<Migrant>();
+
+        List<VisitReqResolutionHist> visitReqResolutionHists;
+
+        Criteria visitorCriteria = session.createCriteria(VisitReqResolutionHist.class, "visitor");
+        visitorCriteria.createAlias("visitor.migrant", "migrant", JoinType.LEFT_OUTER_JOIN);
+        visitorCriteria.createAlias("migrant.clientMigrate", "client", JoinType.LEFT_OUTER_JOIN);
+        visitorCriteria.add(Restrictions.eq("visitor.resolution", VisitReqResolutionHist.RES_OVERDUE_SERVER));
+        visitorCriteria.add(Restrictions.in("client.idOfClientGroup", predefined));
+        visitorCriteria.add(Restrictions.eq("visitor.initiator", VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP));
+
+        visitReqResolutionHists = visitorCriteria.list();
+
+        for (VisitReqResolutionHist value : visitReqResolutionHists) {
+            migrantList.add(value.getMigrant());
+        }
+
+        return migrantList;
+    }
 }

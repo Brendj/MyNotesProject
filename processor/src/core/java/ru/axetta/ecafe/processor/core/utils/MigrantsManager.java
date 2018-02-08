@@ -50,6 +50,13 @@ public class MigrantsManager {
         }
     }
 
+    /**
+     * Обертка для запуска по расписанию, для вынесения резолюций по клиенту попавшие в группу Выбывшие или Удаленные
+     */
+    public void checkMigrantsByClientGroup() throws Exception {
+        changeResolutionOfRequestVisitHistory();
+    }
+
     private void closeOverdueMigrants() throws Exception{
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -108,5 +115,40 @@ public class MigrantsManager {
             }
         }
         return map;
+    }
+
+    public void changeResolutionOfRequestVisitHistory() throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Set<Migrant> migrantList = MigrantsUtils.getAllVisitReqResolutionHist(persistenceSession);
+            Set<Migrant> doneMigrantList = MigrantsUtils.getAllVisitReqResolutionHistResFive(persistenceSession);
+
+            for (Migrant migrant : migrantList) {
+                if (!doneMigrantList.contains(migrant)) {
+                    Long nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession,
+                            migrant.getCompositeIdOfMigrant().getIdOfOrgRegistry());
+                    CompositeIdOfVisitReqResolutionHist compositeId = new CompositeIdOfVisitReqResolutionHist(nextId,
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+                    VisitReqResolutionHist hist = new VisitReqResolutionHist(compositeId, migrant.getOrgRegistry(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
+                            "Закрыта на сервере по истечению срока.", null, null,
+                            VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+                    persistenceSession.save(migrant);
+                    persistenceSession.save(hist);
+                }
+            }
+
+            logger.info(" migrant request closed when go to group CLIENT_LEAVING, CLIENT_DELETED. ");
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 }
