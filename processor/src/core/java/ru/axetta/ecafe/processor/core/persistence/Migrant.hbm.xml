@@ -32,7 +32,7 @@
             </type>
         </property>
         <property name="section" column="section" type="string" length="256"/>
-        <property name="resolutionCodeGroup" column="ResolutionCodeGroup" type="long" not-null="true"/>
+        <property name="resolutionCodeGroup" column="ResolutionCodeGroup" type="long"/>
     </class>
 </hibernate-mapping>
 

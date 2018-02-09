@@ -107,12 +107,9 @@ public class OutcomeMigrationRequestsItem {
             emSetter.setCompositeErrorMessage("Attribute VisitEndDate not found");
         }
 
+        // не проверяем наличие section И resolutionCodeGroup для совместимости со старыми версиями клиента
         section = XMLUtils.getAttributeValue(itemNode, "Section");
-        if (StringUtils.isEmpty(section)) {
-            emSetter.setCompositeErrorMessage("Attribute Section not found");
-        }
-
-        resolutionCodeGroup = getLongValue(itemNode, "ResolutionCodeGroup", emSetter, true);
+        resolutionCodeGroup = XMLUtils.getLongAttributeValue(itemNode, "ResolutionCodeGroup");
 
         return new OutcomeMigrationRequestsItem(idOfRequest, idOfOrgRegistry, requestNumber, idOfClient, idOfOrgVisit,
                 visitStartDate, visitEndDate, section, resolutionCodeGroup, emSetter.getStr());
