@@ -109,7 +109,7 @@ public class OutcomeMigrationRequestsItem {
 
         section = XMLUtils.getAttributeValue(itemNode, "Section");
         if (StringUtils.isEmpty(section)) {
-            emSetter.setCompositeErrorMessage("Attribute Section no found");
+            emSetter.setCompositeErrorMessage("Attribute Section not found");
         }
 
         resolutionCodeGroup = getLongValue(itemNode, "ResolutionCodeGroup", emSetter, true);
