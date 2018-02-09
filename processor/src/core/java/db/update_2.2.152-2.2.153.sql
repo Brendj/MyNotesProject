@@ -29,3 +29,6 @@ CREATE TABLE cf_esz_migrants_requests
   datelearnend bigint,
   CONSTRAINT cf_esz_migrants_requests_idofeszmigrantsrequests_pk PRIMARY KEY (idofeszmigrantsrequest)
 );
+
+--индекс по ид ОО в cf_categoryorg_orgs
+CREATE INDEX cf_categoryorg_orgs_idoforg_idx ON cf_categoryorg_orgs USING btree (idoforg);

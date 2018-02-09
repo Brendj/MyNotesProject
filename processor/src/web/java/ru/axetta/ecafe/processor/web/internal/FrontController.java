@@ -646,13 +646,16 @@ public class FrontController extends HttpServlet {
             Client clientByCard = c.getClient();
             GuardianAndChildItem clientByCardItem = new GuardianAndChildItem(clientByCard.getIdOfClient(), clientByCard.getOrg().getIdOfOrg(),
                     clientByCard.getPerson().getFullName());
-            result.add(clientByCardItem);
+            if (!clientByCard.isDeletedOrLeaving()) {
+                result.add(clientByCardItem);
+            }
 
-            List<Client> childsList = ClientManager.findChildsByClient(persistenceSession, clientByCard.getIdOfClient(), false);
+            List<Client> childsList = ClientManager.findChildsByClient(persistenceSession, clientByCard.getIdOfClient());
             if(childsList.size() > 0) {
                 List<GuardianAndChildItem> childItemList = new ArrayList<GuardianAndChildItem>();
                 List<GuardianAndChildItem> guardiansItemList = new ArrayList<GuardianAndChildItem>();
                 for (Client client : childsList) {
+                    if (client.isDeletedOrLeaving()) continue;
                     GuardianAndChildItem clientItem = new GuardianAndChildItem(client.getIdOfClient(),
                             client.getOrg().getIdOfOrg(), client.getPerson().getFullName());
                     clientByCardItem.getIdOfChildren().add(client.getIdOfClient());
@@ -661,6 +664,7 @@ public class FrontController extends HttpServlet {
                     childItemList.add(clientItem);
                     if (guardians != null && guardians.size() > 0) {
                         for (Client g : guardians) {
+                            if (g.isDeletedOrLeaving()) continue;
                             GuardianAndChildItem gItem = new GuardianAndChildItem(g.getIdOfClient(),
                                     g.getOrg().getIdOfOrg(), g.getPerson().getFullName());
                             clientItem.getIdOfGuardian().add(g.getIdOfClient());

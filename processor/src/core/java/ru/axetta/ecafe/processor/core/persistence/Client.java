@@ -190,6 +190,16 @@ public class Client {
         }
     }
 
+    public boolean isDeletedOrLeaving() {
+        if (getIdOfClientGroup() == null) return false;
+        if (getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())
+                || getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Card findActiveCard(Session session, Card failCard) throws Exception {
         // Ищем активную карту
         Criteria activeClientCardCriteria = session.createCriteria(Card.class);

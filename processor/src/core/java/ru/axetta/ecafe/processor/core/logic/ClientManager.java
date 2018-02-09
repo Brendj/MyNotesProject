@@ -1549,13 +1549,12 @@ public class ClientManager {
     }
 
     /* получить список опекаемых по опекуну */
-    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDeleted) throws Exception {
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        if (!includeDeleted) {
-            idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        }
+        idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
