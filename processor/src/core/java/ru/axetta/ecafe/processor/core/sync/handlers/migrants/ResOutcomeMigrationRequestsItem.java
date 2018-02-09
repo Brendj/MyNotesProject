@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
+import ru.axetta.ecafe.processor.core.persistence.MigrantInitiatorEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -29,6 +30,9 @@ public class ResOutcomeMigrationRequestsItem {
     private Date visitEndDate;
     private Integer resCode;
     private String errorMessage;
+    private MigrantInitiatorEnum inititator;
+    private String section;
+    private Long resolutionCodeGroup;
 
     public ResOutcomeMigrationRequestsItem() {
     }
@@ -45,6 +49,9 @@ public class ResOutcomeMigrationRequestsItem {
         XMLUtils.setAttributeIfNotNull(element, "IdOfOrgVisit", idOfOrgVisit);
         XMLUtils.setAttributeIfNotNull(element, "VisitStartDate", visitStartDate != null ? CalendarUtils.dateTimeToString(visitStartDate): null);
         XMLUtils.setAttributeIfNotNull(element, "VisitEndDate", visitEndDate != null ? CalendarUtils.dateTimeToString(visitEndDate) : null);
+        XMLUtils.setAttributeIfNotNull(element, "Initiator", inititator != null ? inititator.ordinal() : null);
+        XMLUtils.setAttributeIfNotNull(element, "Section", section);
+        XMLUtils.setAttributeIfNotNull(element, "ResolutionCodeGroup", resolutionCodeGroup);
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
         if (resCode != null && resCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
@@ -114,5 +121,29 @@ public class ResOutcomeMigrationRequestsItem {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public MigrantInitiatorEnum getInititator() {
+        return inititator;
+    }
+
+    public void setInititator(MigrantInitiatorEnum inititator) {
+        this.inititator = inititator;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
+    }
+
+    public Long getResolutionCodeGroup() {
+        return resolutionCodeGroup;
+    }
+
+    public void setResolutionCodeGroup(Long resolutionCodeGroup) {
+        this.resolutionCodeGroup = resolutionCodeGroup;
     }
 }

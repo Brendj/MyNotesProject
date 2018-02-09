@@ -123,6 +123,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 outMigReqHisItem.setIdOfClientResol(-1L);
             }
             outMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
+            outMigReqHisItem.setInitiator(vReqHis.getInitiator());
             outcomeMigrationRequestsHistoryItems.add(outMigReqHisItem);
             vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
             session.save(vReqHis);
@@ -157,6 +158,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 inMigReqHisItem.setIdOfClientResol(-1L);
             }
             inMigReqHisItem.setContactInfo(vReqHis.getContactInfo());
+            inMigReqHisItem.setInitiator(vReqHis.getInitiator());
             incomeMigrationRequestsHistoryItems.add(inMigReqHisItem);
             vReqHis.setSyncState(VisitReqResolutionHist.SYNCHRONIZED);
             session.save(vReqHis);
@@ -178,6 +180,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqItem.setGroupOfMigrClient(migrant.getClientMigrate().getClientGroup().getGroupName());
             inMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
             inMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
+            inMigReqItem.setInitiator(migrant.getInitiator());
+            inMigReqItem.setSection(migrant.getSection());
+            inMigReqItem.setResolutionCodeGroup(migrant.getResolutionCodeGroup());
             incomeMigrationRequestsItems.add(inMigReqItem);
             migrant.setSyncState(Migrant.SYNCHRONIZED);
             session.save(migrant);
@@ -198,6 +203,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                 outMigReqItem.setIdOfOrgVisit(migrant.getOrgVisit().getIdOfOrg());
                 outMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
                 outMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
+                outMigReqItem.setInititator(migrant.getInitiator());
+                outMigReqItem.setSection(migrant.getSection());
+                outMigReqItem.setResolutionCodeGroup(migrant.getResolutionCodeGroup());
                 outcomeMigrationRequestsItems.add(outMigReqItem);
             }
         }
@@ -361,7 +369,8 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                                 migrant.getRequestNumber().equals(outMigReqItem.getRequestNumber()) &&
                                 migrant.getOrgVisit().getIdOfOrg().equals(outMigReqItem.getIdOfOrgVisit())&&
                                 migrant.getVisitStartDate().equals(outMigReqItem.getVisitStartDate())&&
-                                migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate())){
+                                migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate()) &&
+                                migrant.getResolutionCodeGroup().equals(outMigReqItem.getResolutionCodeGroup())){
                             resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
                             resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
                         } else {
@@ -379,6 +388,9 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                                 outMigReqItem.getRequestNumber(), clientMigrate, orgVisit,
                                 outMigReqItem.getVisitStartDate(), outMigReqItem.getVisitEndDate(), Migrant.NOT_SYNCHRONIZED);
                         migrant.setOrgRegVendor(contragent);
+                        migrant.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
+                        migrant.setSection(outMigReqItem.getSection());
+                        migrant.setResolutionCodeGroup(outMigReqItem.getResolutionCodeGroup());
                         session.save(migrant);
                         resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
                         resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());

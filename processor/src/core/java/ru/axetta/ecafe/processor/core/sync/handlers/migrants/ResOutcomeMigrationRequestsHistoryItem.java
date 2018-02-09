@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist;
+import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHistInitiatorEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -31,6 +32,7 @@ public class ResOutcomeMigrationRequestsHistoryItem {
     private String contactInfo;
     private Integer resCode;
     private String errorMessage;
+    private VisitReqResolutionHistInitiatorEnum initiator;
 
     public ResOutcomeMigrationRequestsHistoryItem() {
     }
@@ -49,6 +51,7 @@ public class ResOutcomeMigrationRequestsHistoryItem {
         XMLUtils.setAttributeIfNotNull(element, "ResolutionCause", resolutionCause);
         XMLUtils.setAttributeIfNotNull(element, "IdOfClientResol", idOfClientResol);
         XMLUtils.setAttributeIfNotNull(element, "ContactInfo", contactInfo);
+        XMLUtils.setAttributeIfNotNull(element, "Initiator", initiator != null ? initiator.ordinal() : null);
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
         if (resCode != null && resCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
@@ -134,5 +137,13 @@ public class ResOutcomeMigrationRequestsHistoryItem {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public VisitReqResolutionHistInitiatorEnum getInitiator() {
+        return initiator;
+    }
+
+    public void setInitiator(VisitReqResolutionHistInitiatorEnum initiator) {
+        this.initiator = initiator;
     }
 }

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.migrants;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.MigrantInitiatorEnum;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -35,6 +36,8 @@ public class OutcomeMigrationRequestsItem {
     private Date visitEndDate;
     private String errorMessage;
     private Integer resCode;
+    private String section;
+    private Long resolutionCodeGroup;
 
     public static OutcomeMigrationRequestsItem build(Node itemNode, Long idOfOrgRegistry) {
         Long idOfRequest = null;
@@ -44,6 +47,8 @@ public class OutcomeMigrationRequestsItem {
         Date visitStartDate = null;
         Date visitEndDate = null;
         EMSetter emSetter = new EMSetter("");
+        String section = null;
+        Long resolutionCodeGroup = null;
 
         idOfRequest = getLongValue(itemNode, "IdOfRequest", emSetter, true);
         if(idOfRequest != null) {
@@ -102,8 +107,15 @@ public class OutcomeMigrationRequestsItem {
             emSetter.setCompositeErrorMessage("Attribute VisitEndDate not found");
         }
 
+        section = XMLUtils.getAttributeValue(itemNode, "Section");
+        if (StringUtils.isEmpty(section)) {
+            emSetter.setCompositeErrorMessage("Attribute Section no found");
+        }
+
+        resolutionCodeGroup = getLongValue(itemNode, "ResolutionCodeGroup", emSetter, true);
+
         return new OutcomeMigrationRequestsItem(idOfRequest, idOfOrgRegistry, requestNumber, idOfClient, idOfOrgVisit,
-                visitStartDate, visitEndDate, emSetter.getStr());
+                visitStartDate, visitEndDate, section, resolutionCodeGroup, emSetter.getStr());
     }
 
     private static Long getLongValue(Node itemNode, String nodeName, ISetErrorMessage www, boolean checkExists) {
@@ -154,7 +166,8 @@ public class OutcomeMigrationRequestsItem {
     }
 
     public OutcomeMigrationRequestsItem(Long idOfRequest, Long idOfOrgRegistry, String requestNumber,
-            Long idOfClient, Long idOfOrgVisit, Date visitStartDate, Date visitEndDate, String errorMessage) {
+            Long idOfClient, Long idOfOrgVisit, Date visitStartDate, Date visitEndDate, String section,
+            Long resolutionCodeGroup, String errorMessage) {
         this.idOfRequest = idOfRequest;
         this.idOfOrgRegistry = idOfOrgRegistry;
         this.requestNumber = requestNumber;
@@ -162,6 +175,8 @@ public class OutcomeMigrationRequestsItem {
         this.idOfOrgVisit = idOfOrgVisit;
         this.visitStartDate = visitStartDate;
         this.visitEndDate = visitEndDate;
+        this.section = section;
+        this.resolutionCodeGroup = resolutionCodeGroup;
         this.errorMessage = errorMessage;
         if(errorMessage == null || errorMessage.isEmpty() ){
             this.resCode = ERROR_CODE_ALL_OK;
@@ -240,5 +255,21 @@ public class OutcomeMigrationRequestsItem {
 
     public void setResCode(Integer resCode) {
         this.resCode = resCode;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
+    }
+
+    public Long getResolutionCodeGroup() {
+        return resolutionCodeGroup;
+    }
+
+    public void setResolutionCodeGroup(Long resolutionCodeGroup) {
+        this.resolutionCodeGroup = resolutionCodeGroup;
     }
 }
