@@ -149,7 +149,7 @@ public class ImportMigrantsFileService {
 
         StringBuilder sb = new StringBuilder();
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.YYYY H:MM");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
         sb.append(getQuotedStr(array[7])).append(", ");            // idofserviceclass
         sb.append("'").append(getQuotedStr(array[0])).append("'").append(", "); // groupname

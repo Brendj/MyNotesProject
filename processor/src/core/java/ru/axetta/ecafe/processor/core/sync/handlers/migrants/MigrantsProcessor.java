@@ -369,8 +369,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
                                 migrant.getRequestNumber().equals(outMigReqItem.getRequestNumber()) &&
                                 migrant.getOrgVisit().getIdOfOrg().equals(outMigReqItem.getIdOfOrgVisit())&&
                                 migrant.getVisitStartDate().equals(outMigReqItem.getVisitStartDate())&&
-                                migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate()) &&
-                                migrant.getResolutionCodeGroup().equals(outMigReqItem.getResolutionCodeGroup())){
+                                migrant.getVisitEndDate().equals(outMigReqItem.getVisitEndDate())){
                             resOutcomeMigrationRequestsItem = new ResOutcomeMigrationRequestsItem(migrant);
                             resOutcomeMigrationRequestsItem.setResCode(outMigReqItem.getResCode());
                         } else {

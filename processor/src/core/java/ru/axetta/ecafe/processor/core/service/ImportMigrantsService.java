@@ -51,7 +51,24 @@ public class ImportMigrantsService {
                         request.getIdOfServiceClass());
 
                 Client client = DAOUtils.findClientByGuid(session, request.getClientGuid());
-                Org orgVisit = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
+                List<Org> orgVisitList = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
+
+                if (null == client) {
+                    logger.warn(String.format("Client with guid={%s} not found", request.getClientGuid()));
+                    continue;
+                }
+
+                if (orgVisitList.size() > 1) {
+                    logger.warn(String.format("More then one organization was found with unom=%d and inn=%s for client with guid={%s}",
+                            request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
+                    continue;
+                }
+
+                if (orgVisitList.isEmpty()) {
+                    logger.warn(String.format("No organization was found with unom=%d and inn=%s for client with guid={%s}",
+                            request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
+                    continue;
+                }
 
                 Integer resolution;
 
@@ -72,12 +89,12 @@ public class ImportMigrantsService {
                             .nextIdOfProcessorMigrantRequest(session, client.getOrg().getIdOfOrg());
                     CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
                             client.getOrg().getIdOfOrg());
-                    String requestNumber = formRequestNumber(client.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(),
+                    String requestNumber = formRequestNumber(client.getOrg().getIdOfOrg(), orgVisitList.get(0).getIdOfOrg(),
                             idOfProcessorMigrantRequest, date);
 
                     // создаем нового мигранта
                     Migrant migrantNew = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
-                            requestNumber, client, orgVisit, request.getDateLearnStart(), endDate, Migrant.NOT_SYNCHRONIZED);
+                            requestNumber, client, orgVisitList.get(0), request.getDateLearnStart(), endDate, Migrant.NOT_SYNCHRONIZED);
                     migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ESZ);
                     migrantNew.setSection(request.getGroupName());
                     migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
@@ -103,8 +120,8 @@ public class ImportMigrantsService {
                         isMigrantChanged = true;
                     }
 
-                    if (!migrant.getOrgVisit().equals(orgVisit)) {
-                        migrant.setOrgVisit(orgVisit);
+                    if (!migrant.getOrgVisit().equals(orgVisitList.get(0))) {
+                        migrant.setOrgVisit(orgVisitList.get(0));
                         isMigrantChanged = true;
                     }
 
