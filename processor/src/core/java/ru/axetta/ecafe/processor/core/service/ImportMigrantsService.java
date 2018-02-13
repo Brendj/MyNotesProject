@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -30,7 +31,20 @@ public class ImportMigrantsService {
     public final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.esz.migrants.cronExpression";
 
     public void run() throws Exception {
+        if (!isOn())
+            return;
         loadMigrants();
+    }
+
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.esz.migrants.service.node", "1");
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
+                reqInstance.trim())) {
+            return false;
+        }
+        return true;
     }
 
     public void loadMigrants() throws Exception {

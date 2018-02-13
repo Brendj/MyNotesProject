@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -51,7 +52,21 @@ public class ImportMigrantsFileService {
           + "VALUES ";
 
     public void run() throws Exception {
+        if (!isOn())
+            return;
         loadMigrantsFile();
+    }
+
+
+    public static boolean isOn() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.esz.migrants.fileservice.node", "1");
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
+                reqInstance.trim())) {
+            return false;
+        }
+        return true;
     }
 
     public void loadMigrantsFile() throws Exception {
