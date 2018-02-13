@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.director.DirectorOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -17,6 +18,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
@@ -28,6 +30,8 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     protected Calendar localCalendar;
     protected Long idOfOrg;
     public static final String NO_REPORT_DATA = "Нет данных по выбранным критериям";
+    protected PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    protected String htmlReport = null;
 
     public OnlineReportPage() throws RuntimeContext.NotInitializedException {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -56,6 +60,22 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
+    }
+
+    public void setPeriodTypeMenu(PeriodTypeMenu periodTypeMenu) {
+        this.periodTypeMenu = periodTypeMenu;
+    }
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public void setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
     }
 
     public void setEndDate(Date endDate) {
@@ -135,4 +155,21 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
 
     public void fill(Session persistenceSession, User currentUser) throws Exception{};
 
+    public void onReportPeriodChanged(ActionEvent event) {
+        htmlReport = null;
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+            } break;
+        }
+    }
 }

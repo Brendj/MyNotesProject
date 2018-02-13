@@ -329,7 +329,7 @@
 
     <%--@elvariable id="migrantsPage" type="ru.axetta.ecafe.processor.web.ui.client.MigrantsPage"--%>
     <rich:panelMenuItem id="migrantsMenuItem" binding="#{migrantsPage.mainMenuComponent}"
-                        label="Клиенты из других ОО" action="#{migrantsPage.show}" reRender="workspaceForm" />
+                        label="Заявки на посещение" action="#{migrantsPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="loadClientFromFileMenuItem" binding="#{mainPage.clientFileLoadPage.mainMenuComponent}"
                         label="Загрузить из файла" action="#{mainPage.showClientFileLoadPage}"
@@ -1371,6 +1371,11 @@
         <rich:panelMenuItem id="paymentsBetweenContragentsReportMenuItem"
                             binding="#{paymentsBetweenContragentsReportPage.mainMenuComponent}" label="Отчет по объемам оплат между поставщиками питания"
                             action="#{paymentsBetweenContragentsReportPage.show}" reRender="workspaceForm"/>
+
+        <%--@elvariable id="consolidatedSellingReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ConsolidatedSellingReportPage"--%>
+        <rich:panelMenuItem id="consolidatedSellingReportMenuItem"
+                            binding="#{consolidatedSellingReportPage.mainMenuComponent}" label="Сводный отчет по реализации"
+                            action="#{consolidatedSellingReportPage.show}" reRender="workspaceForm"/>
 
     </rich:panelMenuGroup>
 

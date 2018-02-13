@@ -143,24 +143,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         this.endDate = localCalendar.getTime();
     }
 
-    public void onReportPeriodChanged(ActionEvent event) {
-        htmlReport = null;
-        switch (periodTypeMenu.getPeriodType()){
-            case ONE_DAY: {
-                setEndDate(startDate);
-            } break;
-            case ONE_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 6));
-            } break;
-            case TWO_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 13));
-            } break;
-            case ONE_MONTH: {
-                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            } break;
-        }
-    }
-
     public void onGeneratePeriodChanged(ActionEvent event) {
         generateEndDate = new Date(generateBeginDate.getTime()+60*60*1000);
     }
