@@ -265,12 +265,14 @@ public class MigrantsUtils {
         }
         String str;
         if (showAll) {
-            str = "select m from Migrant m where m.visitStartDate between :startDate and :endDate " + condition;
+            str = "select m from Migrant m where m.visitStartDate < :endDate and m.visitEndDate > :startDate "
+                    + condition;
         } else {
             str = "select m from Migrant m "
                     + " where not exists (select h from VisitReqResolutionHist h where h.migrant.compositeIdOfMigrant.idOfRequest = m.compositeIdOfMigrant.idOfRequest "
                     + " and h.migrant.compositeIdOfMigrant.idOfOrgRegistry = m.compositeIdOfMigrant.idOfOrgRegistry and h.resolution > :resolution) "
-                    + " and m.visitStartDate between :startDate and :endDate " + condition;
+                    + " and m.visitStartDate < :endDate and m.visitEndDate > :startDate "
+                    + condition;
         }
         Query query = session.createQuery(str);
         query.setParameter("startDate", startDate);
