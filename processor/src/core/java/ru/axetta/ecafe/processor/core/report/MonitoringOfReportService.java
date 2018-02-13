@@ -102,8 +102,12 @@ public class MonitoringOfReportService {
         monitoringOfItem.setsDate(datePeriod.getStartDate());
         monitoringOfItem.setNumberOfPassesStudents(
                 generateNumberOfPassesStudents(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem.setNumberOfUniquePassesStudents(
+                generateNumberOfUniquePassesStudents(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
         monitoringOfItem.setNumberOfPassesEmployees(
                 generateNumberOfPassesEmployees(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
+        monitoringOfItem.setNumberOfUniquePassesEmployees(
+                generateNumberOfUniquePassesEmployees(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
         monitoringOfItem.setNumberOfPassesGuardians(
                 generateNumberOfPassesGuardians(session, datePeriod.getStartDate(), datePeriod.getEndDate(), idOfOrg));
 
@@ -152,6 +156,20 @@ public class MonitoringOfReportService {
 
     public Long generateNumberOfPassesStudents(Session session, Date startTime, Date endTime, Long idOfOrg) {
         Query query = session.createSQLQuery(
+                "SELECT count(DISTINCT(idofenterevent)) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup < 1100000000 "
+                        + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long generateNumberOfUniquePassesStudents(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        Query query = session.createSQLQuery(
                 "SELECT count(DISTINCT(idofclient)) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup < 1100000000 "
                         + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
 
@@ -166,8 +184,24 @@ public class MonitoringOfReportService {
 
     public Long generateNumberOfPassesEmployees(Session session, Date startTime, Date endTime, Long idOfOrg) {
         Query query = session.createSQLQuery(
-                "SELECT count(DISTINCT(idofclient)) FROM cf_enterevents WHERE idoforg = :idoforg AND idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050) "
-                        + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
+                "SELECT count(DISTINCT(idofenterevent)) FROM cf_enterevents WHERE idoforg = :idoforg "
+                 + "AND idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050) "
+                 + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
+
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("startTime", startTime.getTime());
+        query.setParameter("endTime", endTime.getTime());
+
+        Long result = ((BigInteger) query.uniqueResult()).longValue();
+
+        return result;
+    }
+
+    public Long generateNumberOfUniquePassesEmployees(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "SELECT count(DISTINCT(idofclient)) FROM cf_enterevents WHERE idoforg = :idoforg "
+                 + "AND idofclientgroup IN (1100000000, 1100000010, 1100000001, 1100000020, 1100000040, 1100000050) "
+                 + "AND passdirection IN (0,1,6,7) AND evtdatetime BETWEEN :startTime AND :endTime");
 
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("startTime", startTime.getTime());
@@ -729,7 +763,9 @@ public class MonitoringOfReportService {
 
         private Date sDate;
         private Long numberOfPassesStudents;
+        private Long numberOfUniquePassesStudents;
         private Long numberOfPassesEmployees;
+        private Long numberOfUniquePassesEmployees;
         private Long numberOfPassesGuardians;
         private Long summaryOfPasses;
 
@@ -747,13 +783,16 @@ public class MonitoringOfReportService {
         public MonitoringOfItem() {
         }
 
-        public MonitoringOfItem(Date sDate, Long numberOfPassesStudents, Long numberOfPassesEmployees,
-                Long numberOfPassesGuardians, Long summaryOfPasses, Long numberOfLgotnoe, Long numberOfReserve,
-                Long numberOfBuffetStudent, Long numberOfBuffetGuardians, Long numberOfSubFeedStudents,
-                Long numberOfSubFeedGuardians, Long numberOfPaidStudents, Long numberOfPaidGuardians) {
+        public MonitoringOfItem(Date sDate, Long numberOfPassesStudents, Long numberOfUniquePassesStudents,
+                Long numberOfPassesEmployees, Long numberOfUniquePassesEmployees, Long numberOfPassesGuardians,
+                Long summaryOfPasses, Long numberOfLgotnoe, Long numberOfReserve, Long numberOfBuffetStudent,
+                Long numberOfBuffetGuardians, Long numberOfSubFeedStudents, Long numberOfSubFeedGuardians,
+                Long numberOfPaidStudents, Long numberOfPaidGuardians) {
             this.sDate = sDate;
             this.numberOfPassesStudents = numberOfPassesStudents;
+            this.numberOfUniquePassesStudents = numberOfUniquePassesStudents;
             this.numberOfPassesEmployees = numberOfPassesEmployees;
+            this.numberOfUniquePassesEmployees = numberOfUniquePassesEmployees;
             this.numberOfPassesGuardians = numberOfPassesGuardians;
             this.summaryOfPasses = summaryOfPasses;
             this.numberOfLgotnoe = numberOfLgotnoe;
@@ -884,6 +923,22 @@ public class MonitoringOfReportService {
 
         public void setNumberOfLgotnoeOtherOrg(Long numberOfLgotnoeOtherOrg) {
             this.numberOfLgotnoeOtherOrg = numberOfLgotnoeOtherOrg;
+        }
+
+        public Long getNumberOfUniquePassesStudents() {
+            return numberOfUniquePassesStudents;
+        }
+
+        public void setNumberOfUniquePassesStudents(Long numberOfUniquePassesStudents) {
+            this.numberOfUniquePassesStudents = numberOfUniquePassesStudents;
+        }
+
+        public Long getNumberOfUniquePassesEmployees() {
+            return numberOfUniquePassesEmployees;
+        }
+
+        public void setNumberOfUniquePassesEmployees(Long numberOfUniquePassesEmployees) {
+            this.numberOfUniquePassesEmployees = numberOfUniquePassesEmployees;
         }
     }
 
