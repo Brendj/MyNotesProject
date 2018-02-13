@@ -39,7 +39,9 @@
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
                                    reRender="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;" />
+                                   styleClass="command-link" style="width: 25px;" >
+                    <f:setPropertyActionListener value="6" target="#{mainPage.orgSelectPage.filterMode}" />
+                </a4j:commandButton>
             </h:panelGroup>
 
             <h:outputText escape="true" value="Guid клиента" styleClass="output-text" />
