@@ -89,7 +89,11 @@ public class ImportMigrantsService {
                 if (null == request.getDateEnd()) { // Всегда ставим 1 – подтверждена, если поле DateEnd = null.
                     resolution = VisitReqResolutionHist.RES_CONFIRMED;
                 } else {  // Всегда ставим 3 — аннулирована и сдана в архив, если поле DateEnd = не null.
-                    resolution = VisitReqResolutionHist.RES_CANCELED;
+                    if (request.getDateEnd().getTime() <= date.getTime()) {
+                        resolution = VisitReqResolutionHist.RES_CANCELED;
+                    } else {
+                        resolution = VisitReqResolutionHist.RES_CONFIRMED;
+                    }
                 }
 
                 Date endDate = (null == request.getDateEnd()) ? request.getDateLearnEnd() : request.getDateEnd();
