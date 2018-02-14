@@ -43,7 +43,10 @@ public class ClientGroup {
         // все группы не-учащиеся и не-выбывшие должны быть до CLIENT_OTHERS
         CLIENT_LEAVING ( 1100000060L,"Выбывшие"),
         CLIENT_DELETED ( 1100000070L,"Удаленные"),
-        CLIENT_DISPLACED ( 1100000080L,"Перемещенные");
+        CLIENT_DISPLACED ( 1100000080L,"Перемещенные"),
+        CLIENT_OTHER_ORG (1100000090L, "Обучающиеся других ОО"),
+        CLIENT_PARENT_OTHER_ORG (1100000100L, "Родители обучающихся других ОО"),
+        CLIENT_EMPLOYEE_OTHER_ORG (1100000110L, "Сотрудники других ОО");
 
         private Long value;
         private String nameOfGroup;
