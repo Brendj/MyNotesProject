@@ -819,6 +819,12 @@ public class ClientManager {
                 }
             }
 
+            if (fieldConfig.getValue(ClientManager.FieldId.EXTERNAL_ID) != null) {
+                if (!fieldConfig.getValue(ClientManager.FieldId.EXTERNAL_ID).isEmpty()) {
+                    client.setExternalId(fieldConfig.getValueLong(ClientManager.FieldId.EXTERNAL_ID));
+                }
+            }
+
             if (fieldConfig.getValue(FieldId.MIDDLE_GROUP) != null) {
                 String middleGroup = fieldConfig.getValue(FieldId.MIDDLE_GROUP);
                 if (!StringUtils.isEmpty(middleGroup)) client.setMiddleGroup(middleGroup);
@@ -1107,6 +1113,24 @@ public class ClientManager {
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
 
+    public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName) throws Exception {
+        String strNSIOrg = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.esz.migrants.eszOrg", "");
+        if (StringUtils.isEmpty(strNSIOrg)) throw new Exception("Не найдена организация ЕСЗ");
+        Long idOfESZOrg = Long.parseLong(strNSIOrg);
+        Query query = session.createQuery("select c.idOfClient from Client c where c.org.idOfOrg = :idOfOrg and c.externalId = :externalId");
+        query.setParameter("idOfOrg", idOfESZOrg);
+        query.setParameter("externalId", eszId);
+        Long idOfClient = (Long)query.uniqueResult();
+        if (idOfClient != null) return idOfClient;
+
+        ClientFieldConfig fc = new ClientFieldConfig();
+        fc.setValue(FieldId.SURNAME, surname);
+        fc.setValue(FieldId.NAME, firstName);
+        fc.setValue(FieldId.SECONDNAME, secondName);
+        fc.setValue(FieldId.GROUP, "Обучающиеся других ОО"); //todo переделать на новую константу из ClientGroup.Predefined
+        fc.setValue(FieldId.EXTERNAL_ID, eszId);
+        return ClientManager.registerClient(idOfESZOrg, fc, false, true);
+    }
 
     public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig, boolean checkFullNameUnique, boolean noComment)
             throws Exception {
