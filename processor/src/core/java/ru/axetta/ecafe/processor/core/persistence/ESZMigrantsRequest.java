@@ -16,9 +16,14 @@ public class ESZMigrantsRequest {
     private Date dateEnd;
     private Date dateLearnStart;
     private Date dateLearnEnd;
+    private String firstname;
+    private String surname;
+    private String secondname;
+    private Long idOfESZ;
 
     public ESZMigrantsRequest(Long idOfServiceClass, String groupName, String clientGuid, String visitOrgInn,
-            Integer visitOrgUnom, Date dateEnd, Date dateLearnStart, Date dateLearnEnd) {
+            Integer visitOrgUnom, Date dateEnd, Date dateLearnStart, Date dateLearnEnd, String firstname,
+            String surname, String secondname, Long idOfESZ) {
         this.idOfServiceClass = idOfServiceClass;
         this.groupName = groupName;
         this.clientGuid = clientGuid;
@@ -27,6 +32,10 @@ public class ESZMigrantsRequest {
         this.dateEnd = dateEnd;
         this.dateLearnStart = dateLearnStart;
         this.dateLearnEnd = dateLearnEnd;
+        this.firstname = firstname;
+        this.surname = surname;
+        this.secondname = secondname;
+        this.idOfESZ = idOfESZ;
     }
 
     protected ESZMigrantsRequest() {
@@ -103,6 +112,38 @@ public class ESZMigrantsRequest {
 
     public void setDateLearnEnd(Date dateLearnEnd) {
         this.dateLearnEnd = dateLearnEnd;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getSecondname() {
+        return secondname;
+    }
+
+    public void setSecondname(String secondname) {
+        this.secondname = secondname;
+    }
+
+    public Long getIdOfESZ() {
+        return idOfESZ;
+    }
+
+    public void setIdOfESZ(Long idOfESZ) {
+        this.idOfESZ = idOfESZ;
     }
 
     @Override

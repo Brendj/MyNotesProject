@@ -20,6 +20,9 @@
         <property name="dateEnd" column="DateEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="dateLearnStart" column="DateLearnStart" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="dateLearnEnd" column="DateLearnEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-
+        <property name="firstname" column="Firstname" type="string"/>
+        <property name="surname" column="Surname" type="string"/>
+        <property name="secondname" column="Secondname" type="string"/>
+        <property name="idOfESZ" column="idOfESZ" type="long"/>
     </class>
 </hibernate-mapping>

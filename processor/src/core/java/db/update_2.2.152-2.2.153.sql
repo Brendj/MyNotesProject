@@ -27,6 +27,10 @@ CREATE TABLE cf_esz_migrants_requests
   dateend bigint,
   datelearnstart bigint,
   datelearnend bigint,
+  firstname character varying(64),
+  surname character varying(128),
+  secondname character varying(128),
+  idofesz bigint,
   CONSTRAINT cf_esz_migrants_requests_idofeszmigrantsrequests_pk PRIMARY KEY (idofeszmigrantsrequest)
 );
 
