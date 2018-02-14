@@ -185,12 +185,7 @@ public class ImportMigrantsFileService {
             }
         } else {
             Date dateEnd = simpleDateFormat.parse(array[4]);
-            Date currentDate = new Date();
-            if (dateEnd.getTime() <= currentDate.getTime()) {
-                throw new ClientIsExpelled(String.format("client with guid={%s} is expelled", getQuotedStr(array[1])));
-            } else {
-                sb.append(dateEnd.getTime()).append(", ");
-            }
+            sb.append(dateEnd.getTime()).append(", ");
         }
 
         sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[5]).getTime()))).append(", "); // datelearnstart

@@ -96,6 +96,10 @@ public class ImportMigrantsService {
                     }
                 }
 
+                if (request.getDateLearnEnd().getTime() <= date.getTime()) {
+                    resolution = VisitReqResolutionHist.RES_CANCELED;
+                }
+
                 Date endDate = (null == request.getDateEnd()) ? request.getDateLearnEnd() : request.getDateEnd();
 
                 // флаг, показывающий наличие изменений в заявке
