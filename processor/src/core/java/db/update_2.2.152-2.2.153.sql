@@ -38,6 +38,6 @@ CREATE TABLE cf_esz_migrants_requests
 CREATE INDEX cf_categoryorg_orgs_idoforg_idx ON cf_categoryorg_orgs USING btree (idoforg);
 
 --обновление групп для задачи EP-1225
-UPDATE cf_clientgroups SET idofclientgroup = 1100000090 WHERE groupname = 'Обучающиеся других ОО';
-UPDATE cf_clientgroups SET idofclientgroup = 1100000100 WHERE groupname = 'Родители обучающихся других ОО';
-UPDATE cf_clientgroups SET idofclientgroup = 1100000110 WHERE groupname = 'Сотрудники других ОО';
+--UPDATE cf_clientgroups SET idofclientgroup = 1100000090 WHERE groupname = 'Обучающиеся других ОО';
+--UPDATE cf_clientgroups SET idofclientgroup = 1100000100 WHERE groupname = 'Родители обучающихся других ОО';
+--UPDATE cf_clientgroups SET idofclientgroup = 1100000110 WHERE groupname = 'Сотрудники других ОО';
