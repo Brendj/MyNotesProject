@@ -3690,9 +3690,10 @@ public class Processor implements SyncProcessor {
                         ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(),
                                 client);
                         migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ARM.concat(String.format(" (ид. ОО=%s)", idOfOrg)));
-                        migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-                        migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-
+                        if (client.getClientGroup() != null) {
+                            migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                            migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+                        }
                         migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                         migrationHistory.setNewGroupName(clientGroup.getGroupName());
 
