@@ -79,16 +79,17 @@ public class MigrantsManager {
                             VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
                             "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED,
                             VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
-                    /*nextId--;
+                    nextId--;
                     CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
-                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
                     VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
                             VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
-                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED);
-                    nextId--;*/
+                            "Закрыта на сервере по истечению срока.", null, null, VisitReqResolutionHist.NOT_SYNCHRONIZED,
+                            VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+                    nextId--;
                     persistenceSession.save(migrant);
                     persistenceSession.save(hist1);
-                    //persistenceSession.save(hist2);
+                    persistenceSession.save(hist2);
                 }
             }
 

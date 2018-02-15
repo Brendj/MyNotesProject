@@ -292,12 +292,20 @@ public class MigrantsUtils {
             migrant.setSyncState(Migrant.CLOSED);
             CompositeIdOfVisitReqResolutionHist compositeId1 = new CompositeIdOfVisitReqResolutionHist(nextId,
                     migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
-            VisitReqResolutionHist hist = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
+            VisitReqResolutionHist hist1 = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
+                    VisitReqResolutionHist.RES_CANCELED, new Date(),
+                    resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
+                    VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+            nextId--;
+            CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                    migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
+            VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
                     VisitReqResolutionHist.RES_CANCELED, new Date(),
                     resolutionNames[VisitReqResolutionHist.RES_CANCELED], null, null,
                     VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
             session.update(migrant);
-            session.save(hist);
+            session.save(hist1);
+            session.save(hist2);
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
