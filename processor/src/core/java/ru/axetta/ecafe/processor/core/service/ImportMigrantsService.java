@@ -65,7 +65,10 @@ public class ImportMigrantsService {
                 Migrant migrant = MigrantsUtils.getMigrantRequestByGuidAndGroupId(session, request.getClientGuid(),
                         request.getIdOfServiceClass());
 
-                Client client = DAOUtils.findClientByGuid(session, request.getClientGuid());
+                Client client = null;
+
+                if (!request.getClientGuid().isEmpty())
+                    client = DAOUtils.findClientByGuid(session, request.getClientGuid());
 
                 if (null == client) {
                     Long idOfClient = ClientManager.forceGetClientESZ(session, request.getIdOfESZ(), request.getSurname(),

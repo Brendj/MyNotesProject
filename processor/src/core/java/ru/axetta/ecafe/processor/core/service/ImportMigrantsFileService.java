@@ -157,7 +157,11 @@ public class ImportMigrantsFileService {
 
         sb.append(getQuotedStr(array[12])).append(", ");            // idofserviceclass
         sb.append("'").append(getQuotedStr(array[0])).append("'").append(", "); // groupname
-        sb.append("'").append(getQuotedStr(array[5])).append("'").append(", "); // clientguid
+        if (array[5].equals("null")) {
+            sb.append("NULL, ");
+        } else {
+            sb.append("'").append(getQuotedStr(array[5])).append("'").append(", "); // clientguid
+        }
         sb.append("'").append(getQuotedStr(array[7])).append("'").append(", "); // visitorginn
         sb.append(getQuotedStr(array[8])).append(", ");             // visitorgunom
 
