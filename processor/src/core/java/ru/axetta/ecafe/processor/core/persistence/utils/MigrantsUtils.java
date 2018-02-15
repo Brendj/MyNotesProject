@@ -333,6 +333,13 @@ public class MigrantsUtils {
         return (Migrant)criteria.uniqueResult();
     }
 
+    public static List<Migrant> getMigrantRequestsByExternalIdAndGroupId(Session session, Long externalId, Long groupId) {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.createAlias("clientMigrate", "client", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.eq("client.externalId", externalId));
+        criteria.add(Restrictions.eq("resolutionCodeGroup", groupId));
+        return criteria.list();
+    }
 
     public enum MigrantsEnumType {
         /*0*/ ALL("all", "По всем заявкам"),

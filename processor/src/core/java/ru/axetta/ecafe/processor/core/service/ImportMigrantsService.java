@@ -65,9 +65,19 @@ public class ImportMigrantsService {
                 Migrant migrant = MigrantsUtils.getMigrantRequestByGuidAndGroupId(session, request.getClientGuid(),
                         request.getIdOfServiceClass());
 
+                if (null == migrant) {
+                    List<Migrant> migrants = MigrantsUtils.getMigrantRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
+                            request.getIdOfServiceClass());
+                    if (migrants.isEmpty() || migrants.size() > 1) {
+                        migrant = null;
+                    } else {
+                        migrant = migrants.get(0);
+                    }
+                }
+
                 Client client = null;
 
-                if (!request.getClientGuid().isEmpty())
+                if (null != request.getClientGuid() && !request.getClientGuid().isEmpty())
                     client = DAOUtils.findClientByGuid(session, request.getClientGuid());
 
                 if (null == client) {
@@ -177,15 +187,18 @@ public class ImportMigrantsService {
                         session.saveOrUpdate(migrant);
                     }
 
-                    Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, client.getOrg().getIdOfOrg());
-                    CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
-                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
+                    VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
+                    if (!resolution.equals(hist.getResolution())) {
+                        Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, client.getOrg().getIdOfOrg());
+                        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
+                                migrant.getCompositeIdOfMigrant().getIdOfRequest(), client.getOrg().getIdOfOrg());
 
-                    // создаем новую запись в истории
-                    VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
-                            resolution, date, null, null, null,
-                            VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ESZ);
-                    session.save(visitReqResolutionHist);
+                        // создаем новую запись в истории
+                        VisitReqResolutionHist visitReqResolutionHist = new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
+                                resolution, date, null, null, null,
+                                VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ESZ);
+                        session.save(visitReqResolutionHist);
+                    }
                 }
                 session.flush();
             }
