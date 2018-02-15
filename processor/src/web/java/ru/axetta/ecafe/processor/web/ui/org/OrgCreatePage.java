@@ -625,6 +625,10 @@ public class OrgCreatePage extends BasicWorkspacePage
         session.save(org);
 
         if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());
+
+        if (!org.getType().equals(OrganizationType.SUPPLIER)) {
+            createPredefinedClientGroupsForOrg(session, org.getIdOfOrg());
+        }
     }
 
     public String getMailingListReportsOnNutrition() {
@@ -785,5 +789,15 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setChangesDSZN(Boolean changesDSZN) {
         this.changesDSZN = changesDSZN;
+    }
+
+    public void createPredefinedClientGroupsForOrg(Session persistenceSession, Long idOfOrg) {
+        ClientGroup.Predefined[] predefineds = ClientGroup.Predefined.values();
+
+        for (ClientGroup.Predefined predefined: predefineds) {
+            if (!predefined.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE) && !predefined.equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN)) {
+                DAOUtils.createClientGroup(persistenceSession, idOfOrg, predefined);
+            }
+        }
     }
 }
