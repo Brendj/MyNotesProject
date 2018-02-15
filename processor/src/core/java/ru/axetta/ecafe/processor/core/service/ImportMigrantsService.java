@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -65,12 +66,14 @@ public class ImportMigrantsService {
                         request.getIdOfServiceClass());
 
                 Client client = DAOUtils.findClientByGuid(session, request.getClientGuid());
-                List<Org> orgVisitList = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
 
                 if (null == client) {
-                    logger.warn(String.format("Client with guid={%s} not found", request.getClientGuid()));
-                    continue;
+                    Long idOfClient = ClientManager.forceGetClientESZ(session, request.getIdOfESZ(), request.getSurname(),
+                            request.getFirstname(), request.getSecondname());
+                    client = (Client) session.load(Client.class, idOfClient);
                 }
+
+                List<Org> orgVisitList = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
 
                 if (orgVisitList.size() > 1) {
                     logger.warn(String.format("More then one organization was found with unom=%d and inn=%s for client with guid={%s}",

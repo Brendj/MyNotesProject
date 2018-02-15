@@ -28,12 +28,6 @@ import java.util.Date;
 @Component("ImportMigrantsFileService")
 @Scope("singleton")
 public class ImportMigrantsFileService {
-    public static class NoClientGuidException extends Exception {
-
-        public NoClientGuidException(String message) {
-            super(message);
-        }
-    }
     public static class ClientIsExpelled extends Exception {
 
         public ClientIsExpelled(String message) {
@@ -48,7 +42,7 @@ public class ImportMigrantsFileService {
 
     private final String INITIAL_SQL =
             "INSERT INTO cf_esz_migrants_requests(idofserviceclass, groupname, clientguid, visitorginn, "
-          + "   visitorgunom, dateend, datelearnstart, datelearnend) "
+          + "   visitorgunom, dateend, datelearnstart, datelearnend, firstname, surname, secondname, idofesz) "
           + "VALUES ";
 
     public void run() throws Exception {
@@ -157,40 +151,38 @@ public class ImportMigrantsFileService {
 
     private String buildInsertString(String[] array) throws Exception {
 
-        // если clientguid == null
-        if (array[1].equals("null")) {
-            throw new NoClientGuidException("clientguid = null");
-        }
-
         StringBuilder sb = new StringBuilder();
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
-        sb.append(getQuotedStr(array[7])).append(", ");            // idofserviceclass
+        sb.append(getQuotedStr(array[12])).append(", ");            // idofserviceclass
         sb.append("'").append(getQuotedStr(array[0])).append("'").append(", "); // groupname
-        sb.append("'").append(getQuotedStr(array[1])).append("'").append(", "); // clientguid
-        sb.append("'").append(getQuotedStr(array[2])).append("'").append(", "); // visitorginn
-        sb.append(getQuotedStr(array[3])).append(", ");             // visitorgunom
+        sb.append("'").append(getQuotedStr(array[5])).append("'").append(", "); // clientguid
+        sb.append("'").append(getQuotedStr(array[7])).append("'").append(", "); // visitorginn
+        sb.append(getQuotedStr(array[8])).append(", ");             // visitorgunom
 
         //dateend
         // если не null и дата меньше\равна текущей - клиент отчислен, не обрабатываем
         // если null или дата больше текущей - все ок
-        if (array[4].equals("null")) {
-            Date dateLearnEnd = simpleDateFormat.parse(array[6]);
+        if (array[9].equals("null")) {
+            Date dateLearnEnd = simpleDateFormat.parse(array[11]);
             Date currentDate = new Date();
             if (dateLearnEnd.getTime() <= currentDate.getTime()) {
-                throw new ClientIsExpelled(String.format("client with guid={%s} is expelled", getQuotedStr(array[1])));
+                throw new ClientIsExpelled(String.format("client with guid={%s} is expelled", getQuotedStr(array[5])));
             } else {
                 sb.append(getQuotedStr("null")).append(", ");
             }
         } else {
-            Date dateEnd = simpleDateFormat.parse(array[4]);
+            Date dateEnd = simpleDateFormat.parse(array[9]);
             sb.append(dateEnd.getTime()).append(", ");
         }
 
-        sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[5]).getTime()))).append(", "); // datelearnstart
-
-        sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[6]).getTime()))); // datelearnend
+        sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[10]).getTime()))).append(", ");  // datelearnstart
+        sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[11]).getTime()))).append(", ");  // datelearnend
+        sb.append("'").append(getQuotedStr(array[2])).append("'").append(", "); // firstname
+        sb.append("'").append(getQuotedStr(array[1])).append("'").append(", "); // surname
+        sb.append("'").append(getQuotedStr(array[3])).append("'").append(", "); // secondname
+        sb.append(getQuotedStr(array[4]));                                      // idofesz
 
         return sb.toString();
     }
