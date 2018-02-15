@@ -41,3 +41,28 @@ CREATE INDEX cf_categoryorg_orgs_idoforg_idx ON cf_categoryorg_orgs USING btree 
 --UPDATE cf_clientgroups SET idofclientgroup = 1100000090 WHERE groupname = 'Обучающиеся других ОО';
 --UPDATE cf_clientgroups SET idofclientgroup = 1100000100 WHERE groupname = 'Родители обучающихся других ОО';
 --UPDATE cf_clientgroups SET idofclientgroup = 1100000110 WHERE groupname = 'Сотрудники других ОО';
+
+--добавление 3-ех предопределенных групп для школ с типами орг 0,1,3 для задачи EP-1224
+INSERT INTO cf_clientgroups (idoforg, idofclientgroup, groupname)
+  SELECT cfc.idoforg, 1100000090 AS idofclientgroup, 'Обучающиеся других ОО' AS groupname
+  FROM cf_clientgroups cfc LEFT JOIN (SELECT idoforg    FROM cf_orgs
+  WHERE organizationtype NOT IN (2) AND idoforg NOT IN (
+    SELECT cfc.idoforg FROM cf_clientgroups cfc LEFT JOIN cf_orgs cfo ON cfc.idoforg = cfo.idoforg
+    WHERE cfo.idoforg <> 2 AND cfc.groupname IN ('Обучающиеся других ОО', 'Родители обучающихся других ОО', 'Сотрудники других ОО')
+    GROUP BY cfc.idoforg)) AS org ON cfc.idoforg = org.idoforg GROUP BY cfc.idoforg;
+
+INSERT INTO cf_clientgroups (idoforg, idofclientgroup, groupname)
+  SELECT cfc.idoforg, 1100000100 AS idofclientgroup, 'Родители обучающихся других ОО' AS groupname
+  FROM cf_clientgroups cfc LEFT JOIN (SELECT idoforg    FROM cf_orgs
+  WHERE organizationtype NOT IN (2) AND idoforg NOT IN (
+    SELECT cfc.idoforg FROM cf_clientgroups cfc LEFT JOIN cf_orgs cfo ON cfc.idoforg = cfo.idoforg
+    WHERE cfo.idoforg <> 2 AND cfc.groupname IN ('Обучающиеся других ОО', 'Родители обучающихся других ОО', 'Сотрудники других ОО')
+    GROUP BY cfc.idoforg)) AS org ON cfc.idoforg = org.idoforg GROUP BY cfc.idoforg;
+
+INSERT INTO cf_clientgroups (idoforg, idofclientgroup, groupname)
+  SELECT cfc.idoforg, 1100000110 AS idofclientgroup, 'Сотрудники других ОО' AS groupname
+  FROM cf_clientgroups cfc LEFT JOIN (SELECT idoforg    FROM cf_orgs
+  WHERE organizationtype NOT IN (2) AND idoforg NOT IN (
+    SELECT cfc.idoforg FROM cf_clientgroups cfc LEFT JOIN cf_orgs cfo ON cfc.idoforg = cfo.idoforg
+    WHERE cfo.idoforg <> 2 AND cfc.groupname IN ('Обучающиеся других ОО', 'Родители обучающихся других ОО', 'Сотрудники других ОО')
+    GROUP BY cfc.idoforg)) AS org ON cfc.idoforg = org.idoforg GROUP BY cfc.idoforg;
