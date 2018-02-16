@@ -177,7 +177,8 @@ public class FunctionSelector {
                     .equalsIgnoreCase(Function.FUNC_PAYMENT_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)) {
+                    .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
+                    /*|| function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_MANUAL_REPORT)*/) {
                 supplierFunctions.add(function);
             }
         }
@@ -303,7 +304,7 @@ public class FunctionSelector {
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
-                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier") || item.getFunctionName().equals("manualRprt")) {
+                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
                 optionsItems.add(item);
             } else if (item.getFunctionName().equals("onlineRprt") || item.getFunctionName().equals("onlineRprtComplex")
                     || item.getFunctionName().equals("onlineRprtBenefit") || item.getFunctionName()
@@ -317,7 +318,8 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
                     .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") ||
-                    item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")) {
+                    item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")
+                    || item.getFunctionName().equals("manualRprt")) {
                 onlineReportItems.add(item);
             }
         }
@@ -419,7 +421,7 @@ public class FunctionSelector {
             } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
                     item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
-                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier") || item.getFunctionName().equals("manualRprt")) {
+                    .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }
@@ -436,7 +438,8 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
                     .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") ||
-                    item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")) {
+                    item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")
+                    || item.getFunctionName().equals("manualRprt")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }

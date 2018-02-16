@@ -168,7 +168,8 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             User.DefaultRole role = User.DefaultRole.parse(idOfRole);
             user.setIdOfRole(role.getIdentification());
             if (User.DefaultRole.SUPPLIER.equals(role)) {
-                user.setFunctions(functionSelector.getSupplierFunctions(session));
+                //user.setFunctions(functionSelector.getSupplierFunctions(session));
+                user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
                     this.printError("Список контрагентов пуст.");
@@ -176,10 +177,11 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 }
             }
             if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
-                user.setFunctions(functionSelector.getSupplierReportFunctions(session));
+                //user.setFunctions(functionSelector.getSupplierReportFunctions(session));
+                user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
-                    this.printError("Список контрагенотов пуст.");
+                    this.printError("Список контрагентов пуст.");
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
@@ -208,10 +210,6 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 }
                 user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(this.roleName);
-            }
-            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
-                user.setFunctions(functionSelector.getSupplierReportFunctions(session));
-                user.setRoleName(role.toString());
             }
             if (role.equals(User.DefaultRole.CARD_OPERATOR)) {
                 user.setFunctions(functionSelector.getCardOperatorFunctions(session));
