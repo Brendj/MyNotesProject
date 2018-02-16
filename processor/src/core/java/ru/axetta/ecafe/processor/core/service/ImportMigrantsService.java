@@ -80,8 +80,10 @@ public class ImportMigrantsService {
                     client = DAOUtils.findClientByGuid(session, request.getClientGuid());
 
                 if (null == client) {
-                    Long idOfClient = ClientManager.forceGetClientESZ(session, request.getIdOfESZ(), request.getSurname(),
-                            request.getFirstname(), request.getSecondname());
+                    Long idOfClient = ClientManager.forceGetClientESZ(session, request.getIdOfESZ(),
+                            (request.getSurname() == null) ? "" : request.getSurname(),
+                            (request.getFirstname() == null) ? "" : request.getFirstname(),
+                            (request.getSecondname() == null) ? "" : request.getSecondname());
                     client = (Client) session.load(Client.class, idOfClient);
                 }
 
