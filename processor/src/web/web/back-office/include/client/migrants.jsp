@@ -143,13 +143,13 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Начало занятий" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.visitStartDate}" styleClass="output-text" converter="timeConverter" />
+            <h:outputText escape="true" value="#{item.visitStartDate}" styleClass="output-text" converter="dateConverter" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Окончание занятий" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.visitEndDate}" styleClass="output-text" converter="timeConverter" />
+            <h:outputText escape="true" value="#{item.visitEndDate}" styleClass="output-text" converter="dateConverter" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

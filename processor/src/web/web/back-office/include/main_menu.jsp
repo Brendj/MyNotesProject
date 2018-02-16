@@ -327,10 +327,6 @@
     <rich:panelMenuItem id="createClientMenuItem" binding="#{mainPage.clientCreatePage.mainMenuComponent}"
                         label="Регистрация" action="#{mainPage.showClientCreatePage}" reRender="workspaceForm" />
 
-    <%--@elvariable id="migrantsPage" type="ru.axetta.ecafe.processor.web.ui.client.MigrantsPage"--%>
-    <rich:panelMenuItem id="migrantsMenuItem" binding="#{migrantsPage.mainMenuComponent}"
-                        label="Заявки на посещение" action="#{migrantsPage.show}" reRender="workspaceForm" />
-
     <rich:panelMenuItem id="loadClientFromFileMenuItem" binding="#{mainPage.clientFileLoadPage.mainMenuComponent}"
                         label="Загрузить из файла" action="#{mainPage.showClientFileLoadPage}"
                         reRender="workspaceForm" />
@@ -827,6 +823,10 @@
 
     <rich:panelMenuItem id="loadRegistryFromFileMenuItem" binding="#{mainPage.registryLoadPage.mainMenuComponent}"
                         label="Обработать параметры клиентов из файлов" action="#{mainPage.showRegistryLoadPage}" reRender="workspaceForm" />
+
+    <%--@elvariable id="migrantsPage" type="ru.axetta.ecafe.processor.web.ui.client.MigrantsPage"--%>
+    <rich:panelMenuItem id="migrantsMenuItem" binding="#{migrantsPage.mainMenuComponent}"
+                        label="Заявки на посещение" action="#{migrantsPage.show}" reRender="workspaceForm" />
 
     <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
     <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
