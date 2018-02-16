@@ -60,8 +60,8 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
 
     public List<Client> findAllActiveByOrgAndUpdateDate(List<Long> idOfOrgs, Date lastAccRegistrySync) {
         Query query = entityManager
-                .createQuery("select c from Client c , OrgSync os where c.org.idOfOrg in (:idOfOrgs) "
-                        + " and c.idOfClientGroup<:idOfClientGroup " + " and c.org = os.org "
+                .createQuery("select c from Client c where c.org.idOfOrg in (:idOfOrgs) "
+                        + " and c.idOfClientGroup<:idOfClientGroup "
                         + " and c.updateTime >  :lastAccRegistrySync ")
                 .setParameter("idOfOrgs", idOfOrgs)
                 .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue())
