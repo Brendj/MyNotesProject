@@ -29,7 +29,6 @@ import java.util.List;
 @Scope("singleton")
 public class ImportMigrantsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportMigrantsFileService.class);
-    public final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.esz.migrants.cronExpression";
 
     public void run() throws Exception {
         if (!isOn())
@@ -219,43 +218,5 @@ public class ImportMigrantsService {
     private static String formRequestNumber(Long idOfOrg, Long idOfOrgVisit, Long idOfFirstRequest, Date startDate){
         return String.format("В-%s-%s/%s-%s", idOfOrg, idOfOrgVisit, (idOfFirstRequest * -1L),
                 CalendarUtils.dateShortToString(startDate));
-    }
-
-    public void scheduleSync() throws Exception {
-        String syncSchedule = RuntimeContext.getInstance().getConfigProperties().getProperty(CRON_EXPRESSION_PROPERTY, "");
-        if (syncSchedule.equals("")) {
-            return;
-        }
-        try {
-            logger.info("Scheduling import migrants service job: " + syncSchedule);
-            JobDetail job = new JobDetail("ImportMigrants", Scheduler.DEFAULT_GROUP, ImportMigrantsJob.class);
-
-            SchedulerFactory sfb = new StdSchedulerFactory();
-            Scheduler scheduler = sfb.getScheduler();
-            if (!syncSchedule.equals("")) {
-                CronTrigger trigger = new CronTrigger("ImportMigrants", Scheduler.DEFAULT_GROUP);
-                trigger.setCronExpression(syncSchedule);
-                if (scheduler.getTrigger("ImportMigrants", Scheduler.DEFAULT_GROUP)!=null) {
-                    scheduler.deleteJob("ImportMigrants", Scheduler.DEFAULT_GROUP);
-                }
-                scheduler.scheduleJob(job, trigger);
-            }
-            scheduler.start();
-        } catch(Exception e) {
-            logger.error("Failed to schedule import migrants service job:", e);
-        }
-    }
-
-    public static class ImportMigrantsJob implements Job {
-        @Override
-        public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            try {
-                RuntimeContext.getAppContext().getBean(ImportMigrantsService.class).run();
-            } catch (JobExecutionException e) {
-                throw e;
-            } catch (Exception e) {
-                logger.error("Failed to run import migrants service job:", e);
-            }
-        }
     }
 }

@@ -675,7 +675,6 @@ public class RuntimeContext implements ApplicationContextAware {
             RuntimeContext.getAppContext().getBean(SummaryCalculationService.class).scheduleSync();
 
             RuntimeContext.getAppContext().getBean(ImportMigrantsFileService.class).scheduleSync();
-            RuntimeContext.getAppContext().getBean(ImportMigrantsService.class).scheduleSync();
             //
             if (!isTestRunning()) {
                 initWSCrypto();

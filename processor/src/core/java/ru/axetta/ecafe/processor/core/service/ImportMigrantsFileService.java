@@ -38,7 +38,7 @@ public class ImportMigrantsFileService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportMigrantsFileService.class);
 
     public final String FILENAME_PROPERTY = "ecafe.processor.esz.migrants.filename";
-    public final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.esz.migrants.fileCronExpression";
+    public final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.esz.migrants.cronExpression";
 
     private final String INITIAL_SQL =
             "INSERT INTO cf_esz_migrants_requests(idofserviceclass, groupname, clientguid, visitorginn, "
@@ -50,7 +50,6 @@ public class ImportMigrantsFileService {
             return;
         loadMigrantsFile();
     }
-
 
     public static boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -183,9 +182,21 @@ public class ImportMigrantsFileService {
 
         sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[10]).getTime()))).append(", ");  // datelearnstart
         sb.append(getQuotedStr(String.valueOf(simpleDateFormat.parse(array[11]).getTime()))).append(", ");  // datelearnend
-        sb.append("'").append(getQuotedStr(array[2])).append("'").append(", "); // firstname
-        sb.append("'").append(getQuotedStr(array[1])).append("'").append(", "); // surname
-        sb.append("'").append(getQuotedStr(array[3])).append("'").append(", "); // secondname
+        if (array[2].equals("null")) {
+            sb.append("NULL, ");
+        } else {
+            sb.append("'").append(getQuotedStr(array[2])).append("'").append(", "); // firstname
+        }
+        if (array[1].equals("null")) {
+            sb.append("NULL, ");
+        } else {
+            sb.append("'").append(getQuotedStr(array[1])).append("'").append(", "); // surname
+        }
+        if (array[3].equals("null")) {
+            sb.append("NULL, ");
+        } else {
+            sb.append("'").append(getQuotedStr(array[3])).append("'").append(", "); // secondname
+        }
         sb.append(getQuotedStr(array[4]));                                      // idofesz
 
         return sb.toString();
@@ -228,6 +239,7 @@ public class ImportMigrantsFileService {
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
             try {
                 RuntimeContext.getAppContext().getBean(ImportMigrantsFileService.class).run();
+                RuntimeContext.getAppContext().getBean(ImportMigrantsService.class).run();
             } catch (JobExecutionException e) {
                 throw e;
             } catch (Exception e) {
