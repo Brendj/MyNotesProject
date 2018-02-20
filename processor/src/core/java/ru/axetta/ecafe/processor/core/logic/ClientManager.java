@@ -1561,6 +1561,7 @@ public class ClientManager {
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
+        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
