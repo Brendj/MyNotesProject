@@ -103,7 +103,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList)"
                         + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastAccRegistrySync,"
                         + " cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
-                        + " ORDER BY cfos.lastAccRegistrySync, condition");
+                        + " ORDER BY cfos.lastAccRegistrySync DESC, condition");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         logger.info("OutOfSynchronizationReport start query");
@@ -130,7 +130,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
                         object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue())),
                         object[6] == null ? "" : (String) object[6],
                         object[7] == null ? "" : (String) object[7],
-                        rowName((String) object[0]),
+                        rowName((String) object[0], object[5] == null ? "" : CalendarUtils.dateTimeToString(new Date(((BigInteger) object[5]).longValue()))),
                         (String) object[8],
                         (String) object[9],
                         (String) object[10]);
@@ -159,7 +159,7 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         return null;
     }
 
-    public Long rowName(String condition) {
+    public Long rowName(String condition, String lastAccRegistrySync) {
         if (condition.equals("more10Minutes")) {
             return 1L;
         }
@@ -172,8 +172,10 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         if (condition.equals("more3Hours")) {
             return 4L;
         }
-        if (condition.equals("other")) {
+        if (condition.equals("other") && !lastAccRegistrySync.equals("")) {
             return 4L;
+        } else if (condition.equals("other") && lastAccRegistrySync.equals("")) {
+            return 5L;
         }
         return 0L;
     }
