@@ -84,26 +84,19 @@ public class OutOfSynchronizationReportBuilder extends BasicReportForAllOrgJob.B
         }
 
         Query query = session.createSQLQuery(
-                "SELECT CASE WHEN (current_timestamp - lastfastsynctime < INTERVAL '10 minutes') "
-                        + "    THEN 'less10Minutes' WHEN (current_timestamp - lastfastsynctime > INTERVAL '10 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '30 minutes')"
-                        + "    THEN 'more10Minutes' WHEN (current_timestamp - lastfastsynctime > INTERVAL '30 minutes') AND (current_timestamp - lastfastsynctime <= INTERVAL '1 hour')"
-                        + "    THEN 'more30Minutes' WHEN ((current_timestamp - lastfastsynctime > INTERVAL '1 hour') AND"
-                        + "        (current_timestamp - lastfastsynctime <= INTERVAL '3 hours'))"
-                        + "    THEN 'more60Minutes' WHEN ((lastfastsynctime - current_timestamp > INTERVAL '3 hours'))"
-                        + "    THEN 'more3Hours'  ELSE 'other' END AS condition, cfor.idoforg,"
-                        + "  cfor.shortname, cfor.address, cfor.isworkinsummertime,"
-                        + "  cfos.lastAccRegistrySync,  cfos.clientversion,  cfos.remoteaddress, "
-                        + "  cfor.statusdetailing, cfor.introductionqueue,  cfor.district, lastFastSynctime "
-                        + " FROM cf_orgs cfor LEFT JOIN cf_synchistory cfsh ON cfor.idoforg = cfsh.idoforg "
-                        + "                  LEFT JOIN (SELECT idoforg, max(to_timestamp(syncstarttime / 1000)) AS lastfastsynctime"
-                        + "                                     FROM cf_synchistory cfs WHERE to_timestamp(syncstarttime / 1000) > DATE_TRUNC('hour', CURRENT_DATE) AND"
-                        + "                                           cfs.synctype = 1 AND idoforg IN (:idOfOrgList)"
-                        + "                                     GROUP BY idoforg) AS lastsyncbyorg ON cfsh.idoforg = lastsyncbyorg.idoforg"
-                        + " LEFT JOIN cf_orgs_sync cfos ON cfos.idoforg = cfor.idoforg"
-                        + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList)"
-                        + " GROUP BY cfor.idoforg, lastFastSynctime, cfor.shortname, cfor.address, cfor.isworkinsummertime, cfos.lastAccRegistrySync,"
-                        + " cfos.clientversion, cfos.remoteaddress, cfor.statusdetailing, cfor.introductionqueue, cfor.district"
-                        + " ORDER BY cfos.lastAccRegistrySync DESC, condition");
+        "SELECT CASE WHEN (current_timestamp - to_timestamp(lastaccregistrysync / 1000) < INTERVAL '10 minutes') "
+                + "    THEN 'less10Minutes' WHEN (current_timestamp - to_timestamp(lastaccregistrysync / 1000) > INTERVAL '10 minutes') AND (current_timestamp - to_timestamp(lastaccregistrysync / 1000) <= INTERVAL '30 minutes')"
+                + "    THEN 'more10Minutes' WHEN (current_timestamp - to_timestamp(lastaccregistrysync / 1000) > INTERVAL '30 minutes') AND (current_timestamp - to_timestamp(lastaccregistrysync / 1000) <= INTERVAL '1 hour')"
+                + "    THEN 'more30Minutes' WHEN ((current_timestamp - to_timestamp(lastaccregistrysync / 1000) > INTERVAL '1 hour') AND"
+                + "        (current_timestamp - to_timestamp(lastaccregistrysync / 1000) <= INTERVAL '3 hours'))"
+                + "    THEN 'more60Minutes' WHEN ((to_timestamp(lastaccregistrysync / 1000) - current_timestamp > INTERVAL '3 hours'))"
+                + "    THEN 'more3Hours'  ELSE 'other' END AS condition, cfor.idoforg,"
+                + "  cfor.shortname, cfor.address, cfor.isworkinsummertime,"
+                + "  cfos.lastAccRegistrySync,  cfos.clientversion,  cfos.remoteaddress, "
+                + "  cfor.statusdetailing, cfor.introductionqueue,  cfor.district "
+                + " FROM cf_orgs cfor INNER JOIN cf_orgs_sync cfos ON cfor.idoforg = cfos.idoforg "
+                + " WHERE cfor.state = 1 AND cfor.idoforg IN (:idOfOrgList) "
+                + " ORDER BY cfos.lastAccRegistrySync DESC, condition");
         query.setParameterList("idOfOrgList", idOfOrgList);
 
         logger.info("OutOfSynchronizationReport start query");
