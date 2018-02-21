@@ -72,6 +72,7 @@ public class EventNotificationService {
     public static final String TARGET_VALUES_KEY   = "targetId";
     public static final String SOURCE_ORG_VALUES_KEY   = "sourceOrgId";
     public static final String DIRECTION_VALUES_KEY   = "direction";
+    public static final String ENTER_WITH_CHECKER_VALUES_KEY   = "enterWithChecker";
 
     public static final String PARAM_ORDER_EVENT_TIME = "orderEventTime";
     public static final String PARAM_AMOUNT_PRICE = "amountPrice";
@@ -724,17 +725,42 @@ public class EventNotificationService {
         return Integer.parseInt(id);
     }
 
+    public static boolean isEnterEventWithChecker(String[] values) {
+        String id = findValueInParams(new String [] {ENTER_WITH_CHECKER_VALUES_KEY}, values);
+        return id.equals("1");
+    }
+
+    private EMPEventType getEnterEventEMPType(Client destClient, Client dataClient, Integer direction, String[] values) {
+        EMPEventType empType;
+        int type;
+        if (isEnterEventWithChecker(values)) {
+            if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
+                type = EMPEventTypeFactory.ENTER_WITH_CHECKER;
+            else
+                type = EMPEventTypeFactory.LEAVE_WITH_CHECKER;
+        }
+        else {
+            if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
+                type = EMPEventTypeFactory.ENTER_EVENT;
+            else
+                type = EMPEventTypeFactory.LEAVE_EVENT;
+        }
+        if (dataClient != null) {
+            empType = EMPEventTypeFactory.buildEvent(type, dataClient, destClient);
+        } else {
+            empType = EMPEventTypeFactory.buildEvent(type, destClient);
+        }
+        return empType;
+    }
+
     private Object getTextObject(String text, String type, Client destClient, Client dataClient, Integer direction, Client guardianClient, String[] values) {
         ISmsService smsService = runtimeContext.getSmsService();
         if(smsService instanceof EMPSmsServiceImpl) {
             EMPEventType empType = null;
             if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
-                    (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
-                if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, dataClient, destClient);
-                } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, destClient);
-                }
+                    (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY
+                    || direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
+                empType = getEnterEventEMPType(destClient, dataClient, direction, values);
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
                 if (dataClient != null) {
@@ -758,13 +784,6 @@ public class EventNotificationService {
                 }
                 if (balance != null && balance.length() > 0) {
                     empType.getParameters().put("balance", balance);
-                }
-            } else if(type.equals(NOTIFICATION_ENTER_EVENT) && direction != null &&
-                    (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
-                if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, dataClient, destClient);
-                } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient);
                 }
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {

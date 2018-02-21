@@ -41,6 +41,7 @@ CREATE INDEX cf_categoryorg_orgs_idoforg_idx ON cf_categoryorg_orgs USING btree 
 CREATE INDEX cf_menu_idoforg_idx ON cf_menu USING btree (idoforg);
 CREATE INDEX cf_menu_menudate_idx ON cf_menu USING btree (menudate);
 CREATE INDEX cf_clients_lastupdate_idx ON cf_clients USING btree (lastupdate);
+CREATE INDEX cf_org_accessories_composite_idx ON cf_org_accessories USING btree (IdOfSourceOrg, AccessoryType, AccessoryNumber);
 
 --обновление групп для задачи EP-1225
 --UPDATE cf_clientgroups SET idofclientgroup = 1100000090 WHERE groupname = 'Обучающиеся других ОО';

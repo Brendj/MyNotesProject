@@ -5381,13 +5381,16 @@ public class Processor implements SyncProcessor {
         String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(eventDate);
-        //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
+        String enterWithChecker = "0";
+        if (event.getIdOfClient() != null && event.getEventCode() == 112 && childPassChecker == null) {
+            enterWithChecker = "1"; //для определения на тип события отмечен ли вход охранником/воспитателем
+        }
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
                 guardianName, "empTime", empTime, "childPassCheckerMark", childPassCheckerMark, "childPassCheckerName",
-                childPassCheckerName};
+                childPassCheckerName, EventNotificationService.ENTER_WITH_CHECKER_VALUES_KEY, enterWithChecker};
     }
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
