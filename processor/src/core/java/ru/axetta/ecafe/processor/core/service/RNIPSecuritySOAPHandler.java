@@ -252,7 +252,7 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
                 messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_IN);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error in handle Rnip message", e);
         }
 
         return true;
