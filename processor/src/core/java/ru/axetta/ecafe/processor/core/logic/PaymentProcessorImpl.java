@@ -262,6 +262,7 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                 persistenceSession.flush();
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
+                RuntimeContext.getAppContext().getBean(PaymentNotificator.class).sendNotification(clientPayment, client, subBalanceNum);
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);

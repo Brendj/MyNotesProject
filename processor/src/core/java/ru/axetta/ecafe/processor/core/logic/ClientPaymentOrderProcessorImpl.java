@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.ClientPaymentOrder;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -125,24 +126,15 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
             if (!contragentSum.equals(clientPaymentOrder.getContragentSum())) {
                 logger.warn(
                         String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
-                //throw new IllegalArgumentException(
-                //        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
             }
+            ClientPayment clientPayment = null;
             if (clientPaymentOrder.canApplyOrderStatus(orderStatus)) {
                 clientPaymentOrder.setOrderStatus(orderStatus);
                 clientPaymentOrder.setIdOfPayment(idOfPayment);
                 persistenceSession.update(clientPaymentOrder);
                 if (ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus) {
                     Client client = clientPaymentOrder.getClient();
-                    // Ищем подходящую карту
-                    /*Card paymentCard = client.findActiveCard(persistenceSession, null);
-                    if (null == paymentCard) {
-                        // Нет карты, подходящей для зачисления платежа
-                        throw new IllegalArgumentException(String.format(
-                                "Card approaching for transfer not found, IdOfContragent == %s, IdOfClient == %s",
-                                clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
-                    }  */
-                    RuntimeContext.getFinancialOpsManager()
+                    clientPayment = RuntimeContext.getFinancialOpsManager()
                             .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client,
                                     addIdOfPayment);
                 }
@@ -151,6 +143,9 @@ public class ClientPaymentOrderProcessorImpl implements ClientPaymentOrderProces
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            if (clientPayment != null) {
+                RuntimeContext.getAppContext().getBean(PaymentNotificator.class).sendNotification(clientPayment, clientPaymentOrder.getClient(), null);
+            }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

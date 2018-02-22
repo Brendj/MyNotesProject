@@ -1650,7 +1650,7 @@ public class Processor implements SyncProcessor {
 
                     String clientVersion = (request.getClientVersion() == null ? "" : request.getClientVersion());
                     Long packet = (idOfPacket == null ? -1L : idOfPacket);
-                    if (syncHistory == null) {
+                    if (syncHistory == null && !request.getSyncType().equals(SyncType.TYPE_GET_ACC_INC)) {
                         syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
                                 request.getRemoteAddr(), request.getSyncType().getValue());
                     }

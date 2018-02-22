@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -26,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.List;
 
 @Component
 @Scope("singleton")
@@ -277,7 +274,7 @@ public class FinancialOpsManager {
             int pType = (payType == null ? ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT : payType);
             clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, pType, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
-            registerClientPayment(session, clientPayment, client);
+            registerClientPayment(session, clientPayment);
         } else {
             // TODO: логика по субсчетам
             AccountTransaction accountTransaction;
@@ -292,7 +289,7 @@ public class FinancialOpsManager {
             int pType = (payType == null ? ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT : payType);
             clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, pType, createTime,
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
-            registerSubBalance1ClientPayment(session, clientPayment, client);
+            registerSubBalance1ClientPayment(session, clientPayment);
         }
 
         return clientPayment;
@@ -308,7 +305,7 @@ public class FinancialOpsManager {
         }
     }
 
-    public void createClientPaymentWithOrder(Session session, ClientPaymentOrder clientPaymentOrder,
+    public ClientPayment createClientPaymentWithOrder(Session session, ClientPaymentOrder clientPaymentOrder,
             Client client,String addIdOfPayment) throws Exception {
         // регистрируем транзакцию и проводим по балансу
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
@@ -319,81 +316,26 @@ public class FinancialOpsManager {
         ClientPayment clientPayment = new ClientPayment(accountTransaction, clientPaymentOrder,
                 getContragentReceiverForPayments(session, client),new Date(),addIdOfPayment);
 
-        registerClientPayment(session, clientPayment, client);
+        registerClientPayment(session, clientPayment);
+        return clientPayment;
     }
 
     private void registerClientPayment(Session session,
-            ClientPayment clientPayment,
-            Client client) throws Exception {
+            ClientPayment clientPayment) throws Exception {
         Long paySum = clientPayment.getPaySum();
         Contragent payAgent = clientPayment.getContragent();
 
         getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, clientPayment.getContragentReceiver());
         session.save(clientPayment);
-
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        String empTime = df.format(clientPayment.getCreateTime());
-        Person person = DAOReadExternalsService.getInstance().findPerson(client.getPerson().getIdOfPerson());
-
-        String[] values = new String[]{
-                "paySum",CurrencyStringUtils.copecksToRubles(paySum),
-                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()),
-                "contractId",String.valueOf(client.getContractId()),
-                "surname",person.getSurname(),
-                "firstName",person.getFirstName(),
-                "empTime", empTime
-        };
-        values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
-
-        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
-
-        List<Client> guardians = DAOReadExternalsService.getInstance().findGuardiansByClient(client.getIdOfClient(), null);
-
-        if (!(guardians == null || guardians.isEmpty())) {
-            for (Client destGuardian : guardians) {
-                if (DAOReadExternalsService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
-                        client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
-                    eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
-                }
-            }
-        }
     }
 
     private void registerSubBalance1ClientPayment(Session session,
-            ClientPayment clientPayment,
-            Client client) throws Exception {
+            ClientPayment clientPayment) throws Exception {
         Long paySum = clientPayment.getPaySum();
         Contragent payAgent = clientPayment.getContragent();
 
         getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, clientPayment.getContragentReceiver());
         session.save(clientPayment);
-        final String contractId = String.valueOf(client.getContractId())+"01";
-        final Long balance = client.getSubBalance1()==null?0L:client.getSubBalance1();
-
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        String empTime = df.format(clientPayment.getCreateTime());
-
-        String[] values = new String[]{
-                "paySum",CurrencyStringUtils.copecksToRubles(paySum),
-                "balance", CurrencyStringUtils.copecksToRubles(balance),
-                "contractId", contractId,
-                "surname",client.getPerson().getSurname(),
-                "firstName",client.getPerson().getFirstName(),
-                "empTime", empTime
-        };
-        values = EventNotificationService.attachTargetIdToValues(clientPayment.getIdOfClientPayment(), values);
-        eventNotificationService.sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
-
-        List<Client> guardians = DAOReadExternalsService.getInstance().findGuardiansByClient(client.getIdOfClient(), null);
-
-        if (!(guardians == null || guardians.isEmpty())) {
-            for (Client destGuardian : guardians) {
-                if (DAOReadExternalsService.getInstance().allowedGuardianshipNotification(destGuardian.getIdOfClient(),
-                        client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
-                    eventNotificationService.sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, clientPayment.getCreateTime());
-                }
-            }
-        }
     }
 
 
