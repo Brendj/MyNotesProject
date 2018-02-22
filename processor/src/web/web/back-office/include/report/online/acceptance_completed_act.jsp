@@ -53,6 +53,13 @@
         </rich:calendar>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="false" value="Сформировать Акт по юр.лицу (весь образовательный комплекс)" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{acceptanceOfCompletedWorksActPage.showAllOrgs}"
+                                 styleClass="output-text">
+        </h:selectBooleanCheckbox>
+    </h:panelGrid>
+
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать документ" action="#{acceptanceOfCompletedWorksActPage.buildReportHTML}"
                            reRender="acceptanceOfCompletedWorksActPanel" styleClass="command-button"

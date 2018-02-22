@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            Boolean showAllOrgs = Boolean.valueOf(reportProperties.getProperty("showAllOrgs"));
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
@@ -51,26 +53,24 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
             parameterMap.put("month", month + 1);
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));
-            parameterMap.put("startDate", startTime);
-            parameterMap.put("endDate", endTime);
+            parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime) + "г.");
+            parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime) + "г.");
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap, showAllOrgs));
             Date generateEndTime = new Date();
             return new AcceptanceOfCompletedWorksAct(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
-                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
-
-            DateFormat timeFormat = new SimpleDateFormat("\"dd\" MMMM yyyy");
+                Calendar calendar, Map<String, Object> parameterMap, Boolean showAllOrgs) throws Exception {
 
             daoService = new AcceptanceOfCompletedWorksActDAOService();
             daoService.setSession(session);
 
-            List<AcceptanceOfCompletedWorksActItem> result = daoService.findAllItemsForAct(org, startTime, endTime);
+            List<AcceptanceOfCompletedWorksActItem> result = daoService.findAllItemsForAct(org, showAllOrgs);
             calendar.setTime(startTime);
 
             return new JRBeanCollectionDataSource(result);

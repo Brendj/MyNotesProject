@@ -68,9 +68,13 @@ public class OrgUtils {
                         friendlyOrganizationsInfoModelSet.add(friendlyOrganizationsInfoModel);
                     }
                 } else {
-                    FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(
-                            org.getIdOfOrg(), friendlyOrg);
-                    friendlyOrganizationsInfoModelSet.add(friendlyOrganizationsInfoModel);
+                    for (Org orgItem : friendlyOrg) {
+                        if (orgItem.isMainBuilding()) {
+                            FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel = new FriendlyOrganizationsInfoModel(
+                                    orgItem.getIdOfOrg(), orgItem.getOfficialName(), orgItem.getAddress(), friendlyOrg);
+                            friendlyOrganizationsInfoModelSet.add(friendlyOrganizationsInfoModel);
+                        }
+                    }
                 }
             }
         }

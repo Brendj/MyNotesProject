@@ -25,7 +25,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +48,8 @@ import java.util.Properties;
 public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(AcceptanceOfCompletedWorksActPage.class);
+
+    private Boolean showAllOrgs = false;
 
     private String htmlReport = null;
 
@@ -138,6 +139,7 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
         }
         AcceptanceOfCompletedWorksAct.Builder builder = new AcceptanceOfCompletedWorksAct.Builder(templateFilename);
         Properties properties = new Properties();
+        properties.put("showAllOrgs", Boolean.toString(showAllOrgs));
         builder.setReportProperties(properties);
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -210,9 +212,10 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
             return;
         }
-        Date generateTime = new Date();
+
         AcceptanceOfCompletedWorksAct.Builder builder = new AcceptanceOfCompletedWorksAct.Builder(templateFilename);
         Properties properties = new Properties();
+        properties.put("showAllOrgs", Boolean.toString(showAllOrgs));
 
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -258,6 +261,14 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public Boolean getShowAllOrgs() {
+        return showAllOrgs;
+    }
+
+    public void setShowAllOrgs(Boolean showAllOrgs) {
+        this.showAllOrgs = showAllOrgs;
     }
 
     private String buildFileName(AcceptanceOfCompletedWorksAct acceptanceOfCompletedWorksAct) {

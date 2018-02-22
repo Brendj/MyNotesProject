@@ -13,16 +13,12 @@ public class AcceptanceOfCompletedWorksActItem {
     /**
      * Дата заключения
      */
-    public String dateOfContract;
+    public String dateOfConclusion;
 
     /**
      * Номер контракта
      */
     public String numberOfContract;
-    /**
-     * Текущая дата
-     */
-    public String startDate;
 
     /**
      * Краткое наименование ОО
@@ -55,41 +51,40 @@ public class AcceptanceOfCompletedWorksActItem {
     public String dateOfClosing;
 
     /**
-     * Конец периода
-     */
-    public String endDate;
-
-    /**
      * Сумма
      */
     public String sum;
+
+    /**
+     * Должность
+     */
+    public String officialPosition;
 
     public AcceptanceOfCompletedWorksActItem() {
 
     }
 
-    public AcceptanceOfCompletedWorksActItem(String dateOfContract, String numberOfContract, String startDate,
+    public AcceptanceOfCompletedWorksActItem(String dateOfConclusion, String numberOfContract,
             String shortNameInfoService, String position, String fullName, String personUnderContract,
-            String executor, String dateOfClosing, String endDate, String sum) {
-        this.dateOfContract = dateOfContract;
+            String executor, String dateOfClosing, String sum, String officialPosition) {
+        this.dateOfConclusion = dateOfConclusion;
         this.numberOfContract = numberOfContract;
-        this.startDate = startDate;
         this.shortNameInfoService = shortNameInfoService;
         this.position = position;
         this.fullName = fullName;
         this.personUnderContract = personUnderContract;
         this.executor = executor;
         this.dateOfClosing = dateOfClosing;
-        this.endDate = endDate;
         this.sum = sum;
+        this.officialPosition = officialPosition;
     }
 
-    public String getDateOfContract() {
-        return dateOfContract;
+    public String getDateOfConclusion() {
+        return dateOfConclusion;
     }
 
-    public void setDateOfContract(String dateOfContract) {
-        this.dateOfContract = dateOfContract;
+    public void setDateOfConclusion(String dateOfConclusion) {
+        this.dateOfConclusion = dateOfConclusion;
     }
 
     public String getNumberOfContract() {
@@ -98,14 +93,6 @@ public class AcceptanceOfCompletedWorksActItem {
 
     public void setNumberOfContract(String numberOfContract) {
         this.numberOfContract = numberOfContract;
-    }
-
-    public String getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
     }
 
     public String getPosition() {
@@ -140,14 +127,6 @@ public class AcceptanceOfCompletedWorksActItem {
         this.dateOfClosing = dateOfClosing;
     }
 
-    public String getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
     public String getShortNameInfoService() {
         return shortNameInfoService;
     }
@@ -170,5 +149,13 @@ public class AcceptanceOfCompletedWorksActItem {
 
     public void setSum(String sum) {
         this.sum = sum;
+    }
+
+    public String getOfficialPosition() {
+        return officialPosition;
+    }
+
+    public void setOfficialPosition(String officialPosition) {
+        this.officialPosition = officialPosition;
     }
 }
