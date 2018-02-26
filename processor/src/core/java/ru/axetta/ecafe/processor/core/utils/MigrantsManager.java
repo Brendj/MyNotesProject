@@ -132,14 +132,23 @@ public class MigrantsManager {
                 if (!doneMigrantList.contains(migrant)) {
                     Long nextId = MigrantsUtils.nextIdOfProcessorMigrantResolutions(persistenceSession,
                             migrant.getCompositeIdOfMigrant().getIdOfOrgRegistry());
-                    CompositeIdOfVisitReqResolutionHist compositeId = new CompositeIdOfVisitReqResolutionHist(nextId,
+                    CompositeIdOfVisitReqResolutionHist compositeId1 = new CompositeIdOfVisitReqResolutionHist(nextId,
                             migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgRegistry().getIdOfOrg());
-                    VisitReqResolutionHist hist = new VisitReqResolutionHist(compositeId, migrant.getOrgRegistry(),
+                    VisitReqResolutionHist hist1 = new VisitReqResolutionHist(compositeId1, migrant.getOrgRegistry(),
                             VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
                             "Закрыта на сервере по истечению срока.", null, null,
                             VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+                    nextId--;
+                    CompositeIdOfVisitReqResolutionHist compositeId2 = new CompositeIdOfVisitReqResolutionHist(nextId,
+                            migrant.getCompositeIdOfMigrant().getIdOfRequest(), migrant.getOrgVisit().getIdOfOrg());
+                    VisitReqResolutionHist hist2 = new VisitReqResolutionHist(compositeId2, migrant.getOrgRegistry(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date(),
+                            "Закрыта на сервере по истечению срока.", null, null,
+                            VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ISPP);
+                    nextId--;
                     persistenceSession.save(migrant);
-                    persistenceSession.save(hist);
+                    persistenceSession.save(hist1);
+                    persistenceSession.save(hist2);
                 }
             }
 
