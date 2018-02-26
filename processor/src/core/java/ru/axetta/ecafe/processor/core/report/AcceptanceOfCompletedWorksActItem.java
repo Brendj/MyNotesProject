@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.report;
 
 
+import java.util.List;
+
 /**
  * Created by anvarov on 20.02.2018.
  */
@@ -60,13 +62,18 @@ public class AcceptanceOfCompletedWorksActItem {
      */
     public String officialPosition;
 
+    /**
+     * Данные для кростаба
+     */
+    public List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas;
+
     public AcceptanceOfCompletedWorksActItem() {
 
     }
 
     public AcceptanceOfCompletedWorksActItem(String dateOfConclusion, String numberOfContract,
-            String shortNameInfoService, String position, String fullName, String personUnderContract,
-            String executor, String dateOfClosing, String sum, String officialPosition) {
+            String shortNameInfoService, String position, String fullName, String personUnderContract, String executor,
+            String dateOfClosing, String sum, String officialPosition) {
         this.dateOfConclusion = dateOfConclusion;
         this.numberOfContract = numberOfContract;
         this.shortNameInfoService = shortNameInfoService;
@@ -157,5 +164,13 @@ public class AcceptanceOfCompletedWorksActItem {
 
     public void setOfficialPosition(String officialPosition) {
         this.officialPosition = officialPosition;
+    }
+
+    public List<AcceptanceOfCompletedWorksActCrossTabData> getActCrossTabDatas() {
+        return actCrossTabDatas;
+    }
+
+    public void setActCrossTabDatas(List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas) {
+        this.actCrossTabDatas = actCrossTabDatas;
     }
 }

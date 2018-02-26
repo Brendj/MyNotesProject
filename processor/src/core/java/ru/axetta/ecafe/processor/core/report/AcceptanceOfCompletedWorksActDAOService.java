@@ -96,6 +96,12 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             }
         }
 
+        List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
+        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData("Завтрак");
+        actCrossTabDatas.add(actCrossTabData);
+
+        acceptanceOfCompletedWorksActItem.setActCrossTabDatas(actCrossTabDatas);
+
         if (!res.isEmpty()) {
             result.add(acceptanceOfCompletedWorksActItem);
         }
