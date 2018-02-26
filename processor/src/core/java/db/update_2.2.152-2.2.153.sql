@@ -72,3 +72,5 @@ INSERT INTO cf_clientgroups (idoforg, idofclientgroup, groupname)
     SELECT cfc.idoforg FROM cf_clientgroups cfc LEFT JOIN cf_orgs cfo ON cfc.idoforg = cfo.idoforg
     WHERE cfo.idoforg <> 2 AND cfc.groupname IN ('Обучающиеся других ОО', 'Родители обучающихся других ОО', 'Сотрудники других ОО')
     GROUP BY cfc.idoforg)) AS org ON cfc.idoforg = org.idoforg GROUP BY cfc.idoforg;
+
+--! ФИНАЛИЗИРОВАН 26.02.2018, НЕ МЕНЯТЬ
