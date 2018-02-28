@@ -54,7 +54,9 @@ public class MigrantsManager {
      * Обертка для запуска по расписанию, для вынесения резолюций по клиенту попавшие в группу Выбывшие или Удаленные
      */
     public void checkMigrantsByClientGroup() throws Exception {
-        changeResolutionOfRequestVisitHistory();
+        if (isOn()) {
+            changeResolutionOfRequestVisitHistory();
+        }
     }
 
     private void closeOverdueMigrants() throws Exception{
