@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.MoneyInWords;
 
 import org.hibernate.Query;
 import org.slf4j.Logger;
@@ -48,17 +49,17 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             Set<FriendlyOrganizationsInfoModel> andFriendlyOrgsList = OrgUtils.getMainBuildingAndFriendlyOrgsList(getSession(), idOfOrgList);
 
             for (FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel: andFriendlyOrgsList) {
-                result = findByOrgAllItemsForActByOrgs(friendlyOrganizationsInfoModel, startTime, endDate);
+                result = findAllItemsForActByOrgs(friendlyOrganizationsInfoModel, startTime, endDate);
             }
 
         } else {
-            result = findByOrgAllItemsForAct(org.getIdOfOrg(), startTime, endDate);
+            result = findAllItemsForActByOrg(org.getIdOfOrg(), startTime, endDate);
         }
 
         return result;
     }
 
-    public List<AcceptanceOfCompletedWorksActItem> findByOrgAllItemsForActByOrgs(FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate) {
+    public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrgs(FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate) {
 
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
@@ -75,8 +76,22 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
 
-        List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDataList = findAllForCrossTabByOrgs(friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet(), startTime, endDate);
-        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(actCrossTabDataList);
+        SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrgs(friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet(), startTime, endDate);
+        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(sumPriceAndCrossTabItems.actCrossTabDatas);
+
+        Long priceWhole = sumPriceAndCrossTabItems.getSumPrice() / 100;
+        Long priceCoin = Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100);
+
+        String sumStr = priceWhole + " руб. " + priceCoin + " копеек";
+
+        String sum = (String.format("%d.%02d", sumPriceAndCrossTabItems.getSumPrice() / 100,
+                Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100)));
+
+        double sumInDouble = Double.parseDouble(sum);
+
+        sumStr = sumStr + " (" + MoneyInWords.inwords(sumInDouble) + ")";
+
+        acceptanceOfCompletedWorksActItem.setSum(sumStr);
 
         if (!res.isEmpty()) {
             result.add(acceptanceOfCompletedWorksActItem);
@@ -85,7 +100,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         return  result;
     }
 
-    public List<AcceptanceOfCompletedWorksActItem> findByOrgAllItemsForAct(Long idOfOrg, Date startTime, Date endDate) {
+    public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrg(Long idOfOrg, Date startTime, Date endDate) {
 
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
@@ -102,8 +117,22 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
 
-        List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDataList = findAllForCrossTab(idOfOrg, startTime, endDate);
-        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(actCrossTabDataList);
+        SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrg(idOfOrg, startTime, endDate);
+        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(sumPriceAndCrossTabItems.actCrossTabDatas);
+
+        Long priceWhole = sumPriceAndCrossTabItems.getSumPrice() / 100;
+        Long priceCoin = Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100);
+
+        String sumStr = priceWhole + " руб. " + priceCoin + " копеек";
+
+        String sum = (String.format("%d.%02d", sumPriceAndCrossTabItems.getSumPrice() / 100,
+                Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100)));
+
+        double sumInDouble = Double.parseDouble(sum);
+
+        sumStr = sumStr + " (" + MoneyInWords.inwords(sumInDouble) + ")";
+
+        acceptanceOfCompletedWorksActItem.setSum(sumStr);
 
         if (!res.isEmpty()) {
             result.add(acceptanceOfCompletedWorksActItem);
@@ -112,13 +141,14 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         return  result;
     }
 
-    private List<AcceptanceOfCompletedWorksActCrossTabData> findAllForCrossTab(Long idOfOrg, Date startTime, Date endTime) {
+    private SumPriceAndCrossTabItems findAllForCrossTabByOrg(Long idOfOrg, Date startTime, Date endTime) {
         List<AcceptanceOfCompletedWorksActCrossTabData> actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
+        Long sumPrice = 0L;
 
         OrderDetailsDAOService service = new OrderDetailsDAOService();
         service.setSession(getSession());
 
-        List<GoodItem> allGoods = service.findAllGoods(idOfOrg, startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+        List<GoodItem> allGoods = service.findAllGoods(idOfOrg, startTime, endTime, service.getPayPlanAndSubscriptionFeedingOrderTypes());
         allGoods.addAll(service.findAllGoods(idOfOrg, startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
         if (allGoods.isEmpty()) {
@@ -131,21 +161,26 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             boolean flag  = true;
 
             for (GoodItem goodItem: allGoods) {
-                Long val = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName());
-                Long valDaily = service.buildRegisterStampDailySampleValue(idOfOrg, startTime, endTime, goodItem.getFullName());
 
-                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "школа", String.valueOf(val + valDaily));
-                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(val + valDaily));
+                SumQtyAndPriceItem sumQtyAndPriceItem  = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "школа", String.valueOf(sumQtyAndPriceItem.getSumQty()));
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(sumQtyAndPriceItem.getSumQty()));
                 actItems.add(actCrossTabDataSc);
                 actItems.add(actCrossTabDataCh);
+
+                sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                 if (goodItem.getOrderType().equals(1)) {
 
                     flag = false;
 
-                    Long val1 = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName());
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(val1));
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(val1));
+                    SumQtyAndPriceItem sumQtyAndPriceItem1 = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                    sumPrice += sumQtyAndPriceItem.getSumPrice();
+
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
                     actItems.add(actCrossTabDataScW);
                     actItems.add(actCrossTabDataChW);
                 }
@@ -156,10 +191,10 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             }
         }
 
-        return actItems;
+        return new SumPriceAndCrossTabItems(actItems, sumPrice);
     }
 
-    private List<AcceptanceOfCompletedWorksActCrossTabData> findAllForCrossTabByOrgs(Set<Org> friendlyOrganizationsSet, Date startTime, Date endTime) {
+    private SumPriceAndCrossTabItems findAllForCrossTabByOrgs(Set<Org> friendlyOrganizationsSet, Date startTime, Date endTime) {
 
         List<Long> idOfOrgList = new ArrayList<Long>();
 
@@ -169,10 +204,12 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         List<AcceptanceOfCompletedWorksActCrossTabData> actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
 
+        Long sumPrice = 0L;
+
         OrderDetailsDAOService service = new OrderDetailsDAOService();
         service.setSession(getSession());
 
-        List<GoodItem> allGoods = service.findAllGoods(idOfOrgList, startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+        List<GoodItem> allGoods = service.findAllGoods(idOfOrgList, startTime, endTime, service.getPayPlanAndSubscriptionFeedingOrderTypes());
         allGoods.addAll(service.findAllGoods(idOfOrgList, startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
 
         if (allGoods.isEmpty()) {
@@ -185,21 +222,24 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             boolean flag  = true;
 
             for (GoodItem goodItem: allGoods) {
-                Long val = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName());
-                Long valDaily = service.buildRegisterStampDailySampleValueByOrgs(idOfOrgList, startTime, endTime, goodItem.getFullName());
 
-                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "школа", String.valueOf(val + valDaily));
-                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(val + valDaily));
+                SumQtyAndPriceItem sumQtyAndPriceItem = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "школа", String.valueOf(sumQtyAndPriceItem));
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(sumQtyAndPriceItem));
                 actItems.add(actCrossTabDataSc);
                 actItems.add(actCrossTabDataCh);
+
+                sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                 if (goodItem.getOrderType().equals(1)) {
 
                     flag = false;
 
-                    Long val1 = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName());
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(val1));
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(val1));
+                    SumQtyAndPriceItem sumQtyAndPriceItem1 = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
                     actItems.add(actCrossTabDataScW);
                     actItems.add(actCrossTabDataChW);
                 }
@@ -211,7 +251,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         }
 
-        return actItems;
+        return new SumPriceAndCrossTabItems(actItems, sumPrice);
     }
 
     public void setWaterValueByFlag(List<AcceptanceOfCompletedWorksActCrossTabData> actItems) {
@@ -252,5 +292,36 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         }
 
         return acceptanceOfCompletedWorksActItem;
+    }
+
+    public class SumPriceAndCrossTabItems  {
+        private List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas;
+
+        private Long sumPrice;
+
+        public SumPriceAndCrossTabItems() {
+        }
+
+        public SumPriceAndCrossTabItems(List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas,
+                Long sumPrice) {
+            this.actCrossTabDatas = actCrossTabDatas;
+            this.sumPrice = sumPrice;
+        }
+
+        public List<AcceptanceOfCompletedWorksActCrossTabData> getActCrossTabDatas() {
+            return actCrossTabDatas;
+        }
+
+        public void setActCrossTabDatas(List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas) {
+            this.actCrossTabDatas = actCrossTabDatas;
+        }
+
+        public Long getSumPrice() {
+            return sumPrice;
+        }
+
+        public void setSumPrice(Long sumPrice) {
+            this.sumPrice = sumPrice;
+        }
     }
 }

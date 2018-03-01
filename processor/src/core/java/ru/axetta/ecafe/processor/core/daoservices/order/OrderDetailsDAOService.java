@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
+import ru.axetta.ecafe.processor.core.report.SumQtyAndPriceItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
@@ -106,9 +107,9 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public Long buildRegisterStampBodyValue(Long idOfOrg, Date start, Date end, String fullname) {
+    public SumQtyAndPriceItem buildRegisterStampBodyValue(Long idOfOrg, Date start, Date end, String fullname, Set orderTypes) {
         // todo привести к единому виду способ отнесения заказа к льготной или платной группе
-        String sql ="select sum(orderdetail.qty) "
+        String sql ="select sum(orderdetail.qty), (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) as sumPrice "
                 + " from cf_orders cforder "
                 + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
                 + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
@@ -121,25 +122,34 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and good.fullname like '"+fullname+"' "
                 + "     and orderdetail.menutype>=:mintype "
                 + "     and orderdetail.menutype<=:maxtype "
-                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8)) ";
+                + "     and (cforder.ordertype in (:orderType)) "
+                + " group by orderdetail.qty, (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate", end.getTime());
+        query.setParameterList("orderType", orderTypes);
         List list = query.list();
+
+        SumQtyAndPriceItem sumQtyAndPriceItem = null;
+
         if(list==null || list.isEmpty() || list.get(0)==null){
-            return  0L;
+            return new SumQtyAndPriceItem(0L, 0L);
         } else {
-            return new Long(list.get(0).toString());
+            for (Object o : list) {
+                Object[] objList = (Object[]) o;
+                sumQtyAndPriceItem = new SumQtyAndPriceItem(((BigInteger) objList[0]).longValue(), ((BigInteger) objList[1]).longValue());
+            }
+            return sumQtyAndPriceItem;
         }
     }
 
     @SuppressWarnings("unchecked")
-    public Long buildRegisterStampBodyValueByOrgList(List<Long> idOfOrgList, Date start, Date end, String fullname) {
+    public SumQtyAndPriceItem buildRegisterStampBodyValueByOrgList(List<Long> idOfOrgList, Date start, Date end, String fullname, Set orderTypes) {
         // todo привести к единому виду способ отнесения заказа к льготной или платной группе
-        String sql ="select sum(orderdetail.qty) "
+        String sql ="select sum(orderdetail.qty), (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) as sumPrice "
                 + " from cf_orders cforder "
                 + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
                 + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
@@ -152,18 +162,27 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and good.fullname like '"+fullname+"' "
                 + "     and orderdetail.menutype>=:mintype "
                 + "     and orderdetail.menutype<=:maxtype "
-                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8)) ";
+                + "     and (cforder.ordertype in (:orderType)) "
+                + " group by orderdetail.qty, (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameterList("idoforg",idOfOrgList);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate", end.getTime());
+        query.setParameterList("orderType", orderTypes);
         List list = query.list();
-        if(list==null || list.isEmpty() || list.get(0)==null){
-            return  0L;
+
+        SumQtyAndPriceItem sumQtyAndPriceItem = null;
+
+        if (list == null || list.isEmpty() || list.get(0) == null) {
+            return new SumQtyAndPriceItem(0L, 0L);
         } else {
-            return new Long(list.get(0).toString());
+            for (Object o : list) {
+                Object[] objList = (Object[]) o;
+                sumQtyAndPriceItem = new SumQtyAndPriceItem(((BigInteger) objList[0]).longValue(), ((BigInteger) objList[1]).longValue());
+            }
+            return sumQtyAndPriceItem;
         }
     }
 
@@ -180,31 +199,6 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " cforder.ordertype in (5) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
-        query.setParameter("startDate",start.getTime());
-        query.setParameter("endDate",end.getTime());
-        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
-        Object res = query.uniqueResult();
-        if (res==null) {
-            return 0L;
-        } else {
-            return ((BigInteger) res).longValue();
-        }
-    }
-
-    /* Подсчет суточной пробы для льготного питания для списка организаций*/
-    @SuppressWarnings("unchecked")
-    public Long buildRegisterStampDailySampleValueByOrgs(List<Long> idOfOrgList, Date start, Date end, String fullname) {
-        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
-                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
-                "   and orderdetail.idoforder = cforder.idoforder" +
-                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
-                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " cforder.idoforg in (:idoforgList) and good.fullname like '"+fullname+"' and" +
-                " cforder.ordertype in (5) ";
-        Query query = getSession().createSQLQuery(sql);
-        query.setParameterList("idoforgList",idOfOrgList);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate",end.getTime());
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
@@ -443,6 +437,13 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.RECYCLING_RETIONS);
         //orderTypeEnumTypeSet.add(OrderTypeEnumType.WATER_ACCOUNTING);
+        return orderTypeEnumTypeSet;
+    }
+
+    public Set<OrderTypeEnumType> getPayPlanAndSubscriptionFeedingOrderTypes() {
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.PAY_PLAN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING);
         return orderTypeEnumTypeSet;
     }
 
