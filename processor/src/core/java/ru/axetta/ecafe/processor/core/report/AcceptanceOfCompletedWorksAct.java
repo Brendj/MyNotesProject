@@ -36,10 +36,12 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
     public static class Builder extends BasicReportJob.Builder {
 
         private final String templateFilename;
+        private final String subReportDir;
         private AcceptanceOfCompletedWorksActDAOService daoService;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
+            subReportDir = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
         }
 
         @Override
@@ -56,6 +58,8 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime) + "г.");
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime) + "г.");
+            parameterMap.put("currentDate", CalendarUtils.dateShortToStringFullYear(new Date()) + "г.");
+            parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
@@ -71,7 +75,7 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
             daoService = new AcceptanceOfCompletedWorksActDAOService();
             daoService.setSession(session);
 
-            List<AcceptanceOfCompletedWorksActItem> result = daoService.findAllItemsForAct(org, showAllOrgs);
+            List<AcceptanceOfCompletedWorksActItem> result = daoService.findAllItemsForAct(org, showAllOrgs, startTime, endTime);
             calendar.setTime(startTime);
 
             return new JRBeanCollectionDataSource(result);

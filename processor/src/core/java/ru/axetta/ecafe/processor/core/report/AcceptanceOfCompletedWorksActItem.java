@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,7 +66,7 @@ public class AcceptanceOfCompletedWorksActItem {
     /**
      * Данные для кростаба
      */
-    public List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas;
+    public List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDataList = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
 
     public AcceptanceOfCompletedWorksActItem() {
 
@@ -166,11 +167,11 @@ public class AcceptanceOfCompletedWorksActItem {
         this.officialPosition = officialPosition;
     }
 
-    public List<AcceptanceOfCompletedWorksActCrossTabData> getActCrossTabDatas() {
-        return actCrossTabDatas;
+    public List<AcceptanceOfCompletedWorksActCrossTabData> getActCrossTabDataList() {
+        return actCrossTabDataList;
     }
 
-    public void setActCrossTabDatas(List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas) {
-        this.actCrossTabDatas = actCrossTabDatas;
+    public void setActCrossTabDataList(List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDataList) {
+        this.actCrossTabDataList = actCrossTabDataList;
     }
 }

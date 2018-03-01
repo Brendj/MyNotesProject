@@ -2,9 +2,13 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksAct" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="490" leftMargin="63" rightMargin="42" topMargin="56" bottomMargin="56" uuid="404814b1-5f24-4b2e-8e51-2f435162edde">
 	<property name="ireport.zoom" value="1.100000000000001"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="372"/>
+	<property name="ireport.y" value="480"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\workspace\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="currentDate" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[]]>
 	</queryString>
@@ -18,7 +22,7 @@
 	<field name="dateOfClosing" class="java.lang.String"/>
 	<field name="sum" class="java.lang.String"/>
 	<field name="officialPosition" class="java.lang.String"/>
-	<field name="actCrossTabDatas" class="java.util.List"/>
+	<field name="actCrossTabDataList" class="java.util.List"/>
 	<detail>
 		<band height="695" splitType="Stretch">
 			<staticText>
@@ -40,7 +44,7 @@
 				<textElement textAlignment="Right">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{currentDate}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="60faf0dc-8a37-4b47-a845-6f24e21f257e" x="0" y="286" width="490" height="112"/>
@@ -357,14 +361,14 @@
 				<textFieldExpression><![CDATA["Исполнитель: "]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="091b42db-9d8c-41fa-9751-61321ce4fd6c" x="0" y="156" width="490" height="35"/>
+				<reportElement uuid="091b42db-9d8c-41fa-9751-61321ce4fd6c" x="0" y="132" width="490" height="35"/>
 				<textElement textAlignment="Justified" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
 				<text><![CDATA[4. Сведения о сопутствующих услугах (если предусмотрены Контрактом): ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="67667692-0f63-417b-b725-7efd00a7b2c2" x="0" y="191" width="490" height="30"/>
+				<reportElement uuid="67667692-0f63-417b-b725-7efd00a7b2c2" x="0" y="167" width="490" height="30"/>
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
@@ -397,7 +401,7 @@
 				<text><![CDATA[Качество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2a8567ad-2db1-4ea6-b912-31b952554741" x="161" y="0" width="289" height="40"/>
+				<reportElement uuid="2a8567ad-2db1-4ea6-b912-31b952554741" x="160" y="0" width="290" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -409,7 +413,7 @@
 				<text><![CDATA[Количество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3e746c30-81f7-4a6c-adc1-8f099c3b19c9" x="140" y="0" width="21" height="40"/>
+				<reportElement uuid="3e746c30-81f7-4a6c-adc1-8f099c3b19c9" x="140" y="0" width="20" height="40"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -421,7 +425,7 @@
 				<text><![CDATA[Ед.изм.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="908cb22c-de7b-4c63-830e-c2000f7256f5" x="450" y="40" width="40" height="116"/>
+				<reportElement uuid="908cb22c-de7b-4c63-830e-c2000f7256f5" x="450" y="40" width="40" height="80"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -433,7 +437,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="65637cc3-557f-4f56-9b3b-85e20a4210ad" x="140" y="40" width="21" height="116"/>
+				<reportElement uuid="65637cc3-557f-4f56-9b3b-85e20a4210ad" x="140" y="40" width="20" height="80"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -445,7 +449,7 @@
 				<text><![CDATA[шт.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a331012b-54e8-4c1a-9da6-1dbcde1c3bcc" x="0" y="40" width="140" height="116"/>
+				<reportElement uuid="a331012b-54e8-4c1a-9da6-1dbcde1c3bcc" x="0" y="40" width="140" height="80"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -458,6 +462,11 @@
 				</textElement>
 				<text><![CDATA[Услуга по организации питания и обеспечению питьевого режима обучающихся]]></text>
 			</staticText>
+			<subreport>
+				<reportElement uuid="49338217-6179-47ed-aebc-ef618232f238" positionType="Float" x="160" y="40" width="290" height="80"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{actCrossTabDataList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "AcceptanceOfCompletedWorksActSubreport.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</detail>
 </jasperReport>

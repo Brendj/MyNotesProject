@@ -105,6 +105,68 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyValue(Long idOfOrg, Date start, Date end, String fullname) {
+        // todo привести к единому виду способ отнесения заказа к льготной или платной группе
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg=:idoforg "
+                + "     and good.fullname like '"+fullname+"' "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8)) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",start.getTime());
+        query.setParameter("endDate", end.getTime());
+        List list = query.list();
+        if(list==null || list.isEmpty() || list.get(0)==null){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyValueByOrgList(List<Long> idOfOrgList, Date start, Date end, String fullname) {
+        // todo привести к единому виду способ отнесения заказа к льготной или платной группе
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg in (:idoforg) "
+                + "     and good.fullname like '"+fullname+"' "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8)) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameterList("idoforg",idOfOrgList);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",start.getTime());
+        query.setParameter("endDate", end.getTime());
+        List list = query.list();
+        if(list==null || list.isEmpty() || list.get(0)==null){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
     /* Подсчет суточной пробы для льготного питания*/
     @SuppressWarnings("unchecked")
     public Long buildRegisterStampDailySampleValue(Long idOfOrg, Date start, Date end, String fullname) {
@@ -118,6 +180,31 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " cforder.ordertype in (5) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
+        query.setParameter("startDate",start.getTime());
+        query.setParameter("endDate",end.getTime());
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigInteger) res).longValue();
+        }
+    }
+
+    /* Подсчет суточной пробы для льготного питания для списка организаций*/
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampDailySampleValueByOrgs(List<Long> idOfOrgList, Date start, Date end, String fullname) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " cforder.idoforg in (:idoforgList) and good.fullname like '"+fullname+"' and" +
+                " cforder.ordertype in (5) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameterList("idoforgList",idOfOrgList);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate",end.getTime());
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
@@ -182,6 +269,37 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Query query = getSession().createQuery(sql);
         query.setParameterList("orderType", orderTypes);
         query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
+        return  (List<GoodItem>) query.list();
+    }
+
+    /* получаем список всех товаров для льготного питания по списку организаций */
+    @SuppressWarnings("unchecked")
+    public List<GoodItem> findAllGoods(List<Long> idOfOrgList, Date startTime, Date endTime, Set orderTypes){
+        String sql = "select distinct good.globalId as globalId, "
+                + "     good.parts as parts, "
+                + "     good.fullName as fullName, "
+                + "     case ord.orderType when 10 then 1 else 0 end as orderType "
+                + " from OrderDetail details "
+                + "     left join details.good good "
+                + "     left join details.order ord "
+                + "     left join ord.org o "
+                + " where ord.state=0 "
+                + "     and details.state=0 "
+                + "     and ord.orderType in :orderType "
+                + "     and details.good is not null "
+                + "     and o.idOfOrg in (:idOfOrg) "
+                + "     and ord.createTime between :startDate and :endDate "
+                + "     and details.menuType >= :mintype "
+                + "     and details.menuType <=:maxtype "
+                + " order by fullName";
+        Query query = getSession().createQuery(sql);
+        query.setParameterList("orderType", orderTypes);
+        query.setParameterList("idOfOrg",idOfOrgList);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate",startTime);

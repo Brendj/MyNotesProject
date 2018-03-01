@@ -14,7 +14,23 @@ public class AcceptanceOfCompletedWorksActCrossTabData {
      */
     public String goodName;
 
+    /**
+     * Наименование образовательного учреждения
+     */
+    private String education;
+
+    /**
+     * Сумма
+     */
+    private String sum;
+
     public AcceptanceOfCompletedWorksActCrossTabData() {
+    }
+
+    public AcceptanceOfCompletedWorksActCrossTabData(String goodName, String education, String sum) {
+        this.goodName = goodName;
+        this.education = education;
+        this.sum = sum;
     }
 
     public AcceptanceOfCompletedWorksActCrossTabData(String goodName) {
@@ -29,4 +45,19 @@ public class AcceptanceOfCompletedWorksActCrossTabData {
         this.goodName = goodName;
     }
 
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public String getSum() {
+        return sum;
+    }
+
+    public void setSum(String sum) {
+        this.sum = sum;
+    }
 }

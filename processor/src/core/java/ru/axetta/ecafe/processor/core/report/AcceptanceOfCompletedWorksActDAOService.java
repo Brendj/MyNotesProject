@@ -6,6 +6,9 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -34,7 +37,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         return RuntimeContext.getAppContext().getBean(AcceptanceOfCompletedWorksActDAOService.class);
     }
 
-    public List<AcceptanceOfCompletedWorksActItem> findAllItemsForAct(BasicReportJob.OrgShortItem org, Boolean showAllOrgs) {
+    public List<AcceptanceOfCompletedWorksActItem> findAllItemsForAct(BasicReportJob.OrgShortItem org, Boolean showAllOrgs, Date startTime, Date endDate) {
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
         if (showAllOrgs) {
@@ -45,16 +48,44 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             Set<FriendlyOrganizationsInfoModel> andFriendlyOrgsList = OrgUtils.getMainBuildingAndFriendlyOrgsList(getSession(), idOfOrgList);
 
             for (FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel: andFriendlyOrgsList) {
-                result = findByOrgAllItemsForAct(friendlyOrganizationsInfoModel.getIdOfOrg());
+                result = findByOrgAllItemsForActByOrgs(friendlyOrganizationsInfoModel, startTime, endDate);
             }
+
         } else {
-            result = findByOrgAllItemsForAct(org.getIdOfOrg());
+            result = findByOrgAllItemsForAct(org.getIdOfOrg(), startTime, endDate);
         }
 
         return result;
     }
 
-    public List<AcceptanceOfCompletedWorksActItem> findByOrgAllItemsForAct(Long idOfOrg) {
+    public List<AcceptanceOfCompletedWorksActItem> findByOrgAllItemsForActByOrgs(FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate) {
+
+        List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
+
+        Query query = getSession().createSQLQuery("SELECT contractnumber, dateofconclusion, "
+                + "shortnameinfoservice, contragentname, dateOfClosing, officialposition, "
+                + " (cfp.surname || ' ' || cfp.firstname || ' ' || cfp.secondname) AS fullname, "
+                + " cfp.surname,  cfp.firstname,  cfp.secondname "
+                + " FROM cf_contracts cfc LEFT JOIN cf_orgs cfo ON cfc.idofcontract = cfo.idofcontract "
+                + " LEFT JOIN CF_Contragents cfco ON cfco.IdOfContragent = cfc.IdOfContragent "
+                + " LEFT JOIN cf_persons cfp ON cfp.idofperson = cfo.IdOfOfficialPerson "
+                + " WHERE cfo.idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", friendlyOrganizationsInfoModel.getIdOfOrg());
+        List res = query.list();
+
+        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
+
+        List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDataList = findAllForCrossTabByOrgs(friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet(), startTime, endDate);
+        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(actCrossTabDataList);
+
+        if (!res.isEmpty()) {
+            result.add(acceptanceOfCompletedWorksActItem);
+        }
+
+        return  result;
+    }
+
+    public List<AcceptanceOfCompletedWorksActItem> findByOrgAllItemsForAct(Long idOfOrg, Date startTime, Date endDate) {
 
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
@@ -69,6 +100,130 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         query.setParameter("idOfOrg", idOfOrg);
         List res = query.list();
 
+        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
+
+        List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDataList = findAllForCrossTab(idOfOrg, startTime, endDate);
+        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(actCrossTabDataList);
+
+        if (!res.isEmpty()) {
+            result.add(acceptanceOfCompletedWorksActItem);
+        }
+
+        return  result;
+    }
+
+    private List<AcceptanceOfCompletedWorksActCrossTabData> findAllForCrossTab(Long idOfOrg, Date startTime, Date endTime) {
+        List<AcceptanceOfCompletedWorksActCrossTabData> actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
+
+        OrderDetailsDAOService service = new OrderDetailsDAOService();
+        service.setSession(getSession());
+
+        List<GoodItem> allGoods = service.findAllGoods(idOfOrg, startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+        allGoods.addAll(service.findAllGoods(idOfOrg, startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+
+        if (allGoods.isEmpty()) {
+            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", "0");
+            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", "0");
+            actItems.add(actCrossTabDataSc);
+            actItems.add(actCrossTabDataCh);
+        } else {
+
+            boolean flag  = true;
+
+            for (GoodItem goodItem: allGoods) {
+                Long val = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName());
+                Long valDaily = service.buildRegisterStampDailySampleValue(idOfOrg, startTime, endTime, goodItem.getFullName());
+
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "школа", String.valueOf(val + valDaily));
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(val + valDaily));
+                actItems.add(actCrossTabDataSc);
+                actItems.add(actCrossTabDataCh);
+
+                if (goodItem.getOrderType().equals(1)) {
+
+                    flag = false;
+
+                    Long val1 = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName());
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(val1));
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(val1));
+                    actItems.add(actCrossTabDataScW);
+                    actItems.add(actCrossTabDataChW);
+                }
+            }
+
+            if (flag) {
+                setWaterValueByFlag(actItems);
+            }
+        }
+
+        return actItems;
+    }
+
+    private List<AcceptanceOfCompletedWorksActCrossTabData> findAllForCrossTabByOrgs(Set<Org> friendlyOrganizationsSet, Date startTime, Date endTime) {
+
+        List<Long> idOfOrgList = new ArrayList<Long>();
+
+        for (Org org: friendlyOrganizationsSet) {
+            idOfOrgList.add(org.getIdOfOrg());
+        }
+
+        List<AcceptanceOfCompletedWorksActCrossTabData> actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
+
+        OrderDetailsDAOService service = new OrderDetailsDAOService();
+        service.setSession(getSession());
+
+        List<GoodItem> allGoods = service.findAllGoods(idOfOrgList, startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
+        allGoods.addAll(service.findAllGoods(idOfOrgList, startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+
+        if (allGoods.isEmpty()) {
+            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", "0");
+            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", "0");
+            actItems.add(actCrossTabDataSc);
+            actItems.add(actCrossTabDataCh);
+        } else {
+
+            boolean flag  = true;
+
+            for (GoodItem goodItem: allGoods) {
+                Long val = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName());
+                Long valDaily = service.buildRegisterStampDailySampleValueByOrgs(idOfOrgList, startTime, endTime, goodItem.getFullName());
+
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "школа", String.valueOf(val + valDaily));
+                AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(val + valDaily));
+                actItems.add(actCrossTabDataSc);
+                actItems.add(actCrossTabDataCh);
+
+                if (goodItem.getOrderType().equals(1)) {
+
+                    flag = false;
+
+                    Long val1 = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName());
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(val1));
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(val1));
+                    actItems.add(actCrossTabDataScW);
+                    actItems.add(actCrossTabDataChW);
+                }
+            }
+
+            if (flag) {
+                setWaterValueByFlag(actItems);
+            }
+
+        }
+
+        return actItems;
+    }
+
+    public void setWaterValueByFlag(List<AcceptanceOfCompletedWorksActCrossTabData> actItems) {
+        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                "Вода питьевая", "школа", "0");
+        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(
+                "Вода питьевая", "д/сад", "0");
+        actItems.add(actCrossTabDataSc);
+        actItems.add(actCrossTabDataCh);
+    }
+
+    public AcceptanceOfCompletedWorksActItem fooBar(List<Object> res) {
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = new AcceptanceOfCompletedWorksActItem();
 
         for (Object o : res) {
@@ -96,16 +251,6 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             }
         }
 
-        List<AcceptanceOfCompletedWorksActCrossTabData> actCrossTabDatas = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
-        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData("Завтрак");
-        actCrossTabDatas.add(actCrossTabData);
-
-        acceptanceOfCompletedWorksActItem.setActCrossTabDatas(actCrossTabDatas);
-
-        if (!res.isEmpty()) {
-            result.add(acceptanceOfCompletedWorksActItem);
-        }
-
-        return  result;
+        return acceptanceOfCompletedWorksActItem;
     }
 }
