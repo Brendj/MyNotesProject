@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksAct" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="490" leftMargin="63" rightMargin="42" topMargin="56" bottomMargin="56" uuid="404814b1-5f24-4b2e-8e51-2f435162edde">
 	<property name="ireport.zoom" value="1.100000000000001"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="480"/>
+	<property name="ireport.y" value="1008"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -147,7 +147,7 @@
 						<rightPen lineWidth="0.5"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Calibri"/>
+						<font fontName="Times New Roman"/>
 					</textElement>
 					<text><![CDATA[Услуга по организации питания и обеспечению питьевого режима обучающихся]]></text>
 				</staticText>
@@ -164,7 +164,7 @@
 				<staticText>
 					<reportElement uuid="10865654-ded8-452d-9f58-4d03ce93bbad" x="0" y="0" width="125" height="98"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Calibri"/>
+						<font fontName="Times New Roman"/>
 					</textElement>
 					<text><![CDATA[шт.]]></text>
 				</staticText>
@@ -181,7 +181,7 @@
 				<staticText>
 					<reportElement uuid="7cc82c04-1aac-487b-8bac-62ff5f33b3fb" x="0" y="0" width="125" height="98"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Calibri"/>
+						<font fontName="Times New Roman"/>
 					</textElement>
 					<text><![CDATA[Количество-в соответствии с заявками Заказчика]]></text>
 				</staticText>
@@ -198,7 +198,7 @@
 				<staticText>
 					<reportElement uuid="71c1ff7b-b0d3-4c9e-b957-0d6f482cdadc" x="0" y="0" width="115" height="98"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="Calibri"/>
+						<font fontName="Times New Roman"/>
 					</textElement>
 					<text><![CDATA[Требования к качеству услуг определено требованиями Договора и Технического задания (в т.ч. Требованиями к качеству пищевых продуктов)]]></text>
 				</staticText>
@@ -272,7 +272,9 @@
 			</staticText>
 			<textField>
 				<reportElement uuid="a1056d51-ce3c-4992-a499-dec1fd039278" x="245" y="591" width="245" height="20"/>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["м.п."]]></textFieldExpression>
 			</textField>
 			<staticText>
@@ -288,7 +290,9 @@
 			</staticText>
 			<textField>
 				<reportElement uuid="a8f01b0b-380c-49b0-ba35-e72d86950716" x="0" y="571" width="245" height="20"/>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["«__» ___________ 201___г. "]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -300,7 +304,9 @@
 			</textField>
 			<textField>
 				<reportElement uuid="560686ac-3e74-42a7-8795-c6b7d69d02a0" x="0" y="551" width="245" height="20"/>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["______________ /" + $F{fullName} + "/"]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -312,7 +318,9 @@
 			</textField>
 			<textField>
 				<reportElement uuid="b2249fda-dd2a-4edf-8281-411bbdf0a1a6" x="0" y="591" width="245" height="20"/>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["м.п."]]></textFieldExpression>
 			</textField>
 			<staticText>
@@ -331,7 +339,9 @@
 			</textField>
 			<textField>
 				<reportElement uuid="41e16af4-dc6a-4ec1-88c6-0b24667ce5ed" x="245" y="571" width="245" height="20"/>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["«__» ____________ 201__г."]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -343,7 +353,9 @@
 			</textField>
 			<textField>
 				<reportElement uuid="3e64f939-2ea1-4bc7-9025-8da58f137ca3" x="245" y="551" width="245" height="20"/>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["_______________/ ____________/"]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -383,7 +395,9 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<text><![CDATA[Наименование]]></text>
 			</staticText>
 			<staticText>
@@ -409,7 +423,9 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<text><![CDATA[Количество]]></text>
 			</staticText>
 			<staticText>
@@ -421,7 +437,9 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<text><![CDATA[Ед.изм.]]></text>
 			</staticText>
 			<staticText>
@@ -433,7 +451,9 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
@@ -445,7 +465,9 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
 				<text><![CDATA[шт.]]></text>
 			</staticText>
 			<staticText>
@@ -458,6 +480,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
 					<paragraph leftIndent="20"/>
 				</textElement>
 				<text><![CDATA[Услуга по организации питания и обеспечению питьевого режима обучающихся]]></text>
