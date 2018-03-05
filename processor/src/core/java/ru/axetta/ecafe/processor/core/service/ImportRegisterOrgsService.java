@@ -179,6 +179,11 @@ public class ImportRegisterOrgsService {
                     }
                     addToShortname++;
                     friendlyOrgs.add(org); //все созданные организации загоняем в список, чтобы ниже связать их как дружественные
+
+                    if (!org.getType().equals(OrganizationType.SUPPLIER)) {
+                        createPredefinedClientGroupsForOrg(session, org.getIdOfOrg());
+                    }
+
                     session.persist(org);
                 }
             }
@@ -241,6 +246,16 @@ public class ImportRegisterOrgsService {
         org.setPhotoRegistryDirective(PhotoRegistryDirective.DISALLOWED);
 
         return org;
+    }
+
+    public void createPredefinedClientGroupsForOrg(Session persistenceSession, Long idOfOrg) {
+        ClientGroup.Predefined[] predefineds = ClientGroup.Predefined.values();
+
+        for (ClientGroup.Predefined predefined: predefineds) {
+            if (!predefined.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE) && !predefined.equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN)) {
+                DAOUtils.createClientGroup(persistenceSession, idOfOrg, predefined);
+            }
+        }
     }
 
     protected void modifyOrg(OrgRegistryChange orgRegistryChange, Session session, List<Long> buildingsList, Set<String> fieldFlags)
