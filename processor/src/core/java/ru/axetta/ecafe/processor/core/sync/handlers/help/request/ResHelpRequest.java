@@ -22,7 +22,7 @@ public class ResHelpRequest implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ResHelpRequests");
         for (ResHelpRequestItem item : this.getItems()) {
-            element.appendChild(item.toElement(document, "RHR"));
+            element.appendChild(item.toResElement(document, "RHR"));
         }
         return element;
     }

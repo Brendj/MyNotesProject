@@ -722,8 +722,8 @@ public class Processor implements SyncProcessor {
         try {
             HelpRequest helpRequest = request.getHelpRequest();
             if (helpRequest != null) {
-                resHelpRequest = processHelpRequest(helpRequest);
                 helpRequestData = processHelpRequestData(helpRequest);
+                resHelpRequest = processHelpRequest(helpRequest);
             }
         } catch (Exception e) {
             String message = String.format("processHelpRequest: %s", e.getMessage());
@@ -5740,8 +5740,8 @@ public class Processor implements SyncProcessor {
         try {
             HelpRequest helpRequest = request.getHelpRequest();
             if (helpRequest != null) {
-                resHelpRequest = processHelpRequest(helpRequest);
                 helpRequestData = processHelpRequestData(helpRequest);
+                resHelpRequest = processHelpRequest(helpRequest);
             }
         } catch (Exception e) {
             String message = String.format("processHelpRequest: %s", e.getMessage());
@@ -5768,11 +5768,11 @@ public class Processor implements SyncProcessor {
         try {
             HelpRequest helpRequest = request.getHelpRequest();
             if (null != helpRequest) {
-                ResHelpRequest resHelpRequest = processHelpRequest(helpRequest);
-                addToResponseSections(resHelpRequest, responseSections);
-
                 HelpRequestData helpRequestData = processHelpRequestData(helpRequest);
                 addToResponseSections(helpRequestData, responseSections);
+
+                ResHelpRequest resHelpRequest = processHelpRequest(helpRequest);
+                addToResponseSections(resHelpRequest, responseSections);
             }
         } catch (Exception e) {
             String message = String.format("fullProcessingHelpRequests: %s", e.getMessage());

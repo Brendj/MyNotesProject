@@ -4,13 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.help.request;
 
-import ru.axetta.ecafe.processor.core.persistence.HelpRequest;
 import ru.axetta.ecafe.processor.core.persistence.HelpRequestStatusEnumType;
 import ru.axetta.ecafe.processor.core.persistence.HelpRequestThemeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -127,14 +125,7 @@ public class HelpRequestItem {
         }
 
         message = XMLUtils.getAttributeValue(itemNode, "Message");
-        if (null == message || StringUtils.isEmpty(message)) {
-            errorMessage.append("Attribute Message not found");
-        }
-
         declarer = XMLUtils.getAttributeValue(itemNode, "ContactFIO");
-        if (null == declarer || StringUtils.isEmpty(declarer)) {
-            errorMessage.append("Attribute ContactFIO not found");
-        }
 
         phone = XMLUtils.getAttributeValue(itemNode, "ContactPhone");
         if (null == phone || StringUtils.isEmpty(phone)) {

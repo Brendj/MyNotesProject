@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.persistence.HelpRequest;
 import ru.axetta.ecafe.processor.core.persistence.HelpRequestStatusEnumType;
 import ru.axetta.ecafe.processor.core.persistence.HelpRequestThemeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -79,6 +78,17 @@ public class ResHelpRequestItem {
         XMLUtils.setAttributeIfNotNull(element, "ContactPhone", phone);
         if (null != requestState)
             XMLUtils.setAttributeIfNotNull(element, "RequestState", String.valueOf(requestState.ordinal()));
+        XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
+        XMLUtils.setAttributeIfNotNull(element, "V", version);
+        if (resultCode != null && resultCode != 0) {
+            XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
+        }
+        return element;
+    }
+
+    public Element toResElement(Document document, String elementName) throws Exception {
+        Element element = document.createElement(elementName);
+        XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
         XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         if (resultCode != null && resultCode != 0) {
