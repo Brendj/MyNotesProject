@@ -107,8 +107,15 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public SumQtyAndPriceItem buildRegisterStampBodyValue(Long idOfOrg, Date start, Date end, String fullname, Set orderTypes) {
+    public SumQtyAndPriceItem buildRegisterStampBodyValue(Long idOfOrg, Date start, Date end, String fullname, Set<OrderTypeEnumType> orderTypes) {
         // todo привести к единому виду способ отнесения заказа к льготной или платной группе
+
+        Set<Integer> orderType = new HashSet<Integer>();
+
+        for (OrderTypeEnumType orderTypeEnumType: orderTypes) {
+            orderType.add(orderTypeEnumType.ordinal());
+        }
+
         String sql ="select sum(orderdetail.qty), (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) as sumPrice "
                 + " from cf_orders cforder "
                 + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
@@ -130,7 +137,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate", end.getTime());
-        query.setParameterList("orderType", orderTypes);
+        query.setParameterList("orderType", orderType);
         List list = query.list();
 
         SumQtyAndPriceItem sumQtyAndPriceItem = null;
@@ -147,8 +154,15 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public SumQtyAndPriceItem buildRegisterStampBodyValueByOrgList(List<Long> idOfOrgList, Date start, Date end, String fullname, Set orderTypes) {
+    public SumQtyAndPriceItem buildRegisterStampBodyValueByOrgList(List<Long> idOfOrgList, Date start, Date end, String fullname, Set<OrderTypeEnumType> orderTypes) {
         // todo привести к единому виду способ отнесения заказа к льготной или платной группе
+
+        Set<Integer> orderType = new HashSet<Integer>();
+
+        for (OrderTypeEnumType orderTypeEnumType: orderTypes) {
+            orderType.add(orderTypeEnumType.ordinal());
+        }
+
         String sql ="select sum(orderdetail.qty), (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) as sumPrice "
                 + " from cf_orders cforder "
                 + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
@@ -162,7 +176,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "     and good.fullname like '"+fullname+"' "
                 + "     and orderdetail.menutype>=:mintype "
                 + "     and orderdetail.menutype<=:maxtype "
-                + "     and (cforder.ordertype in (:orderType)) "
+                + "     and cforder.ordertype in (:orderType) "
                 + " group by orderdetail.qty, (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty) * -1) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameterList("idoforg",idOfOrgList);
@@ -170,7 +184,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate", end.getTime());
-        query.setParameterList("orderType", orderTypes);
+        query.setParameterList("orderType", orderType);
         List list = query.list();
 
         SumQtyAndPriceItem sumQtyAndPriceItem = null;
