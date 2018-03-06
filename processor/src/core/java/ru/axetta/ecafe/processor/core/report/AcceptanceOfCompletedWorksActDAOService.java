@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
