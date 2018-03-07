@@ -14,7 +14,7 @@
         </composite-id>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      update="false" insert="false"/>
-        <property name="groupName" column="GroupName" type="string" length="64" not-null="true"/>
+        <property name="groupName" column="GroupName" type="string" length="256" not-null="true"/>
         <set name="clientsInternal" inverse="true" cascade="none" mutable="false">
             <key>
                 <column name="IdOfOrg"/>

@@ -18,7 +18,7 @@
         <property name="firstName" column="FirstName" type="string" length="64" not-null="true"/>
         <property name="secondName" column="SecondName" type="string" length="128" not-null="true"/>
         <property name="surname" column="Surname" type="string" length="128" not-null="true"/>
-        <property name="groupName" column="GroupName" type="string" length="3" not-null="true"/>
+        <property name="groupName" column="GroupName" type="string" length="256" not-null="true"/>
 
         <property name="idOfMigrateOrgTo" column="IdOfMigrateOrgTo" type="long" not-null="false"/>
         <property name="idOfMigrateOrgFrom" column="IdOfMigrateOrgFrom" type="long" not-null="false"/>
@@ -26,7 +26,7 @@
 
         <property name="secondNameFrom" column="SecondNameFrom" type="string" length="128"/>
         <property name="surnameFrom" column="SurnameFrom" type="string" length="128"/>
-        <property name="groupNameFrom" column="GroupNameFrom" type="string" length="3"/>
+        <property name="groupNameFrom" column="GroupNameFrom" type="string" length="256"/>
 
         <property name="idOfClient" column="IdOfClient" type="long" not-null="false"/>
         <property name="operation" column="Operation" type="int" not-null="true"/>

@@ -756,7 +756,7 @@ public class ImportRegisterClientsService {
         String name = trim(fieldConfig.getValue(ClientManager.FieldId.NAME), 64, clientGuid, "Имя ученика");
         String secondname = trim(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME), 128, clientGuid, "Отчество ученика");
         String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, clientGuid, "Фамилия ученика");
-        String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 64, clientGuid, "Наименование группы");
+        String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 256, clientGuid, "Наименование группы");
         String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, clientGuid, "Пол");
         String clientBenefitDSZN = trim(fieldConfig.getValue(ClientManager.FieldId.BENEFIT_DSZN), 128, clientGuid, "Льгота учащегося");
         String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
