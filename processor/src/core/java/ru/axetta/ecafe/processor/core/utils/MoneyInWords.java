@@ -108,10 +108,11 @@ public class MoneyInWords {
                 iw = 2;
         }
         long num = (long) Math.floor(money);
+        long kop = Long.valueOf(skop);
         if (num < 1000000000000000l) {
-            return num2words(num, 1) + " " + num2words(num, 0) + " " + leword[0][iw];
+            return num2words(num, 1) + " " + num2words(kop, 0);
         } else {
-            return "error: слишком много рублей " + num2words(num, 0) + " " + leword[0][iw];
+            return "error: слишком много рублей " + num2words(kop, 0);
         }
     }
 }
