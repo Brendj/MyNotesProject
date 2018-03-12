@@ -21,8 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by anvarov on 20.02.2018.
@@ -38,7 +40,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
     }
 
     public List<AcceptanceOfCompletedWorksActItem> findAllItemsForAct(BasicReportJob.OrgShortItem org,
-            Boolean showAllOrgs, Date startTime, Date endDate) {
+            Boolean showAllOrgs, Date startTime, Date endDate, String type) {
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
         if (showAllOrgs) {
@@ -50,18 +52,58 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     .getMainBuildingAndFriendlyOrgsList(getSession(), idOfOrgList);
 
             for (FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel : andFriendlyOrgsList) {
-                result = findAllItemsForActByOrgs(friendlyOrganizationsInfoModel, startTime, endDate);
+                result = findAllItemsForActByOrgs(friendlyOrganizationsInfoModel, startTime, endDate, type);
             }
-
         } else {
-            result = findAllItemsForActByOrg(org.getIdOfOrg(), startTime, endDate);
+            result = findAllItemsForActByOrg(org.getIdOfOrg(), startTime, endDate, type);
+        }
+
+        return result;
+    }
+
+    public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrg(Long idOfOrg, Date startTime, Date endDate, String type) {
+
+        List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
+
+        Query query = getSession().createSQLQuery("SELECT contractnumber, dateofconclusion, "
+                + "shortnameinfoservice, contragentname, dateOfClosing, officialposition, "
+                + " (cfp.surname || ' ' || cfp.firstname || ' ' || cfp.secondname) AS fullname, "
+                + " cfp.surname,  cfp.firstname,  cfp.secondname "
+                + " FROM cf_contracts cfc LEFT JOIN cf_orgs cfo ON cfc.idofcontract = cfo.idofcontract "
+                + " LEFT JOIN CF_Contragents cfco ON cfco.IdOfContragent = cfc.IdOfContragent "
+                + " LEFT JOIN cf_persons cfp ON cfp.idofperson = cfo.IdOfOfficialPerson "
+                + " WHERE cfo.idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        List res = query.list();
+
+        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
+
+        SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrg(idOfOrg, startTime, endDate, type);
+        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(sumPriceAndCrossTabItems.actCrossTabDatas);
+
+        Long priceWhole = sumPriceAndCrossTabItems.getSumPrice() / 100;
+        Long priceCoin = Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100);
+
+        String sumStr = priceWhole + " руб. " + priceCoin + " копеек";
+
+        String sum = (String.format("%d.%02d", sumPriceAndCrossTabItems.getSumPrice() / 100,
+                Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100)));
+
+        double sumInDouble = Double.parseDouble(sum);
+
+        sumStr = sumStr + " (" + MoneyInWords.inwords(sumInDouble) + ")";
+
+        acceptanceOfCompletedWorksActItem.setSum(sumStr);
+
+        if (!res.isEmpty()) {
+            result.add(acceptanceOfCompletedWorksActItem);
         }
 
         return result;
     }
 
     public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrgs(
-            FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate) {
+            FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate, String type) {
 
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
@@ -79,7 +121,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
 
         SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrgs(
-                friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet(), startTime, endDate);
+                friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet(), startTime, endDate, type);
         acceptanceOfCompletedWorksActItem.setActCrossTabDataList(sumPriceAndCrossTabItems.actCrossTabDatas);
 
         Long priceWhole = sumPriceAndCrossTabItems.getSumPrice() / 100;
@@ -103,118 +145,63 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         return result;
     }
 
-    public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrg(Long idOfOrg, Date startTime, Date endDate) {
 
-        List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
-        Query query = getSession().createSQLQuery("SELECT contractnumber, dateofconclusion, "
-                + "shortnameinfoservice, contragentname, dateOfClosing, officialposition, "
-                + " (cfp.surname || ' ' || cfp.firstname || ' ' || cfp.secondname) AS fullname, "
-                + " cfp.surname,  cfp.firstname,  cfp.secondname "
-                + " FROM cf_contracts cfc LEFT JOIN cf_orgs cfo ON cfc.idofcontract = cfo.idofcontract "
-                + " LEFT JOIN CF_Contragents cfco ON cfco.IdOfContragent = cfc.IdOfContragent "
-                + " LEFT JOIN cf_persons cfp ON cfp.idofperson = cfo.IdOfOfficialPerson "
-                + " WHERE cfo.idoforg = :idOfOrg");
-        query.setParameter("idOfOrg", idOfOrg);
-        List res = query.list();
-
-        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
-
-        SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrg(idOfOrg, startTime, endDate);
-        acceptanceOfCompletedWorksActItem.setActCrossTabDataList(sumPriceAndCrossTabItems.actCrossTabDatas);
-
-        Long priceWhole = sumPriceAndCrossTabItems.getSumPrice() / 100;
-        Long priceCoin = Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100);
-
-        String sumStr = priceWhole + " руб. " + priceCoin + " копеек";
-
-        String sum = (String.format("%d.%02d", sumPriceAndCrossTabItems.getSumPrice() / 100,
-                Math.abs(sumPriceAndCrossTabItems.getSumPrice() % 100)));
-
-        double sumInDouble = Double.parseDouble(sum);
-
-        sumStr = sumStr + " (" + MoneyInWords.inwords(sumInDouble) + ")";
-
-        acceptanceOfCompletedWorksActItem.setSum(sumStr);
-
-        if (!res.isEmpty()) {
-            result.add(acceptanceOfCompletedWorksActItem);
-        }
-
-        return result;
-    }
-
-    private SumPriceAndCrossTabItems findAllForCrossTabByOrg(Long idOfOrg, Date startTime, Date endTime) {
+    private SumPriceAndCrossTabItems findAllForCrossTabByOrg(Long idOfOrg, Date startTime, Date endTime, String type) {
         List<AcceptanceOfCompletedWorksActCrossTabData> actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
         Long sumPrice = 0L;
 
-        OrderDetailsDAOService service = new OrderDetailsDAOService();
-        service.setSession(getSession());
+        if (type.equals("Льготное питание")) {
+            AcceptanceOfCompletedWorksActReducePricePlanService service = new AcceptanceOfCompletedWorksActReducePricePlanService();
+            service.setSession(getSession());
 
-        List<GoodItem1> allGoods = service.findAllGoodsByOrderTypesByOrg(idOfOrg, startTime, endTime,
-                service.getPayPlanAndSubscriptionFeedingOrderTypes());
-        //allGoods.addAll(service.findAllGoods(idOfOrg, startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+            List<GoodItem> allGoods = service.findAllGoodsByTypesByOrg(idOfOrg, startTime, endTime, service.getReducedPricePlanOrderTypes());
 
-/*        HashMap<String, GoodItem1> goodItem1HashMap = new HashMap<String, GoodItem1>();
+            if (allGoods.isEmpty()) {
 
-        for (GoodItem1 goodItem1: allGoods) {
-            if (!goodItem1HashMap.containsKey(goodItem1.getFullName())) {
-                goodItem1HashMap.put(goodItem1.getFullName(), goodItem1);
             } else {
-                GoodItem1 gg = goodItem1HashMap.get(goodItem1.getFullName());
-                gg.setPriceLong(gg.getPrice() + goodItem1.getPrice());
-            }
-        }*/
-
-        if (allGoods.isEmpty()) {
-            /*AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", "0");
-            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", "0");
-            actItems.add(actCrossTabDataSc);
-            actItems.add(actCrossTabDataCh);*/
-        } else {
-
-            //boolean flag  = true;
-
-            for (GoodItem1 goodItem : allGoods) {
-
-                Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrg(idOfOrg, startTime, endTime,
-                        goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
-
-                AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                        goodItem.getPathPart4(), goodItem.getPathPart1(),
-                        (String.format("%d.%02d", goodItem.getPrice() * qty / 100,
-                                Math.abs(goodItem.getPrice() * qty % 100))));
-                //AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "д/сад", String.valueOf(sumQtyAndPriceItem.getSumQty()));
-                actItems.add(actCrossTabData);
-                //actItems.add(actCrossTabDataCh);
-
-                sumPrice += goodItem.getPrice() * qty;
-
-               /* if (goodItem.getOrderType().equals(1)) {
-
-                    //flag = false;
-
-                    SumQtyAndPriceItem sumQtyAndPriceItem1 = service.buildRegisterStampBodyValue(idOfOrg, startTime,  endTime, goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+                for (GoodItem goodItem : allGoods) {
+                    SumQtyAndPriceItem sumQtyAndPriceItem = service.buildRegisterStampBodyValueByOrg(idOfOrg, startTime, endTime, goodItem.getFullName(), service.getReducedPricePlanOrderTypes());
 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
-                    actItems.add(actCrossTabDataScW);
-                    actItems.add(actCrossTabDataChW);
-                }*/
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), goodItem.getPathPart1(), sumQtyAndPriceItem.getSumQty().toString());
+                    actItems.add(actCrossTabData);
+                }
             }
+        }
 
-           /* if (flag) {
-                setWaterValueByFlag(actItems);
-            }*/
+        if (type.equals("Платное горячее питание")) {
+            AcceptanceOfCompletedWorksActPayPlanService service = new AcceptanceOfCompletedWorksActPayPlanService();
+            service.setSession(getSession());
+
+            List<GoodItem1> allGoods = service.findAllGoodsByOrderTypesByOrg(idOfOrg, startTime, endTime, service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+            if (allGoods.isEmpty()) {
+
+            } else {
+
+                //boolean flag  = true;
+
+                for (GoodItem1 goodItem : allGoods) {
+
+                    Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrg(idOfOrg, startTime, endTime,
+                            goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                            goodItem.getPathPart4(), goodItem.getPathPart1(), qty.toString());
+                    actItems.add(actCrossTabData);
+
+                    sumPrice += goodItem.getPrice() * qty;
+                }
+            }
         }
 
         return new SumPriceAndCrossTabItems(actItems, sumPrice);
     }
 
     private SumPriceAndCrossTabItems findAllForCrossTabByOrgs(Set<Org> friendlyOrganizationsSet, Date startTime,
-            Date endTime) {
+            Date endTime, String type) {
 
         List<Long> idOfOrgList = new ArrayList<Long>();
 
@@ -226,65 +213,55 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         Long sumPrice = 0L;
 
-        OrderDetailsDAOService service = new OrderDetailsDAOService();
-        service.setSession(getSession());
+        if (type.equals("Льготное питание")) {
+            AcceptanceOfCompletedWorksActReducePricePlanService service = new AcceptanceOfCompletedWorksActReducePricePlanService();
+            service.setSession(getSession());
 
-        List<GoodItem1> allGoods = service.findAllGoodsByOrderTypesByOrgs(idOfOrgList, startTime, endTime,
-                service.getPayPlanAndSubscriptionFeedingOrderTypes());
-        //allGoods.addAll(service.findAllGoods(idOfOrgList, startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+            List<GoodItem> allGoods = service.findAllGoodsByTypesByOrgs(idOfOrgList, startTime, endTime,
+                    service.getReducedPricePlanOrderTypes());
 
-        if (allGoods.isEmpty()) {
-            /*AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", "0");
-            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", "0");
-            actItems.add(actCrossTabDataSc);
-            actItems.add(actCrossTabDataCh);*/
-        } else {
+            if (allGoods.isEmpty()) {
 
-            // boolean flag  = true;
+            } else {
+                for (GoodItem goodItem : allGoods) {
+                    SumQtyAndPriceItem sumQtyAndPriceItem = service.buildRegisterStampBodyValueByOrgs(idOfOrgList, startTime, endTime, goodItem.getFullName(), service.getReducedPricePlanOrderTypes());
 
-            for (GoodItem1 goodItem : allGoods) {
+                    sumPrice += sumQtyAndPriceItem.getSumPrice();
 
-                Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrgs(idOfOrgList, startTime, endTime,
-                        goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
-
-                AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                        goodItem.getPathPart4(), goodItem.getPathPart1(),
-                        (String.format("%d.%02d", goodItem.getPrice() * qty / 100,
-                                Math.abs(goodItem.getPrice() * qty % 100))));
-                actItems.add(actCrossTabData);
-
-                sumPrice += goodItem.getPrice() * qty;
-
-                /*if (goodItem.getOrderType().equals(1)) {
-
-                    //flag = false;
-
-                    SumQtyAndPriceItem sumQtyAndPriceItem1 = service.buildRegisterStampBodyValueByOrgList(idOfOrgList, startTime,  endTime, goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
-
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataScW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "школа", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataChW = new AcceptanceOfCompletedWorksActCrossTabData("Вода питьевая", "д/сад", String.valueOf(sumQtyAndPriceItem1.getSumQty()));
-                    actItems.add(actCrossTabDataScW);
-                    actItems.add(actCrossTabDataChW);
-                }*/
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), goodItem.getPathPart1(), sumQtyAndPriceItem.getSumQty().toString());
+                    actItems.add(actCrossTabData);
+                }
             }
+        }
+        if (type.equals("Платное горячее питание")) {
+            AcceptanceOfCompletedWorksActPayPlanService service = new AcceptanceOfCompletedWorksActPayPlanService();
+            service.setSession(getSession());
 
-            /*if (flag) {
-                setWaterValueByFlag(actItems);
-            }*/
+            List<GoodItem1> allGoods = service.findAllGoodsByOrderTypesByOrgs(
+                    idOfOrgList, startTime, endTime,
+                    service.getPayPlanAndSubscriptionFeedingOrderTypes());
 
+            if (allGoods.isEmpty()) {
+
+            } else {
+
+                for (GoodItem1 goodItem : allGoods) {
+
+                    Long qty = service
+                            .buildRegisterStampBodyValueByOrderTypesByOrgs(idOfOrgList, startTime, endTime,
+                                    goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                            goodItem.getPathPart4(), goodItem.getPathPart1(), qty.toString());
+                    actItems.add(actCrossTabData);
+
+                    sumPrice += goodItem.getPrice() * qty;
+                }
+            }
         }
 
         return new SumPriceAndCrossTabItems(actItems, sumPrice);
     }
-
-/*    public void setWaterValueByFlag(List<AcceptanceOfCompletedWorksActCrossTabData> actItems) {
-        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
-                "Вода питьевая", "школа", "0");
-        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataCh = new AcceptanceOfCompletedWorksActCrossTabData(
-                "Вода питьевая", "д/сад", "0");
-        actItems.add(actCrossTabDataSc);
-        actItems.add(actCrossTabDataCh);
-    }*/
 
     public AcceptanceOfCompletedWorksActItem fooBar(List<Object> res) {
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = new AcceptanceOfCompletedWorksActItem();

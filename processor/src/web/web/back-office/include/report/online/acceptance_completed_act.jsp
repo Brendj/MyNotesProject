@@ -60,6 +60,13 @@
         </h:selectBooleanCheckbox>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Тип питания" styleClass="output-text" />
+        <h:selectOneMenu id="typeList" value="#{acceptanceOfCompletedWorksActPage.type}" style="width: 200px">
+            <f:selectItems value="#{acceptanceOfCompletedWorksActPage.types}" />
+        </h:selectOneMenu>
+    </h:panelGrid>
+
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать документ" action="#{acceptanceOfCompletedWorksActPage.buildReportHTML}"
                            reRender="acceptanceOfCompletedWorksActPanel" styleClass="command-button"

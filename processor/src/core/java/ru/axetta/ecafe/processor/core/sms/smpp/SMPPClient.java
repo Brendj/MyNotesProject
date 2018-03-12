@@ -57,7 +57,7 @@ public class SMPPClient extends ISmsService {
             int count =0;
             int err = -1;
             while (count<5){
-                err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password, sourceAddressTon, sourceAddressNpi);
+                //err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password, sourceAddressTon, sourceAddressNpi);
                 if(err==0) break;
                 count++;
             }
@@ -110,7 +110,7 @@ public class SMPPClient extends ISmsService {
     }
 
     public void startService(){
-        int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password, sourceAddressTon, sourceAddressNpi);
+        int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password/*, sourceAddressTon, sourceAddressNpi*/);
         if (err != 0) {
             LOGGER.error("SMPP Client connecting error " + err);
         } else {

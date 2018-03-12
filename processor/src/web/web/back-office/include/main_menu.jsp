@@ -1132,11 +1132,6 @@
     <rich:panelMenuGroup id="paidFoodGroupMenu" binding="#{mainPage.paidFoodGroupMenu.mainMenuComponent}"
                          label="Платное питание" reRender="#{mainPage.eligibleToViewMealsReports}" rendered="#{mainPage.eligibleToViewPaidFoodReport}">
         <a4j:support event="onclick" action="#{mainPage.showPaidFoodGroupMenu}" reRender="workspaceForm" />
-        <%--@elvariable id="acceptanceOfCompletedWorksActPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AcceptanceOfCompletedWorksActPage"--%>
-        <rich:panelMenuItem id="acceptanceOfCompletedWorksActMenuItem"
-                            binding="#{acceptanceOfCompletedWorksActPage.mainMenuComponent}"
-                            label="Акт сдачи-приёмки оказанных услуг"
-                            action="#{acceptanceOfCompletedWorksActPage.show}" reRender="workspaceForm" />
         <%--@elvariable id="registerStampPaidPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPaidPage"--%>
         <rich:panelMenuItem id="registerStampPaidReportMenuItem" binding="#{registerStampPaidPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampPaidPage.show}" reRender="workspaceForm" />
@@ -1167,6 +1162,16 @@
         <%--@elvariable id="registerStampSubscriptionFeedingPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampSubscriptionFeedingPage"--%>
         <rich:panelMenuItem id="registerStampSubscriptionFeedingReportMenuItem" binding="#{registerStampSubscriptionFeedingPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampSubscriptionFeedingPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="acceptanceActGroupMenu" binding="#{mainPage.acceptanceActGroupMenu.mainMenuComponent}"
+                         label="Акты" >
+        <a4j:support event="onclick" action="#{mainPage.showAcceptanceGroupMenu}" reRender="workspaceForm" />
+        <%--@elvariable id="acceptanceOfCompletedWorksActPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AcceptanceOfCompletedWorksActPage"--%>
+        <rich:panelMenuItem id="acceptanceOfCompletedWorksActMenuItem"
+                            binding="#{acceptanceOfCompletedWorksActPage.mainMenuComponent}"
+                            label="Акт сдачи-приёмки оказанных услуг"
+                            action="#{acceptanceOfCompletedWorksActPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"

@@ -47,6 +47,7 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Boolean showAllOrgs = Boolean.valueOf(reportProperties.getProperty("showAllOrgs"));
+            String type = reportProperties.getProperty("type");
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("idOfOrg", org.getIdOfOrg());
@@ -63,19 +64,19 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
 
             calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap, showAllOrgs));
+                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap, showAllOrgs, type));
             Date generateEndTime = new Date();
             return new AcceptanceOfCompletedWorksAct(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
-                Calendar calendar, Map<String, Object> parameterMap, Boolean showAllOrgs) throws Exception {
+                Calendar calendar, Map<String, Object> parameterMap, Boolean showAllOrgs, String type) throws Exception {
 
             daoService = new AcceptanceOfCompletedWorksActDAOService();
             daoService.setSession(session);
 
-            List<AcceptanceOfCompletedWorksActItem> result = daoService.findAllItemsForAct(org, showAllOrgs, startTime, endTime);
+            List<AcceptanceOfCompletedWorksActItem> result = daoService.findAllItemsForAct(org, showAllOrgs, startTime, endTime, type);
             calendar.setTime(startTime);
 
             return new JRBeanCollectionDataSource(result);

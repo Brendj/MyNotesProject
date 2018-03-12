@@ -381,6 +381,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage budgetFoodGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paidFoodGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage subscriptionFeedingGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage acceptanceActGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage clientReportsGroupMenu = new BasicWorkspacePage();
@@ -6316,6 +6317,10 @@ public class MainPage implements Serializable {
         return subscriptionFeedingGroupMenu;
     }
 
+    public BasicWorkspacePage getAcceptanceActGroupMenu() {
+        return acceptanceActGroupMenu;
+    }
+
     public BasicWorkspacePage getRepositoryUtilityGroupMenu() {
         return repositoryUtilityGroupMenu;
     }
@@ -6362,6 +6367,12 @@ public class MainPage implements Serializable {
 
     public Object showSubscriptionFeedingGroupMenu() {
         currentWorkspacePage = subscriptionFeedingGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showAcceptanceGroupMenu() {
+        currentWorkspacePage = acceptanceActGroupMenu;
         updateSelectedMainMenu();
         return null;
     }

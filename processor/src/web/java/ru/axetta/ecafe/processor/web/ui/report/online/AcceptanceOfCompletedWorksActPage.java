@@ -14,7 +14,6 @@ import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AcceptanceOfCompletedWorksAct;
-import ru.axetta.ecafe.processor.core.report.AcceptanceOfCompletedWorksActDAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -30,14 +29,13 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -48,6 +46,8 @@ import java.util.Properties;
 public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(AcceptanceOfCompletedWorksActPage.class);
+
+    private String type;
 
     private Boolean showAllOrgs = false;
 
@@ -110,6 +110,17 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
         }
     }
 
+    public List<SelectItem> getTypes() {
+        List<String> types = new ArrayList<String>();
+        types.add("Льготное питание");
+        types.add("Платное горячее питание");
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        for (String reg : types) {
+            items.add(new SelectItem(reg));
+        }
+        return items;
+    }
+
     @Override
     public void onShow() throws Exception {
     }
@@ -140,6 +151,7 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
         AcceptanceOfCompletedWorksAct.Builder builder = new AcceptanceOfCompletedWorksAct.Builder(templateFilename);
         Properties properties = new Properties();
         properties.put("showAllOrgs", Boolean.toString(showAllOrgs));
+        properties.put("type", type);
         builder.setReportProperties(properties);
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -216,6 +228,7 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
         AcceptanceOfCompletedWorksAct.Builder builder = new AcceptanceOfCompletedWorksAct.Builder(templateFilename);
         Properties properties = new Properties();
         properties.put("showAllOrgs", Boolean.toString(showAllOrgs));
+        properties.put("type", type);
 
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -269,6 +282,14 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
 
     public void setShowAllOrgs(Boolean showAllOrgs) {
         this.showAllOrgs = showAllOrgs;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     private String buildFileName(AcceptanceOfCompletedWorksAct acceptanceOfCompletedWorksAct) {
