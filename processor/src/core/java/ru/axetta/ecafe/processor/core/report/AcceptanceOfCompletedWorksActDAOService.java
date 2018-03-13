@@ -273,7 +273,8 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             acceptanceOfCompletedWorksActItem
                     .setDateOfConclusion(CalendarUtils.dateShortToStringFullYear((Date) objList[1]) + "г.");
             acceptanceOfCompletedWorksActItem.setShortNameInfoService((String) objList[2]);
-            acceptanceOfCompletedWorksActItem.setExecutor((String) objList[3]);
+            String executor = ((String) objList[3]).replaceAll("\"", "");
+            acceptanceOfCompletedWorksActItem.setExecutor(executor);
             acceptanceOfCompletedWorksActItem
                     .setDateOfClosing(CalendarUtils.dateShortToStringFullYear((Date) objList[4]) + "г.");
             if (objList[5].equals("")) {
