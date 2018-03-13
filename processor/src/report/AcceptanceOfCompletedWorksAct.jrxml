@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksAct" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="490" leftMargin="63" rightMargin="42" topMargin="56" bottomMargin="56" uuid="404814b1-5f24-4b2e-8e51-2f435162edde">
-	<property name="ireport.zoom" value="1.100000000000001"/>
+	<property name="ireport.zoom" value="1.210000000000002"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="1008"/>
+	<property name="ireport.y" value="993"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -37,7 +37,7 @@
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{shortNameInfoService} + ", именуемый (-ое) в дальнейшем «Заказчик», в лице "]]></textFieldExpression>
+				<textFieldExpression><![CDATA["«" +$F{shortNameInfoService}+"»" + ", именуемый (-ое) в дальнейшем «Заказчик», в лице "]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="0715a69f-f225-46b4-bd49-cbb853edbb9a" x="177" y="114" width="313" height="20"/>
@@ -58,7 +58,7 @@
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<text><![CDATA[2.Контрактом предусмотрено оказание следующих видов услуг:]]></text>
+				<text><![CDATA[2. Контрактом предусмотрено оказание следующих видов услуг:]]></text>
 			</staticText>
 			<frame>
 				<reportElement uuid="17048b87-871c-4183-8824-373edc189887" x="0" y="418" width="125" height="35"/>
@@ -71,7 +71,7 @@
 				</box>
 				<staticText>
 					<reportElement uuid="546418bf-bf89-4368-a448-8c3762850a13" x="0" y="0" width="125" height="35"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Times New Roman" size="14"/>
 					</textElement>
 					<text><![CDATA[Наименование услуги]]></text>
@@ -88,7 +88,7 @@
 				</box>
 				<staticText>
 					<reportElement uuid="eafba183-466e-4237-b3e0-55b2154dfb3c" x="0" y="0" width="125" height="35"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Times New Roman" size="14"/>
 					</textElement>
 					<text><![CDATA[Ед. изм.]]></text>
@@ -105,7 +105,7 @@
 				</box>
 				<staticText>
 					<reportElement uuid="00de9d79-92b3-4b69-834b-c9fa436cb656" x="0" y="0" width="125" height="35"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Times New Roman" size="14"/>
 					</textElement>
 					<text><![CDATA[Количество]]></text>
@@ -122,7 +122,7 @@
 				</box>
 				<staticText>
 					<reportElement uuid="4d7ed1ac-3f02-40b3-9159-3e5998da673e" x="0" y="0" width="115" height="35"/>
-					<textElement textAlignment="Center" verticalAlignment="Top">
+					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="Times New Roman" size="14"/>
 					</textElement>
 					<text><![CDATA[Качество]]></text>
@@ -252,7 +252,7 @@
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA["действующего на основании _________________, с одной стороны, и " + $F{executor} + ", именуемый (-ое) в дальнейшем «Исполнитель», в лице________________________, действующего на основании ___________________, с другой стороны, совместно именуемые в дальнейшем «Стороны» и  каждый в отдельности «Сторона», составили настоящий Акт о нижеследующем:"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["действующего на основании _________________, с одной стороны и " + "«"+$F{executor}+"»" + ", именуемый (-ое) в дальнейшем «Исполнитель», в лице________________________, действующего на основании ___________________, с другой стороны, совместно именуемые в дальнейшем «Стороны» и  каждый в отдельности «Сторона», составили настоящий Акт о нижеследующем:"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="9e454a07-6506-4b3b-8e08-b444f005eb23" x="0" y="154" width="490" height="20"/>
@@ -271,14 +271,14 @@
 				<text><![CDATA[_________________________________________.]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="a1056d51-ce3c-4992-a499-dec1fd039278" x="245" y="591" width="245" height="20"/>
+				<reportElement uuid="a1056d51-ce3c-4992-a499-dec1fd039278" x="245" y="633" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["м.п."]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="10b37246-2188-4512-a581-44159725919b" x="0" y="391" width="490" height="80"/>
+				<reportElement uuid="10b37246-2188-4512-a581-44159725919b" x="0" y="402" width="490" height="80"/>
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
@@ -289,7 +289,7 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="a8f01b0b-380c-49b0-ba35-e72d86950716" x="0" y="571" width="245" height="20"/>
+				<reportElement uuid="a8f01b0b-380c-49b0-ba35-e72d86950716" x="0" y="613" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -303,21 +303,21 @@
 				<textFieldExpression><![CDATA["6. Срок оказания услуг по Контракту " + $F{dateOfConclusion} + " - " + $F{dateOfClosing}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="560686ac-3e74-42a7-8795-c6b7d69d02a0" x="0" y="551" width="245" height="20"/>
+				<reportElement uuid="560686ac-3e74-42a7-8795-c6b7d69d02a0" x="0" y="593" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["______________ /" + $F{fullName} + "/"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="6d3181bb-33c6-4cf0-ad54-97ba29edfa5b" x="0" y="471" width="490" height="60"/>
-				<textElement textAlignment="Justified">
+				<reportElement uuid="6d3181bb-33c6-4cf0-ad54-97ba29edfa5b" x="0" y="482" width="490" height="91"/>
+				<textElement textAlignment="Justified" verticalAlignment="Top">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Сумма, подлежащая уплате Исполнителю: " + $F{sum} + ", без учета НДС (пп. 5 п. 2 ст. 149 Налогового кодекса Российской Федерации, в ред. Федерального закона от 18.07.2011 № 235-ФЗ)."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="b2249fda-dd2a-4edf-8281-411bbdf0a1a6" x="0" y="591" width="245" height="20"/>
+				<reportElement uuid="b2249fda-dd2a-4edf-8281-411bbdf0a1a6" x="0" y="633" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -331,28 +331,28 @@
 				<text><![CDATA[5. Сведения о проведенной экспертизе оказанных услуг: ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="2923902b-8ec2-42c2-b9bd-505c19a9752e" x="0" y="331" width="490" height="60"/>
+				<reportElement uuid="2923902b-8ec2-42c2-b9bd-505c19a9752e" x="0" y="331" width="490" height="71"/>
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA["7. Контрактом предусмотрена оплата оказанных услуг в сумме " + $F{sum} + ", без учета НДС (пп. 5 п. 2 ст. 149 Налогового кодекса Российской Федерации, в ред. Федерального закона от 18.07.2011 № 235-ФЗ)."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="41e16af4-dc6a-4ec1-88c6-0b24667ce5ed" x="245" y="571" width="245" height="20"/>
+				<reportElement uuid="41e16af4-dc6a-4ec1-88c6-0b24667ce5ed" x="245" y="613" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA["«__» ____________ 201__г."]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="704da979-049b-47db-9100-e68253111d92" x="0" y="531" width="245" height="20"/>
+				<reportElement uuid="704da979-049b-47db-9100-e68253111d92" x="0" y="573" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Заказчик: "]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="3e64f939-2ea1-4bc7-9025-8da58f137ca3" x="245" y="551" width="245" height="20"/>
+				<reportElement uuid="3e64f939-2ea1-4bc7-9025-8da58f137ca3" x="245" y="593" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman"/>
 				</textElement>
@@ -366,7 +366,7 @@
 				<textFieldExpression><![CDATA["Фактический срок оказания услуг " + $P{startDate} + " – " + $P{endDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a794eb92-ace8-4b48-8cfc-86209bc14dcf" x="245" y="531" width="245" height="20"/>
+				<reportElement uuid="a794eb92-ace8-4b48-8cfc-86209bc14dcf" x="245" y="573" width="245" height="20"/>
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
@@ -386,107 +386,8 @@
 				</textElement>
 				<text><![CDATA[_______________________________________________________________.]]></text>
 			</staticText>
-			<staticText>
-				<reportElement uuid="896f443c-a9b4-42a4-a46b-32ae11424033" x="0" y="0" width="140" height="40"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[Наименование]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a3525254-e03a-47f9-bfaf-f062eba30c0f" x="450" y="0" width="40" height="40"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[Качество]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="2a8567ad-2db1-4ea6-b912-31b952554741" x="160" y="0" width="290" height="40"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[Количество]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="3e746c30-81f7-4a6c-adc1-8f099c3b19c9" x="140" y="0" width="20" height="40"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[Ед.изм.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="908cb22c-de7b-4c63-830e-c2000f7256f5" x="450" y="40" width="40" height="80"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="65637cc3-557f-4f56-9b3b-85e20a4210ad" x="140" y="40" width="20" height="80"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-				</textElement>
-				<text><![CDATA[шт.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a331012b-54e8-4c1a-9da6-1dbcde1c3bcc" x="0" y="40" width="140" height="80"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Times New Roman"/>
-					<paragraph leftIndent="20"/>
-				</textElement>
-				<text><![CDATA[Услуга по организации питания и обеспечению питьевого режима обучающихся]]></text>
-			</staticText>
 			<subreport>
-				<reportElement uuid="49338217-6179-47ed-aebc-ef618232f238" positionType="Float" x="160" y="40" width="290" height="80"/>
+				<reportElement uuid="49338217-6179-47ed-aebc-ef618232f238" positionType="Float" x="0" y="0" width="490" height="130"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{actCrossTabDataList})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "AcceptanceOfCompletedWorksActSubreport.jasper"]]></subreportExpression>
 			</subreport>
