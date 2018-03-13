@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItemAct;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
@@ -155,18 +155,28 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             AcceptanceOfCompletedWorksActReducePricePlanService service = new AcceptanceOfCompletedWorksActReducePricePlanService();
             service.setSession(getSession());
 
-            List<GoodItem> allGoods = service.findAllGoodsByTypesByOrg(idOfOrg, startTime, endTime, service.getReducedPricePlanOrderTypes());
+            List<GoodItemAct> allGoods = service.findAllGoodsByTypesByOrg(idOfOrg, startTime, endTime, service.getReducedPricePlanOrderTypes());
 
             if (allGoods.isEmpty()) {
 
             } else {
-                for (GoodItem goodItem : allGoods) {
+                for (GoodItemAct goodItem : allGoods) {
                     SumQtyAndPriceItem sumQtyAndPriceItem = service.buildRegisterStampBodyValueByOrg(idOfOrg, startTime, endTime, goodItem.getFullName(), service.getReducedPricePlanOrderTypes());
 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), goodItem.getPathPart1(), sumQtyAndPriceItem.getSumQty().toString());
-                    actItems.add(actCrossTabData);
+                    if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
+                    } else {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+
+                        actItems.add(actCrossTabData);
+                    }
                 }
             }
         }
@@ -180,9 +190,6 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             if (allGoods.isEmpty()) {
 
             } else {
-
-                //boolean flag  = true;
-
                 for (GoodItem1 goodItem : allGoods) {
 
                     Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrg(idOfOrg, startTime, endTime,
@@ -217,19 +224,29 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             AcceptanceOfCompletedWorksActReducePricePlanService service = new AcceptanceOfCompletedWorksActReducePricePlanService();
             service.setSession(getSession());
 
-            List<GoodItem> allGoods = service.findAllGoodsByTypesByOrgs(idOfOrgList, startTime, endTime,
+            List<GoodItemAct> allGoods = service.findAllGoodsByTypesByOrgs(idOfOrgList, startTime, endTime,
                     service.getReducedPricePlanOrderTypes());
 
             if (allGoods.isEmpty()) {
 
             } else {
-                for (GoodItem goodItem : allGoods) {
+                for (GoodItemAct goodItem : allGoods) {
                     SumQtyAndPriceItem sumQtyAndPriceItem = service.buildRegisterStampBodyValueByOrgs(idOfOrgList, startTime, endTime, goodItem.getFullName(), service.getReducedPricePlanOrderTypes());
 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), goodItem.getPathPart1(), sumQtyAndPriceItem.getSumQty().toString());
-                    actItems.add(actCrossTabData);
+                    if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
+                    } else {
+
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
+                    }
                 }
             }
         }

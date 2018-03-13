@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItemAct;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 
@@ -37,9 +38,9 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
 
     /* получаем список всех товаров для льготного питания по одной организации */
     @SuppressWarnings("unchecked")
-    public List<GoodItem> findAllGoodsByTypesByOrg(Long idOfOrg, Date startTime, Date endTime, Set orderTypes) {
+    public List<GoodItemAct> findAllGoodsByTypesByOrg(Long idOfOrg, Date startTime, Date endTime, Set orderTypes) {
         String sql = "select distinct good.globalId as globalId, good.parts as parts, "
-                + "     good.fullName as fullName, case ord.orderType when 10 then 1 else 0 end as orderType "
+                + "     good.fullName as fullName, ord.orderType as orderType "
                 + " from OrderDetail details left join details.good good "
                 + "     left join details.order ord left join ord.org o where ord.state=0 "
                 + "     and details.state=0 and ord.orderType in :orderType "
@@ -53,16 +54,16 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
         query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate", startTime);
         query.setParameter("endDate", endTime);
-        query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
-        return (List<GoodItem>) query.list();
+        query.setResultTransformer(Transformers.aliasToBean(GoodItemAct.class));
+        return (List<GoodItemAct>) query.list();
     }
 
     /* получаем список всех товаров для льготного питания по списку организаций */
     @SuppressWarnings("unchecked")
-    public List<GoodItem> findAllGoodsByTypesByOrgs(List<Long> idOfOrgList, Date startTime, Date endTime,
+    public List<GoodItemAct> findAllGoodsByTypesByOrgs(List<Long> idOfOrgList, Date startTime, Date endTime,
             Set orderTypes) {
         String sql = "select distinct good.globalId as globalId, good.parts as parts, "
-                + "     good.fullName as fullName, case ord.orderType when 10 then 1 else 0 end as orderType "
+                + "     good.fullName as fullName, ord.orderType as orderType "
                 + " from OrderDetail details left join details.good good "
                 + "     left join details.order ord left join ord.org o where ord.state=0 "
                 + "     and details.state=0 and ord.orderType in :orderType "
@@ -76,8 +77,8 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
         query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("startDate", startTime);
         query.setParameter("endDate", endTime);
-        query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
-        return (List<GoodItem>) query.list();
+        query.setResultTransformer(Transformers.aliasToBean(GoodItemAct.class));
+        return (List<GoodItemAct>) query.list();
     }
 
     @SuppressWarnings("unchecked")
