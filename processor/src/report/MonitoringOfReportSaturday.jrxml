@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="6960" pageHeight="30000" columnWidth="6920" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
-	<property name="ireport.zoom" value="0.75"/>
-	<property name="ireport.x" value="1159"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="8430" pageHeight="30000" columnWidth="8390" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
+	<property name="ireport.zoom" value="1.0980750000000021"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["C:\\repAxetta\\processor\\src\\report\\"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["D:\\work\\jboss-jsf2\\processor\\src\\report\\"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="dateTuesday" class="java.lang.String"/>
 	<parameter name="dateWednesday" class="java.lang.String"/>
@@ -34,7 +34,7 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="6920" height="79"/>
+				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="8390" height="79"/>
 				<textElement verticalAlignment="Middle">
 					<font size="24" isBold="true"/>
 					<paragraph leftIndent="50"/>
@@ -215,7 +215,7 @@
 				<text><![CDATA[Учащихся с картами]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" x="1880" y="0" width="840" height="25"/>
+				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" x="1880" y="0" width="1085" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -223,265 +223,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dateMonday}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="94d61009-4628-48a2-8f2f-b93096942664" x="2120" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Льготное питание итого
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="c795c38c-35bc-4871-8b70-499baa6cebdb" x="2420" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="18fffc5d-6f75-424f-a1d7-157a4164e75e" x="2000" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (представители обучающихся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a56cc968-f85b-42c3-a8fd-53ecff2efad2" x="1940" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (сотрудники ОО)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="3ff711a8-9149-4e1c-b227-0b5182786545" x="1880" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="4580c109-2ac0-4004-9e33-76967d243981" x="2600" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="d2e201f1-75eb-431b-8baf-b767e710de28" x="2300" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Резерв и замена
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="2f9154bb-07c5-4f96-9be9-323a59db3b94" x="2060" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общее кол-во проходов
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="193bc6e2-d393-45da-bc47-ff3d1f48a3fd" x="2540" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="6969d820-1e66-4446-911e-b071c4c972a6" x="2360" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="47e1da98-1757-4751-a692-80f71b601562" x="2660" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="feef20f9-190a-4a84-8202-212d628f40a4" x="2480" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="9d53e3bf-508b-4fe4-8be4-0d9df881724c" x="3800" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Льготное питание итого
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="70a68f9b-53f3-4bf8-8a82-0c4386c1df56" x="4400" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="c8cb8752-381d-474b-a3ac-4a2dd2900ebd" x="2840" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (представители обучающихся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f3afef18-de49-49a4-9b30-8ae88e143b1e" x="3560" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (обучающиеся)
-
-]]></text>
-			</staticText>
 			<textField>
-				<reportElement uuid="0a42c746-99c3-4e3d-abf0-3ef43f82c467" x="3560" y="0" width="840" height="25"/>
+				<reportElement uuid="0a42c746-99c3-4e3d-abf0-3ef43f82c467" x="4050" y="0" width="1085" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -489,91 +237,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dateWednesday}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="e9fec8a5-e977-4573-9369-05a438e15c8f" x="4040" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="541720e0-1ced-4ebd-a46f-5450570a3627" x="4160" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="9bd6fa12-dd23-4f1a-b758-f26810c515cf" x="3740" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общее кол-во проходов
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="56aaa30f-f1c6-42c2-9090-344d9a4d5d7d" x="4940" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="26b73005-a9cd-444e-9fc2-49926aad64c7" x="2720" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (обучающиеся)
-
-]]></text>
-			</staticText>
 			<textField>
-				<reportElement uuid="ea4cba3f-8424-4fb0-ab31-3b60c0019cf1" x="2720" y="0" width="840" height="25"/>
+				<reportElement uuid="ea4cba3f-8424-4fb0-ab31-3b60c0019cf1" x="2965" y="0" width="1085" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -581,234 +251,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dateTuesday}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="6d53097a-3390-41d5-bbb4-992f6d9b4762" x="3200" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="722c2dfa-4972-4838-a00c-c9c967454da5" x="3380" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="9d62bd28-3979-4c8e-9c8b-dfabf03310ed" x="4460" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (сотрудники ОО)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="32da001d-6743-4805-9c03-3efba295c5c0" x="5060" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="389cb7e7-9a35-4ee8-a56a-66b833979352" x="2960" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Льготное питание итого
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="d971d529-4153-46e2-a6b2-4e024fafcd31" x="4520" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (представители обучающихся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="c17a586e-1f45-4f48-9d1a-07ed89b6d17c" x="2780" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (сотрудники ОО)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="c4bdaca5-6752-4e14-a473-1a651e0fbb32" x="2900" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общее кол-во проходов
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f47a8064-8f11-4fa1-99bb-521ea4b84bba" x="3680" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (представители обучающихся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="a9700f64-ffb3-4996-a129-d1be4af72d4f" x="3980" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Резерв и замена
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f5c81aed-c84f-4b1d-b059-6f4afc3cd7e2" x="5120" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="bd057cc3-f0f5-427d-8712-8053c9cc8f9b" x="3500" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="86b1460a-53cf-407c-b1b8-b94bfe18474b" x="4280" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="528ffd64-b274-469f-b02b-e22e04afb91a" x="3320" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (обучающиеся)
-
-]]></text>
-			</staticText>
 			<textField>
-				<reportElement uuid="aea30fa1-da29-456e-92fd-85b914cc7922" x="4400" y="0" width="840" height="25"/>
+				<reportElement uuid="aea30fa1-da29-456e-92fd-85b914cc7922" x="5135" y="0" width="1085" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -816,234 +265,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dateThursday}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement uuid="94333e36-7c9b-40e4-9de0-e9274f3525b1" x="3620" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (сотрудники ОО)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="6c902657-1e4a-443f-a398-7666170ab425" x="4220" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="66a0c041-51a0-408a-93bb-491d0383693f" x="4100" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="e0ba161d-a7b4-4800-830e-e0ff3d009a87" x="5000" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="9a913d95-730c-449f-aa39-90e3227bfe0e" x="3140" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Резерв и замена
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="6f9ae41c-4b52-47c8-bf87-d302dfee2a5d" x="4880" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="6cb6cb16-4811-4ab2-b0db-64d8e827eae1" x="3440" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="ed5ab341-3a71-410e-bd61-430ec685aecc" x="3260" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="b50d3e8d-32ca-4cf9-95dd-0c6903bc2b88" x="5180" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="23e7d335-3489-4be0-8730-9eccbac39ffc" x="4580" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общее кол-во проходов
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="7223bf86-3c86-4066-9930-54c7a11ff49d" x="4340" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="f484f3bf-4ba5-4a78-b299-1812a647493b" x="4640" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Льготное питание итого
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="8cea08e1-d9a5-4f9a-bf70-37dc0bd21a51" x="4820" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Резерв и замена
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="5c36299f-ea98-4556-a393-05f98c38a12a" x="6020" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (взрослые)
-
-]]></text>
-			</staticText>
 			<textField>
-				<reportElement uuid="8aa624cd-5ecf-4848-9938-219a3b7129a1" x="5240" y="0" width="840" height="25"/>
+				<reportElement uuid="8aa624cd-5ecf-4848-9938-219a3b7129a1" x="7305" y="0" width="1085" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1051,11 +279,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dateFriday}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="5240" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="8030" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1066,28 +296,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Кол-во проходов (обучающиеся)
-
-]]></text>
+				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="deb1c0e0-8876-43f0-b7c0-ac7b06e24c8f" x="5720" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="cca47c51-b616-4dc2-8496-a3fd46371781" x="5960" y="25" width="60" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="7685" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1098,12 +310,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Платный план (обучающиеся)
-
-]]></text>
+				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2045af43-dfa7-4771-b619-17bf6271fb30" x="5900" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="8270" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1114,28 +324,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонементный план (взрослые)
-
-]]></text>
+				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3c286a69-b526-4cef-9d9f-52c034cd0267" x="5780" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="5300" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="8330" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1146,12 +338,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Кол-во проходов (сотрудники ОО)
-
-]]></text>
+				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b6bc065c-0996-4858-a4be-36cb5fc9a1f1" x="5480" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="8150" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1162,11 +352,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание итого
-]]></text>
+				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e1ebbd3e-886f-433f-a259-ac62f256d4ed" x="5360" y="25" width="60" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="7980" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1177,156 +366,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Кол-во проходов (представители обучающихся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="84eedd11-7d4b-4400-8fc7-406fff515795" x="5660" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Резерв и замена
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="de9b4460-efa7-44a3-b93a-486d909e3c2b" x="5420" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общее кол-во проходов
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="6560" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="6260" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Общее кол-во проходов
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="5973c944-044d-4575-b0bb-38a209a66003" x="6080" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Кол-во проходов (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="6800" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="6860" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Платный план (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="6680" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Абонементный план (обучающиеся)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="6500" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="11" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Резерв и замена
-
-]]></text>
+				<text><![CDATA[Резерв и замена]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="a27072c2-bf6f-4bdb-9624-a5ee6f5c7e0b" x="6080" y="0" width="840" height="25"/>
+				<reportElement uuid="a27072c2-bf6f-4bdb-9624-a5ee6f5c7e0b" x="6220" y="0" width="1085" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1334,11 +377,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{dateSaturday}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="6200" y="25" width="60" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="7615" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1349,12 +394,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Кол-во проходов (представители обучающихся)
-
-]]></text>
+				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b1d137a0-a7d7-4315-a5ba-0bf5e824a786" x="6140" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="8210" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1365,12 +408,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Кол-во проходов (сотрудники ОО)
-
-]]></text>
+				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="6740" y="25" width="60" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="7755" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1381,12 +422,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонементный план (взрослые)
-
-]]></text>
+				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="6320" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="8090" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1397,27 +436,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание итого
-]]></text>
+				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="6620" y="25" width="60" height="110"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Буфет (взрослые)
-
-]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="69d4641a-a185-4e0d-91f0-a55301c70a97" x="5840" y="25" width="60" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="7825" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1428,12 +450,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Абонементный план (обучающиеся)
-
-]]></text>
+				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="6380" y="25" width="60" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="7895" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1444,11 +464,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание своей ОО
-]]></text>
+				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="6440" y="25" width="60" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="7375" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1459,11 +478,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание временно обучающихся в данной ОО
-]]></text>
+				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="fbf178d4-3d1a-4e0b-973e-a4dbb765e732" x="5540" y="25" width="60" height="110"/>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="7305" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1474,11 +492,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание своей ОО
-]]></text>
+				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="e274c710-0cae-4b3a-a8a6-4af83bf369ad" x="5600" y="25" width="60" height="110"/>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="7460" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1489,11 +506,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание временно обучающихся в данной ОО
-]]></text>
+				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ae1fdbec-abd2-49b4-9094-843bbf07779f" x="4700" y="25" width="60" height="110"/>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="7530" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1504,11 +520,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание своей ОО
-]]></text>
+				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3ec618ca-3e07-4280-92be-fbfcb87830bf" x="4760" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="7065" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1519,11 +534,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание временно обучающихся в данной ОО
-]]></text>
+				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="da725495-53f9-4da7-8212-9b56de0716ca" x="3860" y="25" width="60" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="6670" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1534,11 +548,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание своей ОО
-]]></text>
+				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3671209f-b35a-441b-bd61-76abb4ecac1c" x="3920" y="25" width="60" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="6290" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1549,11 +562,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание временно обучающихся в данной ОО
-]]></text>
+				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="50dd19e9-2e0a-4813-8a6e-51c3c8678d19" x="3020" y="25" width="60" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="6530" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1564,11 +576,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание своей ОО
-]]></text>
+				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3560179c-d62d-4b38-a43e-d5ee2dda985b" x="3080" y="25" width="60" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="6810" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1579,11 +590,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание временно обучающихся в данной ОО
-]]></text>
+				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="51a853c3-3ede-4ca7-87a4-aa71d53ed4bb" x="2180" y="25" width="60" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="6600" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1594,11 +604,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание своей ОО
-]]></text>
+				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a7c67889-c117-4f9f-9d1f-bd69a8442e92" x="2240" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="7125" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1609,15 +618,1036 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Льготное питание временно обучающихся в данной ОО
-]]></text>
+				<text><![CDATA[Абонементный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="6445" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="6220" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="7185" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="6945" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="6740" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание своей ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="6895" y="25" width="50" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Резерв и замена]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="7245" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="6375" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="7005" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="5980" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="5585" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание итого]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="5205" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="5445" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="5725" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="5515" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Общее кол-во проходов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="6040" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="5360" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="5135" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="6100" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="5860" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="6160" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="5290" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="5920" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="5655" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание своей ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="5810" y="25" width="50" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Резерв и замена]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="4895" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="4500" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание итого]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="4120" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="4360" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="4640" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="4430" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Общее кол-во проходов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="4955" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="4275" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="4050" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="5015" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="4775" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="5075" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="4205" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="4835" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="4570" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание своей ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="4725" y="25" width="50" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Резерв и замена]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="3810" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="3415" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание итого]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="3035" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="3275" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="3555" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="3345" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Общее кол-во проходов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="3870" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="3190" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="2965" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="3930" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="3690" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="3990" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="3120" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="3750" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="3485" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание своей ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="3640" y="25" width="50" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Резерв и замена]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="2725" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="2330" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание итого]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="1950" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="2190" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="2470" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="2260" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Общее кол-во проходов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="2785" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Абонементный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="2105" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="1880" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="2845" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="2605" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (обучающиеся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="2905" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Платный план (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="2035" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="2665" y="25" width="60" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Буфет (взрослые)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="2400" y="25" width="70" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Льготное питание своей ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="2555" y="25" width="50" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Резерв и замена]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="26" splitType="Stretch">
+		<band height="27" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="fe55e602-4fe3-41c7-98d5-226fe0ef2380" x="0" y="0" width="50" height="26"/>
+				<reportElement uuid="fe55e602-4fe3-41c7-98d5-226fe0ef2380" x="0" y="0" width="50" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1628,7 +1658,7 @@
 				<textFieldExpression><![CDATA[$F{orgNum}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="6588f785-71ec-44e9-a94c-d8ac970a34dd" stretchType="RelativeToBandHeight" x="50" y="0" width="500" height="26"/>
+				<reportElement uuid="6588f785-71ec-44e9-a94c-d8ac970a34dd" stretchType="RelativeToBandHeight" x="50" y="0" width="500" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1639,7 +1669,7 @@
 				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="550" y="0" width="400" height="26"/>
+				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="550" y="0" width="400" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1650,7 +1680,7 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" x="950" y="0" width="50" height="26"/>
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" x="950" y="0" width="50" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1661,7 +1691,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="51a59e17-ad29-4f12-a57c-b92682e854f6" x="1000" y="0" width="100" height="26"/>
+				<reportElement uuid="51a59e17-ad29-4f12-a57c-b92682e854f6" x="1000" y="0" width="100" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1672,7 +1702,7 @@
 				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" x="1100" y="0" width="100" height="26"/>
+				<reportElement uuid="ea7c75e9-c579-4287-bd25-b968a3a08210" x="1100" y="0" width="100" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1683,7 +1713,7 @@
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" x="1200" y="0" width="150" height="26"/>
+				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" x="1200" y="0" width="150" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1694,7 +1724,7 @@
 				<textFieldExpression><![CDATA[$F{typeOfBuilding}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="e13e74a2-48a0-4653-9d25-e4156de827e1" x="1350" y="0" width="100" height="26"/>
+				<reportElement uuid="e13e74a2-48a0-4653-9d25-e4156de827e1" x="1350" y="0" width="100" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1705,7 +1735,7 @@
 				<textFieldExpression><![CDATA[$F{introductionQueue}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" x="1450" y="0" width="70" height="26"/>
+				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" x="1450" y="0" width="70" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1716,7 +1746,7 @@
 				<textFieldExpression><![CDATA[$F{studentsInDatabase}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" x="1520" y="0" width="70" height="26"/>
+				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" x="1520" y="0" width="70" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1727,7 +1757,7 @@
 				<textFieldExpression><![CDATA[$F{studentsWithMaps}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" x="1590" y="0" width="70" height="26"/>
+				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" x="1590" y="0" width="70" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1738,7 +1768,7 @@
 				<textFieldExpression><![CDATA[$F{parents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" x="1660" y="0" width="110" height="26"/>
+				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" x="1660" y="0" width="110" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1749,7 +1779,7 @@
 				<textFieldExpression><![CDATA[$F{pedagogicalComposition}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" x="1770" y="0" width="110" height="26"/>
+				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" x="1770" y="0" width="110" height="27"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -1760,32 +1790,32 @@
 				<textFieldExpression><![CDATA[$F{otherEmployees}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" x="1880" y="0" width="840" height="26"/>
+				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" x="1880" y="0" width="1085" height="27"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsMonday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="f27c8e58-0d9e-4a43-87ff-2d07effaa8fd" x="2720" y="0" width="840" height="26"/>
+				<reportElement uuid="f27c8e58-0d9e-4a43-87ff-2d07effaa8fd" x="2965" y="0" width="1085" height="27"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsTuesday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="461aee88-5803-4d7b-8004-3f511d4ca52f" x="3560" y="0" width="840" height="26"/>
+				<reportElement uuid="461aee88-5803-4d7b-8004-3f511d4ca52f" x="4050" y="0" width="1085" height="27"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsWednesday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="3bcb7720-7da9-45d4-aae0-f24162fd717b" x="4400" y="0" width="840" height="26"/>
+				<reportElement uuid="3bcb7720-7da9-45d4-aae0-f24162fd717b" x="5135" y="0" width="1085" height="27"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsThursday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="5c0b20b6-5cf9-4141-a4d7-b88721547798" x="5240" y="0" width="840" height="26"/>
+				<reportElement uuid="5c0b20b6-5cf9-4141-a4d7-b88721547798" x="6220" y="0" width="1085" height="27"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsFriday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="92958c1b-9b37-418c-a55e-6bd6747b30a9" x="6080" y="0" width="840" height="26"/>
+				<reportElement uuid="92958c1b-9b37-418c-a55e-6bd6747b30a9" x="7305" y="0" width="1085" height="27"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsSaturday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
