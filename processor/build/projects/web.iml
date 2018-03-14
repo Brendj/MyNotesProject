@@ -163,5 +163,8 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="jboss-jaxrs-api_1.1_spec-1.0.0.Final" level="project" />
+    <orderEntry type="library" name="jackson-mapper-asl-1.9.2" level="project" />
+    <orderEntry type="library" name="jackson-core-asl-1.9.2" level="project" />
   </component>
 </module>
