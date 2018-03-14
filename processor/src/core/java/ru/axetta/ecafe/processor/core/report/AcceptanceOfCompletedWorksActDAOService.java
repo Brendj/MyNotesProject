@@ -77,7 +77,13 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         query.setParameter("idOfOrg", idOfOrg);
         List res = query.list();
 
-        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
+        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem;
+
+        if (!res.isEmpty()) {
+            acceptanceOfCompletedWorksActItem = fooBar(res);
+        } else {
+            acceptanceOfCompletedWorksActItem = emptyBar();
+        }
 
         SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrg(idOfOrg, startTime, endDate, type);
         acceptanceOfCompletedWorksActItem.setActCrossTabDataList(sumPriceAndCrossTabItems.actCrossTabDatas);
@@ -96,9 +102,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         acceptanceOfCompletedWorksActItem.setSum(sumStr);
 
-        if (!res.isEmpty()) {
-            result.add(acceptanceOfCompletedWorksActItem);
-        }
+        result.add(acceptanceOfCompletedWorksActItem);
 
         return result;
     }
@@ -119,7 +123,13 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         query.setParameter("idOfOrg", friendlyOrganizationsInfoModel.getIdOfOrg());
         List res = query.list();
 
-        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = fooBar(res);
+        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem;
+
+        if (!res.isEmpty()) {
+            acceptanceOfCompletedWorksActItem = fooBar(res);
+        } else {
+            acceptanceOfCompletedWorksActItem = emptyBar();
+        }
 
         SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrgs(
                 friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet(), startTime, endDate, type);
@@ -139,13 +149,10 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         acceptanceOfCompletedWorksActItem.setSum(sumStr);
 
-        if (!res.isEmpty()) {
-            result.add(acceptanceOfCompletedWorksActItem);
-        }
+        result.add(acceptanceOfCompletedWorksActItem);
 
         return result;
     }
-
 
     private SumPriceAndCrossTabItems findAllForCrossTabByOrg(Long idOfOrg, Date startTime, Date endTime, String type) {
         List<AcceptanceOfCompletedWorksActCrossTabData> actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
@@ -341,6 +348,23 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                 acceptanceOfCompletedWorksActItem.setFullName(fullName);
             }
         }
+
+        return acceptanceOfCompletedWorksActItem;
+    }
+
+    private AcceptanceOfCompletedWorksActItem emptyBar() {
+        AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = new AcceptanceOfCompletedWorksActItem();
+
+        acceptanceOfCompletedWorksActItem.setNumberOfContract("____________");
+        acceptanceOfCompletedWorksActItem.setDateOfConclusion("____________");
+        acceptanceOfCompletedWorksActItem.setShortNameInfoService("____________________________");
+        acceptanceOfCompletedWorksActItem.setExecutor("____________");
+        acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
+        acceptanceOfCompletedWorksActItem
+                .setOfficialPosition("__________________________________________________________________");
+        acceptanceOfCompletedWorksActItem.setFullName("____________");
+        acceptanceOfCompletedWorksActItem.setOfficialPosition("____________");
+        acceptanceOfCompletedWorksActItem.setFullName("____________");
 
         return acceptanceOfCompletedWorksActItem;
     }
