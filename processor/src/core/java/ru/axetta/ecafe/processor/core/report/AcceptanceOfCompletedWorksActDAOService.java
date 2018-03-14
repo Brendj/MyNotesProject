@@ -355,7 +355,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
     private AcceptanceOfCompletedWorksActItem emptyBar() {
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = new AcceptanceOfCompletedWorksActItem();
 
-        acceptanceOfCompletedWorksActItem.setNumberOfContract("____________");
+        acceptanceOfCompletedWorksActItem.setNumberOfContract("____");
         acceptanceOfCompletedWorksActItem.setDateOfConclusion("____________");
         acceptanceOfCompletedWorksActItem.setShortNameInfoService("____________________________");
         acceptanceOfCompletedWorksActItem.setExecutor("____________");
