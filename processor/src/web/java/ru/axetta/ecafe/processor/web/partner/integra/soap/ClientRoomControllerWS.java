@@ -1759,7 +1759,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } else {
             clientSummaryBase.setGrade(client.getClientGroup().getGroupName());
             Long groupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-            if (groupId >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() && groupId <= ClientGroup.Predefined.CLIENT_DISPLACED.getValue()) {
+            if (groupId >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                 clientSummaryBase.setGroupPredefined(1);
             } else {
                 clientSummaryBase.setGroupPredefined(0);
@@ -1771,6 +1771,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryBase.setOrgId(client.getOrg().getIdOfOrg());
         clientSummaryBase.setOrgType(client.getOrg().getType());
         clientSummaryBase.setGuid(client.getClientGUID());
+        clientSummaryBase.setSpecialMenu(client.getSpecialMenu() == null || !client.getSpecialMenu() ? 0 : 1);
         return clientSummaryBase;
     }
 
@@ -5222,9 +5223,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     IntegraPartnerConfig.LinkConfig authenticateRequest(Long contractId, HTTPDataHandler handler) throws Error {
-        /*if (RuntimeContext.getInstance().isTestMode()){
-            return null;
-        }*/
+        if (context == null) return null; //если вызов через создание класса напрямую, не в качестве веб-сервиса
         MessageContext jaxwsContext = context.getMessageContext();
         HttpServletRequest request = (HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST);
         String clientAddress = request.getRemoteAddr();
@@ -6391,6 +6390,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             menuItemExt.setProtein(menuDetail.getProtein());
             menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
             menuItemExt.setFat(menuDetail.getFat());
+            menuItemExt.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
 
             menuItemExtList.add(menuItemExt);
         }
@@ -6579,6 +6579,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             settingExt.setDaysToForbidChangeInPos(parser.getDaysToForbidChangeInPos());
             settingExt.setDayCreateVP(parser.getDayCreateVP());
             settingExt.setHoursForbidVP(parser.getHoursForbidVP());
+            settingExt.setHoursForbidPP(parser.getHoursForbidPP());
             result.subscriptionFeedingSettingExt = settingExt;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -8269,7 +8270,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             ClientSummaryBaseListResult clientSummaryBaseListResult = new ClientSummaryBaseListResult();
-            clientSummaryBaseListResult.clientSummary = clientSummaries;
+            clientSummaryBaseListResult.setClientSummary(clientSummaries);
             clientSummaryBaseListResult.resultCode = cd.resultCode;
             clientSummaryBaseListResult.description = cd.description;
             transaction.commit();

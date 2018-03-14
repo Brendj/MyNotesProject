@@ -4560,6 +4560,10 @@ public class Processor implements SyncProcessor {
             if (rootComplex != null) {
                 complexInfo.setRootComplex(rootComplex);
             }
+            Integer usedSpecialMenu = reqComplexInfo.getUsedSpecialMenu();
+            if (usedSpecialMenu != null) {
+                complexInfo.setUsedSpecialMenu(usedSpecialMenu);
+            }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {
                 MenuDetail menuDetailOptional = findMenuDetailByLocalId(persistenceSession, menu,

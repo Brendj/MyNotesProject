@@ -27,6 +27,7 @@ public class ComplexInfo {
     private Integer usedSubscriptionFeeding; //Признак использования комплекса в абонементном питании. 1 – может быть использован, 0 – не может быть использован
     private Integer usedVariableFeeding; //Признак использования комплекса в вариативном питании. 1 – может быть использован, 0 – не может быть использован
     private Integer rootComplex; //Идентификатор комплекса-родителя для связывания комплексов в группы
+    private Integer usedSpecialMenu; //Признак использования комплекса в предзаказах
 
     protected ComplexInfo() {}
 
@@ -206,5 +207,13 @@ public class ComplexInfo {
         return "ComplexInfo{" + "idOfComplexInfo=" + idOfComplexInfo + ", idOfComplex=" + idOfComplex + ", org=" + org
                 + ", modeFree=" + modeFree + ", modeGrant=" + modeGrant + ", modeOfAdd=" + modeOfAdd + ", useTrDiscount=" + useTrDiscount
                 + ", discountDetail:" + discountDetail + ", currentPrice=" + currentPrice + ", modeVisible=" + modeVisible + '}';
+    }
+
+    public Integer getUsedSpecialMenu() {
+        return usedSpecialMenu;
+    }
+
+    public void setUsedSpecialMenu(Integer usedSpecialMenu) {
+        this.usedSpecialMenu = usedSpecialMenu;
     }
 }

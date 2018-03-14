@@ -77,6 +77,16 @@
         <url-pattern>/back-office/index.faces</url-pattern>
     </filter-mapping>
 
+    <filter>
+        <filter-name>PreorderServiceFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.partner.preorder.PreorderServiceFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>PreorderServiceFilter</filter-name>
+        <url-pattern>/specialmenu/*</url-pattern>
+    </filter-mapping>
+
     <listener>
         <display-name>JavaServer Faces configure listener</display-name>
         <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
@@ -154,6 +164,27 @@
         <servlet-name>LastModifiedOrgsServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.newispp.LastModifiedOrgsServlet</servlet-class>
     </servlet>
+
+    <context-param>
+        <param-name>resteasy.servlet.mapping.prefix</param-name>
+        <param-value>/preorder</param-value>
+    </context-param>
+    <context-param>
+        <param-name>resteasy.resources</param-name>
+        <param-value>ru.axetta.ecafe.processor.web.partner.preorder.PreorderService</param-value>
+    </context-param>
+    <context-param>
+        <param-name>resteasy.providers</param-name>
+        <param-value>ru.axetta.ecafe.processor.web.partner.preorder.PreorderRequestInterceptor</param-value>
+    </context-param>
+    <servlet>
+        <servlet-name>Preorder</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Preorder</servlet-name>
+        <url-pattern>/preorder/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>

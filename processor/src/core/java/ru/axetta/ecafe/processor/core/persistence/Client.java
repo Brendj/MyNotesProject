@@ -133,6 +133,7 @@ public class Client {
     private Date lastConfirmMobile;
     private ClientCreatedFromType createdFrom;
     private String createdFromDesc;
+    private Boolean specialMenu;
 
     protected Client() {
         // For Hibernate only
@@ -1080,5 +1081,13 @@ public class Client {
 
     public void setDisablePlanEndDate(Date disablePlanEndDate) {
         this.disablePlanEndDate = disablePlanEndDate;
+    }
+
+    public Boolean getSpecialMenu() {
+        return specialMenu;
+    }
+
+    public void setSpecialMenu(Boolean preorder) {
+        this.specialMenu = preorder;
     }
 }

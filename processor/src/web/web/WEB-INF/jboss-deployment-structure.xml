@@ -26,6 +26,10 @@
             <module name="javax.faces.api" slot="1.2" />
             <module name="com.sun.jsf-impl" slot="1.2" />
             <module name="org.infinispan" />
+            <module name="org.codehaus.jackson.jackson-jaxrs" />
+            <module name="org.codehaus.jackson.jackson-core-asl" />
+            <module name="org.codehaus.jackson.jackson-mapper-asl" />
+            <module name="org.codehaus.jackson.jackson-xc" />
         </dependencies>
         <exclusions>
             <module name="javax.faces.api" slot="main" />

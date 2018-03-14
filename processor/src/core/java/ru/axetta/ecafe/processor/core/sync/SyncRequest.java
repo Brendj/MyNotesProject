@@ -962,6 +962,12 @@ public class SyncRequest {
                             rootComplex = Integer.parseInt(rootComplexNode.getTextContent());
                         }
 
+                        Node usedSpecialMenuNode = namedNodeMap.getNamedItem("usedSpecialMenu");
+                        int usedSpecialMenu = 0;
+                        if (usedSpecialMenuNode != null) {
+                            usedSpecialMenu = Integer.parseInt(usedSpecialMenuNode.getTextContent());
+                        }
+
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
@@ -1000,7 +1006,7 @@ public class SyncRequest {
                         return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
                                 usedSubscriptionFeeding, reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail,
                                 reqComplexInfoDiscountDetail, currentPrice, goodsGuid, modeVisible, usedVariableFeeding,
-                                rootComplex);
+                                rootComplex, usedSpecialMenu);
                     }
 
                 }
@@ -1012,6 +1018,7 @@ public class SyncRequest {
                 private final int modeOfAdd;
                 private final int usedSubscriptionFeeding;
                 private final int usedVariableFeeding;
+                private final int usedSpecialMenu;
                 private final Integer useTrDiscount;
                 private final ReqMenuDetail reqMenuDetail;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
@@ -1024,7 +1031,7 @@ public class SyncRequest {
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
                         int usedSubscriptionFeeding, List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
                         ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid,
-                        Integer modeVisible, int usedVariableFeeding, Integer rootComplex) {
+                        Integer modeVisible, int usedVariableFeeding, Integer rootComplex, Integer useSpecialMenu) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
@@ -1040,6 +1047,7 @@ public class SyncRequest {
                     this.goodsGuid = goodsGuid;
                     this.modeVisible = modeVisible;
                     this.rootComplex = rootComplex;
+                    this.usedSpecialMenu = useSpecialMenu;
                 }
 
                 public int getComplexId() {
@@ -1096,6 +1104,10 @@ public class SyncRequest {
 
                 public Integer getRootComplex() {
                     return rootComplex;
+                }
+
+                public int getUsedSpecialMenu() {
+                    return usedSpecialMenu;
                 }
 
                 public Integer getModeVisible() {

@@ -19,6 +19,7 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private int daysToForbidChangeInPos; // Количество рабочих дней блокировки баланса с учетом стоимости питания, отмеченного в циклограмме
     private int dayCreateVP; //Количество дней, на которые создаются заявки вариативного питания
     private int hoursForbidVP; //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
+    private int hoursForbidPP; //Количество часов, в течение которых запрещено редактировать заявки по предзаказам
 
     //значения по умолчанию
     private static final int DAY_REQUEST = 5; //5;2;0;1;0;3
@@ -29,6 +30,7 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private static final int DAYS_FORBID_CHANGE_POS = 3;
     private static final int DAY_CREATE_VP = 0;
     private static final int HOURS_FORBID_VP = 0;
+    private static final int HOURS_FORBID_PP = 0;
 
     public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -44,6 +46,7 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
         this.daysToForbidChangeInPos = safeParseInt(values, 5, DAYS_FORBID_CHANGE_POS);
         this.dayCreateVP = safeParseInt(values, 6, DAY_CREATE_VP);
         this.hoursForbidVP = safeParseInt(values, 7, HOURS_FORBID_VP);
+        this.hoursForbidPP = safeParseInt(values, 8, HOURS_FORBID_PP);
     }
 
     private int safeParseInt(String[] values, int index, int default_value) {
@@ -66,7 +69,8 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     public String build() {
         //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
         return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (
-                sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";" + dayCreateVP + ";" + hoursForbidVP + ";";
+                sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";" + dayCreateVP + ";" + hoursForbidVP + ";"
+                + hoursForbidPP + ";";
     }
 
     @Override
@@ -154,5 +158,13 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
 
     public void setHoursForbidVP(int hoursForbidVP) {
         this.hoursForbidVP = hoursForbidVP;
+    }
+
+    public int getHoursForbidPP() {
+        return hoursForbidPP;
+    }
+
+    public void setHoursForbidPP(int hoursForbidPP) {
+        this.hoursForbidPP = hoursForbidPP;
     }
 }

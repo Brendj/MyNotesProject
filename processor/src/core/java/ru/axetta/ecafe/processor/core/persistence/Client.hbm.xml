@@ -67,6 +67,9 @@
         <property name="lastFreePayTime" column="LastFreePayTime"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="discountMode" column="DiscountMode" type="integer" not-null="true"/>
+        <property name="specialMenu" column="specialMenu"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="false"/>
         <property name="balance" column="Balance" type="long" not-null="true" update="false"/>
 
         <property name="subBalance1" column="SubBalance1" type="long" not-null="true" update="false"/>

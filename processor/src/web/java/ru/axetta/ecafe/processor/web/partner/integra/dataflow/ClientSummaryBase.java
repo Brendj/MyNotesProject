@@ -41,6 +41,8 @@ public class ClientSummaryBase {
     private Integer isInside;
     @XmlAttribute(name = "GUID")
     protected String guid;
+    @XmlAttribute(name = "Preorder")
+    private Integer specialMenu;
 
     @XmlAttribute(name = "GuardianCreatedWhere")
     protected Integer guardianCreatedWhere;
@@ -307,5 +309,13 @@ public class ClientSummaryBase {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Integer getSpecialMenu() {
+        return specialMenu;
+    }
+
+    public void setSpecialMenu(Integer specialMenu) {
+        this.specialMenu = specialMenu;
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientSummaryBaseListResult extends Result {
-    public List<ClientSummaryBase> clientSummary;
+    private List<ClientSummaryBase> clientSummary;
 
 
     public ClientSummaryBaseListResult(List<ClientSummaryBase> clientSummary, Long resultCode, String description) {
@@ -23,4 +23,12 @@ public class ClientSummaryBaseListResult extends Result {
         this.description = description;
     }
     public ClientSummaryBaseListResult() {}
+
+    public List<ClientSummaryBase> getClientSummary() {
+        return clientSummary;
+    }
+
+    public void setClientSummary(List<ClientSummaryBase> clientSummary) {
+        this.clientSummary = clientSummary;
+    }
 }

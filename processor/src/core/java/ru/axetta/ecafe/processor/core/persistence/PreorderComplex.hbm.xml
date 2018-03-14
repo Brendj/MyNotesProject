@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.PreorderComplex" table="cf_preorder_complex">
+        <id name="idOfPreorderComplex" column="IdOfPreorderComplex" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="complexInfo" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfo"
+                     column="IdOfComplexInfo" not-null="true" fetch="join"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="IdOfClient" not-null="true" fetch="select"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="amount" column="amount" type="integer"/>
+        <property name="preorderDate" column="preorderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+    </class>
+</hibernate-mapping>
