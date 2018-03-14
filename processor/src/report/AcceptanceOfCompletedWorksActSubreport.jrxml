@@ -8,7 +8,7 @@
 	<field name="education" class="java.lang.String"/>
 	<field name="sum" class="java.lang.String"/>
 	<summary>
-		<band height="130" splitType="Stretch">
+		<band height="130">
 			<crosstab>
 				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="490" height="130"/>
 				<box>
@@ -21,14 +21,14 @@
 				<crosstabHeaderCell>
 					<cellContents/>
 				</crosstabHeaderCell>
-				<rowGroup name="education" width="40">
+				<rowGroup name="education" width="30">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{education}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="40"/>
+								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="40"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -47,14 +47,14 @@
 						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<columnGroup name="goodName" height="40">
+				<columnGroup name="goodName" height="50">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{goodName}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="c5a7ee67-aff5-4688-850d-1cb9f8d9e20f" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="40"/>
+								<reportElement uuid="c5a7ee67-aff5-4688-850d-1cb9f8d9e20f" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="50"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -76,10 +76,10 @@
 				<measure name="sumMeasure" class="java.lang.String" calculation="Sum">
 					<measureExpression><![CDATA[$F{sum}]]></measureExpression>
 				</measure>
-				<crosstabCell width="40" height="41">
+				<crosstabCell width="30" height="40">
 					<cellContents>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="03fd3185-1b8c-44fa-932a-3bdd43b5e279" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="40"/>
+							<reportElement uuid="03fd3185-1b8c-44fa-932a-3bdd43b5e279" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="40"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>

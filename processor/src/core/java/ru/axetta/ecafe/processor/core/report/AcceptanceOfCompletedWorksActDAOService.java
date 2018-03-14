@@ -371,11 +371,15 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         acceptanceOfCompletedWorksActItem.setShortNameInfoService(org.getShortNameInfoService().replaceAll("\"", ""));
         acceptanceOfCompletedWorksActItem.setExecutor("____________");
         acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
-        acceptanceOfCompletedWorksActItem
-                .setOfficialPosition("__________________________________________________________________");
-        acceptanceOfCompletedWorksActItem.setFullName("____________");
+       if (org.getOfficialPosition() != null) {
+           acceptanceOfCompletedWorksActItem
+                   .setOfficialPosition(org.getOfficialPosition() + ", " + org.getOfficialPerson().getFullName());
+           acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getFullName());
+       } else {
+
         acceptanceOfCompletedWorksActItem.setOfficialPosition("____________");
         acceptanceOfCompletedWorksActItem.setFullName("____________");
+       }
 
         return acceptanceOfCompletedWorksActItem;
     }
