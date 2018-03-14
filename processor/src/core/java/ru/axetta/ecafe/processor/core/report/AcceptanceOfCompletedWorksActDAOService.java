@@ -64,6 +64,8 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
     public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrg(Long idOfOrg, Date startTime, Date endDate,
             String type) {
 
+        Org org = (Org) getSession().load(Org.class, idOfOrg);
+
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
         Query query = getSession().createSQLQuery("SELECT contractnumber, dateofconclusion, "
@@ -82,7 +84,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         if (!res.isEmpty()) {
             acceptanceOfCompletedWorksActItem = fooBar(res);
         } else {
-            acceptanceOfCompletedWorksActItem = emptyBar();
+            acceptanceOfCompletedWorksActItem = emptyBar(org);
         }
 
         SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrg(idOfOrg, startTime, endDate, type);
@@ -110,6 +112,15 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
     public List<AcceptanceOfCompletedWorksActItem> findAllItemsForActByOrgs(
             FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate, String type) {
 
+        Org org = null;
+        for (Org org1: friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet()) {
+            if (org1.isMainBuilding()) {
+                org = org1;
+            } else {
+               org = (Org) getSession().load(Org.class, friendlyOrganizationsInfoModel.getIdOfOrg());
+            }
+        }
+
         List<AcceptanceOfCompletedWorksActItem> result = new ArrayList<AcceptanceOfCompletedWorksActItem>();
 
         Query query = getSession().createSQLQuery("SELECT contractnumber, dateofconclusion, "
@@ -128,7 +139,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         if (!res.isEmpty()) {
             acceptanceOfCompletedWorksActItem = fooBar(res);
         } else {
-            acceptanceOfCompletedWorksActItem = emptyBar();
+            acceptanceOfCompletedWorksActItem = emptyBar(org);
         }
 
         SumPriceAndCrossTabItems sumPriceAndCrossTabItems = findAllForCrossTabByOrgs(
@@ -352,12 +363,12 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         return acceptanceOfCompletedWorksActItem;
     }
 
-    private AcceptanceOfCompletedWorksActItem emptyBar() {
+    private AcceptanceOfCompletedWorksActItem emptyBar(Org org) {
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = new AcceptanceOfCompletedWorksActItem();
 
         acceptanceOfCompletedWorksActItem.setNumberOfContract("____");
         acceptanceOfCompletedWorksActItem.setDateOfConclusion("____________");
-        acceptanceOfCompletedWorksActItem.setShortNameInfoService("____________________________");
+        acceptanceOfCompletedWorksActItem.setShortNameInfoService(org.getShortNameInfoService().replaceAll("\"", ""));
         acceptanceOfCompletedWorksActItem.setExecutor("____________");
         acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
         acceptanceOfCompletedWorksActItem

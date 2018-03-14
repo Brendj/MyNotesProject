@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksAct" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="490" leftMargin="63" rightMargin="42" topMargin="56" bottomMargin="56" uuid="404814b1-5f24-4b2e-8e51-2f435162edde">
 	<property name="ireport.zoom" value="1.210000000000002"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="192"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -33,13 +33,6 @@
 				<text><![CDATA[г. Москва]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="762458ec-e9a8-4668-b359-a9c8f6f70393" x="0" y="134" width="490" height="20"/>
-				<textElement textAlignment="Justified">
-					<font fontName="Times New Roman" size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA["«" +$F{shortNameInfoService}+"»" + ", именуемый (-ое) в дальнейшем «Заказчик», в лице "]]></textFieldExpression>
-			</textField>
-			<textField>
 				<reportElement uuid="0715a69f-f225-46b4-bd49-cbb853edbb9a" x="177" y="114" width="313" height="20"/>
 				<textElement textAlignment="Right">
 					<font fontName="Times New Roman" size="14"/>
@@ -47,21 +40,21 @@
 				<textFieldExpression><![CDATA[$P{currentDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="60faf0dc-8a37-4b47-a845-6f24e21f257e" x="0" y="286" width="490" height="112"/>
+				<reportElement uuid="60faf0dc-8a37-4b47-a845-6f24e21f257e" x="0" y="273" width="490" height="120"/>
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA["      1.   В соответствии с условиями контракта от " + $F{dateOfConclusion} + " № " + $F{numberOfContract} + " (далее – Контракт) Исполнителем оказаны услуги, а Заказчиком приняты услуги по предмету закупки: Оказание услуг по организации питания и обеспечению питьевого режима обучающихся государственных образовательных организаций, подведомственных Департаменту образования города Москвы, в 2017 – 2019 годах."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["      1.   В соответствии с условиями контракта № "  + $F{numberOfContract} + " от " + $F{dateOfConclusion} + " (далее – Контракт) Исполнителем оказаны услуги, а Заказчиком приняты услуги по предмету закупки: Оказание услуг по организации питания и обеспечению питьевого режима обучающихся государственных образовательных организаций, подведомственных Департаменту образования города Москвы, в 2017 – 2019 годах."]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="eebcb878-42d9-4904-97a7-133133f01998" x="0" y="398" width="490" height="20"/>
+				<reportElement uuid="eebcb878-42d9-4904-97a7-133133f01998" x="0" y="393" width="490" height="26"/>
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
 				<text><![CDATA[      2.   Контрактом предусмотрено оказание следующих видов услуг:]]></text>
 			</staticText>
 			<frame>
-				<reportElement uuid="17048b87-871c-4183-8824-373edc189887" x="0" y="418" width="125" height="35"/>
+				<reportElement uuid="17048b87-871c-4183-8824-373edc189887" x="0" y="419" width="125" height="35"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -78,7 +71,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="6e74a1fa-3f8b-4d65-bca7-1bfa4e4921e2" x="125" y="418" width="125" height="35"/>
+				<reportElement uuid="6e74a1fa-3f8b-4d65-bca7-1bfa4e4921e2" x="125" y="419" width="125" height="35"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -95,7 +88,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="31c9cba1-b37e-4532-97d7-3403cee14c69" x="250" y="418" width="125" height="35"/>
+				<reportElement uuid="31c9cba1-b37e-4532-97d7-3403cee14c69" x="250" y="419" width="125" height="35"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -112,7 +105,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="9c508c50-786a-4b2b-926c-f06e503aa92e" x="375" y="418" width="115" height="35"/>
+				<reportElement uuid="9c508c50-786a-4b2b-926c-f06e503aa92e" x="375" y="419" width="115" height="35"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -129,7 +122,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="35d467e3-7a62-4b50-ae36-241926b1d0ff" x="0" y="453" width="125" height="98"/>
+				<reportElement uuid="35d467e3-7a62-4b50-ae36-241926b1d0ff" x="0" y="454" width="125" height="98"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -153,7 +146,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="50ca05c7-c0d6-411d-92fe-59168d046f38" x="125" y="453" width="125" height="98"/>
+				<reportElement uuid="50ca05c7-c0d6-411d-92fe-59168d046f38" x="125" y="454" width="125" height="98"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -170,7 +163,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="4700d308-2cd8-4a20-b555-2603517e547a" x="250" y="453" width="125" height="98"/>
+				<reportElement uuid="4700d308-2cd8-4a20-b555-2603517e547a" x="250" y="454" width="125" height="98"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -187,7 +180,7 @@
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="d4f9bc5e-a405-4c22-8b4a-e7a7d9d5e092" x="375" y="453" width="115" height="98"/>
+				<reportElement uuid="d4f9bc5e-a405-4c22-8b4a-e7a7d9d5e092" x="375" y="454" width="115" height="98"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -248,18 +241,11 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="f4db4fa0-3f42-4c74-a6fb-206f6f3b691a" x="0" y="174" width="490" height="112"/>
+				<reportElement uuid="f4db4fa0-3f42-4c74-a6fb-206f6f3b691a" x="0" y="134" width="490" height="139"/>
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA["действующего на основании _________________, с одной стороны и " + "«"+$F{executor}+"»" + ", именуемый (-ое) в дальнейшем «Исполнитель», в лице________________________, действующего на основании ___________________, с другой стороны, совместно именуемые в дальнейшем «Стороны» и  каждый в отдельности «Сторона», составили настоящий Акт о нижеследующем:"]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement uuid="9e454a07-6506-4b3b-8e08-b444f005eb23" x="0" y="154" width="490" height="20"/>
-				<textElement textAlignment="Justified">
-					<font fontName="Times New Roman" size="14"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{officialPosition} + ", "]]></textFieldExpression>
+				<textFieldExpression><![CDATA["«" +$F{shortNameInfoService}+"», именуемый (-ое) в дальнейшем «Заказчик», в лице " + $F{officialPosition} + ", " +"действующего на основании _________________, с одной стороны и «"+$F{executor}+"», именуемый (-ое) в дальнейшем «Исполнитель», в лице________________________, действующего на основании ___________________, с другой стороны, совместно именуемые в дальнейшем «Стороны» и  каждый в отдельности «Сторона», составили настоящий Акт о нижеследующем:"]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="695">
