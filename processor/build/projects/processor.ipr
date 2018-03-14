@@ -1315,7 +1315,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/../../target/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
@@ -1858,6 +1858,20 @@
     <library name="infinispan-core-5.1.2.FINAL">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/infinispan/infinispan-core-5.1.2.FINAL.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="jackson-core-asl-1.9.2">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/rest/jackson-core-asl-1.9.2.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="jackson-mapper-asl-1.9.2">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/rest/jackson-mapper-asl-1.9.2.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
