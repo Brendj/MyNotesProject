@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksActSubreport" pageWidth="490" pageHeight="130" columnWidth="490" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="42bb7608-83ec-43b6-9e1e-49579be8b2d2">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksActSubreport" pageWidth="511" pageHeight="130" columnWidth="511" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="42bb7608-83ec-43b6-9e1e-49579be8b2d2">
 	<property name="ireport.zoom" value="2.1435888100000016"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -10,7 +10,7 @@
 	<summary>
 		<band height="130">
 			<frame>
-				<reportElement uuid="9859bf32-0b98-4df8-a76d-1a9d29cac4a8" x="100" y="30" width="350" height="100"/>
+				<reportElement uuid="9859bf32-0b98-4df8-a76d-1a9d29cac4a8" x="100" y="30" width="370" height="100"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -20,7 +20,7 @@
 				</box>
 			</frame>
 			<crosstab>
-				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="30" width="350" height="100"/>
+				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="30" width="370" height="100"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -161,7 +161,7 @@
 				<text><![CDATA[Ед. изм.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="16a4e486-a290-4a39-aee6-7d898da4e2e9" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="0" width="350" height="30"/>
+				<reportElement uuid="16a4e486-a290-4a39-aee6-7d898da4e2e9" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="0" width="370" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -175,7 +175,7 @@
 				<text><![CDATA[Количество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="012854a6-ba9c-4ea2-9cc3-b413295669a8" positionType="Float" stretchType="RelativeToTallestObject" x="450" y="0" width="40" height="30"/>
+				<reportElement uuid="012854a6-ba9c-4ea2-9cc3-b413295669a8" positionType="Float" stretchType="RelativeToTallestObject" x="470" y="0" width="40" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -217,7 +217,7 @@
 				<text><![CDATA[шт.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="663f35aa-097f-4757-b434-e9914f14e0e4" positionType="Float" stretchType="RelativeToTallestObject" x="450" y="30" width="40" height="100"/>
+				<reportElement uuid="663f35aa-097f-4757-b434-e9914f14e0e4" positionType="Float" stretchType="RelativeToTallestObject" x="470" y="30" width="40" height="100"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
