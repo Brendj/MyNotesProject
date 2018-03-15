@@ -348,7 +348,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     .setDateOfClosing(CalendarUtils.dateShortToStringFullYear((Date) objList[4]) + "г.");
             if (objList[5].equals("")) {
                 acceptanceOfCompletedWorksActItem
-                        .setOfficialPosition("__________________________________________________________________");
+                        .setOfficialPosition("_______________________________________________________________________");
                 acceptanceOfCompletedWorksActItem.setFullName("____________");
             } else {
                 String offPosPlusFullName = objList[5] + ", " + objList[6];
@@ -377,7 +377,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
            acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getSurnameAndFirstLetters());
        } else {
            acceptanceOfCompletedWorksActItem
-                   .setOfficialPosition("__________________________________________________________________");
+                   .setOfficialPosition("_______________________________________________________________________");
            acceptanceOfCompletedWorksActItem.setFullName("____________");
        }
 
