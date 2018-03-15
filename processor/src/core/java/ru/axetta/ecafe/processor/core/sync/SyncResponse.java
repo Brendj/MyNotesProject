@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
@@ -1133,6 +1134,7 @@ public class SyncResponse {
     private  ResMigrants resMigrants;
     private  ResHelpRequest resHelpRequest;
     private HelpRequestData helpRequestData;
+    private PreOrdersFeeding preOrdersFeeding;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1152,7 +1154,7 @@ public class SyncResponse {
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
-            ResHelpRequest resHelpRequest, HelpRequestData helpRequestData) {
+            ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1202,6 +1204,7 @@ public class SyncResponse {
         this.responseSections = responseSections;
         this.resHelpRequest = resHelpRequest;
         this.helpRequestData = helpRequestData;
+        this.preOrdersFeeding = preOrdersFeeding;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1443,6 +1446,10 @@ public class SyncResponse {
 
         if (helpRequestData != null) {
             envelopeElement.appendChild(helpRequestData.toElement(document));
+        }
+
+        if (preOrdersFeeding != null) {
+            envelopeElement.appendChild(preOrdersFeeding.toElement(document));
         }
     }
 

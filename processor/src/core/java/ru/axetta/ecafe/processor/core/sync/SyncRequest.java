@@ -25,6 +25,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
@@ -2808,6 +2809,10 @@ public class SyncRequest {
 
     public HelpRequest getHelpRequest() {
         return this.<HelpRequest>findSection(HelpRequest.class);
+    }
+
+    public PreOrdersFeedingRequest getPreOrderFeedingRequest() {
+        return this.<PreOrdersFeedingRequest>findSection(PreOrdersFeedingRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

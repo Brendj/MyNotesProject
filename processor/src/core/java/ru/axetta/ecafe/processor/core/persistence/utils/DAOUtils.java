@@ -2876,4 +2876,18 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("btiUnom", Long.valueOf(unom)));
         return criteria.list();
     }
+
+    public static List<PreorderComplex> getPreorderComplexSinceVersion(Session session, long version) throws Exception {
+        Criteria criteria = session.createCriteria(PreorderComplex.class);
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,
+            PreorderComplex complex) throws Exception {
+        Criteria criteria = session.createCriteria(PreorderMenuDetail.class);
+        criteria.add(Restrictions.eq("client", complex.getClient()));
+        criteria.add(Restrictions.eq("complexInfo", complex.getComplexInfo()));
+        return criteria.list();
+    }
 }
