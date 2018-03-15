@@ -369,7 +369,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         acceptanceOfCompletedWorksActItem.setNumberOfContract("________");
         acceptanceOfCompletedWorksActItem.setDateOfConclusion("____________");
         acceptanceOfCompletedWorksActItem.setShortNameInfoService(org.getShortNameInfoService().replaceAll("\"", ""));
-        acceptanceOfCompletedWorksActItem.setExecutor("____________");
+        acceptanceOfCompletedWorksActItem.setExecutor("____________________________________________________");
         acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
        if (org.getOfficialPosition() != null) {
            acceptanceOfCompletedWorksActItem

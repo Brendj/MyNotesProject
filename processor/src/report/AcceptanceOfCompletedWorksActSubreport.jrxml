@@ -28,7 +28,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="40"/>
+								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="30"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -47,14 +47,14 @@
 						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<columnGroup name="goodName" height="50">
+				<columnGroup name="goodName" height="40">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{goodName}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="c5a7ee67-aff5-4688-850d-1cb9f8d9e20f" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="50"/>
+								<reportElement uuid="c5a7ee67-aff5-4688-850d-1cb9f8d9e20f" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="40"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -76,10 +76,10 @@
 				<measure name="sumMeasure" class="java.lang.String" calculation="Sum">
 					<measureExpression><![CDATA[$F{sum}]]></measureExpression>
 				</measure>
-				<crosstabCell width="30" height="40">
+				<crosstabCell width="30" height="30">
 					<cellContents>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="03fd3185-1b8c-44fa-932a-3bdd43b5e279" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="40"/>
+							<reportElement uuid="03fd3185-1b8c-44fa-932a-3bdd43b5e279" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="30"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -220,6 +220,16 @@
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
+			<frame>
+				<reportElement uuid="9859bf32-0b98-4df8-a76d-1a9d29cac4a8" x="100" y="30" width="350" height="100"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+			</frame>
 		</band>
 	</summary>
 </jasperReport>
