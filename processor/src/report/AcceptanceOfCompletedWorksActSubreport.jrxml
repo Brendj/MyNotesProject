@@ -9,18 +9,8 @@
 	<field name="sum" class="java.lang.String"/>
 	<summary>
 		<band height="130">
-			<frame>
-				<reportElement uuid="9859bf32-0b98-4df8-a76d-1a9d29cac4a8" x="100" y="30" width="370" height="100"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-			</frame>
-			<crosstab>
-				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="30" width="370" height="100"/>
+			<crosstab columnBreakOffset="0">
+				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" stretchType="RelativeToBandHeight" x="100" y="30" width="370" height="100"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -133,7 +123,7 @@
 				</crosstabCell>
 			</crosstab>
 			<staticText>
-				<reportElement uuid="e5089da7-a267-4eb3-9ae9-021edaf4fc94" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="64" height="30"/>
+				<reportElement uuid="e5089da7-a267-4eb3-9ae9-021edaf4fc94" x="0" y="0" width="64" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -147,7 +137,7 @@
 				<text><![CDATA[Наименование]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d7dc7f92-72dc-4dd3-a6d9-03e91b50fa1d" positionType="Float" stretchType="RelativeToTallestObject" x="64" y="0" width="36" height="30"/>
+				<reportElement uuid="d7dc7f92-72dc-4dd3-a6d9-03e91b50fa1d" x="64" y="0" width="36" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -161,7 +151,7 @@
 				<text><![CDATA[Ед. изм.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="16a4e486-a290-4a39-aee6-7d898da4e2e9" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="0" width="370" height="30"/>
+				<reportElement uuid="16a4e486-a290-4a39-aee6-7d898da4e2e9" x="100" y="0" width="370" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -175,7 +165,7 @@
 				<text><![CDATA[Количество]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="012854a6-ba9c-4ea2-9cc3-b413295669a8" positionType="Float" stretchType="RelativeToTallestObject" x="470" y="0" width="40" height="30"/>
+				<reportElement uuid="012854a6-ba9c-4ea2-9cc3-b413295669a8" x="470" y="0" width="40" height="30"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
