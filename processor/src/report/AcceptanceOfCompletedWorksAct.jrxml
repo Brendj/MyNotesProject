@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksAct" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="511" leftMargin="56" rightMargin="28" topMargin="56" bottomMargin="56" uuid="404814b1-5f24-4b2e-8e51-2f435162edde">
 	<property name="ireport.zoom" value="1.0000000000000018"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="688"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -109,7 +109,7 @@
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA["действующего на основании _____________________________________________,"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["действующего на основании ______________________________________________,"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="a76db39d-a95c-4a21-ab1a-6bc6131c76e1" x="0" y="156" width="511" height="20"/>
@@ -137,7 +137,7 @@
 				<textElement>
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA["действующего на основании _____________________________________________,"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["действующего на основании ______________________________________________,"]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="71c1ff7b-b0d3-4c9e-b957-0d6f482cdadc" x="381" y="493" width="127" height="98"/>
