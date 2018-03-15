@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksAct" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="490" leftMargin="63" rightMargin="42" topMargin="56" bottomMargin="56" uuid="404814b1-5f24-4b2e-8e51-2f435162edde">
-	<property name="ireport.zoom" value="1.210000000000002"/>
+	<property name="ireport.zoom" value="1.0000000000000018"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="192"/>
+	<property name="ireport.y" value="674"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -222,7 +222,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Top">
 					<font fontName="Times New Roman" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["к Контракту " + $F{numberOfContract}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["к Контракту № " + $F{numberOfContract}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement uuid="a844318a-568d-49ac-b837-57e196aea953" x="0" y="40" width="490" height="20"/>
@@ -254,7 +254,7 @@
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<text><![CDATA[_________________________________________.]]></text>
+				<text><![CDATA[      _________________________________________________________.]]></text>
 			</staticText>
 			<textField>
 				<reportElement uuid="a1056d51-ce3c-4992-a499-dec1fd039278" x="245" y="633" width="245" height="20"/>
@@ -370,7 +370,7 @@
 				<textElement textAlignment="Justified">
 					<font fontName="Times New Roman" size="14"/>
 				</textElement>
-				<text><![CDATA[_______________________________________________________________.]]></text>
+				<text><![CDATA[      _________________________________________________________.]]></text>
 			</staticText>
 			<subreport>
 				<reportElement uuid="49338217-6179-47ed-aebc-ef618232f238" positionType="Float" x="0" y="0" width="490" height="130"/>

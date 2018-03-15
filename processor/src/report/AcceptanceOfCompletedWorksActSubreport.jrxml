@@ -10,7 +10,7 @@
 	<summary>
 		<band height="130">
 			<crosstab>
-				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="490" height="130"/>
+				<reportElement uuid="c435b710-85b4-4360-a1c2-c41c7af878a0" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="30" width="350" height="100"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -21,14 +21,14 @@
 				<crosstabHeaderCell>
 					<cellContents/>
 				</crosstabHeaderCell>
-				<rowGroup name="education" width="30">
+				<rowGroup name="education" width="40">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{education}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="40"/>
+								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="40"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -122,6 +122,104 @@
 					</cellContents>
 				</crosstabCell>
 			</crosstab>
+			<staticText>
+				<reportElement uuid="e5089da7-a267-4eb3-9ae9-021edaf4fc94" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="64" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Наименование]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d7dc7f92-72dc-4dd3-a6d9-03e91b50fa1d" positionType="Float" stretchType="RelativeToTallestObject" x="64" y="0" width="36" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Ед. изм.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="16a4e486-a290-4a39-aee6-7d898da4e2e9" positionType="Float" stretchType="RelativeToTallestObject" x="100" y="0" width="350" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Количество]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="012854a6-ba9c-4ea2-9cc3-b413295669a8" positionType="Float" stretchType="RelativeToTallestObject" x="450" y="0" width="40" height="30"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Качество]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="62634d06-2b4f-444e-b905-efb220b4b56e" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="30" width="64" height="100"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[Услуга по организации питания и обеспечению питьевого режима обучающихся]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6e4433e3-a345-49cb-b562-af56f24857ed" positionType="Float" stretchType="RelativeToTallestObject" x="64" y="30" width="36" height="100"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[шт.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="663f35aa-097f-4757-b434-e9914f14e0e4" positionType="Float" stretchType="RelativeToTallestObject" x="450" y="30" width="40" height="100"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>

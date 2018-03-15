@@ -366,19 +366,19 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
     private AcceptanceOfCompletedWorksActItem emptyBar(Org org) {
         AcceptanceOfCompletedWorksActItem acceptanceOfCompletedWorksActItem = new AcceptanceOfCompletedWorksActItem();
 
-        acceptanceOfCompletedWorksActItem.setNumberOfContract("____");
+        acceptanceOfCompletedWorksActItem.setNumberOfContract("________");
         acceptanceOfCompletedWorksActItem.setDateOfConclusion("____________");
         acceptanceOfCompletedWorksActItem.setShortNameInfoService(org.getShortNameInfoService().replaceAll("\"", ""));
         acceptanceOfCompletedWorksActItem.setExecutor("____________");
         acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
        if (org.getOfficialPosition() != null) {
            acceptanceOfCompletedWorksActItem
-                   .setOfficialPosition(org.getOfficialPosition() + ", " + org.getOfficialPerson().getFullName());
-           acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getFullName());
+                   .setOfficialPosition(org.getOfficialPosition() + ", " + org.getOfficialPerson().getSurnameAndFirstLetters());
+           acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getSurnameAndFirstLetters());
        } else {
-
-        acceptanceOfCompletedWorksActItem.setOfficialPosition("____________");
-        acceptanceOfCompletedWorksActItem.setFullName("____________");
+           acceptanceOfCompletedWorksActItem
+                   .setOfficialPosition("__________________________________________________________________");
+           acceptanceOfCompletedWorksActItem.setFullName("____________");
        }
 
         return acceptanceOfCompletedWorksActItem;
