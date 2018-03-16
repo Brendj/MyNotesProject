@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRDocxExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -192,6 +193,7 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
     }
 
     public Object clear() {
+        showAllOrgs = false;
         idOfOrg = null;
         filter = null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -259,6 +261,7 @@ public class AcceptanceOfCompletedWorksActPage extends OnlineReportPage {
             docxExporter.setParameter(JRExporterParameter.JASPER_PRINT, acceptanceOfCompletedWorksAct.getPrint());
             docxExporter.setParameter(JRExporterParameter.OUTPUT_STREAM, servletOutputStream);
             docxExporter.setParameter(JRExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            docxExporter.setParameter(JRDocxExporterParameter.FLEXIBLE_ROW_HEIGHT, true);
             docxExporter.exportReport();
 
             servletOutputStream.flush();
