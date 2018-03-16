@@ -18,7 +18,6 @@
                      column="IdOfClient" not-null="true" fetch="select"/>
         <many-to-one name="menuDetail" class="ru.axetta.ecafe.processor.core.persistence.MenuDetail"
                      column="IdOfMenuDetail" not-null="true" fetch="join"/>
-        <property name="version" column="version" type="long" not-null="true"/>
         <property name="amount" column="amount" type="integer"/>
         <property name="preorderDate" column="preorderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>

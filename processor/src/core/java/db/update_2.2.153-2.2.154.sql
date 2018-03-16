@@ -23,10 +23,13 @@ alter table cf_clients add column specialMenu integer;
 ALTER TABLE CF_RegistryChange ALTER COLUMN groupName TYPE character varying(256),
   ALTER COLUMN groupNameFrom TYPE character varying(256);
 
+--генератор для ключа предзаказа
+ALTER TABLE CF_Generators ADD COLUMN idOfPreorderComplex BIGINT NOT NULL DEFAULT 0;
+
 --комплексы предзаказа
 CREATE TABLE cf_preorder_complex
 (
-  idofpreordercomplex bigserial NOT NULL,
+  idofpreordercomplex bigint NOT NULL,
   idofcomplexinfo bigint NOT NULL,
   idofclient bigint NOT NULL,
   preorderdate bigint,
@@ -43,6 +46,7 @@ CREATE TABLE cf_preorder_complex
 );
 CREATE INDEX cf_preorder_complex_idofclient_idx ON cf_preorder_complex USING btree (idofclient);
 CREATE INDEX cf_preorder_complex_idofcomplexinfo_idx ON cf_preorder_complex USING btree (idofcomplexinfo);
+CREATE INDEX cf_preorder_complex_version_idx ON cf_preorder_complex USING btree (version);
 
 --детализация комплексов предзаказа
 CREATE TABLE cf_preorder_menudetail
@@ -54,7 +58,6 @@ CREATE TABLE cf_preorder_menudetail
   idofclient bigint NOT NULL,
   preorderdate bigint,
   amount integer,
-  version bigint NOT NULL default 0,
   deletedstate integer NOT NULL default 0,
   CONSTRAINT cf_preorder_menudetail_idofpreordermenudetail_pk PRIMARY KEY (idofpreordermenudetail),
   CONSTRAINT cf_preorder_menudetail_idofclient_fk FOREIGN KEY (idofclient)

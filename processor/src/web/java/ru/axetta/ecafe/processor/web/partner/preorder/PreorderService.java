@@ -9,13 +9,14 @@ import ru.axetta.ecafe.processor.core.persistence.SudirToken;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.MenuListWithComplexesResult;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
-import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderClientSummaryBaseListResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.SudirPersonData;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
@@ -30,13 +31,9 @@ import java.util.Date;
  */
 
 
-//@Path("/client")
 @Path("")
 public class PreorderService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderService.class);
-
-    @Autowired
-    PreorderDAOService daoService;
 
     @GET
     @Path("login")
@@ -120,8 +117,7 @@ public class PreorderService {
         ClientRoomControllerWS controller = new ClientRoomControllerWS();
         try {
             Date ddate = CalendarUtils.parseDate(date);
-            PreorderListWithComplexesResult res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexesWithMenuList(contractId, ddate);
-                    //controller.getMenuListWithComplexes(contractId, CalendarUtils.startOfDay(ddate), CalendarUtils.endOfDay(ddate));
+            PreorderListWithComplexesGroupResult res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexesWithMenuList(contractId, ddate);
             return Response.ok(res).build();
         } catch (Exception e) {
             logger.error("Error getMenuListWithComplexes2: ", e);
@@ -129,30 +125,18 @@ public class PreorderService {
         }
     }
 
-    @GET
-    @Path("complexes")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public MenuListWithComplexesResult getMenuListWithComplexes(@QueryParam("filter") MenuListParam value) {
-        ClientRoomControllerWS controller = new ClientRoomControllerWS();
-        try {
-            return controller.getMenuListWithComplexes(value.getContractId(), value.getStartDate(), value.getEndDate());
-        } catch (Exception e) {
-
-        }
-        return null;
-    }
-
     @POST
-    @Path("complexes")
+    @Path("client/complexes")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response saveComplex(ComplexIdWrapper param) {
-        String res = param.getComplexId().toString();
-        String[] ss = param.getBu().split(",");
-        for (String s : ss) {
-            res += "|" + s;
+    public Response saveComplex(PreorderSaveListParam list) {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(list);
+            return Response.ok().build();
+        } catch (Exception e) {
+            logger.error("Error saveComplex: ", e);
+            return Response.serverError().build();
         }
-        return Response.status(200).entity(res).build();
     }
+
 }

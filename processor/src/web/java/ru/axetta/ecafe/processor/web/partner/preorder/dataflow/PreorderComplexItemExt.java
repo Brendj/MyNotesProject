@@ -17,6 +17,8 @@ public class PreorderComplexItemExt {
     private Long currentPrice;
     private int amount;
     private Boolean selected;
+    private Integer complexType;
+    private Boolean isDiscount;
     private List<PreorderMenuItemExt> menuItemExtList;
 
     public PreorderComplexItemExt() {
@@ -27,6 +29,8 @@ public class PreorderComplexItemExt {
         this.setIdOfComplexInfo(ci.getIdOfComplexInfo());
         this.setComplexName(ci.getComplexName());
         this.setCurrentPrice(ci.getCurrentPrice());
+        this.setComplexType(ci.getModeOfAdd());
+        this.setDiscount(ci.getModeFree() == 1 ? true : false);
     }
 
     public List<PreorderMenuItemExt> getMenuItemExtList() {
@@ -75,5 +79,21 @@ public class PreorderComplexItemExt {
 
     public void setSelected(Boolean selected) {
         this.selected = selected;
+    }
+
+    public Integer getComplexType() {
+        return complexType;
+    }
+
+    public void setComplexType(Integer complexType) {
+        this.complexType = complexType;
+    }
+
+    public Boolean getDiscount() {
+        return isDiscount;
+    }
+
+    public void setDiscount(Boolean discount) {
+        isDiscount = discount;
     }
 }

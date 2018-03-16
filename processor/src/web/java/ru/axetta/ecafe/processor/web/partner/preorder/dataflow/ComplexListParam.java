@@ -4,10 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
-import javax.ws.rs.WebApplicationException;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -15,20 +11,31 @@ import java.util.List;
  */
 public class ComplexListParam {
 
-    private Long contractId;
     private Long idOfComplex;
-    private Boolean selected;
     private Integer amount;
     private List<MenuItemParam> menuItems;
 
-    public static ComplexListParam fromString(String jsonRepresentation) {
-        ObjectMapper mapper = new ObjectMapper(); //Jackson's JSON marshaller
-        ComplexListParam o= null;
-        try {
-            o = mapper.readValue(jsonRepresentation, ComplexListParam.class );
-        } catch (IOException e) {
-            throw new WebApplicationException();
-        }
-        return o;
+    public Long getIdOfComplex() {
+        return idOfComplex;
+    }
+
+    public void setIdOfComplex(Long idOfComplex) {
+        this.idOfComplex = idOfComplex;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    public List<MenuItemParam> getMenuItems() {
+        return menuItems;
+    }
+
+    public void setMenuItems(List<MenuItemParam> menuItems) {
+        this.menuItems = menuItems;
     }
 }

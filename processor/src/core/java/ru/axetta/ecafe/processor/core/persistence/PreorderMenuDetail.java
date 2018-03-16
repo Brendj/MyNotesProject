@@ -17,7 +17,6 @@ public class PreorderMenuDetail {
     private MenuDetail menuDetail;
     private Date preorderDate;
     private Integer amount;
-    private Long version;
     private Boolean deletedState;
 
     public PreorderMenuDetail() {
@@ -70,14 +69,6 @@ public class PreorderMenuDetail {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 
     public Boolean getDeletedState() {
