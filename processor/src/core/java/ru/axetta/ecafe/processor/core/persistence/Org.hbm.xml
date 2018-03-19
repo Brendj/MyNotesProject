@@ -253,7 +253,7 @@
         <property name="allowRegistryChangeEmployee" column="allowRegistryChangeEmployee" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="helpdeskEnabled" column="helpdeskEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="requestForVisitsToOtherOrg" column="RequestForVisitsToOtherOrg" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
-
+        <property name="preordersEnabled" column="preordersEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
     </class>
 </hibernate-mapping>
 

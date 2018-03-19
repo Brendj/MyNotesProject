@@ -128,6 +128,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean denyPayPlanForTimeDifference;
     private Boolean allowRegistryChangeEmployee;
     private Boolean helpdeskEnabled;
+    private Boolean preordersEnabled;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -369,6 +370,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setDenyPayPlanForTimeDifference(denyPayPlanForTimeDifference);
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
         org.setHelpdeskEnabled(helpdeskEnabled);
+        org.setPreordersEnabled(preordersEnabled);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -526,6 +528,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.allowRegistryChangeEmployee = org.getAllowRegistryChangeEmployee();
         this.helpdeskEnabled = org.getHelpdeskEnabled();
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
+        this.preordersEnabled = org.getPreordersEnabled();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1120,6 +1123,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setHelpdeskEnabled(Boolean helpdeskEnabled) {
         this.helpdeskEnabled = helpdeskEnabled;
+    }
+
+    public Boolean getPreordersEnabled() {
+        return preordersEnabled;
+    }
+
+    public void setPreordersEnabled(Boolean preordersEnabled) {
+        this.preordersEnabled = preordersEnabled;
     }
 
     public static class ContragentItem {

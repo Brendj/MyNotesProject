@@ -148,6 +148,8 @@
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.cardLimit}" converter="copeckSumConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Включить предзаказы" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.preordersEnabled}" styleClass="input-text" disabled="true" />
 </h:panelGrid>
 <br />
 <rich:separator />

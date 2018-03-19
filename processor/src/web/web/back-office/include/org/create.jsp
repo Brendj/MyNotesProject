@@ -163,6 +163,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.denyPayPlanForTimeDifference}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
+    <h:outputText escape="true" value="Включить предзаказы" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preordersEnabled}" styleClass="input-text" />
 </h:panelGrid>
 <br />
 <rich:separator />
