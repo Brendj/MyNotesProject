@@ -35,6 +35,8 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
     private final static Logger logger = LoggerFactory.getLogger(AcceptanceOfCompletedWorksActDAOService.class);
 
+    private String[] goodNamesReduce = {"Второй завтрак", "Завтрак 1", "Завтрак 2", "Обед", "Полдник", "Вода питьевая"};
+
     public static AcceptanceOfCompletedWorksActDAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(AcceptanceOfCompletedWorksActDAOService.class);
     }
@@ -177,7 +179,14 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     .findAllGoodsByTypesByOrg(idOfOrg, startTime, endTime, service.getReducedPricePlanOrderTypes());
 
             if (allGoods.isEmpty()) {
-
+                for (String name : goodNamesReduce) {
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Детский сад", "0");
+                    actItems.add(actCrossTabDataDs);
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Школа", "0");
+                    actItems.add(actCrossTabDataSc);
+                }
             } else {
                 for (GoodItemAct goodItem : allGoods) {
                     SumQtyAndPriceItem sumQtyAndPriceItem = service
@@ -187,16 +196,66 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                     if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                goodItem.getPathPart3(), goodItem.getPathPart1(),
-                                sumQtyAndPriceItem.getSumQty().toString());
-                        actItems.add(actCrossTabData);
+
+                        if (goodItem.getPathPart1().equals("Детский сад")) {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), "Школа", "0");
+                            actItems.add(actCrossTabDataDs);
+                        } else {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), "Детский сад", "0");
+                            actItems.add(actCrossTabDataDs);
+                        }
                     } else {
-                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                goodItem.getPathPart4(), goodItem.getPathPart1(),
-                                sumQtyAndPriceItem.getSumQty().toString());
-                        actItems.add(actCrossTabData);
+                        if (goodItem.getPathPart1().equals("Детский сад")) {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), "Школа", "0");
+                            actItems.add(actCrossTabDataDs);
+                        } else {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), "Детский сад", "0");
+                            actItems.add(actCrossTabDataDs);
+                        }
                     }
+                }
+            }
+
+            for (String name : goodNamesReduce) {
+                boolean b = false;
+
+                for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
+                    if (actCrossTabData.getGoodName().equals(name)) {
+                        b = true;
+                    }
+                }
+
+                if (b == false) {
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Детский сад", "0");
+                    actItems.add(actCrossTabDataDs);
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Школа", "0");
+                    actItems.add(actCrossTabDataSc);
                 }
             }
         }
@@ -249,7 +308,14 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     service.getReducedPricePlanOrderTypes());
 
             if (allGoods.isEmpty()) {
-
+                for (String name : goodNamesReduce) {
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Детский сад", "0");
+                    actItems.add(actCrossTabDataDs);
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Школа", "0");
+                    actItems.add(actCrossTabDataSc);
+                }
             } else {
                 for (GoodItemAct goodItem : allGoods) {
                     SumQtyAndPriceItem sumQtyAndPriceItem = service
@@ -259,15 +325,64 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                     if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                goodItem.getPathPart3(), goodItem.getPathPart1(),
-                                sumQtyAndPriceItem.getSumQty().toString());
-                        actItems.add(actCrossTabData);
+                        if (goodItem.getPathPart1().equals("Детский сад")) {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), "Школа", "0");
+                            actItems.add(actCrossTabDataDs);
+                        } else {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart3(), "Детский сад", "0");
+                            actItems.add(actCrossTabDataDs);
+                        }
                     } else {
-                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                goodItem.getPathPart4(), goodItem.getPathPart1(),
-                                sumQtyAndPriceItem.getSumQty().toString());
-                        actItems.add(actCrossTabData);
+                        if (goodItem.getPathPart1().equals("Детский сад")) {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), "Школа", "0");
+                            actItems.add(actCrossTabDataDs);
+                        } else {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                    sumQtyAndPriceItem.getSumQty().toString());
+                            actItems.add(actCrossTabData);
+
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    goodItem.getPathPart4(), "Детский сад", "0");
+                            actItems.add(actCrossTabDataDs);
+                        }
+                    }
+                }
+
+                for (String name : goodNamesReduce) {
+                    boolean b = false;
+
+                    for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
+                        if (actCrossTabData.getGoodName().equals(name)) {
+                            b = true;
+                        }
+                    }
+
+                    if (b == false) {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                name, "Детский сад", "0");
+                        actItems.add(actCrossTabDataDs);
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                                name, "Школа", "0");
+                        actItems.add(actCrossTabDataSc);
                     }
                 }
             }
@@ -309,7 +424,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             acceptanceOfCompletedWorksActItem.setNumberOfContract((String) objList[0]);
             acceptanceOfCompletedWorksActItem
                     .setDateOfConclusion(CalendarUtils.dateShortToStringFullYear((Date) objList[1]) + "г.");
-            acceptanceOfCompletedWorksActItem.setShortNameInfoService((String) objList[2]);
+            acceptanceOfCompletedWorksActItem.setShortNameInfoService(((String) objList[2]).replaceAll("\"", ""));
             String executor = ((String) objList[3]).replaceAll("\"", "");
             acceptanceOfCompletedWorksActItem.setExecutor(executor);
             acceptanceOfCompletedWorksActItem
