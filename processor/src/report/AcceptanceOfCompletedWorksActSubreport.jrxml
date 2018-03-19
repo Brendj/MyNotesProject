@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksActSubreport" pageWidth="511" pageHeight="130" columnWidth="511" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="42bb7608-83ec-43b6-9e1e-49579be8b2d2">
-	<property name="ireport.zoom" value="2.1435888100000016"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AcceptanceOfCompletedWorksActSubreport" pageWidth="511" pageHeight="131" columnWidth="511" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="42bb7608-83ec-43b6-9e1e-49579be8b2d2">
+	<property name="ireport.zoom" value="2.8531167061100033"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
@@ -19,22 +19,35 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<crosstabHeaderCell>
-					<cellContents/>
+					<cellContents>
+						<staticText>
+							<reportElement uuid="be79750d-4ae5-4d02-9af6-0c738368f176" style="Crosstab Data Text" x="0" y="0" width="70" height="40"/>
+							<box>
+								<pen lineWidth="0.25"/>
+								<topPen lineWidth="0.25"/>
+								<leftPen lineWidth="0.25"/>
+								<bottomPen lineWidth="0.25"/>
+								<rightPen lineWidth="0.25"/>
+							</box>
+							<textElement/>
+							<text><![CDATA[]]></text>
+						</staticText>
+					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="education" width="40">
+				<rowGroup name="education" width="70">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{education}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="40" height="30"/>
+								<reportElement uuid="d08e98bd-86c9-4192-846a-66b90989263c" style="Crosstab Data Text" positionType="Float" mode="Opaque" x="0" y="0" width="70" height="30"/>
 								<box>
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
+									<pen lineWidth="0.25"/>
+									<topPen lineWidth="0.25"/>
+									<leftPen lineWidth="0.25"/>
+									<bottomPen lineWidth="0.25"/>
+									<rightPen lineWidth="0.25"/>
 								</box>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Times New Roman"/>
@@ -54,13 +67,13 @@
 					<crosstabColumnHeader>
 						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField>
-								<reportElement uuid="c5a7ee67-aff5-4688-850d-1cb9f8d9e20f" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="40"/>
+								<reportElement uuid="c5a7ee67-aff5-4688-850d-1cb9f8d9e20f" style="Crosstab Data Text" positionType="Float" mode="Opaque" x="0" y="0" width="50" height="40"/>
 								<box>
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
+									<pen lineWidth="0.25"/>
+									<topPen lineWidth="0.25"/>
+									<leftPen lineWidth="0.25"/>
+									<bottomPen lineWidth="0.25"/>
+									<rightPen lineWidth="0.25"/>
 								</box>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Times New Roman"/>
@@ -76,16 +89,16 @@
 				<measure name="sumMeasure" class="java.lang.String" calculation="Sum">
 					<measureExpression><![CDATA[$F{sum}]]></measureExpression>
 				</measure>
-				<crosstabCell width="30" height="30">
+				<crosstabCell width="50" height="30">
 					<cellContents>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="03fd3185-1b8c-44fa-932a-3bdd43b5e279" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="30" height="30"/>
+							<reportElement uuid="03fd3185-1b8c-44fa-932a-3bdd43b5e279" style="Crosstab Data Text" positionType="Float" x="0" y="0" width="50" height="30"/>
 							<box>
-								<pen lineWidth="0.5"/>
-								<topPen lineWidth="0.5"/>
-								<leftPen lineWidth="0.5"/>
-								<bottomPen lineWidth="0.5"/>
-								<rightPen lineWidth="0.5"/>
+								<pen lineWidth="0.25"/>
+								<topPen lineWidth="0.25"/>
+								<leftPen lineWidth="0.25"/>
+								<bottomPen lineWidth="0.25"/>
+								<rightPen lineWidth="0.25"/>
 							</box>
 							<textElement verticalAlignment="Middle">
 								<font fontName="Times New Roman"/>

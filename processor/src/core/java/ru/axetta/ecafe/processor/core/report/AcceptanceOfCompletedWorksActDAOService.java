@@ -113,11 +113,11 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             FriendlyOrganizationsInfoModel friendlyOrganizationsInfoModel, Date startTime, Date endDate, String type) {
 
         Org org = null;
-        for (Org org1: friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet()) {
+        for (Org org1 : friendlyOrganizationsInfoModel.getFriendlyOrganizationsSet()) {
             if (org1.isMainBuilding()) {
                 org = org1;
             } else {
-               org = (Org) getSession().load(Org.class, friendlyOrganizationsInfoModel.getIdOfOrg());
+                org = (Org) getSession().load(Org.class, friendlyOrganizationsInfoModel.getIdOfOrg());
             }
         }
 
@@ -187,33 +187,15 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                     if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-                        if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-                            if (goodItem.getPathPart2().equals("СД")) {
-                                AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                        goodItem.getPathPart3(), goodItem.getPathPart2(),
-                                        sumQtyAndPriceItem.getSumQty().toString());
-                                actItems.add(actCrossTabData);
-                            } else {
-                                AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                        goodItem.getPathPart3(), goodItem.getPathPart1(),
-                                        sumQtyAndPriceItem.getSumQty().toString());
-                                actItems.add(actCrossTabData);
-                            }
-                        } else {
-
-                            if (goodItem.getPathPart2().equals("СД")) {
-                                AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                        goodItem.getPathPart4(), goodItem.getPathPart2(),
-                                        sumQtyAndPriceItem.getSumQty().toString());
-                                actItems.add(actCrossTabData);
-                            } else {
-                                AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                        goodItem.getPathPart4(), goodItem.getPathPart1(),
-                                        sumQtyAndPriceItem.getSumQty().toString());
-
-                                actItems.add(actCrossTabData);
-                            }
-                        }
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
+                    } else {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
                     }
                 }
             }
@@ -277,29 +259,15 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                     if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-                        if (goodItem.getPathPart2().equals("СД")) {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), goodItem.getPathPart2(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
-                        } else {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
-                        }
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
                     } else {
-                        if (goodItem.getPathPart2().equals("СД")) {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), goodItem.getPathPart2(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
-                        } else {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
-                        }
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
                     }
                 }
             }
@@ -371,15 +339,15 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         acceptanceOfCompletedWorksActItem.setShortNameInfoService(org.getShortNameInfoService().replaceAll("\"", ""));
         acceptanceOfCompletedWorksActItem.setExecutor("____________________________________________________");
         acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
-       if (org.getOfficialPosition() != null) {
-           acceptanceOfCompletedWorksActItem
-                   .setOfficialPosition(org.getOfficialPosition() + ", " + org.getOfficialPerson().getSurnameAndFirstLetters());
-           acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getSurnameAndFirstLetters());
-       } else {
-           acceptanceOfCompletedWorksActItem
-                   .setOfficialPosition("_______________________________________________________________________");
-           acceptanceOfCompletedWorksActItem.setFullName("____________");
-       }
+        if (org.getOfficialPosition() != null) {
+            acceptanceOfCompletedWorksActItem.setOfficialPosition(
+                    org.getOfficialPosition() + ", " + org.getOfficialPerson().getSurnameAndFirstLetters());
+            acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getSurnameAndFirstLetters());
+        } else {
+            acceptanceOfCompletedWorksActItem
+                    .setOfficialPosition("_______________________________________________________________________");
+            acceptanceOfCompletedWorksActItem.setFullName("____________");
+        }
 
         return acceptanceOfCompletedWorksActItem;
     }

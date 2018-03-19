@@ -1165,7 +1165,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="acceptanceActGroupMenu" binding="#{mainPage.acceptanceActGroupMenu.mainMenuComponent}"
-                         label="Акты" >
+                         label="Документы" >
         <a4j:support event="onclick" action="#{mainPage.showAcceptanceGroupMenu}" reRender="workspaceForm" />
         <%--@elvariable id="acceptanceOfCompletedWorksActPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AcceptanceOfCompletedWorksActPage"--%>
         <rich:panelMenuItem id="acceptanceOfCompletedWorksActMenuItem"
