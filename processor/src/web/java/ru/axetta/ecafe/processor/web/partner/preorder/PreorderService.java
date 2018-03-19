@@ -103,13 +103,6 @@ public class PreorderService {
         }
     }
 
-    @PUT
-    @Path("client/specialmenu/{contractId}/{value}")
-    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response setPreorderPut(@PathParam("contractId") Long contractId, @PathParam("value") Integer value) {
-        return setPreorder(contractId, value);
-    }
-
     @GET
     @Path("client/complexes/{contractId}/{date}")
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")

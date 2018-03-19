@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingSettingResult;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDateComparator;
 
 import java.util.*;
 
@@ -61,7 +62,8 @@ public class PreorderClientSummary {
     }
 
     private Map<String, Integer> getSpecialDates(Date today, Long orgId, String groupName) throws Exception {
-        Map map = new TreeMap();
+        Comparator comparator = new PreorderDateComparator();
+        Map map = new TreeMap(comparator);
         TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
         Calendar c = Calendar.getInstance();
         c.setTimeZone(timeZone);

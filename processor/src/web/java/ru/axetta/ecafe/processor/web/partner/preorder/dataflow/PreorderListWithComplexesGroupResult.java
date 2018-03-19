@@ -13,17 +13,17 @@ import java.util.Map;
 public class PreorderListWithComplexesGroupResult {
     //private String group;
     //private List<PreorderListWithComplexesResult> complexes;
-    private Map<String, List<PreorderComplexItemExt>> complexesWithGroups;
+    private Map<String, Map<String, List<PreorderComplexItemExt>>> complexesWithGroups;
 
     public PreorderListWithComplexesGroupResult() {
         //this.complexes = new ArrayList<PreorderListWithComplexesResult>();
     }
 
-    public Map<String, List<PreorderComplexItemExt>> getComplexesWithGroups() {
+    public Map<String, Map<String, List<PreorderComplexItemExt>>> getComplexesWithGroups() {
         return complexesWithGroups;
     }
 
-    public void setComplexesWithGroups(Map<String, List<PreorderComplexItemExt>> complexesWithGroups) {
+    public void setComplexesWithGroups(Map<String, Map<String, List<PreorderComplexItemExt>>> complexesWithGroups) {
         this.complexesWithGroups = complexesWithGroups;
     }
 }
