@@ -1204,10 +1204,10 @@ public class SyncRequest {
 
                     public ReqMenuDetail build(Node menuDetailNode, MenuGroups menuGroups) throws Exception {
                         NamedNodeMap namedNodeMap = menuDetailNode.getAttributes();
-                        String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 90);
+                        String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 256);
                         Node fullNameNode = namedNodeMap.getNamedItem("FullName");
                         if (null != fullNameNode && StringUtils.isNotEmpty(fullNameNode.getTextContent())) {
-                            name = StringUtils.substring(fullNameNode.getTextContent(), 0, 90);
+                            name = StringUtils.substring(fullNameNode.getTextContent(), 0, 256);
                         }
                         String path = getTextContent(namedNodeMap.getNamedItem("Path"));
                         if (path == null) {
@@ -1620,11 +1620,11 @@ public class SyncRequest {
                     public ReqAssortment build(Node node, MenuGroups menuGroups) throws Exception {
                         NamedNodeMap namedNodeMap = node.getAttributes();
                         long idOfAst = Long.parseLong(namedNodeMap.getNamedItem("IdOfAst").getTextContent());
-                        String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 90);
+                        String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 256);
                         Node fullNameNode = namedNodeMap.getNamedItem("FullName");
                         String fullName = name;
                         if (null != fullNameNode && StringUtils.isNotEmpty(fullNameNode.getTextContent())) {
-                            fullName = StringUtils.substring(fullNameNode.getTextContent(), 0, 90);
+                            fullName = StringUtils.substring(fullNameNode.getTextContent(), 0, 256);
                         }
                         String group = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Group")), 0, 60);
                         if (StringUtils.isEmpty(group)) {
