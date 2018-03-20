@@ -55,7 +55,7 @@ public class PreorderDAOService {
         Client client = getClientByContractId(contractId);
         Query query = emReport.createQuery("select c, pc.amount, pc.deletedState from PreorderComplex pc right join pc.complexInfo c "
                 + "where (pc.client.idOfClient = :idOfClient or pc.client.idOfClient is null) "
-                + "and c.menuDate between :startDate and :endDate and c.usedSpecialMenu = 1 "
+                + "and c.menuDate between :startDate and :endDate and (c.usedSpecialMenu = 1 or c.modeFree = 1) "
                 + "and c.org.idOfOrg = :idOfOrg order by c.modeOfAdd");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
