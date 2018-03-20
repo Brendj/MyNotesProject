@@ -246,6 +246,8 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                 for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
                     if (actCrossTabData.getGoodName().equals(name)) {
                         b = true;
+                    } else {
+                        break;
                     }
                 }
 
@@ -373,6 +375,8 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
                         if (actCrossTabData.getGoodName().equals(name)) {
                             b = true;
+                        } else {
+                            break;
                         }
                     }
 
@@ -431,7 +435,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     .setDateOfClosing(CalendarUtils.dateShortToStringFullYear((Date) objList[4]) + "г.");
             if (objList[5].equals("")) {
                 acceptanceOfCompletedWorksActItem
-                        .setOfficialPosition("_______________________________________________________________________");
+                        .setOfficialPosition("_____________________________________________________");
                 acceptanceOfCompletedWorksActItem.setFullName("____________");
             } else {
                 String offPosPlusFullName = objList[5] + ", " + objList[6];
@@ -452,7 +456,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
         acceptanceOfCompletedWorksActItem.setNumberOfContract("________");
         acceptanceOfCompletedWorksActItem.setDateOfConclusion("____________");
         acceptanceOfCompletedWorksActItem.setShortNameInfoService(org.getShortNameInfoService().replaceAll("\"", ""));
-        acceptanceOfCompletedWorksActItem.setExecutor("____________________________________________________");
+        acceptanceOfCompletedWorksActItem.setExecutor("______________________________");
         acceptanceOfCompletedWorksActItem.setDateOfClosing("____________");
         if (org.getOfficialPosition() != null) {
             acceptanceOfCompletedWorksActItem.setOfficialPosition(
@@ -460,7 +464,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             acceptanceOfCompletedWorksActItem.setFullName(org.getOfficialPerson().getSurnameAndFirstLetters());
         } else {
             acceptanceOfCompletedWorksActItem
-                    .setOfficialPosition("_______________________________________________________________________");
+                    .setOfficialPosition("_____________________________________________________");
             acceptanceOfCompletedWorksActItem.setFullName("____________");
         }
 
