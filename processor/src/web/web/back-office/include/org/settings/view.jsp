@@ -180,6 +180,9 @@
         <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки вариативного питания" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.hoursForbidVP}" styleClass="input-text" style="width: 207px" />
 
+        <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.hoursForbidPP}" styleClass="input-text" style="width: 207px" />
+
     </h:panelGrid>
 
     <h:panelGrid columns="2" id="settingsViewReplacingMissingBeneficiariesSettingPanelGrid"

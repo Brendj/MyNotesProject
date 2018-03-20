@@ -298,6 +298,10 @@
             <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.hoursForbidVP}"
                                     maxValue="72" step="3" minValue="3" showToolTip="true" />
 
+            <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
+            <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.hoursForbidPP}"
+                                    maxValue="72" step="3" minValue="3" showToolTip="true" />
+
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsEditReplacingMissingBeneficiariesSettingPanelGrid"
