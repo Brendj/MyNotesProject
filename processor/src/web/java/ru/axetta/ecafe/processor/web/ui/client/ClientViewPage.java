@@ -144,6 +144,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String photoURL;
     private Long balanceToNotify;
     private Date lastConfirmMobile;
+    private Boolean specialMenu;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -419,6 +420,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         return result;
     }
 
+    public Boolean getSpecialMenu() {
+        return specialMenu;
+    }
+
+    public void setSpecialMenu(Boolean specialMenu) {
+        this.specialMenu = specialMenu;
+    }
+
     @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
@@ -524,6 +533,8 @@ public class ClientViewPage extends BasicWorkspacePage {
         } catch (Exception e){
             this.photoURL = ImageUtils.getDefaultImageURL();
         }
+
+        this.specialMenu = client.getSpecialMenu();
 
 
         // Категории скидок старое не используется

@@ -294,6 +294,10 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.useLastEEModeForPlan}" disabled="true" readonly="true"
                              styleClass="output-text" />
 
+    <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.specialMenu}" disabled="true" readonly="true"
+                             styleClass="output-text" />
+
     <h:outputText escape="true" value="Дата и время подтверждения номера телефона" styleClass="output-text"
                  rendered="#{!mainPage.clientViewPage.isLastConfirmMobileEmpty()}" />
     <h:inputText value="#{mainPage.clientViewPage.lastConfirmMobile}" readonly="true" converter="timeConverter"

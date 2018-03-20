@@ -369,6 +369,9 @@
     <h:inputText value="#{mainPage.clientEditPage.lastConfirmMobile}" readonly="true" converter="timeConverter"
                  styleClass="input-text" rendered="#{!mainPage.clientEditPage.isLastConfirmMobileEmpty()}" />
 
+    <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.specialMenu}" styleClass="output-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

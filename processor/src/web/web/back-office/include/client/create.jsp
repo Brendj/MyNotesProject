@@ -148,6 +148,9 @@
     <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientCreatePage.ageTypeGroup}" maxlength="128" styleClass="input-text" />
 
+    <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientCreatePage.specialMenu}" styleClass="output-text" />
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

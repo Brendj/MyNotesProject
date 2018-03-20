@@ -266,6 +266,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String ageTypeGroup;
     private Long balanceToNotify;
     private Date lastConfirmMobile;
+    private Boolean specialMenu;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -620,6 +621,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setClientGUID(String clientGUID) {
         this.clientGUID = clientGUID;
+    }
+
+    public Boolean getSpecialMenu() {
+        return specialMenu;
+    }
+
+    public void setSpecialMenu(Boolean specialMenu) {
+        this.specialMenu = specialMenu;
     }
 
     public void fill(Session session, Long idOfClient) throws Exception {
@@ -1053,6 +1062,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setBirthDate(this.birthDate);
         client.setAgeTypeGroup(this.ageTypeGroup);
         this.categoriesDiscountsDSZN = ClientViewPage.getCategoriesDiscountsDSZNDesc(persistenceSession, client);
+        client.setSpecialMenu(this.specialMenu);
 
         persistenceSession.update(client);
 
@@ -1159,6 +1169,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         removeListGuardianItems.clear();
         removeListWardItems.clear();
         this.lastConfirmMobile = client.getLastConfirmMobile();
+        this.specialMenu = client.getSpecialMenu();
     }
 
     public String getIdOfCategoryListString() {

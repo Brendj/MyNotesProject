@@ -215,7 +215,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
     private Integer gender;
     private Date birthDate;
     private String ageTypeGroup;
-
+    private Boolean specialMenu;
 
     public String getFax() {
         return fax;
@@ -502,6 +502,14 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.clientGUID = clientGUID;
     }
 
+    public Boolean getSpecialMenu() {
+        return specialMenu;
+    }
+
+    public void setSpecialMenu(Boolean specialMenu) {
+        this.specialMenu = specialMenu;
+    }
+
     public void fill(Session session) throws HibernateException {
         if (null == org) {
             org = new OrgItem();
@@ -645,6 +653,8 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
             client.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
         }
 
+        client.setSpecialMenu(this.specialMenu);
+
         persistenceSession.save(client);
 
         ClientMigration clientMigration = new ClientMigration(client,org,this.contractTime);
@@ -703,6 +713,7 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         this.birthDate = null;
         this.ageTypeGroup = null;
         this.remarks = null;
+        this.specialMenu = false;
     }
 
     private String filter = "Не выбрано";

@@ -361,7 +361,7 @@ public class SyncResponse {
             private final String ageTypeGroup;
             private final Long balanceToNotify;
             private final String san;
-
+            private final Boolean specialMenu;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -401,6 +401,7 @@ public class SyncResponse {
                 this.ageTypeGroup = client.getAgeTypeGroup();
                 this.balanceToNotify = client.getBalanceToNotify();
                 this.san = client.getSan();
+                this.specialMenu = client.getSpecialMenu();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -512,6 +513,10 @@ public class SyncResponse {
                 return san;
             }
 
+            public Boolean getSpecialMenu() {
+                return specialMenu;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("OrgOwner", Long.toString(this.orgOwner));
@@ -581,6 +586,7 @@ public class SyncResponse {
                     element.setAttribute("BalanceToNotify", String.valueOf(this.balanceToNotify));
                 }
                 element.setAttribute("San", this.san);
+                element.setAttribute("SpecialMenu", this.specialMenu ? "1" : "0");
                 return element;
             }
 
