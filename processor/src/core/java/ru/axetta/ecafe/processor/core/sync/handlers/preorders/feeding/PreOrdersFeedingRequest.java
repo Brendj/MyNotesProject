@@ -10,7 +10,7 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
 public class PreOrdersFeedingRequest implements SectionRequest {
-    public static final String SECTION_NAME="HelpRequests";
+    public static final String SECTION_NAME="PreOrdersFeedingRequest";
     private final Long maxVersion;
 
     public PreOrdersFeedingRequest(Node PreOrdersFeedingRequestNode) {

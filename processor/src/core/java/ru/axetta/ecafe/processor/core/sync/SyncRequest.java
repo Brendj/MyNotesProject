@@ -25,6 +25,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
@@ -2566,6 +2567,7 @@ public class SyncRequest {
             builders.add(new ListComplexSchedules.Builder(idOfOrg));
             builders.add(new OrgFilesRequestBuilder(idOfOrg));
             builders.add(new HelpRequestBuilder(idOfOrg));
+            builders.add(new PreOrdersFeedingBuilder());
             return builders;
         }
 
