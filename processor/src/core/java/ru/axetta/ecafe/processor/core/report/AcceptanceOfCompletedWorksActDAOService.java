@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItemAct;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -178,14 +179,19 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             List<GoodItemAct> allGoods = service
                     .findAllGoodsByTypesByOrg(idOfOrg, startTime, endTime, service.getReducedPricePlanOrderTypes());
 
+            Org org = (Org) getSession().load(Org.class, idOfOrg);
+
             if (allGoods.isEmpty()) {
                 for (String name : goodNamesReduce) {
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                            name, "Детский сад", "0");
-                    actItems.add(actCrossTabDataDs);
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
-                            name, "Школа", "0");
-                    actItems.add(actCrossTabDataSc);
+                    if (org.getType().equals(OrganizationType.SCHOOL)) {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                                name, "Школа", "0");
+                        actItems.add(actCrossTabDataSc);
+                    } else if (org.getType().equals(OrganizationType.KINDERGARTEN)) {
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                                name, "Детский сад", "0");
+                        actItems.add(actCrossTabDataDs);
+                    }
                 }
             } else {
                 for (GoodItemAct goodItem : allGoods) {
@@ -196,69 +202,41 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                     if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-
-                        if (goodItem.getPathPart1().equals("Детский сад")) {
                             AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
                                     goodItem.getPathPart3(), goodItem.getPathPart1(),
                                     sumQtyAndPriceItem.getSumQty().toString());
                             actItems.add(actCrossTabData);
-
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), "Школа", "0");
-                            actItems.add(actCrossTabDataDs);
-                        } else {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
-
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), "Детский сад", "0");
-                            actItems.add(actCrossTabDataDs);
-                        }
                     } else {
-                        if (goodItem.getPathPart1().equals("Детский сад")) {
                             AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
                                     goodItem.getPathPart4(), goodItem.getPathPart1(),
                                     sumQtyAndPriceItem.getSumQty().toString());
                             actItems.add(actCrossTabData);
+                    }
+                }
 
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), "Школа", "0");
-                            actItems.add(actCrossTabDataDs);
+            /*    for (String name : goodNamesReduce) {
+                    boolean b = false;
+
+                    for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
+                        if (actCrossTabData.getGoodName().equals(name)) {
+                            b = true;
                         } else {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
+                            break;
+                        }
+                    }
 
+                    if (b == false) {
+                        if (org.getType().equals(OrganizationType.SCHOOL)) {
+                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                                    name, "Школа", "0");
+                            actItems.add(actCrossTabDataSc);
+                        } else if (org.getType().equals(OrganizationType.KINDERGARTEN)) {
                             AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), "Детский сад", "0");
+                                    name, "Детский сад", "0");
                             actItems.add(actCrossTabDataDs);
                         }
                     }
-                }
-            }
-
-            for (String name : goodNamesReduce) {
-                boolean b = false;
-
-                for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
-                    if (actCrossTabData.getGoodName().equals(name)) {
-                        b = true;
-                    } else {
-                        break;
-                    }
-                }
-
-                if (b == false) {
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                            name, "Детский сад", "0");
-                    actItems.add(actCrossTabDataDs);
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
-                            name, "Школа", "0");
-                    actItems.add(actCrossTabDataSc);
-                }
+                }*/
             }
         }
 
@@ -276,9 +254,6 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
                             str, " ", "");
                     actItems.add(actCrossTabDataDs);
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
-                            str, "  ", "");
-                    actItems.add(actCrossTabDataSc);
                 }
             } else {
                 for (GoodItem1 goodItem : allGoods) {

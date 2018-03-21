@@ -63,8 +63,19 @@ public class AcceptanceOfCompletedWorksAct extends BasicReportForOrgJob {
             parameterMap.put("SUBREPORT_DIR", subReportDir);
 
             calendar.setTime(startTime);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap, showAllOrgs, type));
+            JasperPrint jasperPrint;
+            if (showAllOrgs) {
+                jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
+                        createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap,
+                                showAllOrgs, type));
+            } else {
+                String templateFilenameSchool =
+                        RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath()
+                                + "AcceptanceOfCompletedWorksActSchool.jasper";
+                jasperPrint = JasperFillManager.fillReport(templateFilenameSchool, parameterMap,
+                        createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap,
+                                showAllOrgs, type));
+            }
             Date generateEndTime = new Date();
             return new AcceptanceOfCompletedWorksAct(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
