@@ -586,7 +586,9 @@ public class SyncResponse {
                     element.setAttribute("BalanceToNotify", String.valueOf(this.balanceToNotify));
                 }
                 element.setAttribute("San", this.san);
-                element.setAttribute("SpecialMenu", this.specialMenu ? "1" : "0");
+                if (this.specialMenu != null) {
+                    element.setAttribute("SpecialMenu", this.specialMenu ? "1" : "0");
+                }
                 return element;
             }
 
