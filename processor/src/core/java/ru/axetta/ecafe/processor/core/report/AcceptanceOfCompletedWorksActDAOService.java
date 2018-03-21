@@ -270,7 +270,16 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     service.getPayPlanAndSubscriptionFeedingOrderTypes());
 
             if (allGoods.isEmpty()) {
-
+                String str = "";
+                for (int i = 0; i < 6; i++) {
+                    str = str +  " ";
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                            str, " ", "");
+                    actItems.add(actCrossTabDataDs);
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                            str, "  ", "");
+                    actItems.add(actCrossTabDataSc);
+                }
             } else {
                 for (GoodItem1 goodItem : allGoods) {
 
@@ -399,7 +408,16 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     service.getPayPlanAndSubscriptionFeedingOrderTypes());
 
             if (allGoods.isEmpty()) {
-
+                String str = "";
+                for (int i = 0; i < 6; i++) {
+                    str = str +  " ";
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                            str, " ", "");
+                    actItems.add(actCrossTabDataDs);
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                            str, "  ", "");
+                    actItems.add(actCrossTabDataSc);
+                }
             } else {
 
                 for (GoodItem1 goodItem : allGoods) {
