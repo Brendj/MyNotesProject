@@ -28,7 +28,8 @@ public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding
         PreOrdersFeeding result = new PreOrdersFeeding();
         List<PreOrdersFeedingItem> items = new ArrayList<PreOrdersFeedingItem>();
 
-        List<PreorderComplex> list = DAOUtils.getPreorderComplexSinceVersion(session, preOrdersFeedingRequest.getMaxVersion());
+        List<PreorderComplex> list = DAOUtils.getPreorderComplexForOrgSinceVersion(session,
+                preOrdersFeedingRequest.getOrgOwner(), preOrdersFeedingRequest.getMaxVersion());
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex != null) {
                 List<PreorderMenuDetail> menuDetailList =

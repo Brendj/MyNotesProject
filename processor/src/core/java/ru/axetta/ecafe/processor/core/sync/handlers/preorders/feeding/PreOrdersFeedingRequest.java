@@ -12,13 +12,19 @@ import org.w3c.dom.Node;
 public class PreOrdersFeedingRequest implements SectionRequest {
     public static final String SECTION_NAME="PreOrdersFeedingRequest";
     private final Long maxVersion;
+    private final Long orgOwner;
 
-    public PreOrdersFeedingRequest(Node PreOrdersFeedingRequestNode) {
+    public PreOrdersFeedingRequest(Node PreOrdersFeedingRequestNode, Long orgOwner) {
         maxVersion = XMLUtils.getLongAttributeValue(PreOrdersFeedingRequestNode, "V");
+        this.orgOwner = orgOwner;
     }
 
     public Long getMaxVersion() {
         return maxVersion;
+    }
+
+    public Long getOrgOwner() {
+        return orgOwner;
     }
 
     @Override

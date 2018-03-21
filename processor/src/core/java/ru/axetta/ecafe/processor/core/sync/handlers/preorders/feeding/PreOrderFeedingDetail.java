@@ -16,11 +16,11 @@ public class PreOrderFeedingDetail {
     private final String name;
     private final Integer qty;
 
-    public PreOrderFeedingDetail(PreorderMenuDetail menuDetail) {
+    public PreOrderFeedingDetail(PreorderMenuDetail menuDetail, Integer complexId) {
         this.idOfMenu = menuDetail.getMenuDetail().getLocalIdOfMenu();
         this.name = menuDetail.getMenuDetail().getMenuDetailName();
         this.qty = menuDetail.getAmount();
-        this.complexId = null;
+        this.complexId = complexId;
     }
 
     public PreOrderFeedingDetail(PreorderComplex complex) {

@@ -2877,8 +2877,12 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List<PreorderComplex> getPreorderComplexSinceVersion(Session session, long version) throws Exception {
+    public static List<PreorderComplex> getPreorderComplexForOrgSinceVersion(Session session,
+            long orgOwner, long version) throws Exception {
         Criteria criteria = session.createCriteria(PreorderComplex.class);
+        Org org = (Org) session.load(Org.class, orgOwner);
+        criteria.createAlias("client", "c");
+        criteria.add(Restrictions.eq("c.org", org));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }

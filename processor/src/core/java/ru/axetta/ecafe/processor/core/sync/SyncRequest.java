@@ -2567,7 +2567,7 @@ public class SyncRequest {
             builders.add(new ListComplexSchedules.Builder(idOfOrg));
             builders.add(new OrgFilesRequestBuilder(idOfOrg));
             builders.add(new HelpRequestBuilder(idOfOrg));
-            builders.add(new PreOrdersFeedingBuilder());
+            builders.add(new PreOrdersFeedingBuilder(idOfOrg));
             return builders;
         }
 

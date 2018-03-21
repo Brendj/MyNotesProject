@@ -11,9 +11,10 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.w3c.dom.Node;
 
 public class PreOrdersFeedingBuilder implements SectionRequestBuilder {
+    private final long owner;
 
-    public PreOrdersFeedingBuilder(){
-
+    public PreOrdersFeedingBuilder(long owner){
+        this.owner = owner;
     }
 
     public PreOrdersFeedingRequest build(Node envelopeNode) throws Exception {
@@ -25,7 +26,7 @@ public class PreOrdersFeedingBuilder implements SectionRequestBuilder {
     public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
         Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, PreOrdersFeedingRequest.SECTION_NAME);
         if (sectionElement != null) {
-            return new PreOrdersFeedingRequest(sectionElement);
+            return new PreOrdersFeedingRequest(sectionElement, owner);
         } else
             return null;
     }

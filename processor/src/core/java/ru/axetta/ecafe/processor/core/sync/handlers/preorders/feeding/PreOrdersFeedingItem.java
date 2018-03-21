@@ -35,7 +35,8 @@ public class PreOrdersFeedingItem {
         this.preOrderFeedingDetailList.add(feedingDetail);
 
         for (PreorderMenuDetail menuDetail : menuDetailList) {
-            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(menuDetail);
+            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(menuDetail,
+                    preorderComplex.getComplexInfo().getIdOfComplex());
             this.preOrderFeedingDetailList.add(preOrderFeedingDetail);
         }
     }
