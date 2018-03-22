@@ -25,25 +25,28 @@ import javax.ws.rs.core.MediaType;
 @Scope("singleton")
 public class SudirClientService {
     private static final Logger logger = LoggerFactory.getLogger(SudirClientService.class);
-    //private static final String SUDIR_TOKEN_ADDRESS = "https://login-test.mos.ru/sps/oauth/oauth20/token";
-    //private static final String SUDIR_DATA_ADDRESS = "https://login-test.mos.ru/auth/authenticationWS/getUserData?access_token=%s";
-    private static final String SUDIR_LOGOUT_ADDRESS = "https://login-test.mos.ru/logout/logout.jsp?logoutExitPage=%s";
 
     public String CLIENT_ID;
     private String CLIENT_SECRET;
     public String REDIRECT_URI;
     public String SUDIR_AUTHORIZE_ADDRESS;
+    public String SUDIR_LOGOUT_ADDRESS;
+    public String REDIRECT_LOGOUT_URI;
     public String SUDIR_TOKEN_ADDRESS; // = "https://login-test.mos.ru/sps/oauth/oauth20/token";
     public String SUDIR_DATA_ADDRESS;
+    public boolean SECURITY_ON;
 
     @PostConstruct
     private void initialise() {
         CLIENT_ID = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.sudir.client_id", "kkp3ZpdBoc9FOy4HWDC9");
         CLIENT_SECRET = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.sudir.client_secret", "XWcdMXHsxBge8gwVK6wk");
-        REDIRECT_URI = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.redirect_uri", "http://localhost:8000/redirect"); //todo поменять дефолт на пустую строку
+        REDIRECT_URI = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.redirect_uri", "http://localhost:8000/redirect");
         SUDIR_AUTHORIZE_ADDRESS = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.sudir.authorize_address", "https://login-test.mos.ru/sps/oauth/oauth20/authorize");
+        SUDIR_LOGOUT_ADDRESS = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.sudir.logout_address", "https://login-test.mos.ru/logout/logout.jsp");
+        REDIRECT_LOGOUT_URI = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.redirect_logout_uri", "http://localhost:8000/notfound");
         SUDIR_TOKEN_ADDRESS = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.sudir.token_address", "https://login-test.mos.ru/sps/oauth/oauth20/token");
         SUDIR_DATA_ADDRESS = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.sudir.data_address", "https://login-test.mos.ru/auth/authenticationWS/getUserData");
+        SECURITY_ON = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.security", "0").equals("1");
     }
 
     public SudirToken getToken(String authCode) {

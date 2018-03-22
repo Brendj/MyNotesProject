@@ -84,7 +84,7 @@
 
     <filter-mapping>
         <filter-name>PreorderServiceFilter</filter-name>
-        <url-pattern>/specialmenu/*</url-pattern>
+        <url-pattern>/preorder/*</url-pattern>
     </filter-mapping>
 
     <listener>

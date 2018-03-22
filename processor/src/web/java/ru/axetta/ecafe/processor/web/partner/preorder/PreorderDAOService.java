@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 
 import org.slf4j.Logger;
@@ -35,8 +37,30 @@ public class PreorderDAOService {
     private EntityManager emReport;
 
     @Transactional
-    public void saveToken(SudirToken token) {
+    public void saveToken(SudirToken token, ClientSummaryBaseListResult clientSummary) {
         em.merge(token);
+        Set<SudirTokenClient> set = new HashSet<SudirTokenClient>();
+        for (ClientSummaryBase clientSummaryBase : clientSummary.getClientSummary()) {
+            Long contractId = clientSummaryBase.getContractId();
+            SudirTokenClient stc = new SudirTokenClient(contractId, token.getAccess_token());
+            em.merge(stc);
+            set.add(stc);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean matchToken(String token, Long contractId) {
+        Query query = em.createQuery("select t from SudirTokenClient t where t.access_token = :token and t.contractId = :contractId");
+        query.setParameter("token", token);
+        query.setParameter("contractId", contractId);
+        query.setMaxResults(1);
+        try {
+            SudirTokenClient tokenClient = (SudirTokenClient) query.getSingleResult();
+            return true;
+        } catch (Exception e) {
+            logger.info(String.format("Attempt to access client data contractId=%s with token=%s", contractId, token));
+            return false;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -184,10 +208,10 @@ public class PreorderDAOService {
         List<GroupNamesToOrgs> list = query.getResultList() ;
         if (list != null && list.size() > 0) {
             for (GroupNamesToOrgs group : list) {
-                if (group.getGroupName().equals(groupName)) return true;
+                if (group.getGroupName().equals(groupName)) return false;
             }
         }
-        return false;
+        return true;
     }
 
     @Transactional(rollbackFor = Exception.class)

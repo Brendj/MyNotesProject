@@ -16,6 +16,16 @@ CREATE TABLE cf_sudir_tokens
   CONSTRAINT cf_sudir_tokens_access_token_pk PRIMARY KEY (access_token)
 );
 
+--таблица связей токен - л/с
+CREATE TABLE cf_sudir_token_client
+(
+  idofsudirtokenclient bigserial,
+  access_token character varying(64) NOT NULL,
+  contractid bigint,
+  CONSTRAINT cf_sudir_token_client_idofsudirtokenclient_pk PRIMARY KEY (idofsudirtokenclient)
+);
+CREATE INDEX cf_sudir_token_client_access_token_idx ON cf_sudir_token_client USING btree (access_token);
+
 --флаг особенного питания
 alter table cf_clients add column specialMenu integer;
 

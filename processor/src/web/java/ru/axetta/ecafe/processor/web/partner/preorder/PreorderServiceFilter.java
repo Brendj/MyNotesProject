@@ -4,9 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -16,22 +19,30 @@ public class PreorderServiceFilter implements Filter {
 
     public void doFilter ( ServletRequest request, ServletResponse response, FilterChain chain ) throws IOException,
             ServletException {
-        //HttpServletRequest httpRequest = (HttpServletRequest) request;
+        if (!RuntimeContext.getAppContext().getBean(SudirClientService.class).SECURITY_ON) {
+            chain.doFilter(request, response);
+            return;
+        }
         boolean tokenFound = false;
         Cookie[] cookies = ((HttpServletRequest) request).getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("access_token")) {
-                tokenFound = true;
+        if (((HttpServletRequest) request).getPathInfo().contains("login") || ((HttpServletRequest) request).getPathInfo().contains("clientsummary")) {
+            chain.doFilter(request, response);
+            return;
+        }
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("access_token")) {
+                    tokenFound = true;
+                    RuntimeContext.getAppContext().getBean(TokenService.class).setToken(cookie.getValue());
+                    break;
+                }
             }
         }
         if (!tokenFound) {
-            //redirect to sudir login page
+            HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+            httpServletResponse.sendRedirect("/processor/preorder/login");
+            return;
         }
-        /*String access_token = httpRequest.getHeader("access_token");
-        if (access_token != null) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-            httpResponse.setHeader("access_token", access_token);
-        }*/
         chain.doFilter(request, response);
     }
 

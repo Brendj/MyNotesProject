@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by i.semenov on 01.03.2018.
@@ -16,6 +17,7 @@ public class SudirToken {
     private String scope;
     private String refresh_token;
     private Date createdDate;
+    private Set<SudirTokenClient> clients;
 
     public SudirToken() {
         createdDate = new Date();
@@ -67,5 +69,13 @@ public class SudirToken {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Set<SudirTokenClient> getClients() {
+        return clients;
+    }
+
+    public void setClients(Set<SudirTokenClient> clients) {
+        this.clients = clients;
     }
 }
