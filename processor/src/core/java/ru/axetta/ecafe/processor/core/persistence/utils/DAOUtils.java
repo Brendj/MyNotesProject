@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1217,6 +1218,7 @@ public class DAOUtils {
 
     public static void deleteAssortmentForDate(Session persistenceSession, Org organization, Date menuDate) {
         Date endDate = DateUtils.addDays(menuDate, 1);
+        endDate = CalendarUtils.addSeconds(endDate, -1);
         Query q = persistenceSession.createQuery("DELETE FROM Assortment WHERE org=:org AND beginDate>=:fromDate AND beginDate<=:endDate");
         q.setParameter("org", organization);
         q.setParameter("fromDate", menuDate);
@@ -1226,6 +1228,7 @@ public class DAOUtils {
 
     public static void deleteComplexInfoForDate(Session persistenceSession, Org organization, Date menuDate) {
         Date endDate = DateUtils.addDays(menuDate, 1);
+        endDate = CalendarUtils.addSeconds(endDate, -1);
         Query q = persistenceSession.createQuery("DELETE FROM ComplexInfo WHERE org=:org AND menuDate>=:fromDate AND menuDate<=:endDate");
         q.setParameter("org", organization);
         q.setParameter("fromDate", menuDate);
