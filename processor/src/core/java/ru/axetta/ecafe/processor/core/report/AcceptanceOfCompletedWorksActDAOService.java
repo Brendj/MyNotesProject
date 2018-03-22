@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItemAct;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
@@ -22,10 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by anvarov on 20.02.2018.
@@ -179,9 +177,14 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             List<GoodItemAct> allGoods = service
                     .findAllGoodsByTypesByOrg(idOfOrg, startTime, endTime, service.getReducedPricePlanOrderTypes());
 
+            Set<GoodItemAct> allGoodsNon = new TreeSet<GoodItemAct>();
+            for (GoodItemAct goodItemAct : allGoods) {
+                allGoodsNon.add(goodItemAct);
+            }
+
             Org org = (Org) getSession().load(Org.class, idOfOrg);
 
-            if (allGoods.isEmpty()) {
+            if (allGoodsNon.isEmpty()) {
                 for (String name : goodNamesReduce) {
                     if (org.getType().equals(OrganizationType.SCHOOL)) {
                         AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
@@ -194,7 +197,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     }
                 }
             } else {
-                for (GoodItemAct goodItem : allGoods) {
+                for (GoodItemAct goodItem : allGoodsNon) {
                     SumQtyAndPriceItem sumQtyAndPriceItem = service
                             .buildRegisterStampBodyValueByOrg(idOfOrg, startTime, endTime, goodItem.getFullName(),
                                     service.getReducedPricePlanOrderTypes());
@@ -202,17 +205,33 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     sumPrice += sumQtyAndPriceItem.getSumPrice();
 
                     if (goodItem.getOrderType().equals(OrderTypeEnumType.WATER_ACCOUNTING)) {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), goodItem.getPathPart1(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart3(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
                     } else {
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), goodItem.getPathPart1(),
-                                    sumQtyAndPriceItem.getSumQty().toString());
-                            actItems.add(actCrossTabData);
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart4(), goodItem.getPathPart1(),
+                                sumQtyAndPriceItem.getSumQty().toString());
+                        actItems.add(actCrossTabData);
                     }
                 }
+
+                Map<String, AcceptanceOfCompletedWorksActCrossTabData> actItemsSumMap = new HashMap<String, AcceptanceOfCompletedWorksActCrossTabData>();
+
+                for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
+                    if (actItemsSumMap.containsKey(actCrossTabData.getGoodName())) {
+                        Long sum = Long.valueOf(actItemsSumMap.get(actCrossTabData.getGoodName()).getSum());
+                        sum = sum + Long.valueOf(actCrossTabData.getSum());
+                        actItemsSumMap.get(actCrossTabData.getGoodName()).setSum(String.valueOf(sum));
+                    } else {
+                        actItemsSumMap.put(actCrossTabData.getGoodName(), actCrossTabData);
+                    }
+                }
+
+                actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
+
+                actItems.addAll(actItemsSumMap.values());
 
                 List<String> goodNamesNot = new ArrayList<String>();
                 for (String name : goodNamesReduce) {
@@ -230,7 +249,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     }
                 }
 
-                for (String name: goodNamesNot ) {
+                for (String name : goodNamesNot) {
                     if (org.getType().equals(OrganizationType.SCHOOL)) {
                         AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
                                 name, "Школа", "0");
@@ -254,7 +273,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             if (allGoods.isEmpty()) {
                 String str = "";
                 for (int i = 0; i < 6; i++) {
-                    str = str +  " ";
+                    str = str + " ";
                     AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
                             str, " ", "");
                     actItems.add(actCrossTabDataDs);
@@ -297,7 +316,14 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             List<GoodItemAct> allGoods = service.findAllGoodsByTypesByOrgs(idOfOrgList, startTime, endTime,
                     service.getReducedPricePlanOrderTypes());
 
-            if (allGoods.isEmpty()) {
+            Set<GoodItemAct> allGoodsNon = new TreeSet<GoodItemAct>();
+            for (GoodItemAct goodItemAct : allGoods) {
+                allGoodsNon.add(goodItemAct);
+            }
+
+            Map<MapItem, AcceptanceOfCompletedWorksActCrossTabData> actItemsSumMap = new HashMap<MapItem, AcceptanceOfCompletedWorksActCrossTabData>();
+
+            if (allGoodsNon.isEmpty()) {
                 for (String name : goodNamesReduce) {
                     AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
                             name, "Детский сад", "0");
@@ -307,7 +333,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     actItems.add(actCrossTabDataSc);
                 }
             } else {
-                for (GoodItemAct goodItem : allGoods) {
+                for (GoodItemAct goodItem : allGoodsNon) {
                     SumQtyAndPriceItem sumQtyAndPriceItem = service
                             .buildRegisterStampBodyValueByOrgs(idOfOrgList, startTime, endTime, goodItem.getFullName(),
                                     service.getReducedPricePlanOrderTypes());
@@ -321,18 +347,34 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                                     sumQtyAndPriceItem.getSumQty().toString());
                             actItems.add(actCrossTabData);
 
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), "Школа", "0");
-                            actItems.add(actCrossTabDataDs);
+                            MapItem mapItem = new MapItem(goodItem.getPathPart3(), goodItem.getPathPart1());
+                            MapItem mapItemSc = new MapItem(goodItem.getPathPart3(), "Школа");
+
+                            if (!actItemsSumMap.containsKey(mapItem)) {
+                                actItemsSumMap.put(mapItem,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart3(),
+                                                goodItem.getPathPart1(), "0"));
+                                actItemsSumMap.put(mapItemSc,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart3(), "Школа",
+                                                "0"));
+                            }
                         } else {
                             AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
                                     goodItem.getPathPart3(), goodItem.getPathPart1(),
                                     sumQtyAndPriceItem.getSumQty().toString());
                             actItems.add(actCrossTabData);
 
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart3(), "Детский сад", "0");
-                            actItems.add(actCrossTabDataDs);
+                            MapItem mapItem = new MapItem(goodItem.getPathPart3(), goodItem.getPathPart1());
+                            MapItem mapItemDs = new MapItem(goodItem.getPathPart3(), "Детский сад");
+
+                            if (!actItemsSumMap.containsKey(mapItem)) {
+                                actItemsSumMap.put(mapItem,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart3(),
+                                                goodItem.getPathPart1(), "0"));
+                                actItemsSumMap.put(mapItemDs,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart3(),
+                                                "Детский сад", "0"));
+                            }
                         }
                     } else {
                         if (goodItem.getPathPart1().equals("Детский сад")) {
@@ -341,21 +383,53 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                                     sumQtyAndPriceItem.getSumQty().toString());
                             actItems.add(actCrossTabData);
 
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), "Школа", "0");
-                            actItems.add(actCrossTabDataDs);
+                            MapItem mapItem = new MapItem(goodItem.getPathPart4(), goodItem.getPathPart1());
+                            MapItem mapItemSc = new MapItem(goodItem.getPathPart4(), "Школа");
+
+                            if (!actItemsSumMap.containsKey(mapItem)) {
+                                actItemsSumMap.put(mapItem,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(),
+                                                goodItem.getPathPart1(), "0"));
+                                actItemsSumMap.put(mapItemSc,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(), "Школа",
+                                                "0"));
+                            }
                         } else {
                             AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
                                     goodItem.getPathPart4(), goodItem.getPathPart1(),
                                     sumQtyAndPriceItem.getSumQty().toString());
                             actItems.add(actCrossTabData);
 
-                            AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                    goodItem.getPathPart4(), "Детский сад", "0");
-                            actItems.add(actCrossTabDataDs);
+                            MapItem mapItem = new MapItem(goodItem.getPathPart4(), goodItem.getPathPart1());
+                            MapItem mapItemDs = new MapItem(goodItem.getPathPart4(), "Детский сад");
+
+                            if (!actItemsSumMap.containsKey(mapItem)) {
+                                actItemsSumMap.put(mapItem,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(),
+                                                goodItem.getPathPart1(), "0"));
+                                actItemsSumMap.put(mapItemDs,
+                                        new AcceptanceOfCompletedWorksActCrossTabData(goodItem.getPathPart4(),
+                                                "Детский сад", "0"));
+                            }
                         }
                     }
                 }
+
+                for (AcceptanceOfCompletedWorksActCrossTabData actCrossTabData : actItems) {
+                    for (MapItem mapItem : actItemsSumMap.keySet()) {
+                        if (mapItem.getGoodName().equals(actCrossTabData.getGoodName()) && mapItem.getEducation()
+                                .equals(actCrossTabData.getEducation())) {
+                            long sum = Long.parseLong(actItemsSumMap.get(mapItem).getSum());
+                            sum = sum + Long.parseLong(actCrossTabData.getSum());
+                            actItemsSumMap.get(mapItem).setSum(String.valueOf(sum));
+                            break;
+                        }
+                    }
+                }
+
+                actItems = new ArrayList<AcceptanceOfCompletedWorksActCrossTabData>();
+
+                actItems.addAll(actItemsSumMap.values());
 
                 List<String> goodNamesNot = new ArrayList<String>();
                 for (String name : goodNamesReduce) {
@@ -373,14 +447,14 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     }
                 }
 
-                for (String name: goodNamesNot ) {
-                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
-                                name, "Школа", "0");
-                        actItems.add(actCrossTabDataSc);
+                for (String name : goodNamesNot) {
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataSc = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Школа", "0");
+                    actItems.add(actCrossTabDataSc);
 
-                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
-                                name, "Детский сад", "0");
-                        actItems.add(actCrossTabDataDs);
+                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
+                            name, "Детский сад", "0");
+                    actItems.add(actCrossTabDataDs);
                 }
             }
         }
@@ -394,7 +468,7 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
             if (allGoods.isEmpty()) {
                 String str = "";
                 for (int i = 0; i < 6; i++) {
-                    str = str +  " ";
+                    str = str + " ";
                     AcceptanceOfCompletedWorksActCrossTabData actCrossTabDataDs = new AcceptanceOfCompletedWorksActCrossTabData(
                             str, " ", "");
                     actItems.add(actCrossTabDataDs);
@@ -502,6 +576,68 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
 
         public void setSumPrice(Long sumPrice) {
             this.sumPrice = sumPrice;
+        }
+    }
+
+    public class MapItem {
+
+        /**
+         * Наименование товара (Завтрак, Завтрак второй, Обед и т.д.)
+         */
+        public String goodName;
+
+        /**
+         * Наименование образовательного учреждения
+         */
+        private String education;
+
+        public MapItem(String goodName, String education) {
+            this.goodName = goodName;
+            this.education = education;
+        }
+
+        public String getGoodName() {
+            return goodName;
+        }
+
+        public void setGoodName(String goodName) {
+            this.goodName = goodName;
+        }
+
+        public String getEducation() {
+            return education;
+        }
+
+        public void setEducation(String education) {
+            this.education = education;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            MapItem mapItem = (MapItem) o;
+
+            if (!education.equals(mapItem.education)) {
+                return false;
+            }
+            if (!goodName.equals(mapItem.goodName)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = goodName.hashCode();
+            result = 31 * result + education.hashCode();
+            return result;
         }
     }
 }
