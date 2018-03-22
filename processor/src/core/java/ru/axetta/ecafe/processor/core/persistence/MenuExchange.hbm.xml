@@ -12,7 +12,7 @@
             <key-property name="menuDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" column="MenuDate"/>
             <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
         </composite-id>
-        <property name="menuData" column="MenuData" type="string" length="80000" not-null="true" update="true"/>
+        <property name="menuData" column="MenuData" type="string" length="200000" not-null="true" update="true"/>
         <property name="flags" column="Flags" type="int" not-null="true" update="true"/>
 
     </class>
