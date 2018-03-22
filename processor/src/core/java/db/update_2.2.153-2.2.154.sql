@@ -89,3 +89,6 @@ alter table cf_complexinfo add column usedSpecialMenu integer;
 
 --Флаг предзаказы у ОО
 alter table cf_orgs add column preordersEnabled integer not null default 0;
+
+--Увеличиваем размерность для меню поставщика
+ALTER TABLE cf_menuexchange ALTER COLUMN menudata SET DATA TYPE character varying(200000);
