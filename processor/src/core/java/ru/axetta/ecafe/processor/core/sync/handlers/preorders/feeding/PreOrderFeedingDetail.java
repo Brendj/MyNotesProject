@@ -26,7 +26,7 @@ public class PreOrderFeedingDetail {
     public PreOrderFeedingDetail(PreorderComplex complex) {
         this.complexId = complex.getComplexInfo().getIdOfComplex();
         this.name = complex.getComplexInfo().getComplexName();
-        this.qty = 1;
+        this.qty = complex.getAmount();
         this.idOfMenu = null;
     }
 
