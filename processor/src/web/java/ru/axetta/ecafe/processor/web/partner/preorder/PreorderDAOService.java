@@ -324,4 +324,24 @@ public class PreorderDAOService {
 
         return version;
     }
+
+    @Transactional(readOnly = true)
+    public boolean existPreordersByDate(Long contractId, Date date) {
+        Client client = getClientByContractId(contractId);
+        Query query = emReport.createQuery("select count(p.idOfPreorderComplex) from PreorderComplex p "
+                + "where p.amount > 0 and p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        Long cnt = (Long) query.getSingleResult();
+        if (cnt > 0) return true;
+        query = emReport.createQuery("select count(p.idOfPreorderMenuDetail) from PreorderMenuDetail p "
+                + "where p.amount > 0 and p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        Long cnt2 = (Long) query.getSingleResult();
+        if (cnt2 > 0) return true;
+        else return false;
+    }
 }

@@ -33,7 +33,7 @@ public class PreorderClientSummary {
     protected Integer guardianCreatedWhere;
     private Integer groupPredefined;
     private Integer hoursForbidPP;
-    private Map<String, Integer> calendar;
+    private Map<String, Integer[]> calendar;
 
     public PreorderClientSummary() {
 
@@ -58,10 +58,10 @@ public class PreorderClientSummary {
         if (result.resultCode.equals(0L)) {
             this.hoursForbidPP = result.subscriptionFeedingSettingExt.getHoursForbidPP();
         }
-        this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade());
+        this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), summary.getContractId());
     }
 
-    private Map<String, Integer> getSpecialDates(Date today, Long orgId, String groupName) throws Exception {
+    private Map<String, Integer[]> getSpecialDates(Date today, Long orgId, String groupName, Long contractId) throws Exception {
         Comparator comparator = new PreorderDateComparator();
         Map map = new TreeMap(comparator);
         TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
@@ -72,9 +72,10 @@ public class PreorderClientSummary {
         int two_days = 0;
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
+            boolean preorderExistByDate = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(contractId, currentDate);
             if (two_days <= 2) {
                 c.add(Calendar.DATE, 1);
-                map.put(CalendarUtils.dateToString(currentDate), 1);
+                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, preorderExistByDate ? 1 : 0});
                 two_days++;
                 continue;
             }
@@ -93,7 +94,7 @@ public class PreorderClientSummary {
             }
 
             c.add(Calendar.DATE, 1);
-            map.put(CalendarUtils.dateToString(currentDate), isWeekend ? 1 : 0);
+            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, preorderExistByDate ? 1 : 0});
         }
         return map;
     }
@@ -202,11 +203,11 @@ public class PreorderClientSummary {
         this.groupPredefined = groupPredefined;
     }
 
-    public Map<String, Integer> getCalendar() {
+    public Map<String, Integer[]> getCalendar() {
         return calendar;
     }
 
-    public void setCalendar(Map<String, Integer> calendar) {
+    public void setCalendar(Map<String, Integer[]> calendar) {
         this.calendar = calendar;
     }
 }
