@@ -279,16 +279,28 @@ public class AcceptanceOfCompletedWorksActDAOService extends AbstractDAOService 
                     actItems.add(actCrossTabDataDs);
                 }
             } else {
+                Org org = (Org) getSession().load(Org.class, idOfOrg);
                 for (GoodItem1 goodItem : allGoods) {
 
-                    Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrg(idOfOrg, startTime, endTime,
-                            goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+                    if (org.getType().equals(OrganizationType.SCHOOL)) {
+                        Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrg(idOfOrg, startTime, endTime,
+                                goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
 
-                    AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
-                            goodItem.getPathPart4(), goodItem.getPathPart1(), qty.toString());
-                    actItems.add(actCrossTabData);
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart1(), "Школа", qty.toString());
+                        actItems.add(actCrossTabData);
 
-                    sumPrice += goodItem.getPrice() * qty;
+                        sumPrice += goodItem.getPrice() * qty;
+                    } else if (org.getType().equals(OrganizationType.KINDERGARTEN)) {
+                        Long qty = service.buildRegisterStampBodyValueByOrderTypesByOrg(idOfOrg, startTime, endTime,
+                                goodItem.getFullName(), service.getPayPlanAndSubscriptionFeedingOrderTypes());
+
+                        AcceptanceOfCompletedWorksActCrossTabData actCrossTabData = new AcceptanceOfCompletedWorksActCrossTabData(
+                                goodItem.getPathPart1(), "Детский сад", qty.toString());
+                        actItems.add(actCrossTabData);
+
+                        sumPrice += goodItem.getPrice() * qty;
+                    }
                 }
             }
         }
