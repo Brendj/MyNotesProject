@@ -93,7 +93,7 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
         }
 
         String sql =
-                "select sum(orderdetail.qty), (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty)*-1) as sumPrice "
+                "select sum(orderdetail.qty), sum(orderdetail.qty) * (orderdetail.rprice + orderdetail.socdiscount) as sumPrice "
                         + " from cf_orders cforder "
                         + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
                         + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
@@ -103,7 +103,7 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
                         + " and case good.fullname when '' then orderdetail.MenuDetailName else good.fullname end like '"
                         + fullname + "' and orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                         " (cforder.ordertype in (:orderType) or (cforder.ordertype=8  and orderdetail.qty>=0)) "
-                        + " group by orderdetail.qty, (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty)) ";
+                        + " group by orderdetail.qty, orderdetail.rprice, orderdetail.socdiscount ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg", idOfOrg);
         query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
@@ -139,7 +139,7 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
         }
 
         String sql =
-                "select sum(orderdetail.qty), (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty)*-1) as sumPrice "
+                "select sum(orderdetail.qty), sum(orderdetail.qty) * (orderdetail.rprice + orderdetail.socdiscount) as sumPrice "
                         + " from cf_orders cforder "
                         + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
                         + "     left join cf_goods good on good.idofgood = orderdetail.idofgood"
@@ -149,7 +149,7 @@ public class AcceptanceOfCompletedWorksActReducePricePlanService extends Abstrac
                         + " and case good.fullname when '' then orderdetail.MenuDetailName else good.fullname end like '"
                         + fullname + "' and orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and "
                         + " (cforder.ordertype in (:orderType) or (cforder.ordertype=8  and orderdetail.qty>=0)) "
-                        + " group by orderdetail.qty, (((orderdetail.rprice - orderdetail.discount) * orderdetail.qty)) ";
+                        + " group by orderdetail.qty, orderdetail.rprice, orderdetail.socdiscount ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameterList("idoforg", idOfOrgList);
         query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
