@@ -19,6 +19,7 @@ public class SettingValueParser {
             case AutoPlanPaymentSetting: parserBySettingValue = new AutoPlanPaymentSettingSettingValue(values); break;
             case SubscriberFeeding: parserBySettingValue = new SubscriberFeedingSettingSettingValue(values); break;
             case ReplacingMissingBeneficiaries: parserBySettingValue = new ReplacingMissingBeneficiariesSettingSettingValue(values); break;
+            case PreOrderFeeding: parserBySettingValue = new PreOrderFeedingSettingValue(values); break;
         }
     }
 
