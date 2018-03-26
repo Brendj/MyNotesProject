@@ -180,11 +180,11 @@ public class ImportRegisterOrgsService {
                     addToShortname++;
                     friendlyOrgs.add(org); //все созданные организации загоняем в список, чтобы ниже связать их как дружественные
 
+                    session.persist(org);
+
                     if (!org.getType().equals(OrganizationType.SUPPLIER)) {
                         createPredefinedClientGroupsForOrg(session, org.getIdOfOrg());
                     }
-
-                    session.persist(org);
                 }
             }
             //заполняем дружественные организации всем только что созданным организациям
