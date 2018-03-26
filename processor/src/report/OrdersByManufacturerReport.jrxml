@@ -127,7 +127,7 @@
 	</pageHeader>
 	<detail>
 		<band height="153" splitType="Stretch">
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="f263b515-37e2-4f48-a86a-38e74e37aa47" x="20" y="18" width="174" height="20"/>
 				<textElement>
 					<font isBold="true" isUnderline="true"/>
