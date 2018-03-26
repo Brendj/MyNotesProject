@@ -195,6 +195,11 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         return (currUser.getIdOfRole() == User.DefaultRole.ADMIN_SECURITY.getIdentification());
     }
 
+    public boolean userIsCardOperator() {
+        if (currUser == null) return false;
+        return (currUser.getIdOfRole() == User.DefaultRole.CARD_OPERATOR.getIdentification());
+    }
+
     public boolean isChangePassword() {
         return changePassword;
     }

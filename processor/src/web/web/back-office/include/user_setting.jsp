@@ -32,11 +32,11 @@
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText value="#{userSettings.phone}" maxlength="32" styleClass="input-text"
                  converter="phoneConverter" />
-    <h:outputText escape="true" value="Адрес электронной почты" styleClass="output-text" />
-    <h:inputText value="#{userSettings.email}" maxlength="128" styleClass="input-text"/>
+    <h:outputText escape="true" value="Адрес электронной почты" styleClass="output-text" rendered="#{!userSettings.userIsCardOperator()}" />
+    <h:inputText value="#{userSettings.email}" maxlength="128" styleClass="input-text" rendered="#{!userSettings.userIsCardOperator()}"/>
     <h:outputText escape="true" value="Список организаций рассылки сводного отчета по заявкам" styleClass="output-text"
-                  rendered="#{!userSettings.userIsSecurityAdmin()}"/>
-    <h:panelGroup rendered="#{!userSettings.userIsSecurityAdmin()}">
+                  rendered="#{!userSettings.userIsSecurityAdmin() || !userSettings.userIsCardOperator()}"/>
+    <h:panelGroup rendered="#{!userSettings.userIsSecurityAdmin() || !userSettings.userIsCardOperator()}">
         <a4j:commandButton value="..." action="#{userSettings.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
@@ -47,8 +47,8 @@
         <h:outputText styleClass="output-text" escape="true" value=" {#{userSettings.orgFilter}}" />
     </h:panelGroup>
     <h:outputText escape="true" value="Список организаций рассылки по отмененным заказам" styleClass="output-text"
-                  rendered="#{!userSettings.userIsSecurityAdmin()}"/>
-    <h:panelGroup rendered="#{!userSettings.userIsSecurityAdmin()}">
+                  rendered="#{!userSettings.userIsSecurityAdmin() || !userSettings.userIsCardOperator()}"/>
+    <h:panelGroup rendered="#{!userSettings.userIsSecurityAdmin() || !userSettings.userIsCardOperator()}">
         <a4j:commandButton value="..." action="#{userSettings.showOrgListSelectCancelPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px">
