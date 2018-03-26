@@ -377,7 +377,7 @@ public class ClientFilter {
         //Для роли оператора карт разрешаем включение клиентов из группы выбывших
         User user = DAOReadonlyService.getInstance().getUserFromSession();
         Object[] condition;
-        if (user.getIdOfRole() == User.DefaultRole.CARD_OPERATOR.ordinal()) {
+        if (user != null && user.getIdOfRole() == User.DefaultRole.CARD_OPERATOR.ordinal()) {
             condition = new Long[] {ClientGroupMenu.CLIENT_DELETED};
         } else {
             condition = new Long[]{ClientGroupMenu.CLIENT_DELETED, ClientGroupMenu.CLIENT_LEAVING};
