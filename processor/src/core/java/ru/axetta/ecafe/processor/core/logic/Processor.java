@@ -4588,6 +4588,10 @@ public class Processor implements SyncProcessor {
                         reqComplexInfo.getComplexMenuName());
             } else {
                 complexInfo.setIdOfComplex(reqComplexInfo.getComplexId());
+                complexInfo.setModeFree(reqComplexInfo.getModeFree());
+                complexInfo.setModeGrant(reqComplexInfo.getModeGrant());
+                complexInfo.setModeOfAdd(reqComplexInfo.getModeOfAdd());
+                complexInfo.setComplexName(reqComplexInfo.getComplexMenuName());
             }
             Integer useTrDiscount = reqComplexInfo.getUseTrDiscount();
             Long currentPrice = reqComplexInfo.getCurrentPrice();
@@ -4722,6 +4726,12 @@ public class Processor implements SyncProcessor {
 
             String updSql = "update GoodBasicBasketPrice b set b.menuDetail=null where b.menuDetail=:md";
             query = persistenceSession.createQuery(updSql);
+            query.setParameter("md", menuDetail);
+            query.executeUpdate();
+
+            String delPreordersSql = "update PreorderMenuDetail p set amount = 0, deletedState = :true, menuDetail = null "
+                    + "where p.menuDetail = :md";
+            query = persistenceSession.createQuery(delPreordersSql);
             query.setParameter("md", menuDetail);
             query.executeUpdate();
 

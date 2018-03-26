@@ -1237,7 +1237,7 @@ public class DAOUtils {
     }
 
     public static void deletePreordersByComplexInfo(Session session, Long idOfComplexInfo) {
-        Query q = session.createQuery("update PreorderComplex pc set deletedState = true, complexInfo = null "
+        Query q = session.createQuery("update PreorderComplex pc set amount = 0, deletedState = true, complexInfo = null "
                 + "where pc.complexInfo.idOfComplexInfo = :idOfComplexInfo");
         q.setParameter("idOfComplexInfo", idOfComplexInfo);
         q.executeUpdate();
