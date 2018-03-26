@@ -4540,6 +4540,8 @@ public class Processor implements SyncProcessor {
                     persistenceTransaction = null;
                 }
 
+            } catch (Exception e) {
+                logger.error("Error menu.", e);
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -4547,15 +4549,46 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    private ComplexInfo findComplexInfoForDate(List<ComplexInfo> list, int complexId) {
+        for (ComplexInfo complexInfo : list) {
+            if (complexInfo.getIdOfComplex() == complexId) {
+                return complexInfo;
+            }
+        }
+        return null;
+    }
+
     private void processReqComplexInfos(Session persistenceSession, Org organization, Date menuDate, Menu menu,
             List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos,
             HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
-        deleteComplexInfoForDate(persistenceSession, organization, menuDate);
+        //deleteComplexInfoForDate(persistenceSession, organization, menuDate);
+        List<ComplexInfo> dbComplexes = getComplexInfoForDate(persistenceSession, organization, menuDate);
+        //удаляем комплексы в БД, которых нет в пакете
+        boolean found;
+        for (ComplexInfo ci : dbComplexes) {
+            found = false;
+            for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
+                if (ci.getIdOfComplex() == reqComplexInfo.getComplexId()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                deleteComplexInfoDetailsByComplexInfo(persistenceSession, ci.getIdOfComplexInfo());
+                deletePreordersByComplexInfo(persistenceSession, ci.getIdOfComplexInfo());
+                persistenceSession.delete(ci);
+            }
+        }
 
         for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
-            ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
-                    reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
-                    reqComplexInfo.getComplexMenuName());
+            ComplexInfo complexInfo = findComplexInfoForDate(dbComplexes, reqComplexInfo.getComplexId());
+            if (complexInfo == null) {
+                complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
+                        reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
+                        reqComplexInfo.getComplexMenuName());
+            } else {
+                complexInfo.setIdOfComplex(reqComplexInfo.getComplexId());
+            }
             Integer useTrDiscount = reqComplexInfo.getUseTrDiscount();
             Long currentPrice = reqComplexInfo.getCurrentPrice();
             Integer modeVisible = reqComplexInfo.getModeVisible();
@@ -4621,8 +4654,8 @@ public class Processor implements SyncProcessor {
 
                 complexInfo.setDiscountDetail(complexInfoDiscountDetail);
             }
-            persistenceSession.save(complexInfo);
-
+            persistenceSession.saveOrUpdate(complexInfo);
+            deleteComplexInfoDetailsByComplexInfo(persistenceSession, complexInfo.getIdOfComplexInfo());
             for (SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDetail reqComplexInfoDetail : reqComplexInfo
                     .getComplexInfoDetails()) {
                 //MenuDetail menuDetail = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,

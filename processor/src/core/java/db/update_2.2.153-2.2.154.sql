@@ -40,7 +40,8 @@ ALTER TABLE CF_Generators ADD COLUMN idOfPreorderComplex BIGINT NOT NULL DEFAULT
 CREATE TABLE cf_preorder_complex
 (
   idofpreordercomplex bigint NOT NULL,
-  idofcomplexinfo bigint NOT NULL,
+  idofcomplexinfo bigint,
+  armcomplexid integer,
   idofclient bigint NOT NULL,
   preorderdate bigint,
   amount integer,

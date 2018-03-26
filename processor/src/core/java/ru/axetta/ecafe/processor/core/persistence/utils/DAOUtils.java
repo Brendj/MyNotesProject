@@ -1236,6 +1236,30 @@ public class DAOUtils {
         q.executeUpdate();
     }
 
+    public static void deletePreordersByComplexInfo(Session session, Long idOfComplexInfo) {
+        Query q = session.createQuery("update PreorderComplex pc set deletedState = true, complexInfo = null "
+                + "where pc.complexInfo.idOfComplexInfo = :idOfComplexInfo");
+        q.setParameter("idOfComplexInfo", idOfComplexInfo);
+        q.executeUpdate();
+    }
+
+    public static void deleteComplexInfoDetailsByComplexInfo(Session session, Long idOfComplexInfo) {
+        Query q = session.createQuery("delete from ComplexInfoDetail "
+                + "where complexInfo.idOfComplexInfo = :idOfComplexInfo");
+        q.setParameter("idOfComplexInfo", idOfComplexInfo);
+        q.executeUpdate();
+    }
+
+    public static List<ComplexInfo> getComplexInfoForDate(Session session, Org organization, Date menuDate) {
+        Date endDate = DateUtils.addDays(menuDate, 1);
+        endDate = CalendarUtils.addSeconds(endDate, -1);
+        Query q = session.createQuery("select ci from ComplexInfo ci WHERE ci.org=:org AND ci.menuDate>=:fromDate AND ci.menuDate<=:endDate");
+        q.setParameter("org", organization);
+        q.setParameter("fromDate", menuDate);
+        q.setParameter("endDate", endDate);
+        return q.list();
+    }
+
     public static MenuDetail findMenuDetailByLocalId(Session persistenceSession, Menu menu, Long localIdOfMenu) {
         Query q = persistenceSession.createQuery("FROM MenuDetail WHERE menu=:menu AND localIdOfMenu=:localIdOfMenu");
         q.setParameter("menu", menu);

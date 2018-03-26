@@ -12,6 +12,7 @@ import java.util.Date;
 public class PreorderComplex {
     private Long idOfPreorderComplex;
     private ComplexInfo complexInfo;
+    private Integer armComplexId;
     private Client client;
     private Date preorderDate;
     private Integer amount;
@@ -76,5 +77,13 @@ public class PreorderComplex {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public Integer getArmComplexId() {
+        return armComplexId;
+    }
+
+    public void setArmComplexId(Integer armComplexId) {
+        this.armComplexId = armComplexId;
     }
 }
