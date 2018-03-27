@@ -202,6 +202,7 @@ public class CardOperatorFilter extends OnlineReportPage {
     public List retrieveCards(Session session) throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         Criteria cr = session.createCriteria(HistoryCard.class);
+        cr.createAlias("card", "card", JoinType.LEFT_OUTER_JOIN);
         cr.add(Restrictions.eq("user", user));
         if (CardStateFilterMenu.NO_CONDITION != this.cardState) {
             cr.add(Restrictions.eq("card.state", this.cardState));

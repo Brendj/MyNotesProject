@@ -4094,6 +4094,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             cardOperatorListPage.getCardOperatorFilter().clear();
+            cardOperatorListPage.getCardOperatorFilter().setShowOperationsAllPeriod(false);
             cardOperatorListPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;

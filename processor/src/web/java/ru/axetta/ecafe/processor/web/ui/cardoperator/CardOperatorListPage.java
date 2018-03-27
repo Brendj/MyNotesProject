@@ -160,7 +160,7 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
 
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        if (!cardOperatorFilter.isEmpty() || !cardOperatorFilter.getShowOperationsAllPeriod()) {
+        if (!cardOperatorFilter.isEmpty() || cardOperatorFilter.getShowOperationsAllPeriod()) {
             List history = cardOperatorFilter.retrieveCards(session);
             for (Object object : history) {
                 HistoryCard hist = (HistoryCard) object;
