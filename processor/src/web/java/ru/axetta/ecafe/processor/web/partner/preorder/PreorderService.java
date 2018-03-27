@@ -10,10 +10,7 @@ import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
-import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderClientSummaryBaseListResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
-import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.SudirPersonData;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,16 +147,25 @@ public class PreorderService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response saveComplex(PreorderSaveListParam list) {
+        SaveComplexResult res = new SaveComplexResult() ;
         try {
             authorize(list.getContractId(), RuntimeContext.getAppContext().getBean(TokenService.class).getToken());
+            logRequest(list);
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(list);
-            return Response.ok().build();
+            res.setCode(0);
+            res.setMessage("OK");
         } catch (PreorderAccessDeniedException e1) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            res.setCode(403);
+            res.setMessage("Access denied");
         } catch (Exception e) {
             logger.error("Error saveComplex: ", e);
-            return Response.serverError().build();
+            res.setCode(500);
+            res.setMessage("Internal server error");
         }
+        return Response.ok(res).build();
     }
 
+    private void logRequest(PreorderSaveListParam list) {
+        logger.info("Incoming request save preorder: " + list.toString());
+    }
 }

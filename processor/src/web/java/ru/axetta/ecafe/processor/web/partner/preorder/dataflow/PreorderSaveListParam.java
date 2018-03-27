@@ -29,6 +29,16 @@ public class PreorderSaveListParam {
         return o;
     }
 
+    @Override
+    public String toString() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (Exception e) {
+            return "Parse error";
+        }
+    }
+
     public Long getContractId() {
         return contractId;
     }
