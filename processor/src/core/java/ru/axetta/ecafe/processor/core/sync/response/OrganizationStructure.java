@@ -66,6 +66,15 @@ public class OrganizationStructure implements AbstractToElement{
                     o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getOrgStructureVersion());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
+        if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
+            session.refresh(org);
+            OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
+                    org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
+                    org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
+                    getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
+                    org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(), org.getOrgStructureVersion());
+            organizationItemMap.put(org.getIdOfOrg(), item);
+        }
     }
 
     private Long getConfigurationId(Org o) {
