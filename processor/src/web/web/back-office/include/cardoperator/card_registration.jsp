@@ -43,7 +43,7 @@
                  maxlength="16" styleClass="input-text" />
     <h:outputText escape="true" value="Тип карты" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.cardRegistrationAndIssuePage.cardType}" styleClass="input-text">
-        <f:selectItems value="#{mainPage.cardRegistrationAndIssuePage.cardTypeMenu.items}" />
+        <f:selectItems value="#{mainPage.cardRegistrationAndIssuePage.cardTypeMenu.itemsCardOperator}" />
     </h:selectOneMenu>
     <h:outputText escape="true" value="Дата выдачи" styleClass="output-text" />
     <rich:calendar value="#{mainPage.cardRegistrationAndIssuePage.issueTime}" datePattern="dd.MM.yyyy"
