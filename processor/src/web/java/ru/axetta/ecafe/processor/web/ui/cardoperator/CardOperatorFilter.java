@@ -209,12 +209,11 @@ public class CardOperatorFilter extends OnlineReportPage {
         }
         if (!showOperationsAllPeriod) {
             if (startDate != null) {
-                cr.add(
-                        Restrictions.between("upDatetime", startDate, CalendarUtils.addOneDay(startDate)));
+                cr.add(Restrictions.between("upDatetime", startDate, CalendarUtils.addOneDay(startDate)));
             }
         }
         if (client != null && client.getIdOfClient() != null) {
-            Client cl = (Client)session.load(Client.class, client.getIdOfClient());
+            Client cl = (Client) session.load(Client.class, client.getIdOfClient());
             cr.add(Restrictions.eq("card.client", cl));
         }
         if (!this.org.isEmpty()) {

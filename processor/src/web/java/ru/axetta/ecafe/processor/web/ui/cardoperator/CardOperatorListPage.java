@@ -160,19 +160,17 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
 
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        if (!cardOperatorFilter.isEmpty() || cardOperatorFilter.getShowOperationsAllPeriod()) {
-            List history = cardOperatorFilter.retrieveCards(session);
-            for (Object object : history) {
-                HistoryCard hist = (HistoryCard) object;
-                Card card = hist.getCard();
-                Org org = card.getOrg();
-                String personName = "";
-                if (card.getClient() != null) {
-                    Person person = DAOService.getInstance().getPersonByClient(card.getClient());
-                    personName = person.getFullName();
-                }
-                items.add(new Item(org, hist, personName));
+        List history = cardOperatorFilter.retrieveCards(session);
+        for (Object object : history) {
+            HistoryCard hist = (HistoryCard) object;
+            Card card = hist.getCard();
+            Org org = card.getOrg();
+            String personName = "";
+            if (card.getClient() != null) {
+                Person person = DAOService.getInstance().getPersonByClient(card.getClient());
+                personName = person.getFullName();
             }
+            items.add(new Item(org, hist, personName));
         }
         this.items = items;
     }
