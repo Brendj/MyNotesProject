@@ -219,9 +219,10 @@ public class CardOperatorFilter extends OnlineReportPage {
         }
         if (!this.org.isEmpty()) {
             Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
-            cr.createAlias("client", "card.client", JoinType.LEFT_OUTER_JOIN);
+            cr.add(Restrictions.eq("card.org", org));
+            /*cr.createAlias("client", "card.client", JoinType.LEFT_OUTER_JOIN);
             cr.add(Restrictions.disjunction().add(Restrictions.eq("card.org", org))
-                    .add(Restrictions.eq("client.org", org)));
+                    .add(Restrictions.eq("client.org", org)));*/
         }
         cr.addOrder(Order.asc("upDatetime"));
         return cr.list();

@@ -91,8 +91,8 @@ public class CardOperatorListPage extends BasicWorkspacePage implements OrgSelec
         public Item(Org org, HistoryCard history, String personName) {
             Card card = history.getCard();
             this.shortNameInfoService = org.getShortNameInfoService();
-            if (card.getClient() != null) {
-                this.contractId = card.getClient().getContractId();
+            if (history.getNewOwner() != null) {
+                this.contractId = history.getNewOwner().getContractId();
             }
             this.cardNo = card.getCardNo();
             this.cardPrintedNo = card.getCardPrintedNo();
