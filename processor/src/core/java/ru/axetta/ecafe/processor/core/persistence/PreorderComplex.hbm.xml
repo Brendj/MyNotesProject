@@ -23,5 +23,7 @@
         <property name="amount" column="amount" type="integer"/>
         <property name="preorderDate" column="preorderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="guid" column="guid" type="string" length="36" not-null="true"/>
+        <property name="usedSum" column="usedsum" type="long" not-null="true"/>
     </class>
 </hibernate-mapping>

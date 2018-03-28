@@ -40,11 +40,13 @@ ALTER TABLE CF_Generators ADD COLUMN idOfPreorderComplex BIGINT NOT NULL DEFAULT
 CREATE TABLE cf_preorder_complex
 (
   idofpreordercomplex bigint NOT NULL,
+  guid character varying(36),
   idofcomplexinfo bigint,
   armcomplexid integer,
   idofclient bigint NOT NULL,
   preorderdate bigint,
   amount integer,
+  usedsum bigint NOT NULL default 0,
   version bigint NOT NULL default 0,
   deletedstate integer NOT NULL default 0,
   CONSTRAINT cf_preorder_complex_idofpreordercomplex_pk PRIMARY KEY (idofpreordercomplex),
@@ -63,9 +65,10 @@ CREATE INDEX cf_preorder_complex_version_idx ON cf_preorder_complex USING btree 
 CREATE TABLE cf_preorder_menudetail
 (
   idofpreordermenudetail bigserial NOT NULL,
+  guid character varying(36),
   idofcomplexinfo bigint NOT NULL,
   idofcomplexinfodetail bigint NOT NULL,
-  idofmenudetail bigint NOT NULL,
+  idofmenudetail bigint,
   idofclient bigint NOT NULL,
   preorderdate bigint,
   amount integer,

@@ -18,6 +18,8 @@ public class PreorderComplex {
     private Integer amount;
     private Long version;
     private Boolean deletedState;
+    private String guid;
+    private Long usedSum;
 
     public PreorderComplex() {
 
@@ -85,5 +87,21 @@ public class PreorderComplex {
 
     public void setArmComplexId(Integer armComplexId) {
         this.armComplexId = armComplexId;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public Long getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(Long usedSum) {
+        this.usedSum = usedSum;
     }
 }

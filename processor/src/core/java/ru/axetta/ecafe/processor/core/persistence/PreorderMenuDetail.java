@@ -18,6 +18,7 @@ public class PreorderMenuDetail {
     private Date preorderDate;
     private Integer amount;
     private Boolean deletedState;
+    private String guid;
 
     public PreorderMenuDetail() {
 
@@ -85,5 +86,13 @@ public class PreorderMenuDetail {
 
     public void setComplexInfoDetail(ComplexInfoDetail complexInfoDetail) {
         this.complexInfoDetail = complexInfoDetail;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

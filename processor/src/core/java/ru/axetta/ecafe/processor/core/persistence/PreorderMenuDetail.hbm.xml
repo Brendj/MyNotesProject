@@ -17,9 +17,10 @@
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      column="IdOfClient" not-null="true" fetch="select"/>
         <many-to-one name="menuDetail" class="ru.axetta.ecafe.processor.core.persistence.MenuDetail"
-                     column="IdOfMenuDetail" not-null="true" fetch="join"/>
+                     column="IdOfMenuDetail" fetch="join"/>
         <property name="amount" column="amount" type="integer"/>
         <property name="preorderDate" column="preorderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="guid" column="guid" type="string" length="36" not-null="true"/>
     </class>
 </hibernate-mapping>
