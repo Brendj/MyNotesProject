@@ -4549,50 +4549,15 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    private ComplexInfo findComplexInfoForDate(List<ComplexInfo> list, int complexId) {
-        for (ComplexInfo complexInfo : list) {
-            if (complexInfo.getIdOfComplex() == complexId) {
-                return complexInfo;
-            }
-        }
-        return null;
-    }
-
     private void processReqComplexInfos(Session persistenceSession, Org organization, Date menuDate, Menu menu,
             List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos,
             HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
-        //deleteComplexInfoForDate(persistenceSession, organization, menuDate);
-        List<ComplexInfo> dbComplexes = getComplexInfoForDate(persistenceSession, organization, menuDate);
-        //удаляем комплексы в БД, которых нет в пакете
-        boolean found;
-        for (ComplexInfo ci : dbComplexes) {
-            found = false;
-            for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
-                if (ci.getIdOfComplex() == reqComplexInfo.getComplexId()) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                deleteComplexInfoDetailsByComplexInfo(persistenceSession, ci.getIdOfComplexInfo());
-                deletePreordersByComplexInfo(persistenceSession, ci.getIdOfComplexInfo());
-                persistenceSession.delete(ci);
-            }
-        }
+        deleteComplexInfoForDate(persistenceSession, organization, menuDate);
 
         for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
-            ComplexInfo complexInfo = findComplexInfoForDate(dbComplexes, reqComplexInfo.getComplexId());
-            if (complexInfo == null) {
-                complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
-                        reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
-                        reqComplexInfo.getComplexMenuName());
-            } else {
-                complexInfo.setIdOfComplex(reqComplexInfo.getComplexId());
-                complexInfo.setModeFree(reqComplexInfo.getModeFree());
-                complexInfo.setModeGrant(reqComplexInfo.getModeGrant());
-                complexInfo.setModeOfAdd(reqComplexInfo.getModeOfAdd());
-                complexInfo.setComplexName(reqComplexInfo.getComplexMenuName());
-            }
+            ComplexInfo complexInfo = new ComplexInfo(reqComplexInfo.getComplexId(), organization, menuDate,
+                    reqComplexInfo.getModeFree(), reqComplexInfo.getModeGrant(), reqComplexInfo.getModeOfAdd(),
+                    reqComplexInfo.getComplexMenuName());
             Integer useTrDiscount = reqComplexInfo.getUseTrDiscount();
             Long currentPrice = reqComplexInfo.getCurrentPrice();
             Integer modeVisible = reqComplexInfo.getModeVisible();
@@ -4658,12 +4623,9 @@ public class Processor implements SyncProcessor {
 
                 complexInfo.setDiscountDetail(complexInfoDiscountDetail);
             }
-            persistenceSession.saveOrUpdate(complexInfo);
-            deleteComplexInfoDetailsByComplexInfo(persistenceSession, complexInfo.getIdOfComplexInfo());
+            persistenceSession.save(complexInfo);
             for (SyncRequest.ReqMenu.Item.ReqComplexInfo.ReqComplexInfoDetail reqComplexInfoDetail : reqComplexInfo
                     .getComplexInfoDetails()) {
-                //MenuDetail menuDetail = DAOUtils.findMenuDetailByLocalId(persistenceSession, menu,
-                //        reqComplexInfoDetail.getReqMenuDetail().getIdOfMenu());
                 MenuDetail menuDetail = localIdsToMenuDetailMap
                         .get(reqComplexInfoDetail.getReqMenuDetail().getIdOfMenu());
                 if (menuDetail == null) {
@@ -4729,11 +4691,6 @@ public class Processor implements SyncProcessor {
             query.setParameter("md", menuDetail);
             query.executeUpdate();
 
-            String delPreordersSql = "update PreorderMenuDetail p set amount = 0, deletedState = :true, menuDetail = null "
-                    + "where p.menuDetail = :md";
-            query = persistenceSession.createQuery(delPreordersSql);
-            query.setParameter("md", menuDetail);
-            query.executeUpdate();
 
             persistenceSession.delete(menuDetail);
         }

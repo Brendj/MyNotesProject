@@ -12,7 +12,7 @@ import java.util.List;
  * Created by i.semenov on 13.03.2018.
  */
 public class PreorderComplexItemExt {
-    private Long idOfComplexInfo;
+    private Integer idOfComplexInfo;
     private String complexName;
     private Long currentPrice;
     private int amount;
@@ -26,7 +26,7 @@ public class PreorderComplexItemExt {
     }
 
     public PreorderComplexItemExt(ComplexInfo ci) {
-        this.setIdOfComplexInfo(ci.getIdOfComplexInfo());
+        this.setIdOfComplexInfo(ci.getIdOfComplex());
         this.setComplexName(ci.getComplexName());
         this.setCurrentPrice(ci.getCurrentPrice());
         this.setComplexType(ci.getModeOfAdd());
@@ -41,11 +41,11 @@ public class PreorderComplexItemExt {
         this.menuItemExtList = menuItemExtList;
     }
 
-    public Long getIdOfComplexInfo() {
+    public Integer getIdOfComplexInfo() {
         return idOfComplexInfo;
     }
 
-    public void setIdOfComplexInfo(Long idOfComplexInfo) {
+    public void setIdOfComplexInfo(Integer idOfComplexInfo) {
         this.idOfComplexInfo = idOfComplexInfo;
     }
 

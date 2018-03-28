@@ -5,13 +5,13 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by i.semenov on 12.03.2018.
  */
 public class PreorderComplex {
     private Long idOfPreorderComplex;
-    private ComplexInfo complexInfo;
     private Integer armComplexId;
     private Client client;
     private Date preorderDate;
@@ -20,6 +20,7 @@ public class PreorderComplex {
     private Boolean deletedState;
     private String guid;
     private Long usedSum;
+    private Set<PreorderMenuDetail> preorderMenuDetails;
 
     public PreorderComplex() {
 
@@ -31,14 +32,6 @@ public class PreorderComplex {
 
     public void setIdOfPreorderComplex(Long idOfPreorderComplex) {
         this.idOfPreorderComplex = idOfPreorderComplex;
-    }
-
-    public ComplexInfo getComplexInfo() {
-        return complexInfo;
-    }
-
-    public void setComplexInfo(ComplexInfo complexInfo) {
-        this.complexInfo = complexInfo;
     }
 
     public Client getClient() {
@@ -103,5 +96,13 @@ public class PreorderComplex {
 
     public void setUsedSum(Long usedSum) {
         this.usedSum = usedSum;
+    }
+
+    public Set<PreorderMenuDetail> getPreorderMenuDetails() {
+        return preorderMenuDetails;
+    }
+
+    public void setPreorderMenuDetails(Set<PreorderMenuDetail> preorderMenuDetails) {
+        this.preorderMenuDetails = preorderMenuDetails;
     }
 }

@@ -70,6 +70,7 @@ public class PreorderService {
         String mobile;
         NewCookie cookie = null;
         SudirToken token = null;
+        String tok = "";
         if (authCode != null && authCode.length() > 16) {
             //Получаем токен в СУДИР
             token = RuntimeContext.getInstance().getAppContext().getBean(SudirClientService.class).getToken(authCode);
@@ -80,6 +81,7 @@ public class PreorderService {
 
             Cookie cook = new Cookie("access_token", token.getAccess_token(), "/processor/preorder", null);
             cookie = new NewCookie(cook, null, -1, true);
+            tok = token.getAccess_token();
 
             //Получаем данные пользователя в СУДИР
             SudirPersonData personData = RuntimeContext.getInstance().getAppContext().getBean(SudirClientService.class).getPersonData(token.getAccess_token());
@@ -102,7 +104,7 @@ public class PreorderService {
         } else {
             //сохраняем токен и связанные л/с в БД
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).saveToken(token, clientSummary);
-            return Response.ok(result.toString()).cookie(cookie).build();
+            return Response.ok(result.toString()).cookie(cookie).header("Authorization", tok).build();
         }
     }
 

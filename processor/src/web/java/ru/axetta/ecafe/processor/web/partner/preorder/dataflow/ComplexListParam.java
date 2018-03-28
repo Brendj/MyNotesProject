@@ -11,15 +11,15 @@ import java.util.List;
  */
 public class ComplexListParam {
 
-    private Long idOfComplex;
+    private Integer idOfComplex;
     private Integer amount;
     private List<MenuItemParam> menuItems;
 
-    public Long getIdOfComplex() {
+    public Integer getIdOfComplex() {
         return idOfComplex;
     }
 
-    public void setIdOfComplex(Long idOfComplex) {
+    public void setIdOfComplex(Integer idOfComplex) {
         this.idOfComplex = idOfComplex;
     }
 

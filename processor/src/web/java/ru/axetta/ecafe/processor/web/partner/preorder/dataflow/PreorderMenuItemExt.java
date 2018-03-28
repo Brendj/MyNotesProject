@@ -38,7 +38,8 @@ public class PreorderMenuItemExt {
         this.setProtein(menuDetail.getProtein());
         this.setCarbohydrates(menuDetail.getCarbohydrates());
         this.setFat(menuDetail.getFat());
-        this.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
+        //this.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
+        this.setIdOfMenuDetail(menuDetail.getLocalIdOfMenu());
     }
 
     public String getGroup() {

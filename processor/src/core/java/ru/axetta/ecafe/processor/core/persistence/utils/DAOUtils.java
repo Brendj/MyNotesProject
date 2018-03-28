@@ -1236,10 +1236,11 @@ public class DAOUtils {
         q.executeUpdate();
     }
 
-    public static void deletePreordersByComplexInfo(Session session, Long idOfComplexInfo) {
-        Query q = session.createQuery("update PreorderComplex pc set amount = 0, deletedState = true, complexInfo = null "
+    /*public static void deletePreordersByComplexInfo(Session session, Long idOfComplexInfo, Long version) {
+        Query q = session.createQuery("update PreorderComplex pc set amount = 0, deletedState = true, complexInfo = null, version = :version "
                 + "where pc.complexInfo.idOfComplexInfo = :idOfComplexInfo");
         q.setParameter("idOfComplexInfo", idOfComplexInfo);
+        q.setParameter("version", version);
         q.executeUpdate();
     }
 
@@ -1248,7 +1249,7 @@ public class DAOUtils {
                 + "where complexInfo.idOfComplexInfo = :idOfComplexInfo");
         q.setParameter("idOfComplexInfo", idOfComplexInfo);
         q.executeUpdate();
-    }
+    }*/
 
     public static List<ComplexInfo> getComplexInfoForDate(Session session, Org organization, Date menuDate) {
         Date endDate = DateUtils.addDays(menuDate, 1);
@@ -2551,6 +2552,17 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByPreorderComplex(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select e.version from cf_preorder_complex as e order by e.version desc limit 1");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
@@ -2917,8 +2929,26 @@ public class DAOUtils {
     public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,
             PreorderComplex complex) throws Exception {
         Criteria criteria = session.createCriteria(PreorderMenuDetail.class);
-        criteria.add(Restrictions.eq("client", complex.getClient()));
-        criteria.add(Restrictions.eq("complexInfo", complex.getComplexInfo()));
+        criteria.add(Restrictions.eq("preorderComplex.idOfPreorderComplex", complex.getIdOfPreorderComplex()));
         return criteria.list();
+    }
+
+    public static String getPreorderComplexName(Session session, PreorderComplex preorderComplex) {
+        Criteria criteria = session.createCriteria(ComplexInfo.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", preorderComplex.getClient().getOrg().getIdOfOrg()));
+        criteria.add(Restrictions.eq("menuDate", preorderComplex.getPreorderDate()));
+        criteria.add(Restrictions.eq("idOfComplex", preorderComplex.getArmComplexId()));
+        ComplexInfo complexInfo = (ComplexInfo)criteria.uniqueResult();
+        return complexInfo.getComplexName();
+    }
+
+    public static String getPreorderMenuDetailName(Session session, PreorderMenuDetail preorderMenuDetail) {
+        Criteria criteria = session.createCriteria(MenuDetail.class);
+        criteria.createAlias("menu", "m");
+        criteria.add(Restrictions.eq("m.org.idOfOrg", preorderMenuDetail.getClient().getOrg().getIdOfOrg()));
+        criteria.add(Restrictions.eq("m.menuDate", preorderMenuDetail.getPreorderDate()));
+        criteria.add(Restrictions.eq("localIdOfMenu", preorderMenuDetail.getArmIdOfMenu()));
+        MenuDetail menuDetail = (MenuDetail)criteria.uniqueResult();
+        return menuDetail.getMenuDetailName();
     }
 }

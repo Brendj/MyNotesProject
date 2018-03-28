@@ -70,6 +70,8 @@ CREATE TABLE cf_preorder_menudetail
   idofcomplexinfodetail bigint NOT NULL,
   idofmenudetail bigint,
   idofclient bigint NOT NULL,
+  armidofmenu bigint,
+  idofpreordercomplex bigint,
   preorderdate bigint,
   amount integer,
   deletedstate integer NOT NULL default 0,

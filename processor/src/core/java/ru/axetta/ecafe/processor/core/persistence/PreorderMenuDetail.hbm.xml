@@ -10,17 +10,15 @@
         <id name="idOfPreorderMenuDetail" column="IdOfPreorderMenuDetail" type="long">
             <generator class="identity"/>
         </id>
-        <many-to-one name="complexInfo" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfo"
-                     column="IdOfComplexInfo" not-null="true" fetch="select"/>
-        <many-to-one name="complexInfoDetail" class="ru.axetta.ecafe.processor.core.persistence.ComplexInfoDetail"
-                     column="IdOfComplexInfoDetail" not-null="true" fetch="join"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      column="IdOfClient" not-null="true" fetch="select"/>
-        <many-to-one name="menuDetail" class="ru.axetta.ecafe.processor.core.persistence.MenuDetail"
-                     column="IdOfMenuDetail" fetch="join"/>
         <property name="amount" column="amount" type="integer"/>
         <property name="preorderDate" column="preorderDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="guid" column="guid" type="string" length="36" not-null="true"/>
+        <property name="armIdOfMenu" column="armidofmenu" type="long" />
+        <!--<property name="idOfPreorderComplex" column="idofpreordercomplex" type="long" />-->
+        <many-to-one name="preorderComplex" class="ru.axetta.ecafe.processor.core.persistence.PreorderComplex"
+                     column="IdOfPreorderComplex" not-null="true" fetch="select" />
     </class>
 </hibernate-mapping>

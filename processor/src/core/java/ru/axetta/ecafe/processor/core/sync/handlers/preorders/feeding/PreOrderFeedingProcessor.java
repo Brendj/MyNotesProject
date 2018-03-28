@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
-import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
@@ -32,9 +31,7 @@ public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding
                 preOrdersFeedingRequest.getOrgOwner(), preOrdersFeedingRequest.getMaxVersion());
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex != null) {
-                List<PreorderMenuDetail> menuDetailList =
-                        DAOUtils.getPreorderMenuDetailByPreorderComplex(session, preorderComplex);
-                PreOrdersFeedingItem resItem = new PreOrdersFeedingItem(preorderComplex, menuDetailList);
+                PreOrdersFeedingItem resItem = new PreOrdersFeedingItem(session, preorderComplex); //, menuDetailList);
                 items.add(resItem);
             }
         }

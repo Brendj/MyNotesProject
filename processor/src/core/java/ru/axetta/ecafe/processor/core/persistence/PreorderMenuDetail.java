@@ -11,14 +11,14 @@ import java.util.Date;
  */
 public class PreorderMenuDetail {
     private Long idOfPreorderMenuDetail;
-    private ComplexInfo complexInfo;
-    private ComplexInfoDetail complexInfoDetail;
     private Client client;
-    private MenuDetail menuDetail;
     private Date preorderDate;
     private Integer amount;
     private Boolean deletedState;
     private String guid;
+    private Long armIdOfMenu;
+    //private Long idOfPreorderComplex;
+    private PreorderComplex preorderComplex;
 
     public PreorderMenuDetail() {
 
@@ -32,28 +32,12 @@ public class PreorderMenuDetail {
         this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
     }
 
-    public ComplexInfo getComplexInfo() {
-        return complexInfo;
-    }
-
-    public void setComplexInfo(ComplexInfo complexInfo) {
-        this.complexInfo = complexInfo;
-    }
-
     public Client getClient() {
         return client;
     }
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public MenuDetail getMenuDetail() {
-        return menuDetail;
-    }
-
-    public void setMenuDetail(MenuDetail menuDetail) {
-        this.menuDetail = menuDetail;
     }
 
     public Date getPreorderDate() {
@@ -80,14 +64,6 @@ public class PreorderMenuDetail {
         this.deletedState = deletedState;
     }
 
-    public ComplexInfoDetail getComplexInfoDetail() {
-        return complexInfoDetail;
-    }
-
-    public void setComplexInfoDetail(ComplexInfoDetail complexInfoDetail) {
-        this.complexInfoDetail = complexInfoDetail;
-    }
-
     public String getGuid() {
         return guid;
     }
@@ -95,4 +71,28 @@ public class PreorderMenuDetail {
     public void setGuid(String guid) {
         this.guid = guid;
     }
+
+    public Long getArmIdOfMenu() {
+        return armIdOfMenu;
+    }
+
+    public void setArmIdOfMenu(Long armIdOfMenu) {
+        this.armIdOfMenu = armIdOfMenu;
+    }
+
+    public PreorderComplex getPreorderComplex() {
+        return preorderComplex;
+    }
+
+    public void setPreorderComplex(PreorderComplex preorderComplex) {
+        this.preorderComplex = preorderComplex;
+    }
+
+    /*public Long getIdOfPreorderComplex() {
+        return idOfPreorderComplex;
+    }
+
+    public void setIdOfPreorderComplex(Long idOfPreorderComplex) {
+        this.idOfPreorderComplex = idOfPreorderComplex;
+    }*/
 }

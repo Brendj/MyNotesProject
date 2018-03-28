@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -24,19 +25,19 @@ public class PreOrdersFeedingItem {
     private final Long idOfOrg;
     private List<PreOrderFeedingDetail> preOrderFeedingDetailList = new LinkedList<PreOrderFeedingDetail>();
 
-    public PreOrdersFeedingItem(PreorderComplex preorderComplex, List<PreorderMenuDetail> menuDetailList) {
+    public PreOrdersFeedingItem(Session session, PreorderComplex preorderComplex) {
         this.idOfClient = preorderComplex.getClient().getIdOfClient();
         this.dateStart = preorderComplex.getPreorderDate();
         this.version = preorderComplex.getVersion();
         this.isDeleted = preorderComplex.getDeletedState();
-        this.idOfOrg = preorderComplex.getComplexInfo().getOrg().getIdOfOrg();
+        this.idOfOrg = preorderComplex.getClient().getOrg().getIdOfOrg();
 
-        PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(preorderComplex);
+        PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(session, preorderComplex);
         this.preOrderFeedingDetailList.add(feedingDetail);
 
-        for (PreorderMenuDetail menuDetail : menuDetailList) {
-            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(menuDetail,
-                    preorderComplex.getComplexInfo().getIdOfComplex(), preorderComplex.getGuid());
+        for (PreorderMenuDetail menuDetail : preorderComplex.getPreorderMenuDetails()) {
+            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(session, menuDetail,
+                    preorderComplex.getArmComplexId(), preorderComplex.getGuid());
             this.preOrderFeedingDetailList.add(preOrderFeedingDetail);
         }
     }
