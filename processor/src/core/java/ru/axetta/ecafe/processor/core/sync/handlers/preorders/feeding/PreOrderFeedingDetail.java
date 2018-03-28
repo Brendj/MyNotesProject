@@ -15,12 +15,14 @@ public class PreOrderFeedingDetail {
     private final Long idOfMenu;
     private final String name;
     private final Integer qty;
+    private final String guid;
 
-    public PreOrderFeedingDetail(PreorderMenuDetail menuDetail, Integer complexId) {
+    public PreOrderFeedingDetail(PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getMenuDetail().getLocalIdOfMenu();
         this.name = menuDetail.getMenuDetail().getMenuDetailName();
         this.qty = menuDetail.getAmount();
         this.complexId = complexId;
+        this.guid = guid;
     }
 
     public PreOrderFeedingDetail(PreorderComplex complex) {
@@ -28,6 +30,7 @@ public class PreOrderFeedingDetail {
         this.name = complex.getComplexInfo().getComplexName();
         this.qty = complex.getAmount();
         this.idOfMenu = null;
+        this.guid = complex.getGuid();
     }
 
     public Integer getComplexId() {
@@ -46,6 +49,10 @@ public class PreOrderFeedingDetail {
         return qty;
     }
 
+    public String getGuid() {
+        return guid;
+    }
+
     public Element toElement(Document document) throws Exception{
         Element element = document.createElement("POD");
 
@@ -60,6 +67,9 @@ public class PreOrderFeedingDetail {
         }
         if (null != qty) {
             element.setAttribute("Qty", Integer.toString(qty));
+        }
+        if (null != guid) {
+            element.setAttribute("Guid", guid);
         }
 
         return element;

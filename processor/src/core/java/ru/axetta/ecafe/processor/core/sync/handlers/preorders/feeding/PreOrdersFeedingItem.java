@@ -31,14 +31,12 @@ public class PreOrdersFeedingItem {
         this.isDeleted = preorderComplex.getDeletedState();
         this.idOfOrg = preorderComplex.getComplexInfo().getOrg().getIdOfOrg();
 
-        if (preorderComplex.getAmount() > 0) {
-            PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(preorderComplex);
-            this.preOrderFeedingDetailList.add(feedingDetail);
-        }
+        PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(preorderComplex);
+        this.preOrderFeedingDetailList.add(feedingDetail);
 
         for (PreorderMenuDetail menuDetail : menuDetailList) {
             PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(menuDetail,
-                    preorderComplex.getComplexInfo().getIdOfComplex());
+                    preorderComplex.getComplexInfo().getIdOfComplex(), preorderComplex.getGuid());
             this.preOrderFeedingDetailList.add(preOrderFeedingDetail);
         }
     }
