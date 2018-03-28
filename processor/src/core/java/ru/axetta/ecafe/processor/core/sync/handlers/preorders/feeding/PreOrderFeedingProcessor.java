@@ -31,8 +31,12 @@ public class PreOrderFeedingProcessor extends AbstractProcessor<PreOrdersFeeding
                 preOrdersFeedingRequest.getOrgOwner(), preOrdersFeedingRequest.getMaxVersion());
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex != null) {
-                PreOrdersFeedingItem resItem = new PreOrdersFeedingItem(session, preorderComplex); //, menuDetailList);
-                items.add(resItem);
+                try {
+                    PreOrdersFeedingItem resItem = new PreOrdersFeedingItem(session, preorderComplex); //, menuDetailList);
+                    items.add(resItem);
+                } catch (Exception e) {
+                    //todo Есть предзаказ на комплекс или блюдо, но нет самого комплекса или блюда
+                }
             }
         }
         result.setItems(items);
