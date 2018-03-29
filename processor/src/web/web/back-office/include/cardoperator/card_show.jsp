@@ -37,11 +37,11 @@
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Клиент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{cardOperatorPage.client.shortName}" readonly="true" styleClass="input-text long-field"
-                         style="margin-right: 2px;" id="cardOperatorPageClient" />
             <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
+            <h:inputText value="#{cardOperatorPage.client.shortName}" readonly="true" styleClass="input-text long-field"
+                         style="margin-right: 2px;" id="cardOperatorPageClient" />
         </h:panelGroup>
 
 
