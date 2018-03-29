@@ -17,7 +17,6 @@ public class PreorderMenuDetail {
     private Boolean deletedState;
     private String guid;
     private Long armIdOfMenu;
-    //private Long idOfPreorderComplex;
     private PreorderComplex preorderComplex;
 
     public PreorderMenuDetail() {
@@ -88,11 +87,4 @@ public class PreorderMenuDetail {
         this.preorderComplex = preorderComplex;
     }
 
-    /*public Long getIdOfPreorderComplex() {
-        return idOfPreorderComplex;
-    }
-
-    public void setIdOfPreorderComplex(Long idOfPreorderComplex) {
-        this.idOfPreorderComplex = idOfPreorderComplex;
-    }*/
 }
