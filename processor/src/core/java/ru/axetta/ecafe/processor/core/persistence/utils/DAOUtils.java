@@ -2947,13 +2947,18 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static String getPreorderComplexName(Session session, PreorderComplex preorderComplex) {
+    public static ComplexInfo getComplexInfoByPreorderComplex(Session session, PreorderComplex preorderComplex) {
         Criteria criteria = session.createCriteria(ComplexInfo.class);
         criteria.add(Restrictions.eq("org.idOfOrg", preorderComplex.getClient().getOrg().getIdOfOrg()));
         criteria.add(Restrictions.eq("menuDate", preorderComplex.getPreorderDate()));
         criteria.add(Restrictions.eq("idOfComplex", preorderComplex.getArmComplexId()));
         ComplexInfo complexInfo = (ComplexInfo)criteria.uniqueResult();
-        return complexInfo.getComplexName();
+        return complexInfo;
+    }
+
+    public static String getPreorderComplexName(Session session, PreorderComplex preorderComplex) {
+        ComplexInfo ci =  getComplexInfoByPreorderComplex(session, preorderComplex);
+        return ci == null ? "" : ci.getComplexName();
     }
 
     public static String getPreorderMenuDetailName(Session session, PreorderMenuDetail preorderMenuDetail) {

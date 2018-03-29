@@ -33,6 +33,7 @@ public class PreorderClientSummary {
     protected Integer guardianCreatedWhere;
     private Integer groupPredefined;
     private Integer hoursForbidPP;
+    private Long usedSum;
     private Map<String, Integer[]> calendar;
 
     public PreorderClientSummary() {
@@ -53,12 +54,20 @@ public class PreorderClientSummary {
         this.specialMenu = summary.getSpecialMenu();
         this.guardianCreatedWhere = summary.getGuardianCreatedWhere();
         this.groupPredefined = summary.getGroupPredefined();
+        this.usedSum = getPreordersSum(summary.getContractId());
         ClientRoomControllerWS controller = new ClientRoomControllerWS();
         SubscriptionFeedingSettingResult result = controller.getSubscriptionFeedingSetting(summary.getContractId());
         if (result.resultCode.equals(0L)) {
             this.hoursForbidPP = result.subscriptionFeedingSettingExt.getHoursForbidPP();
         }
         this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), summary.getContractId());
+    }
+
+    private Long getPreordersSum(Long contractId) {
+        Date today = CalendarUtils.startOfDay(new Date());
+        Date endDate = CalendarUtils.addDays(today, 14);
+        endDate = CalendarUtils.endOfDay(endDate);
+        return RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreordersSum(contractId, today, endDate);
     }
 
     private Map<String, Integer[]> getSpecialDates(Date today, Long orgId, String groupName, Long contractId) throws Exception {
@@ -72,10 +81,10 @@ public class PreorderClientSummary {
         int two_days = 0;
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            boolean preorderExistByDate = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(contractId, currentDate);
+            Long usedAmount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(contractId, currentDate);
             if (two_days <= 2) {
                 c.add(Calendar.DATE, 1);
-                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, preorderExistByDate ? 1 : 0});
+                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmount.intValue()});
                 two_days++;
                 continue;
             }
@@ -94,7 +103,7 @@ public class PreorderClientSummary {
             }
 
             c.add(Calendar.DATE, 1);
-            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, preorderExistByDate ? 1 : 0});
+            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmount.intValue()});
         }
         return map;
     }
@@ -209,5 +218,13 @@ public class PreorderClientSummary {
 
     public void setCalendar(Map<String, Integer[]> calendar) {
         this.calendar = calendar;
+    }
+
+    public Long getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(Long usedSum) {
+        this.usedSum = usedSum;
     }
 }
