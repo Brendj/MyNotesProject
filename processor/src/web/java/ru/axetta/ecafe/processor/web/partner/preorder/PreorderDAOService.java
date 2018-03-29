@@ -159,9 +159,9 @@ public class PreorderDAOService {
 
     private String getPreorderComplexSubgroup(PreorderComplexItemExt item) {
         if (item.getDiscount()) {
-            return "1.За счет средств бюджета города Москвы";
+            return "2.За счет средств бюджета города Москвы";
         } else {
-            return "2.За счет средств представителей обучающихся";
+            return "1.За счет средств представителей обучающихся";
         }
     }
 
