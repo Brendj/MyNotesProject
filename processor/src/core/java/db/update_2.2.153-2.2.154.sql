@@ -96,3 +96,5 @@ CREATE TABLE cf_preorder_linkod
   price bigint,
   CONSTRAINT cf_preorder_linkod_idofpreorderlinkod_pk PRIMARY KEY (idofpreorderlinkod)
 );
+
+--! ФИНАЛИЗИРОВАН 29.03.2018, НЕ МЕНЯТЬ
