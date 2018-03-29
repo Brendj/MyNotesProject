@@ -98,13 +98,17 @@ public class PreorderService {
 
         ClientRoomControllerWS controller = new ClientRoomControllerWS();
         ClientSummaryBaseListResult clientSummary = controller.getSummaryByGuardMobileMin(PhoneNumberCanonicalizator.canonicalize(mobile));
+        if (clientSummary.resultCode != 0L) {
+            logger.error("Preorder not found client with phone = " + mobile);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         PreorderClientSummaryBaseListResult result = new PreorderClientSummaryBaseListResult(clientSummary);
         if (cookie == null) {
-            return Response.ok(result.toString()).build();
+            return Response.ok(result.toString()).header("Mobile", mobile).build();
         } else {
             //сохраняем токен и связанные л/с в БД
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).saveToken(token, clientSummary);
-            return Response.ok(result.toString()).cookie(cookie).header("Authorization", tok).build();
+            return Response.ok(result.toString()).cookie(cookie).header("Authorization", tok).header("Mobile", mobile).build();
         }
     }
 
