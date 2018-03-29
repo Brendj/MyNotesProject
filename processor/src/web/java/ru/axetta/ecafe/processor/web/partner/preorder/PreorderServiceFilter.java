@@ -4,12 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-
 import javax.servlet.*;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -19,7 +14,9 @@ public class PreorderServiceFilter implements Filter {
 
     public void doFilter ( ServletRequest request, ServletResponse response, FilterChain chain ) throws IOException,
             ServletException {
-        if (!RuntimeContext.getAppContext().getBean(SudirClientService.class).SECURITY_ON) {
+        chain.doFilter(request, response);
+        //Защита на основе cookie выключена
+        /*if (!RuntimeContext.getAppContext().getBean(SudirClientService.class).SECURITY_ON) {
             chain.doFilter(request, response);
             return;
         }
@@ -43,7 +40,7 @@ public class PreorderServiceFilter implements Filter {
             httpServletResponse.sendRedirect("/processor/preorder/login");
             return;
         }
-        chain.doFilter(request, response);
+        chain.doFilter(request, response);*/
     }
 
     @Override

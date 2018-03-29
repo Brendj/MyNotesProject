@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
 import org.jboss.resteasy.annotations.interception.Precedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ResourceMethod;
@@ -27,12 +29,17 @@ public class PreorderRequestInterceptor implements PreProcessInterceptor {
     @Override
     public ServerResponse preProcess(HttpRequest request, ResourceMethod method) throws Failure, WebApplicationException {
 
+        if (!RuntimeContext.getAppContext().getBean(SudirClientService.class).SECURITY_ON) {
+            return null;
+        }
+
+        if (request.getPreprocessedPath().contains("login") || (request.getPreprocessedPath().contains("clientsummary") && request.getPreprocessedPath().length() > 30)) {
+            return null;
+        }
         HttpHeaders headers = request.getHttpHeaders();
-        List<String> header = headers.getRequestHeader("access_token");
+        List<String> header = headers.getRequestHeader("Authorization");
         if (header != null && header.size() > 0) {
-            System.out.println(header.get(0));
-        } else {
-            //throw new WebApplicationException();
+            RuntimeContext.getAppContext().getBean(TokenService.class).setToken(header.get(0));
         }
 
         return null;

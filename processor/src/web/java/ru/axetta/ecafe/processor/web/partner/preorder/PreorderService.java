@@ -99,7 +99,8 @@ public class PreorderService {
         ClientRoomControllerWS controller = new ClientRoomControllerWS();
         ClientSummaryBaseListResult clientSummary = controller.getSummaryByGuardMobileMin(PhoneNumberCanonicalizator.canonicalize(mobile));
         if (clientSummary.resultCode != 0L) {
-            logger.error("Preorder not found client with phone = " + mobile);
+            logger.error(String.format("Preorder not found client with phone = %s, controller code=%s, message=%s",
+                    mobile, clientSummary.resultCode, clientSummary.description));
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         PreorderClientSummaryBaseListResult result = new PreorderClientSummaryBaseListResult(clientSummary);
