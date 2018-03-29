@@ -20,6 +20,7 @@ public class PreorderComplex {
     private Boolean deletedState;
     private String guid;
     private Long usedSum;
+    private Long usedAmount;
     private Set<PreorderMenuDetail> preorderMenuDetails;
 
     public PreorderComplex() {
@@ -104,5 +105,13 @@ public class PreorderComplex {
 
     public void setPreorderMenuDetails(Set<PreorderMenuDetail> preorderMenuDetails) {
         this.preorderMenuDetails = preorderMenuDetails;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
     }
 }

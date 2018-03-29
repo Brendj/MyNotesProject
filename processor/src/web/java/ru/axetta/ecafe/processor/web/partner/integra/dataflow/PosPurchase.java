@@ -48,6 +48,8 @@ public class PosPurchase {
     private Long idOfMenu;
     @XmlAttribute(name = "Manufacturer")
     private String manufacturer;
+    @XmlAttribute(name = "GuidPreOrderDetail")
+    private String guidPreOrderDetail;
 
     public Long getDiscount() {
         return discount;
@@ -175,5 +177,13 @@ public class PosPurchase {
 
     public void setManufacturer(String manufacturer) {
         this.manufacturer = manufacturer;
+    }
+
+    public String getGuidPreOrderDetail() {
+        return guidPreOrderDetail;
+    }
+
+    public void setGuidPreOrderDetail(String guidPreOrderDetail) {
+        this.guidPreOrderDetail = guidPreOrderDetail;
     }
 }

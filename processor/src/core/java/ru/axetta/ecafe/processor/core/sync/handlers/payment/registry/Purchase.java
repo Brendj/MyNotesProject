@@ -8,7 +8,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getLongValue;
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getStringAttributeValue;
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getStringValueNullSafe;
 
 /**
@@ -36,6 +35,7 @@ public class Purchase {
     private final Long idOfRule;
     private final Long idOfMenu;
     private final String manufacturer;
+    private final String guidPreOrderDetail;
 
     public static Purchase build(Node purchaseNode, SyncRequest.MenuGroups menuGroups) throws Exception {
         NamedNodeMap namedNodeMap = purchaseNode.getAttributes();
@@ -95,13 +95,15 @@ public class Purchase {
 
         String manufacturer = getStringValueNullSafe(namedNodeMap, "Manufacturer");
 
+        String guidPreOrderDetail = getStringValueNullSafe(namedNodeMap, "GuidPreOrderDetail");
+
         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer);
+                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer, guidPreOrderDetail);
     }
 
     public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
             long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
-            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer) {
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer, String guidPreOrderDetail) {
         this.discount = discount;
         this.socDiscount = socDiscount;
         this.idOfOrderDetail = idOfOrderDetail;
@@ -118,6 +120,7 @@ public class Purchase {
         this.idOfRule = idOfRule;
         this.idOfMenu = idOfMenu;
         this.manufacturer = manufacturer;
+        this.guidPreOrderDetail = guidPreOrderDetail;
     }
 
     public Long getDiscount() {
@@ -204,5 +207,9 @@ public class Purchase {
                 ", idOfMenu=" + idOfMenu +
                 ", manufacturer=" + manufacturer +
                 '}';
+    }
+
+    public String getGuidPreOrderDetail() {
+        return guidPreOrderDetail;
     }
 }

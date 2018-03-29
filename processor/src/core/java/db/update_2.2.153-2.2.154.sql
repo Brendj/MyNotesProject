@@ -46,6 +46,7 @@ CREATE TABLE cf_preorder_complex
   preorderdate bigint,
   amount integer,
   usedsum bigint NOT NULL default 0,
+  usedamount bigint NOT NULL default 0,
   version bigint NOT NULL default 0,
   deletedstate integer NOT NULL default 0,
   CONSTRAINT cf_preorder_complex_idofpreordercomplex_pk PRIMARY KEY (idofpreordercomplex),
@@ -82,3 +83,16 @@ alter table cf_orgs add column preordersEnabled integer not null default 0;
 
 --Увеличиваем размерность для меню поставщика
 ALTER TABLE cf_menuexchange ALTER COLUMN menudata SET DATA TYPE character varying(200000);
+
+--таблица для хранения связей детализации заказа с предзаказом
+CREATE TABLE cf_preorder_linkod
+(
+  idofpreorderlinkod bigserial NOT NULL,
+  preorderGuid character varying(36),
+  idOfOrg bigint,
+  idOfOrder bigint,
+  idOfOrderDetail bigint,
+  qty bigint,
+  price bigint,
+  CONSTRAINT cf_preorder_linkod_idofpreorderlinkod_pk PRIMARY KEY (idofpreorderlinkod)
+);

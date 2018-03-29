@@ -323,6 +323,7 @@ public class PreorderDAOService {
         preorderComplex.setDeletedState(false);
         preorderComplex.setGuid(UUID.randomUUID().toString());
         preorderComplex.setUsedSum(0L);
+        preorderComplex.setUsedAmount(0L);
         preorderComplex.setArmComplexId(idOfComplex);
         return preorderComplex;
     }

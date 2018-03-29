@@ -3357,6 +3357,9 @@ public class Processor implements SyncProcessor {
                             orderDetail.setGood(good);
                         }
                     }
+                    if (purchase.getGuidPreOrderDetail() != null) {
+                        savePreorderGuidFromOrderDetail(persistenceSession, purchase.getGuidPreOrderDetail(), orderDetail);
+                    }
                     persistenceSession.save(orderDetail);
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
                     totalPurchaseRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
