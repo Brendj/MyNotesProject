@@ -83,15 +83,25 @@ public class PreorderDAOService {
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
         PreorderListWithComplexesResult result = new PreorderListWithComplexesResult();
         Client client = getClientByContractId(contractId);
-        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState "
+        Set<CategoryDiscount> clientDiscounts = client.getCategories();
+        Boolean hasDiscount = false;
+        for (CategoryDiscount categoryDiscount : clientDiscounts) {
+            hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
+        }
+
+        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, o.organizationtype "
                 + " from cf_preorder_complex pc inner join cf_clients c on pc.idofclient = c.idofclient "
-                + " right outer join cf_complexinfo ci on c.idoforg = ci.idoforg and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid "
+                + " right outer join cf_complexinfo ci on (c.idoforg = ci.idoforg and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
+                + " inner join cf_orgs o on o.IdOfOrg = ci.IdOfOrg "
                 + " where (pc.idofclient = :idOfClient or pc.idofclient is null) and (ci.MenuDate between :startDate and :endDate) "
-                + " and (ci.UsedSpecialMenu=1 or ci.ModeFree=1) and ci.IdOfOrg=:idOfOrg order by ci.modeOfAdd");
+                + " and (ci.UsedSpecialMenu=1 or ci.ModeFree=1) and ci.IdOfOrg=:idOfOrg "
+                + " and (o.OrganizationType = :school or o.OrganizationType = :professional) order by ci.modeOfAdd");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
         query.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("school", OrganizationType.SCHOOL.getCode());
+        query.setParameter("professional", OrganizationType.PROFESSIONAL.getCode());
         Map<String, Map<String, List<PreorderComplexItemExt>>> map = new TreeMap<String, Map<String, List<PreorderComplexItemExt>>>();
         List res = query.getResultList();
         List<PreorderComplexItemExt> list = new ArrayList<PreorderComplexItemExt>();
@@ -111,16 +121,20 @@ public class PreorderDAOService {
         }
         result.setComplexItemExtList(list);
         for (PreorderComplexItemExt item : list) {
-            String group = getPreorderComplexGroup(item);
-            if (group == null) continue;
-            String subgroup = getPreorderComplexSubgroup(item);
-            Map<String, List<PreorderComplexItemExt>> submap = map.get(group);
-            if (submap == null) submap = new TreeMap<String, List<PreorderComplexItemExt>>();
-            List<PreorderComplexItemExt> list2 = submap.get(subgroup);
-            if (list2 == null) list2 = new ArrayList<PreorderComplexItemExt>();
-            list2.add(item);
-            submap.put(subgroup, list2);
-            map.put(group, submap);
+            if (isAcceptableComplex(item, client, hasDiscount)) {
+                String group = getPreorderComplexGroup(item);
+                if (group == null) continue;
+                String subgroup = getPreorderComplexSubgroup(item);
+                Map<String, List<PreorderComplexItemExt>> submap = map.get(group);
+                if (submap == null)
+                    submap = new TreeMap<String, List<PreorderComplexItemExt>>();
+                List<PreorderComplexItemExt> list2 = submap.get(subgroup);
+                if (list2 == null)
+                    list2 = new ArrayList<PreorderComplexItemExt>();
+                list2.add(item);
+                submap.put(subgroup, list2);
+                map.put(group, submap);
+            }
         }
 
         groupResult.setComplexesWithGroups(map);
@@ -145,9 +159,9 @@ public class PreorderDAOService {
 
     private String getPreorderComplexSubgroup(PreorderComplexItemExt item) {
         if (item.getDiscount()) {
-            return "2.За счет средств бюджета города Москвы";
+            return "1.За счет средств бюджета города Москвы";
         } else {
-            return "1.За счет средств представителей обучающихся";
+            return "2.За счет средств представителей обучающихся";
         }
     }
 
@@ -349,5 +363,84 @@ public class PreorderDAOService {
         Long cnt2 = (Long) query.getSingleResult();
         if (cnt2 > 0) return true;
         else return false;
+    }
+
+    private boolean isAcceptableComplex(PreorderComplexItemExt complex, Client client, Boolean hasDiscount) {
+        String clientGroupName = client.getClientGroup().getGroupName();
+        if (hasDiscount) {
+            // 1.2.1.1. если навазвание группы начинается на 1-, 2-, 3-, 4-, то выводим следующие комплексы:
+            if (clientGroupName.startsWith("1-") || clientGroupName.startsWith("2-") ||
+                    clientGroupName.startsWith("3-") || clientGroupName.startsWith("4-")) {
+                // а) комплексы с парамтером discount = true при условии наличия у них в названии "Завтрак" + "(1-4)"
+                if (complex.getDiscount() && complex.getComplexName().toLowerCase().contains("завтрак")
+                        && complex.getComplexName().contains("1-4") ||
+                        // б) комплексы с параметром discount = false при условии наличия у них в названии "(1-4)"
+                        !complex.getDiscount() && complex.getComplexName().contains("1-4") ||
+                        // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                                !complex.getComplexName().contains("5-11"))) {
+                    return true;
+                }
+            }
+            // 1.2.1.2. если навазвание группы начинается на 5-, 6-, 7-, 8-, 9-, 10-, 11-, 12-, то выводим следующие комплексы:
+            else if (clientGroupName.startsWith("5-") || clientGroupName.startsWith("6-") ||
+                    clientGroupName.startsWith("7-") || clientGroupName.startsWith("8-") ||
+                    clientGroupName.startsWith("9-") || clientGroupName.startsWith("10-") ||
+                    clientGroupName.startsWith("11-") || clientGroupName.startsWith("12-")) {
+                // а) комплексы с параметром discount = false при условии наличия у них в названии "(5-11)"
+                if (!complex.getDiscount() && complex.getComplexName().contains("5-11") ||
+                        // б) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                                !complex.getComplexName().contains("5-11"))) {
+                    return true;
+                }
+            }
+            // 1.2.1.3. если навазвание группы начинается на другие символы (отличные от двух предыдущих условий), то выводим следующие комплексы:
+            else {
+                // а) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
+                if (!complex.getDiscount() && (!complex.getComplexName().contains("4-11")
+                        || !complex.getComplexName().contains("5-11"))) {
+                    return true;
+                }
+            }
+        } else {
+            // 1.2.2.1. если навазвание группы начинается на 1-, 2-, 3-, 4-, то выводим следующие комплексы:
+            if (clientGroupName.startsWith("1-") || clientGroupName.startsWith("2-") ||
+                    clientGroupName.startsWith("3-") || clientGroupName.startsWith("4-")) {
+                // а) комплексы с парамтером discount = true при условии наличия у них в названии "(1-4)"
+                if (complex.getDiscount() && complex.getComplexName().contains("1-4") ||
+                        // б) комплексы с параметром discount = false при условии наличия у них в названии "(1-4)"
+                        !complex.getDiscount() && complex.getComplexName().contains("1-4") ||
+                        // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                                !complex.getComplexName().contains("5-11"))) {
+                    return true;
+                }
+            }
+            // 1.2.2.2. если навазвание группы начинается на 5-, 6-, 7-, 8-, 9-, 10-, 11-, 12-, то выводим следующие комплексы:
+            else if (clientGroupName.startsWith("5-") || clientGroupName.startsWith("6-") ||
+                    clientGroupName.startsWith("7-") || clientGroupName.startsWith("8-") ||
+                    clientGroupName.startsWith("9-") || clientGroupName.startsWith("10-") ||
+                    clientGroupName.startsWith("11-") || clientGroupName.startsWith("12-")) {
+                // а) комплексы с парамтером discount = true при условии наличия у них в названии "(5-11)"
+                if (complex.getDiscount() && complex.getComplexName().contains("5-11") ||
+                        // б) комплексы с параметром discount = false при условии наличия у них в названии "(5-11)"
+                        !complex.getDiscount() && complex.getComplexName().contains("5-11") ||
+                        // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                                !complex.getComplexName().contains("5-11"))) {
+                    return true;
+                }
+            }
+            // 1.2.2.3. если навазвание группы начинается на другие символы (отличные от двух предыдущих условий), то выводим следующие комплексы:
+            else {
+                // а) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
+                if (!complex.getDiscount() && (!complex.getComplexName().contains("(1-4)") ||
+                        !complex.getComplexName().contains("(5-11)"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
