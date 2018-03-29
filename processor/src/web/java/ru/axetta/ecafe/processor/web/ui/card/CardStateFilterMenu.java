@@ -21,6 +21,7 @@ public class CardStateFilterMenu {
 
     public static final int NO_CONDITION = -1;
     private List<SelectItem> items = readAllItems();
+    private List<SelectItem> itemsCarOperator = readAllItemsCardOperator();
 
     private static List<SelectItem> readAllItems() {
         List<SelectItem> items = new LinkedList<SelectItem>();
@@ -33,7 +34,24 @@ public class CardStateFilterMenu {
         return items;
     }
 
+    private static List<SelectItem> readAllItemsCardOperator() {
+        List<SelectItem> items = new LinkedList<SelectItem>();
+        //items.add(new SelectItem(NO_CONDITION, "Не имеет значения"));
+        for (CardState cardState : CardState.values()) {
+            if (cardState.getDescription().equals("Выдана (активна)")) {
+                items.add(new SelectItem(cardState.getValue(), cardState.getDescription()));
+            } else if (cardState.getDescription().equals("Заблокирована")) {
+                items.add(new SelectItem(cardState.getValue(), cardState.getDescription()));
+            }
+        }
+        return items;
+    }
+
     public List<SelectItem> getItems() {
         return items;
+    }
+
+    public List<SelectItem> getItemsCarOperator() {
+        return itemsCarOperator;
     }
 }

@@ -65,7 +65,7 @@
             <h:outputText escape="true" value="Cтатус" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.cardOperatorListPage.cardOperatorFilter.cardState}"
                              styleClass="input-text" style="width: 240px;">
-                <f:selectItems value="#{mainPage.cardOperatorListPage.cardOperatorFilter.cardStateFilterMenu.items}" />
+                <f:selectItems value="#{mainPage.cardOperatorListPage.cardOperatorFilter.cardStateFilterMenu.itemsCarOperator}" />
             </h:selectOneMenu>
 
             <h:outputText styleClass="output-text" escape="true" value="Дата операции" />
