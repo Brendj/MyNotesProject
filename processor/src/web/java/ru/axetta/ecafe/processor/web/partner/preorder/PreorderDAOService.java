@@ -89,12 +89,11 @@ public class PreorderDAOService {
             hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         }
 
-        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, o.organizationtype "
-                + " from cf_preorder_complex pc inner join cf_clients c on pc.idofclient = c.idofclient "
-                + " right outer join cf_complexinfo ci on (c.idoforg = ci.idoforg and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
-                + " inner join cf_orgs o on o.IdOfOrg = ci.IdOfOrg "
-                + " where (pc.idofclient = :idOfClient or pc.idofclient is null) and (ci.MenuDate between :startDate and :endDate) "
-                + " and (ci.UsedSpecialMenu=1 or ci.ModeFree=1) and ci.IdOfOrg=:idOfOrg "
+        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState "
+                + " from cf_complexinfo ci join cf_orgs o on o.idoforg = ci.idoforg "
+                + " left outer join cf_preorder_complex pc on (ci.idoforg = :idOfOrg and pc.idOfClient = :idOfClient and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
+                + " where ci.MenuDate between :startDate and :endDate "
+                + " and (ci.UsedSpecialMenu=1 or ci.ModeFree=1) and ci.idoforg = :idOfOrg "
                 + " and (o.OrganizationType = :school or o.OrganizationType = :professional) order by ci.modeOfAdd");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
