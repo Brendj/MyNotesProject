@@ -388,7 +388,7 @@ public class PreorderDAOService {
 
     private boolean isAcceptableComplex(PreorderComplexItemExt complex, Client client, Boolean hasDiscount) {
         String clientGroupName = client.getClientGroup().getGroupName();
-        if (hasDiscount) {
+        if (!hasDiscount) {
             // 1.2.1.1. если навазвание группы начинается на 1-, 2-, 3-, 4-, то выводим следующие комплексы:
             if (clientGroupName.startsWith("1-") || clientGroupName.startsWith("2-") ||
                     clientGroupName.startsWith("3-") || clientGroupName.startsWith("4-")) {
