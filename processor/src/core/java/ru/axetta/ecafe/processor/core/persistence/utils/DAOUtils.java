@@ -1762,16 +1762,23 @@ public class DAOUtils {
         return (Good) criteria.uniqueResult();
     }
 
-    public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail) {
-        PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
-        session.save(linkOD);
+    public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail, boolean cancelOrder) {
+        if (!cancelOrder) {
+            PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
+            session.save(linkOD);
+        }
         Criteria criteria = session.createCriteria(PreorderComplex.class);
         criteria.add(Restrictions.eq("guid", guid));
         PreorderComplex preorderComplex = (PreorderComplex)criteria.uniqueResult();
         if (preorderComplex != null) {
             Long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            Long qty = orderDetail.getQty();
+            if (cancelOrder) {
+                sum = -sum;
+                qty = -qty;
+            }
             preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
-            preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + orderDetail.getQty());
+            preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
             session.update(preorderComplex);
         }
     }

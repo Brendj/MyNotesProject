@@ -219,6 +219,13 @@ public class FinancialOpsManager {
             for (OrderDetail od : order.getOrderDetails()) {
                 od.setState(OrderDetail.STATE_CANCELED);
                 session.save(od);
+                Criteria criteria = session.createCriteria(PreorderLinkOD.class);
+                criteria.add(Restrictions.eq("idOfOrg", order.getCompositeIdOfOrder().getIdOfOrg()));
+                criteria.add(Restrictions.eq("idOfOrderDetail", od.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
+                PreorderLinkOD link = (PreorderLinkOD)criteria.uniqueResult();
+                if (link != null) {
+                    DAOUtils.savePreorderGuidFromOrderDetail(session, link.getPreorderGuid(), od, true);
+                }
             }
 
             CanceledOrder canceledOrder = new CanceledOrder(order, order.getOrg());
