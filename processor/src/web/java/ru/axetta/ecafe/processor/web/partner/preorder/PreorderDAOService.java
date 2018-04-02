@@ -353,10 +353,16 @@ public class PreorderDAOService {
         for (PreorderComplex complex : list) {
             ComplexInfo ci = DAOUtils.getComplexInfoByPreorderComplex(session, complex);
             if (ci != null) {
-                sum += ci.getCurrentPrice() - complex.getUsedSum();
+                sum += ci.getCurrentPrice() * complex.getAmount() - complex.getUsedSum();
+                for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
+                    MenuDetail menuDetail = DAOUtils.getPreorderMenuDetail(session, pmd);
+                    if (menuDetail != null) {
+                        sum += menuDetail.getPrice() * pmd.getAmount();
+                    }
+                }
             }
         }
-        return sum;
+        return client.getBalance() - sum;
     }
 
     public long nextVersionByPreorderComplex() {
@@ -373,7 +379,16 @@ public class PreorderDAOService {
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
         Long amount = (Long)query.getSingleResult();
-        return amount == null ? 0L : amount;
+        amount = amount == null ? 0 : amount;
+
+        query = emReport.createQuery("select sum(p.amount) from PreorderMenuDetail p "
+                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        Long amount2 = (Long)query.getSingleResult();
+
+        return amount2 == null ? amount : amount + amount2;
         /*query = emReport.createQuery("select count(p.idOfPreorderMenuDetail) from PreorderMenuDetail p "
                 + "where p.amount > 0 and p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
         query.setParameter("idOfClient", client.getIdOfClient());

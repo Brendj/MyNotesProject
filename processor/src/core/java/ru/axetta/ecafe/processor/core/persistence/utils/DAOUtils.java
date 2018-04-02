@@ -2971,14 +2971,20 @@ public class DAOUtils {
         return ci == null ? "" : ci.getComplexName();
     }
 
-    public static String getPreorderMenuDetailName(Session session, PreorderMenuDetail preorderMenuDetail) {
+    public static MenuDetail getPreorderMenuDetail(Session session, PreorderMenuDetail preorderMenuDetail) {
         Criteria criteria = session.createCriteria(MenuDetail.class);
         criteria.createAlias("menu", "m");
         criteria.add(Restrictions.eq("m.org.idOfOrg", preorderMenuDetail.getClient().getOrg().getIdOfOrg()));
         criteria.add(Restrictions.eq("m.menuDate", preorderMenuDetail.getPreorderDate()));
         criteria.add(Restrictions.eq("localIdOfMenu", preorderMenuDetail.getArmIdOfMenu()));
         MenuDetail menuDetail = (MenuDetail)criteria.uniqueResult();
-        return menuDetail.getMenuDetailName();
+        return menuDetail;
+    }
+
+
+    public static String getPreorderMenuDetailName(Session session, PreorderMenuDetail preorderMenuDetail) {
+        MenuDetail menuDetail = getPreorderMenuDetail(session, preorderMenuDetail);
+        return menuDetail == null ? "" : menuDetail.getMenuDetailName();
     }
 
     public static Integer getPreorderFeedingForbiddenDays(Long contractId) {
@@ -3022,4 +3028,5 @@ public class DAOUtils {
         }
         return forbiddenDays;
     }
+
 }

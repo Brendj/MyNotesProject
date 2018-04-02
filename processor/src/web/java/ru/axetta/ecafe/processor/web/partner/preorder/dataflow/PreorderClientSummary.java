@@ -10,8 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingSettingResult;
-import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDateComparator;
 
@@ -82,7 +80,9 @@ public class PreorderClientSummary {
             if (two_days <= 2) {
                 c.add(Calendar.DATE, 1);
                 map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmount.intValue()});
-                two_days++;
+                if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)) {
+                    two_days++;
+                }
                 continue;
             }
 
