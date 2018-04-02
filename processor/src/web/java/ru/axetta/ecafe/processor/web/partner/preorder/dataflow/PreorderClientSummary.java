@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingSettingResult;
@@ -32,7 +33,7 @@ public class PreorderClientSummary {
     private Integer specialMenu;
     protected Integer guardianCreatedWhere;
     private Integer groupPredefined;
-    private Integer hoursForbidPP;
+    private Integer forbiddenDays;
     private Long usedSum;
     private Map<String, Integer[]> calendar;
 
@@ -55,11 +56,7 @@ public class PreorderClientSummary {
         this.guardianCreatedWhere = summary.getGuardianCreatedWhere();
         this.groupPredefined = summary.getGroupPredefined();
         this.usedSum = getPreordersSum(summary.getContractId());
-        ClientRoomControllerWS controller = new ClientRoomControllerWS();
-        SubscriptionFeedingSettingResult result = controller.getSubscriptionFeedingSetting(summary.getContractId());
-        if (result.resultCode.equals(0L)) {
-            this.hoursForbidPP = result.subscriptionFeedingSettingExt.getHoursForbidPP();
-        }
+        this.forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(summary.getContractId());
         this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), summary.getContractId());
     }
 
@@ -188,12 +185,12 @@ public class PreorderClientSummary {
         this.orgId = orgId;
     }
 
-    public Integer getHoursForbidPP() {
-        return hoursForbidPP;
+    public Integer getForbiddenDays() {
+        return forbiddenDays;
     }
 
-    public void setHoursForbidPP(Integer hoursForbidPP) {
-        this.hoursForbidPP = hoursForbidPP;
+    public void setForbiddenDays(Integer forbiddenDays) {
+        this.forbiddenDays = forbiddenDays;
     }
 
     public Integer getSpecialMenu() {

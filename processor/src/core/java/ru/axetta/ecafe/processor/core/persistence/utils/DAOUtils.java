@@ -14,6 +14,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.PreOrderFeedingSettingValue;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -2976,5 +2979,47 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("localIdOfMenu", preorderMenuDetail.getArmIdOfMenu()));
         MenuDetail menuDetail = (MenuDetail)criteria.uniqueResult();
         return menuDetail.getMenuDetailName();
+    }
+
+    public static Integer getPreorderFeedingForbiddenDays(Long contractId) {
+        Integer forbiddenDays = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = findClientByContractId(persistenceSession, contractId);
+            if (client == null) {
+                return null;
+            }
+            Criteria criteria = persistenceSession.createCriteria(ECafeSettings.class);
+            final Org clientOrg = client.getOrg();
+            final Long idOfOrg = clientOrg.getIdOfOrg();
+            criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+            criteria.add(Restrictions.eq("settingsId", SettingsIds.PreOrderFeeding));
+            criteria.add(Restrictions.eq("deletedState", false));
+            List list = criteria.list();
+            if (list == null || list.isEmpty()) {
+                logger.error("Отсутствуют настройки предзаказанного питания для организации " + clientOrg.getShortNameInfoService());
+                return null;
+            }
+            if (list.size() > 1) {
+                logger.error("Организация имеет более одной настройки " + clientOrg.getShortNameInfoService());
+                return null;
+            }
+            ECafeSettings settings = (ECafeSettings) list.get(0);
+            PreOrderFeedingSettingValue parser = (PreOrderFeedingSettingValue) settings.getSplitSettingValue();
+            forbiddenDays = parser.getForbiddenDaysCount();
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error(String.format("Can't get preorders feeding forbidden days value. Client contractId = %d", contractId), e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return forbiddenDays;
     }
 }

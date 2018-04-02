@@ -179,10 +179,6 @@
 
         <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки вариативного питания" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.hoursForbidVP}" styleClass="input-text" style="width: 207px" />
-
-        <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
-        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.hoursForbidPP}" styleClass="input-text" style="width: 207px" />
-
     </h:panelGrid>
 
     <h:panelGrid columns="2" id="settingsViewReplacingMissingBeneficiariesSettingPanelGrid"
@@ -195,6 +191,11 @@
         <h:outputText escape="true" value="Копуса (1 - только свой корпус / 2 - все корпуса)" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.orgParam}"
                      styleClass="output-text" />
+    </h:panelGrid>
+
+    <h:panelGrid columns="2" id="settingsViewPreorderFeedingSettingPanelGrid" rendered="#{settingViewPage.setting.settingsId.id==6}">
+        <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.forbiddenDaysCount}" styleClass="input-text" style="width: 207px" />
     </h:panelGrid>
 
     <h:panelGrid columns="2">

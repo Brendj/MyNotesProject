@@ -298,11 +298,6 @@
             <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки вариативного питания" styleClass="output-text" />
             <rich:inputNumberSlider inputClass="input-text" value="#{settingCreatePage.parserBySettingValue.hoursForbidVP}"
                                     maxValue="72" step="3" minValue="3" showToolTip="true" />
-
-            <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
-            <rich:inputNumberSlider inputClass="input-text" value="#{settingCreatePage.parserBySettingValue.hoursForbidPP}"
-                                    maxValue="72" step="3" minValue="3" showToolTip="true" />
-
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsCreateReplacingMissingBeneficiariesSettingPanelGrid" rendered="#{settingCreatePage.settingsIds==5}" >
@@ -322,6 +317,12 @@
                 <f:selectItem itemValue="2" itemLabel="Все корпуса"/>
             </rich:comboBox>
 
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" id="settingsCreatePreorderFeedingSettingPanelGrid" rendered="#{settingCreatePage.setting.settingsId.id==6}">
+            <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
+            <rich:inputNumberSlider inputClass="input-text" value="#{settingCreatePage.parserBySettingValue.forbiddenDaysCount}"
+                                    maxValue="3" step="1" minValue="1" showToolTip="true" />
         </h:panelGrid>
 
     </h:panelGrid>

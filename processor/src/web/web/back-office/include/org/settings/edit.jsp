@@ -298,10 +298,6 @@
             <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.hoursForbidVP}"
                                     maxValue="72" step="3" minValue="3" showToolTip="true" />
 
-            <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
-            <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.hoursForbidPP}"
-                                    maxValue="72" step="3" minValue="3" showToolTip="true" />
-
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsEditReplacingMissingBeneficiariesSettingPanelGrid"
@@ -321,6 +317,12 @@
                 <f:selectItem itemValue="1" itemLabel="Только свой корпус"/>
                 <f:selectItem itemValue="2" itemLabel="Все корпуса"/>
             </rich:comboBox>
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" id="settingsEditPreorderFeedingSettingPanelGrid" rendered="#{settingEditPage.setting.settingsId.id==6}">
+            <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки платного питания" styleClass="output-text" />
+            <rich:inputNumberSlider inputClass="input-text" value="#{settingEditPage.parserBySettingValue.forbiddenDaysCount}"
+                                    maxValue="3" step="1" minValue="1" showToolTip="true" />
         </h:panelGrid>
 
     </h:panelGrid>
