@@ -24,8 +24,11 @@
         <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
         <h:inputText value="#{configurationProviderCreatePage.currentConfigurationProvider.name}" maxlength="128" styleClass="input-text long-field" />
 
-        <h:outputText escape="true" value="Количество дней для выгрузки меню" styleClass="output-text" />
+        <h:outputText escape="true" value="Количество выгружаемых дней с меню (больше текущей даты)" styleClass="output-text" />
         <h:inputText value="#{configurationProviderCreatePage.currentConfigurationProvider.menuSyncCountDays}" styleClass="input-text" />
+
+        <h:outputText escape="true" value="Количество выгружаемых дней с меню (меньше текущей даты)" styleClass="output-text" />
+        <h:inputText value="#{configurationProviderCreatePage.currentConfigurationProvider.menuSyncCountDaysInPast}" styleClass="input-text" />
 
         <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
 

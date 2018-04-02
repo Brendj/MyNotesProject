@@ -17,6 +17,7 @@ public class ConfigurationProvider {
     private Long idOfConfigurationProvider;
     private String name;
     private Integer menuSyncCountDays;
+    private Integer menuSyncCountDaysInPast;
     private Long version;
     //private Set products;
     /* Пользователь бэк-оффиса котрый создал изменил конфигурацию */
@@ -138,6 +139,14 @@ public class ConfigurationProvider {
 
     public void setMenuSyncCountDays(Integer menuSyncCountDays) {
         this.menuSyncCountDays = menuSyncCountDays;
+    }
+
+    public Integer getMenuSyncCountDaysInPast() {
+        return menuSyncCountDaysInPast;
+    }
+
+    public void setMenuSyncCountDaysInPast(Integer menuSyncCountDaysInPast) {
+        this.menuSyncCountDaysInPast = menuSyncCountDaysInPast;
     }
 
     public Long getVersion() {

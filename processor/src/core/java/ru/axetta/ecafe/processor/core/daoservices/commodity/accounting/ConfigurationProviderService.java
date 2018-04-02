@@ -42,6 +42,9 @@ public class ConfigurationProviderService {
                 (configurationProvider.getMenuSyncCountDays() < 7 || configurationProvider.getMenuSyncCountDays() > 31)) {
             throw new Exception("Значение количества дней для выгрузки меню должно находиться в пределах 7 - 31 дней");
         }
+        if (configurationProvider.getMenuSyncCountDaysInPast() != null && configurationProvider.getMenuSyncCountDaysInPast().equals(0)) {
+            configurationProvider.setMenuSyncCountDaysInPast(null);
+        }
         ConfigurationProvider cp;
         if(configurationProvider.getIdOfConfigurationProvider()!=null){
             cp = entityManager.find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
@@ -54,6 +57,7 @@ public class ConfigurationProviderService {
         cp.setUserEdit(currentUser);
         cp.setName(configurationProvider.getName());
         cp.setMenuSyncCountDays(configurationProvider.getMenuSyncCountDays());
+        cp.setMenuSyncCountDaysInPast(configurationProvider.getMenuSyncCountDaysInPast());
         cp.setVersion(DAOUtils.nextVersionByConfigurationProvider(entityManager.unwrap(Session.class)));
 
 

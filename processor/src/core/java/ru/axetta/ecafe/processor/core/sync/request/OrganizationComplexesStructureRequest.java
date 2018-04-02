@@ -17,10 +17,12 @@ public class OrganizationComplexesStructureRequest implements SectionRequest {
     public static final String SECTION_NAME = "OrganizationComplexesStructureRequest";
     private final Long maxVersion;
     private final Integer menuSyncCountDays;
+    private final Integer menuSyncCountDaysInPast;
 
-    private OrganizationComplexesStructureRequest(Long maxVersion, Integer menuSyncCountDays) {
+    private OrganizationComplexesStructureRequest(Long maxVersion, Integer menuSyncCountDays, Integer menuSyncCountDaysInPast) {
         this.maxVersion = maxVersion;
         this.menuSyncCountDays = menuSyncCountDays;
+        this.menuSyncCountDaysInPast = menuSyncCountDaysInPast;
     }
 
     @Override
@@ -41,6 +43,10 @@ public class OrganizationComplexesStructureRequest implements SectionRequest {
         return menuSyncCountDays;
     }
 
+    public Integer getMenuSyncCountDaysInPast() {
+        return menuSyncCountDaysInPast;
+    }
+
     public static class Builder implements SectionRequestBuilder {
 
         public OrganizationComplexesStructureRequest build(Node envelopeNode) throws Exception {
@@ -54,7 +60,8 @@ public class OrganizationComplexesStructureRequest implements SectionRequest {
             if (sectionElement != null) {
                 Long maxVersion = XMLUtils.getLongAttributeValue(sectionElement, "V");
                 Integer menuSyncCountDays = XMLUtils.getIntegerAttributeValue(sectionElement, "menuSyncCountDays");
-                return new OrganizationComplexesStructureRequest(maxVersion, menuSyncCountDays);
+                Integer menuSyncCountDaysInPast = XMLUtils.getIntegerAttributeValue(sectionElement, "menuSyncCountDaysInPast");
+                return new OrganizationComplexesStructureRequest(maxVersion, menuSyncCountDays, menuSyncCountDaysInPast);
             } else
                 return null;
         }

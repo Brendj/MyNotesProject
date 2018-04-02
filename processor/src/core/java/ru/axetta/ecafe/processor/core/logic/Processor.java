@@ -458,8 +458,11 @@ public class Processor implements SyncProcessor {
 
         try {
             final OrganizationComplexesStructureRequest organizationComplexesStructureRequest = request.getOrganizationComplexesStructureRequest();
-            organizationComplexesStructure = getOrganizationComplexesStructureData(request.getOrg(),
-                    organizationComplexesStructureRequest.getMaxVersion(), organizationComplexesStructureRequest.getMenuSyncCountDays());
+            if (organizationComplexesStructureRequest != null) {
+                organizationComplexesStructure = getOrganizationComplexesStructureData(request.getOrg(),
+                        organizationComplexesStructureRequest.getMaxVersion(),
+                        organizationComplexesStructureRequest.getMenuSyncCountDays(), organizationComplexesStructureRequest.getMenuSyncCountDaysInPast());
+            }
         } catch (Exception e) {
             String message = String
                     .format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
@@ -1324,9 +1327,12 @@ public class Processor implements SyncProcessor {
 
         OrganizationComplexesStructure organizationComplexesStructure=null;
         try {
-            final OrganizationComplexesStructureRequest organizationComplexesStructureRequest = request.getOrganizationComplexesStructureRequest();
+            final OrganizationComplexesStructureRequest organizationComplexesStructureRequest = request
+                    .getOrganizationComplexesStructureRequest();
             organizationComplexesStructure = getOrganizationComplexesStructureData(request.getOrg(),
-                    organizationComplexesStructureRequest.getMaxVersion(), organizationComplexesStructureRequest.getMenuSyncCountDays());
+                    organizationComplexesStructureRequest.getMaxVersion(),
+                    organizationComplexesStructureRequest.getMenuSyncCountDays(),
+                    organizationComplexesStructureRequest.getMenuSyncCountDaysInPast());
         } catch (Exception e) {
             String message = String
                     .format("Failed to build organization complexes structure, IdOfOrg == %s", request.getIdOfOrg());
@@ -4379,14 +4385,14 @@ public class Processor implements SyncProcessor {
         return infoMessageData;
     }
 
-    private OrganizationComplexesStructure getOrganizationComplexesStructureData(Org org, Long maxVersion, Integer menuSyncCountDays) throws Exception {
+    private OrganizationComplexesStructure getOrganizationComplexesStructureData(Org org, Long maxVersion, Integer menuSyncCountDays, Integer menuSyncCountDaysInPast) throws Exception {
         OrganizationComplexesStructure organizationComplexesStructure = new OrganizationComplexesStructure();
         Session session = null;
         Transaction transaction = null;
         try {
             session = persistenceSessionFactory.openSession();
             transaction = session.beginTransaction();
-            organizationComplexesStructure.fillComplexesStructureAndApplyChanges(session, org.getIdOfOrg(), maxVersion, menuSyncCountDays);
+            organizationComplexesStructure.fillComplexesStructureAndApplyChanges(session, org.getIdOfOrg(), maxVersion, menuSyncCountDays, menuSyncCountDaysInPast);
             transaction.commit();
             transaction = null;
         } finally {

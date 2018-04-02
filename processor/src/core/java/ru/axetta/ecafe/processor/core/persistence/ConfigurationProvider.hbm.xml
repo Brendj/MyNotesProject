@@ -13,6 +13,7 @@
 
         <property name="name" column="NameOfConfigurationProvider" type="string" length="64" not-null="true"/>
         <property name="menuSyncCountDays" column="MenuSyncCountDays" type="integer"/>
+        <property name="menuSyncCountDaysInPast" column="MenuSyncCountDaysInPast" type="integer"/>
         <property name="version" column="Version" type="long" not-null="true"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
