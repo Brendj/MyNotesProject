@@ -11,14 +11,15 @@ import java.util.List;
 /**
  * Created by i.semenov on 13.03.2018.
  */
-public class PreorderComplexItemExt {
+public class PreorderComplexItemExt implements Comparable {
+    private String type;
     private Integer idOfComplexInfo;
     private String complexName;
     private Long currentPrice;
     private int amount;
     private Boolean selected;
     private Integer complexType;
-    private Boolean isDiscount;
+    private Boolean discount;
     private List<PreorderMenuItemExt> menuItemExtList;
 
     public PreorderComplexItemExt() {
@@ -90,10 +91,35 @@ public class PreorderComplexItemExt {
     }
 
     public Boolean getDiscount() {
-        return isDiscount;
+        return discount;
     }
 
     public void setDiscount(Boolean discount) {
-        isDiscount = discount;
+        this.discount = discount;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof PreorderComplexItemExt)) {
+            return 1;
+        }
+
+        PreorderComplexItemExt item = (PreorderComplexItemExt) o;
+        if (this.type.equals(item.getType())) {
+            return 0;
+        }
+
+        if (this.getType().equals("За счет средств бюджета города Москвы"))
+            return -1;
+
+        return 1;
     }
 }

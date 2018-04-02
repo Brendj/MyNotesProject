@@ -81,7 +81,6 @@ public class PreorderDAOService {
     @Transactional(readOnly = true)
     public PreorderListWithComplexesGroupResult getPreorderComplexesWithMenuList(Long contractId, Date date) {
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
-        PreorderListWithComplexesResult result = new PreorderListWithComplexesResult();
         Client client = getClientByContractId(contractId);
         Set<CategoryDiscount> clientDiscounts = client.getCategories();
         Boolean hasDiscount = false;
@@ -101,7 +100,7 @@ public class PreorderDAOService {
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
         query.setParameter("school", OrganizationType.SCHOOL.getCode());
         query.setParameter("professional", OrganizationType.PROFESSIONAL.getCode());
-        Map<String, Map<String, List<PreorderComplexItemExt>>> map = new TreeMap<String, Map<String, List<PreorderComplexItemExt>>>();
+        Map<String, PreorderComplexGroup> groupMap = new HashMap<String, PreorderComplexGroup>();
         List res = query.getResultList();
         List<PreorderComplexItemExt> list = new ArrayList<PreorderComplexItemExt>();
         for (Object o : res) {
@@ -118,49 +117,49 @@ public class PreorderDAOService {
             complexItemExt.setMenuItemExtList(menuItemExtList);
             list.add(complexItemExt);
         }
-        result.setComplexItemExtList(list);
         for (PreorderComplexItemExt item : list) {
             if (isAcceptableComplex(item, client, hasDiscount)) {
-                String group = getPreorderComplexGroup(item);
-                if (group == null) continue;
-                String subgroup = getPreorderComplexSubgroup(item);
-                Map<String, List<PreorderComplexItemExt>> submap = map.get(group);
-                if (submap == null)
-                    submap = new TreeMap<String, List<PreorderComplexItemExt>>();
-                List<PreorderComplexItemExt> list2 = submap.get(subgroup);
-                if (list2 == null)
-                    list2 = new ArrayList<PreorderComplexItemExt>();
-                list2.add(item);
-                submap.put(subgroup, list2);
-                map.put(group, submap);
+                String groupName = getPreorderComplexGroup(item);
+                if (groupName == null) continue;
+                item.setType(getPreorderComplexSubgroup(item));
+                PreorderComplexGroup group = groupMap.get(groupName);
+                if (group == null) {
+                    group = new PreorderComplexGroup(groupName);
+                    groupMap.put(groupName, group);
+                }
+                group.addItem(item);
             }
         }
-
-        groupResult.setComplexesWithGroups(map);
+        List<PreorderComplexGroup> groupList = new ArrayList<PreorderComplexGroup>(groupMap.values());
+        for (PreorderComplexGroup group : groupList) {
+            Collections.sort(group.getItems());
+        }
+        Collections.sort(groupList);
+        groupResult.setComplexesWithGroups(groupList);
         return groupResult;
     }
 
     private String getPreorderComplexGroup(PreorderComplexItemExt item) {
         if (match(item, "завтрак")) {
-            return "1.Завтрак";
+            return "Завтрак";
         }
         if (match(item, "обед")) {
-            return "2.Обед";
+            return "Обед";
         }
         if (match(item, "полдник")) {
-            return "3.Полдник";
+            return "Полдник";
         }
         if (match(item, "ужин")) {
-            return "4.Ужин";
+            return "Ужин";
         }
         return null;
     }
 
     private String getPreorderComplexSubgroup(PreorderComplexItemExt item) {
         if (item.getDiscount()) {
-            return "2.За счет средств бюджета города Москвы";
+            return "За счет средств бюджета города Москвы";
         } else {
-            return "1.За счет средств представителей обучающихся";
+            return "За счет средств представителей обучающихся";
         }
     }
 

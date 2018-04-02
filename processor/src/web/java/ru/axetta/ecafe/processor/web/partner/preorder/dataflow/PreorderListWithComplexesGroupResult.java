@@ -11,19 +11,17 @@ import java.util.Map;
  * Created by i.semenov on 14.03.2018.
  */
 public class PreorderListWithComplexesGroupResult {
-    //private String group;
-    //private List<PreorderListWithComplexesResult> complexes;
-    private Map<String, Map<String, List<PreorderComplexItemExt>>> complexesWithGroups;
+    private List<PreorderComplexGroup> complexesWithGroups;
 
     public PreorderListWithComplexesGroupResult() {
-        //this.complexes = new ArrayList<PreorderListWithComplexesResult>();
+
     }
 
-    public Map<String, Map<String, List<PreorderComplexItemExt>>> getComplexesWithGroups() {
+    public List<PreorderComplexGroup> getComplexesWithGroups() {
         return complexesWithGroups;
     }
 
-    public void setComplexesWithGroups(Map<String, Map<String, List<PreorderComplexItemExt>>> complexesWithGroups) {
+    public void setComplexesWithGroups(List<PreorderComplexGroup> complexesWithGroups) {
         this.complexesWithGroups = complexesWithGroups;
     }
 }
