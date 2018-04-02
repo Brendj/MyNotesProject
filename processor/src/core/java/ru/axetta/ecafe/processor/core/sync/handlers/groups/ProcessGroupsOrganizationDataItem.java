@@ -20,13 +20,15 @@ public class ProcessGroupsOrganizationDataItem {
     private Long bindingToOrg;
     private String parentGroupName;
     private Boolean isMiddleGroup;
+    private Boolean isSixDaysWorkWeek;
 
-    public ProcessGroupsOrganizationDataItem(String name, long version, Long bindingToOrg, String parentGroupName, Boolean isMiddleGroup) {
+    public ProcessGroupsOrganizationDataItem(String name, long version, Long bindingToOrg, String parentGroupName, Boolean isMiddleGroup, Boolean isSixDaysWorkWeek) {
         this.name = name;
         this.version = version;
         this.bindingToOrg = bindingToOrg;
         this.parentGroupName = parentGroupName;
         this.isMiddleGroup = isMiddleGroup;
+        this.isSixDaysWorkWeek = isSixDaysWorkWeek;
     }
 
     public long getVersion() {
@@ -58,13 +60,28 @@ public class ProcessGroupsOrganizationDataItem {
         isMiddleGroup = middleGroup;
     }
 
+    public Boolean getIsSixDaysWorkWeek() {
+        return isSixDaysWorkWeek;
+    }
+
+    public void setIsSixDaysWorkWeek(Boolean isSixDaysWorkWeek) {
+        this.isSixDaysWorkWeek = isSixDaysWorkWeek;
+    }
+
     public Node toElement(Document document) {
         Element element = document.createElement("CG");
         XMLUtils.setAttributeIfNotNull(element, "Name", name);
-        XMLUtils.setAttributeIfNotNull(element, "V", Long.toString(version));
-        if (bindingToOrg != null) {
-            XMLUtils.setAttributeIfNotNull(element,"BindingToOrg",Long.toString(bindingToOrg));
+        if (isSixDaysWorkWeek != null) {
+            if (isSixDaysWorkWeek == true) {
+                XMLUtils.setAttributeIfNotNull(element, "Is6DaysWorkWeek", "1");
+            } else {
+                XMLUtils.setAttributeIfNotNull(element, "Is6DaysWorkWeek", "0");
+            }
         }
+        if (bindingToOrg != null) {
+            XMLUtils.setAttributeIfNotNull(element, "BindingToOrg", Long.toString(bindingToOrg));
+        }
+        XMLUtils.setAttributeIfNotNull(element, "V", Long.toString(version));
         return element;
     }
 

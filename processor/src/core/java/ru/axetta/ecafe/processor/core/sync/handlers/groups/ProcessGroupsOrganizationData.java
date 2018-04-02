@@ -71,6 +71,7 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
             Element elementCmg = document.createElement("CMG");
             XMLUtils.setAttributeIfNotNull(elementCmg, "Name", groupsOrganizationData.getName());
             XMLUtils.setAttributeIfNotNull(elementCmg, "BindingToOrg", groupsOrganizationData.getBindingToOrg());
+            XMLUtils.setAttributeIfNotNull(elementCmg, "Is6DaysWorkWeek", groupsOrganizationData.getIsSixDaysWorkWeek());
             element.appendChild(elementCmg);
         }
 
