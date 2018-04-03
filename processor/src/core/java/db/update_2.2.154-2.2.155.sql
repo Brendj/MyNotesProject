@@ -6,3 +6,5 @@
 
 --Количество выгружаемых дней с меню (меньше текущей даты)
 alter table cf_provider_configurations add column menuSyncCountDaysInPast integer;
+
+--! ФИНАЛИЗИРОВАН 03.04.2018, НЕ МЕНЯТЬ
