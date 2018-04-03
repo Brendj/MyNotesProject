@@ -34,6 +34,19 @@ public class ClientItem {
         return stringBuilder.toString();
     }
 
+    public String getShortNameContractId() {
+        if (contractId == null) {
+            return "";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(" (").append(AbbreviationUtils
+                .buildAbbreviation(contractPerson.getFirstName(), contractPerson.getSurname(),
+                        contractPerson.getSecondName())).append("): ").append(AbbreviationUtils
+                .buildAbbreviation(person.getFirstName(), person.getSurname(), person.getSecondName())).append(ContractIdFormat.format(contractId));
+        return stringBuilder.toString();
+    }
+
     public ClientItem() {
         this.person = new PersonItem();
         this.contractPerson = new PersonItem();

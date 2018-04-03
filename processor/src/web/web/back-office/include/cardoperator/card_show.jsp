@@ -40,7 +40,7 @@
             <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:inputText value="#{cardOperatorPage.client.shortName}" readonly="true" styleClass="input-text long-field"
+            <h:inputText value="#{cardOperatorPage.client.shortNameContractId}" readonly="true" styleClass="input-text long-field"
                          style="margin-right: 2px;" id="cardOperatorPageClient" />
         </h:panelGroup>
 

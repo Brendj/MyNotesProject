@@ -32,7 +32,7 @@
         <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
-        <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.client.shortName}" readonly="true"
+        <h:inputText value="#{mainPage.cardRegistrationAndIssuePage.client.shortNameContractId}" readonly="true"
                      styleClass="input-text long-field" style="margin-right: 2px;" />
     </h:panelGroup>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
