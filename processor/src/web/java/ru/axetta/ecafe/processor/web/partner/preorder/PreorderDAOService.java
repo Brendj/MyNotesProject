@@ -411,7 +411,7 @@ public class PreorderDAOService {
                         // б) комплексы с параметром discount = false при условии наличия у них в названии "(1-4)"
                         !complex.getDiscount() && complex.getComplexName().contains("1-4") ||
                         // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") &&
                                 !complex.getComplexName().contains("5-11"))) {
                     return true;
                 }
@@ -424,7 +424,7 @@ public class PreorderDAOService {
                 // а) комплексы с параметром discount = false при условии наличия у них в названии "(5-11)"
                 if (!complex.getDiscount() && complex.getComplexName().contains("5-11") ||
                         // б) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") &&
                                 !complex.getComplexName().contains("5-11"))) {
                     return true;
                 }
@@ -433,7 +433,7 @@ public class PreorderDAOService {
             else {
                 // а) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
                 if (!complex.getDiscount() && (!complex.getComplexName().contains("4-11")
-                        || !complex.getComplexName().contains("5-11"))) {
+                        && !complex.getComplexName().contains("5-11"))) {
                     return true;
                 }
             }
@@ -446,7 +446,7 @@ public class PreorderDAOService {
                         // б) комплексы с параметром discount = false при условии наличия у них в названии "(1-4)"
                         !complex.getDiscount() && complex.getComplexName().contains("1-4") ||
                         // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") &&
                                 !complex.getComplexName().contains("5-11"))) {
                     return true;
                 }
@@ -461,7 +461,7 @@ public class PreorderDAOService {
                         // б) комплексы с параметром discount = false при условии наличия у них в названии "(5-11)"
                         !complex.getDiscount() && complex.getComplexName().contains("5-11") ||
                         // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") ||
+                        !complex.getDiscount() && (!complex.getComplexName().contains("1-4") &&
                                 !complex.getComplexName().contains("5-11"))) {
                     return true;
                 }
@@ -469,7 +469,7 @@ public class PreorderDAOService {
             // 1.2.2.3. если навазвание группы начинается на другие символы (отличные от двух предыдущих условий), то выводим следующие комплексы:
             else {
                 // а) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                if (!complex.getDiscount() && (!complex.getComplexName().contains("(1-4)") ||
+                if (!complex.getDiscount() && (!complex.getComplexName().contains("(1-4)") &&
                         !complex.getComplexName().contains("(5-11)"))) {
                     return true;
                 }
