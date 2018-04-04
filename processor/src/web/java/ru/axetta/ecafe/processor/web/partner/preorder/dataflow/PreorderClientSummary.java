@@ -74,9 +74,10 @@ public class PreorderClientSummary {
         Date endDate = CalendarUtils.addDays(today, 14);
         boolean isSixWorkWeek = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isSixWorkWeek(orgId);
         int two_days = 0;
+        Long idOfClient = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getIdOfClientByContractId(contractId);
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            Long usedAmount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(contractId, currentDate);
+            Long usedAmount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(idOfClient, currentDate);
             if (two_days <= 2) {
                 c.add(Calendar.DATE, 1);
                 map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmount.intValue()});

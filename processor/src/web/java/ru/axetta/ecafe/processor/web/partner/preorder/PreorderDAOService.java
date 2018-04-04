@@ -202,6 +202,12 @@ public class PreorderDAOService {
         return (Client)query.getSingleResult();
     }
 
+    public Long getIdOfClientByContractId(Long contractId) {
+        Query query = emReport.createQuery("select c.idOfClient from Client c where c.contractId = :contractId");
+        query.setParameter("contractId", contractId);
+        return (Long)query.getSingleResult();
+    }
+
     public SpecialDate getSpecialDate(Date date, Long idOfOrg) {
         try {
             Query query = emReport.createQuery(
@@ -371,11 +377,10 @@ public class PreorderDAOService {
     }
 
     @Transactional(readOnly = true)
-    public Long existPreordersByDate(Long contractId, Date date) {
-        Client client = getClientByContractId(contractId);
+    public Long existPreordersByDate(Long idOfClient, Date date) {
         Query query = emReport.createQuery("select sum(p.amount) from PreorderComplex p "
                 + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
-        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
         Long amount = (Long)query.getSingleResult();
@@ -383,20 +388,12 @@ public class PreorderDAOService {
 
         query = emReport.createQuery("select sum(p.amount) from PreorderMenuDetail p "
                 + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
-        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
         Long amount2 = (Long)query.getSingleResult();
 
         return amount2 == null ? amount : amount + amount2;
-        /*query = emReport.createQuery("select count(p.idOfPreorderMenuDetail) from PreorderMenuDetail p "
-                + "where p.amount > 0 and p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
-        query.setParameter("idOfClient", client.getIdOfClient());
-        query.setParameter("startDate", CalendarUtils.startOfDay(date));
-        query.setParameter("endDate", CalendarUtils.endOfDay(date));
-        Long cnt2 = (Long) query.getSingleResult();
-        if (cnt2 > 0) return true;
-        else return false;*/
     }
 
     private boolean isAcceptableComplex(PreorderComplexItemExt complex, Client client, Boolean hasDiscount) {
