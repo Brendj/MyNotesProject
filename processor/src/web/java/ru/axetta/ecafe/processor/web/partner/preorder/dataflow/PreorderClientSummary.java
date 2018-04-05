@@ -80,23 +80,26 @@ public class PreorderClientSummary {
         Date endDate = CalendarUtils.addDays(today, 14);
         boolean isSixWorkWeek = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isSixWorkWeek(orgId);
         int two_days = 0;
+        Map<Date, Long> usedAmounts = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(client.getIdOfClient(), today, endDate);
+        List<SpecialDate> specialDates = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getSpecialDates(today, endDate, orgId);
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            Long usedAmount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(client.getIdOfClient(), currentDate);
             if (two_days <= 2) {
                 c.add(Calendar.DATE, 1);
-                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmount.intValue()});
+                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
                 if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)) {
                     two_days++;
                 }
                 continue;
             }
 
-            SpecialDate specialDate = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getSpecialDate(currentDate, orgId);
             Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
-            if(specialDate != null){
-                if(!specialDate.getDeleted()){
-                    isWeekend = specialDate.getIsWeekend();
+            if(specialDates != null){
+                for (SpecialDate specialDate : specialDates) {
+                    if (CalendarUtils.betweenDate(specialDate.getCompositeIdOfSpecialDate().getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
+                        isWeekend = specialDate.getIsWeekend();
+                        break;
+                    }
                 }
             }
             int day = CalendarUtils.getDayOfWeek(currentDate);
@@ -106,7 +109,7 @@ public class PreorderClientSummary {
             }
 
             c.add(Calendar.DATE, 1);
-            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmount.intValue()});
+            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
         }
         return map;
     }

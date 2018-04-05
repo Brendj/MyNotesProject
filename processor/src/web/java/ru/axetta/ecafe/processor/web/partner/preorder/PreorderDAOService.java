@@ -210,13 +210,14 @@ public class PreorderDAOService {
         return (Long)query.getSingleResult();
     }
 
-    public SpecialDate getSpecialDate(Date date, Long idOfOrg) {
+    public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
         try {
             Query query = emReport.createQuery(
-                    "select sd from SpecialDate sd where sd.compositeIdOfSpecialDate.date = :date and sd.compositeIdOfSpecialDate.idOfOrg = :idOfOrg");
-            query.setParameter("date", date);
+                    "select sd from SpecialDate sd where sd.compositeIdOfSpecialDate.date between :startDate and :endDate and sd.compositeIdOfSpecialDate.idOfOrg = :idOfOrg");
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
             query.setParameter("idOfOrg", idOfOrg);
-            return (SpecialDate) query.getSingleResult();
+            return query.getResultList();
         } catch (Exception e) {
             return null;
         }
@@ -384,23 +385,41 @@ public class PreorderDAOService {
     }
 
     @Transactional(readOnly = true)
-    public Long existPreordersByDate(Long idOfClient, Date date) {
-        Query query = emReport.createQuery("select sum(p.amount) from PreorderComplex p "
-                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
+    public Map<Date, Long> existPreordersByDate(Long idOfClient, Date startDate, Date endDate) {
+        Map map = new HashMap<Date, Long>();
+        Query query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderComplex p "
+                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate "
+                + "group by p.preorderDate");
         query.setParameter("idOfClient", idOfClient);
-        query.setParameter("startDate", CalendarUtils.startOfDay(date));
-        query.setParameter("endDate", CalendarUtils.endOfDay(date));
-        Long amount = (Long)query.getSingleResult();
-        amount = amount == null ? 0 : amount;
+        query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
+        query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
+        List result = query.getResultList();
+        if (result != null) {
+            for (Object obj : result) {
+                Object[] row = (Object[]) obj;
+                map.put((Date)row[1], (Long)row[0]);
+            }
+        }
 
-        query = emReport.createQuery("select sum(p.amount) from PreorderMenuDetail p "
-                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate");
+        query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderMenuDetail p "
+                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate "
+                + "group by p.preorderDate");
         query.setParameter("idOfClient", idOfClient);
-        query.setParameter("startDate", CalendarUtils.startOfDay(date));
-        query.setParameter("endDate", CalendarUtils.endOfDay(date));
-        Long amount2 = (Long)query.getSingleResult();
-
-        return amount2 == null ? amount : amount + amount2;
+        query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
+        query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
+        List result2 = query.getResultList();
+        if (result2 != null) {
+            for (Object obj : result2) {
+                Object[] row = (Object[]) obj;
+                Date date2 = (Date)row[1];
+                Long amount = (Long)row[0];
+                if (map.containsKey(date2)) {
+                    amount = amount + (Long)map.get(date2);
+                }
+                map.put(date2, amount);
+            }
+        }
+        return map;
     }
 
     private boolean isAcceptableComplex(PreorderComplexItemExt complex, Client client, Boolean hasDiscount) {
