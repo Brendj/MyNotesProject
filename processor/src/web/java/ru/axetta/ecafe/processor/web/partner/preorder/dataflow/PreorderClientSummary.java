@@ -8,6 +8,7 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
@@ -34,6 +35,7 @@ public class PreorderClientSummary {
     private Integer groupPredefined;
     private Integer forbiddenDays;
     private Long usedSum;
+    private Integer subscriptionFeeding;
     private Map<String, Integer[]> calendar;
 
     public PreorderClientSummary() {
@@ -58,6 +60,8 @@ public class PreorderClientSummary {
         this.usedSum = getPreordersSum(client);
         this.forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
         this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), client);
+        SubscriptionFeeding sf = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientSubscriptionFeeding(client);
+        this.subscriptionFeeding = (sf == null) ? 0 : 1;
     }
 
     private Long getPreordersSum(Client client) {
@@ -225,5 +229,13 @@ public class PreorderClientSummary {
 
     public void setUsedSum(Long usedSum) {
         this.usedSum = usedSum;
+    }
+
+    public Integer getSubscriptionFeeding() {
+        return subscriptionFeeding;
+    }
+
+    public void setSubscriptionFeeding(Integer subscriptionFeeding) {
+        this.subscriptionFeeding = subscriptionFeeding;
     }
 }

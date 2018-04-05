@@ -3006,11 +3006,11 @@ public class DAOUtils {
             criteria.add(Restrictions.eq("deletedState", false));
             List list = criteria.list();
             if (list == null || list.isEmpty()) {
-                logger.error("Отсутствуют настройки предзаказанного питания для организации " + clientOrg.getShortNameInfoService());
+                logger.error("Отсутствуют настройки предзаказанного питания для организации клиента с id=" + client.getIdOfClient());
                 return null;
             }
             if (list.size() > 1) {
-                logger.error("Организация имеет более одной настройки " + clientOrg.getShortNameInfoService());
+                logger.error("Организация имеет более одной настройки id OO=" + clientOrg.getIdOfOrg());
                 return null;
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);

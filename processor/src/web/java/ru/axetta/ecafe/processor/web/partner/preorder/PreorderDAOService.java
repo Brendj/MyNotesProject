@@ -5,11 +5,13 @@
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
@@ -478,5 +480,13 @@ public class PreorderDAOService {
             }
         }
         return false;
+    }
+
+    @Transactional
+    public SubscriptionFeeding getClientSubscriptionFeeding(Client client) {
+        Date date = new Date();
+        Session session = (Session)emReport.getDelegate();
+        return SubscriptionFeedingService
+                .getInstance().getCurrentSubscriptionFeedingByClientToDay(session, client, date, null);
     }
 }
