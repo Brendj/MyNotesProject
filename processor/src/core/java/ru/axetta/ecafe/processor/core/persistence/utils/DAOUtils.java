@@ -2987,7 +2987,7 @@ public class DAOUtils {
         return menuDetail == null ? "" : menuDetail.getMenuDetailName();
     }
 
-    public static Integer getPreorderFeedingForbiddenDays(Long contractId) {
+    public static Integer getPreorderFeedingForbiddenDays(Client client) {
         Integer forbiddenDays = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2995,7 +2995,6 @@ public class DAOUtils {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = findClientByContractId(persistenceSession, contractId);
             if (client == null) {
                 return null;
             }
@@ -3021,7 +3020,7 @@ public class DAOUtils {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error(String.format("Can't get preorders feeding forbidden days value. Client contractId = %d", contractId), e);
+            logger.error(String.format("Can't get preorders feeding forbidden days value. Client contractId = %d", client.getContractId()), e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

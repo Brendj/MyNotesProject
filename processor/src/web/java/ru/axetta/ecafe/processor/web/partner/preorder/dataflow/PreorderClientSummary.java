@@ -6,6 +6,7 @@
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -53,19 +54,20 @@ public class PreorderClientSummary {
         this.specialMenu = summary.getSpecialMenu();
         this.guardianCreatedWhere = summary.getGuardianCreatedWhere();
         this.groupPredefined = summary.getGroupPredefined();
-        this.usedSum = getPreordersSum(summary.getContractId());
-        this.forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(summary.getContractId());
-        this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), summary.getContractId());
+        Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
+        this.usedSum = getPreordersSum(client);
+        this.forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
+        this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), client);
     }
 
-    private Long getPreordersSum(Long contractId) {
+    private Long getPreordersSum(Client client) {
         Date today = CalendarUtils.startOfDay(new Date());
         Date endDate = CalendarUtils.addDays(today, 14);
         endDate = CalendarUtils.endOfDay(endDate);
-        return RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreordersSum(contractId, today, endDate);
+        return RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreordersSum(client, today, endDate);
     }
 
-    private Map<String, Integer[]> getSpecialDates(Date today, Long orgId, String groupName, Long contractId) throws Exception {
+    private Map<String, Integer[]> getSpecialDates(Date today, Long orgId, String groupName, Client client) throws Exception {
         Comparator comparator = new PreorderDateComparator();
         Map map = new TreeMap(comparator);
         TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
@@ -74,10 +76,9 @@ public class PreorderClientSummary {
         Date endDate = CalendarUtils.addDays(today, 14);
         boolean isSixWorkWeek = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isSixWorkWeek(orgId);
         int two_days = 0;
-        Long idOfClient = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getIdOfClientByContractId(contractId);
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            Long usedAmount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(idOfClient, currentDate);
+            Long usedAmount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(client.getIdOfClient(), currentDate);
             if (two_days <= 2) {
                 c.add(Calendar.DATE, 1);
                 map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmount.intValue()});

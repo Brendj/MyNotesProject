@@ -196,7 +196,7 @@ public class PreorderDAOService {
         return menuItemExtList;
     }
 
-    private Client getClientByContractId(Long contractId) {
+    public Client getClientByContractId(Long contractId) {
         Query query = emReport.createQuery("select c from Client c where c.contractId = :contractId");
         query.setParameter("contractId", contractId);
         return (Client)query.getSingleResult();
@@ -346,8 +346,7 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public Long getPreordersSum(Long contractId, Date startDate, Date endDate) {
-        Client client = getClientByContractId(contractId);
+    public Long getPreordersSum(Client client, Date startDate, Date endDate) {
         Query query = emReport.createQuery("select pc, ci from PreorderComplex pc, ComplexInfo ci "
                 + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate "
                 + "and ci.menuDate between :startDate and :endDate "
