@@ -1746,7 +1746,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientSummaryResult;
     }
 
-    private ClientSummaryBase processSummaryBase(Client client) {
+    public static ClientSummaryBase processSummaryBase(Client client) {
         ClientSummaryBase clientSummaryBase = new ClientSummaryBase();
         clientSummaryBase.setContractId(client.getContractId());
         clientSummaryBase.setBalance(client.getBalance());

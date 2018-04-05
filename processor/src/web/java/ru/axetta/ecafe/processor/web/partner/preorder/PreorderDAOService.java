@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientsWithResultCode;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 
 import org.hibernate.Session;
@@ -30,6 +31,9 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.*;
+
+import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS.processSummaryBase;
+
 
 /**
  * Created by i.semenov on 05.03.2018.
@@ -507,5 +511,109 @@ public class PreorderDAOService {
         Session session = (Session)emReport.getDelegate();
         return SubscriptionFeedingService
                 .getInstance().getCurrentSubscriptionFeedingByClientToDay(session, client, date, null);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public ClientSummaryBaseListResult getClientSummaryByGuardianMobileWithPreorderEnableFilter(String mobile) {
+        ClientSummaryBaseListResult clientSummaryBaseListResult = new ClientSummaryBaseListResult();
+        try {
+            List<ClientSummaryBase> clientSummaries = new ArrayList<ClientSummaryBase>();
+            ClientsWithResultCode cd = getClientsByGuardMobile(mobile);
+
+            if (cd != null && cd.getClients() != null) {
+                for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                    if (entry.getValue() == null) continue;
+                    ClientSummaryBase base = processSummaryBase(entry.getKey());
+                    base.setGuardianCreatedWhere(entry.getValue().getValue());
+                    if (base != null) {
+                        clientSummaries.add(base);
+                    }
+                }
+            }
+
+            clientSummaryBaseListResult.setClientSummary(clientSummaries);
+            clientSummaryBaseListResult.resultCode = cd.resultCode;
+            clientSummaryBaseListResult.description = cd.description;
+
+        } catch (Exception e) {
+
+        }
+        return clientSummaryBaseListResult;
+    }
+
+    public ClientsWithResultCode getClientsByGuardMobile(String mobile) {
+
+        ClientsWithResultCode data = new ClientsWithResultCode();
+        try {
+            Map<Client, ClientCreatedFromType> clients = extractClientsFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile));
+            if (!clients.isEmpty()) {
+                boolean onlyNotActiveCG = true;
+                for (Map.Entry<Client, ClientCreatedFromType> entry : clients.entrySet()) {
+                    if (entry.getValue() != null) {
+                        onlyNotActiveCG = false;
+                        break;
+                    }
+                }
+                if (onlyNotActiveCG) {
+                    data.description = "Связка не активна";
+                } else {
+                    data.setClients(clients);
+                    data.description = "OK";
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            data.description = e.toString();
+        }
+        return data;
+    }
+
+    public Map<Client, ClientCreatedFromType> extractClientsFromGuardByGuardMobile(String guardMobile) throws Exception {
+        Map<Client, ClientCreatedFromType> result = new HashMap<Client, ClientCreatedFromType>();
+        String query = "select client.idOfClient from cf_clients client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
+                + "and client.IdOfClientGroup not in (:leaving, :deleted)"; //все клиенты с номером телефона
+        Query q = emReport.createNativeQuery(query);
+        q.setParameter("guardMobile", guardMobile);
+        q.setParameter("leaving", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        q.setParameter("deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        List<BigInteger> clients = q.getResultList();
+
+        if (clients != null && !clients.isEmpty()){
+            for(BigInteger id : clients){
+                Long londId = id.longValue();
+                Query q2 = emReport.createQuery("select c, cg from ClientGuardian cg, Client c "
+                        + "join c.org as o "
+                        + "where cg.idOfChildren = c.idOfClient and cg.idOfGuardian = :idOfGuardian "
+                        + "and cg.deletedState = false and o.preordersEnabled = true");  //все дети текущего клиента
+                q2.setParameter("idOfGuardian", londId);
+                List list = q2.getResultList();
+                if (list != null && list.size() > 0) {
+                    for (Object o : list) {
+                        Object[] row = (Object[])o;
+                        ClientGuardian cg = (ClientGuardian) row[1];
+                        if (!cg.isDisabled()) {
+                            result.put((Client) row[0], cg.getCreatedFrom());
+                        } else {
+                            result.put((Client) row[0], null);
+                        }
+                    }
+                } else {
+                    Query q3 = emReport.createQuery("select c from Client c "
+                            + "join c.org as o "
+                            + "join c.clientGroup g "
+                            + "where c.idOfClient=:idOfClient and o.preordersEnabled = true "
+                            + "and g.compositeIdOfClientGroup.idOfClientGroup < :employees");
+                    q3.setParameter("idOfClient", londId);
+                    q3.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                    List list1 = q3.getResultList();
+                    if (!list1.isEmpty()) {
+                        Client c = (Client)list1.get(0);
+                        result.put(c, ClientCreatedFromType.DEFAULT);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

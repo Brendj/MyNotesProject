@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.SudirToken;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
-import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 
 import org.slf4j.Logger;
@@ -95,14 +94,8 @@ public class PreorderService {
         } else {
             mobile = authCode;
         }
-
-        ClientRoomControllerWS controller = new ClientRoomControllerWS();
-        ClientSummaryBaseListResult clientSummary = controller.getSummaryByGuardMobileMin(PhoneNumberCanonicalizator.canonicalize(mobile));
-        if (clientSummary.resultCode != 0L) {
-            logger.error(String.format("Preorder not found client with phone = %s, controller code=%s, message=%s",
-                    mobile, clientSummary.resultCode, clientSummary.description));
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        ClientSummaryBaseListResult clientSummary = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                .getClientSummaryByGuardianMobileWithPreorderEnableFilter(PhoneNumberCanonicalizator.canonicalize(mobile));
         PreorderClientSummaryBaseListResult result = new PreorderClientSummaryBaseListResult(clientSummary);
         if (cookie == null) {
             return Response.ok(result.toString()).header("Mobile", mobile).build();

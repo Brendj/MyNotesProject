@@ -15,6 +15,7 @@ import java.util.List;
  */
 public class PreorderClientSummaryBaseListResult extends SudirBaseData {
     private List<PreorderClientSummary> clientSummary;
+    private String errorMessage;
 
     /*public PreorderClientSummaryBaseListResult(String token, ClientSummaryBaseListResult clientSummary) {
         super(token);
@@ -22,6 +23,10 @@ public class PreorderClientSummaryBaseListResult extends SudirBaseData {
     }*/
 
     public PreorderClientSummaryBaseListResult(ClientSummaryBaseListResult clientSummary) throws Exception {
+        if (clientSummary.getClientSummary().isEmpty()) {
+            errorMessage = " Сайт находится на реконструкции";
+            return;
+        }
         List<PreorderClientSummary> list = new ArrayList<PreorderClientSummary>();
         for (ClientSummaryBase summary : clientSummary.getClientSummary()) {
             PreorderClientSummary preorderClientSummary = new PreorderClientSummary(summary);
@@ -36,5 +41,13 @@ public class PreorderClientSummaryBaseListResult extends SudirBaseData {
 
     public void setClientSummary(List<PreorderClientSummary> clientSummary) {
         this.clientSummary = clientSummary;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
