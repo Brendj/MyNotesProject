@@ -348,16 +348,22 @@ public class PreorderDAOService {
     @Transactional
     public Long getPreordersSum(Long contractId, Date startDate, Date endDate) {
         Client client = getClientByContractId(contractId);
-        Query query = emReport.createQuery("select pc from PreorderComplex pc "
-                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate");
+        Query query = emReport.createQuery("select pc, ci from PreorderComplex pc, ComplexInfo ci "
+                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate "
+                + "and ci.menuDate between :startDate and :endDate "
+                + "and ci.org.idOfOrg = :idOfOrg and pc.preorderDate = ci.menuDate and pc.armComplexId = ci.idOfComplex");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
-        List<PreorderComplex> list = query.getResultList();
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        List list = query.getResultList();
         Long sum = 0L;
         Session session = (Session)emReport.getDelegate();
-        for (PreorderComplex complex : list) {
-            ComplexInfo ci = DAOUtils.getComplexInfoByPreorderComplex(session, complex);
+        //for (PreorderComplex complex : list) {
+        for (Object obj : list) {
+            Object[] row = (Object[]) obj;
+            PreorderComplex complex = (PreorderComplex) row[0];
+            ComplexInfo ci = (ComplexInfo) row[1];
             if (ci != null) {
                 sum += ci.getCurrentPrice() * complex.getAmount() - complex.getUsedSum();
                 for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
