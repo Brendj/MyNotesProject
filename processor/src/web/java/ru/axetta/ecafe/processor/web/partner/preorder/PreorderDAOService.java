@@ -99,7 +99,7 @@ public class PreorderDAOService {
                 + " left outer join cf_preorder_complex pc on (ci.idoforg = :idOfOrg and pc.idOfClient = :idOfClient and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
                 + " where ci.MenuDate between :startDate and :endDate "
                 + " and (ci.UsedSpecialMenu=1 or ci.ModeFree=1) and ci.idoforg = :idOfOrg "
-                + " and (o.OrganizationType = :school or o.OrganizationType = :professional) order by ci.modeOfAdd");
+                + " and (o.OrganizationType = :school or o.OrganizationType = :professional) and ci.modevisible = 1 order by ci.modeOfAdd");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
         query.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
