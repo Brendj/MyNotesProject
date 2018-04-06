@@ -71,7 +71,7 @@
             <h:outputText styleClass="output-text" escape="true" value="Дата операции" />
             <rich:calendar value="#{mainPage.cardOperatorListPage.cardOperatorFilter.startDate}"
                            datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
-                           showWeeksBar="false" />
+                           showWeeksBar="false" readonly="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}" />
 
             <h:outputText escape="false" value="Показать операции за весь период" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.cardOperatorListPage.cardOperatorFilter.showOperationsAllPeriod}"

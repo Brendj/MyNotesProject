@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import generated.registry.manual_synch.Exception_Exception;
 import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -305,6 +306,7 @@ public class MainPage implements Serializable {
     //private final BasicBasketReportPage basicBasketReportPage = new BasicBasketReportPage();
     private final SyncMonitorPage syncMonitorPage = new SyncMonitorPage();
 
+    private final DetailedEnterEventReportPage detailedEnterEventReportPage = new DetailedEnterEventReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -7217,6 +7219,24 @@ public class MainPage implements Serializable {
         }
         return null;
     }
+
+    public DetailedEnterEventReportPage getDetailedEnterEventReportPage() {
+        return detailedEnterEventReportPage;
+    }
+
+    public Object showDetailedEnterEventReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = detailedEnterEventReportPage;
+        } catch (Exception e) {
+            logger.error(" Failed to set enter event report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчет по турникетам: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
 
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;

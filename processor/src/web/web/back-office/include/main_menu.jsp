@@ -1417,6 +1417,10 @@
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
 
+    <rich:panelMenuItem id="detailedEnterEventReportMenuItem" binding="#{mainPage.detailedEnterEventReportPage.mainMenuComponent}"
+                        label="Детализированного отчета по проходам" action="#{mainPage.showDetailedEnterEventReportPage}"
+                        reRender="workspaceForm" />
+
 
 
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
