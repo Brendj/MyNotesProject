@@ -24,7 +24,7 @@ public class PreorderClientSummaryBaseListResult extends SudirBaseData {
 
     public PreorderClientSummaryBaseListResult(ClientSummaryBaseListResult clientSummary) throws Exception {
         if (clientSummary.getClientSummary().isEmpty()) {
-            errorMessage = " Сайт находится на реконструкции";
+            errorMessage = "Ведется разработка раздела. Сервис временно недоступен";
             return;
         }
         List<PreorderClientSummary> list = new ArrayList<PreorderClientSummary>();
