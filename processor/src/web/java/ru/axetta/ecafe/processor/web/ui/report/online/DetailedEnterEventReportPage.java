@@ -38,6 +38,8 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         return "report/online/detailed_enter_event";
     }
 
+    private Boolean allFriendlyOrgs;
+
     public Object buildReportHTML() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
@@ -46,7 +48,12 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         }
         DetailedEnterEventReport.Builder builder = new DetailedEnterEventReport.Builder(templateFilename);
 
-        builder.setOrgsList(idOfOrgList);
+        if (idOfOrg == null) {
+            printError(String.format("Выберите организацию "));
+            return null;
+        }
+        builder.setIdOfOrg(idOfOrg);
+
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -104,7 +111,11 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
-                builder.setOrgsList(idOfOrgList);
+                if (idOfOrg == null) {
+                    printError(String.format("Выберите организацию "));
+                }
+
+                builder.setIdOfOrg(idOfOrg);
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -144,7 +155,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
 
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFilename = DetailedEnterEventReport.class.getSimpleName() + ".jasper";
+        String templateShortFilename = "AutoEnterEventV2Report.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
@@ -153,4 +164,11 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         return templateFilename;
     }
 
+    public Boolean getAllFriendlyOrgs() {
+        return allFriendlyOrgs;
+    }
+
+    public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
+        this.allFriendlyOrgs = allFriendlyOrgs;
+    }
 }
