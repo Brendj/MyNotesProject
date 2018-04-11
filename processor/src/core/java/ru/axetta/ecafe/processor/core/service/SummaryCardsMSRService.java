@@ -126,8 +126,8 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                 hex = "0".concat(hex);
             }
             StringBuilder sb = new StringBuilder(hex).reverse();
-            hex = "0x" + sb.charAt(13) + sb.charAt(12) + sb.charAt(11) + sb.charAt(10) +
-                    sb.charAt(9) + sb.charAt(8) + sb.charAt(7) + sb.charAt(6);
+            hex = "0x" + sb.charAt(1) + sb.charAt(0) + sb.charAt(3) + sb.charAt(2) +
+                    sb.charAt(5) + sb.charAt(4) + sb.charAt(7) + sb.charAt(6);
             return Long.decode(hex);
         } else {
             while (hex.length() < 14) {
