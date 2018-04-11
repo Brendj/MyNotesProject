@@ -40,6 +40,9 @@ public class CalendarUtils {
     private final static ThreadLocal<SimpleDateFormat> timeUnderscoreExtendedFormat = new ThreadLocal<SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("HH_mm_ss"); }
     };
+    private final static ThreadLocal<SimpleDateFormat> timeClassicFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("HH:mm:ss"); }
+    };
     private final static ThreadLocal<SimpleDateFormat> dateShortdd_mmFormat = new ThreadLocal<SimpleDateFormat>() {
         @Override protected SimpleDateFormat initialValue() { return new SimpleDateFormat("dd.MM"); }
     };
@@ -260,6 +263,11 @@ public class CalendarUtils {
 
     public static String formatTimeUnderscoreExtendedToString(Long date) {
         SimpleDateFormat safeTimeUnderscoreExtendedFormat = timeUnderscoreExtendedFormat.get();
+        return safeTimeUnderscoreExtendedFormat.format(new Date(date));
+    }
+
+    public static String formatTimeClassicToString(Long date) {
+        SimpleDateFormat safeTimeUnderscoreExtendedFormat = timeClassicFormat.get();
         return safeTimeUnderscoreExtendedFormat.format(new Date(date));
     }
 

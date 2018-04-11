@@ -447,6 +447,8 @@ public class MainPage implements Serializable {
     private final CardOperatorListPage cardOperatorListPage = new CardOperatorListPage();
     private final CardRegistrationAndIssuePage cardRegistrationAndIssuePage = new CardRegistrationAndIssuePage();
     private final ClientCreateByCardOperatorPage clientRegistrationByCardOperatorPage = new ClientCreateByCardOperatorPage();
+    private final AutoEnterEventReportPage autoEnterEventReportPage = new AutoEnterEventReportPage();
+    private final EnterEventJournalReportPage enterEventJournalReportPage = new EnterEventJournalReportPage();
 
     private final LoadingElementsOfBasicGoodsPage loadingElementsOfBasicGoodsPage = new LoadingElementsOfBasicGoodsPage();
 
@@ -6763,6 +6765,14 @@ public class MainPage implements Serializable {
 
     public SalesReportGroupPage getSalesReportGroupPage() {
         return salesReportGroupPage;
+    }
+
+    public AutoEnterEventReportPage getAutoEnterEventReportPage() {
+        return autoEnterEventReportPage;
+    }
+
+    public EnterEventJournalReportPage getEnterEventJournalReportPage() {
+        return enterEventJournalReportPage;
     }
 
     public Object showGoodRequestNewReportPage() {

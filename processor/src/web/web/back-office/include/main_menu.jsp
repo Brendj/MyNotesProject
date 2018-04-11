@@ -1402,6 +1402,30 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="passReportsGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PassReportsGroupPage"--%>
+    <rich:panelMenuGroup id="passReportsGroupPageMenu" binding="#{passReportsGroupPage.mainMenuComponent}"
+                         label="Отчеты по проходам">
+        <a4j:support event="onclick" action="#{passReportsGroupPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="detailedEnterEventReportMenuItem" binding="#{mainPage.detailedEnterEventReportPage.mainMenuComponent}"
+                            label="Детализированного отчета по проходам" action="#{mainPage.showDetailedEnterEventReportPage}"
+                            reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="autoEnterEventReportMenuItem"
+                            binding="#{mainPage.autoEnterEventReportPage.mainMenuComponent}"
+                            label="Сводный отчет по посещению" action="#{mainPage.autoEnterEventReportPage.show}"
+                            reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="enterEventJournalReportPageMenuItem"
+                            binding="#{mainPage.enterEventJournalReportPage.mainMenuComponent}"
+                            label="Журнал посещений" action="#{mainPage.enterEventJournalReportPage.show}"
+                            reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
+                            label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
+                            reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
+    </rich:panelMenuGroup>
+
     <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
     <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"
                          rendered="#{mainPage.eligibleToViewHelpdesk}">
@@ -1412,16 +1436,6 @@
                             label="Заявки в службу помощи" action="#{helpdeskReportPage.show}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
-
-    <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
-                        label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
-                        reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
-
-    <rich:panelMenuItem id="detailedEnterEventReportMenuItem" binding="#{mainPage.detailedEnterEventReportPage.mainMenuComponent}"
-                        label="Детализированного отчета по проходам" action="#{mainPage.showDetailedEnterEventReportPage}"
-                        reRender="workspaceForm" />
-
-
 
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}"
