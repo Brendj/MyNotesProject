@@ -51,7 +51,7 @@
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.enterEventJournalReportPage.buildReportHTML}"
                            reRender="workspaceTogglePanel, enterEventReportTable" styleClass="command-button"
                            status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.enterEventJournalReportPage.generateXLS}"
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.typesOfCardReportPage.generateXLS}"
                          styleClass="command-button" />
     </h:panelGrid>
 

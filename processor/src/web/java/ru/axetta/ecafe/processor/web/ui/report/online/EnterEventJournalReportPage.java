@@ -19,9 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.event.ActionEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
@@ -97,82 +97,62 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
     }
 
     public void generateXLS(ActionEvent event) {
-        /*RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
         if (templateFilename == null) {
 
         } else {
             EnterEventJournalReport.Builder builder = new EnterEventJournalReport.Builder(templateFilename);
+            if (idOfOrg == null) {
+                printError("Выберите организацию ");
+            } else {
+                builder.setIdOfOrg(idOfOrg);
+                builder.setAllFriendlyOrgs(allFriendlyOrgs);
+                Session persistenceSession = null;
+                Transaction persistenceTransaction = null;
+                BasicReportJob report = null;
+                try {
+                    try {
+                        persistenceSession = runtimeContext.createReportPersistenceSession();
+                        persistenceTransaction = persistenceSession.beginTransaction();
 
-            builder.setIdOfOrg(idOfOrg);
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            BasicReportJob report = null;
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Failed export report : ", e);
-                printError("Ошибка при подготовке отчета: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
-
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            try {
-                if (report != null) {
-                    HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
-                            .getResponse();
-                    ServletOutputStream servletOutputStream = response.getOutputStream();
-                    facesContext.getResponseComplete();
-                    facesContext.responseComplete();
-                    response.setContentType("application/xls");
-                    response.setHeader("Content-disposition", "inline;filename=enterEventJournalReport.xls");
-                    JRXlsExporter xlsExporter = new JRXlsExporter();
-                    xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-                    xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-                    xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-                    xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-                    xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                    xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-                    xlsExporter.exportReport();
-                    servletOutputStream.close();
+                        report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                        persistenceTransaction.commit();
+                        persistenceTransaction = null;
+                    } finally {
+                        HibernateUtils.rollback(persistenceTransaction, logger);
+                        HibernateUtils.close(persistenceSession, logger);
+                    }
+                } catch (Exception e) {
+                    logger.error("Failed export report : ", e);
+                    printError("Ошибка при подготовке отчета: " + e.getMessage());
                 }
-            } catch (Exception e) {
-                logAndPrintMessage("Ошибка при выгрузке отчета:", e);
-            }
-        }*/
 
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-
-        EnterEventJournalReport.Builder builder = new EnterEventJournalReport.Builder(checkIsExistFile());
-        builder.setIdOfOrg(idOfOrg);
-        Session persistenceSession = null;
-        BasicReportJob report;
-        try {
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-            if (report != null) {
-                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-                ServletOutputStream servletOutputStream = response.getOutputStream();
-                facesContext.responseComplete();
-                response.setContentType("application/xls");
-                response.setHeader("Content-disposition", "inline;filename=OrgDiscountsReport.xls");
-                JRXlsExporter xlsExport = new JRXlsExporter();
-                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-                xlsExport.exportReport();
-                servletOutputStream.close();
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                try {
+                    if (report != null) {
+                        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                                .getResponse();
+                        ServletOutputStream servletOutputStream = response.getOutputStream();
+                        facesContext.getResponseComplete();
+                        facesContext.responseComplete();
+                        response.setContentType("application/xls");
+                        response.setHeader("Content-disposition", "inline;filename=enterEventJournalReport.xls");
+                        JRXlsExporter xlsExporter = new JRXlsExporter();
+                        xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                        xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                        xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                        xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                        xlsExporter
+                                .setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                        xlsExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                        xlsExporter.exportReport();
+                        servletOutputStream.close();
+                    }
+                } catch (Exception e) {
+                    logAndPrintMessage("Ошибка при выгрузке отчета:", e);
+                }
             }
-        } catch (Exception e) {
-            logAndPrintMessage("Ошибка при выгрузке отчета:", e);
         }
     }
 
