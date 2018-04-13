@@ -30,6 +30,7 @@ import static org.hibernate.criterion.Restrictions.in;
  * Created by anvarov on 04.04.18.
  */
 public class EnterEventJournalReport extends BasicReportForAllOrgJob {
+
     /*
    * Параметры отчета для добавления в правила и шаблоны
    *
@@ -102,7 +103,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             return new EnterEventJournalReport(generateTime, generateDuration, jasperPrint, startTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime,  Long idOfOrg) {
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg) {
 
 
             List<EnterEventItem> enterEventItems = new ArrayList<EnterEventItem>();
@@ -112,20 +113,20 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 List<Long> idOfOrgList = new ArrayList<Long>();
 
-                for (Org orgItem: org.getFriendlyOrg()) {
+                for (Org orgItem : org.getFriendlyOrg()) {
                     idOfOrgList.add(orgItem.getIdOfOrg());
                 }
 
-                criteria.createAlias("org","o").add(in("o.idOfOrg", idOfOrgList));
+                criteria.createAlias("org", "o").add(in("o.idOfOrg", idOfOrgList));
             } else {
-                criteria.createAlias("org","o").add(eq("o.idOfOrg", idOfOrg));
+                criteria.createAlias("org", "o").add(eq("o.idOfOrg", idOfOrg));
             }
 
             //criteria.createAlias("clientGroup", "cg");
             criteria.add((between("evtDateTime", startTime, endTime)));
             List<EnterEvent> enterEventList = criteria.list();
 
-            for (EnterEvent enterEvent: enterEventList) {
+            for (EnterEvent enterEvent : enterEventList) {
 
                 String passdirection, personFullName;
 
@@ -135,21 +136,48 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                     personFullName = "";
                 }
 
-                switch (enterEvent.getPassDirection()){
-                    case EnterEvent.ENTRY: passdirection="вход"; break;
-                    case EnterEvent.EXIT: passdirection="выход"; break;
-                    case EnterEvent.PASSAGE_IS_FORBIDDEN: passdirection="проход запрещен"; break;
-                    case EnterEvent.TURNSTILE_IS_BROKEN: passdirection="взлом турникета"; break;
-                    case EnterEvent.EVENT_WITHOUT_PASSAGE: passdirection="событие без прохода"; break;
-                    case EnterEvent.PASSAGE_RUFUSAL: passdirection="отказ от прохода"; break;
-                    case EnterEvent.RE_ENTRY: passdirection="повторный вход"; break;
-                    case EnterEvent.RE_EXIT: passdirection="повторный выход"; break;
-                    case EnterEvent.DETECTED_INSIDE: passdirection="обнаружен на подносе карты внутри здания"; break;
-                    case EnterEvent.CHECKED_BY_TEACHER_EXT: passdirection="отмечен в классном журнале через внешнюю систему"; break;
-                    case EnterEvent.CHECKED_BY_TEACHER_INT: passdirection="отмечен учителем внутри здания"; break;
-                    case EnterEvent.QUERY_FOR_ENTER: passdirection="запрос на вход"; break;
-                    case EnterEvent.QUERY_FOR_EXIT: passdirection="запрос на выход"; break;
-                    default: passdirection="Ошибка обратитесь администратору";
+                switch (enterEvent.getPassDirection()) {
+                    case EnterEvent.ENTRY:
+                        passdirection = "вход";
+                        break;
+                    case EnterEvent.EXIT:
+                        passdirection = "выход";
+                        break;
+                    case EnterEvent.PASSAGE_IS_FORBIDDEN:
+                        passdirection = "проход запрещен";
+                        break;
+                    case EnterEvent.TURNSTILE_IS_BROKEN:
+                        passdirection = "взлом турникета";
+                        break;
+                    case EnterEvent.EVENT_WITHOUT_PASSAGE:
+                        passdirection = "событие без прохода";
+                        break;
+                    case EnterEvent.PASSAGE_RUFUSAL:
+                        passdirection = "отказ от прохода";
+                        break;
+                    case EnterEvent.RE_ENTRY:
+                        passdirection = "повторный вход";
+                        break;
+                    case EnterEvent.RE_EXIT:
+                        passdirection = "повторный выход";
+                        break;
+                    case EnterEvent.DETECTED_INSIDE:
+                        passdirection = "обнаружен на подносе карты внутри здания";
+                        break;
+                    case EnterEvent.CHECKED_BY_TEACHER_EXT:
+                        passdirection = "отмечен в классном журнале через внешнюю систему";
+                        break;
+                    case EnterEvent.CHECKED_BY_TEACHER_INT:
+                        passdirection = "отмечен учителем внутри здания";
+                        break;
+                    case EnterEvent.QUERY_FOR_ENTER:
+                        passdirection = "запрос на вход";
+                        break;
+                    case EnterEvent.QUERY_FOR_EXIT:
+                        passdirection = "запрос на выход";
+                        break;
+                    default:
+                        passdirection = "Ошибка обратитесь администратору";
                         /*
                         TwicePassEnter = 6,     //повторный вход
                         TwicePassExit = 7,       //повторный выход
@@ -160,13 +188,15 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 String groupName = "";
 
                 if (enterEvent.getClientGroup() != null) {
-                    groupName = enterEvent.getClientGroup().getGroupName();
+                    if (enterEvent.getClientGroup().getGroupName() != null) {
+                        groupName = enterEvent.getClientGroup().getGroupName();
+                    }
                 }
 
-                EnterEventItem enterEventItem = new EnterEventItem(CalendarUtils.dateShortToStringFullYear(
-                        enterEvent.getEvtDateTime()),
-                        CalendarUtils.formatTimeClassicToString(enterEvent.getEvtDateTime().getTime()), personFullName, groupName,
-                        passdirection, enterEvent.getOrg().getShortNameInfoService());
+                EnterEventItem enterEventItem = new EnterEventItem(
+                        CalendarUtils.dateShortToStringFullYear(enterEvent.getEvtDateTime()),
+                        CalendarUtils.formatTimeClassicToString(enterEvent.getEvtDateTime().getTime()), personFullName,
+                        groupName, passdirection, enterEvent.getOrg().getShortNameInfoService());
 
                 enterEventItems.add(enterEventItem);
             }
