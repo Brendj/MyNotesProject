@@ -1049,7 +1049,7 @@
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="goodRequestsGroupMenu" binding="#{mainPage.goodRequestsGroupMenu.mainMenuComponent}"
-                         label="Отчеты по заявкам" rendered="#{mainPage.eligibleToViewRequestReports}">
+                         label="Отчеты по заявкам и заказам" rendered="#{mainPage.eligibleToViewRequestReports}">
         <a4j:support event="onclick" action="#{mainPage.showGoodRequestsGroupMenu}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="goodRequestNewReportMenuItem" binding="#{mainPage.goodRequestsNewReportPage.mainMenuComponent}"
@@ -1059,6 +1059,11 @@
         <rich:panelMenuItem id="detailedGoodRequestReportMenuItem"
                             binding="#{mainPage.detailedGoodRequestReportPage.mainMenuComponent}"
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
+                            reRender="workspaceForm" />
+
+        <%--@elvariable id="preordersReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreordersReportPage"--%>
+        <rich:panelMenuItem id="preordersMenuItem" binding="#{preordersReportPage.mainMenuComponent}"
+                            label="Отчет по предзаказам" action="#{preordersReportPage.show}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 

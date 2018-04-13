@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2018. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
@@ -8,70 +8,71 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.MigrantsReport;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.report.PreordersReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Liya
- * Date: 11.06.16
- * Time: 15:57
+ * Created by i.semenov on 25.01.2018.
  */
-public class MigrantsReportPage extends OnlineReportPage {
+@Component
+@Scope(value = "session")
+public class PreordersReportPage extends OnlineReportPage {
+    private static final Logger logger = LoggerFactory.getLogger(PreordersReportPage.class);
+    private final String reportName = "Отчет по предварительным заказам";
 
-    private final static Logger logger = LoggerFactory.getLogger(MigrantsReportPage.class);
-    private final String reportName = MigrantsReport.REPORT_NAME;
-    private final String reportNameForMenu = MigrantsReport.REPORT_NAME_FOR_MENU;
-
-    private String htmlReport = null;
-    private Boolean applyUserSettings = false;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-    private String migrantType;
-
-    public MigrantsReportPage() {
-        super();
-        localCalendar.setTime(this.startDate);
-        localCalendar.add(Calendar.DATE, 7);
-        localCalendar.add(Calendar.SECOND, -1);
-        this.endDate = localCalendar.getTime();
+    @Override
+    public String getPageFilename() {
+        return "report/online/preorders";
     }
 
-    public void showOrgListSelectPage () {
+    @PostConstruct
+    public void setDates() {
+        startDate = CalendarUtils.startOfDay(new Date());
+        onReportPeriodChanged(null);
+    }
+
+    public void showOrgListSelectPage() {
         MainPage.getSessionInstance().showOrgListSelectPage();
+    }
+
+    public String getReportName() {
+        return reportName;
     }
 
     public Object buildReportHTML() {
         htmlReport = null;
-        if (validateFormData())  return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
-        MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
+        PreordersReport.Builder builder = new PreordersReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -112,44 +113,12 @@ public class MigrantsReportPage extends OnlineReportPage {
         return null;
     }
 
-    private String checkIsExistFile(String suffix) {
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = MigrantsReport.class.getSimpleName() + suffix;
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
-            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
-            return null;
-        }
-        return templateFilename;
-    }
-
-    private boolean validateFormData() {
-        if(CollectionUtils.isEmpty(idOfOrgList)){
-            printError("Выберите список организаций");
-            return true;
-        }
-        if(startDate==null){
-            printError("Не указано дата выборки от");
-            return true;
-        }
-        if(endDate==null){
-            printError("Не указано дата выборки до");
-            return true;
-        }
-        if(startDate.after(endDate)){
-            printError("Дата выборки от меньше дата выборки до");
-            return true;
-        }
-        return false;
-    }
-
     public void exportToXLS(ActionEvent actionEvent){
-        if (validateFormData()) return;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return ;
         Date generateTime = new Date();
-        MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
+        PreordersReport.Builder builder = new PreordersReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -197,6 +166,13 @@ public class MigrantsReportPage extends OnlineReportPage {
         }
     }
 
+    private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = basicReportJob.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s", "PreordersReport", reportDistinctText, format);
+    }
+
     private Properties buildProperties() {
         Properties properties = new Properties();
         String idOfOrgString = "";
@@ -204,60 +180,25 @@ public class MigrantsReportPage extends OnlineReportPage {
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
-        properties.setProperty(MigrantsReport.P_MIGRANTS_TYPES, MigrantsUtils.MigrantsEnumType
-                .getNameByDescription(migrantType));
+        String idOfClients = "";
+        if(getClientList() != null && getClientList().size() > 0) {
+            for (ClientSelectListPage.Item item : getClientList()) {
+                idOfClients += item.getIdOfClient() + ",";
+            }
+            idOfClients = idOfClients.substring(0, idOfClients.length()-1);
+        }
+        properties.setProperty(PreordersReport.P_ID_OF_CLIENTS, idOfClients);
         return properties;
     }
 
-    private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
-        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
-        String reportDistinctText = basicReportJob.getReportDistinctText();
-        String format = timeFormat.format(generateTime);
-        return String.format("%s-%s-%s", "MigrantsReport", reportDistinctText, format);
-    }
-
-    public List<SelectItem> getMigrantTypes() {
-        List<SelectItem> filters = new ArrayList<SelectItem>();
-        for(MigrantsUtils.MigrantsEnumType m : MigrantsUtils.MigrantsEnumType.values()){
-            filters.add(new SelectItem(m.getDescription()));
+    private String checkIsExistFile(String suffix) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateShortFileName = PreordersReport.class.getSimpleName() + suffix;
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            return null;
         }
-        return filters;
-    }
-
-    @Override
-    public String getPageFilename() {
-        return "report/online/migrants_report";
-    }
-
-    public String getHtmlReport() {
-        return htmlReport;
-    }
-
-    public PeriodTypeMenu getPeriodTypeMenu() {
-        return periodTypeMenu;
-    }
-
-    public Boolean getApplyUserSettings() {
-        return applyUserSettings;
-    }
-
-    public void setApplyUserSettings(Boolean applyUserSettings) {
-        this.applyUserSettings = applyUserSettings;
-    }
-
-    public String getMigrantType() {
-        return migrantType;
-    }
-
-    public void setMigrantType(String migrantType) {
-        this.migrantType = migrantType;
-    }
-
-    public String getReportName() {
-        return reportName;
-    }
-
-    public String getReportNameForMenu() {
-        return reportNameForMenu;
+        return templateFilename;
     }
 }

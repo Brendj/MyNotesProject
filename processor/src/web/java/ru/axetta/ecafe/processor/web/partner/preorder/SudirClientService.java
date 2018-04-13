@@ -12,6 +12,7 @@ import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Component
 @Scope("singleton")
+@DependsOn("runtimeContext")
 public class SudirClientService {
     private static final Logger logger = LoggerFactory.getLogger(SudirClientService.class);
 

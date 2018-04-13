@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.director.DirectorOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -23,7 +24,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 public abstract class OnlineReportPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList,
-        OrgSelectPage.CompleteHandler, DirectorOrgListSelectPage.CompleteHandlerList {
+        OrgSelectPage.CompleteHandler, DirectorOrgListSelectPage.CompleteHandlerList, ClientSelectListPage.CompleteHandler {
     protected Date startDate;
     protected Date endDate;
     protected List<Long> idOfOrgList = new ArrayList<Long>();
@@ -32,6 +33,7 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     public static final String NO_REPORT_DATA = "Нет данных по выбранным критериям";
     protected PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
     protected String htmlReport = null;
+    private final List<ClientSelectListPage.Item> clientList = new ArrayList<ClientSelectListPage.Item>();
 
     public OnlineReportPage() throws RuntimeContext.NotInitializedException {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -97,6 +99,28 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
 
     public String getFilter() {
         return filter;
+    }
+
+    public String getStringClientList() {
+        List<String> val = new ArrayList<String>();
+        for (ClientSelectListPage.Item item : getClientList()) {
+            val.add(item.getCaption());
+        }
+        if (val.isEmpty()) {
+            return "Не выбрано";
+        }
+        else {
+            return val.toString();
+        }
+    }
+
+    public void completeClientSelection(Session session, List<ClientSelectListPage.Item> items) throws Exception {
+        if (items != null) {
+            getClientList().clear();
+            for (ClientSelectListPage.Item item : items) {
+                getClientList().add(item);
+            }
+        }
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
@@ -171,5 +195,29 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
             } break;
         }
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        htmlReport = null;
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noOfDays=(int)(diff/(24*60*60*1000));
+            switch (noOfDays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+        }
+    }
+
+    public List<ClientSelectListPage.Item> getClientList() {
+        return clientList;
     }
 }
