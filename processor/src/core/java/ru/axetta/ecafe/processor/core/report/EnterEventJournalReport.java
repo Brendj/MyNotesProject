@@ -9,12 +9,14 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +105,8 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             return new EnterEventJournalReport(generateTime, generateDuration, jasperPrint, startTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg) {
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
+                throws Exception {
 
 
             List<EnterEventItem> enterEventItems = new ArrayList<EnterEventItem>();
@@ -187,9 +190,11 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
                 String groupName = "";
 
-                if (enterEvent.getClientGroup() != null) {
-                    if (enterEvent.getClientGroup().getGroupName() != null) {
-                        groupName = enterEvent.getClientGroup().getGroupName();
+                ClientGroup clientGroup = getClientGroupByID(enterEvent.getIdOfClientGroup(), enterEvent.getOrg().getIdOfOrg(), session);
+
+                if (clientGroup != null) {
+                    if (clientGroup.getGroupName() != null) {
+                        groupName = clientGroup.getGroupName();
                     }
                 }
 
@@ -204,6 +209,13 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             Collections.reverse(enterEventItems);
 
             return new JRBeanCollectionDataSource(enterEventItems);
+        }
+
+        public ClientGroup getClientGroupByID(Long idOfClientGroup, Long idOfOrg, Session session) throws Exception {
+            Criteria criteria = session.createCriteria(ClientGroup.class);
+            criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+            criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", idOfClientGroup));
+            return (ClientGroup) criteria.uniqueResult();
         }
 
         public void setIdOfOrg(Long idOfOrg) {
