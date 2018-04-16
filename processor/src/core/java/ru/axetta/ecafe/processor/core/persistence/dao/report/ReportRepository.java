@@ -461,6 +461,9 @@ public class ReportRepository extends BaseJpaDao {
                     org.getShortName(), org.getOfficialName(), org.getAddress());
             builder.setOrg(orgShortItem);
             builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            Properties properties = new Properties();
+            properties.setProperty("groupName", reportParameters.getGroupName());
+            builder.setReportProperties(properties);
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;
@@ -700,6 +703,7 @@ public class ReportRepository extends BaseJpaDao {
         private String email;
         private String enterEventType;
         private Integer category;
+        private String groupName;
 
         public ReportParameters(List<ReportParameter> parameters) {
             this.parameters = parameters;
@@ -739,6 +743,10 @@ public class ReportRepository extends BaseJpaDao {
 
         public Integer getCategory() {
             return category;
+        }
+
+        public String getGroupName() {
+            return groupName;
         }
 
         public ReportParameters parse() throws ParseException {
@@ -782,6 +790,9 @@ public class ReportRepository extends BaseJpaDao {
                 }
                 if (parameter.getParameterName().equals("categories")) {
                     category = Integer.valueOf(parameter.getParameterValue());
+                }
+                if (parameter.getParameterName().equals("clientGroupName")) {
+                    groupName = parameter.getParameterValue();
                 }
             }
             return this;

@@ -133,6 +133,8 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
             }
 
+            //группа фильтр
+            String groupName = reportProperties.getProperty("groupName");
 
             //данные для отчета
 
