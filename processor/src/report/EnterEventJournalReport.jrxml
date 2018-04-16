@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EnterEventJournalReport" pageWidth="830" pageHeight="100000" columnWidth="790" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="610e1876-6cc3-430a-8c8a-81cfa52c5891">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EnterEventJournalReport" pageWidth="1030" pageHeight="100000" columnWidth="990" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="610e1876-6cc3-430a-8c8a-81cfa52c5891">
 	<property name="ireport.zoom" value="1.7715610000000017"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="832"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
@@ -14,7 +14,7 @@
 	<title>
 		<band height="50" splitType="Stretch">
 			<textField>
-				<reportElement uuid="afa6e3d7-9c57-4459-8c82-4e7ef4ce4451" x="0" y="0" width="790" height="50"/>
+				<reportElement uuid="afa6e3d7-9c57-4459-8c82-4e7ef4ce4451" x="0" y="0" width="990" height="50"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -53,7 +53,7 @@
 				<text><![CDATA[Время]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ffc3e62d-026f-40ca-8e1f-214f3aeae4f4" x="440" y="0" width="100" height="20"/>
+				<reportElement uuid="ffc3e62d-026f-40ca-8e1f-214f3aeae4f4" x="440" y="0" width="300" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -67,7 +67,7 @@
 				<text><![CDATA[Событие]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="7dbaf461-d157-463e-b1d8-53c19e2adb26" x="540" y="0" width="250" height="20"/>
+				<reportElement uuid="7dbaf461-d157-463e-b1d8-53c19e2adb26" x="740" y="0" width="250" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -161,7 +161,7 @@
 				<textFieldExpression><![CDATA[$F{group}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a73479d2-72c5-4aac-a092-54969c30ac46" x="440" y="0" width="100" height="20"/>
+				<reportElement uuid="a73479d2-72c5-4aac-a092-54969c30ac46" x="440" y="0" width="300" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -173,7 +173,7 @@
 				<textFieldExpression><![CDATA[$F{eventName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="9edf3af5-83f7-4668-9675-3ff8b6c4ca1b" x="540" y="0" width="250" height="20"/>
+				<reportElement uuid="9edf3af5-83f7-4668-9675-3ff8b6c4ca1b" x="740" y="0" width="250" height="20"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
