@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport" pageWidth="1290" pageHeight="20000" columnWidth="1250" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="632a3386-cd83-4545-a5d3-959d9b582229">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="startDate" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="endDate" class="java.lang.String" isForPrompting="false"/>
+	<field name="idOfContragent" class="java.lang.Long"/>
+	<field name="contragentName" class="java.lang.String"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="shortNameInfoService" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="contractId" class="java.lang.Long"/>
+	<field name="surname" class="java.lang.String"/>
+	<field name="firstname" class="java.lang.String"/>
+	<field name="secondname" class="java.lang.String"/>
+	<field name="preorderDate" class="java.util.Date"/>
+	<field name="amountComplex" class="java.lang.Integer"/>
+	<field name="complexName" class="java.lang.String"/>
+	<field name="idOfPreorderComplex" class="java.lang.Long"/>
+	<field name="menuDetailName" class="java.lang.String"/>
+	<field name="amountMenuDetail" class="java.lang.Integer"/>
+	<group name="idOfContragent">
+		<groupExpression><![CDATA[$F{idOfContragent}]]></groupExpression>
+		<groupHeader>
+			<band height="35"/>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="101" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="dbb01621-8933-4cbe-8320-51b6fb22c892" x="0" y="20" width="1250" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["С "+$P{startDate}+" по "+$P{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="ff5e3abe-48a1-45da-b2e6-8ac721a776db" x="0" y="0" width="1250" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Отчет по предварительным заказам]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="6509d064-050f-4e77-a14e-536b252cbcb2" isPrintRepeatedValues="false" x="378" y="40" width="370" height="41"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Данные физ. лица"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2170ea8b-f618-4dd8-8690-150ca81c591e" isPrintRepeatedValues="false" x="139" y="40" width="239" height="41"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Образовательная организация"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9a15bcad-c45d-49aa-a671-e8898260160c" isPrintRepeatedValues="false" x="748" y="40" width="502" height="41"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Данные предварительного заказа"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f78e35f2-b455-4394-8efc-06761ca43734" isPrintRepeatedValues="false" x="0" y="40" width="139" height="41"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Поставщик питания"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="16cf350d-de10-4077-b13e-06388e8c691f" isPrintRepeatedValues="false" x="548" y="81" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Имя"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b53e89db-1d25-41fc-a444-d4949bc8e213" isPrintRepeatedValues="false" x="0" y="81" width="39" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Ид."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ce473e7e-cf7a-4887-8277-5ab8a7de4ddf" isPrintRepeatedValues="false" x="648" y="81" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Отчество"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="da73dd5d-4725-474b-b65a-f36de624c04b" isPrintRepeatedValues="false" x="448" y="81" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Фамилия"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="abf0ea74-2679-4bde-bde8-b3f12a5157c8" isPrintRepeatedValues="false" x="139" y="81" width="39" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Ид."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ffe72589-b24f-4bf0-8582-c5755bab6082" isPrintRepeatedValues="false" x="378" y="81" width="70" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Л/с"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="df4e7b99-20e2-4f14-b0f3-5acf84f2fba0" isPrintRepeatedValues="false" x="278" y="81" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Адрес здания"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8288e0c1-b6f2-4c9a-afcd-acb284a3dff3" isPrintRepeatedValues="false" x="178" y="81" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Название"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="80eb07ca-49f2-4cdb-94cf-9c0f912da4e0" isPrintRepeatedValues="false" x="39" y="81" width="100" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Название"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c8848c6d-0263-4630-8248-2f15acc3f693" isPrintRepeatedValues="false" x="825" y="81" width="136" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Название комплекса"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="19960fbf-4cd2-4757-859a-2d2d2a17ab7b" isPrintRepeatedValues="false" x="1029" y="81" width="149" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Название блюда"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f57e2831-30e2-4b02-a29d-ad3f084dfb91" isPrintRepeatedValues="false" x="961" y="81" width="68" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Количество"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0d947c58-8080-4c79-ae3f-1e189c3ce524" isPrintRepeatedValues="false" x="1178" y="81" width="72" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Количество"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="e560ffe0-efd2-456c-bc16-38a6ea720e9c" isPrintRepeatedValues="false" x="748" y="81" width="77" height="20"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Дата"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="41" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="25f749a7-894b-491a-ad89-f411a3a12065" stretchType="RelativeToBandHeight" x="548" y="0" width="100" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{firstname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="66852971-84f1-490e-be3d-9e27b7c2b682" stretchType="RelativeToBandHeight" x="1029" y="0" width="149" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{menuDetailName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="2ef7aa72-222d-4ba2-be5d-78bb7491468e" stretchType="RelativeToBandHeight" x="178" y="0" width="100" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{shortNameInfoService}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="9403cfa0-efa2-4957-9bf7-b46aafc6897a" stretchType="RelativeToBandHeight" x="139" y="0" width="39" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="278940b2-6a9a-4b4c-b8c7-9bf23ac067c0" stretchType="RelativeToBandHeight" x="648" y="0" width="100" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{secondname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="5dbcfff8-8b52-4d2e-a87e-a9307aa8effe" stretchType="RelativeToBandHeight" x="378" y="0" width="70" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{contractId}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="999dbeaa-7dba-4397-89e0-5e09afa57257" stretchType="RelativeToBandHeight" x="961" y="0" width="68" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{amountComplex}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="893f05ce-a6d0-432a-89b3-a4843d1995bb" stretchType="RelativeToBandHeight" x="448" y="0" width="100" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{surname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="ec31b059-2603-4429-9e81-89ed2307eb7b" stretchType="RelativeToBandHeight" x="278" y="0" width="100" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="39f4572d-f094-4e32-99b7-abacf60a4cd3" stretchType="RelativeToBandHeight" x="825" y="0" width="136" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{complexName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="e3ff5020-3d8b-4fb1-8dc4-cda33eb3689a" stretchType="RelativeToBandHeight" x="748" y="0" width="77" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($F{preorderDate})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="8fa798ed-d046-46a1-8402-832c5419046b" stretchType="RelativeToBandHeight" x="1178" y="0" width="72" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{amountMenuDetail}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="af664daa-f881-483c-9638-a9ee05c91698" stretchType="RelativeToTallestObject" x="0" y="0" width="39" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{idOfContragent}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="e9b059d0-4e4c-4c26-a15c-2beb22205336" stretchType="RelativeToTallestObject" x="39" y="0" width="100" height="21"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{contragentName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
