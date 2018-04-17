@@ -103,6 +103,18 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
 
 
+            //группа фильтр
+            String groupName = reportProperties.getProperty("groupName");
+
+            ArrayList<String> groupList = new ArrayList<String>();
+
+            if (groupName != null) {
+                String[] groups = StringUtils.split(groupName, ",");
+                for (String str: groups) {
+                    groupList.add(str);
+                }
+            }
+
             //Список организаций
             List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
             String friendlyOrgsIds = "" + org.getIdOfOrg();
@@ -115,7 +127,7 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
 
-            List<Client> allByOrg = clientDao.findAllByOrg(ids);
+            List<Client> allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
             List<Data> currentClassList;
             Map<String, StClass> stClassMap = new HashMap<String, StClass>();
 
@@ -133,9 +145,6 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
 
             }
-
-            //группа фильтр
-            String groupName = reportProperties.getProperty("groupName");
 
             String groupStr;
 
