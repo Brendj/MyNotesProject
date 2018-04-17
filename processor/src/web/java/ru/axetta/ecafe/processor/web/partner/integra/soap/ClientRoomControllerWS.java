@@ -3424,6 +3424,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setDirection(enterEvent.getPassDirection());
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             enterEventItem.setLastUpdateDate(toXmlDateTime(lastUpdatePrecessSectionDate.get(enterEvent.getOrg().getIdOfOrg())));
+            enterEventItem.setAddress(enterEvent.getOrg().getAddress());
+            enterEventItem.setShortNameInfoService(enterEvent.getOrg().getShortNameInfoService());
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
                 enterEventItem.setGuardianSan(guardianSan.get(guardianId));
@@ -3444,6 +3446,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setTemporaryCard(0);
             enterEventItem.setLastUpdateDate(toXmlDateTime(OrgRepository.getInstance().getLastProcessSectionsDate(manualEvent.getIdOfOrg(),
                     SectionType.ENTER_EVENTS)));
+            Org org = (Org)session.load(Org.class, manualEvent.getIdOfOrg());
+            enterEventItem.setAddress(org.getAddress());
+            enterEventItem.setShortNameInfoService(org.getShortNameInfoService());
             enterEventList.getE().add(enterEventItem);
         }
         data.setEnterEventList(enterEventList);

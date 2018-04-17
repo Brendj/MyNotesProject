@@ -58,6 +58,11 @@ public class EnterEventItem {
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar lastUpdateDate;
 
+    @XmlAttribute(name = "Address")
+    protected String address;
+    @XmlAttribute(name = "ShortNameInfoService")
+    protected String shortNameInfoService;
+
     /**
      * Gets the value of the dateTime property.
      * 
@@ -232,5 +237,21 @@ public class EnterEventItem {
 
     public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 }
