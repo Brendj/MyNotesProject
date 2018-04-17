@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.EnterEventJournalReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -24,6 +25,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by anvarov on 04.04.18.
@@ -31,14 +34,62 @@ import java.io.File;
 public class EnterEventJournalReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(EnterEventJournalReportPage.class);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     private String htmlReport = null;
+
+    public EnterEventJournalReportPage() throws RuntimeContext.NotInitializedException {
+        super();
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.DATE, 7);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+    }
 
     private Boolean allFriendlyOrgs = false;
 
     public String getPageFilename() {
         return "report/online/enter_event_journal_report";
     }
+
+    public void onReportPeriodChanged(javax.faces.event.ActionEvent event) {
+        htmlReport = null;
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+            } break;
+        }
+    }
+
+    public void onEndDateSpecified(javax.faces.event.ActionEvent event) {
+        htmlReport = null;
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noOfDays=(int)(diff/(24*60*60*1000));
+            switch (noOfDays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+        }
+    }
+
 
     public Object buildReportHTML() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -177,5 +228,9 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
 
     public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
         this.allFriendlyOrgs = allFriendlyOrgs;
+    }
+
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
     }
 }
