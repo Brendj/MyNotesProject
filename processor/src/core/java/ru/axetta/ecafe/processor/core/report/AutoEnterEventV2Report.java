@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -136,6 +137,25 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             //группа фильтр
             String groupName = reportProperties.getProperty("groupName");
 
+            String groupStr;
+
+            if (groupName != null) {
+                String[] groups = StringUtils.split(groupName, ",");
+                groupStr = " AND cg.groupname in (";
+                int count = 0;
+                for (String str : groups) {
+                    groupStr = groupStr + "'" + str + "'";
+                    if (groups.length - 1 > count) {
+                        groupStr = groupStr + ",";
+                        count++;
+                    }
+                }
+                groupStr = groupStr + ") ";
+            } else {
+                groupStr = "";
+            }
+
+
             //данные для отчета
 
             Query query = session.createSQLQuery(
@@ -149,8 +169,8 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
                             + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
-                            + "     AND cs.idofclientgroup != 1100000060 "
-                            + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
+                            + "     AND cs.idofclientgroup != 1100000060 " + groupStr +
+                            "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
 
             query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
             List rList = query.list();
