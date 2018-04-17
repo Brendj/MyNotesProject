@@ -47,7 +47,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
     }
 
     public String getPageFilename() {
-        return "report/online/detailed_enter_event";
+        return "report/online/detailed_enter_event_report";
     }
 
     private Boolean allFriendlyOrgs;
