@@ -19,12 +19,30 @@
 <h:panelGrid id="detailedEnterEventReportPanel" binding="#{mainPage.detailedEnterEventReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+        <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{mainPage.detailedEnterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{mainPage.detailedEnterEventReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                       converter="dateConverter" inputClass="input-text"
+                       showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar,detailedEnterEventReportPanel"
+                         actionListener="#{mainPage.detailedEnterEventReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
+        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+        <h:selectOneMenu id="endDatePeriodSelect"
+                         value="#{mainPage.detailedEnterEventReportPage.periodTypeMenu.periodType}"
+                         styleClass="input-text" style="width: 250px;">
+            <f:converter converterId="periodTypeConverter" />
+            <f:selectItems value="#{mainPage.detailedEnterEventReportPage.periodTypeMenu.items}" />
+            <a4j:support event="onchange" reRender="endDateCalendar,detailedEnterEventReportPanel"
+                         actionListener="#{mainPage.detailedEnterEventReportPage.onReportPeriodChanged}" />
+        </h:selectOneMenu>
+        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+        <rich:calendar id="endDateCalendar" value="#{mainPage.detailedEnterEventReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter"
+                       inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect,detailedEnterEventReportPanel"
+                         actionListener="#{mainPage.detailedEnterEventReportPage.onEndDateSpecified}" />
+        </rich:calendar>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup styleClass="borderless-div">
@@ -62,7 +80,7 @@
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty  mainPage.detailedEnterEventReportPage.htmlReport}">
-            <h:outputText escape="true" value="Отчет по типам карт" styleClass="output-text" />
+            <h:outputText escape="true" value="Детализированный отчет по проходам" styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {

@@ -82,6 +82,7 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
         private final String templateFilename;
         private Long idOfOrg;
+        private Boolean allFriendlyOrgs;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -117,22 +118,28 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                     createDataSource(session, orgLoad, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
             return new DetailedEnterEventReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                    jasperPrint, startTime, endTime, org.getIdOfOrg());
+                    jasperPrint, startTime, endTime, orgLoad.getIdOfOrg());
         }
 
         private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
 
-
             //Список организаций
             List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
-            String friendlyOrgsIds = "" + org.getIdOfOrg();
+
             Set<Long> ids = new HashSet<Long>();
-            ids.add(org.getIdOfOrg());
-            for (ShortBuilding building : friendlyOrgs) {
-                friendlyOrgsIds += "," + building.getId();
-                ids.add(building.getId());
+            String friendlyOrgsIds = "" + org.getIdOfOrg();
+
+            if (allFriendlyOrgs) {
+                ids.add(org.getIdOfOrg());
+                for (ShortBuilding building : friendlyOrgs) {
+                    friendlyOrgsIds += "," + building.getId();
+                    ids.add(building.getId());
+                }
+            } else {
+                ids.add(org.getIdOfOrg());
+                friendlyOrgs = getFriendlyOrg(session, org);
             }
 
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
@@ -253,6 +260,21 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                     resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortAddress(), "2"));
                 }
             }
+            return resultList;
+        }
+
+        //один корпус
+        private static List<ShortBuilding> getFriendlyOrg(Session session, Org org) {
+            List<ShortBuilding> resultList = new LinkedList<ShortBuilding>();
+
+            if (org.isMainBuilding()) {
+                resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getShortAddress(), "2"));
+            }
+
+            if (!org.isMainBuilding()) {
+                resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getShortAddress(), "2"));
+            }
+
             return resultList;
         }
 
@@ -450,6 +472,10 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
         public void setIdOfOrg(Long idOfOrg) {
             this.idOfOrg = idOfOrg;
+        }
+
+        public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
+            this.allFriendlyOrgs = allFriendlyOrgs;
         }
     }
 }
