@@ -440,6 +440,11 @@ public class ReportRepository extends BaseJpaDao {
             if(reportParameters.getEnterEventType() != null) {
                 builder.getReportProperties().setProperty("enterEventType", RuleCondition.ENTEREVENT_TYPE_TEXT[Integer.parseInt(reportParameters.getEnterEventType())]);
             }
+
+            Properties properties = new Properties();
+            properties.setProperty("groupName", reportParameters.getGroupName());
+            builder.setReportProperties(properties);
+
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;

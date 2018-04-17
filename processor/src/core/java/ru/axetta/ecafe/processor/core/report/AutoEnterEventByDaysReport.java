@@ -14,11 +14,13 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
@@ -213,13 +215,26 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 ids.add(Long.parseLong(obj.toString()));
             }
 
+            //группа фильтр
+            String groupName = reportProperties.getProperty("groupName");
 
+            ArrayList<String> groupList = new ArrayList<String>();
 
+            if (groupName != null) {
+                String[] groups = StringUtils.split(groupName, ",");
+                for (String str: groups) {
+                    groupList.add(str);
+                }
+            }
 
             Criteria clientCriteria = session.createCriteria(Client.class);
+            clientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
             //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
             clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
             clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
+            if (groupName != null) {
+                clientCriteria.add(Restrictions.in("cg.groupName", groupList));
+            }
             if (typeConditionsValue != null) {
                 // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
                 String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);
@@ -250,10 +265,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
             Criteria reportCrit = session.createCriteria(EnterEvent.class);
+            reportCrit.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
             reportCrit.add(Restrictions.in("org.idOfOrg", ids));
             reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
             reportCrit.add(Restrictions.in("client.idOfClient", map.keySet()));
             reportCrit.add(Restrictions.between("evtDateTime", startTime, endTime));
+            if (groupName != null) {
+                reportCrit.add(Restrictions.in("cg.groupName", groupList));
+            }
             reportCrit.setProjection(Projections.projectionList().add(Projections.groupProperty("client.idOfClient"))
                     .add(Projections.sqlGroupProjection("({alias}.evtDateTime/24/3600/1000)*24*3600*1000 as eventDay",
                             "{alias}.evtDateTime", new String[]{"eventDay"}, new Type[]{new LongType()}))
