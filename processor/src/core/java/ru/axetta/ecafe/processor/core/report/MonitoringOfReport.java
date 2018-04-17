@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
-import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -42,8 +41,8 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public static final String[] TEMPLATE_FILE_NAMES = {
             "MonitoringOfReportMonday.jasper", "MonitoringOfReportTuesday.jasper", "MonitoringOfReportWednesday.jasper",
             "MonitoringOfReportThursday.jasper", "MonitoringOfReportFriday.jasper", "MonitoringOfReportSaturday.jasper", "MonitoringOfSubReport.jasper"};
-    public static final boolean IS_TEMPLATE_REPORT = false;
-    public static final int[] PARAM_HINTS = new int[]{};
+    public static final boolean IS_TEMPLATE_REPORT = true;
+    public static final int[] PARAM_HINTS = new int[]{3};
 
     public static final String REPORT_NAME_FOR_MENU = "Мониторинг";
 
@@ -62,8 +61,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
         }
 
-        @Override
-        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        public BasicReportJob buildInternal(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
                     .getReportsTemplateFilePath();
 
@@ -138,6 +136,12 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             return new MonitoringOfReport(generateTime, generateDuration, jasperPrint, startTime, null);
         }
 
+        @Override
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            Date date = CalendarUtils.startOfDay(new Date());//вызов из построения по расписанию
+            return buildInternal(session, date, endTime, calendar);
+        }
+
         private JRDataSource createDataSource(Session session, Date startTime, List<Long> idOfOrgList)
                 throws Exception {
 
@@ -147,17 +151,22 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         }
     }
 
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
+    }
+
     public MonitoringOfReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
     }
 
     @Override
-    public BasicReportForAllOrgJob createInstance() {
+    public MonitoringOfReport createInstance() {
         return new MonitoringOfReport();
     }
 
     public MonitoringOfReport() {
+        startTime = new Date();
     }
 
     @Override

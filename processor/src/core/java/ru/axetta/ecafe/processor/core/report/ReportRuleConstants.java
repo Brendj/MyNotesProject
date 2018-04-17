@@ -146,7 +146,8 @@ public class ReportRuleConstants {
             TotalSalesReport.class,
             TransactionsReport.class,
             TypesOfCardReport.class,
-            ZeroTransactionsReport.class
+            ZeroTransactionsReport.class,
+            MonitoringOfReport.class,
     };
 
     public static final ReportHint[] REPORT_HINTS = initReportHitns();

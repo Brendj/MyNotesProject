@@ -87,7 +87,7 @@ public class MonitoringOfReportPage extends OnlineReportPage {
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report = builder.buildInternal(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         }catch (Exception e) {
