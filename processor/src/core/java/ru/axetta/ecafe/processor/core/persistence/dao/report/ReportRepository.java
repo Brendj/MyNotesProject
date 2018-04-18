@@ -73,6 +73,8 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES_SUBJECT = "Сводная справка об услугах питания за счет бюджета города";
     private final String REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES = "DiscountComplexesInAllSuperCategoriesReport";
     private final String REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT = "Справка по предоставлению бесплатного питания обучающимся";
+    private final String REPORT_ENTER_EVENT_JOURNAL="EnterEventJournalReport";
+    private final String REPORT_ENTER_EVENT_JOURNAL_SUBJECT="Журнал посещений";
 
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
@@ -114,6 +116,8 @@ public class ReportRepository extends BaseJpaDao {
             return getDailyReferReportConsolidated(parameters, REPORT_CONSOLIDATE_DISCOUNTS_FOOD_SERVICES_SUBJECT);
         } else if (reportType.equals(REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES)) {
             return getDailyReferReportDiscount(parameters, REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT);
+        } else if (reportType.equals(REPORT_ENTER_EVENT_JOURNAL)) {
+            return getEnterEventJournal(parameters, REPORT_ENTER_EVENT_JOURNAL_SUBJECT);
         }
         return null;
     }
@@ -310,6 +314,22 @@ public class ReportRepository extends BaseJpaDao {
         return rawDataReport;
     }
 
+    private byte[] getEnterEventJournal(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildEnterEventJournalReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPagesOrZero(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
     private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
         return deliveredServicesReport.getPrint().getPages() != null
                 && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0;
@@ -469,6 +489,44 @@ public class ReportRepository extends BaseJpaDao {
             Properties properties = new Properties();
             properties.setProperty("groupName", reportParameters.getGroupName());
             builder.setReportProperties(properties);
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        }
+    }
+
+    private BasicJasperReport buildEnterEventJournalReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + EnterEventJournalReport.class.getSimpleName() + ".jasper";
+        EnterEventJournalReport.Builder builder = new EnterEventJournalReport.Builder(templateFilename);
+        try {
+            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                    org.getShortName(), org.getOfficialName(), org.getAddress());
+            builder.setOrg(orgShortItem);
+            builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            Properties properties = new Properties();
+            if (reportParameters.getGroupName() != null) {
+                properties.setProperty("groupName", reportParameters.getGroupName());
+            }
+
+            builder.setReportProperties(properties);
+
+            boolean isAllFriendlyOrgs = Boolean.parseBoolean(reportParameters.getIsAllFriendlyOrgs());
+
+            if (isAllFriendlyOrgs) {
+                builder.setAllFriendlyOrgs(true);
+                builder.setIdOfOrg(reportParameters.getIdOfOrg());
+            } else {
+                builder.setAllFriendlyOrgs(false);
+                builder.setIdOfOrg(reportParameters.getIdOfOrg());
+            }
+
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;
@@ -709,6 +767,7 @@ public class ReportRepository extends BaseJpaDao {
         private String enterEventType;
         private Integer category;
         private String groupName;
+        private String isAllFriendlyOrgs;
 
         public ReportParameters(List<ReportParameter> parameters) {
             this.parameters = parameters;
@@ -754,6 +813,10 @@ public class ReportRepository extends BaseJpaDao {
             return groupName;
         }
 
+        public String getIsAllFriendlyOrgs() {
+            return isAllFriendlyOrgs;
+        }
+
         public ReportParameters parse() throws ParseException {
             startDate = null;
             endDate = null;
@@ -764,6 +827,8 @@ public class ReportRepository extends BaseJpaDao {
             email = null;
             enterEventType = null;
             category = null;
+            groupName = null;
+            isAllFriendlyOrgs = null;
 
             DateFormat safeDateFormat = dateFormat.get();
             for (ReportParameter parameter : parameters) {
@@ -798,6 +863,9 @@ public class ReportRepository extends BaseJpaDao {
                 }
                 if (parameter.getParameterName().equals("clientGroupName")) {
                     groupName = parameter.getParameterValue();
+                }
+                if (parameter.getParameterName().equals("isAllFriendlyOrgs")) {
+                    isAllFriendlyOrgs = parameter.getParameterValue();
                 }
             }
             return this;

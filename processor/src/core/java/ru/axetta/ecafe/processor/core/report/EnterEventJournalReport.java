@@ -14,9 +14,11 @@ import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,9 +109,25 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
                 throws Exception {
 
+            //группа фильтр
+            String groupNameFilter = reportProperties.getProperty("groupName");
+
+            ArrayList<String> groupList = new ArrayList<String>();
+
+            if (groupNameFilter != null) {
+                String[] groups = StringUtils.split(groupNameFilter, ",");
+                for (String str: groups) {
+                    groupList.add(str);
+                }
+            }
 
             List<EnterEventItem> enterEventItems = new ArrayList<EnterEventItem>();
             Criteria criteria = session.createCriteria(EnterEvent.class);
+
+            if (!groupList.isEmpty()) {
+                criteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+                criteria.add(Restrictions.in("cg.groupName", groupList));
+            }
 
             if (allFriendlyOrgs) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
