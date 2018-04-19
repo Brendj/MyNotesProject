@@ -487,8 +487,16 @@ public class ReportRepository extends BaseJpaDao {
             builder.setOrg(orgShortItem);
             builder.setOrgShortItemList(Arrays.asList(orgShortItem));
             Properties properties = new Properties();
-            properties.setProperty("groupName", reportParameters.getGroupName());
+
+            if (reportParameters.getGroupName() != null) {
+                properties.setProperty("groupName", reportParameters.getGroupName());
+            }
+
+            String isAllFriendlyOrgs = reportParameters.getIsAllFriendlyOrgs();
+            properties.setProperty("isAllFriendlyOrgs", isAllFriendlyOrgs);
+
             builder.setReportProperties(properties);
+
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;

@@ -115,14 +115,27 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                 }
             }
 
+            //по все корпусам фильтр
+            Boolean isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+
             //Список организаций
-            List<ShortBuilding> friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
-            String friendlyOrgsIds = "" + org.getIdOfOrg();
             Set<Long> ids = new HashSet<Long>();
-            ids.add(org.getIdOfOrg());
-            for (ShortBuilding building : friendlyOrgs) {
-                friendlyOrgsIds += "," + building.getId();
-                ids.add(building.getId());
+            String friendlyOrgsIds = "";
+            List<ShortBuilding> friendlyOrgs;
+
+            if (isAllFriendlyOrgs) {
+                friendlyOrgs = getFriendlyOrgs(session, org.getIdOfOrg());
+                friendlyOrgsIds = friendlyOrgsIds + org.getIdOfOrg();
+
+                ids.add(org.getIdOfOrg());
+                for (ShortBuilding building : friendlyOrgs) {
+                    friendlyOrgsIds += "," + building.getId();
+                    ids.add(building.getId());
+                }
+            } else {
+                ids.add(org.getIdOfOrg());
+                friendlyOrgs = getFriendlyOrg(session, org.getIdOfOrg());
+                friendlyOrgsIds = friendlyOrgsIds + org.getIdOfOrg();
             }
 
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
@@ -142,8 +155,6 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                     currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
                     clientIdList.add(client.getIdOfClient());
                 }
-
-
             }
 
             String groupStr;
@@ -453,6 +464,14 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                     resultList.add(new ShortBuilding(organization.getIdOfOrg(), organization.getShortAddress(), "2"));
                 }
             }
+            return resultList;
+        }
+
+        //записываем один корпус
+        private static List<ShortBuilding> getFriendlyOrg(Session session, Long idOfOrg) {
+            List<ShortBuilding> resultList = new LinkedList<ShortBuilding>();
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            resultList.add(new ShortBuilding(org.getIdOfOrg(), org.getShortAddress(), "2"));
             return resultList;
         }
     }
