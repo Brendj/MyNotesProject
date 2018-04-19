@@ -206,13 +206,23 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             //orgCriteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
             //orgCriteria.setProjection(Property.forName("friendlyOrg"));
 
-            final String sql = String.format("SELECT friendlyorg FROM cf_friendly_organization WHERE currentorg=%d", org.getIdOfOrg());
-            Query query = session.createSQLQuery(sql);
-            List orgList = query.list();
+            //по все корпусам фильтр
+            Boolean isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+
             Set<Long> ids = new HashSet<Long>();
-            ids.add(org.getIdOfOrg());
-            for (Object obj: orgList){
-                ids.add(Long.parseLong(obj.toString()));
+
+            if (isAllFriendlyOrgs) {
+                final String sql = String.format("SELECT friendlyorg FROM cf_friendly_organization WHERE currentorg=%d",
+                        org.getIdOfOrg());
+                Query query = session.createSQLQuery(sql);
+                List orgList = query.list();
+
+                ids.add(org.getIdOfOrg());
+                for (Object obj : orgList) {
+                    ids.add(Long.parseLong(obj.toString()));
+                }
+            } else {
+                ids.add(org.getIdOfOrg());
             }
 
             //группа фильтр

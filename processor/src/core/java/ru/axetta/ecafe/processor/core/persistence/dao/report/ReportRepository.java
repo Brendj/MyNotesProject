@@ -462,7 +462,14 @@ public class ReportRepository extends BaseJpaDao {
             }
 
             Properties properties = new Properties();
-            properties.setProperty("groupName", reportParameters.getGroupName());
+
+            if (reportParameters.getGroupName() != null) {
+                properties.setProperty("groupName", reportParameters.getGroupName());
+            }
+
+            String isAllFriendlyOrgs = reportParameters.getIsAllFriendlyOrgs();
+            properties.setProperty("isAllFriendlyOrgs", isAllFriendlyOrgs);
+
             builder.setReportProperties(properties);
 
             BasicJasperReport jasperReport = builder
