@@ -497,6 +497,8 @@ public class ReportRepository extends BaseJpaDao {
 
             if (reportParameters.getGroupName() != null) {
                 properties.setProperty("groupName", reportParameters.getGroupName());
+            } else {
+                properties.setProperty("contractId", String.valueOf(reportParameters.getIdOfContract()));
             }
 
             String isAllFriendlyOrgs = reportParameters.getIsAllFriendlyOrgs();

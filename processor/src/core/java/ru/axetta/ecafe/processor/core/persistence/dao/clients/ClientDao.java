@@ -92,6 +92,15 @@ public class ClientDao extends WritableJpaDao {
     }
 
     @Transactional
+    public List<Client> findAllByOrgAndContractId(Set<Long> orgsIdList, List<Long> contractIdList) {
+        TypedQuery<Client> query = entityManager.createQuery(
+                "from Client c left join fetch c.clientGroup left join fetch c.person "
+                        + " where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060 and c.contractId in :contractIdList",
+                Client.class).setParameter("orgsIdList", orgsIdList).setParameter("contractIdList", contractIdList);
+        return query.getResultList();
+    }
+
+    @Transactional
     public List<ClientCount> findAllStudentsCount() {
         Query nativeQuery = entityManager.createNativeQuery(
                 "select idoforg, count(*) from cf_clients where idofclientgroup <  1100000000 group by idoforg ");

@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
@@ -34,6 +35,7 @@ import java.util.*;
 
 
 public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
+
     /*
     * Параметры отчета для добавления в правила и шаблоны
     *
@@ -106,13 +108,22 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             //группа фильтр
             String groupName = reportProperties.getProperty("groupName");
 
+            //л/с
+            String contractId = reportProperties.getProperty("contractId");
+
             ArrayList<String> groupList = new ArrayList<String>();
+
+            List<Long> contractIdList = new ArrayList<Long>();
 
             if (groupName != null) {
                 String[] groups = StringUtils.split(groupName, ",");
-                for (String str: groups) {
+                for (String str : groups) {
                     groupList.add(str);
                 }
+            }
+
+            if(contractId != null) {
+                contractIdList.add(Long.valueOf(contractId));
             }
 
             //по все корпусам фильтр
@@ -140,7 +151,16 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
 
-            List<Client> allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
+            List<Client> allByOrg = new ArrayList<Client>();
+
+            if (!contractIdList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndContractId(ids, contractIdList);
+            }
+
+            if (!groupList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
+            }
+
             List<Data> currentClassList;
             Map<String, StClass> stClassMap = new HashMap<String, StClass>();
 
