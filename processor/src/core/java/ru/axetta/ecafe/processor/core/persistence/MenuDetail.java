@@ -42,6 +42,7 @@ public class MenuDetail {
     private Integer priority;
     private String groupName;
     private Long idOfMenuFromSync;
+    private String shortName;
 
     public Long getIdOfMenuFromSync() {
         return idOfMenuFromSync;
@@ -302,6 +303,14 @@ public class MenuDetail {
                 + vitB1 + ", vitB2=" + vitB2 + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa="
                 + minCa + ", minP=" + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", vitPp=" + vitPp
                 + ", menuOrigin=" + menuOrigin + ", flags=" + flags + ", priority=" + priority + ", idOfMenuFromSync=" + idOfMenuFromSync
-                + '}';
+                + ", shortName=" + shortName + '}';
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 }

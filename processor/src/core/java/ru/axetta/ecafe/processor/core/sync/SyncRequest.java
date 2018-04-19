@@ -1201,11 +1201,16 @@ public class SyncRequest {
 
             public static class ReqMenuDetail {
 
+                public String getShortName() {
+                    return shortName;
+                }
+
                 public static class Builder {
 
                     public ReqMenuDetail build(Node menuDetailNode, MenuGroups menuGroups) throws Exception {
                         NamedNodeMap namedNodeMap = menuDetailNode.getAttributes();
                         String name = StringUtils.substring(getTextContent(namedNodeMap.getNamedItem("Name")), 0, 256);
+                        String shortName = name;
                         Node fullNameNode = namedNodeMap.getNamedItem("FullName");
                         if (null != fullNameNode && StringUtils.isNotEmpty(fullNameNode.getTextContent())) {
                             name = StringUtils.substring(fullNameNode.getTextContent(), 0, 256);
@@ -1285,7 +1290,7 @@ public class SyncRequest {
                         Double vitPp = getDoubleValue(namedNodeMap, "VitPP");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
                                 flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa,
-                                minP, minMg, minFe, vitB2, vitPp, gBasket);
+                                minP, minMg, minFe, vitB2, vitPp, gBasket, shortName);
                     }
 
                     private static String getTextContent(Node node) throws Exception {
@@ -1357,11 +1362,13 @@ public class SyncRequest {
                 private final Integer flags;
                 private final Integer priority;
                 private final String gBasket;
+                private final String shortName;
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, Long price,
                         int menuOrigin, int availableNow, Integer flags, Integer priority, Double protein, Double fat,
                         Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
-                        Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp, String gBasket) {
+                        Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp, String gBasket,
+                        String shortName) {
                     this.idOfMenu = idOfMenu;
                     this.path = path;
                     this.name = name;
@@ -1387,6 +1394,7 @@ public class SyncRequest {
                     this.vitB2 = vitB2;
                     this.vitPp = vitPp;
                     this.gBasket = gBasket;
+                    this.shortName = shortName;
                 }
 
                 public Long getIdOfMenu() {
@@ -1498,7 +1506,7 @@ public class SyncRequest {
                             + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
                             + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", menuOrigin=" + menuOrigin
                             + ", availableNow=" + availableNow + ", flags=" + flags + ", priority=" + priority
-                            + ", gBasketEl=" + gBasket + '}';
+                            + ", gBasketEl=" + gBasket + ", shortName=" + shortName + '}';
                 }
 
                 @Override
@@ -1552,6 +1560,9 @@ public class SyncRequest {
                     if (name != null ? !name.equals(that.name) : that.name != null) {
                         return false;
                     }
+                    if (shortName != null ? !shortName.equals(that.shortName) : that.shortName != null) {
+                        return false;
+                    }
                     if (output != null ? !output.equals(that.output) : that.output != null) {
                         return false;
                     }
@@ -1591,6 +1602,7 @@ public class SyncRequest {
                     HashCodeBuilder builder = new HashCodeBuilder();
                     builder.append(path);
                     builder.append(name);
+                    builder.append(shortName);
                     builder.append(group);
                     builder.append(output);
                     builder.append(price);

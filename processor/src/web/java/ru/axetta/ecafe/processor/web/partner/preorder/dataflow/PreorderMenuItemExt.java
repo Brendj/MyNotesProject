@@ -13,6 +13,7 @@ public class PreorderMenuItemExt {
 
     private String group;
     private String name;
+    private String fullName;
     private Long price;
     private Double calories;
     private String output;
@@ -30,7 +31,8 @@ public class PreorderMenuItemExt {
 
     public PreorderMenuItemExt(MenuDetail menuDetail) {
         this.setGroup(menuDetail.getGroupName());
-        this.setName(menuDetail.getMenuDetailName());
+        this.setName(menuDetail.getShortName());
+        this.setFullName(menuDetail.getMenuDetailName());
         this.setPrice(menuDetail.getPrice());
         this.setCalories(menuDetail.getCalories());
         this.setOutput(menuDetail.getMenuDetailOutput());
@@ -38,7 +40,6 @@ public class PreorderMenuItemExt {
         this.setProtein(menuDetail.getProtein());
         this.setCarbohydrates(menuDetail.getCarbohydrates());
         this.setFat(menuDetail.getFat());
-        //this.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
         this.setIdOfMenuDetail(menuDetail.getLocalIdOfMenu());
     }
 
@@ -136,5 +137,13 @@ public class PreorderMenuItemExt {
 
     public void setSelected(Boolean selected) {
         this.selected = selected;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

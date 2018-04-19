@@ -21,6 +21,7 @@
                   update="false"/>
         <property name="menuDetailName" column="MenuDetailName" type="string" length="256" not-null="true"
                   update="false"/>
+        <property name="shortName" column="ShortName" type="string" length="256"/>
         <property name="menuDetailOutput" column="MenuDetailOutput" type="string" length="32" update="false"/>
         <property name="menuOrigin" column="MenuOrigin" type="int" not-null="true"/>
         <property name="localIdOfMenu" column="LocalIdOfMenu" type="long"/>
