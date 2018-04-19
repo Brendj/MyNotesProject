@@ -120,8 +120,10 @@ public class PreorderDAOService {
             complexItemExt.setSelected(deleted == null ? false : deleted == 1);
 
             List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(ci.getIdOfComplexInfo(), client.getIdOfClient(), date);
-            complexItemExt.setMenuItemExtList(menuItemExtList);
-            list.add(complexItemExt);
+            if (menuItemExtList.size() > 0) {
+                complexItemExt.setMenuItemExtList(menuItemExtList);
+                list.add(complexItemExt);
+            }
         }
         for (PreorderComplexItemExt item : list) {
             if (isAcceptableComplex(item, client, hasDiscount)) {
@@ -427,6 +429,7 @@ public class PreorderDAOService {
     }
 
     private boolean isAcceptableComplex(PreorderComplexItemExt complex, Client client, Boolean hasDiscount) {
+        if (client.getIdOfClientGroup() == null) return false;
         String clientGroupName = client.getClientGroup().getGroupName();
         if (!hasDiscount) {
             // 1.2.1.1. если навазвание группы начинается на 1-, 2-, 3-, 4-, то выводим следующие комплексы:

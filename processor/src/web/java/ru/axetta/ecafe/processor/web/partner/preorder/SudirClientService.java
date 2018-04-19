@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SudirToken;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.SudirPersonData;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 /**
  * Created by i.semenov on 01.03.2018.
@@ -61,11 +63,21 @@ public class SudirClientService {
                 throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
             }
             SudirToken token = response.getEntity();
+            logSudirResponse("Token message: ", token);
             return token;
         } catch (Exception e) {
             logger.error("Error get token from SUDIR: ", e);
         }
         return null;
+    }
+
+    private void logSudirResponse(String message, Object object) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            logger.info(message + mapper.writeValueAsString(object));
+        } catch (IOException e) {
+            logger.error("Error unmarshall sudir object to string", e);
+        }
     }
 
     private String buildTokenRequestString(String authCode) {
@@ -82,12 +94,19 @@ public class SudirClientService {
         ClientRequest request = new ClientRequest(SUDIR_DATA_ADDRESS + "?access_token=" + token);
         request.accept("application/json");
         try {
-            ClientResponse<SudirPersonData> response = request.get(SudirPersonData.class);
-            if (response.getStatus() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+            try {
+                ClientResponse<SudirPersonData> response = request.get(SudirPersonData.class);
+                if (response.getStatus() != 200) {
+                    throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+                }
+                SudirPersonData data = response.getEntity();
+                logSudirResponse("Person data message: ", data);
+                return data;
+            } catch (Exception e) {
+                ClientResponse<String> response1 = request.get(String.class);
+                String str = response1.getEntity();
+                logSudirResponse(String.format("Person data message2 (status=%s): ", response1.getStatus()), str);
             }
-            SudirPersonData data = response.getEntity();
-            return data;
         } catch (Exception e) {
             logger.error("Error get person data from SUDIR: ", e);
         }
