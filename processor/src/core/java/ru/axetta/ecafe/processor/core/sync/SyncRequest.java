@@ -1205,6 +1205,24 @@ public class SyncRequest {
                     return shortName;
                 }
 
+                public static boolean areMenuDetailsEqual(MenuDetail menuDetail,
+                        ReqMenuDetail reqMenuDetail) {
+                    return valueEqualNullSafe(reqMenuDetail.getPath(), menuDetail.getMenuPath())
+                            && valueEqualNullSafe(reqMenuDetail.getPrice(), menuDetail.getPrice())
+                            && valueEqualNullSafe(reqMenuDetail.getGroup(), menuDetail.getGroupName())
+                            && valueEqualNullSafe(reqMenuDetail.getOutput(), menuDetail.getMenuDetailOutput())
+                            && valueEqualNullSafe(reqMenuDetail.getName(), menuDetail.getMenuDetailName())
+                            && valueEqualNullSafe(reqMenuDetail.getShortName(), menuDetail.getShortName())
+                            && valueEqualNullSafe(reqMenuDetail.getCalories(), menuDetail.getCalories())
+                            && valueEqualNullSafe(reqMenuDetail.getProtein(), menuDetail.getProtein())
+                            && valueEqualNullSafe(reqMenuDetail.getFat(), menuDetail.getFat())
+                            && valueEqualNullSafe(reqMenuDetail.getCarbohydrates(), menuDetail.getCarbohydrates());
+                }
+
+                private static boolean valueEqualNullSafe(Object str1, Object str2) {
+                    return (str1 == null ? "" : str1).equals(str2 == null ? "" : str2);
+                }
+
                 public static class Builder {
 
                     public ReqMenuDetail build(Node menuDetailNode, MenuGroups menuGroups) throws Exception {

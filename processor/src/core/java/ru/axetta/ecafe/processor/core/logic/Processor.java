@@ -4808,20 +4808,15 @@ public class Processor implements SyncProcessor {
 
     private static boolean areMenuDetailsEqual(MenuDetail menuDetail,
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail) {
-        // для организации - источника меню делаем поиска по локальным идентификаторам
-        //if (bOrgIsMenuExchangeSource && reqMenuDetail.getIdOfMenu() != null && menuDetail.getLocalIdOfMenu() != null) {
-        //    return reqMenuDetail.getIdOfMenu().equals(menuDetail.getLocalIdOfMenu());
-        //}
-        // для остальных - по путям и ценам, т.к. в клиентах некорректно обновлялось меню, каждый раз перезаписывалось с новыми ид.
-        //else {
-        return reqMenuDetail.getPath().equals(menuDetail.getMenuPath()) &&
-                (reqMenuDetail.getPrice() == null || menuDetail.getPrice() == null
-                        || reqMenuDetail.getPrice().longValue() == menuDetail.getPrice().longValue()) && (
-                reqMenuDetail.getGroup() == null || menuDetail.getGroupName() == null || reqMenuDetail.getGroup()
-                        .equals(menuDetail.getGroupName())) && (reqMenuDetail.getOutput() == null
-                || menuDetail.getMenuDetailOutput() == null || reqMenuDetail.getOutput()
-                .equals(menuDetail.getMenuDetailOutput()));
-        //}
+        return SyncRequest.ReqMenu.Item.ReqMenuDetail.areMenuDetailsEqual(menuDetail, reqMenuDetail);
+        /*return reqMenuDetail.getPath().equals(menuDetail.getMenuPath())
+                && (reqMenuDetail.getPrice() == null || menuDetail.getPrice() == null
+                        || reqMenuDetail.getPrice().longValue() == menuDetail.getPrice().longValue())
+                && (reqMenuDetail.getGroup() == null || menuDetail.getGroupName() == null
+                        || reqMenuDetail.getGroup().equals(menuDetail.getGroupName()))
+                && (reqMenuDetail.getOutput() == null || menuDetail.getMenuDetailOutput() == null
+                        || reqMenuDetail.getOutput().equals(menuDetail.getMenuDetailOutput()))
+                && (reqMenuDetail.getName().equals(menuDetail.getMenuDetailName()));*/
     }
 
     private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem) throws Exception {
