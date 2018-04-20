@@ -173,8 +173,16 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                     printError(String.format("Выберите организацию "));
                 }
 
-                //builder.setIdOfOrg(idOfOrg);
-                //builder.setAllFriendlyOrgs(allFriendlyOrgs);
+                Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+                BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                        org.getShortName(), org.getOfficialName(), org.getAddress());
+                builder.setOrg(orgShortItem);
+
+                Properties properties = new Properties();
+                if (allFriendlyOrgs) {
+                    properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
+                }
+
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
