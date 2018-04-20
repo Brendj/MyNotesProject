@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -25,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by anvarov on 04.04.18.
@@ -95,21 +97,30 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
         if (templateFilename == null) {
             return null;
         }
-        AutoEnterEventReport.Builder builder = new AutoEnterEventReport.Builder(templateFilename);
+        AutoEnterEventByDaysReport.Builder builder = new AutoEnterEventByDaysReport.Builder(templateFilename);
         if (idOfOrg == null) {
             printError("Выберите организацию ");
             return null;
         }
-        //builder.setIdOfOrg(idOfOrg);
-        //builder.setAllFriendlyOrgs(allFriendlyOrgs);
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
+
         try {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
+                Org org = (Org) persistenceSession.load(Org.class, idOfOrg);
+                BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                        org.getShortName(), org.getOfficialName(), org.getAddress());
+                builder.setOrg(orgShortItem);
+
+                Properties properties = new Properties();
+                if (allFriendlyOrgs) {
+                    properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
+                }
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -203,7 +214,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
 
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFilename = "AutoEnterEventReport.jasper";
+        String templateShortFilename = "AutoEnterEventByDaysReport.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));

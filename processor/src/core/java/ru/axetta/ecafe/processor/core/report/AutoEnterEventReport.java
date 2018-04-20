@@ -49,7 +49,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
     */
     public static final String REPORT_NAME = "Детализированный отчет по посещению";
-    public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventReport.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventByDaysReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{28, 29, -3, 22, 23, 24, 32};
 
