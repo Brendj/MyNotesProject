@@ -4,39 +4,22 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
-import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
+import java.util.List;
 
 /**
- * Created by i.semenov on 01.03.2018.
+ * Created by i.semenov on 23.04.2018.
  */
-public class SudirPersonData /*extends SudirBaseData*/ {
+public class ESIAPersonData {
     private String guid;
     private String firstName;
     private String lastName;
     private String middleName;
     private String mail;
-    private String mobile;
     private String phone;
+    private List<ESIADataVO> esiaDataVO;
 
-    public SudirPersonData() {
+    public ESIAPersonData() {
 
-    }
-
-    public SudirPersonData(ESIAPersonData data) {
-        this.guid = data.getGuid();
-        this.firstName = data.getFirstName();
-        this.lastName = data.getLastName();
-        this.middleName = data.getMiddleName();
-        this.mail = data.getMail();
-        this.phone = data.getPhone();
-    }
-
-    /*public SudirPersonData(String token) {
-        super(token);
-    }*/
-
-    public String getMobileCanonical() throws Exception {
-        return PhoneNumberCanonicalizator.canonicalize(mobile);
     }
 
     public String getGuid() {
@@ -79,19 +62,19 @@ public class SudirPersonData /*extends SudirBaseData*/ {
         this.mail = mail;
     }
 
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public List getEsiaDataVO() {
+        return esiaDataVO;
+    }
+
+    public void setEsiaDataVO(List esiaDataVO) {
+        this.esiaDataVO = esiaDataVO;
     }
 }
