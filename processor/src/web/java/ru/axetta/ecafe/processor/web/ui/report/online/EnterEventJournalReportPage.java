@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.EnterEventJournalReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -47,6 +48,8 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
     }
 
     private Boolean allFriendlyOrgs = false;
+
+    private final ClientFilter clientFilter = new ClientFilter();
 
     public String getPageFilename() {
         return "report/online/enter_event_journal_report";
@@ -228,6 +231,10 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
 
     public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
         this.allFriendlyOrgs = allFriendlyOrgs;
+    }
+
+    public ClientFilter getClientFilter() {
+        return clientFilter;
     }
 
     public PeriodTypeMenu getPeriodTypeMenu() {

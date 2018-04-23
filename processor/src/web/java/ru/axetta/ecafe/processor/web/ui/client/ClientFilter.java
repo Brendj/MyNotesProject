@@ -136,6 +136,7 @@ public class ClientFilter {
     private String filterClientId;
     private String filterClientGUID;
     private Map<String, Long> clientGroupItems = ClientGroupMenu.getItems();
+    private Map<String, Long> clientGroupsCustomItems = ClientGroupMenu.getCustomItems();
     private Long clientGroupId = ClientGroupMenu.CLIENT_ALL;
     private boolean showDeleted;
     private boolean includeFriendlyOrg = true;

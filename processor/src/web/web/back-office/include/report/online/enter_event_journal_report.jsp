@@ -66,6 +66,15 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="Группа" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupId}" styleClass="input-text"
+                     style="width: 145px;">
+        <f:selectItems value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupItems}" />
+        <a4j:support event="onchange" reRender="showDeletedClients" />
+    </h:selectOneMenu>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.enterEventJournalReportPage.buildReportHTML}"
                            reRender="workspaceTogglePanel, enterEventReportTable" styleClass="command-button"
                            status="reportGenerateStatus" />
