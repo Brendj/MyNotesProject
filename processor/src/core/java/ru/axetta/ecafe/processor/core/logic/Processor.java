@@ -254,6 +254,13 @@ public class Processor implements SyncProcessor {
         processorUtils.saveLastProcessSectionCustomDate(sessionFactory, idOfOrg, sectionType);
     }
 
+    private Long addPerformanceInfoAndResetDeltaTime(StringBuilder sb, String function, Long delta) {
+        if (System.currentTimeMillis() - delta > 500L) {
+            sb.append(function + "=" + (System.currentTimeMillis() - delta) + "\n");
+        }
+        return System.currentTimeMillis();
+    }
+
     /* Do process full synchronization */
     private SyncResponse buildFullSyncResponse(SyncRequest request, Date syncStartTime, int syncResult)
             throws Exception {
@@ -306,7 +313,8 @@ public class Processor implements SyncProcessor {
         PreOrdersFeeding preOrdersFeeding = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
-
+        StringBuilder performanceLogger = new StringBuilder();
+        Long timeForDelta = System.currentTimeMillis();
 
         boolean bError = false;
 
@@ -316,10 +324,13 @@ public class Processor implements SyncProcessor {
                 request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Begin sync", timeForDelta);
 
         processMigrantsSections(request, syncHistory, responseSections, null);
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processMigrantsSections", timeForDelta);
 
         processAccountOperationsRegistrySections(request, syncHistory, responseSections, null);
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processAccountOperationsRegistrySections", timeForDelta);
 
         // Process paymentRegistry
         try {
@@ -338,6 +349,7 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
             bError = true;
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncPaymentRegistry", timeForDelta);
 
         // Process ClientParamRegistry
         try {
@@ -349,6 +361,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncClientParamRegistry", timeForDelta);
 
         // Process ClientGuardianRequest
         try {
@@ -372,6 +385,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processClientGuardian", timeForDelta);
 
 
         // Process OrgStructure
@@ -388,6 +402,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncOrgStructure", timeForDelta);
 
         // Build client registry
         try {
@@ -399,6 +414,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncClientRegistry", timeForDelta);
 
         try {
             goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
@@ -408,6 +424,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processGoodsBasicBasketData", timeForDelta);
 
         // Process menu from Org
         try {
@@ -417,6 +434,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncMenu", timeForDelta);
 
         try {
             resMenuExchange = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
@@ -426,6 +444,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getMenuExchangeData", timeForDelta);
 
         // Process prohibitions menu from Org
         try {
@@ -439,6 +458,7 @@ public class Processor implements SyncProcessor {
             prohibitionsMenu = new ProhibitionsMenu(100, String.format("Internal error: %s", e.getMessage()));
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getProhibitionsMenuData", timeForDelta);
 
         //Process organization structure
         try {
@@ -455,6 +475,7 @@ public class Processor implements SyncProcessor {
             organizationStructure = new OrganizationStructure(100, String.format("Internal error: %s", e.getMessage()));
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getOrganizationStructureData", timeForDelta);
 
         try {
             final OrganizationComplexesStructureRequest organizationComplexesStructureRequest = request.getOrganizationComplexesStructureRequest();
@@ -471,6 +492,7 @@ public class Processor implements SyncProcessor {
                     String.format("Internal error: %s", e.getMessage()));
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getOrganizationComplexesStructureData", timeForDelta);
 
         try {
             if (request.getInteractiveReport() != null) {
@@ -481,6 +503,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processInteractiveReport", timeForDelta);
 
         try {
             interactiveReportData = processInteractiveReportData(request.getIdOfOrg());
@@ -490,6 +513,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processInteractiveReportData", timeForDelta);
 
         // Build AccRegistry
         try {
@@ -499,8 +523,8 @@ public class Processor implements SyncProcessor {
             String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
-
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getAccRegistry", timeForDelta);
 
         try {
             resCardsOperationsRegistry = new CardsOperationsRegistryHandler().handler(request, request.getIdOfOrg());
@@ -509,6 +533,7 @@ public class Processor implements SyncProcessor {
                     String.format("Failed to build ResCardsOperationsRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "CardsOperationsRegistryHandler().handler", timeForDelta);
 
         // Process ReqDiary
         try {
@@ -521,6 +546,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncDiary", timeForDelta);
 
         // Process enterEvents
         try {
@@ -538,6 +564,7 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()), e);
             bError = true;
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncEnterEvents", timeForDelta);
 
         try {
             if (request.getTempCardsOperations() != null) {
@@ -548,6 +575,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processTempCardsOperations", timeForDelta);
 
         try {
             if (request.getClientRequests() != null) {
@@ -561,6 +589,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processClientRequestsOperations", timeForDelta);
 
         // Process ResCategoriesDiscountsAndRules
         try {
@@ -572,6 +601,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processCategoriesDiscountsAndRules", timeForDelta);
 
         // Process ComplexRoles
         try {
@@ -580,6 +610,7 @@ public class Processor implements SyncProcessor {
             String message = String.format("processComplexRoles: %s", e.getMessage());
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processComplexRoles", timeForDelta);
 
         // Process CorrectingNumbersOrdersRegistry
         try {
@@ -590,6 +621,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncCorrectingNumbersOrdersRegistry", timeForDelta);
 
         try {
             orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
@@ -598,6 +630,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processOrgOwnerData", timeForDelta);
 
         try {
             questionaryData = processQuestionaryData(request.getIdOfOrg());
@@ -606,15 +639,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
-
-        /*try {
-            goodsBasicBasketData = processGoodsBasicBasketData(request.getIdOfOrg());
-        } catch (Exception e) {
-            String message = String
-                    .format("Failed to process goods basic basket data , IdOfOrg == %s", request.getIdOfOrg());
-            createSyncHistoryException(request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }*/
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processQuestionaryData", timeForDelta);
 
         try {
             if (request.getManager() != null) {
@@ -626,6 +651,7 @@ public class Processor implements SyncProcessor {
             logger.error(
                     String.format("Failed to process of Distribution Manager, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "RO", timeForDelta);
 
         if (bError) {
             DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
@@ -649,6 +675,8 @@ public class Processor implements SyncProcessor {
 
         String fullName = DAOService.getInstance().getPersonNameByOrg(request.getOrg());
 
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Service funcs", timeForDelta);
+
         try {
             saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.ACCOUNTS_REGISTRY);
             accountsRegistry = RuntimeContext.getAppContext().getBean(AccountsRegistryHandler.class)
@@ -656,6 +684,7 @@ public class Processor implements SyncProcessor {
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "AccountsRegistryHandler.handlerFull", timeForDelta);
 
         try {
             if (request.getReestrTaloonApproval() != null) {
@@ -667,6 +696,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processReestrTaloonApproval", timeForDelta);
 
         try {
             if (request.getZeroTransactions() != null) {
@@ -678,6 +708,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processZeroTransactions", timeForDelta);
 
         try {
             if (request.getComplexSchedules() != null) {
@@ -691,6 +722,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processComplexSchedules", timeForDelta);
 
         try {
             if (request.getSpecialDates() != null) {
@@ -702,6 +734,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSpecialDates", timeForDelta);
 
         //Process GroupManagers
         try {
@@ -719,6 +752,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "ClientgroupManagersProcessor", timeForDelta);
 
         //process groups organization
         fullProcessingGroupsOrganization(request,syncHistory,responseSections);
@@ -737,6 +771,7 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processHelpRequest", timeForDelta);
 
         try {
             PreOrdersFeedingRequest preOrdersFeedingRequest = request.getPreOrderFeedingRequest();
@@ -748,6 +783,8 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        addPerformanceInfoAndResetDeltaTime(performanceLogger, "processPreOrderFeedingRequest", timeForDelta);
+        logger.info("Full sync performance info: " + performanceLogger.toString());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), fullName, idOfPacket, request.getProtoVersion(), syncEndTime, "",
