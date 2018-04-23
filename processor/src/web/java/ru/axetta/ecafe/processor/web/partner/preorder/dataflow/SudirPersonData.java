@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 
+import java.util.List;
+
 /**
  * Created by i.semenov on 01.03.2018.
  */
@@ -17,23 +19,11 @@ public class SudirPersonData /*extends SudirBaseData*/ {
     private String mail;
     private String mobile;
     private String phone;
+    private List<ESIADataVO> esiaDataVO;
 
     public SudirPersonData() {
 
     }
-
-    public SudirPersonData(ESIAPersonData data) {
-        this.guid = data.getGuid();
-        this.firstName = data.getFirstName();
-        this.lastName = data.getLastName();
-        this.middleName = data.getMiddleName();
-        this.mail = data.getMail();
-        this.phone = data.getPhone();
-    }
-
-    /*public SudirPersonData(String token) {
-        super(token);
-    }*/
 
     public String getMobileCanonical() throws Exception {
         return PhoneNumberCanonicalizator.canonicalize(mobile);
@@ -93,5 +83,13 @@ public class SudirPersonData /*extends SudirBaseData*/ {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public List<ESIADataVO> getEsiaDataVO() {
+        return esiaDataVO;
+    }
+
+    public void setEsiaDataVO(List<ESIADataVO> esiaDataVO) {
+        this.esiaDataVO = esiaDataVO;
     }
 }

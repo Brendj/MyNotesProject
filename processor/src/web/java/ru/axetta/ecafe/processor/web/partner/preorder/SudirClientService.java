@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.partner.preorder;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SudirToken;
-import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.ESIAPersonData;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.SudirPersonData;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -104,19 +103,9 @@ public class SudirClientService {
                 logSudirResponse("Person data message: ", data);
                 return data;
             } catch (Exception e) {
-                try {
-                    ClientResponse<ESIAPersonData> response2 = request.get(ESIAPersonData.class);
-                    if (response2.getStatus() != 200) {
-                        throw new RuntimeException("Failed : HTTP error code (2): " + response2.getStatus());
-                    }
-                    SudirPersonData data2 = new SudirPersonData(response2.getEntity());
-                    logSudirResponse("Person data message esia: ", data2);
-                    return data2;
-                } catch (Exception e2) {
-                    ClientResponse<String> response1 = request.get(String.class);
-                    String str = response1.getEntity();
-                    logSudirResponse(String.format("Person data message2 (status=%s): ", response1.getStatus()), str);
-                }
+                ClientResponse<String> response1 = request.get(String.class);
+                String str = response1.getEntity();
+                logSudirResponse(String.format("Person data message2 (status=%s): ", response1.getStatus()), str);
             }
         } catch (Exception e) {
             logger.error("Error get person data from SUDIR: ", e);
