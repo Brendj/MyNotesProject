@@ -255,7 +255,7 @@ public class Processor implements SyncProcessor {
     }
 
     private Long addPerformanceInfoAndResetDeltaTime(StringBuilder sb, String function, Long delta) {
-        if (System.currentTimeMillis() - delta > 500L) {
+        if (System.currentTimeMillis() - delta > 100L) {
             sb.append(function + "=" + (System.currentTimeMillis() - delta) + "\n");
         }
         return System.currentTimeMillis();
