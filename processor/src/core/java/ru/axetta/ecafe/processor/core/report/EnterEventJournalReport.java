@@ -114,7 +114,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
             ArrayList<String> groupList = new ArrayList<String>();
 
-            if (groupNameFilter != null) {
+            if (groupNameFilter != null && !groupNameFilter.equals("")) {
                 String[] groups = StringUtils.split(groupNameFilter, ",");
                 for (String str: groups) {
                     groupList.add(str);

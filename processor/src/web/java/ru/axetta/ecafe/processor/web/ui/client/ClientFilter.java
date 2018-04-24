@@ -255,6 +255,10 @@ public class ClientFilter {
         return clientGroupItems;
     }
 
+    public Map<String, Long> getClientGroupsCustomItems() {
+        return clientGroupsCustomItems;
+    }
+
     public boolean isEmpty() {
         return ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
                 && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty()

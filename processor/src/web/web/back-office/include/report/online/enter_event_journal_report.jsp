@@ -69,7 +69,7 @@
     <h:outputText escape="true" value="Группа" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupId}" styleClass="input-text"
                      style="width: 145px;">
-        <f:selectItems value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupItems}" />
+        <f:selectItems value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupsCustomItems}" />
         <a4j:support event="onchange" reRender="showDeletedClients" />
     </h:selectOneMenu>
     </h:panelGrid>
