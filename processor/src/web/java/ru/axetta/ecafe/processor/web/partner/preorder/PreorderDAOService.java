@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
@@ -18,6 +19,8 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseL
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientsWithResultCode;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 
+import org.apache.cxf.common.util.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,10 +87,41 @@ public class PreorderDAOService {
         if (res != 1) throw new Exception("Client not found");
     }
 
+    private boolean isSpecialConfigDate(Client client, Date date) {
+        Long idOfOrg = client.getOrg().getIdOfOrg();
+        String prop = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.specialDates", "");
+        if (StringUtils.isEmpty(prop)) return false;
+        ObjectMapper mapper = new ObjectMapper();
+        SpecialConfigDates dates = null;
+        try {
+            dates = mapper.readValue(prop, SpecialConfigDates.class);
+
+            for (SpecialConfigDate dateConfig : dates.getSpecialConfigDateList()) {
+                if (idOfOrg.equals(dateConfig.getIdOfOrg())) {
+                    for (String strDate : dateConfig.getDates()) {
+                        if (CalendarUtils.parseDate(strDate).equals(date)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Can't get special config dates: ", e);
+            return false;
+        }
+
+        return false;
+    }
+
     @Transactional(readOnly = true)
     public PreorderListWithComplexesGroupResult getPreorderComplexesWithMenuList(Long contractId, Date date) {
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
         Client client = getClientByContractId(contractId);
+        if (isSpecialConfigDate(client, date)) {
+            List<PreorderComplexGroup> groupList = new ArrayList<PreorderComplexGroup>();
+            groupResult.setComplexesWithGroups(groupList);
+            return groupResult;
+        }
         Set<CategoryDiscount> clientDiscounts = client.getCategories();
         Boolean hasDiscount = false;
         for (CategoryDiscount categoryDiscount : clientDiscounts) {
