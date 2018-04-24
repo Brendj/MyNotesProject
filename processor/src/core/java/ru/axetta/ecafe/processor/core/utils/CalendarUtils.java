@@ -106,6 +106,15 @@ public class CalendarUtils {
         return createDate.before(generateEndTime) && createDate.after(generateBeginTime);
     }
 
+    public static boolean betweenOrEqualDate(Date createDate, Date generateBeginTime, Date generateEndTime) {
+        createDate = truncateToDayOfMonth(createDate);
+        generateBeginTime = truncateToDayOfMonth(generateBeginTime);
+        generateEndTime = truncateToDayOfMonth(generateEndTime);
+        return ((createDate.before(generateEndTime) && createDate.after(generateBeginTime)) ||
+                // сравниваем только начальную
+                (createDate.getTime() == generateBeginTime.getTime()));
+    }
+
     public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
         SimpleDateFormat safeDateTimeFormat = dateTimeFormat.get();
         safeDateTimeFormat.setTimeZone(utcTimeZone);

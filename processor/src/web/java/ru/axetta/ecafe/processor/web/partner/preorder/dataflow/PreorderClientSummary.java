@@ -96,7 +96,7 @@ public class PreorderClientSummary {
             Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
             if(specialDates != null){
                 for (SpecialDate specialDate : specialDates) {
-                    if (CalendarUtils.betweenDate(specialDate.getCompositeIdOfSpecialDate().getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
+                    if (CalendarUtils.betweenOrEqualDate(specialDate.getCompositeIdOfSpecialDate().getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
                         isWeekend = specialDate.getIsWeekend();
                         break;
                     }
