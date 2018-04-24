@@ -242,7 +242,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
             clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
             clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
-            if (groupName != null) {
+            if (!groupList.isEmpty()) {
                 clientCriteria.add(Restrictions.in("cg.groupName", groupList));
             }
             if (typeConditionsValue != null) {
@@ -280,7 +280,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             reportCrit.add(Restrictions.in("passDirection", Arrays.asList(0, 1, 6, 7)));
             reportCrit.add(Restrictions.in("client.idOfClient", map.keySet()));
             reportCrit.add(Restrictions.between("evtDateTime", startTime, endTime));
-            if (groupName != null) {
+            if (!groupList.isEmpty()) {
                 reportCrit.add(Restrictions.in("cg.groupName", groupList));
             }
             reportCrit.setProjection(Projections.projectionList().add(Projections.groupProperty("client.idOfClient"))
