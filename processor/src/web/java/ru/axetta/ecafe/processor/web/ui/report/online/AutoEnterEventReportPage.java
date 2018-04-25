@@ -10,12 +10,13 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.report.ClientGroupMenu;
+import ru.axetta.ecafe.processor.core.report.AutoEnterEventByDaysReport;
+import ru.axetta.ecafe.processor.core.report.AutoEnterEventReport;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
-import ru.axetta.ecafe.processor.web.ui.client.items.*;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -25,9 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.event.ActionEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.*;
@@ -61,38 +62,50 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
 
     public void onReportPeriodChanged(javax.faces.event.ActionEvent event) {
         htmlReport = null;
-        switch (periodTypeMenu.getPeriodType()){
+        switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
                 setEndDate(startDate);
-            } break;
+            }
+            break;
             case ONE_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 6));
-            } break;
+            }
+            break;
             case TWO_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 13));
-            } break;
+            }
+            break;
             case ONE_MONTH: {
                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            } break;
+            }
+            break;
         }
     }
 
     public void onEndDateSpecified(javax.faces.event.ActionEvent event) {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+        if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         } else {
-            long diff=end.getTime()-startDate.getTime();
-            int noOfDays=(int)(diff/(24*60*60*1000));
-            switch (noOfDays){
-                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
-                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
-                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
-                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            long diff = end.getTime() - startDate.getTime();
+            int noOfDays = (int) (diff / (24 * 60 * 60 * 1000));
+            switch (noOfDays) {
+                case 0:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
+                    break;
+                case 6:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+                    break;
+                case 13:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK);
+                    break;
+                default:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
+                    break;
             }
         }
-        if(startDate.after(endDate)){
+        if (startDate.after(endDate)) {
             printError("Дата выборки от меньше дата выборки до");
         }
     }
@@ -270,10 +283,12 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
 
         String groupNamesString = "";
 
-        if (!clientFilter.getClientGroupId().equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_ALL)) {
+        if (!clientFilter.getClientGroupId()
+                .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_ALL)) {
 
 
-            if (clientFilter.getClientGroupId().equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
+            if (clientFilter.getClientGroupId()
+                    .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
 
                 List<Long> groupIds = new ArrayList<Long>();
 
@@ -305,8 +320,8 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                         i++;
                     }
                 }
-            } else if (clientFilter.getClientGroupId().equals(
-                    ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
+            } else if (clientFilter.getClientGroupId()
+                    .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
                 int i = 0;
                 for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
                     if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
