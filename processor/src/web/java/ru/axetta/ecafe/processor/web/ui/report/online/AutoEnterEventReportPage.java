@@ -185,7 +185,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
         String templateFilename = checkIsExistFile();
         if (templateFilename == null) {
         } else {
-            AutoEnterEventReport.Builder builder = new AutoEnterEventReport.Builder(templateFilename);
+            AutoEnterEventByDaysReport.Builder builder = new AutoEnterEventByDaysReport.Builder(templateFilename);
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             BasicReportJob report = null;
@@ -231,7 +231,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                     facesContext.getResponseComplete();
                     facesContext.responseComplete();
                     response.setContentType("application/xls");
-                    response.setHeader("Content-disposition", "inline;filename=typesOfCardReport.xls");
+                    response.setHeader("Content-disposition", "inline;filename=AutoEnterEventByDaysReport.xls");
                     JRXlsExporter xlsExporter = new JRXlsExporter();
                     xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                     xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
