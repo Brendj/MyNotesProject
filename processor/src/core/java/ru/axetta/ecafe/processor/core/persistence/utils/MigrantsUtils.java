@@ -253,7 +253,7 @@ public class MigrantsUtils {
     }
 
     public static List<Migrant> getAllMigrantsForOrgsByDate(Session session, List<Long> idOfOrgs,
-            String guid, Date startDate, Date endDate, Boolean showAll){
+            String guid, Date startDate, Date endDate, Boolean showAll, List<Long> clientIDList){
         String condition = "";
 
         if (idOfOrgs.size() > 0) {
@@ -263,15 +263,22 @@ public class MigrantsUtils {
         if (!StringUtils.isEmpty(guid)) {
             condition += String.format(" and m.clientMigrate.clientGUID = '%s'", guid);
         }
+        if (!clientIDList.isEmpty()) {
+            String clients = StringUtils.join(clientIDList, ",");
+            condition += String.format(" and (m.clientMigrate.idOfClient in (%s))", clients);
+        }
         String str;
         if (showAll) {
-            str = "select m from Migrant m where m.visitStartDate < :endDate and m.visitEndDate > :startDate "
+            str = "select m from VisitReqResolutionHist h "
+                    + "join h.migrant m "
+                    + "where h.resolutionDateTime < :endDate and h.resolutionDateTime > :startDate and h.resolution = 0 "
                     + condition;
         } else {
-            str = "select m from Migrant m "
+            str = "select m from VisitReqResolutionHist h "
+                    + "join h.migrant m "
                     + " where not exists (select h from VisitReqResolutionHist h where h.migrant.compositeIdOfMigrant.idOfRequest = m.compositeIdOfMigrant.idOfRequest "
                     + " and h.migrant.compositeIdOfMigrant.idOfOrgRegistry = m.compositeIdOfMigrant.idOfOrgRegistry and h.resolution > :resolution) "
-                    + " and m.visitStartDate < :endDate and m.visitEndDate > :startDate "
+                    + " and h.resolutionDateTime < :endDate and h.resolutionDateTime > :startDate and h.resolution = 0 "
                     + condition;
         }
         Query query = session.createQuery(str);

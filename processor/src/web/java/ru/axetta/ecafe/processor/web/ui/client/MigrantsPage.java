@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -13,6 +14,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -33,7 +35,7 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class MigrantsPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.CompleteHandler {
 
     Logger logger = LoggerFactory.getLogger(MigrantsPage.class);
 
@@ -45,6 +47,8 @@ public class MigrantsPage extends BasicWorkspacePage implements OrgSelectPage.Co
     private List<MigrantItem> items = new ArrayList<MigrantItem>();
     private Boolean showAllMigrants;
     private MigrantItem currentItem;
+
+    protected String filterClient = "Не выбрано";
 
     @PostConstruct
     public void setDates() {
@@ -70,8 +74,9 @@ public class MigrantsPage extends BasicWorkspacePage implements OrgSelectPage.Co
     }
 
     private void update() throws Exception {
-        if (StringUtils.isEmpty(guid) && idOfOrg == null) {
-            printError("Выберите организацию или введите Guid клиента");
+        List<ClientSelectListPage.Item> clientList = getClientList();
+        if (StringUtils.isEmpty(guid) && idOfOrg == null && clientList.isEmpty()) {
+            printError("Выберите организацию, введите Guid клиента или выберите клиента");
             return;
         }
         startDate = CalendarUtils.startOfDay(startDate);
@@ -85,7 +90,13 @@ public class MigrantsPage extends BasicWorkspacePage implements OrgSelectPage.Co
             if (idOfOrg != null) {
                 orgs.add(idOfOrg);
             }
-            List<Migrant> list = MigrantsUtils.getAllMigrantsForOrgsByDate(session, orgs, guid, startDate, endDate, showAllMigrants);
+
+            List<Long> clientIDList = new ArrayList<Long>();
+            for (ClientSelectListPage.Item item : clientList) {
+                clientIDList.add(item.getIdOfClient());
+            }
+
+            List<Migrant> list = MigrantsUtils.getAllMigrantsForOrgsByDate(session, orgs, guid, startDate, endDate, showAllMigrants, clientIDList);
             items.clear();
             for (Migrant migrant : list) {
                 MigrantItem item = new MigrantItem(session, migrant);
@@ -198,5 +209,36 @@ public class MigrantsPage extends BasicWorkspacePage implements OrgSelectPage.Co
 
     public void setCurrentItem(MigrantItem currentItem) {
         this.currentItem = currentItem;
+    }
+
+    public String getStringClientList() {
+        List<String> val = new ArrayList<String>();
+        for (ClientSelectListPage.Item item : getClientList()) {
+            val.add(item.getCaption());
+        }
+        if (val.isEmpty()) {
+            return "";
+        } else {
+            return val.toString();
+        }
+    }
+
+    public String getFilterClient() {
+        return filterClient;
+    }
+
+    @Override
+    public void completeClientSelection(Session session, List<ClientSelectListPage.Item> items) throws Exception {
+        if (items != null) {
+            getClientList().clear();
+            for (ClientSelectListPage.Item item : items) {
+                getClientList().add(item);
+            }
+        }
+        filterClient = getStringClientList();
+    }
+
+    public void setFilterClient(String filterClient) {
+        this.filterClient = filterClient;
     }
 }

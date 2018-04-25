@@ -43,7 +43,21 @@
                     <f:setPropertyActionListener value="6" target="#{mainPage.orgSelectPage.filterMode}" />
                 </a4j:commandButton>
             </h:panelGroup>
-
+            <h:outputText styleClass="output-text" escape="true" value="Клиент" />
+            <h:panelGroup id="clientFilter">
+                <a4j:commandButton value="..."
+                                   action="#{mainPage.showClientSelectListPage(migrantsPage.getClientList())}"
+                                   reRender="modalClientListSelectorPanel,selectedClientList"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null})
+                                    #{rich:component('modalClientListSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" id="clientFilterButton">
+                    <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                    <f:setPropertyActionListener value="#{migrantsPage.getStringClientList}"
+                                                 target="#{mainPage.clientSelectListPage.clientFilter}" />
+                </a4j:commandButton>
+                <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                              value=" {#{migrantsPage.filterClient}}" />
+            </h:panelGroup>
             <h:outputText escape="true" value="Guid клиента" styleClass="output-text" />
             <h:inputText value="#{migrantsPage.guid}" maxlength="36"
                          styleClass="input-text, long-field" />
@@ -91,9 +105,9 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Дата создания" />
+                <h:outputText escape="true" value="Дата создания/редактирования" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.createDateTime}" converter="timeConverter"
+            <h:outputText escape="true" value="#{item.lastUpdateDateTime}" converter="timeConverter"
                           styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">

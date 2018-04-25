@@ -21,6 +21,7 @@ public class MigrantItem implements Comparable {
     private CompositeIdOfMigrant compositeIdOfMigrant;
     private String requestNumber;
     private Date createDateTime;
+    private Date lastUpdateDateTime;
     private String initiator;
     private String fio;
     private String orgRegistry;
@@ -42,6 +43,7 @@ public class MigrantItem implements Comparable {
             this.resolution = MigrantsUtils.getResolutionString(visitReqResolutionHistLast.getResolution());
             if (visitReqResolutionHistLast.getInitiator() != null) this.resolution += " (" + visitReqResolutionHistLast.getInitiator().toString() + ")";
             resolutionValue = visitReqResolutionHistLast.getResolution();
+            this.lastUpdateDateTime = visitReqResolutionHistLast.getResolutionDateTime();
         }
         VisitReqResolutionHist visitReqResolutionHistFirst = MigrantsUtils.getFirstResolutionForMigrant(session, migrant);
         if (visitReqResolutionHistFirst != null) {
@@ -49,7 +51,11 @@ public class MigrantItem implements Comparable {
         }
         this.initiator = migrant.getInitiator().toString();
         this.fio = migrant.getClientMigrate().getPerson().getFullName();
-        this.group = migrant.getClientMigrate().getClientGroup().getGroupName();
+        if (null != migrant.getClientMigrate().getClientGroup()) {
+            this.group = migrant.getClientMigrate().getClientGroup().getGroupName();
+        } else {
+            this.group = "";
+        }
         this.guid = migrant.getClientMigrate().getClientGUID();
         this.orgRegistry = getOrgname(migrant.getOrgRegistry());
         this.orgVisit = getOrgname(migrant.getOrgVisit());
@@ -210,5 +216,13 @@ public class MigrantItem implements Comparable {
 
     public void setAnnulled(boolean annulled) {
         this.annulled = annulled;
+    }
+
+    public Date getLastUpdateDateTime() {
+        return lastUpdateDateTime;
+    }
+
+    public void setLastUpdateDateTime(Date lastUpdateDateTime) {
+        this.lastUpdateDateTime = lastUpdateDateTime;
     }
 }
