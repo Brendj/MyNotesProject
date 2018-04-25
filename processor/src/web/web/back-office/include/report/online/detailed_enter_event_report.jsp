@@ -62,6 +62,15 @@
         </h:selectBooleanCheckbox>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Группа" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupId}" styleClass="input-text"
+                         style="width: 145px;">
+            <f:selectItems value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupsCustomItems}" />
+            <a4j:support event="onchange" reRender="showDeletedClients" />
+        </h:selectOneMenu>
+    </h:panelGrid>
+
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.detailedEnterEventReportPage.buildReportHTML}"

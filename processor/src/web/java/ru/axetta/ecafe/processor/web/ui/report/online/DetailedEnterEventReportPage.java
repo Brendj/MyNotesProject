@@ -8,14 +8,19 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DetailedEnterEventReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.event.ActionEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by anvarov on 06.04.18.
@@ -51,6 +55,8 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
     }
 
     private Boolean allFriendlyOrgs;
+
+    private final ClientFilter clientFilter = new ClientFilter();
 
     public void onReportPeriodChanged(javax.faces.event.ActionEvent event) {
         htmlReport = null;
@@ -114,6 +120,11 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
+                Properties properties = new Properties();
+                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+                properties.setProperty("groupName", groupNamesString);
+                builder.setReportProperties(properties);
+
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -168,6 +179,12 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
 
                 builder.setIdOfOrg(idOfOrg);
                 builder.setAllFriendlyOrgs(allFriendlyOrgs);
+
+                Properties properties = new Properties();
+                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+                properties.setProperty("groupName", groupNamesString);
+                builder.setReportProperties(properties);
+
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -232,4 +249,81 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         return htmlReport;
     }
 
+    public ClientFilter getClientFilter() {
+        return clientFilter;
+    }
+
+    public String getGroupNamesString(Session session, Long idOfOrg, Boolean allFriendlyOrgs) throws Exception {
+
+        String groupNamesString = "";
+
+        if (!clientFilter.getClientGroupId().equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_ALL)) {
+
+
+            if (clientFilter.getClientGroupId().equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
+
+                List<Long> groupIds = new ArrayList<Long>();
+
+                for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
+                    if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                        groupIds.add(predefined.getValue());
+                    }
+                }
+
+                List<ClientGroup> clientGroupList;
+
+                if (allFriendlyOrgs) {
+                    Org org = (Org) session.load(Org.class, idOfOrg);
+                    List<Long> idOfOrgList = new ArrayList<Long>();
+
+                    for (Org orgItem : org.getFriendlyOrg()) {
+                        idOfOrgList.add(orgItem.getIdOfOrg());
+                    }
+                    clientGroupList = getClientGroupByID(session, groupIds, idOfOrgList);
+                } else {
+                    clientGroupList = getClientGroupByID(session, groupIds, idOfOrg);
+                }
+
+                int i = 0;
+                for (ClientGroup clientGroup : clientGroupList) {
+                    groupNamesString = groupNamesString.concat(clientGroup.getGroupName());
+                    if (i < clientGroupList.size()) {
+                        groupNamesString = groupNamesString.concat(",");
+                        i++;
+                    }
+                }
+            } else if (clientFilter.getClientGroupId().equals(
+                    ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
+                int i = 0;
+                for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
+                    if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
+                        groupNamesString = groupNamesString.concat(predefined.getNameOfGroup());
+                        if (i < ClientGroup.Predefined.values().length) {
+                            groupNamesString = groupNamesString.concat(",");
+                            i++;
+                        }
+                    }
+                }
+            } else {
+                ClientGroup.Predefined parse = ClientGroup.Predefined.parse(clientFilter.getClientGroupId());
+                groupNamesString = parse.getNameOfGroup();
+            }
+        }
+
+        return groupNamesString;
+    }
+
+    private List<ClientGroup> getClientGroupByID(Session session, List<Long> groupIds, List<Long> idOfOrgList) {
+        Criteria criteria = session.createCriteria(ClientGroup.class);
+        criteria.add(Restrictions.in("compositeIdOfClientGroup.idOfOrg", idOfOrgList));
+        criteria.add(Restrictions.not(Restrictions.in("compositeIdOfClientGroup.idOfClientGroup", groupIds)));
+        return criteria.list();
+    }
+
+    public List<ClientGroup> getClientGroupByID(Session session, List<Long> groupIds, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(ClientGroup.class);
+        criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.not(Restrictions.in("compositeIdOfClientGroup.idOfClientGroup", groupIds)));
+        return criteria.list();
+    }
 }

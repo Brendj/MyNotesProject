@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -36,6 +37,7 @@ import java.util.*;
  * Created by anvarov on 06.04.18.
  */
 public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
+
     /*
         * Параметры отчета для добавления в правила и шаблоны
         *
@@ -55,7 +57,8 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
     private final static Logger logger = LoggerFactory.getLogger(DetailedEnterEventReport.class);
 
-    public DetailedEnterEventReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime, Date endTime, Long idOfOrg) {
+    public DetailedEnterEventReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime,
+            Date endTime, Long idOfOrg) {
         super(generateTime, generateDuration, jasperPrint, startTime, endTime, idOfOrg);
     }
 
@@ -121,8 +124,8 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                     jasperPrint, startTime, endTime, orgLoad.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
-                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
+        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime, Calendar calendar,
+                Map<String, Object> parameterMap) throws Exception {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
 
             //Список организаций
@@ -142,9 +145,28 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                 friendlyOrgs = getFriendlyOrg(session, org);
             }
 
+            //группа фильтр
+            String groupName = reportProperties.getProperty("groupName");
+
+            ArrayList<String> groupList = new ArrayList<String>();
+
+            if (groupName != null) {
+                String[] groups = StringUtils.split(groupName, ",");
+                for (String str : groups) {
+                    groupList.add(str);
+                }
+            }
+
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
 
-            List<Client> allByOrg = clientDao.findAllByOrg(ids);
+            List<Client> allByOrg;
+
+            if (!groupList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
+            } else {
+                allByOrg = clientDao.findAllByOrg(ids);
+            }
+
             List<Data> currentClassList;
             Map<String, StClass> stClassMap = new HashMap<String, StClass>();
 
