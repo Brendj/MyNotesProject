@@ -8,8 +8,8 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.1000000000000325"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.zoom" value="1.0000000000000295"/>
+	<property name="ireport.x" value="566"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -314,7 +314,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Сводный отчет по посещению"+'\n'
+				<textFieldExpression><![CDATA["Сводный отчет по посещению "+'\n'
 +$P{shortNameInfoService}]]></textFieldExpression>
 			</textField>
 			<staticText>
