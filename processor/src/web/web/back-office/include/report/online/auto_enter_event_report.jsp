@@ -20,7 +20,7 @@
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.detailedEnterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
+        <rich:calendar value="#{mainPage.autoEnterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text"
                        showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar,autoEnterEventReportPanel"
