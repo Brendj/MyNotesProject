@@ -25,9 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.event.ActionEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.*;
@@ -205,7 +205,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                     facesContext.getResponseComplete();
                     facesContext.responseComplete();
                     response.setContentType("application/xls");
-                    response.setHeader("Content-disposition", "inline;filename=typesOfCardReport.xls");
+                    response.setHeader("Content-disposition", "inline;filename=DetailedEnterEventReport.xls");
                     JRXlsExporter xlsExporter = new JRXlsExporter();
                     xlsExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
                     xlsExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
@@ -287,7 +287,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                 int i = 0;
                 for (ClientGroup clientGroup : clientGroupList) {
                     groupNamesString = groupNamesString.concat(clientGroup.getGroupName());
-                    if (i < clientGroupList.size()) {
+                    if (i < clientGroupList.size() - 2) {
                         groupNamesString = groupNamesString.concat(",");
                         i++;
                     }
@@ -298,10 +298,10 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                 for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
                     if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
                         groupNamesString = groupNamesString.concat(predefined.getNameOfGroup());
-                        if (i < ClientGroup.Predefined.values().length) {
+                        if (i < ClientGroup.Predefined.values().length - 2) {
                             groupNamesString = groupNamesString.concat(",");
-                            i++;
                         }
+                        i++;
                     }
                 }
             } else {

@@ -50,8 +50,8 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
         *
         * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
         */
-    public static final String REPORT_NAME = "Детализированного отчета по проходам";
-    public static final String[] TEMPLATE_FILE_NAMES = {".jasper"};
+    public static final String REPORT_NAME = "Детализированный отчет по посещению";
+    public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventV2Report.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
 
@@ -150,11 +150,26 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
             ArrayList<String> groupList = new ArrayList<String>();
 
-            if (groupName != null) {
+            if (groupName != null && !groupName.equals("")) {
                 String[] groups = StringUtils.split(groupName, ",");
                 for (String str : groups) {
                     groupList.add(str);
                 }
+            }
+
+            String groupNameWhere = "";
+
+            if (!groupList.isEmpty()) {
+                int i = 0;
+                String groupNameQuery = "";
+                for (String group : groupList) {
+                    groupNameQuery = groupNameQuery + "'" + group + "'";
+                    if (i < groupList.size() - 1) {
+                        groupNameQuery = groupNameQuery + ", ";
+                    }
+                    i++;
+                }
+                groupNameWhere = " AND cg.groupname in (" + groupNameQuery + ")";
             }
 
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
@@ -196,8 +211,8 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
                             + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
-                            + "     AND cs.idofclientgroup != 1100000060 "
-                            + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
+                            + "     AND cs.idofclientgroup != 1100000060 " + groupNameWhere
+                            + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime");
 
             query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
             List rList = query.list();

@@ -1413,7 +1413,7 @@
         <a4j:support event="onclick" action="#{passReportsGroupPage.show}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="detailedEnterEventReportMenuItem" binding="#{mainPage.detailedEnterEventReportPage.mainMenuComponent}"
-                            label="Детализированного отчета по проходам" action="#{mainPage.showDetailedEnterEventReportPage}"
+                            label="Детализированный отчет по посещению" action="#{mainPage.showDetailedEnterEventReportPage}"
                             reRender="workspaceForm" />
 
         <rich:panelMenuItem id="autoEnterEventReportMenuItem"

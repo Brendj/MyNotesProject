@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AutoEnterEventV2Report" pageWidth="3842" pageHeight="595" orientation="Landscape" columnWidth="3802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1d170b57-aa65-44a1-9f22-08debbf9674a">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AutoEnterEventV2Report" pageWidth="940" pageHeight="15000" orientation="Landscape" columnWidth="900" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1d170b57-aa65-44a1-9f22-08debbf9674a">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -62,7 +62,7 @@
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement uuid="92930ba2-5d5b-4416-92fd-e83db0418073" x="0" y="59" width="900" height="20"/>
+				<reportElement uuid="92930ba2-5d5b-4416-92fd-e83db0418073" positionType="Float" x="0" y="59" width="900" height="20"/>
 				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -76,7 +76,7 @@
 				<text><![CDATA[Детализированный отчет по посещению]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="815df2f5-8037-4eb5-a00c-225ed9222ec8" x="0" y="39" width="900" height="20"/>
+				<reportElement uuid="815df2f5-8037-4eb5-a00c-225ed9222ec8" positionType="Float" x="0" y="39" width="900" height="20"/>
 				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -85,9 +85,9 @@
 		</band>
 	</title>
 	<detail>
-		<band height="178" splitType="Stretch">
+		<band height="173" splitType="Stretch">
 			<crosstab ignoreWidth="true">
-				<reportElement uuid="70db53cf-3607-420e-93c6-7457b0ef514a" x="0" y="53" width="900" height="125"/>
+				<reportElement uuid="70db53cf-3607-420e-93c6-7457b0ef514a" positionType="Float" x="0" y="53" width="900" height="114"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -105,7 +105,7 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="7804660e-94a6-4ceb-9ca5-d2dd1f9f1ad2" style="Crosstab Data Text" x="0" y="0" width="204" height="63"/>
+							<reportElement uuid="7804660e-94a6-4ceb-9ca5-d2dd1f9f1ad2" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="204" height="63"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
@@ -118,7 +118,7 @@
 							<text><![CDATA[Ф.И.О.]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="85a7c605-00da-4ecd-86b7-e12fc69da471" style="Crosstab Data Text" x="204" y="0" width="70" height="63"/>
+							<reportElement uuid="85a7c605-00da-4ecd-86b7-e12fc69da471" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="204" y="0" width="70" height="63"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
@@ -142,7 +142,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="8f39eeda-8e0c-4ab9-b8b3-7ed23b72b2ad" style="Crosstab Data Text" x="0" y="0" width="204" height="50">
+								<reportElement uuid="8f39eeda-8e0c-4ab9-b8b3-7ed23b72b2ad" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="204" height="50">
 									<propertyExpression name="net.sf.jasperreports.export.xls.row.outline.level.1"><![CDATA["1"]]></propertyExpression>
 								</reportElement>
 								<box>
@@ -170,7 +170,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="63b3b0af-154a-4cdf-9e94-962ce81cc4a4" style="Crosstab Data Text" x="0" y="0" width="70" height="50"/>
+								<reportElement uuid="63b3b0af-154a-4cdf-9e94-962ce81cc4a4" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="70" height="50"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -196,7 +196,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="df76537f-1d13-4361-965b-53de2f39449e" style="Crosstab Data Text" x="0" y="0" width="526" height="33"/>
+								<reportElement uuid="df76537f-1d13-4361-965b-53de2f39449e" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="526" height="33"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -209,7 +209,7 @@
 								<textFieldExpression><![CDATA[$V{f05}]]></textFieldExpression>
 							</textField>
 							<staticText>
-								<reportElement uuid="a8e7ee42-52c4-4716-b603-8b21e1d084ec" style="Crosstab Data Text" x="0" y="33" width="50" height="30"/>
+								<reportElement uuid="a8e7ee42-52c4-4716-b603-8b21e1d084ec" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="33" width="50" height="30"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -222,7 +222,7 @@
 								<text><![CDATA[Вход]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="bc5ea2f5-0cbb-452e-8858-449050658982" style="Crosstab Data Text" x="50" y="33" width="70" height="30"/>
+								<reportElement uuid="bc5ea2f5-0cbb-452e-8858-449050658982" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="50" y="33" width="70" height="30"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -235,7 +235,7 @@
 								<text><![CDATA[Выход]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="bd33f08f-26e3-415a-9e1b-c40eb4fe4c49" style="Crosstab Data Text" x="120" y="33" width="102" height="30"/>
+								<reportElement uuid="bd33f08f-26e3-415a-9e1b-c40eb4fe4c49" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="120" y="33" width="102" height="30"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -248,7 +248,7 @@
 								<text><![CDATA[Присутствие]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="979ef54f-a42e-4320-a831-37c37410f010" style="Crosstab Data Text" x="222" y="33" width="304" height="30"/>
+								<reportElement uuid="979ef54f-a42e-4320-a831-37c37410f010" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="222" y="33" width="304" height="30"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -265,7 +265,7 @@
 					<crosstabTotalColumnHeader>
 						<cellContents>
 							<staticText>
-								<reportElement uuid="c7aa1528-4e43-4fe4-8a8c-3c3bbb29eaaf" x="0" y="1" width="100" height="32"/>
+								<reportElement uuid="c7aa1528-4e43-4fe4-8a8c-3c3bbb29eaaf" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="33"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -278,7 +278,7 @@
 								<text><![CDATA[Всего]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="814a532a-93fd-49ef-8c3f-b2352f8af313" x="0" y="33" width="100" height="30"/>
+								<reportElement uuid="814a532a-93fd-49ef-8c3f-b2352f8af313" stretchType="RelativeToBandHeight" x="0" y="33" width="100" height="30"/>
 								<box>
 									<topPen lineWidth="0.5"/>
 									<leftPen lineWidth="0.5"/>
@@ -314,7 +314,7 @@
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="7cfdf929-8dba-4ad0-ba63-e43d69734638" style="Crosstab Data Text" x="0" y="0" width="50" height="50"/>
+							<reportElement uuid="7cfdf929-8dba-4ad0-ba63-e43d69734638" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="50" height="50"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
@@ -325,7 +325,7 @@
 							<textFieldExpression><![CDATA[$V{f06Measure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="ea80c152-48f7-4316-af77-3c9ebf3b11e2" style="Crosstab Data Text" x="50" y="0" width="70" height="50"/>
+							<reportElement uuid="ea80c152-48f7-4316-af77-3c9ebf3b11e2" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="50" y="0" width="70" height="50"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
@@ -336,7 +336,7 @@
 							<textFieldExpression><![CDATA[$V{f07}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="fce743a2-9112-4437-b514-5525815a7375" style="Crosstab Data Text" x="120" y="0" width="102" height="50"/>
+							<reportElement uuid="fce743a2-9112-4437-b514-5525815a7375" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="120" y="0" width="102" height="50"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
@@ -347,7 +347,7 @@
 							<textFieldExpression><![CDATA[$V{f08}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="73a775cc-28e2-48eb-bcac-0e2b865c4e5f" style="Crosstab Data Text" x="222" y="0" width="304" height="50"/>
+							<reportElement uuid="73a775cc-28e2-48eb-bcac-0e2b865c4e5f" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="222" y="0" width="304" height="50"/>
 							<box>
 								<topPen lineWidth="0.5"/>
 								<leftPen lineWidth="0.5"/>
@@ -365,7 +365,7 @@
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="9b20800e-d6ac-4346-8d78-8a5e878263ce" style="Crosstab Data Text" x="0" y="0" width="100" height="50"/>
+							<reportElement uuid="9b20800e-d6ac-4346-8d78-8a5e878263ce" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="50"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{f10}]]></textFieldExpression>
 						</textField>
@@ -373,7 +373,7 @@
 				</crosstabCell>
 			</crosstab>
 			<textField>
-				<reportElement uuid="dcac91b8-c623-46d1-b5bb-d853a5d3f21e" x="0" y="10" width="900" height="28"/>
+				<reportElement uuid="dcac91b8-c623-46d1-b5bb-d853a5d3f21e" positionType="Float" x="0" y="10" width="900" height="28"/>
 				<textElement>
 					<font size="16" isBold="true" isUnderline="true"/>
 				</textElement>
