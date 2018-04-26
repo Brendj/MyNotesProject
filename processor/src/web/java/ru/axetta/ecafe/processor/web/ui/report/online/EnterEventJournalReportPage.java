@@ -303,20 +303,20 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                 int i = 0;
                 for (ClientGroup clientGroup : clientGroupList) {
                     groupNamesString = groupNamesString.concat(clientGroup.getGroupName());
-                    if (i < clientGroupList.size()) {
+                    if (i < clientGroupList.size() - 2) {
                         groupNamesString = groupNamesString.concat(",");
-                        i++;
                     }
+                    i++;
                 }
             } else if (clientFilter.getClientGroupId().equals(ClientGroupMenu.CLIENT_PREDEFINED)) {
                 int i = 0;
                 for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
                     if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {
                         groupNamesString = groupNamesString.concat(predefined.getNameOfGroup());
-                        if (i < ClientGroup.Predefined.values().length) {
+                        if (i < ClientGroup.Predefined.values().length - 2) {
                             groupNamesString = groupNamesString.concat(",");
-                            i++;
                         }
+                        i++;
                     }
                 }
             } else {
