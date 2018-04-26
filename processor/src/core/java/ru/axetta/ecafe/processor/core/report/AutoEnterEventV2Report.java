@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.Data;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
@@ -104,16 +103,24 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             startTime = CalendarUtils.truncateToDayOfMonth(startTime);
 
-
             //группа фильтр
-            String groupName = reportProperties.getProperty("groupName");
-
-            //л/с
-            String contractId = reportProperties.getProperty("contractId");
-
-            ArrayList<String> groupList = new ArrayList<String>();
+            String groupName;
+            if (reportProperties.getProperty("groupName") == null) {
+                groupName = null;
+            } else {
+                groupName = reportProperties.getProperty("groupName");
+            }
 
             List<Long> contractIdList = new ArrayList<Long>();
+
+            //л/с
+            String contractId;
+            if (reportProperties.getProperty("contractId") != null && !reportProperties.getProperty("contractId").equals("null")) {
+                contractId = reportProperties.getProperty("contractId");
+                contractIdList.add(Long.valueOf(contractId));
+            }
+
+            ArrayList<String> groupList = new ArrayList<String>();
 
             if (groupName != null) {
                 String[] groups = StringUtils.split(groupName, ",");
@@ -122,12 +129,14 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                 }
             }
 
-            if(contractId != null) {
-                contractIdList.add(Long.valueOf(contractId));
-            }
+            Boolean isAllFriendlyOrgs;
 
             //по все корпусам фильтр
-            Boolean isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            if (reportProperties.getProperty("isAllFriendlyOrgs") == null) {
+                isAllFriendlyOrgs = true;
+            } else {
+                isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            }
 
             //Список организаций
             Set<Long> ids = new HashSet<Long>();

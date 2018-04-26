@@ -241,7 +241,7 @@ public class ReportRepository extends BaseJpaDao {
             return null; //не переданы или заполнены с ошибкой обязательные параметры
         }
         BasicJasperReport jasperReport = buildAutoEnterEventV2Report(session, reportParameters);
-        if (jasperReport == null || isEmptyReportPrintPages(jasperReport)) {
+        if (jasperReport == null || isEmptyReportPrintPagesOrZero(jasperReport)) {
             return null;
         }
         ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
@@ -467,8 +467,11 @@ public class ReportRepository extends BaseJpaDao {
                 properties.setProperty("groupName", reportParameters.getGroupName());
             }
 
-            String isAllFriendlyOrgs = reportParameters.getIsAllFriendlyOrgs();
-            properties.setProperty("isAllFriendlyOrgs", isAllFriendlyOrgs);
+            if (reportParameters.getIsAllFriendlyOrgs() != null) {
+                properties.setProperty("isAllFriendlyOrgs", reportParameters.getIsAllFriendlyOrgs());
+            } else {
+                properties.setProperty("isAllFriendlyOrgs", "true");
+            }
 
             builder.setReportProperties(properties);
 
@@ -501,8 +504,11 @@ public class ReportRepository extends BaseJpaDao {
                 properties.setProperty("contractId", String.valueOf(reportParameters.getIdOfContract()));
             }
 
-            String isAllFriendlyOrgs = reportParameters.getIsAllFriendlyOrgs();
-            properties.setProperty("isAllFriendlyOrgs", isAllFriendlyOrgs);
+            if (reportParameters.getIsAllFriendlyOrgs() != null) {
+                properties.setProperty("isAllFriendlyOrgs", reportParameters.getIsAllFriendlyOrgs());
+            } else {
+                properties.setProperty("isAllFriendlyOrgs", "true");
+            }
 
             builder.setReportProperties(properties);
 
@@ -534,7 +540,13 @@ public class ReportRepository extends BaseJpaDao {
 
             builder.setReportProperties(properties);
 
-            boolean isAllFriendlyOrgs = Boolean.parseBoolean(reportParameters.getIsAllFriendlyOrgs());
+            boolean isAllFriendlyOrgs;
+
+            if (reportParameters.getIsAllFriendlyOrgs() == null) {
+                isAllFriendlyOrgs = true;
+            } else {
+                isAllFriendlyOrgs = Boolean.parseBoolean(reportParameters.getIsAllFriendlyOrgs());
+            }
 
             if (isAllFriendlyOrgs) {
                 builder.setAllFriendlyOrgs(true);

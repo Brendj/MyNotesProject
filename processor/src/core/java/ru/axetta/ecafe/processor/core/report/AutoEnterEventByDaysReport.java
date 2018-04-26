@@ -207,7 +207,13 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             //orgCriteria.setProjection(Property.forName("friendlyOrg"));
 
             //по все корпусам фильтр
-            Boolean isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            Boolean isAllFriendlyOrgs;
+
+            if (reportProperties.getProperty("isAllFriendlyOrgs") == null) {
+                isAllFriendlyOrgs = true;
+            } else {
+                isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            }
 
             Set<Long> ids = new HashSet<Long>();
 
@@ -226,7 +232,12 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
             //группа фильтр
-            String groupName = reportProperties.getProperty("groupName");
+            String groupName;
+            if (reportProperties.getProperty("groupName") == null) {
+                groupName = null;
+            } else {
+                groupName = reportProperties.getProperty("groupName");
+            }
 
             ArrayList<String> groupList = new ArrayList<String>();
 
