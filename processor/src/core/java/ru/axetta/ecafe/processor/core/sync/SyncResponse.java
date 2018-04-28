@@ -362,6 +362,7 @@ public class SyncResponse {
             private final Long balanceToNotify;
             private final String san;
             private final Boolean specialMenu;
+            private final String passportNumber;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -402,6 +403,7 @@ public class SyncResponse {
                 this.balanceToNotify = client.getBalanceToNotify();
                 this.san = client.getSan();
                 this.specialMenu = client.getSpecialMenu();
+                this.passportNumber = client.getPassportNumber();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -589,6 +591,9 @@ public class SyncResponse {
                 if (this.specialMenu != null) {
                     element.setAttribute("SpecialMenu", this.specialMenu ? "1" : "0");
                 }
+                if (this.passportNumber != null) {
+                    element.setAttribute("PassportNumber", this.passportNumber);
+                }
                 return element;
             }
 
@@ -603,6 +608,9 @@ public class SyncResponse {
 
             }
 
+            public String getPassportNumber() {
+                return passportNumber;
+            }
         }
 
         private final List<Item> items = new ArrayList<Item>();

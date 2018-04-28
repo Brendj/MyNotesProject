@@ -46,6 +46,22 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.disablePlanEndDate = disablePlanEndDate;
     }
 
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
+    }
+
+    public String getCardRequest() {
+        return cardRequest;
+    }
+
+    public void setCardRequest(String cardRequest) {
+        this.cardRequest = cardRequest;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -145,6 +161,8 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
+    private String passportNumber;
+    private String cardRequest;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -535,7 +553,10 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
 
         this.specialMenu = client.getSpecialMenu();
-
+        this.passportNumber = client.getPassportNumber();
+        if (!StringUtils.isEmpty(client.getPassportNumber())) {
+            this.cardRequest = DAOUtils.getCardRequestString(session, client);
+        }
 
         // Категории скидок старое не используется
         // TODO: переписать использутеся кривая логика с return! По этому не рекомендуется писать ниже код

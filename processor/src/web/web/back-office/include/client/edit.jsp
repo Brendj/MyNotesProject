@@ -192,6 +192,8 @@
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.guardsan}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Паспортные данные" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.passportNumber}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
@@ -376,6 +378,10 @@
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea rows="5" cols="64" value="#{mainPage.clientEditPage.remarks}" styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="Дополнительно" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.cardRequest}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
 </h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateClient}" reRender="mainMenu, workspaceTogglePanel, clientGuardianEditTable, clientWardEditTable"

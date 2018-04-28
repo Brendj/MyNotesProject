@@ -160,6 +160,8 @@
     <h:inputText value="#{mainPage.clientViewPage.san}" maxlength="11" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.guardsan}" maxlength="64" styleClass="input-text" readonly="true"/>
+    <h:outputText escape="true" value="Паспортные данные" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.passportNumber}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.externalId}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
@@ -308,6 +310,10 @@
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
     <h:inputTextarea readonly="true" rows="5" cols="64" value="#{mainPage.clientViewPage.remarks}"
                      styleClass="input-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" columns="2">
+    <h:outputText escape="true" value="Дополнительно" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.cardRequest}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showClientEditPage}"

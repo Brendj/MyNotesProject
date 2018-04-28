@@ -134,6 +134,7 @@ public class Client {
     private ClientCreatedFromType createdFrom;
     private String createdFromDesc;
     private Boolean specialMenu;
+    private String passportNumber;
 
     protected Client() {
         // For Hibernate only
@@ -1089,5 +1090,13 @@ public class Client {
 
     public void setSpecialMenu(Boolean preorder) {
         this.specialMenu = preorder;
+    }
+
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
     }
 }

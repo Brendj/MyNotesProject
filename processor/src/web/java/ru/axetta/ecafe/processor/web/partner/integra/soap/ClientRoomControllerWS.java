@@ -133,6 +133,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_SUBSCRIPTION_FEEDING_DUPLICATE = 190L;
     private static final Long RC_LACK_OF_SUBBALANCE1 = 200L;
     private static final Long RC_ERROR_CREATE_SUBSCRIPTION_FEEDING = 210L;
+    private static final Long RC_ERROR_CARD_EXISTS = 220L;
+    private static final Long RC_ERROR_CARDREQUEST_EXISTS = 221L;
     private static final Long RC_SUBSCRIPTION_FEEDING_NOT_FOUND = 230L;
     private static final Long RC_PROHIBIT_EXIST = 300L;
     private static final Long RC_PROHIBIT_NOT_FOUND = 310L;
@@ -7911,7 +7913,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result addGuardian(@WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
-            @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile) {
+            @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
+            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "typeCard") Integer typeCard) {
 
         authenticateRequest(null);
 
@@ -7961,12 +7964,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (guardian == null) {
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
-                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null);
+                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
                 guardian.setCreatedFromDesc(creatorMobile);
+                guardian.setPassportNumber(passportNumber);
                 session.update(guardian);
+            }
+
+            if (typeCard != null) {
+                if (!(typeCard == 1 || typeCard == 7)) return new Result(RC_INVALID_DATA, "Неверный тип карты");
+                Set<Card> cards = guardian.getCards();
+                if (cards != null) {
+                    for (Card card : cards) {
+                        if (card.getState().equals(Card.ACTIVE_STATE) && card.getCardType().equals(typeCard)) {
+                            return new Result(RC_ERROR_CARD_EXISTS, "У клиента уже есть активная карта выбранного типа");
+                        }
+                    }
+                }
+
+                if (DAOUtils.cardRequestExists(session, guardian)) {
+                    return new Result(RC_ERROR_CARDREQUEST_EXISTS, "Заявка на выдачу карты уже существует");
+                }
+                Long nextVersion = DAOUtils.nextVersionByCardRequest(session);
+                CardRequest cardRequest = new CardRequest(guardian, typeCard, creatorMobile, nextVersion);
+                session.save(cardRequest);
             }
 
             ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());

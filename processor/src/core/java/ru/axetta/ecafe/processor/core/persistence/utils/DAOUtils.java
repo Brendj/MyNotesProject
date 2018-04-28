@@ -2565,6 +2565,42 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByCardRequest(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select m.version from cf_card_requests as m order by m.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
+    public static boolean cardRequestExists(Session session, Client client) {
+        //ищем актуальные заявки по клиенту (не удаленные, и по которым не была выдана карта)
+        Query query = session.createQuery("select cr.idOfCardRequest from CardRequest cr "
+                + "where cr.client.idOfClient = :client and cr.deletedState = false and cr.cardIssueDate is null");
+        query.setParameter("client", client.getIdOfClient());
+        List res = query.list();
+        return res.size() > 0;
+    }
+
+    public static String getCardRequestString(Session session, Client client) {
+        Query query = session.createQuery("select cr from CardRequest cr where cr.client.idOfClient = :client and cr.deletedState = false order by cr.createdDate desc");
+        query.setMaxResults(1);
+        query.setParameter("client", client.getIdOfClient());
+        CardRequest cardRequest = null;
+        String result = null;
+        try {
+            cardRequest = (CardRequest)query.uniqueResult();
+            result = "Заказ карты";
+            if (cardRequest.getCardIssueDate() != null) {
+                result += ". " + String.format("Карта выдана %s", CalendarUtils.dateShortToString(cardRequest.getCardIssueDate()));
+            }
+        } catch (Exception notFound) {}
+        return result;
+    }
+
     public static long nextVersionByExternalEvent(Session session){
         long version = 0L;
         Query query = session.createSQLQuery(

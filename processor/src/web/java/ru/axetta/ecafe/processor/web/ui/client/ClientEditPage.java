@@ -73,6 +73,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.disablePlanEndDate = disablePlanEndDate;
     }
 
+    public String getPassportNumber() {
+        return passportNumber;
+    }
+
+    public void setPassportNumber(String passportNumber) {
+        this.passportNumber = passportNumber;
+    }
+
+    public String getCardRequest() {
+        return cardRequest;
+    }
+
+    public void setCardRequest(String cardRequest) {
+        this.cardRequest = cardRequest;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -267,6 +283,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
+    private String passportNumber;
+    private String cardRequest;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -684,7 +702,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.changePassword = false;
         this.categoriesDiscountsDSZN = ClientViewPage.getCategoriesDiscountsDSZNDesc(session, client);
 
-        fill(client);
+        fill(session, client);
     }
 
     public Boolean getAddClientGuardianButtonRendered() {
@@ -1063,10 +1081,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setAgeTypeGroup(this.ageTypeGroup);
         this.categoriesDiscountsDSZN = ClientViewPage.getCategoriesDiscountsDSZNDesc(persistenceSession, client);
         client.setSpecialMenu(this.specialMenu);
+        client.setPassportNumber(this.passportNumber);
 
         persistenceSession.update(client);
 
-        fill(client);
+        fill(persistenceSession, client);
 
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
@@ -1118,7 +1137,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         persistenceSession.delete(client);
     }
 
-    private void fill(Client client) throws Exception {
+    private void fill(Session session, Client client) throws Exception {
         this.idOfClient = client.getIdOfClient();
         this.org = new OrgItem(client.getOrg());
         this.person = new PersonItem(client.getPerson());
@@ -1170,6 +1189,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         removeListWardItems.clear();
         this.lastConfirmMobile = client.getLastConfirmMobile();
         this.specialMenu = client.getSpecialMenu();
+        this.passportNumber = client.getPassportNumber();
+        if (!StringUtils.isEmpty(client.getPassportNumber())) {
+            this.cardRequest = DAOUtils.getCardRequestString(session, client);
+        }
     }
 
     public String getIdOfCategoryListString() {
