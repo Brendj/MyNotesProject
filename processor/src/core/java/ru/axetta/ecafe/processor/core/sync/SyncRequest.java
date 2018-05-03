@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
@@ -2845,6 +2846,10 @@ public class SyncRequest {
 
     public PreOrdersFeedingRequest getPreOrderFeedingRequest() {
         return this.<PreOrdersFeedingRequest>findSection(PreOrdersFeedingRequest.class);
+    }
+
+    public CardRequests getCardRequests() {
+        return this.<CardRequests>findSection(CardRequests.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

@@ -22,6 +22,9 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
+import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
+import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
@@ -311,6 +314,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -783,7 +787,19 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
-        addPerformanceInfoAndResetDeltaTime(performanceLogger, "processPreOrderFeedingRequest", timeForDelta);
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processPreOrderFeedingRequest", timeForDelta);
+
+        try {
+            if (request.getCardRequests() != null) {
+                cardRequestsData = processCardRequestsData(request.getCardRequests());
+            }
+        } catch (Exception e) {
+            String message = String.format("processCardRequest: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        addPerformanceInfoAndResetDeltaTime(performanceLogger, "processCardRequests", timeForDelta);
+
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -2781,6 +2797,24 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resZeroTransactions;
+    }
+
+    private CardRequestsData processCardRequestsData(CardRequests cardRequests) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        CardRequestsData cardRequestsData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            CardRequestsProcessor processor = new CardRequestsProcessor(persistenceSession, cardRequests);
+            cardRequestsData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return cardRequestsData;
     }
 
     private ResComplexSchedules processComplexSchedules(ListComplexSchedules complexSchedules) throws Exception {
