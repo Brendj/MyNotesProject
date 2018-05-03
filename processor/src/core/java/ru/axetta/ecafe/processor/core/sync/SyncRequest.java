@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
+import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientGroupManagerBuilder;
@@ -2599,6 +2600,7 @@ public class SyncRequest {
             builders.add(new OrgFilesRequestBuilder(idOfOrg));
             builders.add(new HelpRequestBuilder(idOfOrg));
             builders.add(new PreOrdersFeedingBuilder(idOfOrg));
+            builders.add(new CardRequestsBuilder(idOfOrg));
             return builders;
         }
 

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
@@ -50,6 +51,14 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class SyncResponse {
+
+    public CardRequestsData getCardRequestsData() {
+        return cardRequestsData;
+    }
+
+    public void setCardRequestsData(CardRequestsData cardRequestsData) {
+        this.cardRequestsData = cardRequestsData;
+    }
 
     public static class AccRegistry implements AbstractToElement{
 
@@ -1151,6 +1160,7 @@ public class SyncResponse {
     private  ResHelpRequest resHelpRequest;
     private HelpRequestData helpRequestData;
     private PreOrdersFeeding preOrdersFeeding;
+    private CardRequestsData cardRequestsData;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1170,7 +1180,7 @@ public class SyncResponse {
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
-            ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding) {
+            ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1221,6 +1231,7 @@ public class SyncResponse {
         this.resHelpRequest = resHelpRequest;
         this.helpRequestData = helpRequestData;
         this.preOrdersFeeding = preOrdersFeeding;
+        this.cardRequestsData = cardRequestsData;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1466,6 +1477,10 @@ public class SyncResponse {
 
         if (preOrdersFeeding != null) {
             envelopeElement.appendChild(preOrdersFeeding.toElement(document));
+        }
+
+        if (cardRequestsData != null) {
+            envelopeElement.appendChild(cardRequestsData.toElement(document));
         }
     }
 

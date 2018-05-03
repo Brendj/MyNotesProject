@@ -811,7 +811,8 @@ public class Processor implements SyncProcessor {
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding);
+                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
+                cardRequestsData);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -1807,6 +1808,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1852,7 +1854,7 @@ public class Processor implements SyncProcessor {
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding);
+                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -1898,6 +1900,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1926,7 +1929,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -1972,6 +1975,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2000,7 +2004,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private SyncResponse buildSpecialDatesSyncResponse(SyncRequest request) throws Exception {
@@ -2046,6 +2050,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2074,7 +2079,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -2120,6 +2125,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2183,7 +2189,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -2249,6 +2255,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2334,7 +2341,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -2384,6 +2391,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2458,7 +2466,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -2505,6 +2513,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2610,7 +2619,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -5840,6 +5849,7 @@ public class Processor implements SyncProcessor {
         ResHelpRequest resHelpRequest = null;
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -5867,7 +5877,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding);
+                helpRequestData, preOrdersFeeding, cardRequestsData);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
