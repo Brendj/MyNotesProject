@@ -43,7 +43,6 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
 
     @Override
     public ClientGuardianData process() throws Exception {
-
         Criteria clientsCriteria = session.createCriteria(Client.class);
         clientsCriteria.createAlias("org", "o");
         clientsCriteria.add(Restrictions.in("o.idOfOrg", getFriendlyOrgsId(idOfOrg)));
@@ -58,7 +57,15 @@ public class ClientGuardianDataProcessor extends AbstractProcessor<ClientGuardia
 
         ClientGuardianData clientGuardianData;
         if (clientIds.size() > 0 || migrantIds.size() > 0) {
-
+            //todo переделать ниже на новый запрос
+            /*
+            select cg.*
+            from cf_client_guardian cg inner join cf_clients c1 on cg.idofchildren = c1.idofclient
+            where cg.version > 1112 and c1.idoforg in (1,2,3,4,5)
+            union
+            select cg.* from cf_client_guardian cg inner join cf_clients c2 on cg.idofguardian = c2.idofclient
+            where cg.version > 1112 and c2.idoforg in (1,2,3,4,5)
+             */
             List<ClientGuardian> clientList = new ArrayList<ClientGuardian>();
             if(clientIds.size() > 0) {
                 Criteria criteria = session.createCriteria(ClientGuardian.class);

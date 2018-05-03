@@ -2601,6 +2601,19 @@ public class DAOUtils {
         return result;
     }
 
+    public static void disableCardRequest(Session session, Long guardianContractId) {
+        Query query = session.createQuery("select cr from CardRequest cr where cr.client.idOfClient = :client and cr.deletedState = false order by cr.createdDate desc");
+        query.setMaxResults(1);
+        query.setParameter("client", guardianContractId);
+        try {
+            CardRequest cardRequest = (CardRequest)query.uniqueResult();
+            Long nextVersion = nextVersionByCardRequest(session);
+            cardRequest.setDeletedState(true);
+            cardRequest.setVersion(nextVersion);
+            session.update(cardRequest);
+        } catch (Exception notFound) {}
+    }
+
     public static long nextVersionByExternalEvent(Session session){
         long version = 0L;
         Query query = session.createSQLQuery(

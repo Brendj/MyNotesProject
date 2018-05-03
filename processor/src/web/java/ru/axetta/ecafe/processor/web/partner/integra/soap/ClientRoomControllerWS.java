@@ -8163,6 +8163,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cg.setVersion(newGuardiansVersions);
             session.update(cg);
 
+            DAOUtils.disableCardRequest(session, guardianContractId);
+
             transaction.commit();
             transaction = null;
             result.resultCode = RC_OK;

@@ -20,3 +20,8 @@ create table cf_card_requests
   version bigint NOT NULL,
   CONSTRAINT cf_card_requests_pk PRIMARY KEY (idofcardrequest)
 );
+
+--индексы для ускорения полной синхронизации
+CREATE INDEX cf_orgs_orgstructureversion_idx ON cf_orgs USING btree (orgstructureversion);
+
+CREATE INDEX cf_client_guardian_version_idx ON cf_client_guardian USING btree (version);
