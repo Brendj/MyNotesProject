@@ -39,8 +39,9 @@ public class CardRequestsProcessor extends AbstractProcessor<ResCardRequests> {
     public CardRequestsData processData() throws Exception {
         CardRequestsData result = new CardRequestsData();
         /*
-        заглушка пока
+        todo заглушка пока
          */
+        result.setItems(new ArrayList<ResCardRequestItem>());
         return result;
     }
 
