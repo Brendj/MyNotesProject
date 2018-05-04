@@ -87,7 +87,7 @@ public class PreorderDAOService {
         if (res != 1) throw new Exception("Client not found");
     }
 
-    private boolean isSpecialConfigDate(Client client, Date date) {
+    public boolean isSpecialConfigDate(Client client, Date date) {
         Long idOfOrg = client.getOrg().getIdOfOrg();
         String prop = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.specialDates", "");
         if (StringUtils.isEmpty(prop)) return false;
