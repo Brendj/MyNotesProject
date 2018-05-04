@@ -22,6 +22,10 @@ public class PreorderComplex {
     private Long usedSum;
     private Long usedAmount;
     private Set<PreorderMenuDetail> preorderMenuDetails;
+    private String complexName;
+    private Long complexPrice;
+    private Date createdDate;
+    private Date lastUpdate;
 
     public PreorderComplex() {
 
@@ -113,5 +117,37 @@ public class PreorderComplex {
 
     public void setUsedAmount(Long usedAmount) {
         this.usedAmount = usedAmount;
+    }
+
+    public String getComplexName() {
+        return complexName;
+    }
+
+    public void setComplexName(String complexName) {
+        this.complexName = complexName;
+    }
+
+    public Long getComplexPrice() {
+        return complexPrice;
+    }
+
+    public void setComplexPrice(Long complexPrice) {
+        this.complexPrice = complexPrice;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

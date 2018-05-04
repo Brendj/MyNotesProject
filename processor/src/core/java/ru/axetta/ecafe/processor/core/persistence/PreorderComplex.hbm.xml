@@ -24,6 +24,10 @@
         <property name="guid" column="guid" type="string" length="36" not-null="true"/>
         <property name="usedSum" column="usedsum" type="long" not-null="true"/>
         <property name="usedAmount" column="usedamount" type="long" not-null="true"/>
+        <property name="complexName" column="complexname" type="string" length="60"/>
+        <property name="complexPrice" column="complexprice" type="long"/>
+        <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <set name="preorderMenuDetails" inverse="true" cascade="all">
             <key column="idOfPreorderComplex"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail"/>

@@ -17,7 +17,8 @@
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="guid" column="guid" type="string" length="36" not-null="true"/>
         <property name="armIdOfMenu" column="armidofmenu" type="long" />
-        <!--<property name="idOfPreorderComplex" column="idofpreordercomplex" type="long" />-->
+        <property name="menuDetailName" column="menudetailname" type="string" length="512"/>
+        <property name="menuDetailPrice" column="menudetailprice" type="long"/>
         <many-to-one name="preorderComplex" class="ru.axetta.ecafe.processor.core.persistence.PreorderComplex"
                      column="IdOfPreorderComplex" not-null="true" fetch="select" />
     </class>

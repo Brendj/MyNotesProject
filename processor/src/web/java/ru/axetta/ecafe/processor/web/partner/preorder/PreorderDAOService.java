@@ -324,6 +324,7 @@ public class PreorderDAOService {
             try {
                 preorderComplex = (PreorderComplex) queryComplexSelect.getSingleResult();
                 preorderComplex.setAmount(complex.getAmount());
+                preorderComplex.setLastUpdate(new Date());
                 preorderComplex.setDeletedState(!complexSelected);
                 preorderComplex.setVersion(nextVersion);
             } catch (NoResultException e ) {
@@ -353,6 +354,11 @@ public class PreorderDAOService {
                     preorderMenuDetail.setPreorderDate(date);
                     preorderMenuDetail.setAmount(menuItem.getAmount());
                     preorderMenuDetail.setDeletedState(false);
+                    MenuDetail md = getMenuDetail(client, menuItem.getIdOfMenuDetail(), date);
+                    if (md != null) {
+                        preorderMenuDetail.setMenuDetailName(md.getMenuDetailName());
+                        preorderMenuDetail.setMenuDetailPrice(md.getPrice());
+                    }
                 }
                 set.add(preorderMenuDetail);
             }
@@ -372,18 +378,38 @@ public class PreorderDAOService {
         preorderComplex.setUsedSum(0L);
         preorderComplex.setUsedAmount(0L);
         preorderComplex.setArmComplexId(idOfComplex);
+        preorderComplex.setCreatedDate(new Date());
+        preorderComplex.setLastUpdate(new Date());
+        ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
+        if (ci != null) {
+            preorderComplex.setComplexName(ci.getComplexName());
+            preorderComplex.setComplexPrice(ci.getCurrentPrice());
+        }
         return preorderComplex;
     }
 
-    private ComplexInfoDetail getComplexInfoDetail(Long idOfComplexInfo, Long idOfMenuDetail) {
+    private ComplexInfo getComplexInfo(Client client, Integer idOfComplex, Date date) {
+        Query query = emReport.createQuery("select ci from ComplexInfo ci where ci.org.idOfOrg = :idOfOrg "
+                + "and ci.idOfComplex = :idOfComplex and ci.menuDate = :menuDate");
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("menuDate", date);
         try {
-            Query query = em.createQuery("select d from ComplexInfoDetail d "
-                    + "where d.complexInfo.idOfComplexInfo = :idOfComplexInfo and d.menuDetail.idOfMenuDetail = :idOfMenuDetail");
-            query.setParameter("idOfComplexInfo", idOfComplexInfo);
-            query.setParameter("idOfMenuDetail", idOfMenuDetail);
-            return (ComplexInfoDetail) query.getSingleResult();
+            return (ComplexInfo)query.getSingleResult();
         } catch (Exception e) {
-            logger.error(String.format("Error getComplexInfoDetail (ci=%s, md=%s)", idOfComplexInfo, idOfMenuDetail), e);
+            return null;
+        }
+    }
+
+    private MenuDetail getMenuDetail(Client client, Long idOfMenu, Date date) {
+        Query query = emReport.createQuery("select md from MenuDetail md where md.menu.org.idOfOrg = :idOfOrg "
+                + "and md.localIdOfMenu = :idOfMenu and md.menu.menuDate = :menuDate");
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("idOfMenu", idOfMenu);
+        query.setParameter("menuDate", date);
+        try {
+            return (MenuDetail)query.getSingleResult();
+        } catch (Exception e) {
             return null;
         }
     }

@@ -25,3 +25,12 @@ create table cf_card_requests
 CREATE INDEX cf_orgs_orgstructureversion_idx ON cf_orgs USING btree (orgstructureversion);
 
 CREATE INDEX cf_client_guardian_version_idx ON cf_client_guardian USING btree (version);
+
+--Цена и название блюда + комплекса в таблицаз предзаказов
+alter table cf_preorder_complex add column complexname character varying(60),
+  add column complexprice bigint,
+  add column createddate bigint,
+  add column lastupdate bigint;
+
+alter table cf_preorder_menudetail add column menudetailname character varying(512),
+  add column menudetailprice bigint;

@@ -18,6 +18,8 @@ public class PreorderMenuDetail {
     private String guid;
     private Long armIdOfMenu;
     private PreorderComplex preorderComplex;
+    private String menuDetailName;
+    private Long menuDetailPrice;
 
     public PreorderMenuDetail() {
 
@@ -87,4 +89,19 @@ public class PreorderMenuDetail {
         this.preorderComplex = preorderComplex;
     }
 
+    public String getMenuDetailName() {
+        return menuDetailName;
+    }
+
+    public void setMenuDetailName(String menuDetailName) {
+        this.menuDetailName = menuDetailName;
+    }
+
+    public Long getMenuDetailPrice() {
+        return menuDetailPrice;
+    }
+
+    public void setMenuDetailPrice(Long menuDetailPrice) {
+        this.menuDetailPrice = menuDetailPrice;
+    }
 }
