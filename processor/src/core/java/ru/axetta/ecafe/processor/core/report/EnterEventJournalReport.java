@@ -109,6 +109,19 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
                 throws Exception {
 
+
+            String eventState = reportProperties.getProperty("eventNums");
+
+            List<Integer> eventsNumList = new ArrayList<Integer>();
+
+            if (!eventState.equals("")) {
+                String [] eventArr = StringUtils.split(eventState, ",");
+
+                for (String str: eventArr) {
+                    eventsNumList.add(Integer.valueOf(str));
+                }
+            }
+
             //группа фильтр
             String groupNameFilter = reportProperties.getProperty("groupName");
 
@@ -140,6 +153,10 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 criteria.createAlias("org", "o").add(in("o.idOfOrg", idOfOrgList));
             } else {
                 criteria.createAlias("org", "o").add(eq("o.idOfOrg", idOfOrg));
+            }
+
+            if (!eventsNumList.isEmpty()){
+                criteria.add(Restrictions.in("passDirection", eventsNumList));
             }
 
             //criteria.createAlias("clientGroup", "cg");

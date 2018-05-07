@@ -25,8 +25,7 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{mainPage.enterEventJournalReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false">
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar,enterEventJournalReportPanelGrid"
                          actionListener="#{mainPage.enterEventJournalReportPage.onReportPeriodChanged}" />
         </rich:calendar>
@@ -42,8 +41,7 @@
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.enterEventJournalReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect,enterEventJournalReportPanelGrid"
                          actionListener="#{mainPage.enterEventJournalReportPage.onEndDateSpecified}" />
         </rich:calendar>
@@ -66,12 +64,19 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Группа" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupId}" styleClass="input-text"
-                     style="width: 145px;">
-        <f:selectItems value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupsCustomItems}" />
-        <a4j:support event="onchange" reRender="showDeletedClients" />
-    </h:selectOneMenu>
+        <h:outputText escape="true" value="Группа" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupId}"
+                         styleClass="input-text" style="width: 145px;">
+            <f:selectItems value="#{mainPage.enterEventJournalReportPage.clientFilter.clientGroupsCustomItems}" />
+            <a4j:support event="onchange" reRender="showDeletedClients" />
+        </h:selectOneMenu>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="События" styleClass="output-text" />
+        <h:selectManyListbox id="cardStateMenu" value="#{mainPage.enterEventJournalReportPage.eventState}">
+            <f:selectItems value="#{mainPage.enterEventJournalReportPage.eventStateSelectItemList}" />
+        </h:selectManyListbox>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">

@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.EnterEventJournalReport;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
@@ -42,6 +44,11 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     private String htmlReport = null;
+
+    private Integer[] eventState;
+    private SelectItem[] eventStateSelectItemList;
+    private String[] eventStates = EventState.values();
+    private List<DocumentState> stateList = new ArrayList<DocumentState>();
 
     public EnterEventJournalReportPage() throws RuntimeContext.NotInitializedException {
         super();
@@ -136,6 +143,14 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                 String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
                 properties.setProperty("groupName", groupNamesString);
 
+                String eventNums = "";
+
+                for (Integer event: eventState) {
+                    eventNums = eventNums + event + ",";
+                }
+
+                properties.setProperty("eventNums", eventNums);
+
                 builder.setReportProperties(properties);
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -197,6 +212,15 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                         String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
                         properties.setProperty("groupName", groupNamesString);
 
+                        String eventNums = "";
+
+
+                        for (Integer event1: eventState) {
+                                eventNums = eventNums + event1 + ",";
+                        }
+
+                        properties.setProperty("eventNums", eventNums);
+
                         builder.setReportProperties(properties);
                         report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                         persistenceTransaction.commit();
@@ -251,6 +275,38 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
 
     public String getHtmlReport() {
         return htmlReport;
+    }
+
+    public SelectItem[] getEventStateSelectItemList() {
+        return eventStateSelectItemList;
+    }
+
+    public Integer[] getEventState() {
+        return eventState;
+    }
+
+    public void setEventState(Integer[] eventState) {
+        this.eventState = eventState;
+    }
+
+    public List<DocumentState> getStateList() {
+        return stateList;
+    }
+
+    public void setEventStateSelectItemList(SelectItem[] eventStateSelectItemList) {
+        this.eventStateSelectItemList = eventStateSelectItemList;
+    }
+
+    public String[] getEventStates() {
+        return eventStates;
+    }
+
+    public void setEventStates(String[] eventStates) {
+        this.eventStates = eventStates;
+    }
+
+    public void setStateList(List<DocumentState> stateList) {
+        this.stateList = stateList;
     }
 
     public Boolean getAllFriendlyOrgs() {
@@ -326,6 +382,42 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
         }
 
         return groupNamesString;
+    }
+
+    @Override
+    public void onShow() {
+        eventStateSelectItemList = new SelectItem[eventStates.length];
+
+        for (int i = 0; i < eventStates.length; i++) {
+            if (eventStates[i].toString().equals("вход")) {
+                eventStateSelectItemList[i] = new SelectItem(0, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("выход")) {
+                eventStateSelectItemList[i] = new SelectItem(1, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("проход запрещен")) {
+                eventStateSelectItemList[i] = new SelectItem(2, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("взлом турникета")) {
+                eventStateSelectItemList[i] = new SelectItem(3, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("событие без прохода")) {
+                eventStateSelectItemList[i] = new SelectItem(4, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("отказ от прохода")) {
+                eventStateSelectItemList[i] = new SelectItem(5, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("повторный вход")) {
+                eventStateSelectItemList[i] = new SelectItem(6, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("повторный выход")) {
+                eventStateSelectItemList[i] = new SelectItem(7, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("обнаружен на подносе карты внутри здания")) {
+                eventStateSelectItemList[i] = new SelectItem(100, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("отмечен в классном журнале через внешнюю систему")) {
+                eventStateSelectItemList[i] = new SelectItem(101, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("отмечен учителем внутри здания")) {
+                eventStateSelectItemList[i] = new SelectItem(102, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("запрос на вход")) {
+                eventStateSelectItemList[i] = new SelectItem(8, eventStates[i].toString());
+            } else if (eventStates[i].toString().equals("запрос на выход")) {
+                eventStateSelectItemList[i] = new SelectItem(9, eventStates[i].toString());
+            }
+        }
+        stateList.clear();
     }
 
     private List<ClientGroup> getClientGroupByID(Session session, List<Long> groupIds, List<Long> idOfOrgList) {
