@@ -62,6 +62,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.cardRequest = cardRequest;
     }
 
+    public String getPassportSeries() {
+        return passportSeries;
+    }
+
+    public void setPassportSeries(String passportSeries) {
+        this.passportSeries = passportSeries;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -162,6 +170,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Date lastConfirmMobile;
     private Boolean specialMenu;
     private String passportNumber;
+    private String passportSeries;
     private String cardRequest;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
@@ -554,9 +563,8 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.specialMenu = client.getSpecialMenu();
         this.passportNumber = client.getPassportNumber();
-        if (!StringUtils.isEmpty(client.getPassportNumber())) {
-            this.cardRequest = DAOUtils.getCardRequestString(session, client);
-        }
+        this.passportSeries = client.getPassportSeries();
+        this.cardRequest = DAOUtils.getCardRequestString(session, client);
 
         // Категории скидок старое не используется
         // TODO: переписать использутеся кривая логика с return! По этому не рекомендуется писать ниже код

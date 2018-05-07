@@ -192,7 +192,9 @@
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.guardsan}" maxlength="64" styleClass="input-text" />
-    <h:outputText escape="true" value="Паспортные данные" styleClass="output-text" />
+    <h:outputText escape="true" value="Серия паспорта" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.passportSeries}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Номер паспорта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.passportNumber}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Внешний идентификатор" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>

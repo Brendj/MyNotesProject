@@ -2590,21 +2590,23 @@ public class DAOUtils {
         query.setMaxResults(1);
         query.setParameter("client", client.getIdOfClient());
         CardRequest cardRequest = null;
-        String result = null;
+        String result = "";
         try {
             cardRequest = (CardRequest)query.uniqueResult();
-            result = "Заказ карты";
-            if (cardRequest.getCardIssueDate() != null) {
-                result += ". " + String.format("Карта выдана %s", CalendarUtils.dateShortToString(cardRequest.getCardIssueDate()));
+            if (cardRequest != null) {
+                result = "Заказ карты";
+                if (cardRequest.getCardIssueDate() != null) {
+                    result += ". " + String.format("Карта выдана %s", CalendarUtils.dateShortToString(cardRequest.getCardIssueDate()));
+                }
             }
         } catch (Exception notFound) {}
         return result;
     }
 
-    public static void disableCardRequest(Session session, Long guardianContractId) {
+    public static void disableCardRequest(Session session, Long idOfClient) {
         Query query = session.createQuery("select cr from CardRequest cr where cr.client.idOfClient = :client and cr.deletedState = false order by cr.createdDate desc");
         query.setMaxResults(1);
-        query.setParameter("client", guardianContractId);
+        query.setParameter("client", idOfClient);
         try {
             CardRequest cardRequest = (CardRequest)query.uniqueResult();
             Long nextVersion = nextVersionByCardRequest(session);

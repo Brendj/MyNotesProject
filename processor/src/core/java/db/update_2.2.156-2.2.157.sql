@@ -5,7 +5,8 @@
 -- Пакет обновлений 2.2.157
 
 --Номер паспорта в таблице клиентов
-alter table cf_clients add column passportnumber character varying(20);
+alter table cf_clients add column passportnumber character varying(20),
+  add column passportseries character varying(20);
 
 --Таблица заявок на выдачу карты представителю
 create table cf_card_requests

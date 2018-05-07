@@ -497,7 +497,8 @@ public interface ClientRoomController {
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
             @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
-            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "typeCard") Integer typeCard);
+            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "passportSeries") String passportSeries,
+            @WebParam(name = "typeCard") Integer typeCard);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,

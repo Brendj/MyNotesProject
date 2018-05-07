@@ -1014,7 +1014,7 @@ public class ClientManager {
 
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
             String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
-            String createdFromDesc, Iterator<Long> iterator, String passportNumber) throws Exception {
+            String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1066,6 +1066,7 @@ public class ClientManager {
         clientGuardianToSave.setCreatedFrom(createdFrom);
         clientGuardianToSave.setCreatedFromDesc(createdFromDesc);
         clientGuardianToSave.setPassportNumber(passportNumber);
+        clientGuardianToSave.setPassportSeries(passportSeries);
         session.persist(clientGuardianToSave);
         return clientGuardianToSave;
     }
@@ -1105,7 +1106,7 @@ public class ClientManager {
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
                 registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
-                remark, null, organization, ClientCreatedFromType.REGISTRY, "", iterator, null);
+                remark, null, organization, ClientCreatedFromType.REGISTRY, "", iterator, null, null);
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),

@@ -89,6 +89,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.cardRequest = cardRequest;
     }
 
+    public String getPassportSeries() {
+        return passportSeries;
+    }
+
+    public void setPassportSeries(String passportSeries) {
+        this.passportSeries = passportSeries;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -284,6 +292,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Date lastConfirmMobile;
     private Boolean specialMenu;
     private String passportNumber;
+    private String passportSeries;
     private String cardRequest;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
@@ -1082,6 +1091,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.categoriesDiscountsDSZN = ClientViewPage.getCategoriesDiscountsDSZNDesc(persistenceSession, client);
         client.setSpecialMenu(this.specialMenu);
         client.setPassportNumber(this.passportNumber);
+        client.setPassportSeries(this.passportSeries);
 
         persistenceSession.update(client);
 
@@ -1190,9 +1200,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.lastConfirmMobile = client.getLastConfirmMobile();
         this.specialMenu = client.getSpecialMenu();
         this.passportNumber = client.getPassportNumber();
-        if (!StringUtils.isEmpty(client.getPassportNumber())) {
-            this.cardRequest = DAOUtils.getCardRequestString(session, client);
-        }
+        this.passportSeries = client.getPassportSeries();
+        this.cardRequest = DAOUtils.getCardRequestString(session, client);
     }
 
     public String getIdOfCategoryListString() {

@@ -135,6 +135,7 @@ public class Client {
     private String createdFromDesc;
     private Boolean specialMenu;
     private String passportNumber;
+    private String passportSeries;
 
     protected Client() {
         // For Hibernate only
@@ -1098,5 +1099,13 @@ public class Client {
 
     public void setPassportNumber(String passportNumber) {
         this.passportNumber = passportNumber;
+    }
+
+    public String getPassportSeries() {
+        return passportSeries;
+    }
+
+    public void setPassportSeries(String passportSeries) {
+        this.passportSeries = passportSeries;
     }
 }

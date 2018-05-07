@@ -372,6 +372,7 @@ public class SyncResponse {
             private final String san;
             private final Boolean specialMenu;
             private final String passportNumber;
+            private final String passportSeries;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -413,6 +414,7 @@ public class SyncResponse {
                 this.san = client.getSan();
                 this.specialMenu = client.getSpecialMenu();
                 this.passportNumber = client.getPassportNumber();
+                this.passportSeries = client.getPassportSeries();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -603,6 +605,9 @@ public class SyncResponse {
                 if (this.passportNumber != null) {
                     element.setAttribute("PassportNumber", this.passportNumber);
                 }
+                if (this.passportSeries != null) {
+                    element.setAttribute("PassportSeries", this.passportNumber);
+                }
                 return element;
             }
 
@@ -619,6 +624,10 @@ public class SyncResponse {
 
             public String getPassportNumber() {
                 return passportNumber;
+            }
+
+            public String getPassportSeries() {
+                return passportSeries;
             }
         }
 

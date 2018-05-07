@@ -7914,7 +7914,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
             @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
-            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "typeCard") Integer typeCard) {
+            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "passportSeries") String passportSeries,
+            @WebParam(name = "typeCard") Integer typeCard) {
 
         authenticateRequest(null);
 
@@ -7964,12 +7965,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (guardian == null) {
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
-                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber);
+                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
                 guardian.setCreatedFromDesc(creatorMobile);
                 guardian.setPassportNumber(passportNumber);
+                guardian.setPassportSeries(passportSeries);
                 session.update(guardian);
             }
 
@@ -8163,7 +8165,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cg.setVersion(newGuardiansVersions);
             session.update(cg);
 
-            DAOUtils.disableCardRequest(session, guardianContractId);
+            DAOUtils.disableCardRequest(session, guardian.getIdOfClient());
 
             transaction.commit();
             transaction = null;
