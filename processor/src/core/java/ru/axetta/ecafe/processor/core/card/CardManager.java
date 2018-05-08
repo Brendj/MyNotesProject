@@ -55,6 +55,9 @@ public interface CardManager {
     Long createCard(Long idOfClient, Long cardNo, Integer cardType, Date validTime, String lockReason, Date issueTime,
             Long cardPrintedNo) throws Exception;
 
+    void reissueCard(Session persistenceSession, Long idOfClient, Long cardNo, Integer cardType, Integer state, Date validTime, Integer lifeState,
+            String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception;
+
     class NewCardItem{
         private Long cardPrintedNo;
         private Integer cardType;

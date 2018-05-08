@@ -3087,4 +3087,10 @@ public class DAOUtils {
         return forbiddenDays;
     }
 
+    public static Card getLastCardByClient(Session persistenceSession, Client client){
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("client", client)).addOrder(org.hibernate.criterion.Order.desc("createTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
+    }
 }

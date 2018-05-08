@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
-import generated.registry.manual_synch.Exception_Exception;
 import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -23,6 +22,7 @@ import ru.axetta.ecafe.processor.web.ui.card.*;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.cardoperator.CardOperatorListPage;
 import ru.axetta.ecafe.processor.web.ui.cardoperator.CardRegistrationAndIssuePage;
+import ru.axetta.ecafe.processor.web.ui.cardoperator.CardRegistrationConfirm;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountCreatePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
@@ -126,9 +126,9 @@ public class MainPage implements Serializable {
     private String currentConfigurationProvider;
     /* Параметр фильтра по организациям в странице выбора списка оганизаций
      * если строка не пуста и заполнена номерами идентификаторов организаций
-      * то отобразится диалоговое окно с организациями где будут помечены галочками
-      * те организации идентификаторы которых перечислены черз запятую в этой строке
-      * иначе отобразится весь список организаций без проставленных галочек*/
+     * то отобразится диалоговое окно с организациями где будут помечены галочками
+     * те организации идентификаторы которых перечислены черз запятую в этой строке
+     * иначе отобразится весь список организаций без проставленных галочек*/
     private String orgFilterOfSelectOrgListSelectPage = "";
     private List<Long> idOfContragentOrgList = null;
     private List<Long> idOfContragentList = null;
@@ -372,6 +372,7 @@ public class MainPage implements Serializable {
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
     private final UserSelectPage userSelectPage = new UserSelectPage();
     private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
+    private final CardRegistrationConfirm cardRegistrationConfirm = new CardRegistrationConfirm();
 
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
@@ -10149,5 +10150,98 @@ public class MainPage implements Serializable {
 
     public SyncMonitorPage getSyncMonitorPage() {
         return syncMonitorPage;
+    }
+
+    public CardRegistrationConfirm getCardRegistrationConfirm() {
+        return cardRegistrationConfirm;
+    }
+
+    public Object verificationCardData(){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if(cardRegistrationAndIssuePage.isClientHasNotBlockedCard()){
+                throw new Exception("Данный клиент имеет незаблокированную(ые) карту(ы).");
+            }
+            String cardType = Card.TYPE_NAMES[cardRegistrationAndIssuePage.getCardType()];
+            if(cardType.equals("Mifare") || cardType.equals("Браслет (Mifare)")){
+                Client client = (Client) persistenceSession.load(Client.class, cardRegistrationAndIssuePage.getClient().getIdOfClient());
+                Card lastCard = DAOUtils.getLastCardByClient(persistenceSession, client);
+                if(lastCard == null) cardRegistrationAndIssuePage.createCard();
+                String cardLockReason = lastCard.getLockReason();
+                if (cardLockReason.equals(CardLockReason.REISSUE_BROKEN.getDescription()) || cardLockReason.equals(CardLockReason.REISSUE_LOSS.getDescription())){
+                    modalPages.push(cardRegistrationConfirm);
+                    cardRegistrationConfirm.prepareADialogue(cardType);
+                } else {
+                    cardRegistrationAndIssuePage.createCard();
+                }
+            } else {
+                cardRegistrationAndIssuePage.createCard();
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to verifi card", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при проверке данных карты: " + e.getMessage(),
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object confirmReissueCard() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try{
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            cardRegistrationAndIssuePage.reissueCard(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Карта зарегистрирована успешно", null));
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == cardRegistrationConfirm) {
+                    modalPages.pop();
+                }
+            }
+        } catch(Exception e){
+            logger.error("Failed to re-issue card", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при заказе карты: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object cancelReissueCard() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == cardRegistrationConfirm) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete user selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора пользователя: " + e.getMessage(), null));
+        }
+        return null;
     }
 }

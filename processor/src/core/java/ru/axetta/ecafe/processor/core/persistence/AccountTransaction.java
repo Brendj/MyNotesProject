@@ -31,6 +31,7 @@ public class AccountTransaction {
     public static final int CANCEL_TRANSACTION_SOURCE_TYPE = 30;
     public static final int ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE = 40;
     public static final int ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE = 50;
+    public static final int CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE = 60;
 
     public static String sourceTypeToString(int sourceType) {
         if (sourceType==PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE) return "Платежная система";
@@ -41,6 +42,7 @@ public class AccountTransaction {
         else if (sourceType==CANCEL_TRANSACTION_SOURCE_TYPE) return "Отмена";
         else if (sourceType==ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE) return "Перевод между счетами";
         else if (sourceType==ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE) return "Возврат средств";
+        else if (sourceType==CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE) return "Покупка карты";
         return "Неизвестно";
     }
 

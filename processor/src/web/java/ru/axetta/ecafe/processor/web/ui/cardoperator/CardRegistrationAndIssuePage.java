@@ -190,4 +190,21 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
     public void onCardRead() {
         cardNo = cardNoHidden;
     }
+
+    public void reissueCard(Session session) throws Exception {
+        if (client == null || client.getIdOfClient() == null) {
+            throw new Exception("Выберите клиента для привязки карты");
+        }
+        if (isClientHasNotBlockedCard()){
+            throw new Exception("Данный клиент имеет незаблокированную(ые) карту(ы).");
+        }
+        if (cardNo == null || cardNo.equals(0L)) {
+            throw new Exception("Введите номер карты.");
+        }
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        validTime = CalendarUtils.endOfDay(validTime);
+        RuntimeContext.getInstance().getCardManager().reissueCard(session, this.client.getIdOfClient(),  this.cardNo, this.cardType, CardState.ISSUED.getValue(),
+                            this.validTime, 1, this.lockReason, this.issueTime,
+                            this.cardPrintedNo, user);
+    }
 }

@@ -7,7 +7,6 @@
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
-
 <script>
     var socket = new WebSocket("ws://localhost:8001");
     socket.onmessage = function(event) {
@@ -53,8 +52,11 @@
                    converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Зарегистрировать новую карту" action="#{mainPage.cardRegistrationAndIssuePage.createCard}"
-                       styleClass="command-button" />
+    <a4j:commandButton value="Зарегистрировать новую карту" action="#{mainPage.verificationCardData}"
+                       oncomplete="if (#{facesContext.maximumSeverity == null})#{rich:component('cardRegistrationConfirm')}.show();"
+                       reRender="cardRegistrationConfirm"
+                       styleClass="command-button">
+    </a4j:commandButton>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

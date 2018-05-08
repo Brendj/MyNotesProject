@@ -83,6 +83,9 @@
         <c:import url="include/commodity_accounting/configuration_provider/product/select.jsp" />
     </f:subview>
 
+    <f:subview id="cardRegistrationConfirmSubView">
+        <c:import url="include/cardoperator/card_create_confirm.jsp" />
+    </f:subview>
 
     <f:subview id="technologicalMapGroupSelectSubView">
         <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/group/select.jsp" />

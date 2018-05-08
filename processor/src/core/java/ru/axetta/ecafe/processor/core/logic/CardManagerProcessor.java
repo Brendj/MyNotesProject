@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -32,6 +33,8 @@ public class CardManagerProcessor implements CardManager {
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
+    public static final Long PRICE_OF_MIFARE = 15000L;
+    public static final Long PRICE_OF_MIFARE_BRACELET = 29000L;
 
     public CardManagerProcessor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
@@ -97,7 +100,6 @@ public class CardManagerProcessor implements CardManager {
                 throw new Exception("У клиента уже есть активная карта.");
             }
         }
-
         logger.debug("clear active card");
         if (state == Card.ACTIVE_STATE) {
             lockActiveCards(persistenceSession, client.getCards());
@@ -118,7 +120,6 @@ public class CardManagerProcessor implements CardManager {
         historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo());
         historyCard.setUser(cardOperatorUser);
         persistenceSession.save(historyCard);
-
         return card.getIdOfCard();
     }
 
@@ -496,6 +497,24 @@ public class CardManagerProcessor implements CardManager {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    @Transactional
+    @Override
+    public void reissueCard(Session persistenceSession, Long idOfClient, Long cardNo, Integer cardType, Integer state, Date validTime, Integer lifeState,
+            String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception {
+        Client client = getClientReference(persistenceSession, idOfClient);
+        Long price = Card.TYPE_NAMES[cardType].equals("Mifare")? PRICE_OF_MIFARE : PRICE_OF_MIFARE_BRACELET;
+        if(client.getBalance() < price){
+            throw new Exception("Не хватает средств на лицевом счете. Текущий баланс: " + client.getBalance() / 100 + " р.");
+        }
+        AccountTransaction accountTransaction = null;
+        Date currTime = new Date();
+        accountTransaction = ClientAccountManager.processAccountTransaction(persistenceSession, client, null, -price, "",
+                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, currTime);
+        createCard(persistenceSession, idOfClient, cardNo, cardType, state, validTime, lifeState,
+                lockReason, issueTime, cardPrintedNo, user);
+        persistenceSession.save(accountTransaction);
     }
 
     private Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient,
