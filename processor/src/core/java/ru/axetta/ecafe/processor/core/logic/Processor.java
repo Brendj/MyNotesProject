@@ -3823,6 +3823,12 @@ public class Processor implements SyncProcessor {
                 if (clientParamItem.getBalanceToNotify() != null) {
                     client.setBalanceToNotify((clientParamItem.getBalanceToNotify()));
                 }
+                if (clientParamItem.getPassportNumber() != null) {
+                    client.setPassportNumber(clientParamItem.getPassportNumber());
+                }
+                if (clientParamItem.getPassportSeries() != null) {
+                    client.setPassportSeries(clientParamItem.getPassportSeries());
+                }
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());

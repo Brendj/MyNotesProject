@@ -7976,7 +7976,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             if (typeCard != null) {
-                if (!(typeCard == 1 || typeCard == 7)) return new Result(RC_INVALID_DATA, "Неверный тип карты");
+                //допустимые типы карт - Mifare или соц. карта москвича - смотрим по массиву типов карт в Card
+                if (!(typeCard == 1 || typeCard == 8)) return new Result(RC_INVALID_DATA, "Неверный тип карты");
                 Set<Card> cards = guardian.getCards();
                 if (cards != null) {
                     for (Card card : cards) {

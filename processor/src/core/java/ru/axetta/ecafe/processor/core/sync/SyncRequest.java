@@ -98,6 +98,14 @@ public class SyncRequest {
                 return disablePlanEndDate;
             }
 
+            public String getPassportNumber() {
+                return passportNumber;
+            }
+
+            public String getPassportSeries() {
+                return passportSeries;
+            }
+
             public static class Builder {
 
                 public Builder() {
@@ -155,6 +163,8 @@ public class SyncRequest {
                     }
                     Long orgOwner = getLongValueNullSafe(namedNodeMap, "OrgId");
                     String san = getStringValueNullSafe(namedNodeMap, "San");
+                    String passportNumber = getStringValueNullSafe(namedNodeMap, "PassportNumber");
+                    String passportSeries = getStringValueNullSafe(namedNodeMap, "PassportSeries");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime, discountMode,
                             categoriesDiscounts, name, surname, secondName, address, phone, mobilePhone, middleGroup,
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
@@ -162,7 +172,8 @@ public class SyncRequest {
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
                             canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
-                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner, san);
+                            gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner, san,
+                            passportNumber, passportSeries);
                 }
 
 
@@ -189,6 +200,8 @@ public class SyncRequest {
             private final Date disablePlanEndDate;
             private final Long orgOwner;
             private final String san;
+            private final String passportNumber;
+            private final String passportSeries;
 
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
@@ -196,7 +209,7 @@ public class SyncRequest {
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
                     String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
-                    Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner, String san) {
+                    Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner, String san, String passportNumber, String passportSeries) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -229,6 +242,8 @@ public class SyncRequest {
                 this.disablePlanEndDate = disablePlanEndDate;
                 this.orgOwner = orgOwner;
                 this.san = san;
+                this.passportNumber = passportNumber;
+                this.passportSeries = passportSeries;
             }
 
             public long getIdOfClient() {
