@@ -7976,6 +7976,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             if (typeCard != null) {
+                if (StringUtils.isEmpty(passportNumber) || StringUtils.isEmpty(passportSeries)) {
+                    return new Result(RC_INVALID_DATA, "Не указаны серия и номер паспорта для создания заявки на карту");
+                }
                 //допустимые типы карт - Mifare или соц. карта москвича - смотрим по массиву типов карт в Card
                 if (!(typeCard == 1 || typeCard == 8)) return new Result(RC_INVALID_DATA, "Неверный тип карты");
                 Set<Card> cards = guardian.getCards();
