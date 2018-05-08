@@ -606,7 +606,7 @@ public class SyncResponse {
                     element.setAttribute("PassportNumber", this.passportNumber);
                 }
                 if (this.passportSeries != null) {
-                    element.setAttribute("PassportSeries", this.passportNumber);
+                    element.setAttribute("PassportSeries", this.passportSeries);
                 }
                 return element;
             }
