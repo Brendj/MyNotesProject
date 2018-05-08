@@ -500,7 +500,9 @@ public class ReportRepository extends BaseJpaDao {
 
             if (reportParameters.getGroupName() != null) {
                 properties.setProperty("groupName", reportParameters.getGroupName());
-            } else {
+            }
+
+            if (reportParameters.getIdOfContract() != null) {
                 properties.setProperty("contractId", String.valueOf(reportParameters.getIdOfContract()));
             }
 

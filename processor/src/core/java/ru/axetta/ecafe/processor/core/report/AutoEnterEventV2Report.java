@@ -162,12 +162,16 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
             List<Client> allByOrg = new ArrayList<Client>();
 
-            if (!contractIdList.isEmpty()) {
+            if (!groupList.isEmpty() && contractIdList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
+            }
+
+            if (!contractIdList.isEmpty() && groupList.isEmpty()) {
                 allByOrg = clientDao.findAllByOrgAndContractId(ids, contractIdList);
             }
 
-            if (!groupList.isEmpty()) {
-                allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
+            if (!contractIdList.isEmpty() && !groupList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndContractIdAndGroupNames(ids, contractIdList, groupList);
             }
 
             List<Data> currentClassList;
