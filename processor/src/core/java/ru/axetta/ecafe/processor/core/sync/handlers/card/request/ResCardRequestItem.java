@@ -28,6 +28,8 @@ public class ResCardRequestItem {
     private Long idOfClient;
     private Date cardIssueDate;
     private Boolean deletedState;
+    private Long cardNo;
+    private String guid;
 
     public ResCardRequestItem() {
 
@@ -41,14 +43,18 @@ public class ResCardRequestItem {
         this.setIdOfClient(cr.getClient().getIdOfClient());
         this.setCardIssueDate(cr.getCardIssueDate());
         this.setDeletedState(cr.getDeletedState());
+        this.setGuid(cr.getGuid());
+        this.setCardNo(cr.getCard() == null ? null : cr.getCard().getCardNo());
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
+        XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "TypeCard", typeCard);
         XMLUtils.setAttributeIfNotNull(element, "Mobile", mobile);
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
+        XMLUtils.setAttributeIfNotNull(element, "CardNo", cardNo);
         if (createdDate != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedDate", CalendarUtils.dateShortToStringFullYear(createdDate));
         }
@@ -116,5 +122,21 @@ public class ResCardRequestItem {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public Long getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(Long cardNo) {
+        this.cardNo = cardNo;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

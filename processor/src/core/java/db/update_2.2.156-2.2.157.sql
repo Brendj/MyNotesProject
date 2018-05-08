@@ -12,14 +12,21 @@ alter table cf_clients add column passportnumber character varying(20),
 create table cf_card_requests
 (
   idofcardrequest bigserial NOT NULL,
+  guid character varying(36),
   typecard integer NOT NULL,
   idofclient bigint NOT NULL,
   createddate bigint NOT NULL,
   mobile character varying(32),
   cardissuedate bigint,
+  idofcard bigint,
   deletedstate integer NOT NULL DEFAULT 0,
+  deletedate bigint,
   version bigint NOT NULL,
-  CONSTRAINT cf_card_requests_pk PRIMARY KEY (idofcardrequest)
+  CONSTRAINT cf_card_requests_pk PRIMARY KEY (idofcardrequest),
+  CONSTRAINT cf_card_requests_idofcard_fk FOREIGN KEY (idofcard)
+  REFERENCES cf_cards (idofcard) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_card_requests_idofclient_fk FOREIGN KEY (idofclient)
+  REFERENCES cf_clients (idofclient) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 --индексы для ускорения полной синхронизации

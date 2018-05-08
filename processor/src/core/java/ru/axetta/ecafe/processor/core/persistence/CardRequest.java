@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class CardRequest {
     private Long idOfCardRequest;
@@ -11,6 +12,9 @@ public class CardRequest {
     private Client client;
     private Date cardIssueDate;
     private Boolean deletedState;
+    private Date deleteDate;
+    private String guid;
+    private Card card;
 
     public CardRequest() {
 
@@ -23,6 +27,7 @@ public class CardRequest {
         this.createdDate = new Date();
         this.deletedState = false;
         this.version = version;
+        this.guid = UUID.randomUUID().toString();
     }
 
     public Long getIdOfCardRequest() {
@@ -87,5 +92,29 @@ public class CardRequest {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
+
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
     }
 }

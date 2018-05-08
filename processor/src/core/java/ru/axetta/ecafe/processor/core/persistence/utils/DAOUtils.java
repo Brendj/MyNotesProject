@@ -2672,6 +2672,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<CardRequest> getCardRequestsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Org org = (Org)session.load(Org.class, idOfOrg);
+        Criteria criteria = session.createCriteria(CardRequest.class);
+        criteria.add(Restrictions.eq("org", org));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
     public static List<SpecialDate> getSpecialDatesForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         Org org = (Org)session.load(Org.class, idOfOrg);
         Criteria criteria = session.createCriteria(SpecialDate.class);

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.card.request;
 
+import ru.axetta.ecafe.processor.core.persistence.CardRequest;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -38,10 +40,14 @@ public class CardRequestsProcessor extends AbstractProcessor<ResCardRequests> {
 
     public CardRequestsData processData() throws Exception {
         CardRequestsData result = new CardRequestsData();
-        /*
-        todo заглушка пока
-         */
-        result.setItems(new ArrayList<ResCardRequestItem>());
+        List<ResCardRequestItem> items = new ArrayList<ResCardRequestItem>();
+        List<CardRequest> requests = DAOUtils.getCardRequestsForOrgSinceVersion(session,
+                cardRequests.getIdOfOrgOwner(), cardRequests.getMaxVersion());
+        for (CardRequest cardRequest : requests) {
+            ResCardRequestItem item = new ResCardRequestItem(cardRequest);
+            items.add(item);
+        }
+        result.setItems(items);
         return result;
     }
 
