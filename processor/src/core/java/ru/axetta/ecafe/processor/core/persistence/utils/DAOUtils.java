@@ -2672,9 +2672,9 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List<CardRequest> getCardRequestsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
-        Query query = session.createQuery("select cr from CardRequest cr join cr.client cl where cl.org.idOfOrg = :idOfOrg and cr.version > :version");
-        query.setParameter("idOfOrg", idOfOrg);
+    public static List<CardRequest> getCardRequestsForOrgSinceVersion(Session session, List<Long> idOfOrgs, long version) throws Exception {
+        Query query = session.createQuery("select cr from CardRequest cr join cr.client cl where cl.org.idOfOrg in (:idOfOrgs) and cr.version > :version");
+        query.setParameterList("idOfOrgs", idOfOrgs);
         query.setParameter("version", version);
         return query.list();
     }

@@ -41,8 +41,9 @@ public class CardRequestsProcessor extends AbstractProcessor<ResCardRequests> {
     public CardRequestsData processData() throws Exception {
         CardRequestsData result = new CardRequestsData();
         List<ResCardRequestItem> items = new ArrayList<ResCardRequestItem>();
+        List<Long> orgs = DAOUtils.findFriendlyOrgIds(session, cardRequests.getIdOfOrgOwner());
         List<CardRequest> requests = DAOUtils.getCardRequestsForOrgSinceVersion(session,
-                cardRequests.getIdOfOrgOwner(), cardRequests.getMaxVersion());
+                orgs, cardRequests.getMaxVersion());
         for (CardRequest cardRequest : requests) {
             ResCardRequestItem item = new ResCardRequestItem(cardRequest);
             items.add(item);

@@ -213,6 +213,18 @@ public class CardWritableRepository extends WritableJpaDao {
     }
 
     public int issueToClient(CardsOperationsRegistryItem o,  long idOfOrg) {
+        if (o.getRequestGuid() != null) {
+            Card card = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
+            if (card != null) {
+                Query query = entityManager.createQuery("update CardRequest cr "
+                        + "set cr.card.idOfCard = :idOfCard, cr.cardIssueDate = :issueDate "
+                        + "where cr.guid = :guid");
+                query.setParameter("idOfCard", card.getIdOfCard());
+                query.setParameter("issueDate", o.getOperationDate());
+                query.setParameter("guid", o.getRequestGuid());
+                query.executeUpdate();
+            }
+        }
         Client client = ClientReadOnlyRepository.getInstance().findById(o.getIdOfClient());
         return entityManager.createQuery("update Card set "
                 + " client = :client, "
