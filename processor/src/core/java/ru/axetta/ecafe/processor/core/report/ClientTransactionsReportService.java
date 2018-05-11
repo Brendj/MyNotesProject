@@ -316,6 +316,33 @@ public class ClientTransactionsReportService {
             clientTransactionsReportItemList.add(clientTransactionsReportItem);
         }
 
+        if (accountTransaction.getSourceType() == 60) {
+            ClientTransactionsReportItem clientTransactionsReportItem = new ClientTransactionsReportItem();
+
+            clientTransactionsReportItem.setIdOfOrg(accountTransaction.getOrg().getIdOfOrg());
+
+            Set<ClientPayment> clientPayments = accountTransaction.getClientPayments();
+
+            if (clientPayments.size() > 0) {
+                for (ClientPayment clientPayment : clientPayments) {
+                    clientTransactionsReportItem.setContragent(clientPayment.getContragent().getContragentName());
+                }
+            } else {
+                clientTransactionsReportItem.setContragent("");
+            }
+            clientTransactionsReportItem.setOperationType("Покупка карты " +
+                    (accountTransaction.getTransactionSum().equals(-15000L)? "Mifare":"Mifare (Браслет)"));
+            clientTransactionsReportItem.setTransactionDescription("Списание");
+            clientTransactionsReportItem.setOrderNumber(String.valueOf(accountTransaction.getIdOfTransaction()));
+            clientTransactionsReportItem.setSumm(String.format("%d.%02d", accountTransaction.getTransactionSum() / 100,
+                    Math.abs(accountTransaction.getTransactionSum() % 100)));
+            clientTransactionsReportItem
+                    .setTransactionTime(CalendarUtils.dateTimeToString(accountTransaction.getTransactionTime()));
+            clientTransactionsReportItem.setPersonalAccount(accountTransaction.getClient().getContractId());
+
+            clientTransactionsReportItemList.add(clientTransactionsReportItem);
+        }
+
         return clientTransactionsReportItemList;
     }
 

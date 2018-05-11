@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -33,8 +34,8 @@ public class CardManagerProcessor implements CardManager {
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
-    public static final Long PRICE_OF_MIFARE = 15000L;
-    public static final Long PRICE_OF_MIFARE_BRACELET = 29000L;
+    public static final Long PRICE_OF_MIFARE = Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
+    public static final Long PRICE_OF_MIFARE_BRACELET = Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifareBracelet"));
 
     public CardManagerProcessor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
