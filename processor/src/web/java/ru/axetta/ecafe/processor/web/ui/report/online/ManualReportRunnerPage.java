@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -485,8 +486,10 @@ public class ManualReportRunnerPage extends OnlineReportPage
             Map<Long, String> res = new HashMap<Long, String>();
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
-                Org org = DAOService.getInstance().getOrg(idOfOrg);
-                res.put(org.getIdOfOrg(), org.getOfficialName());
+                String s = DAOReadonlyService.getInstance().getOrgOfficialName(idOfOrg);
+                if (s != null) {
+                    res.put(idOfOrg, s);
+                }
             }
             completeOrgListSelection(res);
         } catch (Exception e) {

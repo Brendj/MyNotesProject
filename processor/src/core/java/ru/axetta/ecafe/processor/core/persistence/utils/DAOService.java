@@ -1831,6 +1831,7 @@ public class DAOService {
             Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
             String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent,
             String contragent, Integer createState) {
+        if (endDate == null) endDate = startDate;
         ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
                 endDate, reportFile, orgNum, idOfOrg, tag, idOfContragent, contragent, idOfContragentReceiver,
                 contragentReceiver, createState);

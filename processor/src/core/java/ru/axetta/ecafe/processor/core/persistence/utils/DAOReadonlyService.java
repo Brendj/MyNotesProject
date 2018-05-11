@@ -482,4 +482,14 @@ public class DAOReadonlyService {
             return false;
         }
     }
+
+    public String getOrgOfficialName(Long idOfOrg) {
+        Query q = entityManager.createQuery("select o.officialName from Org o where idOfOrg = :idOfOrg", String.class);
+        q.setParameter("idOfOrg", idOfOrg);
+        try {
+            return (String) q.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
