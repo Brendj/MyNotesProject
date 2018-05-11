@@ -10,8 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.visitor.VisitorReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardSignVerifyType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
+import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -216,11 +218,15 @@ public class CardWritableRepository extends WritableJpaDao {
         if (o.getRequestGuid() != null) {
             Card card = CardReadOnlyRepository.getInstance().findByCardNo(o.getCardNo());
             if (card != null) {
+                Long version = DAOUtils.nextVersionByCardRequest((Session)entityManager.getDelegate());
                 Query query = entityManager.createQuery("update CardRequest cr "
-                        + "set cr.card.idOfCard = :idOfCard, cr.cardIssueDate = :issueDate "
+                        + "set cr.card.idOfCard = :idOfCard, "
+                        + "cr.cardIssueDate = :issueDate, "
+                        + "cr.version = :version "
                         + "where cr.guid = :guid");
                 query.setParameter("idOfCard", card.getIdOfCard());
                 query.setParameter("issueDate", o.getOperationDate());
+                query.setParameter("version", version);
                 query.setParameter("guid", o.getRequestGuid());
                 query.executeUpdate();
             }
