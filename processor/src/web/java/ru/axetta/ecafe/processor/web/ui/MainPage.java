@@ -10161,6 +10161,7 @@ public class MainPage implements Serializable {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        boolean doCreateCard = false;
         try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
@@ -10172,17 +10173,17 @@ public class MainPage implements Serializable {
             if(cardType.equals("Mifare") || cardType.equals("Браслет (Mifare)")){
                 Client client = (Client) persistenceSession.load(Client.class, cardRegistrationAndIssuePage.getClient().getIdOfClient());
                 Card lastCard = DAOUtils.getLastCardByClient(persistenceSession, client);
-                if(lastCard == null) cardRegistrationAndIssuePage.createCard();
-                String cardLockReason = lastCard.getLockReason();
-                if (cardLockReason.equals(CardLockReason.REISSUE_BROKEN.getDescription()) || cardLockReason.equals(CardLockReason.REISSUE_LOSS.getDescription())){
-                    modalPages.push(cardRegistrationConfirm);
-                    cardRegistrationConfirm.prepareADialogue(cardType);
-                } else {
-                    cardRegistrationAndIssuePage.createCard();
-                }
-            } else {
-                cardRegistrationAndIssuePage.createCard();
-            }
+                if(lastCard != null) {
+                    String cardLockReason = lastCard.getLockReason();
+                    if (cardLockReason != null) {
+                        if (cardLockReason.equals(CardLockReason.REISSUE_BROKEN.getDescription()) || cardLockReason.equals(CardLockReason.REISSUE_LOSS.getDescription())) {
+                            modalPages.push(cardRegistrationConfirm);
+                            cardRegistrationConfirm.prepareADialogue(cardType);
+                        } else doCreateCard = true;
+                    } else doCreateCard = true;
+                } else doCreateCard = true;
+            } else doCreateCard = true;
+            if(doCreateCard) cardRegistrationAndIssuePage.createCard();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
