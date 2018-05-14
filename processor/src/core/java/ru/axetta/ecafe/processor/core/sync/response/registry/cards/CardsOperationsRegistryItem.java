@@ -70,7 +70,7 @@ public class CardsOperationsRegistryItem {
         if("1".equals(getStringValueNullSafe(namedNodeMap, "IsTemp")) ){
             isTemp = true;
         }
-        String requestGuid = getStringValueNullSafe(namedNodeMap, "RequestGuid");
+        String requestGuid = getStringValueNullSafe(namedNodeMap, "GuidRequest");
         return new CardsOperationsRegistryItem(idOfOperation,cardNo,type,operationDate,idOfClient,globalId,staffGuid,
                 validDate, comment, isTemp, requestGuid);
     }
