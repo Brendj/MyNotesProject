@@ -220,6 +220,7 @@ public class ClientOrderList {
 
     public void fill(Session session, Client client, Date startTime, Date endTime) throws Exception {
         Criteria criteria = session.createCriteria(Order.class);
+        /* По какой-то причине это -> criteria.createAlias("transaction", "t") не дается выводиться льготным покупкам */
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.ge("createTime", startTime));
         criteria.add(Restrictions.le("createTime", CalendarUtils.addDays(endTime, 1)));
