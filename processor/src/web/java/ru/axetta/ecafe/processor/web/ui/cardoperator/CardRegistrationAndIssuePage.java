@@ -144,7 +144,7 @@ public class CardRegistrationAndIssuePage extends BasicWorkspacePage implements 
                     }
                 }
             }
-        }
+        } else this.client = new ClientItem();
     }
 
     public void createCard() throws Exception {

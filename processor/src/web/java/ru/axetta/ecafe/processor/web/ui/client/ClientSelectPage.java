@@ -317,6 +317,7 @@ public class ClientSelectPage extends BasicPage implements OrgSelectPage.Complet
             }
         }
         this.items = items;
+        this.selectedItem = new Item();
     }
 
     public void fill(Session session, Long idOfClient) throws Exception {
