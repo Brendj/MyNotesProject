@@ -7975,45 +7975,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 session.update(guardian);
             }
 
-            if (typeCard != null) {
-                if (StringUtils.isEmpty(passportNumber) || StringUtils.isEmpty(passportSeries)) {
-                    return new Result(RC_INVALID_DATA, "Не указаны серия и номер паспорта для создания заявки на карту");
-                }
-                //допустимые типы карт - Mifare или соц. карта москвича - смотрим по массиву типов карт в Card
-                if (!(typeCard == 1 || typeCard == 8)) return new Result(RC_INVALID_DATA, "Неверный тип карты");
-                Set<Card> cards = guardian.getCards();
-                if (cards != null) {
-                    for (Card card : cards) {
-                        if (card.getState().equals(Card.ACTIVE_STATE) && card.getCardType().equals(typeCard)) {
-                            return new Result(RC_ERROR_CARD_EXISTS, "У клиента уже есть активная карта выбранного типа");
-                        }
-                    }
-                }
-
-                if (DAOUtils.cardRequestExists(session, guardian)) {
-                    return new Result(RC_ERROR_CARDREQUEST_EXISTS, "Заявка на выдачу карты уже существует");
-                }
-                Long nextVersion = DAOUtils.nextVersionByCardRequest(session);
-                CardRequest cardRequest = new CardRequest(guardian, typeCard, creatorMobile, nextVersion);
-                session.save(cardRequest);
-            }
-
             ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
-                ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient(), ClientCreatedFromType.MPGU);
+                clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient(), ClientCreatedFromType.MPGU);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()){
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);
                 clientGuardian.setCreatedFrom(ClientCreatedFromType.MPGU);
                 session.update(clientGuardian);
-            } else {
-                return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
             }
+            session.flush();
+            result = addCardRequest(session, typeCard, passportNumber, passportSeries, guardian, creatorMobile, clientGuardian);
 
             transaction.commit();
             transaction = null;
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
+            return result;
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
@@ -8023,6 +7999,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private Result addCardRequest(Session session, Integer typeCard, String passportNumber, String passportSeries,
+            Client guardian, String creatorMobile, ClientGuardian clientGuardian) {
+        if (typeCard != null) {
+            if (StringUtils.isEmpty(passportNumber) || StringUtils.isEmpty(passportSeries)) {
+                return new Result(RC_INVALID_DATA, "Не указаны серия и номер паспорта для создания заявки на карту");
+            }
+            //допустимые типы карт - Mifare или соц. карта москвича - смотрим по массиву типов карт в Card
+            if (!(typeCard == 1 || typeCard == 8)) return new Result(RC_INVALID_DATA, "Неверный тип карты");
+            Set<Card> cards = guardian.getCards();
+            if (cards != null) {
+                for (Card card : cards) {
+                    if (card.getState().equals(Card.ACTIVE_STATE) && card.getCardType().equals(typeCard)) {
+                        return new Result(RC_ERROR_CARD_EXISTS, "У клиента уже есть активная карта выбранного типа");
+                    }
+                }
+            }
+
+            if (DAOUtils.cardRequestExists(session, guardian)) {
+                return new Result(RC_ERROR_CARDREQUEST_EXISTS, "Заявка на выдачу карты уже существует");
+            }
+            Long nextVersion = DAOUtils.nextVersionByCardRequest(session);
+            CardRequest cardRequest = new CardRequest(guardian, typeCard, creatorMobile, nextVersion);
+            session.save(cardRequest);
+            Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
+            clientGuardian.setCardRequest(cardRequest);
+            clientGuardian.setVersion(newGuardiansVersions);
+            session.update(clientGuardian);
+        }
+        return new Result(RC_OK, RC_OK_DESC);
     }
 
     /*private void testClientsForGuardianMethods(List<Client> clients) throws IllegalArgumentException {

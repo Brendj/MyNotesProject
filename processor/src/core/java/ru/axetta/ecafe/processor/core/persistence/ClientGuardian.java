@@ -27,6 +27,7 @@ public class ClientGuardian {
     private Set<ClientGuardianNotificationSetting> notificationSettings = new HashSet<ClientGuardianNotificationSetting>();
     private ClientCreatedFromType createdFrom;
     private Date lastUpdate;
+    private CardRequest cardRequest;
 
     protected ClientGuardian() {}
 
@@ -165,5 +166,13 @@ public class ClientGuardian {
 
     public void setCreatedFrom(ClientCreatedFromType createdFrom) {
         this.createdFrom = createdFrom;
+    }
+
+    public CardRequest getCardRequest() {
+        return cardRequest;
+    }
+
+    public void setCardRequest(CardRequest cardRequest) {
+        this.cardRequest = cardRequest;
     }
 }

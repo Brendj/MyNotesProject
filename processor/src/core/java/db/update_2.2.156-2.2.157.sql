@@ -42,3 +42,8 @@ alter table cf_preorder_complex add column complexname character varying(60),
 
 alter table cf_preorder_menudetail add column menudetailname character varying(512),
   add column menudetailprice bigint;
+
+alter table cf_client_guardian add column idofcardrequest bigint,
+ADD CONSTRAINT cf_client_guardian_cardrequest_fk FOREIGN KEY (idofcardrequest)
+REFERENCES cf_card_requests (idofcardrequest) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION;

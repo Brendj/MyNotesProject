@@ -1071,7 +1071,7 @@ public class ClientManager {
         return clientGuardianToSave;
     }
 
-    public static void createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
+    public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
             Long idOfClientChild, ClientCreatedFromType createdFrom) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
@@ -1098,6 +1098,7 @@ public class ClientManager {
         }
         clientGuardian.setLastUpdate(new Date());
         session.persist(clientGuardian);
+        return clientGuardian;
     }
 
     public static void applyGuardians(RegistryChangeGuardians registryChangeGuardians, Session persistenceSession,
