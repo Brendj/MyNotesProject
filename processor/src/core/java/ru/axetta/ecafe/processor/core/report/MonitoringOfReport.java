@@ -61,7 +61,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
         }
 
-        public BasicReportJob buildInternal(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        public BasicReportJob buildInternal(Date startTime, Date endTime, Calendar calendar) throws Exception {
             String reportsTemplateFilePath = RuntimeContext.getInstance().getAutoReportGenerator()
                     .getReportsTemplateFilePath();
 
@@ -129,7 +129,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, idOfOrgList);
+            JRDataSource dataSource = createDataSource(startTime, idOfOrgList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -139,15 +139,15 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date date = CalendarUtils.startOfDay(new Date());//вызов из построения по расписанию
-            return buildInternal(session, date, endTime, calendar);
+            return buildInternal(date, endTime, calendar);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, List<Long> idOfOrgList)
+        private JRDataSource createDataSource(Date startTime, List<Long> idOfOrgList)
                 throws Exception {
 
             MonitoringOfReportService service = new MonitoringOfReportService();
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(session, startTime, idOfOrgList));
+            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, idOfOrgList));
         }
     }
 
@@ -158,6 +158,24 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public MonitoringOfReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
+    }
+
+    @Override
+    protected void prepare() {
+        if (!hasPrint() && templateFilename != null && sessionFactory != null) {
+            templateFilename = AutoReportGenerator.restoreFilename(
+                    RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath(), templateFilename);
+            Builder builder = createBuilder(templateFilename);
+            try {
+                builder.setReportProperties(getReportProperties());
+                BasicReportJob report = builder.build(null, startTime, endTime, calendar);
+                setGenerateTime(report.getGenerateTime());
+                setGenerateDuration(report.getGenerateDuration());
+                setPrint(report.getPrint());
+            } catch (Exception e) {
+                getLogger().error(String.format("Failed at report lazy-build \"%s\"", MonitoringOfReport.class), e);
+            }
+        }
     }
 
     @Override

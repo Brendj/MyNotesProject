@@ -81,21 +81,12 @@ public class MonitoringOfReportPage extends OnlineReportPage {
         }
         MonitoringOfReport.Builder builder = new MonitoringOfReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.buildInternal(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            report = builder.buildInternal(startDate, endDate, localCalendar);
         }catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
         if (report != null) {
             try {

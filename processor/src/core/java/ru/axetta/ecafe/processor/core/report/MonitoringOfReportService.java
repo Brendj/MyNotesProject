@@ -4,14 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,8 +24,8 @@ import java.util.List;
  * Created by anvarov on 04.05.2017.
  */
 public class MonitoringOfReportService {
-
-    public List<ReportItem> buildReportItems(Session session, Date startTime, List<Long> idOfOrgList) {
+    final private static Logger logger = LoggerFactory.getLogger(MonitoringOfReportService.class);
+    public List<ReportItem> buildReportItems(Date startTime, List<Long> idOfOrgList) {
         List<DatePeriods> datePeriodsList = new ArrayList<DatePeriods>();
 
         int dayOfWeek = CalendarUtils.getDayOfWeek(startTime);
@@ -87,7 +90,7 @@ public class MonitoringOfReportService {
             datePeriodsList.add(datePeriodssss);
         }
 
-        List<ReportItem> reportItemList = getOrgData(session, idOfOrgList, datePeriodsList);
+        List<ReportItem> reportItemList = getOrgData(idOfOrgList, datePeriodsList);
 
         return reportItemList;
     }
@@ -869,56 +872,70 @@ public class MonitoringOfReportService {
         return numberOfPaidList;
     }
 
-    public List<ReportItem> getOrgData(Session session, List<Long> idOfOrgList, List<DatePeriods> datePeriodsList) {
+    public List<ReportItem> getOrgData(List<Long> idOfOrgList, List<DatePeriods> datePeriodsList) {
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
 
+        Session session = null;
+        Transaction transaction = null;
         for (Long idOfOrg : idOfOrgList) {
-            Org org = (Org) session.load(Org.class, idOfOrg);
-            ReportItem reportItem = new ReportItem();
-            reportItem.setOrgNum(org.getOrgNumberInName());
-            reportItem.setShortName(org.getShortNameInfoService());
-            reportItem.setAddress(org.getAddress());
-            reportItem.setIdOfOrg(String.valueOf(org.getIdOfOrg()));
-            reportItem.setCode(String.valueOf(org.getUniqueAddressId()));
-            reportItem.setDistrict(org.getDistrict());
-            reportItem.setTypeOfBuilding(org.getType().toString());
-            reportItem.setIntroductionQueue(org.getIntroductionQueue());
+            try {
+                session = RuntimeContext.getInstance().createReportPersistenceSession();
+                transaction = session.beginTransaction();
+                Org org = (Org) session.load(Org.class, idOfOrg);
+                ReportItem reportItem = new ReportItem();
+                reportItem.setOrgNum(org.getOrgNumberInName());
+                reportItem.setShortName(org.getShortNameInfoService());
+                reportItem.setAddress(org.getAddress());
+                reportItem.setIdOfOrg(String.valueOf(org.getIdOfOrg()));
+                reportItem.setCode(String.valueOf(org.getUniqueAddressId()));
+                reportItem.setDistrict(org.getDistrict());
+                reportItem.setTypeOfBuilding(org.getType().toString());
+                reportItem.setIntroductionQueue(org.getIntroductionQueue());
 
-            PeopleData peopleData = loadPeopleData(session, idOfOrg);
+                PeopleData peopleData = loadPeopleData(session, idOfOrg);
 
-            reportItem.setStudentsInDatabase(String.valueOf(peopleData.getAllPeoples()));
-            reportItem.setStudentsWithMaps(String.valueOf(peopleData.getStudentsWithCards()));
-            reportItem.setParents(String.valueOf(peopleData.getParents()));
-            reportItem.setPedagogicalComposition(String.valueOf(peopleData.getPedagogicalComposition()));
-            reportItem.setOtherEmployees(String.valueOf(peopleData.getOther()));
+                reportItem.setStudentsInDatabase(String.valueOf(peopleData.getAllPeoples()));
+                reportItem.setStudentsWithMaps(String.valueOf(peopleData.getStudentsWithCards()));
+                reportItem.setParents(String.valueOf(peopleData.getParents()));
+                reportItem.setPedagogicalComposition(String.valueOf(peopleData.getPedagogicalComposition()));
+                reportItem.setOtherEmployees(String.valueOf(peopleData.getOther()));
 
-            List<List<MonitoringOfItem>> monitoringOfItemList = getMonitoringOfItems(session, datePeriodsList, idOfOrg);
+                List<List<MonitoringOfItem>> monitoringOfItemList = getMonitoringOfItems(session, datePeriodsList,
+                        idOfOrg);
 
-            if (monitoringOfItemList.size() >= 1) {
-                reportItem.setMonitoringOfItemsMonday(monitoringOfItemList.get(0));
+                if (monitoringOfItemList.size() >= 1) {
+                    reportItem.setMonitoringOfItemsMonday(monitoringOfItemList.get(0));
+                }
+
+                if (monitoringOfItemList.size() >= 2) {
+                    reportItem.setMonitoringOfItemsTuesday(monitoringOfItemList.get(1));
+                }
+
+                if (monitoringOfItemList.size() >= 3) {
+                    reportItem.setMonitoringOfItemsWednesday(monitoringOfItemList.get(2));
+                }
+
+                if (monitoringOfItemList.size() >= 4) {
+                    reportItem.setMonitoringOfItemsThursday(monitoringOfItemList.get(3));
+                }
+
+                if (monitoringOfItemList.size() >= 5) {
+                    reportItem.setMonitoringOfItemsFriday(monitoringOfItemList.get(4));
+                }
+
+                if (monitoringOfItemList.size() == 6) {
+                    reportItem.setMonitoringOfItemsSaturday(monitoringOfItemList.get(5));
+                }
+
+                reportItemList.add(reportItem);
+                transaction.commit();
+                transaction = null;
+            } catch (Exception e) {
+                logger.error(String.format("Error in MonitoringOfReportService. IdOfOrg = %s. Error text: ", idOfOrg), e);
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
             }
-
-            if (monitoringOfItemList.size() >= 2) {
-                reportItem.setMonitoringOfItemsTuesday(monitoringOfItemList.get(1));
-            }
-
-            if (monitoringOfItemList.size() >= 3) {
-                reportItem.setMonitoringOfItemsWednesday(monitoringOfItemList.get(2));
-            }
-
-            if (monitoringOfItemList.size() >= 4) {
-                reportItem.setMonitoringOfItemsThursday(monitoringOfItemList.get(3));
-            }
-
-            if (monitoringOfItemList.size() >= 5) {
-                reportItem.setMonitoringOfItemsFriday(monitoringOfItemList.get(4));
-            }
-
-            if (monitoringOfItemList.size() == 6) {
-                reportItem.setMonitoringOfItemsSaturday(monitoringOfItemList.get(5));
-            }
-
-            reportItemList.add(reportItem);
         }
         return reportItemList;
     }
