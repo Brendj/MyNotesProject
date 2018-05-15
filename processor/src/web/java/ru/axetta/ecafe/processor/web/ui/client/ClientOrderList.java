@@ -220,7 +220,6 @@ public class ClientOrderList {
 
     public void fill(Session session, Client client, Date startTime, Date endTime) throws Exception {
         Criteria criteria = session.createCriteria(Order.class);
-        criteria.createAlias("transaction", "t");
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.ge("createTime", startTime));
         criteria.add(Restrictions.le("createTime", CalendarUtils.addDays(endTime, 1)));
