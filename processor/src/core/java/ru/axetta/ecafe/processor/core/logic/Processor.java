@@ -2453,6 +2453,14 @@ public class Processor implements SyncProcessor {
             logger.error(String.format("Failed to build AccountsRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
 
+        try {
+            if (request.getCardRequests() != null) {
+                cardRequestsData = processCardRequestsData(request.getCardRequests());
+            }
+        } catch (Exception e) {
+            String message = String.format("processCardRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
 
         Date syncEndTime = new Date();
 
