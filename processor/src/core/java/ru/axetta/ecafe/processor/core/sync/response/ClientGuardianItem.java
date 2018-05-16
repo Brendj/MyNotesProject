@@ -24,6 +24,7 @@ public class ClientGuardianItem {
     private ResultOperation result;
     private Boolean disabled;
     private Integer relation;
+    private String guidRequest;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -32,6 +33,9 @@ public class ClientGuardianItem {
         this.disabled = clientGuardian.isDisabled();
         this.deleteState = clientGuardian.getDeletedState() ? 1 : 0;
         this.relation = clientGuardian.getRelation() == null ? null : clientGuardian.getRelation().ordinal();
+        if (clientGuardian.getCardRequest() != null) {
+            this.guidRequest = clientGuardian.getCardRequest().getGuid();
+        }
         this.result = null;
     }
 
@@ -69,6 +73,7 @@ public class ClientGuardianItem {
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "D", deleteState);
         XMLUtils.setAttributeIfNotNull(element, "Relation", relation);
+        XMLUtils.setAttributeIfNotNull(element, "GuidRequest", guidRequest);
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
