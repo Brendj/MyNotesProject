@@ -310,11 +310,18 @@
         </f:facet>
         <h:outputText escape="true" value="#{item.createTime}" converter="timeConverter" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header" sortBy="#{item.transactionTime}">
+    <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Время транзакции" />
         </f:facet>
         <h:outputText escape="true" value="#{item.transactionTime}" converter="timeConverter"
+                      styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header" sortBy="#{item.orderDate}">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время пробития" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.orderDate}" converter="timeConverter"
                       styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">

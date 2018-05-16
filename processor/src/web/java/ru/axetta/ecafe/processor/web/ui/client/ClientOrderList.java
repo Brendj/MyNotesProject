@@ -27,6 +27,10 @@ public class ClientOrderList {
 
     public static class Item {
 
+        public Date getOrderDate() {
+            return orderDate;
+        }
+
         public static class OrgItem {
 
             private final Long idOfOrg;
@@ -107,6 +111,7 @@ public class ClientOrderList {
         private final Date createTime;
         private final Long idOfTransaction;
         private final Date transactionTime;
+        private final Date orderDate;
         private final Long sumByCard;
         private final Long sumByCash;
         private final List<Detail> details;
@@ -126,6 +131,7 @@ public class ClientOrderList {
             this.idOfCashier = order.getIdOfCashier();
             this.socDiscount = order.getSocDiscount();
             this.tradeDiscount = order.getTrdDiscount();
+            this.orderDate = order.getOrderDate();
             this.grantSum = order.getGrantSum();
             this.rSum = order.getRSum();
             this.createTime = order.getCreateTime();
@@ -220,7 +226,6 @@ public class ClientOrderList {
 
     public void fill(Session session, Client client, Date startTime, Date endTime) throws Exception {
         Criteria criteria = session.createCriteria(Order.class);
-        /* По какой-то причине это -> criteria.createAlias("transaction", "t") не дается выводиться льготным покупкам */
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.ge("createTime", startTime));
         criteria.add(Restrictions.le("createTime", CalendarUtils.addDays(endTime, 1)));
