@@ -142,7 +142,8 @@ public class ImportMigrantsService {
                     session.save(createResolutionHistory(session, client, compositeIdOfMigrant.getIdOfRequest(),
                             VisitReqResolutionHist.RES_CREATED, date));
                     session.flush();
-                    session.save(createResolutionHistory(session, client, compositeIdOfMigrant.getIdOfRequest(), resolution, date));
+                    session.save(createResolutionHistory(session, client, compositeIdOfMigrant.getIdOfRequest(), resolution,
+                            CalendarUtils.addSeconds(date, 1)));
                 } else {    // сравниваем, если надо - обновляем
                     if (!migrant.getOrgRegVendor().equals(client.getOrg().getDefaultSupplier())) {
                         migrant.setOrgRegVendor(client.getOrg().getDefaultSupplier());
