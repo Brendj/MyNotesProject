@@ -34,8 +34,12 @@ public class CardManagerProcessor implements CardManager {
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
-    public static final Long PRICE_OF_MIFARE = Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
-    public static final Long PRICE_OF_MIFARE_BRACELET = Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifareBracelet"));
+    public static Long getPriceOfMifare() {
+        return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
+    }
+    public static Long getPriceOfMifareBracelet() {
+        return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifareBracelet"));
+    }
 
     public CardManagerProcessor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
@@ -506,7 +510,7 @@ public class CardManagerProcessor implements CardManager {
     public void reissueCard(Session persistenceSession, Long idOfClient, Long cardNo, Integer cardType, Integer state, Date validTime, Integer lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception {
         Client client = getClientReference(persistenceSession, idOfClient);
-        Long price = Card.TYPE_NAMES[cardType].equals("Mifare")? PRICE_OF_MIFARE : PRICE_OF_MIFARE_BRACELET;
+        Long price = Card.TYPE_NAMES[cardType].equals("Mifare")? getPriceOfMifare() : getPriceOfMifareBracelet();
         if(client.getBalance() < price){
             throw new Exception("Не хватает средств на лицевом счете. Текущий баланс: " + client.getBalance() / 100 + " р.");
         }

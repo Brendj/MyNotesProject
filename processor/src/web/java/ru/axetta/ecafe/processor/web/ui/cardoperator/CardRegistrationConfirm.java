@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.cardoperator;
 
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -29,7 +30,7 @@ public class CardRegistrationConfirm extends BasicWorkspacePage {
     public void prepareADialogue(String cardType) {
         message = "Внимание! За предоставленную услугу с лицевого счета клиента будет списана сумма в размере "
                 + (cardType.equals("Mifare")?
-                CardManagerProcessor.PRICE_OF_MIFARE / 100 + " руб.":CardManagerProcessor.PRICE_OF_MIFARE_BRACELET / 100 + " руб.")
+                CardManagerProcessor.getPriceOfMifare() / 100 + " руб.":CardManagerProcessor.getPriceOfMifareBracelet() / 100 + " руб.")
                 + " за карту " + cardType;
     }
 }
