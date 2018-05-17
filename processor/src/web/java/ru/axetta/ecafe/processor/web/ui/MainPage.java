@@ -7266,34 +7266,6 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object buildEnterEventReport() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            enterEventReportPage.buildReport(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to build enter event report", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(),
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
-        return null;
-    }
-
     public String showEnterEventCSVList() {
         return "showEnterEventCSVList";
     }
