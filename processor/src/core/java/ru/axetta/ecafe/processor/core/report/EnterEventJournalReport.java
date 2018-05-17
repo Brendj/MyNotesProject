@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
@@ -25,9 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
-import static org.hibernate.criterion.Restrictions.between;
-import static org.hibernate.criterion.Restrictions.eq;
-import static org.hibernate.criterion.Restrictions.in;
+import static org.hibernate.criterion.Restrictions.*;
 
 /**
  * Created by anvarov on 04.04.18.
@@ -99,7 +98,6 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
 
-            startTime = CalendarUtils.endOfDay(startTime); //на конец дня, чтобы отображать зареганные в этот день карты
             JasperPrint jasperPrint = JasperFillManager
                     .fillReport(templateFilename, parameterMap, createDataSource(session, startTime, endTime, idOfOrg));
             long generateDuration = generateTime.getTime();
@@ -108,19 +106,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
                 throws Exception {
-
-
-            String eventState = reportProperties.getProperty("eventNums");
-
-            List<Integer> eventsNumList = new ArrayList<Integer>();
-
-            if (!eventState.equals("")) {
-                String [] eventArr = StringUtils.split(eventState, ",");
-
-                for (String str: eventArr) {
-                    eventsNumList.add(Integer.valueOf(str));
-                }
-            }
+            Integer eventFilter = Integer.parseInt(reportProperties.getProperty("eventFilter"));
 
             //группа фильтр
             String groupNameFilter = reportProperties.getProperty("groupName");
@@ -155,18 +141,15 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 criteria.createAlias("org", "o").add(eq("o.idOfOrg", idOfOrg));
             }
 
-            if (!eventsNumList.isEmpty()){
-                criteria.add(Restrictions.in("passDirection", eventsNumList));
-            }
-
-            //criteria.createAlias("clientGroup", "cg");
             criteria.add((between("evtDateTime", startTime, endTime)));
+            criteria.addOrder(Order.asc("evtDateTime"));
             List<EnterEvent> enterEventList = criteria.list();
 
+            String passdirection, personFullName;
             for (EnterEvent enterEvent : enterEventList) {
-
-                String passdirection, personFullName;
-
+                if (!matchItem(enterEvent, eventFilter)) {
+                    continue;
+                }
                 if (enterEvent.getClient() != null) {
                     personFullName = enterEvent.getClient().getPerson().getFullName();
                 } else {
@@ -214,12 +197,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                         passdirection = "запрос на выход";
                         break;
                     default:
-                        passdirection = "Ошибка обратитесь администратору";
-                        /*
-                        TwicePassEnter = 6,     //повторный вход
-                        TwicePassExit = 7,       //повторный выход
-                        DetectedInside=100 // обнаружен на подносе карты внутри здания
-                        * */
+                        passdirection = "неизвестный тип";
                 }
 
                 String groupName = "";
@@ -239,10 +217,21 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
                 enterEventItems.add(enterEventItem);
             }
-            Collections.sort(enterEventItems);
-            Collections.reverse(enterEventItems);
 
             return new JRBeanCollectionDataSource(enterEventItems);
+        }
+
+        private boolean matchItem(EnterEvent enterEvent, Integer eventFilter) {
+            if (eventFilter.equals(0)) return true;      //все
+            if (eventFilter.equals(1)) {                //входы-выходы
+                return (enterEvent.getPassDirection() == EnterEvent.ENTRY || enterEvent.getPassDirection() == EnterEvent.EXIT
+                || enterEvent.getPassDirection() == EnterEvent.RE_ENTRY || enterEvent.getPassDirection() == EnterEvent.RE_EXIT);
+            }
+            if (eventFilter.equals(2)) {                //с клиентом
+                return enterEvent.getClient() != null;
+            } else {
+                return enterEvent.getClient() == null;
+            }
         }
 
         public ClientGroup getClientGroupByID(Long idOfClientGroup, Long idOfOrg, Session session) throws Exception {

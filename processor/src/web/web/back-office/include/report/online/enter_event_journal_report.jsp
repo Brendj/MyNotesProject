@@ -74,9 +74,11 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="События" styleClass="output-text" />
-        <h:selectManyListbox id="cardStateMenu" value="#{mainPage.enterEventJournalReportPage.eventState}">
-            <f:selectItems value="#{mainPage.enterEventJournalReportPage.eventStateSelectItemList}" />
-        </h:selectManyListbox>
+        <h:selectOneMenu value="#{mainPage.enterEventJournalReportPage.selectedEventFilter}"
+                         styleClass="input-text" style="width: 145px;">
+            <f:selectItems value="#{mainPage.enterEventJournalReportPage.eventFilter}" />
+            <a4j:support event="onchange" reRender="showDeletedClients" />
+        </h:selectOneMenu>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">

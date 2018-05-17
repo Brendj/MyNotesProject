@@ -46,9 +46,9 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
     private String htmlReport = null;
 
     private Integer[] eventState;
-    private SelectItem[] eventStateSelectItemList;
-    private String[] eventStates = EventState.values();
     private List<DocumentState> stateList = new ArrayList<DocumentState>();
+    private SelectItem[] eventFilter;
+    private Integer selectedEventFilter = 0;
 
     public EnterEventJournalReportPage() throws RuntimeContext.NotInitializedException {
         super();
@@ -142,14 +142,7 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                 Properties properties = new Properties();
                 String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
                 properties.setProperty("groupName", groupNamesString);
-
-                String eventNums = "";
-
-                for (Integer event: eventState) {
-                    eventNums = eventNums + event + ",";
-                }
-
-                properties.setProperty("eventNums", eventNums);
+                properties.setProperty("eventFilter", selectedEventFilter.toString());
 
                 builder.setReportProperties(properties);
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -277,10 +270,6 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
         return htmlReport;
     }
 
-    public SelectItem[] getEventStateSelectItemList() {
-        return eventStateSelectItemList;
-    }
-
     public Integer[] getEventState() {
         return eventState;
     }
@@ -291,18 +280,6 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
 
     public List<DocumentState> getStateList() {
         return stateList;
-    }
-
-    public void setEventStateSelectItemList(SelectItem[] eventStateSelectItemList) {
-        this.eventStateSelectItemList = eventStateSelectItemList;
-    }
-
-    public String[] getEventStates() {
-        return eventStates;
-    }
-
-    public void setEventStates(String[] eventStates) {
-        this.eventStates = eventStates;
     }
 
     public void setStateList(List<DocumentState> stateList) {
@@ -386,37 +363,11 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
 
     @Override
     public void onShow() {
-        eventStateSelectItemList = new SelectItem[eventStates.length];
-
-        for (int i = 0; i < eventStates.length; i++) {
-            if (eventStates[i].toString().equals("вход")) {
-                eventStateSelectItemList[i] = new SelectItem(0, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("выход")) {
-                eventStateSelectItemList[i] = new SelectItem(1, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("проход запрещен")) {
-                eventStateSelectItemList[i] = new SelectItem(2, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("взлом турникета")) {
-                eventStateSelectItemList[i] = new SelectItem(3, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("событие без прохода")) {
-                eventStateSelectItemList[i] = new SelectItem(4, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("отказ от прохода")) {
-                eventStateSelectItemList[i] = new SelectItem(5, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("повторный вход")) {
-                eventStateSelectItemList[i] = new SelectItem(6, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("повторный выход")) {
-                eventStateSelectItemList[i] = new SelectItem(7, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("обнаружен на подносе карты внутри здания")) {
-                eventStateSelectItemList[i] = new SelectItem(100, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("отмечен в классном журнале через внешнюю систему")) {
-                eventStateSelectItemList[i] = new SelectItem(101, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("отмечен учителем внутри здания")) {
-                eventStateSelectItemList[i] = new SelectItem(102, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("запрос на вход")) {
-                eventStateSelectItemList[i] = new SelectItem(8, eventStates[i].toString());
-            } else if (eventStates[i].toString().equals("запрос на выход")) {
-                eventStateSelectItemList[i] = new SelectItem(9, eventStates[i].toString());
-            }
-        }
+        eventFilter = new SelectItem[4];
+        eventFilter[0] = new SelectItem(0, "Все");
+        eventFilter[1] = new SelectItem(1, "Вход-выход");
+        eventFilter[2] = new SelectItem(2, "С клиентом");
+        eventFilter[3] = new SelectItem(3, "Без клиента");
         stateList.clear();
     }
 
@@ -432,5 +383,21 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
         criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
         criteria.add(Restrictions.not(Restrictions.in("compositeIdOfClientGroup.idOfClientGroup", groupIds)));
         return criteria.list();
+    }
+
+    public SelectItem[] getEventFilter() {
+        return eventFilter;
+    }
+
+    public void setEventFilter(SelectItem[] eventFilter) {
+        this.eventFilter = eventFilter;
+    }
+
+    public Integer getSelectedEventFilter() {
+        return selectedEventFilter;
+    }
+
+    public void setSelectedEventFilter(Integer selectedEventFilter) {
+        this.selectedEventFilter = selectedEventFilter;
     }
 }
