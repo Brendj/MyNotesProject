@@ -47,3 +47,5 @@ alter table cf_client_guardian add column idofcardrequest bigint,
 ADD CONSTRAINT cf_client_guardian_cardrequest_fk FOREIGN KEY (idofcardrequest)
 REFERENCES cf_card_requests (idofcardrequest) MATCH SIMPLE
 ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+CREATE INDEX cf_categoryorg_orgs_idofcategoryorg_idx ON cf_categoryorg_orgs USING btree (idofcategoryorg);
