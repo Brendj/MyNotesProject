@@ -12,7 +12,7 @@ public abstract class ClientGroupSortByName<T extends ClientGroupSortByNameItem>
 
     @Override
     public int compareTo(T o) {
-        int stringCompareResult = ((Integer)this.getName().length()).compareTo(o.getName().length());
+        int stringCompareResult = ((Integer)this.getName().replaceAll("[\\s|-]+", "").length()).compareTo(o.getName().replaceAll("[\\s|-]+", "").length());
         if( stringCompareResult!= 0){
             return stringCompareResult;
         }

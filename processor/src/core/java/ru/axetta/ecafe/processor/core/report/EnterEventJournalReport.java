@@ -106,7 +106,12 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
                 throws Exception {
-            Integer eventFilter = Integer.parseInt(reportProperties.getProperty("eventFilter"));
+            Integer eventFilter;
+            try {
+                eventFilter = Integer.parseInt(reportProperties.getProperty("eventFilter"));
+            } catch (Exception e) {
+                eventFilter = 0;
+            }
 
             //группа фильтр
             String groupNameFilter = reportProperties.getProperty("groupName");
