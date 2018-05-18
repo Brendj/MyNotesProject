@@ -61,6 +61,7 @@
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<field name="notificationMark" class="java.lang.Long"/>
 	<field name="tempClients" class="java.lang.Long"/>
+	<field name="newTempClients" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -232,6 +233,9 @@
 				<measure name="tempClientsMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{tempClients}]]></measureExpression>
 				</measure>
+				<measure name="newTempClientsMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{newTempClients}]]></measureExpression>
+				</measure>
 				<crosstabCell width="108" height="24">
 					<cellContents style="table">
 						<property name="local_mesure_unitheight" value="pixel"/>
@@ -246,7 +250,21 @@
 							</textElement>
 							<textFieldExpression><![CDATA["<font size=\"5\">" + $V{totalCountMeasure}+
 ( $V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L) ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " +
-$V{tempClientsMeasure}))
+$V{tempClientsMeasure})) + ($V{hideLastValueSum}==0L?"":
+(
+"&#10;(" +
+new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue() )
+  +
+( $V{hideDailySampleSum}==0L
+    || (new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue()))==0L? "" : " / "+
+    new Long($V{dailySampleMeasure}.longValue() - $V{newDailySampleMeasure}.longValue() )
+) +
+( $V{hideDailySampleSum}==0L
+    || (new Long($V{tempClientsMeasure}.longValue() - $V{newTempClientsMeasure}.longValue()))==0L? "" : " / "+
+    new Long($V{tempClientsMeasure}.longValue() - $V{newTempClientsMeasure}.longValue() )
+)
++ ")"
+))
 +"</font>"]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true">
