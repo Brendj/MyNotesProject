@@ -49,3 +49,5 @@ REFERENCES cf_card_requests (idofcardrequest) MATCH SIMPLE
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE INDEX cf_categoryorg_orgs_idofcategoryorg_idx ON cf_categoryorg_orgs USING btree (idofcategoryorg);
+
+--! ФИНАЛИЗИРОВАН 21.05.2018, НЕ МЕНЯТЬ
