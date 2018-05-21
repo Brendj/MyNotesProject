@@ -183,11 +183,9 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
             parameterMap.put("shortAddress", sb.length() == 0 ? orgLoad.getShortAddress() : sb.substring(0, sb.length() - 2));
             calendar.setTime(startTime);
-//            Calendar c = Calendar.getInstance();
-//            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
+            Date firtstDayOfMonth = CalendarUtils.getFirstDayOfMonth(startTime);
             for (int day = 1; day <= 31; day++) {
-                daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(CalendarUtils.addDays(startTime, day - 1))));
-                //daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(startDate + (day - 1) * 1000 * 60 * 60 * 24)));
+                daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(CalendarUtils.addDays(firtstDayOfMonth, day - 1))));
             }
             parameterMap.put("days", daysOfMonth);
             parameterMap.put("monthName", calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("ru")));
@@ -338,7 +336,13 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             Comparator<ReportItem> nameLengthComparator = new Comparator<ReportItem>() {
                 @Override
                 public int compare(ReportItem o1, ReportItem o2) {
-                    return o1.getGroupName().length()-o2.getGroupName().length();
+                    //return o1.getGroupName().replaceAll("[\\s|-]+", "").length()-o2.getGroupName().replaceAll("[\\s|-]+", "").length();
+                    int stringCompareResult = ((Integer)o1.getGroupName().replaceAll("[\\s|-]+", "").length()).compareTo(o2.getGroupName().replaceAll("[\\s|-]+", "").length());
+                    if( stringCompareResult!= 0){
+                        return stringCompareResult;
+                    }
+
+                    return o1.getGroupName().toLowerCase().compareTo(o2.getGroupName().toLowerCase());
                 }
             };
             Collections.sort(values, nameLengthComparator);
