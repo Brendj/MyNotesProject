@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -10142,7 +10143,8 @@ public class MainPage implements Serializable {
                 throw new Exception("Данный клиент имеет незаблокированную(ые) карту(ы).");
             }
             String cardType = Card.TYPE_NAMES[cardRegistrationAndIssuePage.getCardType()];
-            if(cardType.equals("Mifare") || cardType.equals("Браслет (Mifare)")){
+            if(cardType.equals("Mifare") && !CardManagerProcessor.getPriceOfMifare().equals(0L) ||
+                    cardType.equals("Браслет (Mifare)" ) && !CardManagerProcessor.getPriceOfMifareBracelet().equals(0L)){
                 Client client = (Client) persistenceSession.load(Client.class, cardRegistrationAndIssuePage.getClient().getIdOfClient());
                 Card lastCard = DAOUtils.getLastCardByClient(persistenceSession, client);
                 if(lastCard != null) {
