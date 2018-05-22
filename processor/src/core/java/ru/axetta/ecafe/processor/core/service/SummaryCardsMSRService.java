@@ -121,15 +121,9 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
 
     public static Long convertCardId(Long cardId) {
         String hex = Long.toHexString(cardId);
-        if (cardId > 0xFFFFFFFFL) {
-            while (hex.length() < 14) {
-                hex = "0".concat(hex);
-            }
-            StringBuilder sb = new StringBuilder(hex).reverse();
-            hex = "0x" + sb.charAt(1) + sb.charAt(0) + sb.charAt(3) + sb.charAt(2) +
-                    sb.charAt(5) + sb.charAt(4) + sb.charAt(7) + sb.charAt(6);
-            return Long.decode(hex);
-        } else {
+        if (cardId > 0xFFFFFFFFL) {     // 7 byte cards
+            return cardId >> 24;
+        } else {                        // 4 byte cards
             while (hex.length() < 14) {
                 hex = "0".concat(hex);
             }
