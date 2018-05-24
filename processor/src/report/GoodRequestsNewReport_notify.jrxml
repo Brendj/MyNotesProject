@@ -104,8 +104,6 @@
 				<reportElement style="style3" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="900" height="70" forecolor="#FFFFFF" uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055"/>
 				<crosstabHeaderCell>
 					<cellContents style="table">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<textField>
 							<reportElement mode="Opaque" x="0" y="0" width="300" height="24" uuid="e6acfcff-3fa4-4c53-9568-a19131f91cf3"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
@@ -135,8 +133,6 @@
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
 						<cellContents>
-							<property name="local_mesure_unitheight" value="pixel"/>
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<textField>
 								<reportElement mode="Opaque" x="0" y="0" width="300" height="24" uuid="4675ad94-88eb-4875-a2bc-0831e27026a9"/>
 								<box leftPadding="10"/>
@@ -165,8 +161,6 @@
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#99CCFF" mode="Opaque" style="style2">
-							<property name="local_mesure_unitheight" value="pixel"/>
-							<property name="com.jaspersoft.studio.unit.height" value="px"/>
 							<textField isBlankWhenNull="true">
 								<reportElement style="Crosstab Data Text" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="300" height="24" backcolor="#99CCFF" uuid="f25ffeb0-d0ba-4c96-a6cb-c6bf252b0ced"/>
 								<box leftPadding="4"/>
@@ -238,8 +232,6 @@
 				</measure>
 				<crosstabCell width="108" height="24">
 					<cellContents style="table">
-						<property name="local_mesure_unitheight" value="pixel"/>
-						<property name="local_mesure_unitwidth" value="pixel"/>
 						<textField isStretchWithOverflow="true">
 							<reportElement positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="108" height="24" forecolor="#FFFFFF" backcolor="#FF6666" uuid="231375ae-43c8-4e27-bc2f-2f82281f4282">
 								<printWhenExpression><![CDATA[(!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) && $V{notificationMark}.equals(0L))]]></printWhenExpression>
@@ -340,8 +332,6 @@ new Long($V{newTotalCountMeasure}.longValue() )
 				</crosstabCell>
 				<crosstabCell width="108" height="24" rowTotalGroup="goodName">
 					<cellContents backcolor="#99CCFF" mode="Opaque" style="table">
-						<property name="local_mesure_unitwidth" value="pixel"/>
-						<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="goodName" columnTotalGroup="doneDateStr">

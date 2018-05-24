@@ -891,6 +891,7 @@ public class MonitoringOfReportService {
                 reportItem.setDistrict(org.getDistrict());
                 reportItem.setTypeOfBuilding(org.getType().toString());
                 reportItem.setIntroductionQueue(org.getIntroductionQueue());
+                reportItem.setOrgStatus(org.getStatus().toString());
 
                 PeopleData peopleData = loadPeopleData(session, idOfOrg);
 
@@ -1016,6 +1017,7 @@ public class MonitoringOfReportService {
         public String district;
         public String typeOfBuilding;
         public String introductionQueue;
+        public String orgStatus;
         public String studentsInDatabase;
         public String studentsWithMaps;
         public String parents;
@@ -1033,8 +1035,8 @@ public class MonitoringOfReportService {
         }
 
         public ReportItem(String orgNum, String shortName, String address, String idOfOrg, String code, String district,
-                String typeOfBuilding, String introductionQueue, String studentsInDatabase, String studentsWithMaps,
-                String parents, String pedagogicalComposition, String otherEmployees,
+                String typeOfBuilding, String introductionQueue, String orgStatus, String studentsInDatabase,
+                String studentsWithMaps, String parents, String pedagogicalComposition, String otherEmployees,
                 List<MonitoringOfItem> monitoringOfItemsMonday, List<MonitoringOfItem> monitoringOfItemsTuesday,
                 List<MonitoringOfItem> monitoringOfItemsWednesday, List<MonitoringOfItem> monitoringOfItemsThursday,
                 List<MonitoringOfItem> monitoringOfItemsFriday, List<MonitoringOfItem> monitoringOfItemsSaturday) {
@@ -1046,6 +1048,7 @@ public class MonitoringOfReportService {
             this.district = district;
             this.typeOfBuilding = typeOfBuilding;
             this.introductionQueue = introductionQueue;
+            this.orgStatus = orgStatus;
             this.studentsInDatabase = studentsInDatabase;
             this.studentsWithMaps = studentsWithMaps;
             this.parents = parents;
@@ -1121,6 +1124,14 @@ public class MonitoringOfReportService {
 
         public void setIntroductionQueue(String introductionQueue) {
             this.introductionQueue = introductionQueue;
+        }
+
+        public String getOrgStatus() {
+            return orgStatus;
+        }
+
+        public void setOrgStatus(String orgStatus) {
+            this.orgStatus = orgStatus;
         }
 
         public String getStudentsInDatabase() {
