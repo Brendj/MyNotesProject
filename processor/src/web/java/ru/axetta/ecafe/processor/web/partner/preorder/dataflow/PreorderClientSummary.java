@@ -7,15 +7,14 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
-import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDateComparator;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
 
 
 public class PreorderClientSummary {
@@ -59,7 +58,7 @@ public class PreorderClientSummary {
         Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
         this.usedSum = getPreordersSum(client);
         this.forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
-        this.calendar = getSpecialDates(new Date(), summary.getOrgId(), summary.getGrade(), client);
+        this.calendar = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getSpecialDates(new Date(), PreorderDAOService.DEFAULT_MENU_SYNC_COUNT_DAYS, summary.getOrgId(), client);
         SubscriptionFeeding sf = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientSubscriptionFeeding(client);
         this.subscriptionFeeding = (sf == null) ? 0 : 1;
     }
@@ -69,50 +68,6 @@ public class PreorderClientSummary {
         Date endDate = CalendarUtils.addDays(today, 14);
         endDate = CalendarUtils.endOfDay(endDate);
         return RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreordersSum(client, today, endDate);
-    }
-
-    private Map<String, Integer[]> getSpecialDates(Date today, Long orgId, String groupName, Client client) throws Exception {
-        Comparator comparator = new PreorderDateComparator();
-        Map map = new TreeMap(comparator);
-        TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
-        Calendar c = Calendar.getInstance();
-        c.setTimeZone(timeZone);
-        Date endDate = CalendarUtils.addDays(today, 14);
-        boolean isSixWorkWeek = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isSixWorkWeek(orgId);
-        int two_days = 0;
-        Map<Date, Long> usedAmounts = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).existPreordersByDate(client.getIdOfClient(), today, endDate);
-        List<SpecialDate> specialDates = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getSpecialDates(today, endDate, orgId);
-        while (c.getTimeInMillis() < endDate.getTime() ){
-            Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            if (two_days <= 2) {
-                c.add(Calendar.DATE, 1);
-                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
-                if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)
-                        && !RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isSpecialConfigDate(client, currentDate)) {
-                    two_days++;
-                }
-                continue;
-            }
-
-            Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
-            if(specialDates != null){
-                for (SpecialDate specialDate : specialDates) {
-                    if (CalendarUtils.betweenOrEqualDate(specialDate.getCompositeIdOfSpecialDate().getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
-                        isWeekend = specialDate.getIsWeekend();
-                        break;
-                    }
-                }
-            }
-            int day = CalendarUtils.getDayOfWeek(currentDate);
-            if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
-                //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
-                isWeekend = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isWeekendByGroup(orgId, groupName);
-            }
-
-            c.add(Calendar.DATE, 1);
-            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
-        }
-        return map;
     }
 
     public Long getContractId() {

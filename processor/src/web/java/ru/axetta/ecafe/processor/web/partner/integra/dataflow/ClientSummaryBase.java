@@ -41,7 +41,7 @@ public class ClientSummaryBase {
     private Integer isInside;
     @XmlAttribute(name = "GUID")
     protected String guid;
-    @XmlAttribute(name = "Preorder")
+    @XmlAttribute(name = "SpecialMenu")
     private Integer specialMenu;
 
     @XmlAttribute(name = "GuardianCreatedWhere")

@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderParam;
+
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.ws.rs.WebApplicationException;
@@ -17,6 +20,16 @@ public class PreorderSaveListParam {
     private Long contractId;
     private String date;
     private List<ComplexListParam> complexes;
+
+    public PreorderSaveListParam() {
+
+    }
+
+    public PreorderSaveListParam(PreorderParam preorderParam) {
+        this.contractId = preorderParam.getContractId();
+        this.date = CalendarUtils.dateToString(preorderParam.getDate());
+        this.complexes = preorderParam.getComplexes();
+    }
 
     public static PreorderSaveListParam fromString(String jsonRepresentation) {
         ObjectMapper mapper = new ObjectMapper(); //Jackson's JSON marshaller

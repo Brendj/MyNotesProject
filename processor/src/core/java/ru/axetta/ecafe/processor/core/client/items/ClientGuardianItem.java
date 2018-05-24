@@ -26,6 +26,7 @@ public class ClientGuardianItem {
     private ClientCreatedFromType createdWhereClientGuardian;
     private ClientCreatedFromType createdWhereGuardian;
     private String createdWhereGuardianDesc;
+    private Boolean informedSpecialMenu;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -34,11 +35,12 @@ public class ClientGuardianItem {
         this.mobile = client.getMobile();
         this.disabled = false;
         isNew = true;
+        informedSpecialMenu = false;
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
             List notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
-            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc) {
+            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc, Boolean informedSpecialMenu) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
@@ -50,6 +52,7 @@ public class ClientGuardianItem {
         this.createdWhereClientGuardian = createdWhereClientGuardian;
         this.createdWhereGuardian = createdWhereGuardian;
         this.createdWhereGuardianDesc = createdWhereGuardianDesc;
+        this.informedSpecialMenu = informedSpecialMenu;
     }
 
     public String getCreatedWhereClientGuardianStr() {
@@ -154,5 +157,13 @@ public class ClientGuardianItem {
 
     public void setCreatedWhereGuardianDesc(String createdWhereGuardianDesc) {
         this.createdWhereGuardianDesc = createdWhereGuardianDesc;
+    }
+
+    public Boolean getInformedSpecialMenu() {
+        return informedSpecialMenu;
+    }
+
+    public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
+        this.informedSpecialMenu = informedSpecialMenu;
     }
 }

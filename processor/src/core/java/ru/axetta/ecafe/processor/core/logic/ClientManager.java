@@ -1484,7 +1484,8 @@ public class ClientManager {
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
-                        notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc()));
+                        notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
+                        clientGuardian.getInformedSpecialMenu()));
             }
         }
         return guardianItems;
@@ -1502,7 +1503,8 @@ public class ClientManager {
             if(cl != null){
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
-                        notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc()));
+                        notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
+                        clientWard.getInformedSpecialMenu()));
             }
         }
         return wardItems;
@@ -1700,6 +1702,18 @@ public class ClientManager {
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
         }
+    }
+
+    /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
+    public static void setInformSpecialMenu(Session session, Long idOfClient, Long idOfGuardian, Long newVersion) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfClient));
+        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
+        cg.setInformedSpecialMenu(true);
+        cg.setVersion(newVersion);
+        cg.setLastUpdate(new Date());
+        session.update(cg);
     }
 
     public static void attachNotifications(ClientGuardian clientGuardian, List<NotificationSettingItem> notificationItems) {

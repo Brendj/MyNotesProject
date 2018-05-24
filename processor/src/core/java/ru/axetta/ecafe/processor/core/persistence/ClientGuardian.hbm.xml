@@ -40,5 +40,6 @@
         </set>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <many-to-one name="cardRequest" class="ru.axetta.ecafe.processor.core.persistence.CardRequest" column="IdOfCardRequest" fetch="select"/>
+        <property name="informedSpecialMenu" column="informedSpecialMenu" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
     </class>
 </hibernate-mapping>

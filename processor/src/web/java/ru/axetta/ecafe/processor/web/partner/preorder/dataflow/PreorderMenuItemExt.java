@@ -7,22 +7,40 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PreorderMenuItemExt")
 public class PreorderMenuItemExt {
-
+    @XmlAttribute(name = "group")
     private String group;
+    @XmlAttribute(name = "name")
     private String name;
+    @XmlAttribute(name = "fullName")
     private String fullName;
+    @XmlAttribute(name = "price")
     private Long price;
+    @XmlAttribute(name = "calories")
     private Double calories;
+    @XmlAttribute(name = "output")
     private String output;
+    @XmlAttribute(name = "availableNow")
     private Integer availableNow;
+    @XmlAttribute(name = "protein")
     private Double protein;
+    @XmlAttribute(name = "fat")
     private Double fat;
+    @XmlAttribute(name = "carbohydrates")
     private Double carbohydrates;
+    @XmlAttribute(name = "idOfMenuDetail")
     private Long idOfMenuDetail;
+    @XmlAttribute(name = "amount")
     private int amount;
+    @XmlAttribute(name = "selected")
     private Boolean selected;
 
     public PreorderMenuItemExt() {

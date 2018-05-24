@@ -63,6 +63,10 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResu
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
@@ -80,6 +84,7 @@ import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -161,6 +166,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CARD_NOT_FOUND = 610L;
     //private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
     private static final Long RC_START_WEEK_POSITION_NOT_CORRECT = 630L;
+    private static final Long RC_NOT_INFORMED_SPECIAL_MENU = 640L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -197,6 +203,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CARD_NOT_FOUND_DESC = "Карта не найдена";
     //private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
     private static final String RC_START_WEEK_POSITION_NOT_CORRECT_DESC = "Номер стартовой недели некорректен";
+    private static final String RC_NOT_INFORMED_SPECIAL_MENU_DESC = "Представитель не проинформирован об условиях предоставления услуги";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8429,5 +8436,229 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    @Override
+    public PreorderClientSummaryResult getPreorderClientSummary(@WebParam(name="contractId") Long contractId,
+            @WebParam(name="guardianMobile") String guardianMobile) {
+        authenticateRequest(contractId);
+        PreorderClientSummaryResult result = new PreorderClientSummaryResult();
+        try {
+            ClientResult cr = getClientOrError(contractId, guardianMobile);
+            if (!cr.resultCode.equals(RC_OK)) {
+                result.resultCode = cr.resultCode;
+                result.description = cr.description;
+                return result;
+            }
+            Client client = cr.getClient();
+
+            PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
+            Integer syncCountDays = preorderDAOService.getMenuSyncCountDays(client.getOrg().getIdOfOrg());
+            Date today = CalendarUtils.startOfDay(new Date());
+            Date endDate = CalendarUtils.addDays(today, syncCountDays);
+            endDate = CalendarUtils.endOfDay(endDate);
+            Long preordersSum = preorderDAOService.getPreordersSum(client, today, endDate);
+            result.setBalanceWithPreorders(preordersSum);
+            result.setForbiddenDays(DAOUtils.getPreorderFeedingForbiddenDays(client));
+            Map<String, Integer[]> sd = preorderDAOService.getSpecialDates(new Date(), syncCountDays, client.getOrg().getIdOfOrg(), client);
+            PreorderCalendar calendar = new PreorderCalendar();
+            for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
+                PreorderCalendarItem item = new PreorderCalendarItem();
+                item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
+                item.setEditForbidden((entry.getValue())[0]);
+                item.setPreorderExists((entry.getValue())[1]);
+                calendar.getItems().add(item);
+            }
+            result.setCalendar(calendar);
+            SubscriptionFeeding sf = preorderDAOService.getClientSubscriptionFeeding(client);
+            result.setSubscriptionFeeding((sf == null) ? 0 : 1);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in getPreorderClientSummary: ", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        }
+    }
+
+    private ClientResult getClientOrError(Long contractId, String guardianMobile) {
+        ClientResult result = new ClientResult();
+        Client client;
+        try {
+            client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
+        } catch (NoResultException e) {
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+            return result;
+        }
+
+        Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).findOrg(client.getOrg().getIdOfOrg());
+        if (!org.getPreordersEnabled()) {
+            result.resultCode = RC_SETTINGS_NOT_FOUND;
+            result.description = "У организации не работает функционал предзаказов";
+            return result;
+        }
+
+        ClientGuardianResult cgr = getClientGuardianOrError(client, guardianMobile);
+        if (!cgr.resultCode.equals(RC_OK)) {
+            result.resultCode = cgr.resultCode;
+            result.description = cgr.description;
+            return result;
+        }
+
+        boolean informed = false;
+        for (ClientGuardian cg : cgr.getClientGuardian()) {
+            if (cg.getInformedSpecialMenu()) {
+                informed = true;
+                break;
+            }
+        }
+        if (!informed) {
+            result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
+            result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
+            return result;
+        }
+
+        result.resultCode = RC_OK;
+        result.setClient(client);
+        return result;
+    }
+
+    private ClientGuardianResult getClientGuardianOrError(Client client, String guardianMobile) {
+        ClientGuardianResult result = new ClientGuardianResult();
+        List<ClientGuardian> guardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientGuardian(client, guardianMobile);
+        if (guardians.size() == 0) {
+            result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+            result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+            return result;
+        }
+
+        result.setClientGuardian(guardians);
+        result.resultCode = RC_OK;
+        return result;
+    }
+
+    @Override
+    public Result setInformedSpecialMenu(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+            Long version = getClientGuardiansResultVersion(session);
+            boolean guardianWithMobileFound = false;
+            for (Client guardian : guardians) {
+                if (guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                    guardianWithMobileFound = true;
+                    ClientManager.setInformSpecialMenu(session, client.getIdOfClient(), guardian.getIdOfClient(), version);
+                }
+            }
+
+            if (!guardianWithMobileFound) {
+                result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                return result;
+            }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            client.setSpecialMenu(value);
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            client.setClientRegistryVersion(clientRegistryVersion);
+            client.setUpdateTime(new Date());
+            session.update(client);
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setSpecialMenu", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date) {
+        authenticateRequest(contractId);
+        PreorderComplexesResult result = new PreorderComplexesResult();
+        try {
+            PreorderListWithComplexesGroupResult res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexesWithMenuList(contractId, date);
+            ComplexGroup complexGroup = new ComplexGroup();
+            complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
+            result.setComplexGroup(complexGroup);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch(Exception e) {
+            logger.error("Error in getPreorderComplexes", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
+    public Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders) {
+        authenticateRequest(preorders.getContractId());
+        Result result = new Result();
+        try {
+            PreorderSaveListParam preorderSaveListParam = new PreorderSaveListParam(preorders);
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(preorderSaveListParam);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch(Exception e) {
+            logger.error("Error in putPreorderComplex", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
     }
 }

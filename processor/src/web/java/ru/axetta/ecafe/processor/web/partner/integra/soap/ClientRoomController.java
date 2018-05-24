@@ -8,6 +8,9 @@ import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderClientSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderComplexesResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderParam;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -519,4 +522,19 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getGuardiansFromDate")
     GuardianInfoListResult getGuardiansFromDate(@WebParam(name="dateTime")Long dateTime);
+
+    @WebMethod(operationName = "getPreorderClientSummary")
+    PreorderClientSummaryResult getPreorderClientSummary(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);
+
+    @WebMethod(operationName = "setInformedSpecialMenu")
+    Result setInformedSpecialMenu(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);
+
+    @WebMethod(operationName = "setSpecialMenu")
+    Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
+
+    @WebMethod(operationName = "getPreorderComplexes")
+    PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);
+
+    @WebMethod()
+    Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders);
 }

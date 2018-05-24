@@ -6,20 +6,32 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
 /**
  * Created by i.semenov on 13.03.2018.
  */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PreorderComplexItemExt")
 public class PreorderComplexItemExt implements Comparable {
+    @XmlAttribute(name = "type")
     private String type;
+    @XmlAttribute(name = "idOfComplexInfo")
     private Integer idOfComplexInfo;
+    @XmlAttribute(name = "complexName")
     private String complexName;
+    @XmlAttribute(name = "currentPrice")
     private Long currentPrice;
+    @XmlAttribute(name = "amount")
     private int amount;
+    @XmlAttribute(name = "selected")
     private Boolean selected;
+    @XmlAttribute(name = "complexType")
     private Integer complexType;
+    @XmlAttribute(name = "discount")
     private Boolean discount;
+    @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
 
     public PreorderComplexItemExt() {

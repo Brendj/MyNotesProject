@@ -45,6 +45,8 @@ import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomContr
 @Scope("singleton")
 public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
+    public static final Integer DEFAULT_MENU_SYNC_COUNT_DAYS = 14;
+    public static final Integer DEFAULT_FORBIDDEN_DAYS = 3;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -599,7 +601,7 @@ public class PreorderDAOService {
             clientSummaryBaseListResult.description = cd.description;
 
         } catch (Exception e) {
-
+            logger.error("Error in getClientSummaryByGuardianMobileWithPreorderEnableFilter: ", e);
         }
         return clientSummaryBaseListResult;
     }
@@ -678,5 +680,87 @@ public class PreorderDAOService {
         }
 
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Integer[]> getSpecialDates(Date today, Integer syncCountDays, Long orgId, Client client) throws Exception {
+        Comparator comparator = new PreorderDateComparator();
+        Map map = new TreeMap(comparator);
+        TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
+        Calendar c = Calendar.getInstance();
+        c.setTimeZone(timeZone);
+        Date endDate = CalendarUtils.addDays(today, syncCountDays);
+        boolean isSixWorkWeek = isSixWorkWeek(orgId);
+        int two_days = 0;
+        Map<Date, Long> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);
+        List<SpecialDate> specialDates = getSpecialDates(today, endDate, orgId);
+        Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
+        if (forbiddenDays == null) {
+            forbiddenDays = DEFAULT_FORBIDDEN_DAYS;
+        }
+        while (c.getTimeInMillis() < endDate.getTime() ){
+            Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
+            if (two_days < forbiddenDays) {
+                c.add(Calendar.DATE, 1);
+                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
+                if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)
+                        && !isSpecialConfigDate(client, currentDate)) {
+                    two_days++;
+                }
+                continue;
+            }
+
+            Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
+            if(specialDates != null){
+                for (SpecialDate specialDate : specialDates) {
+                    if (CalendarUtils.betweenOrEqualDate(specialDate.getCompositeIdOfSpecialDate().getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
+                        isWeekend = specialDate.getIsWeekend();
+                        break;
+                    }
+                }
+            }
+            int day = CalendarUtils.getDayOfWeek(currentDate);
+            if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
+                //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
+                isWeekend = isWeekendByGroup(orgId, getClientGroupName(client));
+            }
+
+            c.add(Calendar.DATE, 1);
+            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
+        }
+        return map;
+    }
+
+    private String getClientGroupName(Client client) {
+        if (client.getClientGroup() != null) {
+            Query query = emReport.createQuery("select cg.groupName from ClientGroup cg "
+                    + "where cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg and cg.compositeIdOfClientGroup.idOfClientGroup = :idOfClientGroup");
+            try {
+                return (String) query.getSingleResult();
+            } catch (Exception ignore) { }
+        }
+        return "";
+    }
+
+    public List<ClientGuardian> getClientGuardian(Client child, String guardianMobile) {
+        Query query = emReport.createQuery("select cg from ClientGuardian cg, Client g "
+                + "where g.idOfClient = cg.idOfGuardian and cg.idOfChildren = :idOfChildren and g.mobile = :guardianMobile");
+        query.setParameter("idOfChildren", child.getIdOfClient());
+        query.setParameter("guardianMobile", guardianMobile);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public Integer getMenuSyncCountDays(Long idOfOrg) {
+        Org org = emReport.find(Org.class, idOfOrg);
+        if (org.getConfigurationProvider() == null) {
+            return DEFAULT_MENU_SYNC_COUNT_DAYS;
+        } else {
+            return org.getConfigurationProvider().getMenuSyncCountDays();
+        }
+    }
+
+    public Org findOrg(long idOfOrg) {
+        return emReport.find(Org.class, idOfOrg);
     }
 }

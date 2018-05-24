@@ -247,6 +247,12 @@
         </rich:column>
         <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
+                <h:outputText escape="true" value="Согласие на предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.informedSpecialMenu}" disabled="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" width="150">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Степень родства" />
             </f:facet>
             <h:selectOneMenu value="#{clientGuardian.relation}" styleClass="input-text">
@@ -317,6 +323,14 @@
                 <h:outputText escape="true" value="Опекунство активировано" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" />
+            <br/>
+            <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" rendered="#{!clientWard.isCreatedWhereDefault}"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Согласие на предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" styleClass="output-text" />
             <br/>
             <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" rendered="#{!clientWard.isCreatedWhereDefault}"/>
         </rich:column>

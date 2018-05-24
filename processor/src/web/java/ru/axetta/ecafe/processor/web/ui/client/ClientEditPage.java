@@ -796,13 +796,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (!guardianExists(idOfClient))
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName()));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName()));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false));
             }
         }
     }

@@ -4,15 +4,29 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "PreorderComplexGroup")
 public class PreorderComplexGroup implements Comparable {
+    @XmlElement(name = "name")
     private String name;
-    private final List<PreorderComplexItemExt> items = new ArrayList<PreorderComplexItemExt>();
+
+    @XmlElement(name = "complexItem")
+    private List<PreorderComplexItemExt> items;
+
+    public PreorderComplexGroup() {
+        items = new ArrayList<PreorderComplexItemExt>();
+    }
 
     public PreorderComplexGroup(String name) {
         this.name = name;
+        items = new ArrayList<PreorderComplexItemExt>();
     }
 
     public String getName() {
