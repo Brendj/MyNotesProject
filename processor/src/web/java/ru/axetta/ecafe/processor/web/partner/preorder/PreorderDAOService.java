@@ -735,6 +735,8 @@ public class PreorderDAOService {
         if (client.getClientGroup() != null) {
             Query query = emReport.createQuery("select cg.groupName from ClientGroup cg "
                     + "where cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg and cg.compositeIdOfClientGroup.idOfClientGroup = :idOfClientGroup");
+            query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+            query.setParameter("idOfClientGroup", client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
             try {
                 return (String) query.getSingleResult();
             } catch (Exception ignore) { }
