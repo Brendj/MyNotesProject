@@ -178,8 +178,11 @@ public class FieldProcessor {
         }
 
         public void setValue(Object id, Object value) throws Exception {
-            if (value instanceof Date) getField(id).currentValue = dateFormat.format((Date)value);
-            else getField(id).currentValue = value.toString();
+            if (value instanceof Date) {
+                getField(id).currentValue = dateFormat.format((Date) value);
+            } else {
+                getField(id).currentValue = (null == value) ? null : value.toString();
+            }
         }
 
         public void setValueList(Object id, List<ImportRegisterClientsService.GuardianInfo> value) throws Exception {
@@ -188,6 +191,12 @@ public class FieldProcessor {
 
         public void setValueSet(Object id, Set<RegistryChangeGuardians> value) throws Exception {
             getField(id).guardiansSet = value;
+        }
+
+        public void resetToDefaultValues(Def[] fieldInfo) throws Exception {
+            for (Def def : fieldInfo) {
+                setValue(def.fieldId, def.defValue);
+            }
         }
     }
 

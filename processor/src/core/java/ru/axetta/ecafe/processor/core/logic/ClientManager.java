@@ -156,6 +156,11 @@ public class ClientManager {
                 }
             }
         }
+
+        public void resetToDefaultValues() throws Exception
+        {
+            resetToDefaultValues(fieldInfo);
+        }
     }
 
     public static class ClientFieldConfigForUpdate extends FieldProcessor.Config {

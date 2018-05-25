@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
@@ -159,6 +160,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
             String currLine = reader.readLine();
             while (null != currLine) {
+                fieldConfig.resetToDefaultValues();
                 if (lineNo==0 && currLine.startsWith("!")) {
                     parseLineConfig(fieldConfig, currLine);
                 } else {
@@ -210,6 +212,11 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         if (notifyEmailIsNull) {
             String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
+        }
+
+        Boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
+        if (isGroupsFieldEmpty) {
+            fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
         }
 
         try {
