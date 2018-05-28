@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="8580" pageHeight="30000" columnWidth="8540" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.9075000000000024"/>
-	<property name="ireport.x" value="869"/>
+	<property name="ireport.x" value="5952"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -367,7 +367,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв и замена]]></text>
+				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<textField>
 				<reportElement uuid="a27072c2-bf6f-4bdb-9624-a5ee6f5c7e0b" x="6370" y="0" width="1085" height="25"/>
@@ -703,7 +703,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв и замена]]></text>
+				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="7395" y="25" width="60" height="110"/>
@@ -969,7 +969,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв и замена]]></text>
+				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="5045" y="25" width="60" height="110"/>
@@ -1193,7 +1193,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв и замена]]></text>
+				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="3960" y="25" width="60" height="110"/>
@@ -1417,7 +1417,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв и замена]]></text>
+				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="2875" y="25" width="60" height="110"/>
@@ -1641,7 +1641,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Резерв и замена]]></text>
+				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" x="1450" y="0" width="150" height="135"/>
