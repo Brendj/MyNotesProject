@@ -891,7 +891,7 @@ public class MonitoringOfReportService {
                 reportItem.setDistrict(org.getDistrict());
                 reportItem.setTypeOfBuilding(org.getType().toString());
                 reportItem.setIntroductionQueue(org.getIntroductionQueue());
-                reportItem.setOrgStatus(org.getStatus().toString());
+                reportItem.setOrgStatus(org.stateString());
 
                 PeopleData peopleData = loadPeopleData(session, idOfOrg);
 

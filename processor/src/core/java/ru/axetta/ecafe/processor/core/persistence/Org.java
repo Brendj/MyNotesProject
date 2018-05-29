@@ -1143,4 +1143,17 @@ public class Org implements Serializable {
     public void setPreordersEnabled(Boolean preordersEnabled) {
         this.preordersEnabled = preordersEnabled;
     }
+
+    public String stateString() {
+        String result;
+        if (this.state >= 0 && this.state < Org.STATE_NAMES.length) {
+            result = Org.STATE_NAMES[this.state];
+        } else {
+            result = Org.UNKNOWN_STATE_NAME;
+        }
+
+        if (!this.statusDetailing.isEmpty() && !this.statusDetailing.equalsIgnoreCase("/"))
+            result += " (" + this.statusDetailing + ")";
+        return result;
+    }
 }
