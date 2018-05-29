@@ -66,6 +66,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private Boolean needChangePassword;
     private Date blockedUntilDate;
     private String organizationsFilter = "Не выбрано";
+    private String firstName;
+    private String surname;
+    private String secondName;
+    private String department;
 
     private UserNotificationType selectOrgType;
 
@@ -156,6 +160,16 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setPasswordDate(new Date(System.currentTimeMillis()));
             }
             Boolean successChangeGrants = getChangeGrantsMode(session, user);
+            if(user.getPerson() != null) {
+                user.getPerson().setSurname(surname);
+                user.getPerson().setSecondName(secondName);
+                user.getPerson().setFirstName(firstName);
+                session.update(user.getPerson());
+            } else if(!firstName.isEmpty() || !surname.isEmpty() || !secondName.isEmpty()) {
+                Person person = new Person(firstName, surname, secondName);
+                user.setPerson(person);
+                session.save(person);
+            }
             user.setPhone(phone);
             user.setEmail(email);
             user.setUpdateTime(new Date());
@@ -214,6 +228,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             if (role.equals(User.DefaultRole.CARD_OPERATOR)) {
                 user.setFunctions(functionSelector.getCardOperatorFunctions(session));
                 user.setRoleName(role.toString());
+                user.setDepartment(department);
             }
             if (region != null && region.length() > 0) {
                 user.setRegion(region);
@@ -601,6 +616,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.userName = user.getUserName();
         this.phone = user.getPhone();
         this.email = user.getEmail();
+        this.department = user.getDepartment();
+        if(user.getPerson() != null){
+            this.firstName = user.getPerson().getFirstName();
+            this.surname = user.getPerson().getSurname();
+            this.secondName = user.getPerson().getSecondName();
+        } else {
+            this.firstName = this.surname = this.secondName = "";
+        }
         this.functionSelector.fill(session, user.getFunctions());
         for (Contragent c : user.getContragents()) {
             this.contragentItems.add(new ContragentItem(c));
@@ -659,6 +682,38 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setNeedChangePassword(Boolean needChangePassword) {
         this.needChangePassword = needChangePassword;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public static class ContragentItem {

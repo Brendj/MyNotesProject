@@ -116,6 +116,22 @@ public class User {
         return DAOService.getInstance().setUserInfo(this);
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     public enum DefaultRole{
         DEFAULT(0,"настраиваемая роль"),
         ADMIN(1,"администратор"),
@@ -185,6 +201,8 @@ public class User {
     private Date blockedUntilDate;
     private Date passwordDate;
     private Integer attemptNumber;
+    private Person person;
+    private String department;
 
     public String getRoleName() {
         return roleName;
@@ -224,6 +242,7 @@ public class User {
         this.phone = phone;
         this.updateTime = updateTime;
         this.deletedState = false;
+        this.person = null;
     }
 
     public Long getIdOfUser() {

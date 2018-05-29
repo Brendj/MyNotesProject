@@ -63,6 +63,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
     protected List<OrgItem> organizationItems = new ArrayList<OrgItem>(0);
     private Long organizationId;
+    private String firstName;
+    private String surname;
+    private String secondName;
+    private String department;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -263,6 +267,11 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             user.setIdOfRole(idOfRole);
             user.setBlocked(false);
             user.setPasswordDate(new Date(System.currentTimeMillis()));
+            if(!firstName.isEmpty() || !surname.isEmpty() || !secondName.isEmpty()) {
+                Person person = new Person(firstName, surname, secondName);
+                user.setPerson(person);
+                session.save(person);
+            }
             if (User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
                     this.printError("Заполните имя роли");
@@ -322,6 +331,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             if (role.equals(User.DefaultRole.CARD_OPERATOR)){
                 user.setFunctions(functionSelector.getCardOperatorFunctions(session));
                 user.setRoleName(role.toString());
+                user.setDepartment(department);
             }
             user.setNeedChangePassword(needChangePassword);
             session.save(user);
@@ -429,6 +439,38 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
 
     public void setNeedChangePassword(Boolean needChangePassword) {
         this.needChangePassword = needChangePassword;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public static class ContragentItem {

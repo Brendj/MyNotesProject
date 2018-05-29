@@ -16,6 +16,12 @@
              columns="2">
     <h:outputText escape="true" value="Имя пользователя" styleClass="output-text" />
     <h:inputText value="#{mainPage.userCreatePage.userName}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userCreatePage.surname}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Имя" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userCreatePage.firstName}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userCreatePage.secondName}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Пароль" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.userCreatePage.plainPassword}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Повторите пароль" styleClass="output-text" />
@@ -51,6 +57,11 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>--%>
+
+    <h:outputText escape="true" value="Подразделение" styleClass="output-text" rendered="#{mainPage.userCreatePage.isCardOperator}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userCreatePage.isCardOperator}">
+        <h:inputText value="#{mainPage.userCreatePage.department}" maxlength="128" styleClass="input-text" />
+    </h:panelGroup>
 
     <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" rendered="#{!mainPage.userCreatePage.isSecurityAdmin && !mainPage.userCreatePage.isDirector}"/>
     <h:panelGroup styleClass="borderless-div" rendered="#{!mainPage.userCreatePage.isSecurityAdmin && !mainPage.userCreatePage.isDirector}">
