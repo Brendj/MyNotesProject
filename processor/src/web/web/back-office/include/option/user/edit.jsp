@@ -16,6 +16,12 @@
              columns="2">
     <h:outputText escape="true" value="Имя пользователя" styleClass="output-text" />
     <h:inputText value="#{mainPage.userEditPage.userName}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userEditPage.surname}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Имя" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userEditPage.firstName}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userEditPage.secondName}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Сменить пароль" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.userEditPage.changePassword}" styleClass="output-text">
         <a4j:support event="onclick" reRender="userEditGrid" ajaxSingle="true" />
@@ -70,6 +76,12 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>--%>
+
+    <h:outputText escape="true" value="Подразделение" styleClass="output-text" rendered="#{mainPage.userEditPage.isCardOperator}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userEditPage.isCardOperator}">
+        <h:inputText value="#{mainPage.userEditPage.department}" maxlength="128" styleClass="input-text" />
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}"/>
     <h:panelGroup styleClass="borderless-div" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
         <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
