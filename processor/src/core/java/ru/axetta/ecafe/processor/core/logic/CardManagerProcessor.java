@@ -56,7 +56,7 @@ public class CardManagerProcessor implements CardManager {
 
     public Long createCard(Session persistenceSession, Long idOfClient, long cardNo,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
-            Long cardPrintedNo, User cardOperatorUser) throws Exception {
+            Long cardPrintedNo, User cardOperatorUser, AccountTransaction transaction) throws Exception {
 
         logger.debug("check valid date");
         if (validTime.after(CalendarUtils.AFTER_DATE)) {
@@ -121,6 +121,7 @@ public class CardManagerProcessor implements CardManager {
         //История карты при создании новой карты
         HistoryCard historyCard = new HistoryCard();
         historyCard.setCard(card);
+        historyCard.setTransaction(transaction);
         historyCard.setUpDatetime(new Date());
         historyCard.setNewOwner(client);
         historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo());
@@ -139,6 +140,13 @@ public class CardManagerProcessor implements CardManager {
     public Long createCardTransactionFree(Session session, Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo) throws Exception {
         return createCard(session, idOfClient, cardNo, cardType, state, validTime, lifeState, lockReason, issueTime, cardPrintedNo, null);
+    }
+
+    public Long createCard(Session persistenceSession, Long idOfClient, long cardNo,
+            int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
+            Long cardPrintedNo, User cardOperatorUser) throws Exception {
+        return createCard(persistenceSession, idOfClient, cardNo, cardType, state, validTime, lifeState,
+                lockReason, issueTime, cardPrintedNo, cardOperatorUser, null);
     }
 
     @Override
@@ -515,11 +523,10 @@ public class CardManagerProcessor implements CardManager {
             throw new Exception("Не хватает средств на лицевом счете. Текущий баланс: " + client.getBalance() / 100 + " р.");
         }
         AccountTransaction accountTransaction = null;
-        Date currTime = new Date();
-        accountTransaction = ClientAccountManager.processAccountTransaction(persistenceSession, client, null, -price, "",
-                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, currTime);
+        accountTransaction = ClientAccountManager.processAccountTransaction(persistenceSession, client, null, -price, cardPrintedNo.toString(),
+                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, issueTime);
         createCard(persistenceSession, idOfClient, cardNo, cardType, state, validTime, lifeState,
-                lockReason, issueTime, cardPrintedNo, user);
+                lockReason, issueTime, cardPrintedNo, user, accountTransaction);
         persistenceSession.save(accountTransaction);
     }
 

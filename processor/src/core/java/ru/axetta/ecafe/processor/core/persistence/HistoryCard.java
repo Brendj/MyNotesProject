@@ -44,6 +44,11 @@ public class HistoryCard {
      */
     private User user;
 
+    /**
+     * Транзакция в случае покупки карты
+     */
+    private AccountTransaction transaction;
+
     public HistoryCard() {
 
     }
@@ -111,5 +116,13 @@ public class HistoryCard {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public AccountTransaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(AccountTransaction transaction) {
+        this.transaction = transaction;
     }
 }

@@ -242,6 +242,7 @@ public class MainPage implements Serializable {
     private final NewCardFileLoadPage newCardFileLoadPage = new NewCardFileLoadPage();
     private final CardExpireBatchEditPage cardExpireBatchEditPage = new CardExpireBatchEditPage();
     private final VisitorDogmLoadPage visitorDogmLoadPage = new VisitorDogmLoadPage();
+    private final CreatedAndReissuedCardReportFromCardOperatorPage createdAndReissuedCardReportFromCardOperatorPage = new CreatedAndReissuedCardReportFromCardOperatorPage();
 
     // Service pages
     private final BasicWorkspacePage serviceNewGroupPage = new BasicWorkspacePage();
@@ -10217,6 +10218,37 @@ public class MainPage implements Serializable {
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при обработке выбора пользователя: " + e.getMessage(), null));
         }
+        return null;
+    }
+
+    public CreatedAndReissuedCardReportFromCardOperatorPage getCreatedAndReissuedCardReportFromCardOperatorPage() {
+        return createdAndReissuedCardReportFromCardOperatorPage;
+    }
+
+    public Object showCreatedAndReissuedCardReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        User user = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            user = getSessionInstance().getCurrentUser();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            createdAndReissuedCardReportFromCardOperatorPage.fill(persistenceSession, user);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = createdAndReissuedCardReportFromCardOperatorPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill card list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по картам: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
         return null;
     }
 }

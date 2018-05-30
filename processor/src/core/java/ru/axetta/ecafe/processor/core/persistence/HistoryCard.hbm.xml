@@ -22,6 +22,7 @@
                      not-null="false"/>
         <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser"
                     not-null="false"/>
+        <many-to-one name="transaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction" column="idoftransaction"/>
 
         <property name="informationAboutCard" column="informationaboutcard" type="string" length="1024"/>
     </class>
