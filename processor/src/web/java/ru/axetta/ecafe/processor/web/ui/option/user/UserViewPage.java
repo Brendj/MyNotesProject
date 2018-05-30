@@ -24,6 +24,9 @@ public class UserViewPage extends BasicWorkspacePage {
     private String userName;
     private String phone;
     private String email;
+    private String firstName;
+    private String surname;
+    private String secondName;
     private Date updateTime;
     private final FunctionViewer functionViewer = new FunctionViewer();
 
@@ -63,6 +66,36 @@ public class UserViewPage extends BasicWorkspacePage {
         this.phone = user.getPhone();
         this.email = user.getEmail();
         this.functionViewer.fill(user);
+        if(user.getPerson() != null){
+            this.firstName = user.getPerson().getFirstName();
+            this.surname = user.getPerson().getSurname();
+            this.secondName = user.getPerson().getSecondName();
+        } else {
+            this.firstName = this.surname = this.secondName = "";
+        }
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
+    }
 }

@@ -13,6 +13,12 @@
              columns="2">
     <h:outputText escape="true" value="Имя пользователя" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.userViewPage.userName}" styleClass="input-text" />
+    <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userViewPage.surname}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Имя" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userViewPage.firstName}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+    <h:inputText value="#{mainPage.userViewPage.secondName}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Контактный телефон" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.userViewPage.phone}" styleClass="input-text"
                  converter="phoneConverter" />
