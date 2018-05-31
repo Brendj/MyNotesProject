@@ -96,7 +96,7 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
                 + "od.rprice, od.qty, o.ordertype, od.menuorigin "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
-                + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) "
+                + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + org_condition
                 + "order by org.idoforg");
         query.setParameter("startDate", startDate.getTime());
