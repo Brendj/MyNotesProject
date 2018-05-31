@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.security;
 
+import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -17,6 +18,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
 import java.util.Collections;
@@ -57,7 +59,11 @@ public class UserSelectPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session, Long idOfUser) throws Exception {
-        List<UserShortItem> items = retrieveUsers(session, getFilter());
+        fill(session, idOfUser, null);
+    }
+
+    public void fill(Session session, Long idOfUser, User.DefaultRole role) throws Exception {
+        List<UserShortItem> items = retrieveUsersByRole(session, getFilter(), role);
         UserShortItem selectedItem = new UserShortItem();
         if (null != idOfUser) {
             Criteria criteria = session.createCriteria(User.class);
@@ -105,20 +111,26 @@ public class UserSelectPage extends BasicWorkspacePage {
         void completeUserSelection(Session session, Long idOfUser) throws Exception;
     }
 
-    public static List<UserShortItem> retrieveUsers(Session session, String filter) throws HibernateException {
-
+    public static List<UserShortItem> retrieveUsersByRole(Session session, String filter, User.DefaultRole role) throws HibernateException {
         Criteria userCriteria = session.createCriteria(User.class);
         userCriteria.addOrder(Order.asc("idOfUser"));
-
 
         if (StringUtils.isNotEmpty(filter)) {
             userCriteria.add(Restrictions.or(Restrictions.ilike("userName", filter, MatchMode.ANYWHERE),
                     Restrictions.ilike("userName", filter, MatchMode.ANYWHERE)));
         }
 
+        if (null != role) {
+            userCriteria.add(Restrictions.eq("idOfRole", role.getIdentification()));
+        }
+
+        userCriteria.createAlias("person", "p", JoinType.LEFT_OUTER_JOIN);
         userCriteria.setProjection(
                 Projections.projectionList().add(Projections.distinct(Projections.property("idOfUser")), "idOfUser")
-                        .add(Projections.property("userName"), "userName"));
+                        .add(Projections.property("userName"), "userName")
+                        .add(Projections.property("p.firstName"), "firstName")
+                        .add(Projections.property("p.surname"), "surname")
+                        .add(Projections.property("p.secondName"), "secondName"));
         userCriteria.setCacheMode(CacheMode.NORMAL);
         userCriteria.setCacheable(true);
         userCriteria.setResultTransformer(Transformers.aliasToBean(UserShortItem.class));
@@ -126,10 +138,17 @@ public class UserSelectPage extends BasicWorkspacePage {
         return (List<UserShortItem>) userCriteria.list();
     }
 
+    public static List<UserShortItem> retrieveUsers(Session session, String filter) throws HibernateException {
+        return retrieveUsersByRole(session, filter, null);
+    }
+
     public static class UserShortItem {
 
         private Long idOfUser;
         private String userName;
+        private String firstName;
+        private String secondName;
+        private String surname;
         private Boolean selected = false;
 
         public UserShortItem() {
@@ -163,6 +182,41 @@ public class UserSelectPage extends BasicWorkspacePage {
 
         public void setSelected(Boolean selected) {
             this.selected = selected;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getSecondName() {
+            return secondName;
+        }
+
+        public void setSecondName(String secondName) {
+            this.secondName = secondName;
+        }
+
+        public String getSurname() {
+            return surname;
+        }
+
+        public void setSurname(String surname) {
+            this.surname = surname;
+        }
+
+        public String getSurnameAndFirstLetters() {
+            String n = getSurname();
+            if (null == n) return "";
+            String fn = getFirstName();
+            if ((null == fn) || (fn.length()==0)) return n;
+            fn = fn.substring(0, 1)+".";
+            String sn = getSecondName();
+            if ((null == sn) || (sn.length()!=0)) sn=sn.substring(0, 1)+".";
+            return n+" "+fn+sn;
         }
     }
 }

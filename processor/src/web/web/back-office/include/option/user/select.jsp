@@ -64,6 +64,13 @@
                             <h:outputText escape="true" value="#{item.userName}"
                                           styleClass="output-text" />
                         </rich:column>
+                        <rich:column headerClass="column-header">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="ФИО" />
+                            </f:facet>
+                            <h:outputText escape="true" value="#{item.getSurnameAndFirstLetters()}"
+                                          styleClass="output-text" />
+                        </rich:column>
                         <f:facet name="footer">
                             <rich:datascroller for="modalUserSelectorUserTable" renderIfSinglePage="false" maxPages="5"
                                                fastControls="hide" stepControls="auto" boundaryControls="hide">

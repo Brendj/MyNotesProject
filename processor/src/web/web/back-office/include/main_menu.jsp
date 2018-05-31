@@ -1405,6 +1405,10 @@
                             binding="#{interactiveCardDataReportPage.mainMenuComponent}"
                             label="Отчет по обороту электронных карт" action="#{interactiveCardDataReportPage.show}"
                             reRender="workspaceForm" />
+        <rich:panelMenuItem id="issuedCardsReportMenuItem"
+                            binding="#{mainPage.issuedCardsReportPage.mainMenuComponent}"
+                            label="Отчет о выданных и перевыпущенных картах" action="#{mainPage.issuedCardsReportPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="passReportsGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PassReportsGroupPage"--%>

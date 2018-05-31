@@ -8,12 +8,15 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar,reportPanel"
+                         actionListener="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.onReportPeriodChanged}" />
+        </rich:calendar>
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDateCalendar,goodRequestsNewReportPanel"
-                         actionListener="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.onReportPeriodChanged}" />
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect,reportPanel"
+                         actionListener="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.onEndDateSpecified}" />
         </rich:calendar>
         <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
         <h:selectOneMenu id="endDatePeriodSelect"

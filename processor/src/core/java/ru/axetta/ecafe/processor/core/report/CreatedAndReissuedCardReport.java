@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,29 +33,9 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
 
 
     private final static Logger logger = LoggerFactory.getLogger(CreatedAndReissuedCardReport.class);
-    public static DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");
+    public static DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
-    private Date startDate;
-    private Date endDate;
     protected List<CreatedAndReissuedCardReportItem> items;
-
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
@@ -64,8 +45,8 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
     }
 
     private CreatedAndReissuedCardReport(Date startDate, Date endDate, List<CreatedAndReissuedCardReportItem> items, JasperPrint jasperPrint){
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startTime = startDate;
+        this.endTime = endDate;
         this.items = items;
         this.setPrint(jasperPrint);
     }
@@ -111,12 +92,14 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 criteriaHistoryCard
                         .add(Restrictions.eq("user", user))
                         .add(Restrictions.between("upDatetime", startTime, endTime));
+                criteriaHistoryCard.addOrder(Order.asc("upDatetime"));
                 listOfHistoryCard = criteriaHistoryCard.list();
             }else{
                 Criteria criteriaHistoryCard = session.createCriteria(HistoryCard.class);
                 criteriaHistoryCard
                         .add(Restrictions.between("upDatetime", startTime, endTime))
                         .add(Restrictions.isNotNull("user"));
+                criteriaHistoryCard.addOrder(Order.asc("upDatetime"));
                 listOfHistoryCard = criteriaHistoryCard.list();
             }
             long number = 1;
@@ -139,6 +122,9 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 items.add(item);
                 number++;
             }
+
+            if (items.isEmpty())
+                throw new Exception("Недостаточно данных для построения отчета");
 
             JRDataSource dataSource = createDataSource(items);
             JasperPrint jasperPrint = JasperFillManager

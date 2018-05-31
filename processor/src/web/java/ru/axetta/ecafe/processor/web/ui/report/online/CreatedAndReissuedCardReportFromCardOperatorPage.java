@@ -35,9 +35,10 @@ public class CreatedAndReissuedCardReportFromCardOperatorPage extends OnlineRepo
     public CreatedAndReissuedCardReportFromCardOperatorPage(){
         super();
         localCalendar.setTime(this.startDate);
-        localCalendar.add(Calendar.DATE, 7);
+        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
+        this.periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
     }
 
     public Object generateReport() {

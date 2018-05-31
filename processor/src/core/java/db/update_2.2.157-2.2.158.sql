@@ -6,3 +6,7 @@
 
 --Флаг информирования об условиях предоставления питания по предзаказам
 alter table cf_client_guardian add column informedspecialmenu integer;
+
+alter table cf_users add column idofperson bigint;
+alter table cf_users add column department character varying(128);
+alter table cf_history_card add column idoftransaction bigint;

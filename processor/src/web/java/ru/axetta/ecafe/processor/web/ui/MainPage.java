@@ -242,7 +242,9 @@ public class MainPage implements Serializable {
     private final NewCardFileLoadPage newCardFileLoadPage = new NewCardFileLoadPage();
     private final CardExpireBatchEditPage cardExpireBatchEditPage = new CardExpireBatchEditPage();
     private final VisitorDogmLoadPage visitorDogmLoadPage = new VisitorDogmLoadPage();
-    private final CreatedAndReissuedCardReportFromCardOperatorPage createdAndReissuedCardReportFromCardOperatorPage = new CreatedAndReissuedCardReportFromCardOperatorPage();
+    private final CreatedAndReissuedCardReportFromCardOperatorPage createdAndReissuedCardReportFromCardOperatorPage =
+            new CreatedAndReissuedCardReportFromCardOperatorPage();
+    private final IssuedCardsReportPage issuedCardsReportPage = new IssuedCardsReportPage();
 
     // Service pages
     private final BasicWorkspacePage serviceNewGroupPage = new BasicWorkspacePage();
@@ -3429,6 +3431,11 @@ public class MainPage implements Serializable {
     }
 
     public Object showUserSelectPage() {
+        showUserSelectPage(null);
+        return null;
+    }
+
+    public void showUserSelectPage(User.DefaultRole role) {
         BasicPage currentTopMostPage = getTopMostPage();
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -3439,7 +3446,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            userSelectPage.fill(persistenceSession, null);
+            userSelectPage.fill(persistenceSession, null, role);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             if (currentTopMostPage instanceof UserSelectPage.CompleteHandler) {
@@ -3455,7 +3462,6 @@ public class MainPage implements Serializable {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return null;
     }
 
     public Object clearClientSelectListPageFilter() {
@@ -10250,5 +10256,9 @@ public class MainPage implements Serializable {
         }
         updateSelectedMainMenu();
         return null;
+    }
+
+    public IssuedCardsReportPage getIssuedCardsReportPage() {
+        return issuedCardsReportPage;
     }
 }

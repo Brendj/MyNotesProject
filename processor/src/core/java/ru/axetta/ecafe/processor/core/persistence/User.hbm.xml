@@ -40,7 +40,7 @@
         <property name="passwordDate" column="PasswordDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="attemptNumber" column="AttemptNumber" type="integer"/>
         <property name="department" column="department" type="string" length="64" not-null="false" />
-        <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="idofperson" fetch="select"/>
+        <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="idofperson" fetch="select" lazy="false"/>
 
         <set name="contragents" table="CF_UserContragents">
             <key column="IdOfUser"/>
