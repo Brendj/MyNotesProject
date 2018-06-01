@@ -1875,7 +1875,7 @@
         <rich:panelMenuItem id="cardOperatorList" binding="#{mainPage.cardOperatorListPage.mainMenuComponent}"
                             label="Список операций" action="#{mainPage.showCardOperatorListPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="crateAndReissueCardReport" binding="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.mainMenuComponent}"
-                            label="Отчет по картам" action="#{mainPage.showCreatedAndReissuedCardReport}" reRender="workspaceForm" />
+                            label="Отчет по операциям" action="#{mainPage.showCreatedAndReissuedCardReport}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
 </rich:panelMenu>

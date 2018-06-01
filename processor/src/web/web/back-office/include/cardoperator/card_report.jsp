@@ -30,6 +30,8 @@
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.generateReport}"
                            reRender="workspaceTogglePanel, reportPanel"
                            styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.createdAndReissuedCardReportFromCardOperatorPage.exportToXLS}"
+                         styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -50,4 +52,6 @@
             </f:verbatim>
         </c:if>
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 </h:panelGrid>
