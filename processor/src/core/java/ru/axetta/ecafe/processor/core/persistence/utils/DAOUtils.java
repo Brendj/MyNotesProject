@@ -3092,4 +3092,11 @@ public class DAOUtils {
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
     }
+
+    public static List<User> getUsersByIds(Session session, List<Long> idOfUserList) {
+        Criteria criteria = session.createCriteria(User.class);
+        criteria.add(Restrictions.in("idOfUser", idOfUserList));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("idOfUser"));
+        return criteria.list();
+    }
 }

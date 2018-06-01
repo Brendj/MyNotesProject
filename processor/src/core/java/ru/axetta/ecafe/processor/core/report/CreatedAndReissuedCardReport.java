@@ -53,7 +53,7 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
         private final String templateFilename;
-        private User user = null;
+        private List<User> userList = new ArrayList<User>();
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -87,10 +87,10 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
             parameterMap.put("endDate", format.format(endTime));
             List<HistoryCard> listOfHistoryCard = Collections.emptyList();
             List<CreatedAndReissuedCardReportItem> items = new LinkedList<CreatedAndReissuedCardReportItem>();
-            if(user != null){
+            if(!userList.isEmpty()){
                 Criteria criteriaHistoryCard = session.createCriteria(HistoryCard.class);
                 criteriaHistoryCard
-                        .add(Restrictions.eq("user", user))
+                        .add(Restrictions.in("user", userList))
                         .add(Restrictions.between("upDatetime", startTime, endTime));
                 criteriaHistoryCard.addOrder(Order.asc("upDatetime"));
                 listOfHistoryCard = criteriaHistoryCard.list();
@@ -138,12 +138,17 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        public User getUser() {
-            return user;
+        public List<User> getUserList() {
+            return userList;
         }
 
-        public void setUser(User user) {
-            this.user = user;
+        public void setUserList(List<User> userList) {
+            this.userList = userList;
+        }
+
+        public void addUser(User user) {
+            this.userList.clear();
+            this.userList.add(user);
         }
     }
 

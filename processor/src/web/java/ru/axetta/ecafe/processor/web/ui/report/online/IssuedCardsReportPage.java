@@ -11,11 +11,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.CreatedAndReissuedCardReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.report.security.UserSelectPage;
+import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -33,17 +35,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
-public class IssuedCardsReportPage extends OnlineReportPage implements UserSelectPage.CompleteHandler  {
+public class IssuedCardsReportPage extends OnlineReportPage implements UserListSelectPage.CompleteHandlerList  {
 
     private final static Logger logger = LoggerFactory.getLogger(MonitoringOfReportPage.class);
     private final String reportName = CreatedAndReissuedCardReport.REPORT_NAME;
     private Calendar localCalendar;
     private String htmlReport = null;
-    private final UserSelectPage.UserShortItem userItem = new UserSelectPage.UserShortItem();
+    private List<Long> idOfUsersList;
 
     public IssuedCardsReportPage() {
         super();
@@ -62,7 +62,7 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserSelec
     }
 
     public void showUserSelectPage() {
-        MainPage.getSessionInstance().showUserSelectPage(User.DefaultRole.CARD_OPERATOR);
+        MainPage.getSessionInstance().showUserListSelectPage(User.DefaultRole.CARD_OPERATOR);
     }
 
     public Object buildReportHTML() {
@@ -79,9 +79,8 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserSelec
         Transaction persistenceTransaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            builder.setUser(MainPage.getSessionInstance().getCurrentUser());
             persistenceTransaction = session.beginTransaction();
-            builder.setUser((User) session.load(User.class, userItem.getIdOfUser()));
+            builder.setUserList(DAOUtils.getUsersByIds(session, idOfUsersList));
             report = builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -126,9 +125,8 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserSelec
         Transaction persistenceTransaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            builder.setUser(MainPage.getSessionInstance().getCurrentUser());
             persistenceTransaction = session.beginTransaction();
-            builder.setUser((User) session.load(User.class, userItem.getIdOfUser()));
+            builder.setUserList(DAOUtils.getUsersByIds(session, idOfUsersList));
             report =  builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -167,8 +165,8 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserSelec
     }
 
     private boolean validateFormData() {
-        if (null == userItem.getIdOfUser()) {
-            printError("Выберите пользователя");
+        if (idOfUsersList.isEmpty()) {
+            printError("Выберите пользователей");
             return true;
         }
         return false;
@@ -203,30 +201,28 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserSelec
     }
 
     @Override
-    public void completeUserSelection(Session session, Long id) throws Exception {
-        if (id == null) {
-            filter = "Не выбрано";
-            userItem.setIdOfUser(null);
-            userItem.setUserName(null);
-            return;
-        }
-        User user = DAOReadonlyService.getInstance().findUserById(id);
-        if (user != null) {
-            filter = user.getUserName();
-            userItem.setIdOfUser(user.getIdOfUser());
-            userItem.setUserName(user.getUserName());
-            Person person = user.getPerson();
-            if (null != person) {
-                userItem.setFirstName(person.getFirstName());
-                userItem.setSecondName(person.getSecondName());
-                userItem.setSurname(person.getSurname());
-                filter += " (" + userItem.getSurnameAndFirstLetters() + ")";
+    public void completeUserListSelection(Map<Long, String> userMap) throws Exception {
+        if (null != userMap) {
+            idOfUsersList = new ArrayList<Long>();
+            if (userMap.isEmpty())
+                filter = "Не выбрано";
+            else {
+                filter = "";
+                for(Long idOfUser : userMap.keySet()) {
+                    idOfUsersList.add(idOfUser);
+                    filter = filter.concat(userMap.get(idOfUser) + "; ");
+                }
+                filter = filter.substring(0, filter.length() - 1);
             }
-        } else {
-            filter = "Не выбрано";
-            userItem.setIdOfUser(null);
-            userItem.setUserName(null);
         }
+    }
+
+    public List<Long> getIdOfUsersList() {
+        return idOfUsersList;
+    }
+
+    public void setIdOfUsersList(List<Long> idOfUsersList) {
+        this.idOfUsersList = idOfUsersList;
     }
 
     @Override

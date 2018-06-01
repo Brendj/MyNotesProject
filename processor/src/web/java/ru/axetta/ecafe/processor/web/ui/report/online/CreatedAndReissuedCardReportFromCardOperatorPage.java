@@ -55,12 +55,17 @@ public class CreatedAndReissuedCardReportFromCardOperatorPage extends OnlineRepo
         Transaction persistenceTransaction = null;
         CreatedAndReissuedCardReport.Builder reportBuilder = new CreatedAndReissuedCardReport.Builder();
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            reportBuilder.setUser(MainPage.getSessionInstance().getCurrentUser());
-            persistenceTransaction = session.beginTransaction();
-            this.report = reportBuilder.build(session, startDate, endDate, new GregorianCalendar());
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                reportBuilder.addUser(MainPage.getSessionInstance().getCurrentUser());
+                persistenceTransaction = session.beginTransaction();
+                this.report = reportBuilder.build(session, startDate, endDate, new GregorianCalendar());
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(session, logger);
+            }
         } catch(Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -102,7 +107,7 @@ public class CreatedAndReissuedCardReportFromCardOperatorPage extends OnlineRepo
         Transaction persistenceTransaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            builder.setUser(MainPage.getSessionInstance().getCurrentUser());
+            builder.addUser(MainPage.getSessionInstance().getCurrentUser());
             persistenceTransaction = session.beginTransaction();
             report = builder.build(session, startDate, endDate, new GregorianCalendar());
             persistenceTransaction.commit();

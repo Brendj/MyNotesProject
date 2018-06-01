@@ -64,6 +64,7 @@ import ru.axetta.ecafe.processor.web.ui.service.msk.CancelCategoryBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlBenefitsPage;
 import ru.axetta.ecafe.processor.web.ui.service.msk.GroupControlSubscriptionsPage;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
+import ru.axetta.ecafe.processor.web.ui.user.UserListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.visitordogm.VisitorDogmLoadPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -144,6 +145,7 @@ public class MainPage implements Serializable {
     private String DEFAULT_ORG_FILTER_PAGE_NAME = "Выбор организаций";
     private String orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
     private Long contractIdCardOperator;
+    private String userFilterOfSelectUserListSelectPage = "";
 
     private boolean eligibleToViewUsers;
 
@@ -377,6 +379,7 @@ public class MainPage implements Serializable {
     private final UserSelectPage userSelectPage = new UserSelectPage();
     private final OrgMainBuildingListSelectPage orgMainBuildingListSelectPage = new OrgMainBuildingListSelectPage();
     private final CardRegistrationConfirm cardRegistrationConfirm = new CardRegistrationConfirm();
+    private final UserListSelectPage userListSelectPage = new UserListSelectPage();
 
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
@@ -10260,5 +10263,122 @@ public class MainPage implements Serializable {
 
     public IssuedCardsReportPage getIssuedCardsReportPage() {
         return issuedCardsReportPage;
+    }
+
+    public UserListSelectPage getUserListSelectPage() {
+        return userListSelectPage;
+    }
+
+    public Object clearUserListSelectedItemsList() {
+        userListSelectPage.deselectAllItems();
+        userFilterOfSelectUserListSelectPage = "";
+        updateUserListSelectPage();
+        return null;
+    }
+
+    public Object selectAllUserListSelectedItemsList() {
+        userListSelectPage.selectAllItems();
+        updateUserListSelectPage();
+        return null;
+    }
+
+    public Object updateUserListSelectPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            userListSelectPage.fill(persistenceSession, userListSelectPage.getSelectedUsers().keySet(),
+                    userListSelectPage.getRoleFilter(), true, this, userFilterOfSelectUserListSelectPage);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill user selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора пользователей: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object completeUserListSelectionOk() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            userListSelectPage.completeUserListSelection(true);
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == userListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete users selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора пользователей: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+    public Object completeUserListSelectionCancel() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            userListSelectPage.completeUserListSelection(false);
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == userListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete users selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора пользователей: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
+
+    public void showUserListSelectPage() {
+        showUserSelectPage(null);
+    }
+
+    public void showUserListSelectPage(User.DefaultRole role) {
+        BasicPage currentTopMostPage = getTopMostPage();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            userListSelectPage.fill(persistenceSession, null, role, false, this, userFilterOfSelectUserListSelectPage);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (currentTopMostPage instanceof UserListSelectPage.CompleteHandlerList) {
+                userListSelectPage.pushCompleteHandlerList((UserListSelectPage.CompleteHandlerList) currentTopMostPage);
+                modalPages.push(userListSelectPage);
+            }
+
+        } catch (Exception e) {
+            logger.error("Failed to fill users selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора пользователей: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    public String getUserFilterOfSelectUserListSelectPage() {
+        return userFilterOfSelectUserListSelectPage;
+    }
+
+    public void setUserFilterOfSelectUserListSelectPage(String userFilterOfSelectUserListSelectPage) {
+        this.userFilterOfSelectUserListSelectPage = userFilterOfSelectUserListSelectPage;
     }
 }

@@ -10,11 +10,11 @@
         <h:outputText escape="true" value="Пользователь" styleClass="output-text" />
         <h:panelGroup id="userFilter">
             <a4j:commandButton value="..." action="#{mainPage.issuedCardsReportPage.showUserSelectPage()}"
-                               reRender="modalUserSelectorPanel,userFilter"
+                               reRender="modalUserListSelectorPanel,userFilter"
                                oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalUserSelectorPanel')}.show();"
+                                        #{rich:component('modalUserListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{mainPage.userSelectPage.filter}" target="#{mainPage.userSelectPage.filter}" />
+                <f:setPropertyActionListener value="#{mainPage.userListSelectPage.filter}" target="#{mainPage.userListSelectPage.filter}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" id="selectedUser"
                           value=" {#{mainPage.issuedCardsReportPage.filter}}" />
