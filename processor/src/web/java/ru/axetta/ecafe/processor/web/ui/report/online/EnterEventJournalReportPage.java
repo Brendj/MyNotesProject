@@ -155,15 +155,7 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                         Properties properties = new Properties();
                         String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
                         properties.setProperty("groupName", groupNamesString);
-
-                        String eventNums = "";
-
-
-                        for (Integer event1: eventState) {
-                                eventNums = eventNums + event1 + ",";
-                        }
-
-                        properties.setProperty("eventNums", eventNums);
+                        properties.setProperty("eventFilter", selectedEventFilter.toString());
 
                         builder.setReportProperties(properties);
                         report = builder.build(persistenceSession, startDate, endDate, localCalendar);
