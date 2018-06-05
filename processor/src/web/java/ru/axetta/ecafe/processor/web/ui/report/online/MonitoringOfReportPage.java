@@ -13,14 +13,11 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.MonitoringOfReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2018. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.report;
@@ -16,15 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by anvarov on 04.05.2017.
  */
 public class MonitoringOfReportService {
     final private static Logger logger = LoggerFactory.getLogger(MonitoringOfReportService.class);
+    private final static Integer ORGS_AMOUNT_FOR_REPORT = 20;
     public List<ReportItem> buildReportItems(Date startTime, List<Long> idOfOrgList) {
         List<DatePeriods> datePeriodsList = new ArrayList<DatePeriods>();
 
@@ -95,7 +94,12 @@ public class MonitoringOfReportService {
         return reportItemList;
     }
 
-    private List<List<MonitoringOfItem>> getMonitoringOfItems(Session session, List<DatePeriods> datePeriodList, Long idOfOrg) {
+    private List<List<MonitoringOfItem>> getMonitoringOfItems(List<DatePeriods> datePeriodList,
+            Long idOfOrg, Map<Long, List<NumberOfPasses>> numberOfPassesMap,
+            Map<Long, List<NumberOfPreferential>> numberOfPreferentialMap,
+            Map<Long, List<NumberOfStudentsAndGuardians>> numberOfBuffetMap,
+            Map<Long, List<NumberOfStudentsAndGuardians>> numberOfSubfeedMap,
+            Map<Long, List<NumberOfStudentsAndGuardians>> numberOfPaidMap) {
         List<List<MonitoringOfItem>> monitoringOfItemList = new ArrayList<List<MonitoringOfItem>>();
 
         for (DatePeriods datePeriod : datePeriodList) {
@@ -107,7 +111,7 @@ public class MonitoringOfReportService {
         }
 
         // passes
-        List<NumberOfPasses> numberOfPassesList = generateNumberOfPasses(session, datePeriodList, idOfOrg);
+        List<NumberOfPasses> numberOfPassesList = numberOfPassesMap.get(idOfOrg);
         for (int i = 0; i < numberOfPassesList.size(); i++) {
             NumberOfPasses numberOfPasses = numberOfPassesList.get(i);
             MonitoringOfItem monitoringOfItem = monitoringOfItemList.get(i).get(0);
@@ -123,7 +127,7 @@ public class MonitoringOfReportService {
         }
 
         // lgotnoe
-        List<NumberOfPreferential> numberOfLgotnoeList = numberOfPreferential(session, datePeriodList, idOfOrg);
+        List<NumberOfPreferential> numberOfLgotnoeList = numberOfPreferentialMap.get(idOfOrg);
         for (int i = 0; i < numberOfLgotnoeList.size(); i++) {
             NumberOfPreferential numberOfPreferential = numberOfLgotnoeList.get(i);
             MonitoringOfItem monitoringOfItem = monitoringOfItemList.get(i).get(0);
@@ -135,7 +139,7 @@ public class MonitoringOfReportService {
         }
 
         // buffet
-        List<NumberOfStudentsAndGuardians> numberOfBuffetList = numberOfBuffet(session, datePeriodList, idOfOrg);
+        List<NumberOfStudentsAndGuardians> numberOfBuffetList = numberOfBuffetMap.get(idOfOrg);
         for (int i = 0; i < numberOfBuffetList.size(); i++) {
             NumberOfStudentsAndGuardians numberOfBuffet = numberOfBuffetList.get(i);
             MonitoringOfItem monitoringOfItem = monitoringOfItemList.get(i).get(0);
@@ -145,7 +149,7 @@ public class MonitoringOfReportService {
         }
 
         // subfeed
-        List<NumberOfStudentsAndGuardians> numberOfSubfeedList = numberOfSubFeed(session, datePeriodList, idOfOrg);
+        List<NumberOfStudentsAndGuardians> numberOfSubfeedList = numberOfSubfeedMap.get(idOfOrg);
         for (int i = 0; i < numberOfSubfeedList.size(); i++) {
             NumberOfStudentsAndGuardians numberOfSubfeed = numberOfSubfeedList.get(i);
             MonitoringOfItem monitoringOfItem = monitoringOfItemList.get(i).get(0);
@@ -155,7 +159,7 @@ public class MonitoringOfReportService {
         }
 
         // paid
-        List<NumberOfStudentsAndGuardians> numberOfPaidList = numberOfPaid(session, datePeriodList, idOfOrg);
+        List<NumberOfStudentsAndGuardians> numberOfPaidList = numberOfPaidMap.get(idOfOrg);
         for (int i = 0; i < numberOfPaidList.size(); i++) {
             NumberOfStudentsAndGuardians numberOfPaid = numberOfPaidList.get(i);
             MonitoringOfItem monitoringOfItem = monitoringOfItemList.get(i).get(0);
@@ -167,720 +171,791 @@ public class MonitoringOfReportService {
         return monitoringOfItemList;
     }
 
-    private List<NumberOfPasses> generateNumberOfPasses(Session session, List<DatePeriods> datePeriodList, Long idOfOrg) {
-        List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>();
+    private Map<Long, List<NumberOfPasses>> generateNumberOfPasses(List<DatePeriods> datePeriodList, List<Long> idOfOrgList) {
+        Map<Long, List<NumberOfPasses>> result = new HashMap<Long, List<NumberOfPasses>>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Date wholeStartTime = datePeriodList.get(0).getStartDate();
+            Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
 
-        if (datePeriodList.isEmpty() || datePeriodList.size() > 6)
-            return numberOfPassesList;
+            String selectFields = "";
 
-        Date wholeStartTime = datePeriodList.get(0).getStartDate();
-        Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
+            if (datePeriodList.size() >= 1) {
+                selectFields +=
+                        "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students_monday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_monday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_monday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_monday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday))"
+                                + "                   THEN idofclient END)) AS number_of_passes_guardians_monday ";
+            }
 
-        String selectFields = "";
+            if (datePeriodList.size() >= 2) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students_tuesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_tuesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_tuesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_tuesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday))"
+                                + "                   THEN idofclient END)) AS number_of_passes_guardians_tuesday ";
+            }
 
-        if (datePeriodList.size() >= 1) {
-            selectFields +=
-                "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_students_monday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_students_monday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_employees_monday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_employees_monday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday))"
-              + "                   THEN idofclient END)) AS number_of_passes_guardians_monday ";
+            if (datePeriodList.size() >= 3) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday))"
+                                + "                   THEN idofclient END)) AS number_of_passes_guardians_wednesday ";
+            }
+
+            if (datePeriodList.size() >= 4) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students_thursday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_thursday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_thursday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_thursday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday))"
+                                + "                   THEN idofclient END)) AS number_of_passes_guardians_thursday ";
+            }
+
+            if (datePeriodList.size() >= 5) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students_friday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_friday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_friday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_friday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday))"
+                                + "                   THEN idofclient END)) AS number_of_passes_guardians_friday ";
+            }
+
+            if (datePeriodList.size() == 6) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students_saturday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_saturday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_saturday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
+                                + "                   AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_saturday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday))"
+                                + "                   THEN idofclient END)) AS number_of_passes_guardians_saturday ";
+            }
+            String orgCondition = "";
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                orgCondition = " idoforg in (:idOfOrgs) and ";
+            }
+
+            String sqlString =
+                    "SELECT idoforg, " + selectFields
+                            + "FROM cf_enterevents "
+                            + "WHERE " + orgCondition
+                            + "    ((idofclientgroup < :employees) OR idofclientgroup IN "
+                            + "        (:employees, :administration, :employee, :techEmployees, :parents, :visitors, :others)) "
+                            + " AND passdirection IN (:passEntry, :passExit, :passReEntry, :passReExit) AND evtdatetime BETWEEN :startTime AND :endTime "
+                            + "group by idoforg";
+
+            Query query = session.createSQLQuery(sqlString);
+
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+            query.setParameter("techEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                query.setParameterList("idOfOrgs", idOfOrgList);
+            }
+            query.setParameter("passEntry", EnterEvent.ENTRY);
+            query.setParameter("passExit", EnterEvent.EXIT);
+            query.setParameter("passReEntry", EnterEvent.RE_ENTRY);
+            query.setParameter("passReExit", EnterEvent.RE_EXIT);
+            query.setParameter("startTime", wholeStartTime.getTime());
+            query.setParameter("endTime", wholeEndTime.getTime());
+
+            updateQueryDates(query, datePeriodList);
+
+            List<Object[]> list = query.list();
+
+            for (Object[] object : list) {
+                List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>();
+                if (datePeriodList.size() >= 1) {
+                    NumberOfPasses numberOfPassesMonday = new NumberOfPasses(((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(),
+                            ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue());
+                    numberOfPassesList.add(numberOfPassesMonday);
+                }
+                if (datePeriodList.size() >= 2) {
+                    NumberOfPasses numberOfPassesTuesday = new NumberOfPasses(((BigInteger) object[6]).longValue(), ((BigInteger) object[7]).longValue(), ((BigInteger) object[8]).longValue(),
+                            ((BigInteger) object[9]).longValue(), ((BigInteger) object[10]).longValue());
+                    numberOfPassesList.add(numberOfPassesTuesday);
+                }
+                if (datePeriodList.size() >= 3) {
+                    NumberOfPasses numberOfPassesWednesday = new NumberOfPasses(((BigInteger) object[11]).longValue(), ((BigInteger) object[12]).longValue(), ((BigInteger) object[13]).longValue(),
+                            ((BigInteger) object[14]).longValue(), ((BigInteger) object[15]).longValue());
+                    numberOfPassesList.add(numberOfPassesWednesday);
+                }
+                if (datePeriodList.size() >= 4) {
+                    NumberOfPasses numberOfPassesThursday = new NumberOfPasses(((BigInteger) object[16]).longValue(), ((BigInteger) object[17]).longValue(), ((BigInteger) object[18]).longValue(),
+                            ((BigInteger) object[19]).longValue(), ((BigInteger) object[20]).longValue());
+                    numberOfPassesList.add(numberOfPassesThursday);
+                }
+                if (datePeriodList.size() >= 5) {
+                    NumberOfPasses numberOfPassesFriday = new NumberOfPasses(((BigInteger) object[21]).longValue(), ((BigInteger) object[22]).longValue(), ((BigInteger) object[23]).longValue(),
+                            ((BigInteger) object[24]).longValue(), ((BigInteger) object[25]).longValue());
+                    numberOfPassesList.add(numberOfPassesFriday);
+                }
+                if (datePeriodList.size() == 6) {
+                    NumberOfPasses numberOfPassesSaturday = new NumberOfPasses(((BigInteger) object[26]).longValue(), ((BigInteger) object[27]).longValue(), ((BigInteger) object[28]).longValue(),
+                            ((BigInteger) object[29]).longValue(), ((BigInteger) object[30]).longValue());
+                    numberOfPassesList.add(numberOfPassesSaturday);
+                }
+                result.put(((BigInteger) object[0]).longValue(), numberOfPassesList);
+            }
+            transaction.commit();
+            transaction = null;
+            for (Long idOfOrg : idOfOrgList) {
+                if (result.get(idOfOrg) == null) {
+                    List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>();
+                    for (int ii = 1; ii <= datePeriodList.size(); ii++) {
+                        NumberOfPasses numberOfPasses = new NumberOfPasses(0L, 0L, 0L, 0L, 0L);
+                        numberOfPassesList.add(numberOfPasses);
+                    }
+                    result.put(idOfOrg, numberOfPassesList);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in generateNumberOfPasses: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-
-        if (datePeriodList.size() >= 2) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_students_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_students_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_employees_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_employees_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday))"
-              + "                   THEN idofclient END)) AS number_of_passes_guardians_tuesday ";
-        }
-
-        if (datePeriodList.size() >= 3) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_students_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_students_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_employees_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_employees_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday))"
-              + "                   THEN idofclient END)) AS number_of_passes_guardians_wednesday ";
-        }
-
-        if (datePeriodList.size() >= 4) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_students_thursday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_students_thursday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_employees_thursday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_employees_thursday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday))"
-              + "                   THEN idofclient END)) AS number_of_passes_guardians_thursday ";
-        }
-
-        if (datePeriodList.size() >= 5) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_students_friday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_students_friday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_employees_friday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_employees_friday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday))"
-              + "                   THEN idofclient END)) AS number_of_passes_guardians_friday ";
-        }
-
-        if (datePeriodList.size() == 6) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_students_saturday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_students_saturday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                   THEN idofenterevent END)) AS number_of_passes_employees_saturday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-              + "                   AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                   THEN idofclient END)) AS number_of_unique_passes_employees_saturday, "
-              + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday))"
-              + "                   THEN idofclient END)) AS number_of_passes_guardians_saturday ";
-        }
-
-        String sqlString =
-                "SELECT " + selectFields
-              + "FROM cf_enterevents "
-              + "WHERE idoforg = :idOfOrg AND "
-              + "    ((idofclientgroup < :employees) OR idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :techEmployees, :parents, :visitors, :others)) "
-              + " AND passdirection IN (:passEntry, :passExit, :passReEntry, :passReExit) AND evtdatetime BETWEEN :startTime AND :endTime";
-
-        Query query = session.createSQLQuery(sqlString);
-
-        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-        query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
-        query.setParameter("techEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("passEntry", EnterEvent.ENTRY);
-        query.setParameter("passExit", EnterEvent.EXIT);
-        query.setParameter("passReEntry", EnterEvent.RE_ENTRY);
-        query.setParameter("passReExit", EnterEvent.RE_EXIT);
-        query.setParameter("startTime", wholeStartTime.getTime());
-        query.setParameter("endTime", wholeEndTime.getTime());
-
-        updateQueryDates(query, datePeriodList);
-
-        Object[] object = (Object[])query.uniqueResult();
-
-        if (datePeriodList.size() >= 1) {
-            NumberOfPasses numberOfPassesMonday = new NumberOfPasses(((BigInteger) object[0]).longValue(),
-                    ((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(),
-                    ((BigInteger) object[3]).longValue(), ((BigInteger) object[4]).longValue());
-            numberOfPassesList.add(numberOfPassesMonday);
-        }
-        if (datePeriodList.size() >= 2) {
-            NumberOfPasses numberOfPassesTuesday = new NumberOfPasses(((BigInteger) object[5]).longValue(),
-                    ((BigInteger) object[6]).longValue(), ((BigInteger) object[7]).longValue(),
-                    ((BigInteger) object[8]).longValue(), ((BigInteger) object[9]).longValue());
-            numberOfPassesList.add(numberOfPassesTuesday);
-        }
-        if (datePeriodList.size() >= 3) {
-            NumberOfPasses numberOfPassesWednesday = new NumberOfPasses(((BigInteger) object[10]).longValue(),
-                    ((BigInteger) object[11]).longValue(), ((BigInteger) object[12]).longValue(),
-                    ((BigInteger) object[13]).longValue(), ((BigInteger) object[14]).longValue());
-            numberOfPassesList.add(numberOfPassesWednesday);
-        }
-        if (datePeriodList.size() >= 4) {
-            NumberOfPasses numberOfPassesThursday = new NumberOfPasses(((BigInteger) object[15]).longValue(),
-                    ((BigInteger) object[16]).longValue(), ((BigInteger) object[17]).longValue(),
-                    ((BigInteger) object[18]).longValue(), ((BigInteger) object[19]).longValue());
-            numberOfPassesList.add(numberOfPassesThursday);
-        }
-        if (datePeriodList.size() >= 5) {
-            NumberOfPasses numberOfPassesFriday = new NumberOfPasses(((BigInteger) object[20]).longValue(),
-                    ((BigInteger) object[21]).longValue(), ((BigInteger) object[22]).longValue(),
-                    ((BigInteger) object[23]).longValue(), ((BigInteger) object[24]).longValue());
-            numberOfPassesList.add(numberOfPassesFriday);
-        }
-        if (datePeriodList.size() == 6) {
-            NumberOfPasses numberOfPassesSaturday = new NumberOfPasses(((BigInteger) object[25]).longValue(),
-                    ((BigInteger) object[26]).longValue(), ((BigInteger) object[27]).longValue(),
-                    ((BigInteger) object[28]).longValue(), ((BigInteger) object[29]).longValue());
-            numberOfPassesList.add(numberOfPassesSaturday);
-        }
-
-        return numberOfPassesList;
+        return result;
     }
 
-    private List<NumberOfPreferential> numberOfPreferential(Session session, List<DatePeriods> datePeriodList, Long idOfOrg) {
-        List<NumberOfPreferential> numberOfPreferentialList = new ArrayList<NumberOfPreferential>();
+    private Map<Long, List<NumberOfPreferential>> numberOfPreferential(List<DatePeriods> datePeriodList, List<Long> idOfOrgList) {
+        Map<Long, List<NumberOfPreferential>> result = new HashMap<Long, List<NumberOfPreferential>>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Date wholeStartTime = datePeriodList.get(0).getStartDate();
+            Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
 
-        if (datePeriodList.isEmpty() || datePeriodList.size() > 6)
-            return numberOfPreferentialList;
+            String selectFields = "";
 
-        Date wholeStartTime = datePeriodList.get(0).getStartDate();
-        Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
+            if (datePeriodList.size() >= 1) {
+                selectFields +=
+                    "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_monday, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_monday, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_monday ";
+            }
+            if (datePeriodList.size() >= 2) {
+                selectFields +=
+                    ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_tuesday, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_tuesday, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_tuesday ";
+            }
+            if (datePeriodList.size() >= 3) {
+                selectFields +=
+                    ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_wednesday, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_wednesday, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_wednesday ";
+            }
+            if (datePeriodList.size() >= 4) {
+                selectFields +=
+                    ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_thursday, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_thursday, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_thursday ";
+            }
+            if (datePeriodList.size() >= 5) {
+                selectFields +=
+                    ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_friday, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_friday, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_friday ";
+            }
+            if (datePeriodList.size() == 6) {
+                selectFields +=
+                    ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_saturday, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_saturday, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_saturday ";
+            }
 
-        String selectFields = "";
+            String orgCondition = "";
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
+            }
+            String sqlQuery =
+                    "SELECT cfo.idoforg, " + selectFields
+                  + "FROM cf_orders cfo "
+                  + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                  + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
+                  + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
+                  + "LEFT JOIN cf_friendly_organization fo on fo.currentorg = c.idoforg "
+                  + "WHERE cfo.ordertype IN (:reducedPricePlan, :correctionType) AND " + orgCondition
+                  + "    cfo.state = 0 AND g.idofclientgroup < :employees AND cfo.createddate BETWEEN :startTime AND :endTime AND "
+                  + "    cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0 group by cfo.idoforg";
 
-        if (datePeriodList.size() >= 1) {
-            selectFields +=
-                "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_monday, "
-              + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_monday, "
-              + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_reserve_monday ";
-        }
-        if (datePeriodList.size() >= 2) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_tuesday, "
-              + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_reserve_tuesday ";
-        }
-        if (datePeriodList.size() >= 3) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_wednesday, "
-              + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_reserve_wednesday ";
-        }
-        if (datePeriodList.size() >= 4) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_thursday, "
-              + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_thursday, "
-              + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_reserve_thursday ";
-        }
-        if (datePeriodList.size() >= 5) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_friday, "
-              + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_friday, "
-              + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_reserve_friday ";
-        }
-        if (datePeriodList.size() == 6) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_saturday, "
-              + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_saturday, "
-              + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                 THEN cfo.idofclient END)) AS number_of_reserve_saturday ";
-        }
+            Query query = session.createSQLQuery(sqlQuery);
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                query.setParameterList("idOfOrgs", idOfOrgList);
+            }
+            query.setParameter("startTime", wholeStartTime.getTime());
+            query.setParameter("endTime", wholeEndTime.getTime());
+            query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("reducedPricePlan", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
+            query.setParameter("correctionType", OrderTypeEnumType.CORRECTION_TYPE.ordinal());
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("reservePlan", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
+            query.setParameter("changePlan", OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal());
 
-        String sqlQuery =
-                "SELECT " + selectFields
-              + "FROM cf_orders cfo "
-              + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-              + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
-              + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-              + "LEFT JOIN "
-              + "    (SELECT friendlyorg "
-              + "     FROM cf_friendly_organization "
-              + "     WHERE currentorg = :idOfOrg) fo ON fo.friendlyorg = c.idoforg "
-              + "WHERE cfo.ordertype IN (:reducedPricePlan, :correctionType) AND cfo.idoforg = :idOfOrg AND "
-              + "    cfo.state = 0 AND g.idofclientgroup < :employees AND cfo.createddate BETWEEN :startTime AND :endTime AND "
-              + "    cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0";
+            updateQueryDates(query, datePeriodList);
 
-        Query query = session.createSQLQuery(sqlQuery);
+            List<Object[]> list = query.list();
+            for (Object[] object : list) {
+                List<NumberOfPreferential> numberOfPreferentialList = new ArrayList<NumberOfPreferential>();
 
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("startTime", wholeStartTime.getTime());
-        query.setParameter("endTime", wholeEndTime.getTime());
-        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("reducedPricePlan", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
-        query.setParameter("correctionType", OrderTypeEnumType.CORRECTION_TYPE.ordinal());
-        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("reservePlan", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
-        query.setParameter("changePlan", OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal());
+                if (datePeriodList.size() >= 1) {
+                    NumberOfPreferential numberOfPreferentialMonday = new NumberOfPreferential(((BigInteger) object[1]).longValue(),
+                            ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue());
+                    numberOfPreferentialList.add(numberOfPreferentialMonday);
+                }
+                if (datePeriodList.size() >= 2) {
+                    NumberOfPreferential numberOfPreferentialTuesday = new NumberOfPreferential(((BigInteger) object[4]).longValue(),
+                            ((BigInteger) object[5]).longValue(), ((BigInteger) object[6]).longValue());
+                    numberOfPreferentialList.add(numberOfPreferentialTuesday);
+                }
+                if (datePeriodList.size() >= 3) {
+                    NumberOfPreferential numberOfPreferentialWednesday = new NumberOfPreferential(((BigInteger) object[7]).longValue(),
+                            ((BigInteger) object[8]).longValue(), ((BigInteger) object[9]).longValue());
+                    numberOfPreferentialList.add(numberOfPreferentialWednesday);
+                }
+                if (datePeriodList.size() >= 4) {
+                    NumberOfPreferential numberOfPreferentialThursday = new NumberOfPreferential(((BigInteger) object[10]).longValue(),
+                            ((BigInteger) object[11]).longValue(), ((BigInteger) object[12]).longValue());
+                    numberOfPreferentialList.add(numberOfPreferentialThursday);
+                }
+                if (datePeriodList.size() >= 5) {
+                    NumberOfPreferential numberOfPreferentialFriday = new NumberOfPreferential(((BigInteger) object[13]).longValue(),
+                            ((BigInteger) object[14]).longValue(), ((BigInteger) object[15]).longValue());
+                    numberOfPreferentialList.add(numberOfPreferentialFriday);
+                }
+                if (datePeriodList.size() == 6) {
+                    NumberOfPreferential numberOfPreferentialSaturday = new NumberOfPreferential(((BigInteger) object[16]).longValue(),
+                            ((BigInteger) object[17]).longValue(), ((BigInteger) object[18]).longValue());
+                    numberOfPreferentialList.add(numberOfPreferentialSaturday);
+                }
+                result.put(((BigInteger) object[0]).longValue(), numberOfPreferentialList);
+            }
 
-        updateQueryDates(query, datePeriodList);
-
-        Object[] object = (Object[]) query.uniqueResult();
-
-        if (datePeriodList.size() >= 1) {
-            NumberOfPreferential numberOfPreferentialMonday = new NumberOfPreferential(((BigInteger) object[0]).longValue(),
-                    ((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue());
-            numberOfPreferentialList.add(numberOfPreferentialMonday);
+            transaction.commit();
+            transaction = null;
+            for (Long idOfOrg : idOfOrgList) {
+                if (result.get(idOfOrg) == null) {
+                    List<NumberOfPreferential> numberOfPreferentialList = new ArrayList<NumberOfPreferential>();
+                    for (int ii = 1; ii <= datePeriodList.size(); ii++) {
+                        NumberOfPreferential numberOfPreferential = new NumberOfPreferential(0L, 0L, 0L);
+                        numberOfPreferentialList.add(numberOfPreferential);
+                    }
+                    result.put(idOfOrg, numberOfPreferentialList);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in generateNumberOfPreferential: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        if (datePeriodList.size() >= 2) {
-            NumberOfPreferential numberOfPreferentialTuesday = new NumberOfPreferential(((BigInteger) object[3]).longValue(),
-                    ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue());
-            numberOfPreferentialList.add(numberOfPreferentialTuesday);
-        }
-        if (datePeriodList.size() >= 3) {
-            NumberOfPreferential numberOfPreferentialWednesday = new NumberOfPreferential(((BigInteger) object[6]).longValue(),
-                    ((BigInteger) object[7]).longValue(), ((BigInteger) object[8]).longValue());
-            numberOfPreferentialList.add(numberOfPreferentialWednesday);
-        }
-        if (datePeriodList.size() >= 4) {
-            NumberOfPreferential numberOfPreferentialThursday = new NumberOfPreferential(((BigInteger) object[9]).longValue(),
-                    ((BigInteger) object[10]).longValue(), ((BigInteger) object[11]).longValue());
-            numberOfPreferentialList.add(numberOfPreferentialThursday);
-        }
-        if (datePeriodList.size() >= 5) {
-            NumberOfPreferential numberOfPreferentialFriday = new NumberOfPreferential(((BigInteger) object[12]).longValue(),
-                    ((BigInteger) object[13]).longValue(), ((BigInteger) object[14]).longValue());
-            numberOfPreferentialList.add(numberOfPreferentialFriday);
-        }
-        if (datePeriodList.size() == 6) {
-            NumberOfPreferential numberOfPreferentialSaturday = new NumberOfPreferential(((BigInteger) object[15]).longValue(),
-                    ((BigInteger) object[16]).longValue(), ((BigInteger) object[17]).longValue());
-            numberOfPreferentialList.add(numberOfPreferentialSaturday);
-        }
-
-        return numberOfPreferentialList;
+        return result;
     }
 
-    private List<NumberOfStudentsAndGuardians> numberOfBuffet(Session session, List<DatePeriods> datePeriodList, Long idOfOrg) {
-        List<NumberOfStudentsAndGuardians> numberOfBuffetList = new ArrayList<NumberOfStudentsAndGuardians>();
+    private Map<Long, List<NumberOfStudentsAndGuardians>> numberOfBuffet(List<DatePeriods> datePeriodList, List<Long> idOfOrgList) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
 
-        if (datePeriodList.isEmpty() || datePeriodList.size() > 6)
-            return numberOfBuffetList;
 
-        Date wholeStartTime = datePeriodList.get(0).getStartDate();
-        Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
 
-        String selectFields = "";
+            Date wholeStartTime = datePeriodList.get(0).getStartDate();
+            Date wholeEndTime = datePeriodList.get(datePeriodList.size() - 1).getEndDate();
 
-        if (datePeriodList.size() >= 1) {
-            selectFields +=
-                "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "   THEN cfo.idofclient END)) AS number_of_buffet_students_monday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "   AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) THEN cfo.idofclient END)) "
-              + "   AS number_of_buffet_guardians_monday ";
-        }
-        if (datePeriodList.size() >= 2) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "   THEN cfo.idofclient END)) AS number_of_buffet_students_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "   AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) THEN cfo.idofclient END)) "
-              + "   AS number_of_buffet_guardians_tuesday ";
-        }
-        if (datePeriodList.size() >= 3) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "   THEN cfo.idofclient END)) AS number_of_buffet_students_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "   AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) THEN cfo.idofclient END)) "
-              + "   AS number_of_buffet_guardians_wednesday ";
-        }
-        if (datePeriodList.size() >= 4) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "   THEN cfo.idofclient END)) AS number_of_buffet_students_thursday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "   AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) THEN cfo.idofclient END)) "
-              + "   AS number_of_buffet_guardians_thursday ";
-        }
-        if (datePeriodList.size() >= 5) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "   THEN cfo.idofclient END)) AS number_of_buffet_students_friday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "   AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) THEN cfo.idofclient END)) "
-              + "   AS number_of_buffet_guardians_friday ";
-        }
-        if (datePeriodList.size() == 6) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "   THEN cfo.idofclient END)) AS number_of_buffet_students_saturday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "   AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) THEN cfo.idofclient END)) "
-              + "   AS number_of_buffet_guardians_saturday ";
-        }
+            String selectFields = "";
 
-        String sqlQuery =
-                "SELECT " + selectFields
-              + "FROM cf_orders cfo "
-              + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
-              + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
-              + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-              + "WHERE cfo.ordertype IN (:unknownType, :defaultType, :vendingType) AND cfo.idoforg = :idOfOrg AND cfo.state = :stateCommited "
-              + "    AND ((g.idofclientgroup < :employees) OR g.idofclientgroup IN "
-              + "        (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-              + "    AND cfo.createddate BETWEEN :startTime AND :endTime";
-        Query query = session.createSQLQuery(sqlQuery);
+            if (datePeriodList.size() >= 1) {
+                selectFields +=
+                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_monday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                                + "   AND (cfo.createddate BETWEEN :startTimeMonday AND :endTimeMonday)) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians_monday ";
+            }
+            if (datePeriodList.size() >= 2) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_tuesday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                                + "   AND (cfo.createddate BETWEEN :startTimeTuesday AND :endTimeTuesday)) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians_tuesday ";
+            }
+            if (datePeriodList.size() >= 3) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_wednesday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                                + "   AND (cfo.createddate BETWEEN :startTimeWednesday AND :endTimeWednesday)) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians_wednesday ";
+            }
+            if (datePeriodList.size() >= 4) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_thursday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                                + "   AND (cfo.createddate BETWEEN :startTimeThursday AND :endTimeThursday)) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians_thursday ";
+            }
+            if (datePeriodList.size() >= 5) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_friday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                                + "   AND (cfo.createddate BETWEEN :startTimeFriday AND :endTimeFriday)) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians_friday ";
+            }
+            if (datePeriodList.size() == 6) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_saturday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                                + "   AND (cfo.createddate BETWEEN :startTimeSaturday AND :endTimeSaturday)) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians_saturday ";
+            }
 
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("startTime", wholeStartTime.getTime());
-        query.setParameter("endTime", wholeEndTime.getTime());
-        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-        query.setParameter("displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
-        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-        query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        query.setParameter("unknownType", OrderTypeEnumType.UNKNOWN.ordinal());
-        query.setParameter("defaultType", OrderTypeEnumType.DEFAULT.ordinal());
-        query.setParameter("vendingType", OrderTypeEnumType.VENDING.ordinal());
-        query.setParameter("stateCommited", Order.STATE_COMMITED);
+            String orgCondition = "";
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
+            }
+            String sqlQuery = "SELECT cfo.idoforg, " + selectFields + "FROM cf_orders cfo " + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
+                    + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
+                    + "WHERE cfo.ordertype IN (:unknownType, :defaultType, :vendingType) AND " + orgCondition + " cfo.state = :stateCommited "
+                    + "    AND ((g.idofclientgroup < :employees) OR g.idofclientgroup IN " + "        (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
+                    + "    AND cfo.createddate BETWEEN :startTime AND :endTime group by cfo.idoforg";
+            Query query = session.createSQLQuery(sqlQuery);
 
-        updateQueryDates(query, datePeriodList);
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                query.setParameterList("idOfOrgs", idOfOrgList);
+            }
+            query.setParameter("startTime", wholeStartTime.getTime());
+            query.setParameter("endTime", wholeEndTime.getTime());
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+            query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+            query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            query.setParameter("unknownType", OrderTypeEnumType.UNKNOWN.ordinal());
+            query.setParameter("defaultType", OrderTypeEnumType.DEFAULT.ordinal());
+            query.setParameter("vendingType", OrderTypeEnumType.VENDING.ordinal());
+            query.setParameter("stateCommited", Order.STATE_COMMITED);
 
-        Object[] object = (Object[]) query.uniqueResult();
+            updateQueryDates(query, datePeriodList);
 
-        if (datePeriodList.size() >= 1) {
-            NumberOfStudentsAndGuardians numberOfBuffetMonday = new NumberOfStudentsAndGuardians(((BigInteger) object[0]).longValue(),
-                    ((BigInteger) object[1]).longValue());
-            numberOfBuffetList.add(numberOfBuffetMonday);
+            List<Object[]> list = query.list();
+
+            transaction.commit();
+            transaction = null;
+            result = getFromQuery(list, datePeriodList, idOfOrgList);
+        } catch (Exception e) {
+            logger.error("Error in numberOfBuffet: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        if (datePeriodList.size() >= 2) {
-            NumberOfStudentsAndGuardians numberOfBuffetTuesday = new NumberOfStudentsAndGuardians(((BigInteger) object[2]).longValue(),
-                    ((BigInteger) object[3]).longValue());
-            numberOfBuffetList.add(numberOfBuffetTuesday);
-        }
-        if (datePeriodList.size() >= 3) {
-            NumberOfStudentsAndGuardians numberOfBuffetWednesday = new NumberOfStudentsAndGuardians(((BigInteger) object[4]).longValue(),
-                    ((BigInteger) object[5]).longValue());
-            numberOfBuffetList.add(numberOfBuffetWednesday);
-        }
-        if (datePeriodList.size() >= 4) {
-            NumberOfStudentsAndGuardians numberOfBuffetThursday = new NumberOfStudentsAndGuardians(((BigInteger) object[6]).longValue(),
-                    ((BigInteger) object[7]).longValue());
-            numberOfBuffetList.add(numberOfBuffetThursday);
-        }
-        if (datePeriodList.size() >= 5) {
-            NumberOfStudentsAndGuardians numberOfBuffetFriday = new NumberOfStudentsAndGuardians(((BigInteger) object[8]).longValue(),
-                    ((BigInteger) object[9]).longValue());
-            numberOfBuffetList.add(numberOfBuffetFriday);
-        }
-        if (datePeriodList.size() == 6) {
-            NumberOfStudentsAndGuardians numberOfBuffetSaturday = new NumberOfStudentsAndGuardians(((BigInteger) object[10]).longValue(),
-                    ((BigInteger) object[11]).longValue());
-            numberOfBuffetList.add(numberOfBuffetSaturday);
-        }
-        return numberOfBuffetList;
+        return result;
     }
 
-    private List<NumberOfStudentsAndGuardians> numberOfSubFeed(Session session, List<DatePeriods> datePeriodList, Long idOfOrg) {
-        List<NumberOfStudentsAndGuardians> numberOfSubFeedList = new ArrayList<NumberOfStudentsAndGuardians>();
-
-        if (datePeriodList.isEmpty() || datePeriodList.size() > 6)
-            return numberOfSubFeedList;
-
-        Date wholeStartTime = datePeriodList.get(0).getStartDate();
-        Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
-
-        String selectFields = "";
-
-        if (datePeriodList.size() >= 1) {
-            selectFields +=
-                "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_monday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_monday ";
+    private Map<Long, List<NumberOfStudentsAndGuardians>> getFromQuery(List<Object[]> list, List<DatePeriods> datePeriodList, List<Long> idOfOrgList) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
+        for (Object[] object : list) {
+            List<NumberOfStudentsAndGuardians> numberOfBuffetList = new ArrayList<NumberOfStudentsAndGuardians>();
+            if (datePeriodList.size() >= 1) {
+                NumberOfStudentsAndGuardians numberOfBuffetMonday = new NumberOfStudentsAndGuardians(((BigInteger) object[1]).longValue(),
+                        ((BigInteger) object[2]).longValue());
+                numberOfBuffetList.add(numberOfBuffetMonday);
+            }
+            if (datePeriodList.size() >= 2) {
+                NumberOfStudentsAndGuardians numberOfBuffetTuesday = new NumberOfStudentsAndGuardians(((BigInteger) object[3]).longValue(),
+                        ((BigInteger) object[4]).longValue());
+                numberOfBuffetList.add(numberOfBuffetTuesday);
+            }
+            if (datePeriodList.size() >= 3) {
+                NumberOfStudentsAndGuardians numberOfBuffetWednesday = new NumberOfStudentsAndGuardians(((BigInteger) object[5]).longValue(),
+                        ((BigInteger) object[6]).longValue());
+                numberOfBuffetList.add(numberOfBuffetWednesday);
+            }
+            if (datePeriodList.size() >= 4) {
+                NumberOfStudentsAndGuardians numberOfBuffetThursday = new NumberOfStudentsAndGuardians(((BigInteger) object[7]).longValue(),
+                        ((BigInteger) object[8]).longValue());
+                numberOfBuffetList.add(numberOfBuffetThursday);
+            }
+            if (datePeriodList.size() >= 5) {
+                NumberOfStudentsAndGuardians numberOfBuffetFriday = new NumberOfStudentsAndGuardians(((BigInteger) object[9]).longValue(),
+                        ((BigInteger) object[10]).longValue());
+                numberOfBuffetList.add(numberOfBuffetFriday);
+            }
+            if (datePeriodList.size() == 6) {
+                NumberOfStudentsAndGuardians numberOfBuffetSaturday = new NumberOfStudentsAndGuardians(((BigInteger) object[11]).longValue(),
+                        ((BigInteger) object[12]).longValue());
+                numberOfBuffetList.add(numberOfBuffetSaturday);
+            }
+            result.put(((BigInteger) object[0]).longValue(), numberOfBuffetList);
         }
-        if (datePeriodList.size() >= 2) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_tuesday ";
+        for (Long idOfOrg : idOfOrgList) {
+            if (result.get(idOfOrg) == null) {
+                List<NumberOfStudentsAndGuardians> numberOfStudentsAndGuardiansList = new ArrayList<NumberOfStudentsAndGuardians>();
+                for (int ii = 1; ii <= datePeriodList.size(); ii++) {
+                    NumberOfStudentsAndGuardians numberOfStudentsAndGuardians = new NumberOfStudentsAndGuardians(0L, 0L);
+                    numberOfStudentsAndGuardiansList.add(numberOfStudentsAndGuardians);
+                }
+                result.put(idOfOrg, numberOfStudentsAndGuardiansList);
+            }
         }
-        if (datePeriodList.size() >= 3) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_wednesday ";
-        }
-        if (datePeriodList.size() >= 4) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_thursday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_thursday ";
-        }
-        if (datePeriodList.size() >= 5) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_friday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_friday ";
-        }
-        if (datePeriodList.size() == 6) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_saturday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_saturday ";
-        }
-
-        String sqlQuery =
-                "SELECT " + selectFields
-              + "FROM CF_OrderDetails cfod "
-              + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
-              + "    AND cfo.State = :stateCommited AND cfo.OrderType = :subscriptionPlan "
-              + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
-              + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
-              + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-              + "WHERE cfod.State = :detailedStateCommited AND org.IdOfOrg = :idOfOrg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
-              + "    AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType "
-              + "    AND ((g.idofclientgroup < :employees) OR "
-              + "        g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents))";
-
-        Query query = session.createSQLQuery(sqlQuery);
-
-
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("startTime", wholeStartTime.getTime());
-        query.setParameter("endTime", wholeEndTime.getTime());
-        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-        query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
-        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-        query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        query.setParameter("stateCommited", Order.STATE_COMMITED);
-        query.setParameter("detailedStateCommited", OrderDetail.STATE_COMMITED);
-        query.setParameter("subscriptionPlan", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
-
-        updateQueryDates(query, datePeriodList);
-
-        Object[] object = (Object[]) query.uniqueResult();
-
-        if (datePeriodList.size() >= 1) {
-            NumberOfStudentsAndGuardians numberOfSubFeedMonday = new NumberOfStudentsAndGuardians(((BigInteger) object[0]).longValue(),
-                    ((BigInteger) object[1]).longValue());
-            numberOfSubFeedList.add(numberOfSubFeedMonday);
-        }
-        if (datePeriodList.size() >= 2) {
-            NumberOfStudentsAndGuardians numberOfSubFeedTuesday = new NumberOfStudentsAndGuardians(((BigInteger) object[2]).longValue(),
-                    ((BigInteger) object[3]).longValue());
-            numberOfSubFeedList.add(numberOfSubFeedTuesday);
-        }
-        if (datePeriodList.size() >= 3) {
-            NumberOfStudentsAndGuardians numberOfSubFeedWednesday = new NumberOfStudentsAndGuardians(((BigInteger) object[4]).longValue(),
-                    ((BigInteger) object[5]).longValue());
-            numberOfSubFeedList.add(numberOfSubFeedWednesday);
-        }
-        if (datePeriodList.size() >= 4) {
-            NumberOfStudentsAndGuardians numberOfSubFeedThursday = new NumberOfStudentsAndGuardians(((BigInteger) object[6]).longValue(),
-                    ((BigInteger) object[7]).longValue());
-            numberOfSubFeedList.add(numberOfSubFeedThursday);
-        }
-        if (datePeriodList.size() >= 5) {
-            NumberOfStudentsAndGuardians numberOfSubFeedFriday = new NumberOfStudentsAndGuardians(((BigInteger) object[8]).longValue(),
-                    ((BigInteger) object[9]).longValue());
-            numberOfSubFeedList.add(numberOfSubFeedFriday);
-        }
-        if (datePeriodList.size() == 6) {
-            NumberOfStudentsAndGuardians numberOfSubFeedSaturday = new NumberOfStudentsAndGuardians(((BigInteger) object[10]).longValue(),
-                    ((BigInteger) object[11]).longValue());
-            numberOfSubFeedList.add(numberOfSubFeedSaturday);
-        }
-        return numberOfSubFeedList;
+        return result;
     }
 
-    private List<NumberOfStudentsAndGuardians> numberOfPaid(Session session, List<DatePeriods> datePeriodList, Long idOfOrg) {
-        List<NumberOfStudentsAndGuardians> numberOfPaidList = new ArrayList<NumberOfStudentsAndGuardians>();
+    private Map<Long, List<NumberOfStudentsAndGuardians>> numberOfSubFeed(List<DatePeriods> datePeriodList, List<Long> idOfOrgList) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
 
-        if (datePeriodList.isEmpty() || datePeriodList.size() > 6)
-            return numberOfPaidList;
+            Date wholeStartTime = datePeriodList.get(0).getStartDate();
+            Date wholeEndTime = datePeriodList.get(datePeriodList.size() - 1).getEndDate();
 
-        Date wholeStartTime = datePeriodList.get(0).getStartDate();
-        Date wholeEndTime = datePeriodList.get(datePeriodList.size()-1).getEndDate();
+            String selectFields = "";
 
-        String selectFields = "";
+            if (datePeriodList.size() >= 1) {
+                selectFields +=
+                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_monday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday)) " + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_monday ";
+            }
+            if (datePeriodList.size() >= 2) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_tuesday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday)) " + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_tuesday ";
+            }
+            if (datePeriodList.size() >= 3) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_wednesday ";
+            }
+            if (datePeriodList.size() >= 4) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_thursday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday)) " + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_thursday ";
+            }
+            if (datePeriodList.size() >= 5) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_friday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday)) " + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_friday ";
+            }
+            if (datePeriodList.size() == 6) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_saturday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday)) " + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_saturday ";
+            }
+            String orgCondition = "";
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
+            }
+            String sqlQuery = "SELECT cfo.idoforg, " + selectFields + "FROM CF_OrderDetails cfod " + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                    + "    AND cfo.State = :stateCommited AND cfo.OrderType = :subscriptionPlan " + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
+                    + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
+                    + "WHERE cfod.State = :detailedStateCommited AND " + orgCondition + " (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
+                    + "    AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType " + "    AND ((g.idofclientgroup < :employees) OR "
+                    + "        g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) group by cfo.idoforg";
 
-        if (datePeriodList.size() >= 1) {
-            selectFields +=
-                "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_paid_students_monday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday))"
-              + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_monday ";
-        }
-        if (datePeriodList.size() >= 2) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_paid_students_tuesday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday))"
-              + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_tuesday ";
-        }
-        if (datePeriodList.size() >= 3) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_paid_students_wednesday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday))"
-              + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_wednesday ";
-        }
-        if (datePeriodList.size() >= 4) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_paid_students_thursday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday))"
-              + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_thursday ";
-        }
-        if (datePeriodList.size() >= 5) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_paid_students_friday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday))"
-              + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_friday ";
-        }
-        if (datePeriodList.size() == 6) {
-            selectFields +=
-                ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
-              + "                   THEN cfo.idofclient END)) AS number_of_paid_students_saturday, "
-              + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-              + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-              + "           AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday))"
-              + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_saturday ";
-        }
+            Query query = session.createSQLQuery(sqlQuery);
 
-        String sqlQuery =
-                "SELECT " + selectFields
-              + "FROM CF_OrderDetails cfod "
-              + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
-              + "    AND cfo.State = :stateCommited AND cfo.OrderType = :payPlan "
-              + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
-              + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
-              + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-              + "WHERE cfod.State = :detailedStateCommited AND "
-              + "    org.IdOfOrg = :idOfOrg AND (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
-              + "AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType AND ((g.idofclientgroup < :employees) "
-              + "    OR g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents))";
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                query.setParameterList("idOfOrgs", idOfOrgList);
+            }
+            query.setParameter("startTime", wholeStartTime.getTime());
+            query.setParameter("endTime", wholeEndTime.getTime());
+            query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+            query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+            query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            query.setParameter("stateCommited", Order.STATE_COMMITED);
+            query.setParameter("detailedStateCommited", OrderDetail.STATE_COMMITED);
+            query.setParameter("subscriptionPlan", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
 
-        Query query = session.createSQLQuery(sqlQuery);
+            updateQueryDates(query, datePeriodList);
 
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("startTime", wholeStartTime.getTime());
-        query.setParameter("endTime", wholeEndTime.getTime());
-        query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-        query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
-        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-        query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        query.setParameter("stateCommited", Order.STATE_COMMITED);
-        query.setParameter("detailedStateCommited", OrderDetail.STATE_COMMITED);
-        query.setParameter("payPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
+            List<Object[]> list = query.list();
+            transaction.commit();
+            transaction = null;
+            result = getFromQuery(list, datePeriodList, idOfOrgList);
+        } catch (Exception e) {
+            logger.error("Error in numberOfSubFeed: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 
-        updateQueryDates(query, datePeriodList);
+    private Map<Long, List<NumberOfStudentsAndGuardians>> numberOfPaid(List<DatePeriods> datePeriodList, List<Long> idOfOrgList) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
 
-        Object[] object = (Object[]) query.uniqueResult();
-        if (datePeriodList.size() >= 1) {
-            NumberOfStudentsAndGuardians numberOfPaidMonday = new NumberOfStudentsAndGuardians(((BigInteger) object[0]).longValue(),
-                    ((BigInteger) object[1]).longValue());
-            numberOfPaidList.add(numberOfPaidMonday);
+            Date wholeStartTime = datePeriodList.get(0).getStartDate();
+            Date wholeEndTime = datePeriodList.get(datePeriodList.size() - 1).getEndDate();
+
+            String selectFields = "";
+
+            if (datePeriodList.size() >= 1) {
+                selectFields +=
+                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_monday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeMonday AND :endTimeMonday))" + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_monday ";
+            }
+            if (datePeriodList.size() >= 2) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_tuesday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeTuesday AND :endTimeTuesday))" + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_tuesday ";
+            }
+            if (datePeriodList.size() >= 3) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN " + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeWednesday AND :endTimeWednesday))"
+                                + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_wednesday ";
+            }
+            if (datePeriodList.size() >= 4) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_thursday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeThursday AND :endTimeThursday))" + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_thursday ";
+            }
+            if (datePeriodList.size() >= 5) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_friday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeFriday AND :endTimeFriday))" + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_friday ";
+            }
+            if (datePeriodList.size() == 6) {
+                selectFields +=
+                        ",count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_saturday, " + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
+                                + "           AND (cfo.CreatedDate BETWEEN :startTimeSaturday AND :endTimeSaturday))" + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_saturday ";
+            }
+            String orgCondition = "";
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
+            }
+            String sqlQuery = "SELECT cfo.idoforg, " + selectFields + "FROM CF_OrderDetails cfod " + "LEFT OUTER JOIN CF_Orders cfo ON cfod.IdOfOrg = cfo.IdOfOrg AND cfod.IdOfOrder = cfo.IdOfOrder "
+                    + "    AND cfo.State = :stateCommited AND cfo.OrderType = :payPlan " + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
+                    + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient " + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
+                    + "WHERE cfod.State = :detailedStateCommited AND " + orgCondition + " (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
+                    + "AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType AND ((g.idofclientgroup < :employees) "
+                    + "    OR g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) group by cfo.idoforg";
+
+            Query query = session.createSQLQuery(sqlQuery);
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
+                query.setParameterList("idOfOrgs", idOfOrgList);
+            }
+            query.setParameter("startTime", wholeStartTime.getTime());
+            query.setParameter("endTime", wholeEndTime.getTime());
+            query.setParameter("minType", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("maxType", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("employee", ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue());
+            query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+            query.setParameter("other", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            query.setParameter("stateCommited", Order.STATE_COMMITED);
+            query.setParameter("detailedStateCommited", OrderDetail.STATE_COMMITED);
+            query.setParameter("payPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
+
+            updateQueryDates(query, datePeriodList);
+
+            List<Object[]> list = query.list();
+            transaction.commit();
+            transaction = null;
+            result = getFromQuery(list, datePeriodList, idOfOrgList);
+        } catch (Exception e) {
+            logger.error("Error in numberOfPaid: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        if (datePeriodList.size() >= 2) {
-            NumberOfStudentsAndGuardians numberOfPaidTuesday = new NumberOfStudentsAndGuardians(((BigInteger) object[2]).longValue(),
-                    ((BigInteger) object[3]).longValue());
-            numberOfPaidList.add(numberOfPaidTuesday);
+        return result;
+    }
+
+    private Map<Long, PeopleData> loadPeopleDataForOrgs(List<Long> idOfOrgList) {
+        Session session = null;
+        Transaction transaction = null;
+        Map<Long, PeopleData> result = new HashMap<Long, PeopleData>();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            String orgsCondition = " ";
+            if (idOfOrgList.size() <= 10) {
+                orgsCondition = " cfc.idoforg in (:idOfOrg) and ";
+            }
+            Query query = session.createSQLQuery(
+                    "SELECT "
+                            + "    count(DISTINCT(CASE WHEN (cfc.IdOfClientGroup = :parents) THEN cfc.idofclient END)) AS parents, "
+                            + "    count(DISTINCT(CASE WHEN (cfc.IdOfClientGroup IN (:employees, :administration)) THEN cfc.idofclient END)) "
+                            + "        AS pedagogical_composition, "
+                            + "    count(DISTINCT(CASE WHEN (cfc.idofclientgroup < :employees) THEN cfc.idofclient END)) AS all_peoples, "
+                            + "    count(DISTINCT(CASE WHEN (cfc.idofclientgroup IN (:others, :tech_employees, :visitors)) "
+                            + "                    THEN cfc.idofclient END)) AS other_emloyees, "
+                            + "    count(DISTINCT(CASE WHEN ((cfc.idofclientgroup < :employees) AND (cfca.idofclient IS NOT NULL)) "
+                            + "                    THEN cfca.idofclient END)) AS students_with_cards, cfc.idoforg "
+                            + "FROM cf_clients cfc "
+                            + "LEFT JOIN cf_cards cfca ON cfc.idofclient = cfca.idofclient "
+                            + "WHERE " + orgsCondition + " (cfc.IdOfClientGroup = :parents "
+                            + "        OR cfc.IdOfClientGroup IN (:employees, :administration) "
+                            + "        OR (cfc.idofclientgroup < :employees) "
+                            + "        OR (cfc.idofclientgroup IN (:others, :tech_employees, :visitors))) group by cfc.idoforg");
+
+            if (idOfOrgList.size() <= 10) {
+                query.setParameterList("idOfOrg", idOfOrgList);
+            }
+            query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+            query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
+
+            List<Object[]> list = query.list();
+
+            for (Object[] obj : list) {
+                PeopleData peopleData = new PeopleData(((BigInteger) obj[0]).longValue(), ((BigInteger) obj[1]).longValue(),
+                        ((BigInteger) obj[2]).longValue(), ((BigInteger) obj[3]).longValue(), ((BigInteger) obj[4]).longValue());
+                result.put(((BigInteger) obj[5]).longValue(), peopleData);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in loadPeopleDataForOrgs: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        if (datePeriodList.size() >= 3) {
-            NumberOfStudentsAndGuardians numberOfPaidWednesday = new NumberOfStudentsAndGuardians(((BigInteger) object[4]).longValue(),
-                    ((BigInteger) object[5]).longValue());
-            numberOfPaidList.add(numberOfPaidWednesday);
-        }
-        if (datePeriodList.size() >= 4) {
-            NumberOfStudentsAndGuardians numberOfPaidThursday = new NumberOfStudentsAndGuardians(((BigInteger) object[6]).longValue(),
-                    ((BigInteger) object[7]).longValue());
-            numberOfPaidList.add(numberOfPaidThursday);
-        }
-        if (datePeriodList.size() >= 5) {
-            NumberOfStudentsAndGuardians numberOfPaidFriday = new NumberOfStudentsAndGuardians(((BigInteger) object[8]).longValue(),
-                    ((BigInteger) object[9]).longValue());
-            numberOfPaidList.add(numberOfPaidFriday);
-        }
-        if (datePeriodList.size() == 6) {
-            NumberOfStudentsAndGuardians numberOfPaidSaturday = new NumberOfStudentsAndGuardians(((BigInteger) object[10]).longValue(),
-                    ((BigInteger) object[11]).longValue());
-            numberOfPaidList.add(numberOfPaidSaturday);
-        }
-        return numberOfPaidList;
+        return result;
     }
 
     public List<ReportItem> getOrgData(List<Long> idOfOrgList, List<DatePeriods> datePeriodsList) {
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
-
+        Map<Long, PeopleData> peopleDataMap = loadPeopleDataForOrgs(idOfOrgList);
+        Map<Long, List<NumberOfPasses>> numberOfPassesMap = generateNumberOfPasses(datePeriodsList, idOfOrgList);
+        Map<Long, List<NumberOfPreferential>> numberOfPreferentialMap = numberOfPreferential(datePeriodsList, idOfOrgList);
+        Map<Long, List<NumberOfStudentsAndGuardians>> numberOfBuffetMap = numberOfBuffet(datePeriodsList, idOfOrgList);
+        Map<Long, List<NumberOfStudentsAndGuardians>> numberOfSubfeedMap = numberOfSubFeed(datePeriodsList, idOfOrgList);
+        Map<Long, List<NumberOfStudentsAndGuardians>> numberOfPaidMap = numberOfPaid(datePeriodsList, idOfOrgList);
         Session session = null;
         Transaction transaction = null;
-        for (Long idOfOrg : idOfOrgList) {
-            try {
-                session = RuntimeContext.getInstance().createReportPersistenceSession();
-                transaction = session.beginTransaction();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            for (Long idOfOrg : idOfOrgList) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 ReportItem reportItem = new ReportItem();
                 reportItem.setOrgNum(org.getOrgNumberInName());
@@ -893,16 +968,16 @@ public class MonitoringOfReportService {
                 reportItem.setIntroductionQueue(org.getIntroductionQueue());
                 reportItem.setOrgStatus(org.stateString());
 
-                PeopleData peopleData = loadPeopleData(session, idOfOrg);
+                PeopleData peopleData = peopleDataMap.get(idOfOrg);
 
-                reportItem.setStudentsInDatabase(String.valueOf(peopleData.getAllPeoples()));
-                reportItem.setStudentsWithMaps(String.valueOf(peopleData.getStudentsWithCards()));
-                reportItem.setParents(String.valueOf(peopleData.getParents()));
-                reportItem.setPedagogicalComposition(String.valueOf(peopleData.getPedagogicalComposition()));
-                reportItem.setOtherEmployees(String.valueOf(peopleData.getOther()));
+                reportItem.setStudentsInDatabase(peopleData == null ? "" : String.valueOf(peopleData.getAllPeoples()));
+                reportItem.setStudentsWithMaps(peopleData == null ? "" : String.valueOf(peopleData.getStudentsWithCards()));
+                reportItem.setParents(peopleData == null ? "" : String.valueOf(peopleData.getParents()));
+                reportItem.setPedagogicalComposition(peopleData == null ? "" : String.valueOf(peopleData.getPedagogicalComposition()));
+                reportItem.setOtherEmployees(peopleData == null ? "" : String.valueOf(peopleData.getOther()));
 
-                List<List<MonitoringOfItem>> monitoringOfItemList = getMonitoringOfItems(session, datePeriodsList,
-                        idOfOrg);
+                List<List<MonitoringOfItem>> monitoringOfItemList = getMonitoringOfItems(datePeriodsList,
+                        idOfOrg, numberOfPassesMap, numberOfPreferentialMap, numberOfBuffetMap, numberOfSubfeedMap, numberOfPaidMap);
 
                 if (monitoringOfItemList.size() >= 1) {
                     reportItem.setMonitoringOfItemsMonday(monitoringOfItemList.get(0));
@@ -929,14 +1004,14 @@ public class MonitoringOfReportService {
                 }
 
                 reportItemList.add(reportItem);
-                transaction.commit();
-                transaction = null;
-            } catch (Exception e) {
-                logger.error(String.format("Error in MonitoringOfReportService. IdOfOrg = %s. Error text: ", idOfOrg), e);
-            } finally {
-                HibernateUtils.rollback(transaction, logger);
-                HibernateUtils.close(session, logger);
             }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in MonitoringOfReportService: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
         return reportItemList;
     }
@@ -972,39 +1047,6 @@ public class MonitoringOfReportService {
             query.setParameter("startTimeSaturday", saturdayPeriod.getStartDate().getTime());
             query.setParameter("endTimeSaturday", saturdayPeriod.getEndDate().getTime());
         }
-    }
-
-    private PeopleData loadPeopleData(Session session, Long idOfOrg) {
-        Query query = session.createSQLQuery(
-                "SELECT "
-                 + "    count(DISTINCT(CASE WHEN (cfc.IdOfClientGroup = :parents) THEN cfc.idofclient END)) AS parents, "
-                 + "    count(DISTINCT(CASE WHEN (cfc.IdOfClientGroup IN (:employees, :administration)) THEN cfc.idofclient END)) "
-                 + "        AS pedagogical_composition, "
-                 + "    count(DISTINCT(CASE WHEN (cfc.idofclientgroup < :employees) THEN cfc.idofclient END)) AS all_peoples, "
-                 + "    count(DISTINCT(CASE WHEN (cfc.idofclientgroup IN (:others, :tech_employees, :visitors)) "
-                 + "                    THEN cfc.idofclient END)) AS other_emloyees, "
-                 + "    count(DISTINCT(CASE WHEN ((cfc.idofclientgroup < :employees) AND (cfca.idofclient IS NOT NULL)) "
-                 + "                    THEN cfca.idofclient END)) AS students_with_cards "
-                 + "FROM cf_clients cfc "
-                 + "LEFT JOIN cf_cards cfca ON cfc.idofclient = cfca.idofclient "
-                 + "WHERE cfc.idoforg = :idOfOrg AND (cfc.IdOfClientGroup = :parents "
-                 + "        OR cfc.IdOfClientGroup IN (:employees, :administration) "
-                 + "        OR (cfc.idofclientgroup < :employees) "
-                 + "        OR (cfc.idofclientgroup IN (:others, :tech_employees, :visitors)));");
-
-        query.setParameter("idOfOrg", idOfOrg);
-        query.setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue());
-        query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-        query.setParameter("administration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-        query.setParameter("others", ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-        query.setParameter("tech_employees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-        query.setParameter("visitors", ClientGroup.Predefined.CLIENT_VISITORS.getValue());
-
-        Object[] object = (Object[]) query.uniqueResult();
-
-        PeopleData peopleData = new PeopleData(((BigInteger) object[0]).longValue(), ((BigInteger) object[1]).longValue(),
-                ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(), ((BigInteger) object[4]).longValue());
-        return peopleData;
     }
 
     public static class ReportItem {
