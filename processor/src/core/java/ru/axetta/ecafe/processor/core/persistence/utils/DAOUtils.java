@@ -3093,6 +3093,12 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static List<Card> getAllCardByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("client", client)).addOrder(org.hibernate.criterion.Order.desc("createTime"));
+        return criteria.list();
+    }
+
     public static List<User> getUsersByIds(Session session, List<Long> idOfUserList) {
         Criteria criteria = session.createCriteria(User.class);
         criteria.add(Restrictions.in("idOfUser", idOfUserList));

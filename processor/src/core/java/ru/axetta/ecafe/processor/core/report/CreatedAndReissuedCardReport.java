@@ -10,13 +10,15 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.HistoryCard;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +93,7 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 Criteria criteriaHistoryCard = session.createCriteria(HistoryCard.class);
                 criteriaHistoryCard
                         .add(Restrictions.in("user", userList))
+                        .add(Restrictions.like("informationAboutCard", "Регистрация%", MatchMode.ANYWHERE))
                         .add(Restrictions.between("upDatetime", startTime, endTime));
                 criteriaHistoryCard.addOrder(Order.asc("upDatetime"));
                 listOfHistoryCard = criteriaHistoryCard.list();
@@ -98,14 +101,22 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 Criteria criteriaHistoryCard = session.createCriteria(HistoryCard.class);
                 criteriaHistoryCard
                         .add(Restrictions.between("upDatetime", startTime, endTime))
+                        .add(Restrictions.like("informationAboutCard", "Регистрация%", MatchMode.ANYWHERE))
                         .add(Restrictions.isNotNull("user"));
                 criteriaHistoryCard.addOrder(Order.asc("upDatetime"));
                 listOfHistoryCard = criteriaHistoryCard.list();
             }
             long number = 1;
             for(HistoryCard el : listOfHistoryCard){
+                if(el.getCard().getState().equals(6)){
+                    continue;
+                }
+                if(el.getCard().getClient() == null){
+                    logger.error(String.format("Card ID %s cardNo %s does not have owner", el.getCard().getIdOfCard(), el.getCard().getCardNo()));
+                    continue;
+                }
                 Long printNo = el.getCard().getCardPrintedNo();
-                String loscReason  = el.getCard().getLockReason();
+                String lockReason  = stringNotNull(getLockReasonPenultimateCard(session, el.getCard().getClient())); // Причина перевыпуска есть причиа блокировки старой карты
                 Date createDate = el.getCard().getCreateTime();
                 String firstname, surname, secondname, department;
                 Long cost = el.getTransaction() == null? 0: longNotNull(el.getTransaction().getTransactionSum());
@@ -118,7 +129,7 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 }
                 department = stringNotNull(el.getUser().getDepartment());
                 CreatedAndReissuedCardReportItem item = new CreatedAndReissuedCardReportItem(firstname, surname, secondname, cost,
-                        loscReason, department, printNo, createDate, number);
+                        lockReason, department, printNo, createDate, number);
                 items.add(item);
                 number++;
             }
@@ -132,6 +143,18 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
 
             return new CreatedAndReissuedCardReport(startTime, endTime, items, jasperPrint);
 
+        }
+
+        private String getLockReasonPenultimateCard(Session session, Client client) {
+            List<Card> allClientCard = DAOUtils.getAllCardByClient(session, client);
+            if(allClientCard.size() == 1){
+                return "Новая карта";
+            }
+            else if(allClientCard.isEmpty()){
+                logger.error("Client have card, but Hibernate return empty CardList");
+                return "";
+            }
+            return allClientCard.get(1).getLockReason();
         }
 
         private JRDataSource createDataSource(List<CreatedAndReissuedCardReportItem> items){
@@ -180,11 +203,15 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 String reason, String department, Long cardNo, Date issueDate, Long number){
             this.employeeName = firstname + " " + surname + " " + secondname;
             this.cost = cost /100;
-            this.reason = reason;
+            this.reason = getCheckedReason(reason);
             this.department = department;
             this.cardNo = cardNo;
             this.issueDate = issueDate;
             this.number = number;
+        }
+
+        private String getCheckedReason(String reason) {
+            return reason.isEmpty()? "Причина перевыпуска не указана" : reason;
         }
 
 
