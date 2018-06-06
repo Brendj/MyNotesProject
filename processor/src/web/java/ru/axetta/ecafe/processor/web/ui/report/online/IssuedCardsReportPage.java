@@ -43,7 +43,7 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserListS
     private final String reportName = CreatedAndReissuedCardReport.REPORT_NAME;
     private Calendar localCalendar;
     private String htmlReport = null;
-    private List<Long> idOfUsersList;
+    private List<Long> idOfUsersList = new ArrayList<Long>();
 
     public IssuedCardsReportPage() {
         super();
@@ -203,7 +203,6 @@ public class IssuedCardsReportPage extends OnlineReportPage implements UserListS
     @Override
     public void completeUserListSelection(Map<Long, String> userMap) throws Exception {
         if (null != userMap) {
-            idOfUsersList = new ArrayList<Long>();
             if (userMap.isEmpty())
                 filter = "Не выбрано";
             else {

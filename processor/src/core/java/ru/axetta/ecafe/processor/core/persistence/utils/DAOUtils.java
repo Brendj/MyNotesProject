@@ -3105,4 +3105,9 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.asc("idOfUser"));
         return criteria.list();
     }
+
+    public static List<String> getAllDistinctDepartments(Session session){
+        Query sql = session.createSQLQuery("select distinct department from cf_users where department is not null and department not like ''");
+        return sql.list();
+    }
 }

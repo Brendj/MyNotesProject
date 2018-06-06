@@ -45,7 +45,6 @@
                         reRender="modalUserListSelectorForm" />
         <a4j:jsFunction name="deselectAll" action="#{mainPage.clearUserListSelectedItemsList}"
                         reRender="modalUserListSelectorForm" />
-
         <table class="borderless-grid" width="480">
             <tr>
                 <td style="text-align: left;">
@@ -69,6 +68,21 @@
                             <a4j:support event="onkeyup" action="#{mainPage.updateUserListSelectPage}"
                                          reRender="modalUserListSelectorTable, myPanel" />
                         </h:inputText>
+                        <h:outputText escape="true" value="Отобразить фильтр по подразделениям"
+                                      styleClass="output-text" />
+                        <h:selectBooleanCheckbox value="#{mainPage.userListSelectPage.showDetail}" styleClass="output-text">
+                            <a4j:support event="onclick" reRender="modalUserListSelectorForm" ajaxSingle="true" />
+                        </h:selectBooleanCheckbox>
+                        <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;"
+                                      rendered="#{mainPage.userListSelectPage.showDetail}">
+                        <h:selectManyCheckbox id="userListSelectorTitles"
+                                              value="#{mainPage.userListSelectPage.preferentialTitleDepartment}"
+                                              layout="pageDirection" styleClass="output-text"
+                                              rendered="#{mainPage.userListSelectPage.showDetail}">
+                            <a4j:support requestDelay="1000" event="onclick" reRender="modalUserListSelectorForm" action="#{mainPage.updateUserListSelectPage}"/>
+                        <f:selectItems value="#{mainPage.userListSelectPage.availableTitleDepartment}"/>
+                       </h:selectManyCheckbox>
+                        </h:panelGroup>
                     </h:panelGrid>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
                         <a4j:commandButton action="#{mainPage.selectAllUserListSelectedItemsList}"
@@ -105,6 +119,12 @@
                             </f:facet>
                             <h:outputText escape="true" value="#{item.userName}"
                                           styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <f:facet name="header">
+                                <h:outputText escape="true" value="Подразделение" />
+                            </f:facet>
+                            <h:outputText escape="true" value="#{item.department}" styleClass="output-text" />
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <f:facet name="header">

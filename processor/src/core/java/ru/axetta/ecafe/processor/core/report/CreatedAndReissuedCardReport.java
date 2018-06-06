@@ -10,15 +10,13 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.HistoryCard;
-import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +106,7 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
             }
             long number = 1;
             for(HistoryCard el : listOfHistoryCard){
-                if(el.getCard().getState().equals(6)){
+                if(el.getCard().getState().equals(CardState.BLOCKED.getValue())){
                     continue;
                 }
                 if(el.getCard().getClient() == null){
@@ -151,7 +149,7 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 return "Новая карта";
             }
             else if(allClientCard.isEmpty()){
-                logger.error("Client have card, but Hibernate return empty CardList");
+                logger.error(String.format("Client ID %s have card, but Hibernate return empty CardList", client.getIdOfClient()));
                 return "";
             }
             return allClientCard.get(1).getLockReason();

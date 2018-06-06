@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.security;
 
-import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -107,6 +106,39 @@ public class UserSelectPage extends BasicWorkspacePage {
         this.filter = filter;
     }
 
+    public static List<UserShortItem> retrieveUsersByRoleAndDepartment(Session session, String filter, User.DefaultRole roleFilter,
+            List<String> departmentFilter) throws HibernateException{
+        Criteria userCriteria = session.createCriteria(User.class);
+        userCriteria.addOrder(Order.asc("idOfUser"));
+
+        if (StringUtils.isNotEmpty(filter)) {
+            userCriteria.add(Restrictions.or(Restrictions.ilike("userName", filter, MatchMode.ANYWHERE),
+                    Restrictions.ilike("userName", filter, MatchMode.ANYWHERE)));
+        }
+
+        if (null != roleFilter) {
+            userCriteria.add(Restrictions.eq("idOfRole", roleFilter.getIdentification()));
+        }
+
+        if(!departmentFilter.isEmpty()){
+            userCriteria.add(Restrictions.in("department", departmentFilter));
+        }
+
+        userCriteria.createAlias("person", "p", JoinType.LEFT_OUTER_JOIN);
+        userCriteria.setProjection(
+                Projections.projectionList().add(Projections.distinct(Projections.property("idOfUser")), "idOfUser")
+                        .add(Projections.property("userName"), "userName")
+                        .add(Projections.property("department"), "department")
+                        .add(Projections.property("p.firstName"), "firstName")
+                        .add(Projections.property("p.surname"), "surname")
+                        .add(Projections.property("p.secondName"), "secondName"));
+        userCriteria.setCacheMode(CacheMode.NORMAL);
+        userCriteria.setCacheable(true);
+        userCriteria.setResultTransformer(Transformers.aliasToBean(UserShortItem.class));
+        userCriteria.addOrder(Order.asc("idOfUser"));
+        return (List<UserShortItem>) userCriteria.list();
+    }
+
     public interface CompleteHandler {
         void completeUserSelection(Session session, Long idOfUser) throws Exception;
     }
@@ -128,6 +160,7 @@ public class UserSelectPage extends BasicWorkspacePage {
         userCriteria.setProjection(
                 Projections.projectionList().add(Projections.distinct(Projections.property("idOfUser")), "idOfUser")
                         .add(Projections.property("userName"), "userName")
+                        .add(Projections.property("department"), "department")
                         .add(Projections.property("p.firstName"), "firstName")
                         .add(Projections.property("p.surname"), "surname")
                         .add(Projections.property("p.secondName"), "secondName"));
@@ -149,6 +182,7 @@ public class UserSelectPage extends BasicWorkspacePage {
         private String firstName;
         private String secondName;
         private String surname;
+        private String department;
         private Boolean selected = false;
 
         public UserShortItem() {
@@ -217,6 +251,14 @@ public class UserSelectPage extends BasicWorkspacePage {
             String sn = getSecondName();
             if ((null == sn) || (sn.length()!=0)) sn=sn.substring(0, 1)+".";
             return n+" "+fn+sn;
+        }
+
+        public String getDepartment() {
+            return department;
+        }
+
+        public void setDepartment(String department) {
+            this.department = department;
         }
     }
 }

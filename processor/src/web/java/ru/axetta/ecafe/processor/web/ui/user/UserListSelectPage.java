@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.user;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.report.security.UserSelectPage;
@@ -12,6 +13,8 @@ import ru.axetta.ecafe.processor.web.ui.report.security.UserSelectPage;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.faces.event.ValueChangeEvent;
+import javax.faces.model.SelectItem;
 import java.util.*;
 
 public class UserListSelectPage extends BasicWorkspacePage {
@@ -19,8 +22,13 @@ public class UserListSelectPage extends BasicWorkspacePage {
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private Map<Long, String> selectedUsers = new HashMap<Long, String>();
     protected List<UserSelectPage.UserShortItem> items = Collections.emptyList();
+    private List<UserListSelectPage.DepartmentItem> listOfDepartmentItems = Collections.emptyList();
+    private List<String> departmentFilter;
     private User.DefaultRole roleFilter = null;
     private String filter = "";
+    private Integer[] preferentialTitleDepartment;
+    private Boolean showDetail = false;
+    private List<SelectItem> availableTitleDepartment = Collections.emptyList();
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
@@ -52,7 +60,12 @@ public class UserListSelectPage extends BasicWorkspacePage {
         } else {
             selectedUsers.clear();
         }
-
+        listOfDepartmentItems = buildDepartmentItems(session);
+        if(availableTitleDepartment.isEmpty()){
+            fillAvailableTitleDepartment();
+        } else {
+            updateAvailableTitleDepartment();
+        }
         String[] idOfUser = userFilter.split(",");
         Set<String> longSet = new HashSet<String>(Arrays.asList(idOfUser));
         ///
@@ -67,7 +80,7 @@ public class UserListSelectPage extends BasicWorkspacePage {
                 if (user.getPerson() != null)
                     userName += " (" + user.getPerson().getSurnameAndFirstLetters() + ")";
                 selectedUsers.put(id, userName);
-            } catch (Exception ignored) {
+                } catch (Exception ignored) {
             }
         }
 
@@ -81,12 +94,38 @@ public class UserListSelectPage extends BasicWorkspacePage {
             }
         }
 
+        this.departmentFilter = fillDepartmentFilter();
         this.roleFilter = roleFilter;
-        List<UserSelectPage.UserShortItem> items = UserSelectPage.retrieveUsersByRole(session, filter, this.roleFilter);
+        List<UserSelectPage.UserShortItem> items = UserSelectPage.retrieveUsersByRoleAndDepartment(session, filter, this.roleFilter, this.departmentFilter);
         for (UserSelectPage.UserShortItem userShortItem : items) {
             userShortItem.setSelected(selectedUsers.containsKey(userShortItem.getIdOfUser()));
         }
         this.items = items;
+    }
+
+    private List<String> fillDepartmentFilter() {
+        List<String> filter = new ArrayList<String>();
+        for(Integer index : preferentialTitleDepartment){
+            if(index != null) {
+                filter.add(availableTitleDepartment.get(index).getLabel());
+            }
+        }
+        return filter;
+    }
+
+    private void updateAvailableTitleDepartment() {
+        boolean isActual = true;
+        int i = 0;
+        for(SelectItem el : availableTitleDepartment){
+            if(!el.getLabel().equals(listOfDepartmentItems.get(i).getDepartment())){
+                isActual = false;
+                break;
+            }
+            i++;
+        }
+        if(!isActual){
+            fillAvailableTitleDepartment();
+        }
     }
 
     public synchronized void fill(Session session)
@@ -99,6 +138,16 @@ public class UserListSelectPage extends BasicWorkspacePage {
         this.items = items;
     }
 
+    private List<UserListSelectPage.DepartmentItem> buildDepartmentItems(Session session) {
+        List<String> listDepartment = DAOUtils.getAllDistinctDepartments(session);
+        List<UserListSelectPage.DepartmentItem> refreshDepartmentItems = new ArrayList<DepartmentItem>();
+        for(String department : listDepartment){
+            DepartmentItem item = new DepartmentItem(department);
+            refreshDepartmentItems.add(item);
+        }
+        return refreshDepartmentItems;
+    }
+
     private void updateSelectedUsers() {
         for (UserSelectPage.UserShortItem i : this.getItems()) {
             if (i.getSelected()) {
@@ -107,6 +156,51 @@ public class UserListSelectPage extends BasicWorkspacePage {
                 selectedUsers.remove(i.getIdOfUser());
             }
         }
+    }
+
+    public void setAvailableTitleDepartment(List<SelectItem> availableTitleDepartment) {
+        this.availableTitleDepartment = availableTitleDepartment;
+    }
+
+    public List<DepartmentItem> getListOfDepartmentItems() {
+        return listOfDepartmentItems;
+    }
+    
+    private void fillAvailableTitleDepartment() {
+        List<SelectItem> list = new ArrayList<SelectItem>();
+        int i = 0;
+        for (DepartmentItem item : listOfDepartmentItems) {
+            SelectItem selectItem = new SelectItem(i, item.department);
+            list.add(selectItem);
+            i++;
+        }
+        preferentialTitleDepartment = new Integer[listOfDepartmentItems.size()];
+        availableTitleDepartment = list;
+    }
+    
+    public void setListOfDepartmentItems(List<DepartmentItem> listOfDepartmentItems) {
+        this.listOfDepartmentItems = listOfDepartmentItems;
+    }
+
+    public Integer[] getPreferentialTitleDepartment() {
+        return preferentialTitleDepartment;
+    }
+
+    public void setPreferentialTitleDepartment(Integer[] preferentialTitleDepartment) {
+        this.preferentialTitleDepartment = preferentialTitleDepartment;
+    }
+
+    public Boolean getShowDetail() {
+        return showDetail;
+    }
+
+    public void setShowDetail(Boolean showDetail) {
+        this.showDetail = showDetail;
+    }
+
+
+    public Object getAvailableTitleDepartment() {
+        return availableTitleDepartment;
     }
 
     public interface CompleteHandlerList {
@@ -167,5 +261,34 @@ public class UserListSelectPage extends BasicWorkspacePage {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public static class DepartmentItem{
+        private String department;
+        private Boolean selected = false;
+
+        public DepartmentItem(String department){
+            this.department = department;
+        }
+
+        public DepartmentItem(){ setSelected(false); }
+
+        public String getDepartment() {
+            return department;
+        }
+
+        public void setDepartment(String department) {
+            this.department = department;
+        }
+
+        public Boolean getSelected() {
+            return selected;
+        }
+
+        public void setSelected(Boolean selected) {
+            this.selected = selected;
+        }
+
+
     }
 }
