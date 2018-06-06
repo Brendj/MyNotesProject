@@ -301,13 +301,13 @@ public class ClientFilter {
 
     public void addRestrictions(Session session, Criteria criteria) throws Exception {
         //  Ограничение на отображение только тех клиентов, которые доступны пользователю
-        try {
+       try {
+            criteria.createAlias("org", "o");
             Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
-            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "org.idOfOrg", criteria);
+            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "o.idOfOrg", criteria);
         } catch (Exception e) {
         }
         if (!this.org.isEmpty()) {
-            criteria.createAlias("org", "o");
             if (includeFriendlyOrg) {
                 List<Long> orgIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
                 criteria.add(orgIds.isEmpty() ? Restrictions.eq("o.idOfOrg", org.getIdOfOrg())

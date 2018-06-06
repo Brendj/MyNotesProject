@@ -117,7 +117,7 @@ public class ContextDAOServices {
         if (!orgIds.isEmpty()) {
             criteria.add(Restrictions.in(field, orgIds));
         }
-        buildRegionsRestriction(idOfUser, "district", criteria);        //  Ограничение по региону
+        buildRegionsRestriction(idOfUser, "o.district", criteria);        //  Ограничение по региону
     }
 
     public String buildOrgRestriction(long idOfUser, String field) throws Exception {

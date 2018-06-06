@@ -51,7 +51,8 @@ public class ContragentFilter {
     public void addRestrictions(Criteria criteria) throws Exception {
         try {
             Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
-            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "org.idOfOrg", criteria);
+            criteria.createAlias("org", "o");
+            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "o.idOfOrg", criteria);
         } catch (Exception e) {
         }
         if (StringUtils.isNotEmpty(officialName)) {
