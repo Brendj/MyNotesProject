@@ -33,7 +33,6 @@ import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
 import ru.axetta.ecafe.processor.core.service.CheckSumsMessageDigitsService;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsFileService;
-import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
@@ -53,10 +52,7 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.stat.Statistics;
 import org.quartz.Scheduler;
@@ -318,11 +314,17 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public Session createReportPersistenceSession() {
-        return reportsSessionFactory.openSession();
+        Session session = reportsSessionFactory.openSession();
+        session.setDefaultReadOnly(true);
+        session.setFlushMode(FlushMode.MANUAL);
+        return session;
     }
 
     public Session createExternalServicesPersistenceSession() {
-        return externalServicesSessionFactory.openSession();
+        Session session = externalServicesSessionFactory.openSession();
+        session.setDefaultReadOnly(true);
+        session.setFlushMode(FlushMode.MANUAL);
+        return session;
     }
 
     //hibernate cache for processorPU
