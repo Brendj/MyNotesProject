@@ -117,7 +117,7 @@ public class ContextDAOServices {
         if (!orgIds.isEmpty()) {
             criteria.add(Restrictions.in(field, orgIds));
         }
-        buildRegionsRestriction(idOfUser, "o.district", criteria);        //  Ограничение по региону
+        buildRegionsRestriction(idOfUser, "district", criteria);        //  Ограничение по региону
     }
 
     public String buildOrgRestriction(long idOfUser, String field) throws Exception {
@@ -271,5 +271,13 @@ public class ContextDAOServices {
             query.setParameter("contragentSet", contragentSet);
             return query.getResultList();
         }
+    }
+
+    public void buildOrgRestrictionWithAlias(Long idOfUser, String field, Criteria criteria) throws Exception{
+        List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);     //  Ограничение по контрагенту
+        if (!orgIds.isEmpty()) {
+            criteria.add(Restrictions.in(field, orgIds));
+        }
+        buildRegionsRestriction(idOfUser, "o.district", criteria);
     }
 }

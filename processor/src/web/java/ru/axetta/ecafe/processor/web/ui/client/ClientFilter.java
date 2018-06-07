@@ -304,7 +304,7 @@ public class ClientFilter {
        try {
             criteria.createAlias("org", "o");
             Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
-            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "o.idOfOrg", criteria);
+            ContextDAOServices.getInstance().buildOrgRestrictionWithAlias(idOfUser, "o.idOfOrg", criteria);
         } catch (Exception e) {
         }
         if (!this.org.isEmpty()) {
