@@ -634,6 +634,13 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date addMilliseconds(Date date, int i) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MILLISECOND, i);
+        return calendar.getTime();
+    }
+
     public static String replaceMonthNameByGenitive(String date) {
         if (date.contains("Январь")) return date.replace("Январь", "Января");
         if (date.contains("Февраль")) return date.replace("Февраль", "Февраля");

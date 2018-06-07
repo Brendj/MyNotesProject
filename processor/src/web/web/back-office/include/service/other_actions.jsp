@@ -16,7 +16,8 @@
 <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
 
 <%--Тест лога --%>
-<h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid borderless-grid-align-top" columns="2">
+    <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
@@ -32,7 +33,7 @@
     <a4j:commandButton value="Перестроить таблицу опекунов" action="#{otherActionsPage.runClientGuardSANRebuild}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
-    <a4j:commandButton value="Иморт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
+    <a4j:commandButton value="Импорт платежей из RNIP" action="#{otherActionsPage.runImportRNIPPayment}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
     <a4j:commandButton value="Очистить Репозиторий" action="#{otherActionsPage.runRepositoryReportsCleanup}"
@@ -111,7 +112,31 @@
 
     <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}" id="loadESZMigrants"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-
+    </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
+        <rich:panel>
+            <h:outputText escape="true" value="Загрузить производственный календарь для всех ОО" styleClass="output-text" /> <br/>
+            <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates" value="Скачать пример файла" styleClass="command-link" />
+            <rich:fileUpload id="specialDatesFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
+                             addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
+                             cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
+                             stopButtonClassDisabled="upload-command-button-diasbled" uploadButtonClass="upload-command-button"
+                             uploadButtonClassDisabled="upload-command-button-diasbled" fileEntryClass="output-text"
+                             fileEntryClassDisabled="output-text" fileEntryControlClass="output-text"
+                             fileEntryControlClassDisabled="output-text" sizeErrorLabel="Недопустимый размер"
+                             stopControlLabel="Остановить" stopEntryControlLabel="Остановить" addControlLabel="Добавить файл"
+                             clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
+                             cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
+                             uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
+                             fileUploadListener="#{otherActionsPage.specialDatesLoadFileListener}">
+                <f:facet name="label">
+                    <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
+                </f:facet>
+                <a4j:support event="onuploadcomplete" reRender="specialDatesFileLoaderPanel" />
+                <a4j:support event="onclear" reRender="specialDatesFileLoaderPanel" />
+            </rich:fileUpload>
+        </rich:panel>
+    </h:panelGrid>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

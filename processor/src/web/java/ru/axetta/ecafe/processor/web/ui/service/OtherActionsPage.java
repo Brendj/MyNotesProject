@@ -20,12 +20,16 @@ import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.richfaces.event.UploadEvent;
+import org.richfaces.model.UploadItem;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -379,4 +383,54 @@ public class OtherActionsPage extends BasicWorkspacePage {
             printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
         }
     }
+
+    public void specialDatesLoadFileListener(UploadEvent event) {
+        UploadItem item = event.getUploadItem();
+        InputStream inputStream = null;
+        long dataSize = 0;
+        try {
+            if (item.isTempFile()) {
+                File file = item.getFile();
+                dataSize = file.length();
+                inputStream = new FileInputStream(file);
+            } else {
+                byte[] data = item.getData();
+                dataSize = data.length;
+                inputStream = new ByteArrayInputStream(data);
+            }
+            DAOService.getInstance().loadSpecialDates(inputStream, dataSize);
+            printMessage("Файл загружен успешно");
+        } catch (Exception e) {
+            getLogger().error("Failed to load special dates from file", e);
+            printMessage("Ошибка при загрузке производственного календаря : " + e.getMessage());
+        } finally {
+            close(inputStream);
+        }
+    }
+
+    public Object downloadSampleFile() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                    .getResponse();
+
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+
+            facesContext.responseComplete();
+            response.setContentType("application/csv");
+            response.setHeader("Content-disposition", "attachment;filename=\"pk.csv\"");
+            String sample = "\"Год/Месяц\",\"Январь\",\"Февраль\",\"Март\",\"Апрель\",\"Май\",\"Июнь\",\"Июль\",\"Август\",\"Сентябрь\",\"Октябрь\",\"Ноябрь\",\"Декабрь\"\n"
+                    + "2019,\"1,2,3,4,5,6,7,8,9,10,12,13,19,20,26,27\",\"2,3,9,10,16,17,22*,23,24,25\",\"2,3,7*,8,9,10,16,17,23,24,30,31\",\"6,7,13,14,20,21,27,28,30*\","
+                    + "\"1,4,5,8*,9,11,12,18,19,25,26\",\"1,2,8,9,11*,12,15,16,22,23,29,30\",\"6,7,13,14,20,21,27,28\",\"3,4,10,11,17,18,24,25,31\","
+                    + "\"1,7,8,14,15,21,22,28,29\",\"5,6,12,13,19,20,26,27\",\"2,3,4,9,10,16,17,23,24,30\",\"1,7,8,14,15,21,22,28,29,31*\"";
+            servletOutputStream.write(sample.getBytes(Charset.forName("UTF-8")));
+            servletOutputStream.flush();
+            servletOutputStream.close();
+        } catch (Exception e) {
+            getLogger().error("Failed export report : ", e);
+            printError("Не удалось сгенерировать пример файла для загрузки: " + e.getMessage());
+        }
+        return null;
+    }
+
 }

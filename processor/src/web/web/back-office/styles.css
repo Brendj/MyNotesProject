@@ -150,6 +150,10 @@
     border: none;
 }
 
+.borderless-grid-align-top td {
+    vertical-align: top;
+}
+
 .borderless-grid-all-client {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
