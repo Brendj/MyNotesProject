@@ -106,15 +106,12 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
             }
             long number = 1;
             for(HistoryCard el : listOfHistoryCard){
-                if(el.getCard().getState().equals(CardState.BLOCKED.getValue())){
-                    continue;
-                }
                 if(el.getCard().getClient() == null){
                     logger.error(String.format("Card ID %s cardNo %s does not have owner", el.getCard().getIdOfCard(), el.getCard().getCardNo()));
                     continue;
                 }
                 Long printNo = el.getCard().getCardPrintedNo();
-                String lockReason  = stringNotNull(getLockReasonPenultimateCard(session, el.getCard().getClient())); // Причина перевыпуска есть причиа блокировки старой карты
+                String lockReason  = stringNotNull(getLockReasonPenultimateCard(session, el.getCard())); // Причина перевыпуска есть причиа блокировки старой карты
                 Date createDate = el.getCard().getCreateTime();
                 String firstname, surname, secondname, department;
                 Long cost = el.getTransaction() == null? 0: longNotNull(el.getTransaction().getTransactionSum());
@@ -143,16 +140,17 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
 
         }
 
-        private String getLockReasonPenultimateCard(Session session, Client client) {
-            List<Card> allClientCard = DAOUtils.getAllCardByClient(session, client);
-            if(allClientCard.size() == 1){
-                return "Новая карта";
-            }
-            else if(allClientCard.isEmpty()){
-                logger.error(String.format("Client ID %s have card, but Hibernate return empty CardList", client.getIdOfClient()));
+        private String getLockReasonPenultimateCard(Session session, Card card) {
+            List<Card> allClientCard = DAOUtils.getAllCardByClient(session, card.getClient());
+            if(allClientCard.isEmpty()){
+                logger.error(String.format("Client ID %s have card, but Hibernate return empty CardList", card.getClient().getIdOfClient()));
                 return "";
             }
-            return allClientCard.get(1).getLockReason();
+            int index = allClientCard.indexOf(card);
+            if(index == allClientCard.size() -1){
+                return "Новая карта";
+            }
+            return allClientCard.get(index+1).getLockReason();
         }
 
         private JRDataSource createDataSource(List<CreatedAndReissuedCardReportItem> items){
