@@ -128,6 +128,7 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
                 Criteria criteria = session.createCriteria(SpecialDate.class);
                 criteria.add(Restrictions.between("compositeIdOfSpecialDate.date", bDate, eDate));
                 criteria.add(Restrictions.eq("compositeIdOfSpecialDate.idOfOrg", orgId));
+                criteria.add(Restrictions.eq("deleted", false));
                 SpecialDate specialDate = (SpecialDate) criteria.uniqueResult();
                 String comment = "";
 
