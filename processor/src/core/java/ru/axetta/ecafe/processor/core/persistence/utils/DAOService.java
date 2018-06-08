@@ -2135,10 +2135,11 @@ public class DAOService {
         TypedQuery<OrgRegistryChangeItem> query = entityManager.createQuery(q, OrgRegistryChangeItem.class);
         query.setParameter("lastUpdate", revisionDate);
         List<OrgRegistryChangeItem> resultOfQuery = query.getResultList();
-
         for(OrgRegistryChangeItem item : resultOfQuery){
-            OrgRegistryChange orgRegistryChange = item.getOrgRegistryChange();
-            if(orgRegistryChange == null) continue;
+            OrgRegistryChange orgRegistryChange = item.getOrgRegistryChange(); // used not lazy loading because entityManager return object with fields = null
+            if(orgRegistryChange == null){
+                continue;
+            }
             if(orgRegistryChangeList.indexOf(orgRegistryChange) == -1){
                 if((orgRegistryChange.getRegion().equals(regionFilter) || isEmptyRegionFilter)
                         && (orgRegistryChange.getOperationType() == operationType  || isAllOperations)

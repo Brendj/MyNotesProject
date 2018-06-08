@@ -52,7 +52,15 @@ public class OrgRegistryChangeItem {
     protected String interdistrictCouncilChiefFrom;
 
     protected Boolean applied = false;
+    private Long mainRegistry;
 
+    public Long getMainRegistry() {
+        return mainRegistry;
+    }
+
+    public void setMainRegistry(Long mainRegistry) {
+        this.mainRegistry = mainRegistry;
+    }
 
 
     public OrgRegistryChangeItem() {

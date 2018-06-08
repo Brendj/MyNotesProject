@@ -56,6 +56,7 @@
         <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>
         <property name="additionalId" column="additionalid" type="long"/>
+        <property name="mainRegistry" column="mainRegistry" type="long" insert="false" update="false"/>
         <property name="mainBuilding" column="mainBuilding" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <many-to-one name="orgRegistryChange" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange" lazy="false"
                      column="mainRegistry" />

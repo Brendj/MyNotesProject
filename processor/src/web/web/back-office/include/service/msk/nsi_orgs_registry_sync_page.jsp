@@ -50,7 +50,8 @@
 
         <h:outputText escape="true" value="Фильтр наименования ОО" styleClass="output-text" />
         <h:inputText value="#{NSIOrgsRegistrySynchPage.nameFilter}" style="width:350px;" styleClass="input-text" />
-
+        <h:outputText escape="true" value="Подпоиск по корпусам" styleClass="output-text"/>
+        <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.isNeedAddElements}" style="width:350px;margin-left:-168px"/>
         <h:outputText escape="true" value="Тип операции" styleClass="output-text" />
         <h:selectOneMenu id="operationType" value="#{NSIOrgsRegistrySynchPage.selectedOperationType}" style="width:350px;" >
             <f:selectItems value="#{NSIOrgsRegistrySynchPage.operationTypes}"/>
@@ -93,10 +94,6 @@
             </h:panelGrid>
         </h:column>
         <h:column>
-            <h:panelGrid columns="2" styleClass="borderless-grid">
-                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.isNeedAddElements}"/>
-                <h:outputText escape="true" value="Выводить записи, в элементах которого встречается фильтр" styleClass="output-text" />
-            </h:panelGrid>
             <h:panelGrid>
                 <h:panelGrid id="synchTableControl">
                     <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"

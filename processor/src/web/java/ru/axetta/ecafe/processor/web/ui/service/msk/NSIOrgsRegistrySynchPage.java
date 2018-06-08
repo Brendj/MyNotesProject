@@ -304,7 +304,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public void doUpdate() {
         try {
             List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, getRegionFilter(), selectedRevision, selectedOperationType, hideApplied);
-            if(isNeedAddElements){
+            if(isNeedAddElements && nameFilter != null && nameFilter.length() > 0){
                 dbItems = DAOService.getInstance().getOrgRegistryChangesThroughOrgRegistryChangeItems(nameFilter, selectedRevision, getRegionFilter(), selectedOperationType, hideApplied, dbItems);
             }
             putDbItems(dbItems);
