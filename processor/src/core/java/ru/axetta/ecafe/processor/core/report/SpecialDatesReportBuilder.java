@@ -122,9 +122,11 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
             c.setTime(startDate);
             while (c.getTimeInMillis() < endDate.getTime() ){
                 Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
+                Date bDate = CalendarUtils.startOfDay(currentDate);
+                Date eDate = CalendarUtils.endOfDay(currentDate);
 
                 Criteria criteria = session.createCriteria(SpecialDate.class);
-                criteria.add(Restrictions.eq("compositeIdOfSpecialDate.date", currentDate));
+                criteria.add(Restrictions.between("compositeIdOfSpecialDate.date", bDate, eDate));
                 criteria.add(Restrictions.eq("compositeIdOfSpecialDate.idOfOrg", orgId));
                 SpecialDate specialDate = (SpecialDate) criteria.uniqueResult();
                 String comment = "";
