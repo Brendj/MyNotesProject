@@ -406,4 +406,13 @@ public class OrgRegistryChange {
     public void setInnFrom(String innFrom) {
         this.innFrom = innFrom;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if(this.getClass() != obj.getClass()){
+            return false;
+        }
+        OrgRegistryChange other = (OrgRegistryChange) obj;
+        return this.idOfOrgRegistryChange.equals(other.getIdOfOrgRegistryChange());
+    }
 }

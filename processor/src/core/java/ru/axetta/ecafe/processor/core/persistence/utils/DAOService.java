@@ -2116,6 +2116,41 @@ public class DAOService {
         return query.getResultList();
     }
 
+    public List<OrgRegistryChange> getOrgRegistryChangesThroughOrgRegistryChangeItems(String nameFilter, long revisionDate,
+            String regionFilter, long operationType, boolean hideApplied, List<OrgRegistryChange> orgRegistryChangeList) throws Exception {
+        boolean isEmptyRegionFilter = StringUtils.isEmpty(regionFilter);
+        boolean isAllOperations = operationType <= 0;
+        if (revisionDate < 1L) {
+            revisionDate = getLastOrgRegistryChangeRevision();
+        }
+        if (revisionDate < 1) {
+            return Collections.EMPTY_LIST;
+        }
+        String nameStatement = "";
+        if (nameFilter != null && nameFilter.length() > 0) {
+            nameStatement = " and (lower(shortName||officialName) like lower('%" + nameFilter + "%')" +
+                    " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
+        }
+        String q = "from OrgRegistryChangeItem where createDate=:lastUpdate" + nameStatement + " order by officialName";
+        TypedQuery<OrgRegistryChangeItem> query = entityManager.createQuery(q, OrgRegistryChangeItem.class);
+        query.setParameter("lastUpdate", revisionDate);
+        List<OrgRegistryChangeItem> resultOfQuery = query.getResultList();
+
+        for(OrgRegistryChangeItem item : resultOfQuery){
+            OrgRegistryChange orgRegistryChange = item.getOrgRegistryChange();
+            if(orgRegistryChange == null) continue;
+            if(orgRegistryChangeList.indexOf(orgRegistryChange) == -1){
+                if((orgRegistryChange.getRegion().equals(regionFilter) || isEmptyRegionFilter)
+                        && (orgRegistryChange.getOperationType() == operationType  || isAllOperations)
+                        && orgRegistryChange.getApplied().equals(!hideApplied)){
+                    orgRegistryChangeList.add(orgRegistryChange);
+                }
+            }
+        }
+        return orgRegistryChangeList;
+    }
+
+
     public long getLastOrgRegistryChangeRevision() throws Exception {
         Query q = entityManager.createNativeQuery("SELECT max(createDate) FROM cf_orgregistrychange");
         Object res = q.getSingleResult();

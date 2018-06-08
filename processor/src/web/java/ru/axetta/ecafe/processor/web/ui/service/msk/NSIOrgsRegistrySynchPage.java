@@ -52,6 +52,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected Integer selectedIndustry = 0;
 
     private final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
+    private Boolean isNeedAddElements;
 
     public NSIOrgsRegistrySynchPage() {
         super();
@@ -303,6 +304,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public void doUpdate() {
         try {
             List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, getRegionFilter(), selectedRevision, selectedOperationType, hideApplied);
+            if(isNeedAddElements){
+                dbItems = DAOService.getInstance().getOrgRegistryChangesThroughOrgRegistryChangeItems(nameFilter, selectedRevision, getRegionFilter(), selectedOperationType, hideApplied, dbItems);
+            }
             putDbItems(dbItems);
         } catch (Exception e) {
             errorMessages = "Не удалось произвести загрузку организаций из Реестров: " + e.getMessage();
@@ -561,6 +565,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public void setSelectedIndustry(Integer selectedIndustry) {
         this.selectedIndustry = selectedIndustry;
+    }
+
+    public void setIsNeedAddElements(Boolean isNeedAddElements) {
+        this.isNeedAddElements = isNeedAddElements;
+    }
+
+    public Boolean getIsNeedAddElements() {
+        return isNeedAddElements;
     }
 
     public class WebItem {

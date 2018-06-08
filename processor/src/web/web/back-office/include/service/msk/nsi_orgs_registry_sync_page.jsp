@@ -93,6 +93,10 @@
             </h:panelGrid>
         </h:column>
         <h:column>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.isNeedAddElements}"/>
+                <h:outputText escape="true" value="Выводить записи, в элементах которого встречается фильтр" styleClass="output-text" />
+            </h:panelGrid>
             <h:panelGrid>
                 <h:panelGrid id="synchTableControl">
                     <a4j:commandButton value="Выбрать все" action="#{NSIOrgsRegistrySynchPage.doCheckAll}" reRender="synchTable,synchTableInfoPanel" status="updateStatus"
