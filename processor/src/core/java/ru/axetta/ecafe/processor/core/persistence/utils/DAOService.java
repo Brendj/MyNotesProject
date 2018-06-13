@@ -2128,15 +2128,24 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and (lower(shortName||officialName) like lower('%" + nameFilter + "%')" +
-                    " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
+            nameStatement = " and (lower(rci.shortName||rci.officialName) like lower('%" + nameFilter + "%')" +
+                    " or lower(rci.shortNameFrom||rci.officialNameFrom) like lower('%%" + nameFilter + "%'))";
         }
-        String q = "from OrgRegistryChangeItem where createDate=:lastUpdate" + nameStatement + " order by officialName";
-        TypedQuery<OrgRegistryChangeItem> query = entityManager.createQuery(q, OrgRegistryChangeItem.class);
+        String q = "select rci, rc from OrgRegistryChangeItem rci join rci.orgRegistryChange rc"
+                + " where rci.createDate=:lastUpdate " + nameStatement + "order by rci.officialName";
+
+        TypedQuery<Object[]> query = entityManager.createQuery(q, Object[].class); //JPA has no tool to get 2 or more objects
         query.setParameter("lastUpdate", revisionDate);
-        List<OrgRegistryChangeItem> resultOfQuery = query.getResultList();
+        List<Object[]> bufObjectList = query.getResultList();
+        List<OrgRegistryChangeItem> resultOfQuery = new LinkedList<OrgRegistryChangeItem>();
+        for(Object[] bufElm : bufObjectList){
+            OrgRegistryChangeItem item = (OrgRegistryChangeItem) bufElm[0];
+            item.setOrgRegistryChange((OrgRegistryChange) bufElm[1]);
+            resultOfQuery.add(item);
+        }
+
         for(OrgRegistryChangeItem item : resultOfQuery){
-            OrgRegistryChange orgRegistryChange = item.getOrgRegistryChange(); // used not lazy loading because entityManager return object with fields = null
+            OrgRegistryChange orgRegistryChange = item.getOrgRegistryChange();
             if(orgRegistryChange == null){
                 continue;
             }

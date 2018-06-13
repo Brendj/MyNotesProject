@@ -303,9 +303,12 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     //Применяем фильтр
     public void doUpdate() {
         try {
-            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, getRegionFilter(), selectedRevision, selectedOperationType, hideApplied);
+            List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, getRegionFilter(),
+                    selectedRevision, selectedOperationType, hideApplied);
             if(isNeedAddElements && nameFilter != null && nameFilter.length() > 0){
-                dbItems = DAOService.getInstance().getOrgRegistryChangesThroughOrgRegistryChangeItems(nameFilter, selectedRevision, getRegionFilter(), selectedOperationType, hideApplied, dbItems);
+                dbItems = DAOService.getInstance()
+                        .getOrgRegistryChangesThroughOrgRegistryChangeItems(nameFilter, selectedRevision, getRegionFilter(),
+                                selectedOperationType, hideApplied, dbItems);
             }
             putDbItems(dbItems);
         } catch (Exception e) {
