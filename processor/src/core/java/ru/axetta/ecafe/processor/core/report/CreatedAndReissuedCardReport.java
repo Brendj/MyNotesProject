@@ -113,17 +113,15 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
                 Long printNo = el.getCard().getCardPrintedNo();
                 String lockReason  = stringNotNull(getLockReasonPenultimateCard(session, el.getCard())); // Причина перевыпуска есть причиа блокировки старой карты
                 Date createDate = el.getCard().getCreateTime();
-                String firstname, surname, secondname, department;
+                String shortName, department;
                 Long cost = el.getTransaction() == null? 0: longNotNull(el.getTransaction().getTransactionSum());
                 if(el.getUser().getPerson() != null){
-                    firstname = stringNotNull(el.getUser().getPerson().getFirstName());
-                    surname = stringNotNull(el.getUser().getPerson().getSurname());
-                    secondname = stringNotNull(el.getUser().getPerson().getSecondName());
+                    shortName = stringNotNull(el.getUser().getPerson().getSurnameAndFirstLetters());
                 } else {
-                    firstname = surname = secondname = "";
+                    shortName =  "";
                 }
                 department = stringNotNull(el.getUser().getDepartment());
-                CreatedAndReissuedCardReportItem item = new CreatedAndReissuedCardReportItem(firstname, surname, secondname, cost,
+                CreatedAndReissuedCardReportItem item = new CreatedAndReissuedCardReportItem(shortName, cost,
                         lockReason, department, printNo, createDate, number);
                 items.add(item);
                 number++;
@@ -195,9 +193,9 @@ public class CreatedAndReissuedCardReport extends BasicReportForAllOrgJob {
         private Long cardNo;
         private Date issueDate;
 
-        CreatedAndReissuedCardReportItem(String firstname, String surname, String secondname, Long cost,
+        CreatedAndReissuedCardReportItem(String shortName, Long cost,
                 String reason, String department, Long cardNo, Date issueDate, Long number){
-            this.employeeName = firstname + " " + surname + " " + secondname;
+            this.employeeName = shortName;
             this.cost = cost /100;
             this.reason = getCheckedReason(reason);
             this.department = department;
