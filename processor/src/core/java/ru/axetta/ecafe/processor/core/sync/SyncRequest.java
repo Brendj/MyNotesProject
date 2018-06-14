@@ -8,7 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
@@ -43,11 +45,14 @@ import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequest;
 import ru.axetta.ecafe.processor.core.sync.request.registry.accounts.AccountsRegistryRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistry;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.text.StrTokenizer;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -1305,6 +1310,31 @@ public class SyncRequest {
                                 priority = Integer.parseInt(priorityStr);
                             }
                         }
+                        String guidOfGood;
+                        Long idOfGood = null;
+                        Node guidOfGoodNode = namedNodeMap.getNamedItem("GuidOfGoods");
+                        if (null != guidOfGoodNode) {
+                            guidOfGood = getTextContent(guidOfGoodNode);
+                            if (null != guidOfGood) {
+                                RuntimeContext runtimeContext = RuntimeContext.getInstance();
+                                Session session = null;
+                                Transaction transaction = null;
+                                try {
+                                    session = runtimeContext.createReportPersistenceSession();
+                                    transaction = session.beginTransaction();
+                                    Good good = DAOUtils.findGoodByGuid(session, guidOfGood);
+                                    if (null != good)
+                                        idOfGood = good.getGlobalId();
+                                    transaction.commit();
+                                    transaction = null;
+                                } catch (Exception e) {
+                                    logger.error("Failed build MenuDetail section ", e);
+                                } finally {
+                                    HibernateUtils.rollback(transaction, logger);
+                                    HibernateUtils.close(session, logger);
+                                }
+                            }
+                        }
 
                         String gBasket = getTextContent(namedNodeMap.getNamedItem("GBasketEl"));
 
@@ -1325,7 +1355,7 @@ public class SyncRequest {
                         Double vitPp = getDoubleValue(namedNodeMap, "VitPP");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
                                 flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa,
-                                minP, minMg, minFe, vitB2, vitPp, gBasket, shortName);
+                                minP, minMg, minFe, vitB2, vitPp, gBasket, shortName, idOfGood);
                     }
 
                     private static String getTextContent(Node node) throws Exception {
@@ -1398,12 +1428,13 @@ public class SyncRequest {
                 private final Integer priority;
                 private final String gBasket;
                 private final String shortName;
+                private final Long idOfGood;
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, Long price,
                         int menuOrigin, int availableNow, Integer flags, Integer priority, Double protein, Double fat,
                         Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
                         Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp, String gBasket,
-                        String shortName) {
+                        String shortName, Long idOfGood) {
                     this.idOfMenu = idOfMenu;
                     this.path = path;
                     this.name = name;
@@ -1430,6 +1461,7 @@ public class SyncRequest {
                     this.vitPp = vitPp;
                     this.gBasket = gBasket;
                     this.shortName = shortName;
+                    this.idOfGood = idOfGood;
                 }
 
                 public Long getIdOfMenu() {
@@ -1532,6 +1564,10 @@ public class SyncRequest {
                     return gBasket;
                 }
 
+                public Long getIdOfGood() {
+                    return idOfGood;
+                }
+
                 @Override
                 public String toString() {
                     return "ReqMenuDetail{" + "idOfMenu=" + idOfMenu + ", path='" + path + '\'' + ", name='" + name
@@ -1541,7 +1577,7 @@ public class SyncRequest {
                             + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
                             + minP + ", minMg=" + minMg + ", minFe=" + minFe + ", menuOrigin=" + menuOrigin
                             + ", availableNow=" + availableNow + ", flags=" + flags + ", priority=" + priority
-                            + ", gBasketEl=" + gBasket + ", shortName=" + shortName + '}';
+                            + ", gBasketEl=" + gBasket + ", shortName=" + shortName + ", idOfGood=" + idOfGood + '}';
                 }
 
                 @Override

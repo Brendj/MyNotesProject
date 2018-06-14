@@ -23,9 +23,11 @@ public class ReqMenuDetailTest {
         menuDetail.setFat(2d);
         menuDetail.setCarbohydrates(3d);
         menuDetail.setCalories(4d);
+        menuDetail.setIdOfGood(0L);
         SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = new SyncRequest.ReqMenu.Item.ReqMenuDetail(0L, "path",
                 "detailName", "group", "output", 100L, 1, 2, 0, 1, 1d, 2d,
-                3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d, 12d, 13d, 14d, "gBasket", "shortName");
+                3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d, 12d, 13d, 14d,
+                "gBasket", "shortName", 0L);
         assertTrue(SyncRequest.ReqMenu.Item.ReqMenuDetail.areMenuDetailsEqual(menuDetail, reqMenuDetail));
     }
 }

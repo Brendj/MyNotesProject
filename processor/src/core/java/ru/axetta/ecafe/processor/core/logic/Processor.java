@@ -4840,6 +4840,7 @@ public class Processor implements SyncProcessor {
                 newMenuDetail.setVitPp(reqMenuDetail.getVitPp());
                 newMenuDetail.setIdOfMenuFromSync(reqMenuDetail.getIdOfMenu());
                 newMenuDetail.setShortName(reqMenuDetail.getShortName());
+                newMenuDetail.setIdOfGood(reqMenuDetail.getIdOfGood());
 
                 persistenceSession.save(newMenuDetail);
                 menu.addMenuDetail(newMenuDetail);
