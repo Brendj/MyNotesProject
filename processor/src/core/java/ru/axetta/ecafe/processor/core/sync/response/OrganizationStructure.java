@@ -63,7 +63,8 @@ public class OrganizationStructure implements AbstractToElement{
                     o.getShortNameInfoService(), o.getOfficialName(), o.getShortName(),
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(),
-                    o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getOrgStructureVersion());
+                    o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getShortAddress(),
+                    o.getOrgStructureVersion());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
@@ -72,7 +73,8 @@ public class OrganizationStructure implements AbstractToElement{
                     org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
                     org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
-                    org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(), org.getOrgStructureVersion());
+                    org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(), org.getShortAddress(),
+                    org.getOrgStructureVersion());
             organizationItemMap.put(org.getIdOfOrg(), item);
         }
     }
@@ -103,10 +105,11 @@ public class OrganizationStructure implements AbstractToElement{
         private final Boolean variableFeeding;
         private final Boolean needVerifyCardSign;
         private final Boolean useSpecialMenu;
+        private final String shortAddress;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
                 String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId,Long defaultSupplier, Boolean isFriendly,
-                String nCounty, Integer state, Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, Long version) {
+                String nCounty, Integer state, Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress, Long version) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -123,6 +126,7 @@ public class OrganizationStructure implements AbstractToElement{
             this.variableFeeding = variableFeeding;
             this.needVerifyCardSign = needVerifyCardSign;
             this.useSpecialMenu = useSpecialMenu;
+            this.shortAddress = shortAddress;
             this.version = version;
         }
 
@@ -149,6 +153,7 @@ public class OrganizationStructure implements AbstractToElement{
             element.setAttribute("UseVariableFeeding", variableFeeding ? "1" : "0");
             element.setAttribute("NeedVerifyCardSign", needVerifyCardSign ? "1" : "0");
             element.setAttribute("UseSpecialMenu", useSpecialMenu ? "1" : "0");
+            element.setAttribute("ShortAddress", shortAddress);
             return element;
         }
 
