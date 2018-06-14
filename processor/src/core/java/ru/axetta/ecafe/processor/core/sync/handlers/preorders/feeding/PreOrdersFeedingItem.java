@@ -23,6 +23,8 @@ public class PreOrdersFeedingItem {
     private final Long version;
     private final Boolean isDeleted;
     private final Long idOfOrg;
+    private final Date createdDate;
+    private final Date lastUpdate;
     private List<PreOrderFeedingDetail> preOrderFeedingDetailList = new LinkedList<PreOrderFeedingDetail>();
 
     public PreOrdersFeedingItem(Session session, PreorderComplex preorderComplex) {
@@ -31,6 +33,8 @@ public class PreOrdersFeedingItem {
         this.version = preorderComplex.getVersion();
         this.isDeleted = preorderComplex.getDeletedState();
         this.idOfOrg = preorderComplex.getClient().getOrg().getIdOfOrg();
+        this.createdDate = preorderComplex.getCreatedDate();
+        this.lastUpdate = preorderComplex.getLastUpdate();
 
         PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(session, preorderComplex);
         this.preOrderFeedingDetailList.add(feedingDetail);
@@ -62,6 +66,14 @@ public class PreOrdersFeedingItem {
         return idOfOrg;
     }
 
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
     public Element toElement(Document document) throws Exception{
         Element element = document.createElement("POF");
         DateFormat timeFormat = CalendarUtils.getDateTimeFormatLocal();
@@ -80,6 +92,12 @@ public class PreOrdersFeedingItem {
         }
         if (null != idOfOrg) {
             element.setAttribute("OrgId", Long.toString(idOfOrg));
+        }
+        if (null != createdDate) {
+            element.setAttribute("CreatedDate", timeFormat.format(createdDate));
+        }
+        if (null != lastUpdate) {
+            element.setAttribute("LastUpdate", timeFormat.format(lastUpdate));
         }
 
         for (PreOrderFeedingDetail detail : this.preOrderFeedingDetailList) {

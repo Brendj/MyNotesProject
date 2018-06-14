@@ -18,6 +18,7 @@ public class PreOrderFeedingDetail {
     private final String name;
     private final Integer qty;
     private final String guid;
+    private final Long price;
 
     public PreOrderFeedingDetail(Session session, PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getArmIdOfMenu();
@@ -25,6 +26,7 @@ public class PreOrderFeedingDetail {
         this.qty = menuDetail.getAmount();
         this.complexId = complexId;
         this.guid = guid;
+        this.price = menuDetail.getMenuDetailPrice();
     }
 
     public PreOrderFeedingDetail(Session session, PreorderComplex complex) {
@@ -33,6 +35,7 @@ public class PreOrderFeedingDetail {
         this.qty = complex.getAmount();
         this.idOfMenu = null;
         this.guid = complex.getGuid();
+        this.price = complex.getComplexPrice();
     }
 
     public Integer getComplexId() {
@@ -55,6 +58,10 @@ public class PreOrderFeedingDetail {
         return guid;
     }
 
+    public Long getPrice() {
+        return price;
+    }
+
     public Element toElement(Document document) throws Exception{
         Element element = document.createElement("POD");
 
@@ -72,6 +79,9 @@ public class PreOrderFeedingDetail {
         }
         if (null != guid) {
             element.setAttribute("Guid", guid);
+        }
+        if (null != price) {
+            element.setAttribute("Price", price.toString());
         }
 
         return element;
