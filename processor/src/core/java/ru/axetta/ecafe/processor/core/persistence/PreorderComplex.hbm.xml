@@ -32,5 +32,10 @@
             <key column="idOfPreorderComplex"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail"/>
         </set>
+        <property name="state" column="state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderState</param>
+            </type>
+        </property>
     </class>
 </hibernate-mapping>

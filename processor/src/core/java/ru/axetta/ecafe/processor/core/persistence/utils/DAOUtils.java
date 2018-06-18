@@ -3045,7 +3045,7 @@ public class DAOUtils {
         return menuDetail == null ? "" : menuDetail.getMenuDetailName();
     }
 
-    public static Integer getPreorderFeedingForbiddenDays(Client client) {
+    public static Integer getPreorderFeedingForbiddenDays(Long idOfOrg) {
         Integer forbiddenDays = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -3053,22 +3053,17 @@ public class DAOUtils {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            if (client == null) {
-                return null;
-            }
             Criteria criteria = persistenceSession.createCriteria(ECafeSettings.class);
-            final Org clientOrg = client.getOrg();
-            final Long idOfOrg = clientOrg.getIdOfOrg();
             criteria.add(Restrictions.eq("orgOwner", idOfOrg));
             criteria.add(Restrictions.eq("settingsId", SettingsIds.PreOrderFeeding));
             criteria.add(Restrictions.eq("deletedState", false));
             List list = criteria.list();
             if (list == null || list.isEmpty()) {
-                logger.error("Отсутствуют настройки предзаказанного питания для организации клиента с id=" + client.getIdOfClient());
+                logger.error("Отсутствуют настройки предзаказанного питания для организации с id=" + idOfOrg);
                 return null;
             }
             if (list.size() > 1) {
-                logger.error("Организация имеет более одной настройки id OO=" + clientOrg.getIdOfOrg());
+                logger.error("Организация имеет более одной настройки id OO=" + idOfOrg);
                 return null;
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);
@@ -3078,12 +3073,57 @@ public class DAOUtils {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error(String.format("Can't get preorders feeding forbidden days value. Client contractId = %d", client.getContractId()), e);
+            logger.error(String.format("Can't get preorders feeding forbidden days value. IdOfOrg = %d", idOfOrg), e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
         return forbiddenDays;
+    }
+
+    public static List<MenusCalendar> getMenusCalendarForOrgSinceVersion(Session session, Long version, Long idOfOrg) {
+        try {
+            Criteria criteria = session.createCriteria(MenuExchangeRule.class);
+            criteria.add(Restrictions.eq("idOfDestOrg", idOfOrg));
+            MenuExchangeRule menuExchangeRule = (MenuExchangeRule) criteria.uniqueResult();
+            if (menuExchangeRule == null)
+                return new ArrayList<MenusCalendar>();
+
+            Query query = session.createQuery(
+                    "select mc from MenusCalendar mc where mc.version > :version and mc.org.idOfOrg = :idOfOrg");
+            query.setParameter("version", version);
+            query.setParameter("idOfOrg", menuExchangeRule.getIdOfSourceOrg());
+            return query.list();
+        } catch (NonUniqueResultException ne) {
+            return new ArrayList<MenusCalendar>();
+        }
+    }
+
+    public static List<MenusCalendarDate> getMenusCalendarDateItems(Session session, Long idOfMenusCalendar) {
+        Criteria criteria = session.createCriteria(MenusCalendarDate.class);
+        criteria.add(Restrictions.eq("menusCalendar.idOfMenusCalendar", idOfMenusCalendar));
+        return criteria.list();
+    }
+
+    public static MenusCalendar getMenusCalendarForOrgByGuid(Session session, Long idOfOrg, String guid) throws Exception {
+        Criteria criteria = session.createCriteria(MenusCalendar.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("guid", guid));
+        return (MenusCalendar) criteria.uniqueResult();
+    }
+
+    public static MenusCalendarDate getMenusCalendarDate(Session session, Long idOfMenusCalendar, Date date) {
+        Criteria criteria = session.createCriteria(MenusCalendarDate.class);
+        criteria.add(Restrictions.eq("menusCalendar.idOfMenusCalendar", idOfMenusCalendar));
+        criteria.add(Restrictions.eq("date", date));
+        return (MenusCalendarDate)criteria.uniqueResult();
+    }
+
+    public static Integer getPreorderFeedingForbiddenDays(Client client) {
+        if (client == null) {
+            return null;
+        }
+        return getPreorderFeedingForbiddenDays(client.getOrg().getIdOfOrg());
     }
 
     public static Card getLastCardByClient(Session persistenceSession, Client client){

@@ -52,6 +52,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsProcessor;
@@ -315,6 +316,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -800,6 +803,28 @@ public class Processor implements SyncProcessor {
         }
         addPerformanceInfoAndResetDeltaTime(performanceLogger, "processCardRequests", timeForDelta);
 
+        try {
+            MenusCalendarSupplierRequest menusCalendarSupplierRequest = request.getMenusCalendarSupplierRequest();
+            if (menusCalendarSupplierRequest != null) {
+                resMenusCalendar = processMenusCalendarSupplier(menusCalendarSupplierRequest);
+            }
+        } catch (Exception e) {
+            String message = String.format("processMenusCalendarSupplier: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            MenusCalendarRequest menusCalendarRequest = request.getMenusCalendarRequest();
+            if (menusCalendarRequest != null) {
+                menusCalendarData = processMenusCalendarData(menusCalendarRequest);
+            }
+        } catch (Exception e) {
+            String message = String.format("processMenusCalendarSupplier: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -812,7 +837,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
-                cardRequestsData);
+                cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -1809,6 +1834,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1854,7 +1881,8 @@ public class Processor implements SyncProcessor {
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData);
+                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
+                resMenusCalendar, menusCalendarData);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -1901,6 +1929,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1929,7 +1959,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -1976,6 +2006,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2004,7 +2036,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private SyncResponse buildSpecialDatesSyncResponse(SyncRequest request) throws Exception {
@@ -2051,6 +2083,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2079,7 +2113,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -2126,6 +2160,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2189,7 +2225,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -2256,6 +2292,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2341,7 +2379,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -2392,6 +2430,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2474,7 +2514,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -2522,6 +2562,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2627,7 +2669,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -4633,6 +4675,7 @@ public class Processor implements SyncProcessor {
                                 localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu,
                                 item.getReqComplexInfos(), localIdsToMenuDetailMap);
+                        processPreorders(persistenceSession, organization, menuDate);
 
                     }
 
@@ -4747,6 +4790,47 @@ public class Processor implements SyncProcessor {
                     complexInfoDetail.setCount(menuItemCount);
                 }
                 persistenceSession.save(complexInfoDetail);
+            }
+        }
+    }
+
+    private void processPreorders(Session persistenceSession, Org organization, Date menuDate) {
+        Date dateFrom = CalendarUtils.startOfDay(new Date());
+
+        Query query = persistenceSession.createQuery("select pc from PreorderComplex pc "
+                + "where pc.client.org = :org and pc.preorderDate > :date");
+        query.setParameter("org", organization);
+        query.setParameter("date", dateFrom);
+        List<PreorderComplex> list = query.list();
+        List<PreorderComplex> deletedPreorders = new ArrayList<PreorderComplex>();
+        List<PreorderComplex> changedPreorders = new ArrayList<PreorderComplex>();
+        for (PreorderComplex preorderComplex : list) {
+            ComplexInfo complexInfo = DAOUtils.getComplexInfoByPreorderComplex(persistenceSession, preorderComplex);
+            if (complexInfo == null) {
+                deletedPreorders.add(preorderComplex);
+            } else {
+                if (!preorderComplex.equalPrice(complexInfo)) {
+                    changedPreorders.add(preorderComplex);
+                }
+            }
+        }
+        Long version = 0L;
+
+        if (deletedPreorders.size() > 0 || changedPreorders.size() > 0) {
+            Integer days = DAOUtils.getPreorderFeedingForbiddenDays(organization.getIdOfOrg());
+            if (days == null) days = 3;
+            dateFrom = CalendarUtils.addDays(dateFrom, days); //дата, начиная с которой нужно удалять измененные предзаказы
+            version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
+        }
+        if (deletedPreorders.size() > 0) {
+            for (PreorderComplex preorderComplex : deletedPreorders) {
+                preorderComplex.deleteBySupplier(version, true);
+                persistenceSession.update(preorderComplex);
+            }
+        }
+        if (changedPreorders.size() > 0) {
+            for (PreorderComplex preorderComplex : changedPreorders) {
+                preorderComplex.changeBySupplier(version);
             }
         }
     }
@@ -5803,6 +5887,42 @@ public class Processor implements SyncProcessor {
         return resHelpRequest;
     }
 
+    private ResMenusCalendar processMenusCalendarSupplier(MenusCalendarSupplierRequest menusCalendarSupplierRequest) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResMenusCalendar resMenusCalendar = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            MenusCalendarProcessor processor = new MenusCalendarProcessor(persistenceSession, menusCalendarSupplierRequest);
+            resMenusCalendar = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resMenusCalendar;
+    }
+
+    private MenusCalendarData processMenusCalendarData(MenusCalendarRequest menusCalendarRequest) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        MenusCalendarData menusCalendarData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            MenusCalendarProcessor processor = new MenusCalendarProcessor(persistenceSession, menusCalendarRequest);
+            menusCalendarData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return menusCalendarData;
+    }
+
     private HelpRequestData processHelpRequestData(HelpRequest helpRequest)
             throws Exception {
         Session persistenceSession = null;
@@ -5865,6 +5985,8 @@ public class Processor implements SyncProcessor {
         HelpRequestData helpRequestData = null;
         PreOrdersFeeding preOrdersFeeding = null;
         CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -5892,7 +6014,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData);
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {

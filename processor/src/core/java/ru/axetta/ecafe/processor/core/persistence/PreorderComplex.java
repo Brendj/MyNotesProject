@@ -26,9 +26,31 @@ public class PreorderComplex {
     private Long complexPrice;
     private Date createdDate;
     private Date lastUpdate;
+    private PreorderState state;
 
     public PreorderComplex() {
 
+    }
+
+    public void deleteBySupplier(Long nextVersion, boolean doDelete) {
+        this.version = nextVersion;
+        this.deletedState = true;
+        this.state = PreorderState.DELETED;
+        this.lastUpdate = new Date();
+    }
+
+    public void changeBySupplier(Long nextVersion) {
+        this.version = nextVersion;
+        this.state = PreorderState.CHANGED_PRICE;
+        this.lastUpdate = new Date();
+    }
+
+    public boolean equalPrice(ComplexInfo ci) {
+        return getPriceNullSafe(this.getComplexPrice()) == getPriceNullSafe(ci.getCurrentPrice());
+    }
+
+    private long getPriceNullSafe(Long value) {
+        return value == null ? 0 : value;
     }
 
     public Long getIdOfPreorderComplex() {
@@ -149,5 +171,13 @@ public class PreorderComplex {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public PreorderState getState() {
+        return state;
+    }
+
+    public void setState(PreorderState state) {
+        this.state = state;
     }
 }

@@ -37,7 +37,7 @@ public class ResSpecialDatesItem {
         this.idOfOrg = specialDate.getCompositeIdOfSpecialDate().getIdOfOrg();
         this.date = specialDate.getCompositeIdOfSpecialDate().getDate();
         this.isWeekend = specialDate.getIsWeekend();
-        this.deleted = specialDate.getDeleted();
+        this.deleted = specialDate.getDeleted() == null ? false : specialDate.getDeleted();
         this.comment = "";
         this.version = specialDate.getVersion();
         this.idOfOrgOwner = specialDate.getOrgOwner().getIdOfOrg();

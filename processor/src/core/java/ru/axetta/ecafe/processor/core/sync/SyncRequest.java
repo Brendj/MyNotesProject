@@ -25,6 +25,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarSupplierBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarSupplierRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
@@ -2652,6 +2656,8 @@ public class SyncRequest {
             builders.add(new HelpRequestBuilder(idOfOrg));
             builders.add(new PreOrdersFeedingBuilder(idOfOrg));
             builders.add(new CardRequestsBuilder(idOfOrg));
+            builders.add(new MenusCalendarBuilder(idOfOrg));
+            builders.add(new MenusCalendarSupplierBuilder());
             return builders;
         }
 
@@ -2903,6 +2909,14 @@ public class SyncRequest {
 
     public CardRequests getCardRequests() {
         return this.<CardRequests>findSection(CardRequests.class);
+    }
+
+    public MenusCalendarRequest getMenusCalendarRequest() {
+        return this.<MenusCalendarRequest>findSection(MenusCalendarRequest.class);
+    }
+
+    public MenusCalendarSupplierRequest getMenusCalendarSupplierRequest() {
+        return this.<MenusCalendarSupplierRequest>findSection(MenusCalendarSupplierRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

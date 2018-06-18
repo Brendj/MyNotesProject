@@ -73,6 +73,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     resItem.setDate(item.getDate());
                     resItem.setIsWeekend(item.getIsWeekend());
                     resItem.setComment(item.getComment());
+                    resItem.setDeleted(item.getDelete());
                     resItem.setResCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());
                 }
