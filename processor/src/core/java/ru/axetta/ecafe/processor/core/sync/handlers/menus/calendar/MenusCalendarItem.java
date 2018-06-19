@@ -51,14 +51,13 @@ public class MenusCalendarItem extends BaseItem {
     }
 
     public MenusCalendarItem(String guid, Long idOfOrg, Long idOfMenu, Date startDate, Date endDate,
-            Boolean sixWorkDays, Long version, Boolean deletedState, List<MenusCalendarDateItem> items, String errorMessage) {
+            Boolean sixWorkDays, Boolean deletedState, List<MenusCalendarDateItem> items, String errorMessage) {
         this.guid = guid;
         this.idOfOrg = idOfOrg;
         this.idOfMenu = idOfMenu;
         this.startDate = startDate;
         this.endDate = endDate;
         this.sixWorkDays = sixWorkDays;
-        this.version = version;
         this.deletedState = deletedState;
         this.items = items;
         this.errorMessage = errorMessage;
@@ -86,26 +85,23 @@ public class MenusCalendarItem extends BaseItem {
         Date startDate = null;
         Date endDate = null;
         Boolean sixWorkDays = null;
-        Long version = null;
         Boolean deletedState = null;
         StringBuilder errorMessage = new StringBuilder();
         List<MenusCalendarDateItem> items = new ArrayList<MenusCalendarDateItem>();
-
+        String str = XMLUtils.getAttributeValue(itemNode, "D");
+        deletedState = str == null ? false : str.equals("1");
         guid = XMLUtils.getAttributeValue(itemNode, "Guid");
         if (null == guid || StringUtils.isEmpty(guid)) {
             errorMessage.append("Attribute Guid not found");
         }
         idOfOrg = getOrgId(itemNode, errorMessage);
-        String str = XMLUtils.getAttributeValue(itemNode, "IdOfMenu");
-        idOfMenu = Long.parseLong(str);
+        //String str = XMLUtils.getAttributeValue(itemNode, "IdOfMenu");
+        idOfMenu = getLongValue(itemNode, "IdOfMenu", errorMessage, !deletedState); //Long.parseLong(str);
         startDate = getDateValue(itemNode, "SDate", errorMessage);
         endDate = getDateValue(itemNode, "EDate", errorMessage);
         str = XMLUtils.getAttributeValue(itemNode, "SixWorkDays");
         sixWorkDays = str == null ? false : str.equals("1");
-        str = XMLUtils.getAttributeValue(itemNode, "D");
-        deletedState = str == null ? false : str.equals("1");
-        str = XMLUtils.getAttributeValue(itemNode, "V");
-        version = Long.parseLong(str);
+
         Node dateNode = itemNode.getFirstChild();
         while (null != dateNode) {
             if (Node.ELEMENT_NODE == dateNode.getNodeType() && dateNode.getNodeName().equals("CDI")) {
@@ -114,7 +110,7 @@ public class MenusCalendarItem extends BaseItem {
             }
             dateNode = dateNode.getNextSibling();
         }
-        return new MenusCalendarItem(guid, idOfOrg, idOfMenu, startDate, endDate, sixWorkDays, version, deletedState, items, errorMessage.toString());
+        return new MenusCalendarItem(guid, idOfOrg, idOfMenu, startDate, endDate, sixWorkDays, deletedState, items, errorMessage.toString());
     }
 
     public Long getIdOfMenusCalendar() {

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,45 +41,55 @@ public class MenusCalendarProcessor extends AbstractProcessor<ResMenusCalendar> 
         List<ResMenusCalendarItem> items = new ArrayList<ResMenusCalendarItem>();
         Map<Long, Org> orgs  = new HashMap<Long, Org>();
         try {
+            Long nextVersion = DAOUtils.nextVersionByMenusCalendar(session);
             for (MenusCalendarItem item : menusCalendarSupplierRequest.getItems()) {
-                MenusCalendar menusCalendar = DAOUtils.getMenusCalendarForOrgByGuid(session, item.getIdOfOrg(), item.getGuid());
-                Org org = orgs.get(item.getIdOfOrg());
-                if (org == null) {
-                    org = DAOUtils.findOrg(session, item.getIdOfOrg());
-                    orgs.put(item.getIdOfOrg(), org);
-                }
-                if (menusCalendar == null) {
-                    menusCalendar = new MenusCalendar(item.getGuid(), org, item.getIdOfMenu(), item.getStartDate(),
-                            item.getEndDate(), item.getSixWorkDays(), item.getVersion(), item.getDeletedState());
-                    session.save(menusCalendar);
+                if (!StringUtils.isEmpty(item.getErrorMessage())) {
+                    ResMenusCalendarItem resItem = new ResMenusCalendarItem();
+                    resItem.setGuid(item.getGuid());
+                    resItem.setResultCode(1);
+                    resItem.setErrorMessage(item.getErrorMessage());
+                    items.add(resItem);
                 } else {
-                    menusCalendar.setGuid(item.getGuid());
-                    menusCalendar.setIdOfMenu(item.getIdOfMenu());
-                    menusCalendar.setStartDate(item.getStartDate());
-                    menusCalendar.setEndDate(item.getEndDate());
-                    menusCalendar.setSixWorkDays(item.getSixWorkDays());
-                    menusCalendar.setVersion(item.getVersion());
-                    menusCalendar.setDeletedState(item.getDeletedState());
-                    menusCalendar.setLastUpdate(new Date());
-                    session.update(menusCalendar);
-                }
-
-                for (MenusCalendarDateItem dateItem : item.getItems()) {
-                    MenusCalendarDate menusCalendarDate = DAOUtils.getMenusCalendarDate(session, menusCalendar.getIdOfMenusCalendar(), dateItem.getDate());
-                    if (menusCalendarDate == null) {
-                        menusCalendarDate = new MenusCalendarDate();
+                    MenusCalendar menusCalendar = DAOUtils.getMenusCalendarForOrgByGuid(session, item.getIdOfOrg(), item.getGuid());
+                    Org org = orgs.get(item.getIdOfOrg());
+                    if (org == null) {
+                        org = DAOUtils.findOrg(session, item.getIdOfOrg());
+                        orgs.put(item.getIdOfOrg(), org);
                     }
-                    menusCalendarDate.setDate(dateItem.getDate());
-                    menusCalendarDate.setComment(dateItem.getComment());
-                    menusCalendarDate.setIsWeekend(dateItem.getWeekend());
-                    menusCalendarDate.setMenusCalendar(menusCalendar);
-                    session.saveOrUpdate(menusCalendarDate);
+                    if (menusCalendar == null) {
+                        menusCalendar = new MenusCalendar(item.getGuid(), org, item.getIdOfMenu(), item.getStartDate(),
+                                item.getEndDate(), item.getSixWorkDays(), nextVersion, item.getDeletedState());
+                        session.save(menusCalendar);
+                    } else {
+                        menusCalendar.setGuid(item.getGuid());
+                        menusCalendar.setIdOfMenu(item.getIdOfMenu());
+                        menusCalendar.setStartDate(item.getStartDate());
+                        menusCalendar.setEndDate(item.getEndDate());
+                        menusCalendar.setSixWorkDays(item.getSixWorkDays());
+                        menusCalendar.setVersion(nextVersion);
+                        menusCalendar.setDeletedState(item.getDeletedState());
+                        menusCalendar.setLastUpdate(new Date());
+                        session.update(menusCalendar);
+                    }
+
+                    for (MenusCalendarDateItem dateItem : item.getItems()) {
+                        MenusCalendarDate menusCalendarDate = DAOUtils
+                                .getMenusCalendarDate(session, menusCalendar.getIdOfMenusCalendar(), dateItem.getDate());
+                        if (menusCalendarDate == null) {
+                            menusCalendarDate = new MenusCalendarDate();
+                        }
+                        menusCalendarDate.setDate(dateItem.getDate());
+                        menusCalendarDate.setComment(dateItem.getComment());
+                        menusCalendarDate.setIsWeekend(dateItem.getWeekend());
+                        menusCalendarDate.setMenusCalendar(menusCalendar);
+                        session.saveOrUpdate(menusCalendarDate);
+                    }
+                    ResMenusCalendarItem resItem = new ResMenusCalendarItem();
+                    resItem.setGuid(item.getGuid());
+                    resItem.setResultCode(0);
+                    resItem.setErrorMessage("OK");
+                    items.add(resItem);
                 }
-                ResMenusCalendarItem resItem = new ResMenusCalendarItem();
-                resItem.setGuid(item.getGuid());
-                resItem.setResultCode(0);
-                resItem.setErrorMessage("OK");
-                items.add(resItem);
             }
         } catch (Exception e) {
             logger.error("Error saving MenusCalendar", e);

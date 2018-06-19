@@ -52,4 +52,19 @@ public class BaseItem {
         }
         return orgId;
     }
+
+    protected static Long getLongValue(Node itemNode, String attrName, StringBuilder errorMessage, boolean errorIfEmpty) {
+        Long result = null;
+        String str = XMLUtils.getAttributeValue(itemNode, attrName);
+        if (StringUtils.isNotEmpty(str)) {
+            try {
+                result = Long.parseLong(str);
+            } catch (Exception e){
+                errorMessage.append(String.format("Attribute %s not found or incorrect", attrName));
+            }
+        } else {
+            if (errorIfEmpty) errorMessage.append(String.format("Attribute %s not found", attrName));
+        }
+        return result;
+    }
 }

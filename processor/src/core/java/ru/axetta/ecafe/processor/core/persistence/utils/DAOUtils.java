@@ -2521,6 +2521,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByMenusCalendar(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select sd.version from cf_menus_calendar as sd order by sd.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByClientPhoto(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select cp.version from cf_clientphoto as cp where cp.version is not null order by cp.version desc limit 1 for update");
