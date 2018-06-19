@@ -3090,7 +3090,7 @@ public class DAOUtils {
                 return new ArrayList<MenusCalendar>();
 
             Query query = session.createQuery(
-                    "select mc from MenusCalendar mc where mc.version > :version and mc.org.idOfOrg = :idOfOrg");
+                    "select mc from MenusCalendar mc where mc.version >= :version and mc.org.idOfOrg = :idOfOrg");
             query.setParameter("version", version);
             query.setParameter("idOfOrg", menuExchangeRule.getIdOfSourceOrg());
             return query.list();
