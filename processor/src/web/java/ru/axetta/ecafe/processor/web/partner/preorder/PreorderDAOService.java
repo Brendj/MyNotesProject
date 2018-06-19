@@ -382,6 +382,7 @@ public class PreorderDAOService {
         preorderComplex.setArmComplexId(idOfComplex);
         preorderComplex.setCreatedDate(new Date());
         preorderComplex.setLastUpdate(new Date());
+        preorderComplex.setState(PreorderState.OK);
         ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
         if (ci != null) {
             preorderComplex.setComplexName(ci.getComplexName());
