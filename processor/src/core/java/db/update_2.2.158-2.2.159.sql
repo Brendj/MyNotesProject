@@ -42,3 +42,5 @@ create table cf_menus_calendar_dates
   REFERENCES cf_menus_calendar (idofmenuscalendar) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 CREATE INDEX cf_menus_calendar_dates_idofmenuscalendar_idx ON cf_menus_calendar_dates USING btree (idofmenuscalendar);
+
+--! ФИНАЛИЗИРОВАН 19.06.2018, НЕ МЕНЯТЬ
