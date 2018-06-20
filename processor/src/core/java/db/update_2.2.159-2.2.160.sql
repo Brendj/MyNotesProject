@@ -6,3 +6,7 @@
 
 --Код товара
 alter table cf_menudetails add column itemcode character varying(32);
+
+--Календарь меню - замена idOfMenu на Guid
+alter table cf_menus_calendar drop column idofmenu,
+  add column guidofmenu CHARACTER VARYING(36);

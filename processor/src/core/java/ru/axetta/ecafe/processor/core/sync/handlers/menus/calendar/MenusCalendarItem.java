@@ -25,7 +25,7 @@ public class MenusCalendarItem extends BaseItem {
     private Long idOfMenusCalendar;
     private String guid;
     private Long idOfOrg;
-    private Long idOfMenu;
+    private String guidOfMenu;
     private Date startDate;
     private Date endDate;
     private Boolean sixWorkDays;
@@ -41,7 +41,7 @@ public class MenusCalendarItem extends BaseItem {
     public MenusCalendarItem(MenusCalendar menusCalendar, List<MenusCalendarDateItem> items) {
         this.guid = menusCalendar.getGuid();
         this.idOfOrg = menusCalendar.getOrg().getIdOfOrg();
-        this.idOfMenu = menusCalendar.getIdOfMenu();
+        this.guidOfMenu = menusCalendar.getGuidOfMenu();
         this.startDate = menusCalendar.getStartDate();
         this.endDate = menusCalendar.getEndDate();
         this.sixWorkDays = menusCalendar.getSixWorkDays();
@@ -50,11 +50,11 @@ public class MenusCalendarItem extends BaseItem {
         this.items = items;
     }
 
-    public MenusCalendarItem(String guid, Long idOfOrg, Long idOfMenu, Date startDate, Date endDate,
+    public MenusCalendarItem(String guid, Long idOfOrg, String guidOfMenu, Date startDate, Date endDate,
             Boolean sixWorkDays, Boolean deletedState, List<MenusCalendarDateItem> items, String errorMessage) {
         this.guid = guid;
         this.idOfOrg = idOfOrg;
-        this.idOfMenu = idOfMenu;
+        this.guidOfMenu = guidOfMenu;
         this.startDate = startDate;
         this.endDate = endDate;
         this.sixWorkDays = sixWorkDays;
@@ -66,7 +66,7 @@ public class MenusCalendarItem extends BaseItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "OrgId", idOfOrg);
-        XMLUtils.setAttributeIfNotNull(element, "IdOfMenu", idOfMenu);
+        XMLUtils.setAttributeIfNotNull(element, "GuidMenu", guidOfMenu);
         XMLUtils.setAttributeIfNotNull(element, "SDate", CalendarUtils.dateShortToStringFullYear(startDate));
         XMLUtils.setAttributeIfNotNull(element, "EDate", CalendarUtils.dateShortToStringFullYear(endDate));
         XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
@@ -81,7 +81,7 @@ public class MenusCalendarItem extends BaseItem {
     public static MenusCalendarItem build(Node itemNode) {
         String guid = null;
         Long idOfOrg = null;
-        Long idOfMenu = null;
+        String guidOfMenu = null;
         Date startDate = null;
         Date endDate = null;
         Boolean sixWorkDays = null;
@@ -95,8 +95,7 @@ public class MenusCalendarItem extends BaseItem {
             errorMessage.append("Attribute Guid not found");
         }
         idOfOrg = getOrgId(itemNode, errorMessage);
-        //String str = XMLUtils.getAttributeValue(itemNode, "IdOfMenu");
-        idOfMenu = getLongValue(itemNode, "IdOfMenu", errorMessage, !deletedState); //Long.parseLong(str);
+        guidOfMenu = XMLUtils.getAttributeValue(itemNode, "GuidMenu"); //Long.parseLong(str);
         startDate = getDateValue(itemNode, "SDate", errorMessage);
         endDate = getDateValue(itemNode, "EDate", errorMessage);
         str = XMLUtils.getAttributeValue(itemNode, "SixWorkDays");
@@ -110,7 +109,7 @@ public class MenusCalendarItem extends BaseItem {
             }
             dateNode = dateNode.getNextSibling();
         }
-        return new MenusCalendarItem(guid, idOfOrg, idOfMenu, startDate, endDate, sixWorkDays, deletedState, items, errorMessage.toString());
+        return new MenusCalendarItem(guid, idOfOrg, guidOfMenu, startDate, endDate, sixWorkDays, deletedState, items, errorMessage.toString());
     }
 
     public Long getIdOfMenusCalendar() {
@@ -137,12 +136,12 @@ public class MenusCalendarItem extends BaseItem {
         this.idOfOrg = idOfOrg;
     }
 
-    public Long getIdOfMenu() {
-        return idOfMenu;
+    public String getGuidOfMenu() {
+        return guidOfMenu;
     }
 
-    public void setIdOfMenu(Long idOfMenu) {
-        this.idOfMenu = idOfMenu;
+    public void setGuidOfMenu(String guidOfMenu) {
+        this.guidOfMenu = guidOfMenu;
     }
 
     public Date getStartDate() {

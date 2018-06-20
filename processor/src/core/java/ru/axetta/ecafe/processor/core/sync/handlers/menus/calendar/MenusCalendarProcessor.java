@@ -57,12 +57,12 @@ public class MenusCalendarProcessor extends AbstractProcessor<ResMenusCalendar> 
                         orgs.put(item.getIdOfOrg(), org);
                     }
                     if (menusCalendar == null) {
-                        menusCalendar = new MenusCalendar(item.getGuid(), org, item.getIdOfMenu(), item.getStartDate(),
+                        menusCalendar = new MenusCalendar(item.getGuid(), org, item.getGuidOfMenu(), item.getStartDate(),
                                 item.getEndDate(), item.getSixWorkDays(), nextVersion, item.getDeletedState());
                         session.save(menusCalendar);
                     } else {
                         menusCalendar.setGuid(item.getGuid());
-                        menusCalendar.setIdOfMenu(item.getIdOfMenu());
+                        menusCalendar.setGuidOfMenu(item.getGuidOfMenu());
                         menusCalendar.setStartDate(item.getStartDate());
                         menusCalendar.setEndDate(item.getEndDate());
                         menusCalendar.setSixWorkDays(item.getSixWorkDays());

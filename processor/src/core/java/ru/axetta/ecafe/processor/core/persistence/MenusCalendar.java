@@ -13,7 +13,7 @@ public class MenusCalendar {
     private Long idOfMenusCalendar;
     private String guid;
     private Org org;
-    private Long idOfMenu;
+    private String guidOfMenu;
     private Date startDate;
     private Date endDate;
     private Boolean sixWorkDays;
@@ -26,11 +26,11 @@ public class MenusCalendar {
 
     }
 
-    public MenusCalendar(String guid, Org org, Long idOfMenu, Date startDate, Date endDate, Boolean sixWorkDays,
+    public MenusCalendar(String guid, Org org, String guidOfMenu, Date startDate, Date endDate, Boolean sixWorkDays,
             Long version, Boolean deletedState) {
         this.guid = guid;
         this.org = org;
-        this.idOfMenu = idOfMenu;
+        this.guidOfMenu = guidOfMenu;
         this.startDate = startDate;
         this.endDate = endDate;
         this.sixWorkDays = sixWorkDays;
@@ -63,12 +63,12 @@ public class MenusCalendar {
         this.org = org;
     }
 
-    public Long getIdOfMenu() {
-        return idOfMenu;
+    public String getGuidOfMenu() {
+        return guidOfMenu;
     }
 
-    public void setIdOfMenu(Long idOfMenu) {
-        this.idOfMenu = idOfMenu;
+    public void setGuidOfMenu(String guidOfMenu) {
+        this.guidOfMenu = guidOfMenu;
     }
 
     public Date getStartDate() {
