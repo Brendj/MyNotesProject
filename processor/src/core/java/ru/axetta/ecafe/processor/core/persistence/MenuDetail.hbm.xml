@@ -46,6 +46,7 @@
         <property name="VitPp" column="VitPp" type="double" update="false"/>
         <property name="idOfMenuFromSync" column="IdOfMenuFromSync" type="long"/>
         <property name="idOfGood" column="IdOfGood" type="long"/>
+        <property name="itemCode" column="ItemCode" type="string" length="32"/>
     </class>
 </hibernate-mapping>
 

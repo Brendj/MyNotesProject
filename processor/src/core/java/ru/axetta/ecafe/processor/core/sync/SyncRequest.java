@@ -1249,6 +1249,10 @@ public class SyncRequest {
                     return (str1 == null ? "" : str1).equals(str2 == null ? "" : str2);
                 }
 
+                public String getItemCode() {
+                    return itemCode;
+                }
+
                 public static class Builder {
 
                     public ReqMenuDetail build(Node menuDetailNode, MenuGroups menuGroups) throws Exception {
@@ -1341,6 +1345,7 @@ public class SyncRequest {
                         }
 
                         String gBasket = getTextContent(namedNodeMap.getNamedItem("GBasketEl"));
+                        String itemCode = getTextContent(namedNodeMap.getNamedItem("ItemCode"));
 
                         Double protein = getDoubleValue(namedNodeMap, "Protein");
                         Double fat = getDoubleValue(namedNodeMap, "Fat");
@@ -1359,7 +1364,7 @@ public class SyncRequest {
                         Double vitPp = getDoubleValue(namedNodeMap, "VitPP");
                         return new ReqMenuDetail(idOfMenu, path, name, group, output, price, menuOrigin, availableNow,
                                 flags, priority, protein, fat, carbohydrates, calories, vitB1, vitC, vitA, vitE, minCa,
-                                minP, minMg, minFe, vitB2, vitPp, gBasket, shortName, idOfGood);
+                                minP, minMg, minFe, vitB2, vitPp, gBasket, shortName, idOfGood, itemCode);
                     }
 
                     private static String getTextContent(Node node) throws Exception {
@@ -1433,12 +1438,13 @@ public class SyncRequest {
                 private final String gBasket;
                 private final String shortName;
                 private final Long idOfGood;
+                private final String itemCode;
 
                 public ReqMenuDetail(Long idOfMenu, String path, String name, String group, String output, Long price,
                         int menuOrigin, int availableNow, Integer flags, Integer priority, Double protein, Double fat,
                         Double carbohydrates, Double calories, Double vitB1, Double vitC, Double vitA, Double vitE,
                         Double minCa, Double minP, Double minMg, Double minFe, Double vitB2, Double vitPp, String gBasket,
-                        String shortName, Long idOfGood) {
+                        String shortName, Long idOfGood, String itemCode) {
                     this.idOfMenu = idOfMenu;
                     this.path = path;
                     this.name = name;
@@ -1466,6 +1472,7 @@ public class SyncRequest {
                     this.gBasket = gBasket;
                     this.shortName = shortName;
                     this.idOfGood = idOfGood;
+                    this.itemCode = itemCode;
                 }
 
                 public Long getIdOfMenu() {

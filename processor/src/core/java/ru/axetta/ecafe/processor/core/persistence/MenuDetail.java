@@ -44,6 +44,7 @@ public class MenuDetail {
     private Long idOfMenuFromSync;
     private String shortName;
     private Long idOfGood;
+    private String itemCode;
 
     public Long getIdOfMenuFromSync() {
         return idOfMenuFromSync;
@@ -321,5 +322,13 @@ public class MenuDetail {
 
     public void setIdOfGood(Long idOfGood) {
         this.idOfGood = idOfGood;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
     }
 }

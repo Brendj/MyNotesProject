@@ -4925,6 +4925,7 @@ public class Processor implements SyncProcessor {
                 newMenuDetail.setIdOfMenuFromSync(reqMenuDetail.getIdOfMenu());
                 newMenuDetail.setShortName(reqMenuDetail.getShortName());
                 newMenuDetail.setIdOfGood(reqMenuDetail.getIdOfGood());
+                newMenuDetail.setItemCode(reqMenuDetail.getItemCode());
 
                 persistenceSession.save(newMenuDetail);
                 menu.addMenuDetail(newMenuDetail);
