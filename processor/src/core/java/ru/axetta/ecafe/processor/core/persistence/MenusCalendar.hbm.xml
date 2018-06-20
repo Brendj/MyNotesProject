@@ -14,7 +14,7 @@
         <property name="guid" column="guid" type="string" length="36" not-null="true" update="false"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
                      not-null="true"/>
-        <property name="idOfMenu" column="idofmenu" type="long"/>
+        <property name="guidOfMenu" column="guidofmenu" type="string" length="36"/>
         <property name="startDate" column="startdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="endDate" column="enddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
