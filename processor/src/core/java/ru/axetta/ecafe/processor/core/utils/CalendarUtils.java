@@ -686,4 +686,9 @@ public class CalendarUtils {
         return false;
     }
 
+    public static int getHourFromDate(Date date) {
+        Long diff = date.getTime() - startOfDay(date).getTime();
+        return new Long(diff / (1000*60*60)).intValue();
+    }
+
 }

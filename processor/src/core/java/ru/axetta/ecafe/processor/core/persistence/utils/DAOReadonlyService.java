@@ -9,6 +9,9 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -488,6 +491,57 @@ public class DAOReadonlyService {
         q.setParameter("idOfOrg", idOfOrg);
         try {
             return (String) q.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean isSixWorkWeek(Long orgId) throws Exception {
+        List<ECafeSettings> settings = DAOService.getInstance().geteCafeSettingses(orgId, SettingsIds.SubscriberFeeding, false);
+        boolean isSixWorkWeek = false;
+        if(!settings.isEmpty()){
+            ECafeSettings cafeSettings = settings.get(0);
+            SubscriberFeedingSettingSettingValue parser =
+                    (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
+            isSixWorkWeek = parser.isSixWorkWeek();
+        }
+        return isSixWorkWeek;
+    }
+
+    public boolean isWeekendByGroup(Long idOfOrg, Client client) {
+        Query query = entityManager.createQuery("select gnto from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.isSixDaysWorkWeek = true");
+        query.setParameter("idOfOrg", idOfOrg);
+        List<GroupNamesToOrgs> list = query.getResultList() ;
+        String groupName = getClientGroupName(client);
+        if (list != null && list.size() > 0) {
+            for (GroupNamesToOrgs group : list) {
+                if (group.getGroupName().equals(groupName)) return false;
+            }
+        }
+        return true;
+    }
+
+    private String getClientGroupName(Client client) {
+        if (client.getClientGroup() != null) {
+            Query query = entityManager.createQuery("select cg.groupName from ClientGroup cg "
+                    + "where cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg and cg.compositeIdOfClientGroup.idOfClientGroup = :idOfClientGroup");
+            query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+            query.setParameter("idOfClientGroup", client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+            try {
+                return (String) query.getSingleResult();
+            } catch (Exception ignore) { }
+        }
+        return "";
+    }
+
+    public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
+        try {
+            Query query = entityManager.createQuery(
+                    "select sd from SpecialDate sd where sd.compositeIdOfSpecialDate.date between :startDate and :endDate and sd.compositeIdOfSpecialDate.idOfOrg = :idOfOrg");
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+            query.setParameter("idOfOrg", idOfOrg);
+            return query.getResultList();
         } catch (Exception e) {
             return null;
         }

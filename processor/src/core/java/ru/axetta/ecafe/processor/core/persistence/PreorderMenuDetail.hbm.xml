@@ -19,7 +19,13 @@
         <property name="armIdOfMenu" column="armidofmenu" type="long" />
         <property name="menuDetailName" column="menudetailname" type="string" length="512"/>
         <property name="menuDetailPrice" column="menudetailprice" type="long"/>
+        <property name="itemCode" column="itemcode" type="string" length="32"/>
         <many-to-one name="preorderComplex" class="ru.axetta.ecafe.processor.core.persistence.PreorderComplex"
                      column="IdOfPreorderComplex" not-null="true" fetch="select" />
+        <property name="state" column="state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderState</param>
+            </type>
+        </property>
     </class>
 </hibernate-mapping>

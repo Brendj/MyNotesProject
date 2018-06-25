@@ -20,9 +20,27 @@ public class PreorderMenuDetail {
     private PreorderComplex preorderComplex;
     private String menuDetailName;
     private Long menuDetailPrice;
+    private String itemCode;
+    private PreorderState state;
 
     public PreorderMenuDetail() {
 
+    }
+
+    public void deleteBySupplier(Long nextVersion, boolean doDelete) {
+        this.preorderComplex.setVersion(nextVersion);
+        this.deletedState = doDelete;
+        if (doDelete) this.amount = 0;
+        this.state = PreorderState.DELETED;
+        this.preorderComplex.setLastUpdate(new Date());
+    }
+
+    public void changeBySupplier(Long nextVersion, boolean doDelete) {
+        this.preorderComplex.setVersion(nextVersion);
+        this.deletedState = doDelete;
+        if (doDelete) this.amount = 0;
+        this.state = PreorderState.CHANGED_PRICE;
+        this.preorderComplex.setLastUpdate(new Date());
     }
 
     public Long getIdOfPreorderMenuDetail() {
@@ -103,5 +121,21 @@ public class PreorderMenuDetail {
 
     public void setMenuDetailPrice(Long menuDetailPrice) {
         this.menuDetailPrice = menuDetailPrice;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    public PreorderState getState() {
+        return state;
+    }
+
+    public void setState(PreorderState state) {
+        this.state = state;
     }
 }

@@ -125,7 +125,7 @@ public class Processor implements SyncProcessor {
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.accRegistryUpdate.timeClient", 7) * 24 * 60 * 60 * 1000;
-    private static final int MIN_REMAINING_CAPACITY_POOL = 1000;
+    public static final Integer DEFAULT_FORBIDDEN_DAYS_MPGU = 2;
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
@@ -4668,14 +4668,15 @@ public class Processor implements SyncProcessor {
                     }
                     // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
                     if (detailsHashCode == null || !detailsHashCode.equals(detailsHashCode1)) {
-
+                        /*List<PreorderComplex> preorderComplexes = DAOUtils.getPreorderComplexesForOrgByPeriod(persistenceSession,
+                                idOfOrg, CalendarUtils.startOfDay(menuDate), CalendarUtils.endOfDay(menuDate)); */
                         processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
                         HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
                         processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
                                 localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu,
                                 item.getReqComplexInfos(), localIdsToMenuDetailMap);
-                        processPreorders(persistenceSession, organization, menuDate);
+                        processPreorders(persistenceSession, organization, menuDate, item.getReqComplexInfos(), item.getReqMenuDetails());
 
                     }
 
@@ -4794,45 +4795,111 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    private void processPreorders(Session persistenceSession, Org organization, Date menuDate) {
-        Date dateFrom = CalendarUtils.startOfDay(new Date());
+    private void processPreorders(Session persistenceSession, Org organization, Date menuDate,
+            List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos,
+            Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails) throws Exception {
+        Date begDate = CalendarUtils.startOfDay(menuDate);
+        Date endDate = CalendarUtils.endOfDay(menuDate);
+        Date now = new Date();
 
         Query query = persistenceSession.createQuery("select pc from PreorderComplex pc "
-                + "where pc.client.org = :org and pc.preorderDate > :date");
+                + "where pc.client.org = :org and pc.preorderDate between :begDate and :endDate and pc.deletedState = false "
+                + "and pc.amount is not null and pc.amount > 0");  //предзаказы по ОО на день меню
         query.setParameter("org", organization);
-        query.setParameter("date", dateFrom);
+        query.setParameter("begDate", begDate);
+        query.setParameter("endDate", endDate);
         List<PreorderComplex> list = query.list();
         List<PreorderComplex> deletedPreorders = new ArrayList<PreorderComplex>();
         List<PreorderComplex> changedPreorders = new ArrayList<PreorderComplex>();
         for (PreorderComplex preorderComplex : list) {
-            ComplexInfo complexInfo = DAOUtils.getComplexInfoByPreorderComplex(persistenceSession, preorderComplex);
-            if (complexInfo == null) {
+            boolean found = false;
+            SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = null;
+            for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
+                if (preorderComplex.getArmComplexId().equals(reqComplexInfo.getComplexId())) {
+                    found = true;
+                    reqComplexInfoMatch = reqComplexInfo;
+                    break;
+                }
+            }
+            if (!found) {
                 deletedPreorders.add(preorderComplex);
             } else {
-                if (!preorderComplex.equalPrice(complexInfo)) {
+                if (!preorderComplex.getComplexPrice().equals(reqComplexInfoMatch.getCurrentPrice())) {
                     changedPreorders.add(preorderComplex);
                 }
             }
         }
+
+        query = persistenceSession.createQuery("select pmd from PreorderMenuDetail pmd "
+                + "where pmd.client.org = :org and pmd.preorderDate between :begDate and :endDate and pmd.deletedState = false "
+                + "and pmd.amount is not null and pmd.amount > 0");
+        query.setParameter("org", organization);
+        query.setParameter("begDate", begDate);
+        query.setParameter("endDate", endDate);
+        List<PreorderMenuDetail> pmdList = query.list();
+        List<PreorderMenuDetail> deletedPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
+        List<PreorderMenuDetail> changedPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
+        for (PreorderMenuDetail preorderMenuDetail : pmdList) {
+            boolean found = false;
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
+            while (reqMenuDetails.hasNext()) {
+                SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
+                if (preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())
+                        || preorderMenuDetail.getItemCode().equals(reqMenuDetail.getItemCode())) {
+                    found = true;
+                    reqMenuDetailMatch = reqMenuDetail;
+                    break;
+                }
+            }
+            if (!found) {
+                deletedPreorderMenuDetails.add(preorderMenuDetail);
+            } else {
+                if (!preorderMenuDetail.getMenuDetailPrice().equals(reqMenuDetailMatch.getPrice())) {
+                    changedPreorderMenuDetails.add(preorderMenuDetail);
+                }
+            }
+        }
+
         Long version = 0L;
 
-        if (deletedPreorders.size() > 0 || changedPreorders.size() > 0) {
-            Integer days = DAOUtils.getPreorderFeedingForbiddenDays(organization.getIdOfOrg());
-            if (days == null) days = 3;
-            dateFrom = CalendarUtils.addDays(dateFrom, days); //дата, начиная с которой нужно удалять измененные предзаказы
+        Integer days = getDaysToAdd(organization.getIdOfOrg(), now, CalendarUtils.addDays(now, 14));
+        Date dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(now, days)); //дата, начиная с которой нужно удалять измененные предзаказы
+        if (deletedPreorders.size() > 0 || changedPreorders.size() > 0 || deletedPreorderMenuDetails.size() > 0 || changedPreorderMenuDetails.size() > 0) {
             version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
         }
-        if (deletedPreorders.size() > 0) {
-            for (PreorderComplex preorderComplex : deletedPreorders) {
-                preorderComplex.deleteBySupplier(version, true);
-                persistenceSession.update(preorderComplex);
-            }
+        for (PreorderComplex preorderComplex : deletedPreorders) {
+            preorderComplex.deleteBySupplier(version, preorderComplex.getPreorderDate().after(dateFrom));
+            persistenceSession.update(preorderComplex);
         }
-        if (changedPreorders.size() > 0) {
-            for (PreorderComplex preorderComplex : changedPreorders) {
-                preorderComplex.changeBySupplier(version);
-            }
+        for (PreorderComplex preorderComplex : changedPreorders) {
+            preorderComplex.changeBySupplier(version, preorderComplex.getPreorderDate().after(dateFrom));
+            persistenceSession.update(preorderComplex);
         }
+        for (PreorderMenuDetail preorderMenuDetail : deletedPreorderMenuDetails) {
+            preorderMenuDetail.deleteBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
+            persistenceSession.update(preorderMenuDetail);
+        }
+        for (PreorderMenuDetail preorderMenuDetail : changedPreorderMenuDetails) {
+            preorderMenuDetail.changeBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
+            persistenceSession.update(preorderMenuDetail);
+        }
+    }
+
+    private int getDaysToAdd(Long idOfOrg, Date fromDate, Date toDate) throws Exception {
+        Integer days = DAOUtils.getPreorderFeedingForbiddenDays(idOfOrg);
+        if (days == null) days = DEFAULT_FORBIDDEN_DAYS_MPGU;
+        if (CalendarUtils.getHourFromDate(fromDate) >= 12) days++;
+
+        Map<Date, Integer> map = DAOUtils.getSpecialDates(fromDate, CalendarUtils.getDifferenceInDays(fromDate, toDate), idOfOrg);
+        int result = 0;
+        for (Map.Entry<Date, Integer> entry : map.entrySet()) {
+            if (entry.getValue().equals(1)) {
+                result++;
+            }
+            else break;
+        }
+
+        return result;
     }
 
     private void processReqAssortment(Session persistenceSession, Org organization, Date menuDate,

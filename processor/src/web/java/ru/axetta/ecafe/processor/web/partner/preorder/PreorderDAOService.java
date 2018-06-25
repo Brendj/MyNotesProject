@@ -7,10 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.preorder;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -252,45 +249,6 @@ public class PreorderDAOService {
         return (Long)query.getSingleResult();
     }
 
-    public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
-        try {
-            Query query = emReport.createQuery(
-                    "select sd from SpecialDate sd where sd.compositeIdOfSpecialDate.date between :startDate and :endDate and sd.compositeIdOfSpecialDate.idOfOrg = :idOfOrg");
-            query.setParameter("startDate", startDate);
-            query.setParameter("endDate", endDate);
-            query.setParameter("idOfOrg", idOfOrg);
-            return query.getResultList();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public boolean isSixWorkWeek(Long orgId) throws Exception {
-        DAOService daoService = DAOService.getInstance();
-        List<ECafeSettings> settings = daoService
-                .geteCafeSettingses(orgId, SettingsIds.SubscriberFeeding, false);
-        boolean isSixWorkWeek = false;
-        if(!settings.isEmpty()){
-            ECafeSettings cafeSettings = settings.get(0);
-            SubscriberFeedingSettingSettingValue parser =
-                    (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-            isSixWorkWeek = parser.isSixWorkWeek();
-        }
-        return isSixWorkWeek;
-    }
-
-    public boolean isWeekendByGroup(Long idOfOrg, String groupName) {
-        Query query = emReport.createQuery("select gnto from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.isSixDaysWorkWeek = true");
-        query.setParameter("idOfOrg", idOfOrg);
-        List<GroupNamesToOrgs> list = query.getResultList() ;
-        if (list != null && list.size() > 0) {
-            for (GroupNamesToOrgs group : list) {
-                if (group.getGroupName().equals(groupName)) return false;
-            }
-        }
-        return true;
-    }
-
     @Transactional(rollbackFor = Exception.class)
     public void savePreorderComplexes(PreorderSaveListParam list) throws Exception {
         Long contractId = list.getContractId();
@@ -360,6 +318,7 @@ public class PreorderDAOService {
                     if (md != null) {
                         preorderMenuDetail.setMenuDetailName(md.getMenuDetailName());
                         preorderMenuDetail.setMenuDetailPrice(md.getPrice());
+                        preorderMenuDetail.setItemCode(md.getItemCode());
                     }
                 }
                 set.add(preorderMenuDetail);
@@ -691,10 +650,10 @@ public class PreorderDAOService {
         Calendar c = Calendar.getInstance();
         c.setTimeZone(timeZone);
         Date endDate = CalendarUtils.addDays(today, syncCountDays);
-        boolean isSixWorkWeek = isSixWorkWeek(orgId);
+        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(orgId);
         int two_days = 0;
         Map<Date, Long> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);
-        List<SpecialDate> specialDates = getSpecialDates(today, endDate, orgId);
+        List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);
         Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
         if (forbiddenDays == null) {
             forbiddenDays = DEFAULT_FORBIDDEN_DAYS;
@@ -723,26 +682,13 @@ public class PreorderDAOService {
             int day = CalendarUtils.getDayOfWeek(currentDate);
             if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
                 //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
-                isWeekend = isWeekendByGroup(orgId, getClientGroupName(client));
+                isWeekend = DAOReadonlyService.getInstance().isWeekendByGroup(orgId, client);
             }
 
             c.add(Calendar.DATE, 1);
             map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
         }
         return map;
-    }
-
-    private String getClientGroupName(Client client) {
-        if (client.getClientGroup() != null) {
-            Query query = emReport.createQuery("select cg.groupName from ClientGroup cg "
-                    + "where cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg and cg.compositeIdOfClientGroup.idOfClientGroup = :idOfClientGroup");
-            query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
-            query.setParameter("idOfClientGroup", client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-            try {
-                return (String) query.getSingleResult();
-            } catch (Exception ignore) { }
-        }
-        return "";
     }
 
     public List<ClientGuardian> getClientGuardian(Client child, String guardianMobile) {

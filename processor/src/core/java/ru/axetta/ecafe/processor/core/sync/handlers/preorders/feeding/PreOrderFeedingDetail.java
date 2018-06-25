@@ -19,6 +19,7 @@ public class PreOrderFeedingDetail {
     private final Integer qty;
     private final String guid;
     private final Long price;
+    private final String itemCode;
 
     public PreOrderFeedingDetail(Session session, PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getArmIdOfMenu();
@@ -27,6 +28,7 @@ public class PreOrderFeedingDetail {
         this.complexId = complexId;
         this.guid = guid;
         this.price = menuDetail.getMenuDetailPrice();
+        this.itemCode = menuDetail.getItemCode();
     }
 
     public PreOrderFeedingDetail(Session session, PreorderComplex complex) {
@@ -36,6 +38,7 @@ public class PreOrderFeedingDetail {
         this.idOfMenu = null;
         this.guid = complex.getGuid();
         this.price = complex.getComplexPrice();
+        this.itemCode = null;
     }
 
     public Integer getComplexId() {
@@ -82,6 +85,9 @@ public class PreOrderFeedingDetail {
         }
         if (null != price) {
             element.setAttribute("Price", price.toString());
+        }
+        if (null != itemCode) {
+            element.setAttribute("ItemCode", itemCode);
         }
 
         return element;
