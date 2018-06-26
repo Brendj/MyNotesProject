@@ -31,10 +31,10 @@ public class PreorderComplexItemExt implements Comparable {
     private Integer complexType;
     @XmlAttribute(name = "discount")
     private Boolean discount;
+    @XmlAttribute(name = "state")
+    private Integer state;
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
-    @XmlElement(name = "state")
-    private Integer state;
 
     public PreorderComplexItemExt() {
 
