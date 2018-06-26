@@ -38,8 +38,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -149,12 +147,9 @@ public class PreorderRequestsReportService {
     private void updateDate() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        localCalendar = runtimeContext
-                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
-
+        localCalendar = runtimeContext.getDefaultLocalCalendar(null);
+        
         localCalendar.setTime(new Date());
-
         localCalendar.add(Calendar.DATE, -1);
 
         CalendarUtils.truncateToDayOfMonth(localCalendar);
