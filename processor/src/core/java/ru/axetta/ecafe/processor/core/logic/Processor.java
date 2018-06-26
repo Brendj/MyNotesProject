@@ -4676,7 +4676,7 @@ public class Processor implements SyncProcessor {
                                 localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu,
                                 item.getReqComplexInfos(), localIdsToMenuDetailMap);
-                        processPreorders(persistenceSession, organization, menuDate, item.getReqComplexInfos(), item.getReqMenuDetails());
+                        processPreorders(persistenceSession, organization, menuDate, item);
 
                     }
 
@@ -4796,8 +4796,7 @@ public class Processor implements SyncProcessor {
     }
 
     private void processPreorders(Session persistenceSession, Org organization, Date menuDate,
-            List<SyncRequest.ReqMenu.Item.ReqComplexInfo> reqComplexInfos,
-            Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails) throws Exception {
+            SyncRequest.ReqMenu.Item item) throws Exception {
         Date begDate = CalendarUtils.startOfDay(menuDate);
         Date endDate = CalendarUtils.endOfDay(menuDate);
         Date now = new Date();
@@ -4814,7 +4813,7 @@ public class Processor implements SyncProcessor {
         for (PreorderComplex preorderComplex : list) {
             boolean found = false;
             SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = null;
-            for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : reqComplexInfos) {
+            for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : item.getReqComplexInfos()) {
                 if (preorderComplex.getArmComplexId().equals(reqComplexInfo.getComplexId())) {
                     found = true;
                     reqComplexInfoMatch = reqComplexInfo;
@@ -4842,6 +4841,7 @@ public class Processor implements SyncProcessor {
         for (PreorderMenuDetail preorderMenuDetail : pmdList) {
             boolean found = false;
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
+            Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
             while (reqMenuDetails.hasNext()) {
                 SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
                 if (preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())
