@@ -21,7 +21,8 @@ public enum SettingsIds {
     AutoPlanPaymentSetting(3,"Настройка автооплаты льготного питания"),
     SubscriberFeeding(4,"Настройки персонализированного питания"),
     ReplacingMissingBeneficiaries(5,"Режим замены отсутствующих льготников"),
-    PreOrderFeeding(6,"Настройки питания по предзаказу");
+    PreOrderFeeding(6,"Настройки питания по предзаказу"),
+    PreOrderAutopay(7,"Настройка автооплаты предзаказа");
 
     private Integer id;
     private String description;
