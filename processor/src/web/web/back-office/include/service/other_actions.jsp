@@ -137,6 +137,9 @@
             </rich:fileUpload>
         </rich:panel>
     </h:panelGrid>
+    <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

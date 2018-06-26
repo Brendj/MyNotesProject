@@ -11,12 +11,15 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.PreOrderFeedingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -3201,5 +3204,41 @@ public class DAOUtils {
             map.put(currentDate, isWeekend ? 1 : 0);
         }
         return map;
+    }
+
+    public static Staff getAdminStaffFromOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(Staff.class);
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.eq("idOfRole", Staff.Roles.ADMIN.getIdOfRole()));
+        List list = criteria.list();
+        if (null != list && !list.isEmpty())
+            return (Staff) list.get(0);
+        return null;
+    }
+
+    public static Long getNextGoodRequestNumberForOrgPerDay(Session session, Long idOfOrg, Date date) {
+        Date startDate = CalendarUtils.truncateToDayOfMonth(date);
+        Date endDate = CalendarUtils.addSeconds(CalendarUtils.addOneDay(startDate), -1);
+        Query query = session.createQuery("select count(*) from GoodRequest where orgOwner=:orgOwner and createdDate between :startDate and :endDate");
+        query.setParameter("orgOwner", idOfOrg);
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        return (Long)query.uniqueResult() + 1L;
+    }
+
+    public static List<GoodRequestPosition> getGoodRequestPositionsFromGoodRequest(Session session, GoodRequest request) {
+        Criteria criteria = session.createCriteria(GoodRequestPosition.class);
+        criteria.add(Restrictions.eq("goodRequest", request));
+        return criteria.list();
+    }
+
+    public static GoodRequest findGoodRequestByPreorderInfo(Session session, Long idOfOrg, Date createdDate) {
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.eq("doneDate", createdDate));
+        List list = criteria.list();
+        if (!list.isEmpty())
+            return (GoodRequest) list.get(0);
+        return null;
     }
 }

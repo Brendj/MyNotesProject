@@ -27,6 +27,7 @@ public class PreorderComplex {
     private Date createdDate;
     private Date lastUpdate;
     private PreorderState state;
+    private Long idOfGoodsRequestPosition;
 
     public PreorderComplex() {
 
@@ -182,5 +183,13 @@ public class PreorderComplex {
 
     public void setState(PreorderState state) {
         this.state = state;
+    }
+
+    public Long getIdOfGoodsRequestPosition() {
+        return idOfGoodsRequestPosition;
+    }
+
+    public void setIdOfGoodsRequestPosition(Long idOfGoodsRequestPosition) {
+        this.idOfGoodsRequestPosition = idOfGoodsRequestPosition;
     }
 }

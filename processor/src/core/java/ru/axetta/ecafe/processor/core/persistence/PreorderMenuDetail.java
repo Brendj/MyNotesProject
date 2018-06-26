@@ -22,7 +22,7 @@ public class PreorderMenuDetail {
     private Long menuDetailPrice;
     private String itemCode;
     private PreorderState state;
-
+    private Long idOfGoodsRequestPosition;
     public PreorderMenuDetail() {
 
     }
@@ -137,5 +137,13 @@ public class PreorderMenuDetail {
 
     public void setState(PreorderState state) {
         this.state = state;
+    }
+
+    public Long getIdOfGoodsRequestPosition() {
+        return idOfGoodsRequestPosition;
+    }
+
+    public void setIdOfGoodsRequestPosition(Long idOfGoodsRequestPosition) {
+        this.idOfGoodsRequestPosition = idOfGoodsRequestPosition;
     }
 }

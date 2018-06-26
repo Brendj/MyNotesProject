@@ -394,7 +394,7 @@ public class GoodRequestsChangeAsyncNotificationService {
         return reportJob;
     }
 
-    public void addEmailFromClient(Session persistenceSession, Long idOfOrg, Set<String> addresses) {
+    public static void addEmailFromClient(Session persistenceSession, Long idOfOrg, Set<String> addresses) {
         DetachedCriteria staffClientQuery = DetachedCriteria.forClass(Staff.class);
         staffClientQuery.add(Restrictions.eq("orgOwner", idOfOrg));
         staffClientQuery.add(Restrictions.eq("idOfRole", 0L));
@@ -417,7 +417,7 @@ public class GoodRequestsChangeAsyncNotificationService {
         }
     }
 
-    public void addEmailFromUser(Session persistenceSession, Long idOfOrg, Set<String> addresses) {
+    public static void addEmailFromUser(Session persistenceSession, Long idOfOrg, Set<String> addresses) {
         Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("userNotificationType", UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY));

@@ -433,4 +433,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
         return null;
     }
 
+    public void sendGoodRequestsNewReports() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runTask();
+            printMessage("Отправка отчетов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error send PreorderRequestsReport: ", e);
+            printError("Во время отправки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
 }

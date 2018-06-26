@@ -16,3 +16,9 @@ alter table cf_preorder_menudetail add column itemcode character varying(32);
 
 --поле статуса предзаказа
 alter table cf_preorder_menudetail add column state integer not null default 0;
+
+--ИД заявки для предзаказа
+alter table cf_preorder_complex add column idofgoodsrequestposition bigint;
+
+--ИД заявки для предзаказа
+alter table cf_preorder_menudetail add column idofgoodsrequestposition bigint;
