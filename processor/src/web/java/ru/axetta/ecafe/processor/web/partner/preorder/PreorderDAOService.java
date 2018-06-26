@@ -320,6 +320,7 @@ public class PreorderDAOService {
                     preorderMenuDetail.setPreorderDate(date);
                     preorderMenuDetail.setAmount(menuItem.getAmount());
                     preorderMenuDetail.setDeletedState(false);
+                    preorderMenuDetail.setState(PreorderState.OK);
                     MenuDetail md = getMenuDetail(client, menuItem.getIdOfMenuDetail(), date);
                     if (md != null) {
                         preorderMenuDetail.setMenuDetailName(md.getMenuDetailName());
