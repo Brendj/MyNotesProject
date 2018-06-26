@@ -127,7 +127,7 @@ public class PreorderDAOService {
             hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         }
 
-        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState "
+        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, pc.state "
                 + " from cf_complexinfo ci join cf_orgs o on o.idoforg = ci.idoforg "
                 + " left outer join cf_preorder_complex pc on (ci.idoforg = :idOfOrg and pc.idOfClient = :idOfClient and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
                 + " where ci.MenuDate between :startDate and :endDate "
@@ -148,9 +148,11 @@ public class PreorderDAOService {
             ComplexInfo ci = emReport.find(ComplexInfo.class, id);
             Integer amount = (Integer) row[1];
             Integer deleted = (Integer) row[2];
+            Integer state = (Integer) row[3];
             PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci);
             complexItemExt.setAmount(amount == null ? 0 : amount);
             complexItemExt.setSelected(deleted == null ? false : deleted == 1);
+            complexItemExt.setState(state == null ? 0 : state);
 
             List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(ci.getIdOfComplexInfo(), client.getIdOfClient(), date);
             if (menuItemExtList.size() > 0) {
@@ -214,7 +216,9 @@ public class PreorderDAOService {
                 + "(SELECT pmd.amount FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
                    + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu) AS amount, "
                 + "(SELECT pmd.deletedState FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
-                    + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu) AS deletedState "
+                    + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu) AS deletedState, "
+                + "(SELECT pmd.state FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
+                + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu) AS state "
                 + "FROM CF_MenuDetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
                 + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo");
 
@@ -229,9 +233,11 @@ public class PreorderDAOService {
             MenuDetail menuDetail = emReport.find(MenuDetail.class, id);
             Integer amount = (Integer) row[1];
             Integer deleted = (Integer) row[2];
+            Integer state = (Integer) row[3];
             PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(menuDetail);
             menuItemExt.setAmount(amount == null ? 0 : amount);
             menuItemExt.setSelected(deleted == null ? false : deleted==1);
+            menuItemExt.setState(state == null ? 0 : state);
             menuItemExtList.add(menuItemExt);
         }
         return menuItemExtList;

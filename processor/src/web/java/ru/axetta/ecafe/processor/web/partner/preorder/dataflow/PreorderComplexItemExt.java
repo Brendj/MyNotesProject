@@ -33,6 +33,8 @@ public class PreorderComplexItemExt implements Comparable {
     private Boolean discount;
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
+    @XmlElement(name = "state")
+    private Integer state;
 
     public PreorderComplexItemExt() {
 
@@ -133,5 +135,13 @@ public class PreorderComplexItemExt implements Comparable {
             return -1;
 
         return 1;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }

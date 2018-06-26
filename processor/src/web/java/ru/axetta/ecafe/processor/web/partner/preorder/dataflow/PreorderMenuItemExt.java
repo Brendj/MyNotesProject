@@ -7,10 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -42,6 +39,8 @@ public class PreorderMenuItemExt {
     private int amount;
     @XmlAttribute(name = "selected")
     private Boolean selected;
+    @XmlElement(name = "state")
+    private Integer state;
 
     public PreorderMenuItemExt() {
 
@@ -163,5 +162,13 @@ public class PreorderMenuItemExt {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }
