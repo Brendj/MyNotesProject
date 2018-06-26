@@ -4845,7 +4845,7 @@ public class Processor implements SyncProcessor {
             while (reqMenuDetails.hasNext()) {
                 SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
                 if (preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())
-                        || preorderMenuDetail.getItemCode().equals(reqMenuDetail.getItemCode())) {
+                        || equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
                     found = true;
                     reqMenuDetailMatch = reqMenuDetail;
                     break;
@@ -4883,6 +4883,10 @@ public class Processor implements SyncProcessor {
             preorderMenuDetail.changeBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
             persistenceSession.update(preorderMenuDetail);
         }
+    }
+
+    private boolean equalsNullSafe(String str1, String str2) {
+        return ((str1 == null ? "" : str1).equals(str2 == null ? "" : str2));
     }
 
     private int getDaysToAdd(Long idOfOrg, Date fromDate, Date toDate) throws Exception {
