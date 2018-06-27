@@ -4845,7 +4845,7 @@ public class Processor implements SyncProcessor {
             while (reqMenuDetails.hasNext()) {
                 SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
                 if (preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())
-                        || equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
+                        && equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
                     found = true;
                     reqMenuDetailMatch = reqMenuDetail;
                     break;
