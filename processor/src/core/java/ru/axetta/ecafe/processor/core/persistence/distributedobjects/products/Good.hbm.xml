@@ -144,6 +144,16 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifferencePosition" />
         </set>
-
+        <property name="goodType" column="GoodType" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType</param>
+            </type>
+        </property>
+        <property name="ageGroupType" column="AgeGroup" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType</param>
+            </type>
+        </property>
+        <property name="dailySale" column="DailySale" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
     </class>
 </hibernate-mapping>

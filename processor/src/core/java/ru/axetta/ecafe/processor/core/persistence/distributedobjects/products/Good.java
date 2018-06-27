@@ -74,6 +74,10 @@ public class Good extends ConfigurationProviderDistributedObject {
 
     private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
 
+    private GoodType goodType;
+    private GoodAgeGroupType ageGroupType;
+    private Boolean dailySale;
+
     public String[] getParts() {
         return parts;
     }
@@ -156,6 +160,9 @@ public class Good extends ConfigurationProviderDistributedObject {
             //XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", basicGood.getGuid());
             XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", guidOfBasicGood);
         }
+        XMLUtils.setAttributeIfNotNull(element, "TypeGood", (null != goodType) ? goodType.getCode() : null);
+        XMLUtils.setAttributeIfNotNull(element, "AgeGroup", (null != ageGroupType) ? ageGroupType.getCode() : null);
+        XMLUtils.setAttributeIfNotNull(element, "DailySale", dailySale);
     }
 
     @Override
@@ -243,6 +250,20 @@ public class Good extends ConfigurationProviderDistributedObject {
         guidOfTM = XMLUtils.getStringAttributeValue(node, "GuidOfTechMap", 36);
         guidOfBasicGood = XMLUtils.getStringAttributeValue(node, "GuidOfBasicGood", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
+
+        Integer typeGood = XMLUtils.getIntegerAttributeValue(node, "TypeGood");
+        if (null != typeGood) {
+            setGoodType(GoodType.fromInteger(typeGood));
+        }
+
+        Integer ageGroup = XMLUtils.getIntegerAttributeValue(node, "AgeGroup");
+        if (null != ageGroup) {
+            setAgeGroupType(GoodAgeGroupType.fromInteger(ageGroup));
+        }
+
+        Boolean dailySale = XMLUtils.getBooleanAttributeValue(node, "DailySale");
+        setDailySale(dailySale);
+
         return this;
     }
 
@@ -503,4 +524,27 @@ public class Good extends ConfigurationProviderDistributedObject {
         this.pathPart1 = pathPart1;
     }
 
+    public GoodType getGoodType() {
+        return goodType;
+    }
+
+    public void setGoodType(GoodType goodType) {
+        this.goodType = goodType;
+    }
+
+    public GoodAgeGroupType getAgeGroupType() {
+        return ageGroupType;
+    }
+
+    public void setAgeGroupType(GoodAgeGroupType ageGroupType) {
+        this.ageGroupType = ageGroupType;
+    }
+
+    public Boolean getDailySale() {
+        return dailySale;
+    }
+
+    public void setDailySale(Boolean dailySale) {
+        this.dailySale = dailySale;
+    }
 }
