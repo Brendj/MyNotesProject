@@ -4797,6 +4797,7 @@ public class Processor implements SyncProcessor {
 
     private void processPreorders(Session persistenceSession, Org organization, Date menuDate,
             SyncRequest.ReqMenu.Item item) throws Exception {
+        if (menuDate.before(CalendarUtils.startOfDay(new Date()))) return; //пропускаем для прошедших дат
         Date begDate = CalendarUtils.startOfDay(menuDate);
         Date endDate = CalendarUtils.endOfDay(menuDate);
         Date now = new Date();

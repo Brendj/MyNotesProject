@@ -325,6 +325,19 @@
                                     maxValue="3" step="1" minValue="1" showToolTip="true" />
         </h:panelGrid>
 
+        <h:panelGrid columns="2" id="settingsEditPreorderAutopaySettingPanelGrid" rendered="#{settingEditPage.setting.settingsId.id==7}">
+            <h:outputText escape="true" value="Активность для предзаказов" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{settingEditPage.parserBySettingValue.isActivePreorder}">
+                <f:selectItem itemValue="true"/>
+                <f:selectItem itemValue="false"/>
+            </h:selectBooleanCheckbox>
+            <h:outputText escape="true" value="Время автооплаты (Ч:ММ)" styleClass="output-text" />
+            <h:inputText value="#{settingEditPage.parserBySettingValue.processingTime_Preorder}" id="preorderAutopayTimeValue"
+                         maxlength="5"  styleClass="output-text" converterMessage="Не верный формат времени">
+                <f:convertDateTime pattern="HH:mm"/>
+            </h:inputText>
+        </h:panelGrid>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">

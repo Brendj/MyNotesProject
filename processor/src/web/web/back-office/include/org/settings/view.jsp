@@ -198,6 +198,21 @@
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.forbiddenDaysCount}" styleClass="input-text" style="width: 207px" />
     </h:panelGrid>
 
+    <h:panelGrid columns="2" id="settingsViewPreorderAutopaySettingPanelGrid"
+                 rendered="#{settingViewPage.setting.settingsId.id==7}" >
+
+        <h:outputText escape="true" value="Активность для предзаказов" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{(settingViewPage.setting.splitSettingValue.isActivePreorder?'Включено':'Выключено')}"
+                     styleClass="output-text" />
+
+        <h:outputText escape="true" value="Время автооплаты (Ч:ММ)" styleClass="output-text" />
+        <h:inputText value="#{settingViewPage.setting.splitSettingValue.processingTime_Preorder}" id="preorderAutopayTimeValue"
+                     maxlength="5" readonly="true" styleClass="output-text" converterMessage="Не верный формат времени">
+            <f:convertDateTime pattern="HH:mm"/>
+        </h:inputText>
+
+    </h:panelGrid>
+
     <h:panelGrid columns="2">
         <a4j:commandButton action="#{settingViewPage.edit}" value="Редактировать" styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/>
     </h:panelGrid>
