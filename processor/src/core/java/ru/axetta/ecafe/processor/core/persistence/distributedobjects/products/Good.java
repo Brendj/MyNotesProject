@@ -262,7 +262,9 @@ public class Good extends ConfigurationProviderDistributedObject {
         }
 
         Boolean dailySale = XMLUtils.getBooleanAttributeValue(node, "DailySale");
-        setDailySale(dailySale);
+        if (null != dailySale) {
+            setDailySale(dailySale);
+        }
 
         return this;
     }
