@@ -24,6 +24,6 @@ alter table cf_preorder_complex add column idofgoodsrequestposition bigint;
 alter table cf_preorder_menudetail add column idofgoodsrequestposition bigint;
 
 --вид рациона, тип возрастной категории и флаг ежедневной продажи
-alter table cf_goods add column typegood integer not null default 0,
+alter table cf_goods add column goodtype integer not null default 0,
 	add column agegroup integer not null default 0,
 	add column dailysale integer not null default 0;
