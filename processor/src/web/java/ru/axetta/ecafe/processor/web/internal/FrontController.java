@@ -1293,25 +1293,28 @@ public class FrontController extends HttpServlet {
                 idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid));
         CardService cardService = CardService.getInstance();
         if (!(type >=0 && type < Card.TYPE_NAMES.length)) {
-            return new ResponseItem(ResponseItem.ERROR_INVALID_TYPE, ResponseItem.ERROR_INVALID_TYPE_MESSAGE);
+            return new CardResponseItem(CardResponseItem.ERROR_INVALID_TYPE, CardResponseItem.ERROR_INVALID_TYPE_MESSAGE);
         }
+        Card card;
+        Long idOfCard;
         try{
-            cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
+            card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
+            idOfCard = card.getIdOfCard();
         }catch (Exception e){
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);
-                return new ResponseItem(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+                return new CardResponseItem(CardResponseItem.ERROR_INTERNAL, CardResponseItem.ERROR_INTERNAL_MESSAGE);
             }
             if (e.getMessage().contains("ConstraintViolationException")) {
-                return new ResponseItem(ResponseItem.ERROR_DUPLICATE, ResponseItem.ERROR_DUPLICATE_CARD_MESSAGE);
+                return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, CardResponseItem.ERROR_DUPLICATE_CARD_MESSAGE);
             } else if (e instanceof IllegalStateException) {
-                return new ResponseItem(ResponseItem.ERROR_SIGN_VERIFY, ResponseItem.ERROR_SIGN_VERIFY_MESSAGE);
+                return new CardResponseItem(CardResponseItem.ERROR_SIGN_VERIFY, CardResponseItem.ERROR_SIGN_VERIFY_MESSAGE);
             } else {
                 logger.error("Error in register card", e);
-                return new ResponseItem(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+                return new CardResponseItem(CardResponseItem.ERROR_INTERNAL, CardResponseItem.ERROR_INTERNAL_MESSAGE);
             }
         }
-        return new ResponseItem();
+        return new CardResponseItem(idOfCard);
     }
 
     @WebMethod(operationName = "getEnterEventsManual")
