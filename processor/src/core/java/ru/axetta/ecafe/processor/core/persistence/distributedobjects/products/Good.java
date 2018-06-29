@@ -107,6 +107,9 @@ public class Good extends ConfigurationProviderDistributedObject {
         projectionList.add(Projections.property("p.guid"), "guidOfP");
         projectionList.add(Projections.property("tm.guid"), "guidOfTM");
         projectionList.add(Projections.property("bg.guid"), "guidOfBasicGood");
+        projectionList.add(Projections.property("goodType"), "goodType");
+        projectionList.add(Projections.property("ageGroupType"), "ageGroupType");
+        projectionList.add(Projections.property("dailySale"), "dailySale");
         criteria.setProjection(projectionList);
 
     }
