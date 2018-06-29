@@ -71,16 +71,19 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
-            Long idOfContragent, Long idOfContract) throws HibernateException {
+            Long idOfContragent, Long idOfContract) throws Exception {
 
         Criteria orgCriteria = session.createCriteria(Org.class);
         orgCriteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
-        try {
+        //try {// -- Убран try с пустым catch для потверждения догадки в рамках задачи EP-1377
             Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
+            if(idOfUser == null){
+                throw new Exception("Не удалось получить пользователя");
+            }
             ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, orgCriteria);
-        } catch (Exception ignored) {
-        }
+        //} catch (Exception ignored) {
+        //}
 
         if (StringUtils.isNotEmpty(filter)) {
             orgCriteria.add(Restrictions.or(Restrictions.ilike("shortName", filter, MatchMode.ANYWHERE),
@@ -350,7 +353,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
-            List<Long> idOfSupplierList) throws HibernateException {
+            List<Long> idOfSupplierList) throws Exception {
         deselectAllItems();
         return retrieveOrgs(session, getFilter(), getTagFilter(), getSupplierFilter(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, idOfSupplierList, null, null);
@@ -358,7 +361,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     @SuppressWarnings("unchecked")
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList)
-            throws HibernateException {
+            throws Exception {
         deselectAllItems();
         return retrieveOrgs(session, getFilter(), getTagFilter(), getSupplierFilter(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, Collections.EMPTY_LIST, null, null);
