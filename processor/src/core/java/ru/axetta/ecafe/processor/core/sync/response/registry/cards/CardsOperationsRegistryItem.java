@@ -34,9 +34,10 @@ public class CardsOperationsRegistryItem {
     private String comment;
     private Boolean isTemp;
     private String requestGuid;
+    private Long idOfCard;
 
     public CardsOperationsRegistryItem(long idOfOperation, long cardNo, int type, Date operationDate, Long idOfClient,
-            Long globalId, String staffGuid, Date validDate, String comment, Boolean isTemp, String requestGuid) {
+            Long globalId, String staffGuid, Date validDate, String comment, Boolean isTemp, String requestGuid, Long idOfCard) {
         this.idOfOperation = idOfOperation;
         this.cardNo = cardNo;
         this.type = type;
@@ -48,6 +49,7 @@ public class CardsOperationsRegistryItem {
         this.comment = comment;
         this.isTemp = isTemp;
         this.requestGuid = requestGuid;
+        this.idOfCard = idOfCard;
     }
 
     public static CardsOperationsRegistryItem build(Node CardsOperationRegistry, LoadContext loadContext) throws Exception {
@@ -71,8 +73,9 @@ public class CardsOperationsRegistryItem {
             isTemp = true;
         }
         String requestGuid = getStringValueNullSafe(namedNodeMap, "GuidRequest");
+        Long idOfCard = getLongValueNullSafe(namedNodeMap, "IdOfCard");
         return new CardsOperationsRegistryItem(idOfOperation,cardNo,type,operationDate,idOfClient,globalId,staffGuid,
-                validDate, comment, isTemp, requestGuid);
+                validDate, comment, isTemp, requestGuid, idOfCard);
     }
 
     public long getIdOfOperation() {
@@ -117,5 +120,9 @@ public class CardsOperationsRegistryItem {
 
     public String getRequestGuid() {
         return requestGuid;
+    }
+
+    public Long getIdOfCard() {
+        return idOfCard;
     }
 }

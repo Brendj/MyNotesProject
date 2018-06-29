@@ -1283,7 +1283,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerCardWithoutClient")
-    public  ResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
+    public  CardResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum, @WebParam(name = "isLongUid") boolean isLongUid)
