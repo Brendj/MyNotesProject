@@ -265,13 +265,15 @@ public class PreorderDAOService {
         long nextVersion = nextVersionByPreorderComplex();
 
         Query queryComplexSelect = em.createQuery("select p from PreorderComplex p "
-                + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo and p.preorderDate between :startDate and :endDate");
+                + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo "
+                + "and p.preorderDate between :startDate and :endDate and p.deletedState = false");
         queryComplexSelect.setParameter("idOfClient", client.getIdOfClient());
         queryComplexSelect.setParameter("startDate", startDate);
         queryComplexSelect.setParameter("endDate", endDate);
 
         Query queryMenuSelect = em.createQuery("select m from PreorderMenuDetail m "
-                + "where m.client.idOfClient = :idOfClient and m.preorderComplex.idOfPreorderComplex = :idOfPreorderComplex and m.armIdOfMenu = :armIdOfMenu");
+                + "where m.client.idOfClient = :idOfClient and m.preorderComplex.idOfPreorderComplex = :idOfPreorderComplex "
+                + "and m.armIdOfMenu = :armIdOfMenu and m.deletedState = false");
         queryMenuSelect.setParameter("idOfClient", client.getIdOfClient());
 
         for (ComplexListParam complex : list.getComplexes()) {
