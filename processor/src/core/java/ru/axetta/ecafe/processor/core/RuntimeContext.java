@@ -106,6 +106,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return Boolean.parseBoolean((String)configProperties.get("ecafe.processor.testMode"));
     }
 
+    public HttpSessionJournal getHttpSessionJournal() {
+        return httpSessionJournal;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -179,6 +183,8 @@ public class RuntimeContext implements ApplicationContextAware {
     private ClientAuthenticator clientAuthenticator;
 
     private ClientPasswordRecover clientPasswordRecover;
+
+    private HttpSessionJournal httpSessionJournal;
 
     private RuleProcessor autoReportProcessor;
     private EventProcessor eventProcessor;
@@ -652,7 +658,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.payformGroupUrl = buildPayformGroupUrl(properties);
             this.messageIdGenerator = createMessageIdGenerator(properties, sessionFactory);
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
-
+            this.httpSessionJournal = createHttpSessionJournal(properties);
             // Start background activities
             if (isMainNode() && !isTestRunning()) {
                 this.autoReportGenerator.start();
@@ -693,6 +699,11 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isInfoEnabled()) {
             logger.info("Runtime context created.");
         }
+    }
+
+    private HttpSessionJournal createHttpSessionJournal(Properties properties) {
+        boolean isEnable = Boolean.parseBoolean(properties.getProperty("ecafe.processor.HttpSession.MultipleAuthorizations"));
+        return new HttpSessionJournal(isEnable);
     }
 
     private void runCheckSums() {

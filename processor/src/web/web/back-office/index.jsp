@@ -45,6 +45,63 @@
     <link rel="icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
     <link rel="shortcut icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
     <link rel="stylesheet" href="<c:url value="/back-office/styles.css"/>" type="text/css">
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript" language="javascript">
+
+        var waitActivity = 500; // 0.5 sec
+        var validNavigation = false;
+
+        onInactive(waitActivity, function () {
+            validNavigation = false;
+        });
+
+        function onInactive(ms, cb) {
+            var wait = setTimeout(cb, ms);
+            document.onmousemove = document.mousedown = document.mouseup = document.onkeydown = document.onkeyup = document.focus = function () {
+                clearTimeout(wait);
+                wait = setTimeout(cb, ms);
+                validNavigation = true;
+            };
+        }
+
+        function endSession() {
+            logOutWhenClosePage();
+        }
+
+        function wireUpEvents() {
+            window.onbeforeunload = function () {
+                if (!validNavigation) {
+                    endSession();
+                }
+            };
+
+            jQuery(document).bind('keypress', function (e) {
+                if (e.keyCode == 116) { //F5 key
+                    validNavigation = true;
+                } else {
+                    validNavigation = false;
+                }
+            });
+
+            jQuery("a").bind("click", function () {
+                validNavigation = true;
+            });
+
+            jQuery("form").bind("submit", function () {
+                validNavigation = true;
+            });
+
+            jQuery("input[type=submit]").bind("click", function () {
+                validNavigation = true;
+            });
+
+        }
+
+        jQuery(document).ready(function () {
+            wireUpEvents();
+        });
+    </script>
 </head>
 
 <body style="margin: 4px; padding: 0;">
@@ -249,6 +306,7 @@
             <td colspan="2">
                     <%-- Заголовок страницы --%>
                 <a4j:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                    <a4j:jsFunction name="logOutWhenClosePage" action="#{mainPage.logout}"/>
                     <rich:panel styleClass="header-panel" bodyClass="header-panel-body">
                         <h:panelGroup style="text-align: right; float: right;">
                             <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"

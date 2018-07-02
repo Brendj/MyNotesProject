@@ -621,6 +621,7 @@ public class MainPage implements Serializable {
         HttpSession httpSession = (HttpSession) facesExternalContext.getSession(false);
         if (null != httpSession && StringUtils.isNotEmpty(facesExternalContext.getRemoteUser())) {
             httpSession.invalidate();
+            RuntimeContext.getInstance().getHttpSessionJournal().removeSessionFromJournal(userLogin);
             ((HttpServletRequest)facesExternalContext.getRequest()).logout();
         }
         return outcome;
