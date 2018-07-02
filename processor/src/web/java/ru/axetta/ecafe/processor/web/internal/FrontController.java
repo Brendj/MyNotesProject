@@ -1297,9 +1297,11 @@ public class FrontController extends HttpServlet {
         }
         Card card;
         Long idOfCard;
+        CardTransitionState transitionState;
         try{
             card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
             idOfCard = card.getIdOfCard();
+            transitionState = card.getTransitionState();
         }catch (Exception e){
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);
@@ -1314,7 +1316,7 @@ public class FrontController extends HttpServlet {
                 return new CardResponseItem(CardResponseItem.ERROR_INTERNAL, CardResponseItem.ERROR_INTERNAL_MESSAGE);
             }
         }
-        return new CardResponseItem(idOfCard);
+        return new CardResponseItem(idOfCard, transitionState);
     }
 
     @WebMethod(operationName = "getEnterEventsManual")

@@ -66,6 +66,7 @@ public class Card {
     private Set<Order> orders = new HashSet<Order>();
     private Set<HistoryCard> historyCards = new HashSet<HistoryCard>();
     private Boolean isLongUid;
+    private CardTransitionState transitionState;
 
     protected Card() {
         // For Hibernate only
@@ -286,6 +287,14 @@ public class Card {
 
     public void setIsLongUid(Boolean longUid) {
         isLongUid = longUid;
+    }
+
+    public CardTransitionState getTransitionState() {
+        return transitionState;
+    }
+
+    public void setTransitionState(CardTransitionState transitionState) {
+        this.transitionState = transitionState;
     }
 
     @Override
