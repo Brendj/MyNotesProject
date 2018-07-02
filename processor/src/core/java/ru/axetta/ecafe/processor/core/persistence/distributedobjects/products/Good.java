@@ -200,9 +200,13 @@ public class Good extends ConfigurationProviderDistributedObject {
         setMargin(((Good) distributedObject).getMargin());
         setUnitsScale(((Good) distributedObject).getUnitsScale());
         setIdOfConfigurationProvider(((Good) distributedObject).getIdOfConfigurationProvider());
-        setGoodType(((Good) distributedObject).getGoodType());
-        setAgeGroupType(((Good)distributedObject).getAgeGroupType());
-        setDailySale(((Good)distributedObject).getDailySale());
+
+        GoodType goodType = ((Good) distributedObject).getGoodType();
+        setGoodType((null == goodType) ? GoodType.UNSPECIFIED : goodType);
+        GoodAgeGroupType ageGroupType = ((Good)distributedObject).getAgeGroupType();
+        setAgeGroupType((null == ageGroupType) ? GoodAgeGroupType.UNSPECIFIED : ageGroupType);
+        Boolean dailySale = ((Good)distributedObject).getDailySale();
+        setDailySale((null == dailySale) ? Boolean.FALSE : dailySale);
     }
 
     @Override
