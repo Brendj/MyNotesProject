@@ -49,7 +49,7 @@
 
     <script type="text/javascript" language="javascript">
 
-        var waitActivity = 500; // 0.5 sec
+        var waitActivity = 300; // 0.3 sec
         var validNavigation = false;
 
         onInactive(waitActivity, function () {
@@ -61,7 +61,6 @@
             document.onmousemove = document.mousedown = document.mouseup = document.onkeydown = document.onkeyup = document.focus = function () {
                 clearTimeout(wait);
                 wait = setTimeout(cb, ms);
-                validNavigation = true;
             };
         }
 
