@@ -200,6 +200,9 @@ public class Good extends ConfigurationProviderDistributedObject {
         setMargin(((Good) distributedObject).getMargin());
         setUnitsScale(((Good) distributedObject).getUnitsScale());
         setIdOfConfigurationProvider(((Good) distributedObject).getIdOfConfigurationProvider());
+        setGoodType(((Good) distributedObject).getGoodType());
+        setAgeGroupType(((Good)distributedObject).getAgeGroupType());
+        setDailySale(((Good)distributedObject).getDailySale());
     }
 
     @Override
