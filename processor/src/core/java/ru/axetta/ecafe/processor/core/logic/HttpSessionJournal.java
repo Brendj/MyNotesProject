@@ -47,9 +47,9 @@ public class HttpSessionJournal {
                 long validTime = session.getMaxInactiveInterval() * 1000;
                 if(lifeTime >= validTime){
                     this.sessions.remove(username);
-                    return true;
-                } else {
                     return false;
+                } else {
+                    return true;
                 }
             } catch (IllegalStateException e){
                 this.sessions.remove(username);
