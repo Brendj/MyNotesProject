@@ -12,7 +12,7 @@ public enum CardTransitionState {
     /*0*/ OWN(0, "Своя"),
     /*1*/ GIVEN_AWAY_NOT_SYNC(1, "Отдана не синхронизирована"),
     /*2*/ GIVEN_AWAY_SYNC(2, "Отдана синхронизирована"),
-    /*3*/ BORROWED(3, "Заимствована");
+    /*3*/ BORROWED(4, "Заимствована");
 
     private final Integer code;
     private final String description;
