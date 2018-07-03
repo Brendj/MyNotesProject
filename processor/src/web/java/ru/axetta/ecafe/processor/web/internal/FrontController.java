@@ -1298,11 +1298,48 @@ public class FrontController extends HttpServlet {
         Card card;
         Long idOfCard;
         CardTransitionState transitionState;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try{
-            card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
-            idOfCard = card.getIdOfCard();
-            transitionState = card.getTransitionState();
-        }catch (Exception e){
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Card exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            if (null == exCard) {
+                card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                        isLongUid);
+                idOfCard = card.getIdOfCard();
+                transitionState = card.getTransitionState();
+            } else {
+                if (CardState.BLOCKED.getValue() != exCard.getState()) {
+                    throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                } else {
+                    List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
+                    for (Org o : friendlyOrgs) {
+                        if (o.getIdOfOrg() == idOfOrg) {
+                            throw new CardResponseItem.CardAlreadyExist("Карта уже зарегистрирована в вашей организации");
+                        }
+                    }
+                    card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                            isLongUid);
+                    card.setTransitionState(CardTransitionState.BORROWED);
+                    persistenceSession.update(card);
+                    persistenceSession.flush();
+                    idOfCard = card.getIdOfCard();
+                    transitionState = card.getTransitionState();
+                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY_NOT_SYNC);
+                    persistenceSession.update(exCard);
+                    persistenceSession.flush();
+                }
+            }
+        } catch (CardResponseItem.CardAlreadyExist e) {
+            logger.error("CardAlreadyExistException", e);
+            return new CardResponseItem(CardResponseItem.ERROR_CARD_ALREADY_EXIST,
+                    CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+        } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
+            logger.error("CardAlreadyExistInYourOrgException", e);
+            return new CardResponseItem(CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG,
+                    CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
+        } catch (Exception e){
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);
                 return new CardResponseItem(CardResponseItem.ERROR_INTERNAL, CardResponseItem.ERROR_INTERNAL_MESSAGE);
@@ -1315,6 +1352,9 @@ public class FrontController extends HttpServlet {
                 logger.error("Error in register card", e);
                 return new CardResponseItem(CardResponseItem.ERROR_INTERNAL, CardResponseItem.ERROR_INTERNAL_MESSAGE);
             }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return new CardResponseItem(idOfCard, transitionState);
     }

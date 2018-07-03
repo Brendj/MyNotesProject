@@ -121,6 +121,9 @@ public class PreorderRequestsReportService {
                     continue;
                 }
 
+                if (null == guid)   // инфа в позиции не поменялась
+                    continue;
+
                 Long orgOwner = item.getIdOfOrg();
                 if (!mapPositions.containsKey(orgOwner)) {
                     mapPositions.put(orgOwner, new ArrayList<String>());
@@ -238,7 +241,8 @@ public class PreorderRequestsReportService {
                 "SELECT ci.idoforg, pc.createddate, pc.idofpreordercomplex, pmd.idofpreordermenudetail, "
               + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
               + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
-              + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition "
+              + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
+              + "   pc.preorderdate "
               + "FROM cf_preorder_complex pc "
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -254,14 +258,15 @@ public class PreorderRequestsReportService {
         for (Object entry : data) {
             Object o[] = (Object[]) entry;
             Long idOfOrg = (null != o[0]) ? ((BigInteger) o[0]).longValue() : null;
-            Date preorderDate = (null != o[1]) ? new Date(((BigInteger) o[1]).longValue()) : null;
+            Date createdDate = (null != o[1]) ? new Date(((BigInteger) o[1]).longValue()) : null;
             Long idOfPreorderComplex = (null != o[2]) ? ((BigInteger) o[2]).longValue() : null;
             Long idOfPreorderMenuDetail = (null != o[3]) ? ((BigInteger) o[3]).longValue() : null;
             Long idOfGood = (null != o[4]) ? ((BigInteger) o[4]).longValue() : null;
             Integer amount = (Integer) o[5];
             Long idOfGoodsRequest = (null != o[6]) ? ((BigInteger) o[6]).longValue() : null;
+            Date preorderDate = (null != o[7]) ? new Date(((BigInteger) o[7]).longValue()) : null;
             preorderItemList.add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
-                    preorderDate, idOfGoodsRequest));
+                    createdDate, idOfGoodsRequest, preorderDate));
         }
         return preorderItemList;
     }
@@ -284,8 +289,8 @@ public class PreorderRequestsReportService {
         //  Создание GoodRequest
         GoodRequest goodRequest = new GoodRequest();
         goodRequest.setOrgOwner(preorderItem.getIdOfOrg());
-        goodRequest.setDateOfGoodsRequest(fireTime);
-        goodRequest.setDoneDate(preorderItem.getCreatedDate());
+        goodRequest.setDateOfGoodsRequest(preorderItem.getCreatedDate());
+        goodRequest.setDoneDate(preorderItem.getPreorderDate());
         goodRequest.setNumber(number);
         goodRequest.setState(DocumentState.FOLLOW);
         goodRequest.setDeletedState(false);
@@ -330,12 +335,30 @@ public class PreorderRequestsReportService {
             logger.error("PreorderRequestsReportService: could not find GoodRequestPosition with id=" + item.getIdOfGoodsRequestPosition().toString());
             return "";
         }
-        Long lastTotal = pos.getTotalCount();
-        pos.setTotalCount(item.getAmount() * 1000L);
-        pos.setLastTotalCount(lastTotal);
-        pos.setLastUpdate(fireTime);
+        Boolean isUpdated = false;
 
-        return pos.getGuid();
+        if ((item.getAmount() * 1000L) != pos.getTotalCount()) {
+            Long lastTotal = pos.getTotalCount();
+            pos.setTotalCount(item.getAmount() * 1000L);
+            pos.setLastTotalCount(lastTotal);
+            isUpdated = true;
+        }
+
+        GoodRequest request = pos.getGoodRequest();
+
+        if (!item.getPreorderDate().equals(request.getDoneDate())) {
+            request.setDoneDate(item.getPreorderDate());
+            request.setLastUpdate(fireTime);
+            isUpdated = true;
+        }
+
+        if (isUpdated) {
+            pos.setLastUpdate(fireTime);
+            session.flush();
+            return pos.getGuid();
+        }
+
+        return null;
     }
 
     public <T extends ConsumerRequestDistributedObject> T save(Session session, T object, String className) {
@@ -653,9 +676,10 @@ public class PreorderRequestsReportService {
         private Integer amount;
         private Date createdDate;
         private Long idOfGoodsRequestPosition;
+        private Date preorderDate;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
-                Date createdDate, Long idOfGoodsRequestPosition) {
+                Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -663,6 +687,7 @@ public class PreorderRequestsReportService {
             this.amount = amount;
             this.createdDate = createdDate;
             this.idOfGoodsRequestPosition = idOfGoodsRequestPosition;
+            this.preorderDate = preorderDate;
         }
 
         public PreorderItem() {
@@ -723,6 +748,14 @@ public class PreorderRequestsReportService {
 
         public void setIdOfGoodsRequestPosition(Long idOfGoodsRequestPosition) {
             this.idOfGoodsRequestPosition = idOfGoodsRequestPosition;
+        }
+
+        public Date getPreorderDate() {
+            return preorderDate;
+        }
+
+        public void setPreorderDate(Date preorderDate) {
+            this.preorderDate = preorderDate;
         }
     }
 

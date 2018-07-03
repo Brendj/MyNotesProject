@@ -21,6 +21,8 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_INVALID_TYPE = 190;
     public static final int ERROR_SPECIAL_CARD_NOT_FOUND = 200;
     public static final int ERROR_AUTHENTICATOIN_FAILED = 400;
+    public static final int ERROR_CARD_ALREADY_EXIST = 120;
+    public static final int ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG = 130;
     public static final String OK_MESSAGE = "Ok.";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
@@ -29,6 +31,8 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_INVALID_TYPE_MESSAGE = "Неизвестный тип карты";
     public static final String ERROR_AUTHENTICATION_FAILED_MESSAGE = "Неверные учетные данные пользователя";
     public static final String ERROR_SPECIAL_CARD_NOT_FOUND_MESSAGE = "Карта не найдена";
+    public static final String ERROR_CARD_ALREADY_EXIST_MESSAGE = "Карта уже занята и не может быть зарегистрирована";
+    public static final String ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE = "Карта уже зарегистрирована в вашей организации";
     public int code;
     public String message;
 

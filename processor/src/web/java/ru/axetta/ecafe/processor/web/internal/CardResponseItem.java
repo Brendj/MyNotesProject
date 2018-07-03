@@ -30,4 +30,16 @@ public class CardResponseItem extends ResponseItem {
         this.idOfCard = null;
         this.transitionState = CardTransitionState.OWN;
     }
+
+    public static class CardAlreadyExist extends Exception {
+        public CardAlreadyExist(String message) {
+            super(message);
+        }
+    }
+
+    public static class CardAlreadyExistInYourOrg extends Exception {
+        public CardAlreadyExistInYourOrg(String message) {
+            super(message);
+        }
+    }
 }
