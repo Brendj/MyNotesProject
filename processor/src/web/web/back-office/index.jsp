@@ -48,7 +48,9 @@
     <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>-->
 
     <script type="text/javascript" language="javascript">
-
+        //TODO Экранирование не работает на 100%, так же скрипт срабатывает, если просто обновить страницу
+        //Выключен на время поисков более эффективного решения
+        /*
         var waitActivity = 300; // 0.3 sec
         var validNavigation = false;
 
@@ -99,7 +101,7 @@
 
         jQuery(document).ready(function () {
             wireUpEvents();
-        });
+        });*/
     </script>
 </head>
 
