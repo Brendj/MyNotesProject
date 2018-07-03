@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
+import ru.axetta.ecafe.processor.core.logic.HttpSessionJournal;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -10381,5 +10382,33 @@ public class MainPage implements Serializable {
 
     public void setUserFilterOfSelectUserListSelectPage(String userFilterOfSelectUserListSelectPage) {
         this.userFilterOfSelectUserListSelectPage = userFilterOfSelectUserListSelectPage;
+    }
+
+    // Методы userSaidGoodbye и userSaidHello заведены как тестовые в рамках задачи EP-1383,
+    // необходимы для грамотной обработки событий unload на стороне клиента
+    public Object userSaidGoodbye() {
+        HttpSessionJournal journal = RuntimeContext.getInstance().getHttpSessionJournal();
+        if(journal.isEnableMultipleAuthorizations()){
+            return null;
+        }
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        ExternalContext facesExternalContext = facesContext.getExternalContext();
+        final String username = facesExternalContext.getRemoteUser();
+        journal.putNewInactivityUser(username);
+        return null;
+    }
+
+    public Object userSaidHello() {
+        HttpSessionJournal journal = RuntimeContext.getInstance().getHttpSessionJournal();
+        if(journal.isEnableMultipleAuthorizations()){
+            return null;
+        }
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        ExternalContext facesExternalContext = facesContext.getExternalContext();
+        final String username = facesExternalContext.getRemoteUser();
+        if(journal.userIsInactive(username)){
+            journal.removeInactivityUser(username);
+        }
+        return null;
     }
 }

@@ -50,8 +50,8 @@
     <script type="text/javascript" language="javascript">
         //TODO Экранирование не работает на 100%, так же скрипт срабатывает, если просто обновить страницу
         //Выключен на время поисков более эффективного решения
-        /*
-        var waitActivity = 300; // 0.3 sec
+
+        /*var waitActivity = 5000; // 5 sec
         var validNavigation = false;
 
         onInactive(waitActivity, function () {
@@ -62,44 +62,37 @@
             var wait = setTimeout(cb, ms);
             document.onmousemove = document.mousedown = document.mouseup = document.onkeydown = document.onkeyup = document.focus = function () {
                 clearTimeout(wait);
-                wait = setTimeout(cb, ms);
+                sayHello();
             };
-        }
-
-        function endSession() {
-            logOutWhenClosePage();
         }
 
         function wireUpEvents() {
-            window.onbeforeunload = function () {
-                if (!validNavigation) {
-                    endSession();
-                }
-            };
 
-            jQuery(document).bind('keypress', function (e) {
-                if (e.keyCode == 116) { //F5 key
-                    validNavigation = true;
-                } else {
-                    validNavigation = false;
-                }
+            window.addEventListener("unload", function () {
+                sayGoodbye();
             });
 
             jQuery("a").bind("click", function () {
-                validNavigation = true;
+                onInactive(waitActivity, function () {
+                    validNavigation = false;
+                });
             });
 
             jQuery("form").bind("submit", function () {
-                validNavigation = true;
+                onInactive(waitActivity, function () {
+                    validNavigation = false;
+                });
             });
 
             jQuery("input[type=submit]").bind("click", function () {
-                validNavigation = true;
+                onInactive(waitActivity, function () {
+                    validNavigation = false;
+                });
             });
-
         }
 
         jQuery(document).ready(function () {
+            sayHello();
             wireUpEvents();
         });*/
     </script>
@@ -307,7 +300,8 @@
             <td colspan="2">
                     <%-- Заголовок страницы --%>
                 <a4j:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
-                    <a4j:jsFunction name="logOutWhenClosePage" action="#{mainPage.logout}"/>
+                    <a4j:jsFunction name="sayHello" action="#{mainPage.userSaidHello}"/>
+                    <a4j:jsFunction name="sayGoodbye" action="#{mainPage.userSaidGoodbye}"/>
                     <rich:panel styleClass="header-panel" bodyClass="header-panel-body">
                         <h:panelGroup style="text-align: right; float: right;">
                             <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"
