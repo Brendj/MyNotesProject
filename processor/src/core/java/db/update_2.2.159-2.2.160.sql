@@ -30,3 +30,6 @@ alter table cf_goods add column goodtype integer not null default 0,
 
 --Статус перехода УИД карты от одной организации к другой
 alter table cf_cards add column transitionstate integer not null default 0;
+
+--дубли уидов
+alter table cf_cards drop constraint cf_cards_cardno;

@@ -116,6 +116,7 @@ public class CardManagerProcessor implements CardManager {
         card.setIssueTime(issueTime);
         card.setLockReason(lockReason);
         card.setOrg(client.getOrg());
+        card.setTransitionState(CardTransitionState.OWN);
         persistenceSession.save(card);
 
         //История карты при создании новой карты
@@ -572,6 +573,7 @@ public class CardManagerProcessor implements CardManager {
         card.setIssueTime(issueTime);
         card.setLockReason(lockReason);
         card.setOrg(client.getOrg());
+        card.setTransitionState(CardTransitionState.OWN);
         persistenceSession.save(card);
 
         //История карты при создании новой карты

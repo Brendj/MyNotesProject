@@ -14,7 +14,7 @@ public class CardResponseItem extends ResponseItem {
         this.code = OK;
         this.message = OK_MESSAGE;
         this.idOfCard = null;
-        this.transitionState = CardTransitionState.OWN;
+        this.transitionState = null;
     }
 
     public CardResponseItem(Long idOfCard, CardTransitionState transitionState) {
@@ -28,7 +28,7 @@ public class CardResponseItem extends ResponseItem {
         this.code = code;
         this.message = message;
         this.idOfCard = null;
-        this.transitionState = CardTransitionState.OWN;
+        this.transitionState = null;
     }
 
     public static class CardAlreadyExist extends Exception {

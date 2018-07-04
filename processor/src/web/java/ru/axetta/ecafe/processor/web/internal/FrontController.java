@@ -1297,7 +1297,7 @@ public class FrontController extends HttpServlet {
         }
         Card card;
         Long idOfCard;
-        CardTransitionState transitionState;
+        CardTransitionState transitionState = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try{
@@ -1316,7 +1316,7 @@ public class FrontController extends HttpServlet {
                     List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
                     for (Org o : friendlyOrgs) {
                         if (o.getIdOfOrg() == idOfOrg) {
-                            throw new CardResponseItem.CardAlreadyExist("Карта уже зарегистрирована в вашей организации");
+                            throw new CardResponseItem.CardAlreadyExistInYourOrg(CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
                         }
                     }
                     card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,

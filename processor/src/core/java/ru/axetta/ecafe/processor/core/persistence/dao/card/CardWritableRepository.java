@@ -118,6 +118,7 @@ public class CardWritableRepository extends WritableJpaDao {
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());
         card.setCreateTime(new Date());
+        card.setTransitionState(CardTransitionState.OWN);
         if (null != isLongUid)
             card.setIsLongUid(isLongUid);
         if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !isSocial(type))
