@@ -1283,7 +1283,7 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerCardWithoutClient")
-    public  CardResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
+    public CardResponseItem registerCardWithoutClient(@WebParam(name = "orgId") long idOfOrg,
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum, @WebParam(name = "isLongUid") boolean isLongUid)
@@ -1333,11 +1333,11 @@ public class FrontController extends HttpServlet {
             }
         } catch (CardResponseItem.CardAlreadyExist e) {
             logger.error("CardAlreadyExistException", e);
-            return new CardResponseItem(CardResponseItem.ERROR_CARD_ALREADY_EXIST,
+            return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE,
                     CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
             logger.error("CardAlreadyExistInYourOrgException", e);
-            return new CardResponseItem(CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG,
+            return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE,
                     CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
         } catch (Exception e){
             if (e.getMessage() == null) {
@@ -1356,7 +1356,7 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new CardResponseItem(idOfCard, transitionState);
+        return new CardResponseItem(idOfCard, (null != transitionState) ? transitionState.getCode() : null);
     }
 
     @WebMethod(operationName = "getEnterEventsManual")
