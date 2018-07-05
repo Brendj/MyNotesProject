@@ -22,9 +22,12 @@ public class SettingsIdEnumTypeMenu {
 
     private static SelectItem[] readAllItems() {
         SettingsIds[] settingsIdses = SettingsIds.values();
-        SelectItem[] items = new SelectItem[settingsIdses.length];
-        for (int i = 0; i < items.length; ++i) {
-            items[i] = new SelectItem(settingsIdses[i].getId(), settingsIdses[i].toString());
+        SelectItem[] items = new SelectItem[settingsIdses.length-1];
+        int j = 0;
+        for (int i = 0; i < settingsIdses.length; ++i) {
+            if(i == 5) continue;
+            items[j] = new SelectItem(settingsIdses[i].getId(), settingsIdses[i].toString());
+            j++;
         }
         return items;
     }

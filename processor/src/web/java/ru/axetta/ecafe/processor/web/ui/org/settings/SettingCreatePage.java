@@ -39,7 +39,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
     private Integer settingsIds;
     private String settingsId;
     private AbstractParserBySettingValue parserBySettingValue;
-    private SettingsIds[]  settingsIdses = SettingsIds.values();
+    private SettingsIds[]  settingsIdses = getSettingsIdsWithoutFiveElm();
     private List<String> allPrinters;
 
     @Autowired
@@ -61,6 +61,19 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
     public void onShow() throws Exception {
         init();
     }
+
+    private SettingsIds[] getSettingsIdsWithoutFiveElm(){
+        SettingsIds[] buffer = SettingsIds.values();
+        SettingsIds[] settingsIds = new SettingsIds[buffer.length-1];
+        int j = 0;
+        for(int i = 0; i != buffer.length; i++){
+            if(i == 5) continue;
+            settingsIds[j] = buffer[i];
+            j++;
+        }
+        return settingsIds;
+    }
+
 
     private void init() throws Exception {
         if(settingsIds!=null){
