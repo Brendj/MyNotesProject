@@ -3241,4 +3241,10 @@ public class DAOUtils {
             return (GoodRequest) list.get(0);
         return null;
     }
+
+    public static OrgSync getOrgSyncForOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(OrgSync.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        return (OrgSync) criteria.uniqueResult();
+    }
 }

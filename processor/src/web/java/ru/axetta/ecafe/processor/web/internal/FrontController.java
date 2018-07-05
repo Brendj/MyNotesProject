@@ -22,9 +22,11 @@ import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.core.utils.Base64;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.VersionV2;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -1310,6 +1312,19 @@ public class FrontController extends HttpServlet {
                 idOfCard = card.getIdOfCard();
                 transitionState = card.getTransitionState();
             } else {
+                String clientVersionProperty =
+                        RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.card.registration.client.version", "2.7.86.1");
+                OrgSync orgSync = DAOUtils.getOrgSyncForOrg(persistenceSession, idOfOrg);
+                if (null == orgSync) {
+                    throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                }
+                String clientVersion = orgSync.getClientVersion();
+                VersionV2 propVersion = new VersionV2(clientVersionProperty);
+                VersionV2 clVersion = new VersionV2(clientVersion);
+                if (clVersion.compareTo(propVersion) < 0) {
+                    throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                }
+
                 if (CardState.BLOCKED.getValue() != exCard.getState()) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                 } else {
@@ -1356,7 +1371,7 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new CardResponseItem(idOfCard, (null != transitionState) ? transitionState.getCode() : null);
+        return new CardResponseItem(idOfCard, transitionState);
     }
 
     @WebMethod(operationName = "getEnterEventsManual")

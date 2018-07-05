@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import ru.axetta.ecafe.processor.core.persistence.CardTransitionState;
+
 public class CardResponseItem extends ResponseItem {
     public Long idOfCard;
-    public Integer transitionState;
+    public CardTransitionState transitionState;
 
     public CardResponseItem() {
         this.code = OK;
@@ -15,7 +17,7 @@ public class CardResponseItem extends ResponseItem {
         this.transitionState = null;
     }
 
-    public CardResponseItem(Long idOfCard, Integer transitionState) {
+    public CardResponseItem(Long idOfCard, CardTransitionState transitionState) {
         this.code = OK;
         this.message = OK_MESSAGE;
         this.idOfCard = idOfCard;
