@@ -14,6 +14,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
@@ -870,6 +873,17 @@ public class Manager implements AbstractToElement {
             distributedObject.setCreatedDate(new Date());
             if (GoodRequestPosition.class.isInstance(distributedObject)) {
                 ((GoodRequestPosition) distributedObject).setNotified(false);
+            }
+            if (Good.class.isInstance(distributedObject)) {
+                if (null == ((Good) distributedObject).getGoodType()) {
+                    ((Good) distributedObject).setGoodType(GoodType.UNSPECIFIED);
+                }
+                if (null == ((Good) distributedObject).getAgeGroupType()) {
+                    ((Good) distributedObject).setAgeGroupType(GoodAgeGroupType.UNSPECIFIED);
+                }
+                if (null == ((Good) distributedObject).getDailySale()) {
+                    ((Good) distributedObject).setDailySale(Boolean.FALSE);
+                }
             }
             persistenceSession.persist(distributedObject);
             distributedObject.setTagName("C");
