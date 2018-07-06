@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -157,6 +158,21 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 }
                 if (enterEvent.getClient() != null) {
                     personFullName = enterEvent.getClient().getPerson().getFullName();
+                } else if(enterEvent.getVisitorFullName() != null) {
+                    personFullName = enterEvent.getVisitorFullName();
+                } else if(enterEvent.getIdOfVisitor() != null) {
+                    Criteria visitorCriteria =  session.createCriteria(Visitor.class);
+                    visitorCriteria.add(Restrictions.eq("idOfVisitor", enterEvent.getIdOfVisitor()));
+                    Visitor visitor = (Visitor) visitorCriteria.uniqueResult();
+                    if(visitor != null) {
+                        if (visitor.getPerson() != null) {
+                            personFullName = visitor.getPerson().getFullName();
+                        } else {
+                            personFullName = "";
+                        }
+                    } else {
+                        personFullName = "";
+                    }
                 } else {
                     personFullName = "";
                 }
