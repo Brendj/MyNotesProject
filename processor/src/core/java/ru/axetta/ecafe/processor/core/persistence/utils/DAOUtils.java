@@ -444,6 +444,8 @@ public class DAOUtils {
     public static Card findCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
     }
 

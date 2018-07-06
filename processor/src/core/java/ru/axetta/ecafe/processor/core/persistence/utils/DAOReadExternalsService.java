@@ -64,8 +64,9 @@ public class DAOReadExternalsService {
     public Long getContractIdByCardNo(long cardId) {
         try {
             Query query = entityManager
-                .createQuery("select c.client.contractId from Card c where c.cardNo = :cardNo", Long.class);
+                .createQuery("select c.client.contractId from Card c where c.cardNo = :cardNo order by c.updateTime desc", Long.class);
             query.setParameter("cardNo", cardId);
+            query.setMaxResults(1);
             return (Long) query.getSingleResult();
         } catch (Exception ignore) {
             return null;
