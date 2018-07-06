@@ -1303,7 +1303,7 @@ public class FrontController extends HttpServlet {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try{
-            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Card exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             if (null == exCard) {
@@ -1336,13 +1336,12 @@ public class FrontController extends HttpServlet {
                     }
                     card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                             isLongUid);
+                    card = (Card) persistenceSession.load(Card.class, card.getIdOfCard());
                     card.setTransitionState(CardTransitionState.BORROWED);
-                    persistenceSession.update(card);
                     persistenceSession.flush();
                     idOfCard = card.getIdOfCard();
                     transitionState = card.getTransitionState();
                     exCard.setTransitionState(CardTransitionState.GIVEN_AWAY_NOT_SYNC);
-                    persistenceSession.update(exCard);
                     persistenceSession.flush();
                 }
             }
