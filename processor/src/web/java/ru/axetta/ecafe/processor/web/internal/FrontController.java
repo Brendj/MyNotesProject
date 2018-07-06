@@ -1300,10 +1300,12 @@ public class FrontController extends HttpServlet {
         Card card;
         Long idOfCard;
         CardTransitionState transitionState = null;
+        RuntimeContext runtimeContext;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try{
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Card exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             if (null == exCard) {
@@ -1313,7 +1315,7 @@ public class FrontController extends HttpServlet {
                 transitionState = card.getTransitionState();
             } else {
                 String clientVersionProperty =
-                        RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.card.registration.client.version", "2.7.86.1");
+                        runtimeContext.getPropertiesValue("ecafe.processor.card.registration.client.version", "2.7.86.1");
                 OrgSync orgSync = DAOUtils.getOrgSyncForOrg(persistenceSession, idOfOrg);
                 if (null == orgSync) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
@@ -1328,6 +1330,13 @@ public class FrontController extends HttpServlet {
                 if (CardState.BLOCKED.getValue() != exCard.getState()) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                 } else {
+                    Integer blockPeriod = runtimeContext.getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
+                    Date now = new Date();
+                    if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
+                        throw new CardResponseItem.CardAlreadyExist(String.format("%s. Минимальный срок блокировки карты не прошел - %dд",
+                                CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
+                    }
+
                     List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
                     for (Org o : friendlyOrgs) {
                         if (o.getIdOfOrg() == idOfOrg) {
@@ -1348,11 +1357,11 @@ public class FrontController extends HttpServlet {
         } catch (CardResponseItem.CardAlreadyExist e) {
             logger.error("CardAlreadyExistException", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE,
-                    CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                    e.getMessage());
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
             logger.error("CardAlreadyExistInYourOrgException", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE,
-                    CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
+                    e.getMessage());
         } catch (Exception e){
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);
