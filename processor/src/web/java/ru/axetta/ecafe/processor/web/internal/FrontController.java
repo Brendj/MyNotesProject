@@ -1370,7 +1370,7 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new CardResponseItem(idOfCard, transitionState);
+        return new CardResponseItem(idOfCard, (null != transitionState) ? transitionState.getCode() : null);
     }
 
     @WebMethod(operationName = "getEnterEventsManual")
