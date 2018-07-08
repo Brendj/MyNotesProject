@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 /**
  * Created by i.semenov on 13.03.2018.
@@ -19,6 +16,8 @@ public class MenuItemParam {
     private Long idOfMenuDetail;
     @XmlAttribute(name = "amount")
     private Integer amount;
+    @XmlElement(name = "regularMenuDetail")
+    private RegularPreorderParam regularMenuDetail;
 
     public Long getIdOfMenuDetail() {
         return idOfMenuDetail;
@@ -35,4 +34,13 @@ public class MenuItemParam {
     public void setAmount(Integer amount) {
         this.amount = amount;
     }
+
+    public RegularPreorderParam getRegularMenuDetail() {
+        return regularMenuDetail;
+    }
+
+    public void setRegularMenuDetail(RegularPreorderParam regularMenuDetail) {
+        this.regularMenuDetail = regularMenuDetail;
+    }
+
 }

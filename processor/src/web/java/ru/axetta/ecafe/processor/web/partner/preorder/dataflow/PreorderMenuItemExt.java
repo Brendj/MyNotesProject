@@ -40,10 +40,14 @@ public class PreorderMenuItemExt {
     private Long idOfMenuDetail;
     @XmlAttribute(name = "amount")
     private int amount;
-    @XmlAttribute(name = "selected")
-    private Boolean selected;
+    /*@XmlAttribute(name = "selected")
+    private Boolean selected;*/
     @XmlAttribute(name = "state")
     private Integer state;
+    @XmlAttribute(name = "isRegular")
+    private Boolean isRegular;
+    @XmlAttribute(name = "itemCode")
+    private String itemCode;
 
     public PreorderMenuItemExt() {
 
@@ -61,6 +65,7 @@ public class PreorderMenuItemExt {
         this.setCarbohydrates(menuDetail.getCarbohydrates());
         this.setFat(menuDetail.getFat());
         this.setIdOfMenuDetail(menuDetail.getLocalIdOfMenu());
+        this.setItemCode(menuDetail.getItemCode());
     }
 
     public String getGroup() {
@@ -151,13 +156,13 @@ public class PreorderMenuItemExt {
         this.amount = amount;
     }
 
-    public Boolean getSelected() {
+    /*public Boolean getSelected() {
         return selected;
     }
 
     public void setSelected(Boolean selected) {
         this.selected = selected;
-    }
+    }*/
 
     public String getFullName() {
         return fullName;
@@ -173,5 +178,21 @@ public class PreorderMenuItemExt {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    public Boolean getIsRegular() {
+        return isRegular;
+    }
+
+    public void setIsRegular(Boolean regular) {
+        isRegular = regular;
     }
 }

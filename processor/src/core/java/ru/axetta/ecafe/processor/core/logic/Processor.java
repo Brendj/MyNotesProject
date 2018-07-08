@@ -125,7 +125,6 @@ public class Processor implements SyncProcessor {
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
     private static final long ACC_REGISTRY_TIME_CLIENT_IN_MILLIS = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.accRegistryUpdate.timeClient", 7) * 24 * 60 * 60 * 1000;
-    public static final Integer DEFAULT_FORBIDDEN_DAYS_MPGU = 2;
 
     private ProcessorUtils processorUtils = RuntimeContext.getAppContext().getBean(ProcessorUtils.class);
 
@@ -4863,7 +4862,7 @@ public class Processor implements SyncProcessor {
 
         Long version = 0L;
 
-        Integer days = getDaysToAdd(organization.getIdOfOrg(), now, CalendarUtils.addDays(now, 14));
+        Integer days = getDaysToAdd(organization.getIdOfOrg(), now, CalendarUtils.addDays(now, PreorderComplex.getDaysOfRegularPreorders()));
         Date dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(now, days)); //дата, начиная с которой нужно удалять измененные предзаказы
         if (deletedPreorders.size() > 0 || changedPreorders.size() > 0 || deletedPreorderMenuDetails.size() > 0 || changedPreorderMenuDetails.size() > 0) {
             version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
@@ -4891,9 +4890,8 @@ public class Processor implements SyncProcessor {
     }
 
     private int getDaysToAdd(Long idOfOrg, Date fromDate, Date toDate) throws Exception {
-        Integer days = DAOUtils.getPreorderFeedingForbiddenDays(idOfOrg);
-        if (days == null) days = DEFAULT_FORBIDDEN_DAYS_MPGU;
-        if (CalendarUtils.getHourFromDate(fromDate) >= 12) days++;
+        //Integer days = DAOUtils.getPreorderFeedingForbiddenDays(idOfOrg);
+        //if (days == null) days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
 
         Map<Date, Integer> map = DAOUtils.getSpecialDates(fromDate, CalendarUtils.getDifferenceInDays(fromDate, toDate), idOfOrg);
         int result = 0;

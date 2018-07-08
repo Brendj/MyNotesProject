@@ -38,5 +38,7 @@
             </type>
         </property>
         <property name="idOfGoodsRequestPosition" column="idofgoodsrequestposition" type="long" />
+        <many-to-one name="regularPreorder" class="ru.axetta.ecafe.processor.core.persistence.RegularPreorder"
+                     column="IdOfRegularPreorder" fetch="select"/>
     </class>
 </hibernate-mapping>

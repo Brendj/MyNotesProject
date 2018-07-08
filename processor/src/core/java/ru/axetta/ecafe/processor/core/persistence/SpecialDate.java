@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Liya
@@ -11,30 +13,34 @@ package ru.axetta.ecafe.processor.core.persistence;
  * Time: 13:07
  */
 public class SpecialDate {
-    private CompositeIdOfSpecialDate compositeIdOfSpecialDate;
+    private Long idOfSpecialDate;
+    private Long idOfOrg;
+    private Date date;
     private Org org;
     private Boolean isWeekend;
     private Boolean deleted;
     private Org orgOwner; // От какой организации создана запись
     private Long version;
     private String comment;
+    private Long idOfClientGroup;
 
     public SpecialDate() {
     }
 
     public SpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate,  Boolean isWeekend, String comment) {
-        this.compositeIdOfSpecialDate = compositeIdOfSpecialDate;
+        this.idOfOrg = compositeIdOfSpecialDate.getIdOfOrg();
+        this.date = compositeIdOfSpecialDate.getDate();
         this.isWeekend = isWeekend;
         this.comment = comment;
     }
 
-    public CompositeIdOfSpecialDate getCompositeIdOfSpecialDate() {
+    /*public CompositeIdOfSpecialDate getCompositeIdOfSpecialDate() {
         return compositeIdOfSpecialDate;
     }
 
     public void setCompositeIdOfSpecialDate(CompositeIdOfSpecialDate compositeIdOfSpecialDate) {
         this.compositeIdOfSpecialDate = compositeIdOfSpecialDate;
-    }
+    }*/
 
     public Org getOrg() {
         return org;
@@ -84,4 +90,35 @@ public class SpecialDate {
         this.comment = comment;
     }
 
+    public Long getIdOfClientGroup() {
+        return idOfClientGroup;
+    }
+
+    public void setIdOfClientGroup(Long idOfClientGroup) {
+        this.idOfClientGroup = idOfClientGroup;
+    }
+
+    public Long getIdOfSpecialDate() {
+        return idOfSpecialDate;
+    }
+
+    public void setIdOfSpecialDate(Long idOfSpecialDate) {
+        this.idOfSpecialDate = idOfSpecialDate;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 }

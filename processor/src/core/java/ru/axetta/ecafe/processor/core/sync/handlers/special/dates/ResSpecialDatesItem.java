@@ -4,10 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -24,6 +28,7 @@ public class ResSpecialDatesItem {
     private Date date;
     private Boolean isWeekend;
     private String comment;
+    private String groupName;
     private Boolean deleted;
     private Long idOfOrgOwner;
     private Long version;
@@ -33,14 +38,23 @@ public class ResSpecialDatesItem {
     public ResSpecialDatesItem() {
     }
 
-    public ResSpecialDatesItem(SpecialDate specialDate){
-        this.idOfOrg = specialDate.getCompositeIdOfSpecialDate().getIdOfOrg();
-        this.date = specialDate.getCompositeIdOfSpecialDate().getDate();
+    public ResSpecialDatesItem(Session session, SpecialDate specialDate) throws Exception {
+        this.idOfOrg = specialDate.getIdOfOrg();
+        this.date = specialDate.getDate();
         this.isWeekend = specialDate.getIsWeekend();
         this.deleted = specialDate.getDeleted() == null ? false : specialDate.getDeleted();
         this.comment = "";
         this.version = specialDate.getVersion();
         this.idOfOrgOwner = specialDate.getOrgOwner().getIdOfOrg();
+        if (specialDate.getIdOfClientGroup() != null) {
+            Criteria criteria = session.createCriteria(ClientGroup.class);
+            criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", this.idOfOrg));
+            criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", specialDate.getIdOfClientGroup()));
+            ClientGroup cg = (ClientGroup)criteria.uniqueResult();
+            if (cg != null) {
+                this.groupName = cg.getGroupName();
+            }
+        }
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
@@ -52,6 +66,7 @@ public class ResSpecialDatesItem {
         if(!comment.isEmpty()) {
             XMLUtils.setAttributeIfNotNull(element, "Comment", comment);
         }
+        XMLUtils.setAttributeIfNotNull(element, "GroupName", groupName);
         if (deleted) {
             XMLUtils.setAttributeIfNotNull(element, "D", deleted);
         }

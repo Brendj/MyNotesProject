@@ -537,7 +537,8 @@ public class DAOReadonlyService {
     public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
         try {
             Query query = entityManager.createQuery(
-                    "select sd from SpecialDate sd where sd.compositeIdOfSpecialDate.date between :startDate and :endDate and sd.compositeIdOfSpecialDate.idOfOrg = :idOfOrg");
+                    "select sd from SpecialDate sd where sd.date between :startDate and :endDate "
+                            + "and sd.idOfOrg = :idOfOrg and sd.deleted = false");
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
             query.setParameter("idOfOrg", idOfOrg);

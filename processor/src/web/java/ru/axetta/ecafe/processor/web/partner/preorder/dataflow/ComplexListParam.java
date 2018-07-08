@@ -18,6 +18,8 @@ public class ComplexListParam {
     private Integer idOfComplex;
     @XmlAttribute(name = "amount")
     private Integer amount;
+    @XmlElement(name = "regularComplex")
+    private RegularPreorderParam regularComplex;
     @XmlElement(name = "menuItem")
     private List<MenuItemParam> menuItems;
 
@@ -43,5 +45,13 @@ public class ComplexListParam {
 
     public void setMenuItems(List<MenuItemParam> menuItems) {
         this.menuItems = menuItems;
+    }
+
+    public RegularPreorderParam getRegularComplex() {
+        return regularComplex;
+    }
+
+    public void setRegularComplex(RegularPreorderParam regularComplex) {
+        this.regularComplex = regularComplex;
     }
 }

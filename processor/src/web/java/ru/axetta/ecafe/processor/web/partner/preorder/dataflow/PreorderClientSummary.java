@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -58,7 +59,7 @@ public class PreorderClientSummary {
         Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
         this.usedSum = getPreordersSum(client);
         this.forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
-        this.calendar = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getSpecialDates(new Date(), PreorderDAOService.DEFAULT_MENU_SYNC_COUNT_DAYS, summary.getOrgId(), client);
+        this.calendar = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getSpecialDates(new Date(), PreorderComplex.getDaysOfRegularPreorders(), summary.getOrgId(), client);
         SubscriptionFeeding sf = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientSubscriptionFeeding(client);
         this.subscriptionFeeding = (sf == null) ? 0 : 1;
     }

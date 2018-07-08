@@ -25,14 +25,16 @@ public class PreorderComplexItemExt implements Comparable {
     private Long currentPrice;
     @XmlAttribute(name = "amount")
     private int amount;
-    @XmlAttribute(name = "selected")
-    private Boolean selected;
+    /*@XmlAttribute(name = "selected")
+    private Boolean selected;*/
     @XmlAttribute(name = "complexType")
     private Integer complexType;
     @XmlAttribute(name = "discount")
     private Boolean discount;
     @XmlAttribute(name = "state")
     private Integer state;
+    @XmlAttribute(name = "isRegular")
+    private Boolean isRegular;
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
 
@@ -88,13 +90,13 @@ public class PreorderComplexItemExt implements Comparable {
         this.amount = amount;
     }
 
-    public Boolean getSelected() {
+    /*public Boolean getSelected() {
         return selected;
     }
 
     public void setSelected(Boolean selected) {
         this.selected = selected;
-    }
+    }*/
 
     public Integer getComplexType() {
         return complexType;
@@ -143,5 +145,13 @@ public class PreorderComplexItemExt implements Comparable {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Boolean getIsRegular() {
+        return isRegular;
+    }
+
+    public void setIsRegular(Boolean regular) {
+        isRegular = regular;
     }
 }

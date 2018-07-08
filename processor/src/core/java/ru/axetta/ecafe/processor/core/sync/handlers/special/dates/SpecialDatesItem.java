@@ -30,6 +30,7 @@ public class SpecialDatesItem {
     private String comment;
     private Boolean delete;
     private Long idOfOrgOwner;
+    private String groupName;
     private String errorMessage;
     private Integer resCode;
 
@@ -38,6 +39,7 @@ public class SpecialDatesItem {
         Date date = null;
         Boolean isWeekend = null;
         String comment = null;
+        String groupName = null;
         Boolean delete = false;
 
         EMSetter emSetter = new EMSetter("");
@@ -78,6 +80,7 @@ public class SpecialDatesItem {
         }
 
         comment = XMLUtils.getAttributeValue(itemNode, "Comment");
+        groupName = XMLUtils.getAttributeValue(itemNode, "GroupName");
 
         Integer intDelete = getIntValue(itemNode, "D", emSetter, false);
         if(intDelete != null){
@@ -88,7 +91,7 @@ public class SpecialDatesItem {
             }
         }
 
-        return new SpecialDatesItem(idOfOrg, date, isWeekend, comment, delete, orgOwner, emSetter.getStr());
+        return new SpecialDatesItem(idOfOrg, date, isWeekend, comment, groupName, delete, orgOwner, emSetter.getStr());
     }
 
     private static Integer getIntValue(Node itemNode, String nodeName, ISetErrorMessage www, boolean checkExists) {
@@ -106,6 +109,14 @@ public class SpecialDatesItem {
             }
         }
         return result;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     private static class EMSetter implements ISetErrorMessage {
@@ -134,12 +145,13 @@ public class SpecialDatesItem {
     public SpecialDatesItem() {
     }
 
-    public SpecialDatesItem(Long idOfOrg, Date date, Boolean isWeekend, String comment, Boolean delete,
+    public SpecialDatesItem(Long idOfOrg, Date date, Boolean isWeekend, String comment, String groupName, Boolean delete,
             Long idOfOrgOwner, String errorMessage) {
         this.idOfOrg = idOfOrg;
         this.date = date;
         this.isWeekend = isWeekend;
         this.comment = comment;
+        this.groupName = groupName;
         this.delete = delete;
         this.idOfOrgOwner = idOfOrgOwner;
         this.errorMessage = errorMessage;

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -11,6 +13,9 @@ import java.util.Set;
  * Created by i.semenov on 12.03.2018.
  */
 public class PreorderComplex {
+    public static final Integer DEFAULT_MENU_SYNC_COUNT_DAYS = 14;
+    public static final Integer DEFAULT_FORBIDDEN_DAYS = 2;
+
     private Long idOfPreorderComplex;
     private Integer armComplexId;
     private Client client;
@@ -28,6 +33,12 @@ public class PreorderComplex {
     private Date lastUpdate;
     private PreorderState state;
     private Long idOfGoodsRequestPosition;
+    private RegularPreorder regularPreorder;
+
+    public static Integer getDaysOfRegularPreorders() {
+        return Integer.parseInt(RuntimeContext
+                .getInstance().getConfigProperties().getProperty("ecafe.processor.preorder.daysToGenerate", "14"));
+    }
 
     public PreorderComplex() {
 
@@ -191,5 +202,13 @@ public class PreorderComplex {
 
     public void setIdOfGoodsRequestPosition(Long idOfGoodsRequestPosition) {
         this.idOfGoodsRequestPosition = idOfGoodsRequestPosition;
+    }
+
+    public RegularPreorder getRegularPreorder() {
+        return regularPreorder;
+    }
+
+    public void setRegularPreorder(RegularPreorder regularPreorder) {
+        this.regularPreorder = regularPreorder;
     }
 }

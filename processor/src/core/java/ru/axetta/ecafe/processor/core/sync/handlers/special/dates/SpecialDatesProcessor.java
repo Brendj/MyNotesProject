@@ -4,12 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.special.dates;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfSpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +47,20 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
             for(SpecialDatesItem item : specialDates.getItems()){
                 if(item.getResCode().equals(SpecialDatesItem.ERROR_CODE_ALL_OK)){
                     CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(item.getIdOfOrg(), item.getDate());
-                    SpecialDate specialDate = DAOUtils.findSpecialDate(session, compositeId);
+                    SpecialDate specialDate = null;
+                    String groupName = item.getGroupName();
+                    Long idOfClientGroup = null;
+                    if (!StringUtils.isEmpty(groupName)) {
+                        ClientGroup clientGroup = DAOUtils
+                                .findClientGroupByGroupNameAndIdOfOrg(session, item.getIdOfOrg(), groupName);
+                        if (clientGroup != null)
+                            idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+                    }
+                    if (StringUtils.isEmpty(groupName)) {
+                        specialDate = DAOUtils.findSpecialDate(session, compositeId);
+                    } else {
+                        specialDate = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfClientGroup);
+                    }
                     Boolean isWeekend = item.getIsWeekend();
                     Boolean deleted = item.getDelete();
                     Org orgOwner = (Org)session.load(Org.class, item.getIdOfOrgOwner());
@@ -60,12 +75,13 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     specialDate.setIsWeekend(isWeekend);
                     specialDate.setDeleted(deleted);
                     specialDate.setComment(comment);
+                    specialDate.setIdOfClientGroup(idOfClientGroup);
                     specialDate.setOrgOwner(orgOwner);
                     specialDate.setVersion(nextVersion);
 
                     session.saveOrUpdate(specialDate);
 
-                    resItem = new ResSpecialDatesItem(specialDate);
+                    resItem = new ResSpecialDatesItem(session, specialDate);
                     resItem.setResCode(item.getResCode());
                 } else {
                     resItem = new ResSpecialDatesItem();
@@ -97,7 +113,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
         List<SpecialDate> list = DAOUtils.getSpecialDatesForFriendlyOrgsSinceVersion(session,
                 specialDates.getIdOfOrgOwner(), specialDates.getMaxVersion());
         for(SpecialDate sd : list){
-            resItem = new ResSpecialDatesItem(sd);
+            resItem = new ResSpecialDatesItem(session, sd);
             resItem.setComment(sd.getComment());
             items.add(resItem);
         }

@@ -54,7 +54,6 @@ import java.text.DateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.Processor.DEFAULT_FORBIDDEN_DAYS_MPGU;
 
 /**
  * Created by IntelliJ IDEA.
@@ -409,7 +408,19 @@ public class DAOUtils {
     }
 
     public static SpecialDate findSpecialDate(Session persistenceSession, CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
-        return (SpecialDate) persistenceSession.get(SpecialDate.class, compositeIdOfSpecialDate);
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
+        return (SpecialDate)criteria.uniqueResult();
+    }
+
+    public static SpecialDate findSpecialDateWithGroup(Session persistenceSession,
+            CompositeIdOfSpecialDate compositeIdOfSpecialDate, Long idOfClientGroup) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
+        criteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+        return (SpecialDate)criteria.uniqueResult();
     }
 
     public static LastProcessSectionsDates findLastProcessSectionsDate(Session persistenceSession,
@@ -3178,7 +3189,7 @@ public class DAOUtils {
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);
         Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(orgId);
         if (forbiddenDays == null) {
-            forbiddenDays = DEFAULT_FORBIDDEN_DAYS_MPGU;
+            forbiddenDays = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
         }
         if (CalendarUtils.getHourFromDate(today) < 12) forbiddenDays++;
         while (c.getTimeInMillis() < endDate.getTime() ){
@@ -3195,7 +3206,7 @@ public class DAOUtils {
             Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
             if(specialDates != null){
                 for (SpecialDate specialDate : specialDates) {
-                    if (CalendarUtils.betweenOrEqualDate(specialDate.getCompositeIdOfSpecialDate().getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
+                    if (CalendarUtils.betweenOrEqualDate(specialDate.getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
                         isWeekend = specialDate.getIsWeekend();
                         break;
                     }
