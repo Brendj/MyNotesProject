@@ -30,6 +30,7 @@ public class ResCardRequestItem {
     private Boolean deletedState;
     private Long cardNo;
     private String guid;
+    private Long orgOwner;
 
     public ResCardRequestItem() {
 
@@ -45,6 +46,7 @@ public class ResCardRequestItem {
         this.setDeletedState(cr.getDeletedState());
         this.setGuid(cr.getGuid());
         this.setCardNo(cr.getCard() == null ? null : cr.getCard().getCardNo());
+        this.setOrgOwner(cr.getCard() == null ? null : cr.getCard().getOrg().getIdOfOrg());
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
@@ -64,6 +66,7 @@ public class ResCardRequestItem {
         if (deletedState) {
             XMLUtils.setAttributeIfNotNull(element, "D", deletedState);
         }
+        XMLUtils.setAttributeIfNotNull(element, "CardOrg", orgOwner);
 
         return element;
     }
@@ -138,5 +141,13 @@ public class ResCardRequestItem {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Long getOrgOwner() {
+        return orgOwner;
+    }
+
+    public void setOrgOwner(Long orgOwner) {
+        this.orgOwner = orgOwner;
     }
 }
