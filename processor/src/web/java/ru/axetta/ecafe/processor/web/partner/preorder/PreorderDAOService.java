@@ -117,6 +117,82 @@ public class PreorderDAOService {
     }
 
     @Transactional(readOnly = true)
+    public PreorderListWithComplexesGroupResult getPreorderComplexesWithMenuListWithGoodsParams(Long contractId, Date date,
+            Long goodType, Long ageGroup) {
+        PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
+        Client client = getClientByContractId(contractId);
+        if (isSpecialConfigDate(client, date)) {
+            List<PreorderComplexGroup> groupList = new ArrayList<PreorderComplexGroup>();
+            groupResult.setComplexesWithGroups(groupList);
+            return groupResult;
+        }
+        Set<CategoryDiscount> clientDiscounts = client.getCategories();
+        Boolean hasDiscount = false;
+        for (CategoryDiscount categoryDiscount : clientDiscounts) {
+            hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
+        }
+
+        Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder "
+                + " from cf_complexinfo ci join cf_orgs o on o.idoforg = ci.idoforg "
+                + " join cf_goods as g on ci.idofgood = g.idofgood"
+                + " left outer join cf_preorder_complex pc on (ci.idoforg = :idOfOrg and pc.idOfClient = :idOfClient and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
+                + " where ci.MenuDate between :startDate and :endDate "
+                + " and g.goodtype = :goodType and g.ageGroup = :ageGroup"
+                + " and (ci.UsedSpecialMenu=1 or ci.ModeFree=1) and ci.idoforg = :idOfOrg "
+                + " and (o.OrganizationType = :school or o.OrganizationType = :professional) and ci.modevisible = 1 and (pc.deletedstate is null or pc.deletedstate = 0) order by ci.modeOfAdd");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
+        query.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("school", OrganizationType.SCHOOL.getCode());
+        query.setParameter("professional", OrganizationType.PROFESSIONAL.getCode());
+        query.setParameter("goodType", goodType);
+        query.setParameter("ageGroup", ageGroup);
+        Map<String, PreorderComplexGroup> groupMap = new HashMap<String, PreorderComplexGroup>();
+        List res = query.getResultList();
+        List<PreorderComplexItemExt> list = new ArrayList<PreorderComplexItemExt>();
+        for (Object o : res) {
+            Object[] row = (Object[]) o;
+            Long id = ((BigInteger)row[0]).longValue();
+            ComplexInfo ci = emReport.find(ComplexInfo.class, id);
+            Integer amount = (Integer) row[1];
+            Integer state = (Integer) row[3];
+            Long idOfRegularPreorder = row[4] == null ? null : ((BigInteger)row[4]).longValue();
+            PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci);
+            complexItemExt.setAmount(amount == null ? 0 : amount);
+            complexItemExt.setState(state == null ? 0 : state);
+            complexItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
+
+            List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(ci.getIdOfComplexInfo(), client.getIdOfClient(), date);
+            if (menuItemExtList.size() > 0) {
+                complexItemExt.setMenuItemExtList(menuItemExtList);
+                list.add(complexItemExt);
+            }
+        }
+        for (PreorderComplexItemExt item : list) {
+            if (isAcceptableComplex(item, client, hasDiscount)) {
+                String groupName = getPreorderComplexGroup(item);
+                if (groupName == null) continue;
+                item.setType(getPreorderComplexSubgroup(item));
+                PreorderComplexGroup group = groupMap.get(groupName);
+                if (group == null) {
+                    group = new PreorderComplexGroup(groupName);
+                    groupMap.put(groupName, group);
+                }
+                group.addItem(item);
+            }
+        }
+        List<PreorderComplexGroup> groupList = new ArrayList<PreorderComplexGroup>(groupMap.values());
+        for (PreorderComplexGroup group : groupList) {
+            Collections.sort(group.getItems());
+        }
+        Collections.sort(groupList);
+        groupResult.setComplexesWithGroups(groupList);
+
+        return groupResult;
+    }
+
+    @Transactional(readOnly = true)
     public PreorderListWithComplexesGroupResult getPreorderComplexesWithMenuList(Long contractId, Date date) {
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
         Client client = getClientByContractId(contractId);

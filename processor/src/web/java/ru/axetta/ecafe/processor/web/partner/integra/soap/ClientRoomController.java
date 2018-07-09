@@ -533,7 +533,8 @@ public interface ClientRoomController {
     Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
 
     @WebMethod(operationName = "getPreorderComplexes")
-    PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);
+    PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date,
+            @WebParam(name = "goodType") Long goodType, @WebParam(name = "ageGroup") Long ageGroup);
 
     @WebMethod()
     Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders);
