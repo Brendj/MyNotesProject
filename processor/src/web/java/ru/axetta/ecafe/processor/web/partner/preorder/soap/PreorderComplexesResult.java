@@ -19,6 +19,8 @@ import javax.xml.bind.annotation.XmlType;
 public class PreorderComplexesResult extends Result {
     @XmlElement(name = "complexGroups")
     private ComplexGroup complexGroup;
+    @XmlElement(name = "regularPreorders")
+    private RegularPreordersList regularPreorders;
 
     public PreorderComplexesResult() {
 
@@ -30,5 +32,13 @@ public class PreorderComplexesResult extends Result {
 
     public void setComplexGroup(ComplexGroup complexGroup) {
         this.complexGroup = complexGroup;
+    }
+
+    public RegularPreordersList getRegularPreorders() {
+        return regularPreorders;
+    }
+
+    public void setRegularPreorders(RegularPreordersList regularPreorders) {
+        this.regularPreorders = regularPreorders;
     }
 }

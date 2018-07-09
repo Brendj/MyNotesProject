@@ -8635,6 +8635,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ComplexGroup complexGroup = new ComplexGroup();
             complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
             result.setComplexGroup(complexGroup);
+            RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreordersList(contractId);
+            result.setRegularPreorders(regularPreordersList);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch(Exception e) {

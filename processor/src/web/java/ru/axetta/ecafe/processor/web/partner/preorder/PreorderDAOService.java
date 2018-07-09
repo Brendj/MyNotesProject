@@ -15,6 +15,8 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientsWithResultCode;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.RegularPreorderItem;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.RegularPreordersList;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -181,7 +183,24 @@ public class PreorderDAOService {
         }
         Collections.sort(groupList);
         groupResult.setComplexesWithGroups(groupList);
+
         return groupResult;
+    }
+
+    public RegularPreordersList getRegularPreordersList(Long contractId) {
+        RegularPreordersList rp = new RegularPreordersList();
+        Query regularsQuery = emReport.createQuery("select r from RegularPreorder r where r.client.contractId = :contractId and r.deletedState = false");
+        regularsQuery.setParameter("contractId", contractId);
+        List<RegularPreorder> reglist = regularsQuery.getResultList();
+        if (reglist.size() > 0) {
+            List<RegularPreorderItem> items = new ArrayList<RegularPreorderItem>();
+            for (RegularPreorder regularPreorder : reglist) {
+                RegularPreorderItem item = new RegularPreorderItem(regularPreorder);
+                items.add(item);
+            }
+            rp.setRegularPreorders(items);
+        }
+        return rp;
     }
 
     private String getPreorderComplexGroup(PreorderComplexItemExt item) {
