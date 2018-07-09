@@ -126,17 +126,17 @@ public class SpecialDatesReportBuilder extends BasicReportForAllOrgJob.Builder {
                 Date eDate = CalendarUtils.endOfDay(currentDate);
 
                 Criteria criteria = session.createCriteria(SpecialDate.class);
-                criteria.add(Restrictions.between("compositeIdOfSpecialDate.date", bDate, eDate));
-                criteria.add(Restrictions.eq("compositeIdOfSpecialDate.idOfOrg", orgId));
+                criteria.add(Restrictions.between("date", bDate, eDate));
+                criteria.add(Restrictions.eq("idOfOrg", orgId));
                 criteria.add(Restrictions.eq("deleted", false));
-                SpecialDate specialDate = (SpecialDate) criteria.uniqueResult();
+                List<SpecialDate> specialDates = criteria.list();
                 String comment = "";
 
                 Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
-                if(specialDate != null){
-                    if(!specialDate.getDeleted()){
+                if(specialDates.size() > 0) {
+                    for (SpecialDate specialDate : specialDates) {
                         isWeekend = specialDate.getIsWeekend();
-                        if(showComments) {
+                        if (showComments) {
                             comment = specialDate.getComment();
                         }
                     }
