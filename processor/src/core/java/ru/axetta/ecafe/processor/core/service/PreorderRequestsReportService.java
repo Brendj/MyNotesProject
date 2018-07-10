@@ -53,7 +53,7 @@ public class PreorderRequestsReportService {
 
     public final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.report.PreorderRequestsReport.cronExpression";
     public static final String NODE_PROPERTY = "ecafe.processor.report.PreorderRequestsReport.node";
-    private static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
+    public static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
 
     private Calendar localCalendar;
@@ -91,7 +91,6 @@ public class PreorderRequestsReportService {
         isHideMissedCol = runtimeContext
                 .getOptionValueBool(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
 
-        HashMap<Long, List<String>> mapPositions = new HashMap<Long, List<String>>();
         Date fireTime = new Date();
 
         Session session = null;
@@ -109,26 +108,15 @@ public class PreorderRequestsReportService {
                     continue;
                 }
 
-                String guid;
                 try {
                     if (null == item.getIdOfGoodsRequestPosition()) {
-                        guid = createRequestFromPreorder(session, item, fireTime);
+                        createRequestFromPreorder(session, item, fireTime);
                     } else {
-                        guid = updateRequestFromPreorder(session, item, fireTime);
+                         updateRequestFromPreorder(session, item, fireTime);
                     }
                 } catch (Exception e) {
                     logger.warn("PreorderRequestsReportService: could not create GoodRequest");
-                    continue;
                 }
-
-                if (null == guid)   // инфа в позиции не поменялась
-                    continue;
-
-                Long orgOwner = item.getIdOfOrg();
-                if (!mapPositions.containsKey(orgOwner)) {
-                    mapPositions.put(orgOwner, new ArrayList<String>());
-                }
-                mapPositions.get(orgOwner).add(guid);
             }
             transaction.commit();
             transaction = null;
@@ -141,10 +129,103 @@ public class PreorderRequestsReportService {
         final Date lastCreateOrUpdateDate = calendarEnd.getTime();
         calendarEnd.add(Calendar.MINUTE, 1);
         final Date endGenerateTime = calendarEnd.getTime();
-        for (Long orgOwner : mapPositions.keySet()) {
-            List<String> guids = mapPositions.get(orgOwner);
-            notifyOrg(orgOwner, fireTime, endGenerateTime, lastCreateOrUpdateDate, guids);
+
+        Date now = CalendarUtils.startOfDay(new Date());
+        Date monthFinished = CalendarUtils.endOfDay(CalendarUtils.addMonth(startDate, 1));
+
+        List<Long> goodRequestOrgOwnerList = new ArrayList<Long>();
+
+        try {
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<GoodRequest> goodRequestList = DAOUtils.getPreorderGoodRequestsByDate(session, now, monthFinished);
+
+            for (GoodRequest request : goodRequestList)
+                if (!goodRequestOrgOwnerList.contains(request.getOrgOwner()))
+                    goodRequestOrgOwnerList.add(request.getOrgOwner());
+
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
+
+        for (Long orgOwner : goodRequestOrgOwnerList) {
+            Integer forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(orgOwner);
+            if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
+                forbiddenDaysCount -= 1;
+
+            List<String> guids = getGoodRequestPositionGuids(orgOwner, forbiddenDaysCount);
+            if (!guids.isEmpty())
+                notifyOrg(orgOwner, fireTime, endGenerateTime, lastCreateOrUpdateDate, guids);
+        }
+    }
+
+    private List<String> getGoodRequestPositionGuids(Long orgOwner, Integer forbiddenDaysCount) {
+        Session session = null;
+        Transaction transaction = null;
+        List<String> resultList = new ArrayList<String>();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
+            Date startDate = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date specialDaysMonth = CalendarUtils.addMonth(startDate, 1);
+
+            Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
+            specialDaysCriteria.add(Restrictions.eq("idOfOrg", idOfSourceOrg));
+            specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
+            specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
+            specialDaysCriteria.add(Restrictions.between("date", startDate, specialDaysMonth));
+
+            List<SpecialDate> specialDates = specialDaysCriteria.list();
+
+            Integer forbiddenCout = forbiddenDaysCount;
+            Date endDate = CalendarUtils.endOfDay(startDate);
+
+            Boolean hasWeekend = false;
+            do {
+                Date endDateStart = CalendarUtils.startOfDay(endDate);
+                Date endDateEnd = CalendarUtils.endOfDay(endDate);
+
+                Boolean isWeekend = false;
+                for (SpecialDate date : specialDates) {
+                    if (CalendarUtils.betweenDate(date.getDate(), endDateStart, endDateEnd)) {
+                        isWeekend = true;
+                        break;
+                    }
+                }
+                hasWeekend |= isWeekend;
+                endDate = CalendarUtils.addOneDay(endDate);
+                if (!isWeekend) {
+                    forbiddenCout--;
+                }
+            } while (forbiddenCout >= 0);
+
+            if (!hasWeekend) {
+                startDate = CalendarUtils.startOfDay(endDate);
+            }
+
+            Criteria criteria = session.createCriteria(GoodRequestPosition.class);
+            criteria.createAlias("goodRequest", "gr");
+            criteria.add(Restrictions.between("gr.doneDate", startDate, endDate));
+            criteria.add(Restrictions.eq("notified", Boolean.FALSE));
+            criteria.add(Restrictions.eq("orgOwner", orgOwner));
+            criteria.setProjection(Projections.projectionList().add(Projections.property("guid")));
+            resultList = criteria.list();
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return resultList;
     }
 
     private void updateDate() {
@@ -231,7 +312,6 @@ public class PreorderRequestsReportService {
         //properties.setProperty(GoodRequestsNewReport.P_NAME_FILTER, nameFiler);
         //properties.setProperty(GoodRequestsNewReport.P_ORG_REQUEST_FILTER, "1");        //OrgRequestFilterConverter.OrgRequestFilterEnum.ORG_WITH_DATA("Только с данными");
         properties.setProperty(GoodRequestsNewReport.P_HIDE_TOTAL_ROW, Boolean.toString(true));
-        properties.setProperty(GoodRequestsNewReport.P_NOTIFICATION, Boolean.toString(true));
         return properties;
     }
 
@@ -271,7 +351,7 @@ public class PreorderRequestsReportService {
         return preorderItemList;
     }
 
-    private String createRequestFromPreorder(Session session, PreorderItem preorderItem, Date fireTime) {
+    private void createRequestFromPreorder(Session session, PreorderItem preorderItem, Date fireTime) {
         //  Формируем номер по маске {idOfOrg}-{yyMMdd}-ЗВК-{countToDay}
         Date now = new Date(System.currentTimeMillis());
         String number = "";
@@ -284,7 +364,7 @@ public class PreorderRequestsReportService {
         Staff staff = DAOUtils.getAdminStaffFromOrg(session, preorderItem.getIdOfOrg());
 
         if (null == good || null == staff)
-            return null;
+            return;
 
         //  Создание GoodRequest
         GoodRequest goodRequest = new GoodRequest();
@@ -312,6 +392,7 @@ public class PreorderRequestsReportService {
         pos.setNetWeight(good.getNetWeight());
         pos.setCreatedDate(fireTime);
         pos.setTotalCount(preorderItem.getAmount() * 1000L);
+        pos.setNotified(false);
         pos.setLastUpdate(fireTime);
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
@@ -326,14 +407,13 @@ public class PreorderRequestsReportService {
             session.update(detail);
         }
         session.flush();
-        return pos.getGuid();
     }
 
-    private String updateRequestFromPreorder(Session session, PreorderItem item, Date fireTime) {
+    private void updateRequestFromPreorder(Session session, PreorderItem item, Date fireTime) {
         GoodRequestPosition pos = (GoodRequestPosition) session.load(GoodRequestPosition.class, item.getIdOfGoodsRequestPosition());
         if (null == pos) {
             logger.error("PreorderRequestsReportService: could not find GoodRequestPosition with id=" + item.getIdOfGoodsRequestPosition().toString());
-            return "";
+            return;
         }
         Boolean isUpdated = false;
 
@@ -353,12 +433,8 @@ public class PreorderRequestsReportService {
         }
 
         if (isUpdated) {
-            pos.setLastUpdate(fireTime);
             session.flush();
-            return pos.getGuid();
         }
-
-        return null;
     }
 
     public <T extends ConsumerRequestDistributedObject> T save(Session session, T object, String className) {

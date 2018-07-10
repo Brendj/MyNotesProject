@@ -33,6 +33,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService.PREORDER_COMMENT;
+
 public class PreorderRequestsReport extends BasicReportForContragentJob {
     /*
      * Параметры отчета для добавления в правила и шаблоны
@@ -109,16 +111,13 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                 idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
             }
 
-            String notificationString = reportProperties.getProperty(GoodRequestsNewReport.P_NOTIFICATION, "false");
-            final boolean notification = Boolean.parseBoolean(notificationString);
-
             String guidFilterString = reportProperties.getProperty(PreorderRequestsReport.P_GUID_FILTER, "");
             String[] guidFilterArray = StringUtils.split(guidFilterString, ",");
             List<String> guidFilter = new ArrayList<String>(Arrays.asList(guidFilterArray));
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, hideDailySampleValue, generateEndTime,
                     idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, hideGeneratePeriod, hideLastValue,
-                    notification, guidFilter);
+                    guidFilter);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date genEndTime = new Date();
             long generateDuration = genEndTime.getTime() - generateTime.getTime();
@@ -127,7 +126,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, int hideDailySampleValue,
                 Date generateEndTime, List<Long> idOfOrgList, List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns,
-                boolean hideGeneratePeriod, int hideLastValue, boolean notification, List<String> guidFilter) {
+                boolean hideGeneratePeriod, int hideLastValue, List<String> guidFilter) {
 
             HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(session, idOfOrgList, idOfMenuSourceOrgList);
             List<Item> itemList = new LinkedList<Item>();
@@ -187,18 +186,12 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             }
 
             List<GoodRequestPosition> goodRequestPositionList = getGoodRequestPositions(session, guidFilter, generateEndTime,
-                    hideGeneratePeriod, false, orgMap, beginDate, endDate);
-            if (notification) {
-                List<GoodRequestPosition> goodRequestPositionListN = getGoodRequestPositions(session, guidFilter, generateEndTime,
-                        hideGeneratePeriod, true, orgMap, beginDate, endDate);
-                if (goodRequestPositionListN.size() > 0) {
-                    goodRequestPositionList.addAll(goodRequestPositionListN);
-                }
-            }
+                    hideGeneratePeriod, orgMap, beginDate, endDate);
+
             Map<Long, GoodInfo> requestGoodsInfo = new HashMap<Long, GoodInfo>();
             for (Object obj : goodRequestPositionList) {
                 processPosition(session, hideDailySampleValue, hideMissedColumns, hideLastValue, orgMap, itemList, beginDate,
-                        endDate, dates, complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj, notification);
+                        endDate, dates, complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj);
             }
 
             if (!idOfMenuSourceOrgList.isEmpty()) {
@@ -265,22 +258,16 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
         }
 
         private List<GoodRequestPosition> getGoodRequestPositions(Session session, List<String> guidFilter, Date generateEndTime,
-                boolean hideGeneratePeriod, boolean notification, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
+                boolean hideGeneratePeriod, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
                 Date beginDate, Date endDate) {
             Criteria criteria = session.createCriteria(GoodRequestPosition.class);
             criteria.createAlias("goodRequest", "gr");
             criteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
             criteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
             criteria.add(Restrictions.isNotNull("good"));
+            criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
 
-            if (notification) {
-                criteria.add(Restrictions.eq("deletedState", true));
-                criteria.add(Restrictions.eq("gr.deletedState", true));
-                criteria.add(Restrictions.or(Restrictions.eq("notified", false), Restrictions.isNull("notified")));
-            } else {
-                criteria.add(Restrictions.eq("deletedState", false));
-                criteria.add(Restrictions.eq("gr.deletedState", false));
-            }
+            criteria.add(Restrictions.or(Restrictions.eq("notified", false), Restrictions.isNull("notified")));
 
             if (hideGeneratePeriod) {
                 Disjunction dateDisjunction = Restrictions.disjunction();
@@ -302,7 +289,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
         private void processPosition(Session session, int hideDailySampleValue, boolean hideMissedColumns, int hideLastValue,
                 HashMap<Long, BasicReportJob.OrgShortItem> orgMap, List<Item> itemList, Date beginDate, Date endDate,
                 TreeSet<Date> dates, Map<Long, ComplexInfoItem> complexOrgDictionary, List goodRequestPositionList,
-                Map<Long, GoodInfo> requestGoodsInfo, Object obj, boolean notification) {
+                Map<Long, GoodInfo> requestGoodsInfo, Object obj) {
 
             Date doneDate;
             GoodRequestPosition position = (GoodRequestPosition) obj;
@@ -352,10 +339,9 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, tempClientsCount, newTotalCount, newDailySample, newTempClients,
                     hideDailySampleValue, hideLastValue, goodType, notificationMark);
             dates.add(doneDate);
-            if (notification) {
-                position.setNotified(true);
-                session.persist(position);
-            }
+
+            position.setNotified(true);
+            session.persist(position);
         }
 
         private HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(Session session, List<Long> idOfOrgList,

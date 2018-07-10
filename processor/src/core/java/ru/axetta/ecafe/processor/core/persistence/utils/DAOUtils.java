@@ -54,6 +54,7 @@ import java.text.DateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService.PREORDER_COMMENT;
 
 /**
  * Created by IntelliJ IDEA.
@@ -3259,5 +3260,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(OrgSync.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         return (OrgSync) criteria.uniqueResult();
+    }
+
+    public static List<GoodRequest> getPreorderGoodRequestsByDate(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.eq("comment", PREORDER_COMMENT));
+        criteria.add(Restrictions.between("doneDate", startDate, endDate));
+        return criteria.list();
     }
 }
