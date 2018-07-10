@@ -412,7 +412,7 @@ public class PreorderDAOService {
                 if (regularMenuItem != null) {
                     if (regularMenuItem.getEnabled()) {
                         createRegularPreorder(client, regularMenuItem, menuItem.getAmount(),
-                                null, date, false, menuItem.getIdOfMenuDetail(), preorderComplex);
+                                idOfComplex, date, false, menuItem.getIdOfMenuDetail(), preorderComplex);
                     } else {
                         deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date);
                     }
@@ -482,7 +482,7 @@ public class PreorderDAOService {
                         regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), complexPrice);
                 em.persist(regularPreorder);
             } else {
-                regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), itemCode, null,
+                regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), itemCode, idOfComplex,
                         amount, menuDetailName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
                         regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), menuDetailPrice);
                 em.persist(regularPreorder);
