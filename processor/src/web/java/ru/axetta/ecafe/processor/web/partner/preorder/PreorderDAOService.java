@@ -371,40 +371,47 @@ public class PreorderDAOService {
             Integer complexAmount = complex.getAmount();
             Integer idOfComplex = complex.getIdOfComplex();
             boolean complexSelected = (complexAmount > 0);
+            boolean regularMenuItems = false;
             for (MenuItemParam menuItem : complex.getMenuItems()) {
                 if (menuItem.getAmount() > 0) {
                     complexSelected = true;
-                    break;
+                }
+                if (menuItem.getRegularMenuDetail() != null) {
+                    regularMenuItems = true;
                 }
             }
             RegularPreorderParam regularComplex = complex.getRegularComplex();
             if (regularComplex != null) {
                 if (regularComplex.getEnabled()) {
                     createRegularPreorder(client, regularComplex, complex.getAmount(),
-                            complex.getIdOfComplex(), date, true, null, null);
+                            complex.getIdOfComplex(), date, true, null);
                 } else {
                     deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date);
                 }
                 continue;
             }
 
-            queryComplexSelect.setParameter("idOfComplexInfo", idOfComplex);
             PreorderComplex preorderComplex = null;
-            try {
-                preorderComplex = (PreorderComplex) queryComplexSelect.getSingleResult();
-                preorderComplex.setAmount(complex.getAmount());
-                preorderComplex.setLastUpdate(new Date());
-                preorderComplex.setDeletedState(!complexSelected);
-                preorderComplex.setVersion(nextVersion);
-                //em.merge(preorderComplex);
-            } catch (NoResultException e ) {
-                if (complexSelected) {
-                    preorderComplex = createPreorderComplex(idOfComplex, client, date, complexAmount, null, nextVersion);
-                    //em.persist(preorderComplex);
+            if (!regularMenuItems) {
+                queryComplexSelect.setParameter("idOfComplexInfo", idOfComplex);
+                try {
+                    preorderComplex = (PreorderComplex) queryComplexSelect.getSingleResult();
+                    preorderComplex.setAmount(complex.getAmount());
+                    preorderComplex.setLastUpdate(new Date());
+                    preorderComplex.setDeletedState(!complexSelected);
+                    preorderComplex.setVersion(nextVersion);
+                    //em.merge(preorderComplex);
+                } catch (NoResultException e) {
+                    if (complexSelected) {
+                        preorderComplex = createPreorderComplex(idOfComplex, client, date, complexAmount, null,
+                                nextVersion);
+                        //em.persist(preorderComplex);
+                    }
                 }
-            }
 
-            if (preorderComplex == null) continue;
+                if (preorderComplex == null)
+                    continue;
+            }
 
             Set<PreorderMenuDetail> set = new HashSet<PreorderMenuDetail>();
             for (MenuItemParam menuItem : complex.getMenuItems()) {
@@ -412,7 +419,7 @@ public class PreorderDAOService {
                 if (regularMenuItem != null) {
                     if (regularMenuItem.getEnabled()) {
                         createRegularPreorder(client, regularMenuItem, menuItem.getAmount(),
-                                idOfComplex, date, false, menuItem.getIdOfMenuDetail(), preorderComplex);
+                                idOfComplex, date, false, menuItem.getIdOfMenuDetail());
                     } else {
                         deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date);
                     }
@@ -432,13 +439,15 @@ public class PreorderDAOService {
                 }
                 set.add(preorderMenuDetail);
             }
-            preorderComplex.setPreorderMenuDetails(set);
-            em.merge(preorderComplex);
+            if (preorderComplex != null) {
+                preorderComplex.setPreorderMenuDetails(set);
+                em.merge(preorderComplex);
+            }
         }
     }
 
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
-            Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, PreorderComplex preorderComplex) throws Exception {
+            Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu) throws Exception {
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;
@@ -488,7 +497,7 @@ public class PreorderDAOService {
                 em.persist(regularPreorder);
             }
         }
-        createPreordersFromRegular(regularPreorder, preorderComplex);
+        createPreordersFromRegular(regularPreorder);
     }
 
     private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date) {
@@ -500,7 +509,7 @@ public class PreorderDAOService {
             regularPreorderSelect.setParameter("idOfComplex", idOfComplex);
         else {
             MenuDetail menuDetail = getMenuDetail(client, idOfMenu, date);
-            regularPreorderSelect.setParameter("itemCode", menuDetail.getLocalIdOfMenu());
+            regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
         regularPreorder.setDeletedState(true);
@@ -509,7 +518,7 @@ public class PreorderDAOService {
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
-    public void createPreordersFromRegular(RegularPreorder regularPreorder, PreorderComplex parentPreorderComplex) throws Exception {
+    public void createPreordersFromRegular(RegularPreorder regularPreorder) throws Exception {
         //генерация предзаказов по ид. регулярного заказа
         //для блюд - по коду товара и цене
         //для комплексов - по ид. комплеса + цена.
@@ -542,33 +551,40 @@ public class PreorderDAOService {
                 continue;
             }
 
-            if (StringUtils.isEmpty(regularPreorder.getItemCode())) {
-                //предзаказ на комплекс
-                PreorderComplex preorderComplex = findPreorderComplex(currentDate, regularPreorder.getClient(),
-                        regularPreorder.getIdOfComplex());
-                if (preorderComplex == null) {
-                    //на искомую дату нет предзаказа, надо создавать
-                    ComplexInfo complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate); //комплекс на дату и с ценой рег. заказа
-                    if (complexInfo == null || !complexInfo.getCurrentPrice().equals(regularPreorder.getPrice())) { //не найден комплекс или цена не совпадает с рег. заказом
-                        currentDate = CalendarUtils.addDays(currentDate, 1);
-                        continue;
+            //предзаказ на комплекс
+            PreorderComplex preorderComplex = findPreorderComplex(currentDate, regularPreorder.getClient(),
+                    regularPreorder.getIdOfComplex());
+            MenuDetail menuDetail = null;
+            if (preorderComplex == null) {
+                //на искомую дату нет предзаказа, надо создавать
+                ComplexInfo complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate); //комплекс на дату и с ценой рег. заказа
+                boolean comparePrice = StringUtils.isEmpty(regularPreorder.getItemCode()); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
+                boolean menuDetailNotFoundInDay = false;
+                if (!comparePrice) {
+                    menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice());
+                    if (menuDetail == null) {
+                        menuDetailNotFoundInDay = true;
                     }
-                    preorderComplex = createPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
-                            complexInfo.getMenuDate(), regularPreorder.getAmount(), complexInfo, nextVersion);
-                    preorderComplex.setRegularPreorder(regularPreorder);
-                    em.persist(preorderComplex);
                 }
-            } else {
-                //предзаказ на блюдо
-                MenuDetail menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice());
-                if (menuDetail == null) {
+                if (complexInfo == null || (comparePrice ? !complexInfo.getCurrentPrice().equals(regularPreorder.getPrice()) : false) || menuDetailNotFoundInDay) { //не найден комплекс или цена не совпадает с рег. заказом
                     currentDate = CalendarUtils.addDays(currentDate, 1);
                     continue;
                 }
+                preorderComplex = createPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
+                        complexInfo.getMenuDate(), regularPreorder.getAmount(), complexInfo, nextVersion);
+                preorderComplex.setRegularPreorder(regularPreorder);
+                em.persist(preorderComplex);
+            }
+            if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
+                /*MenuDetail menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice());
+                if (menuDetail == null) {
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                } */
                 PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(), menuDetail.getLocalIdOfMenu());
                 if (preorderMenuDetail == null) {
                     //на искомую дату нет предзаказа, надо создавать
-                    preorderMenuDetail = createPreorderMenuDetail(regularPreorder.getClient(), parentPreorderComplex, menuDetail,
+                    preorderMenuDetail = createPreorderMenuDetail(regularPreorder.getClient(), preorderComplex, menuDetail,
                             menuDetail.getMenu().getMenuDate(), menuDetail.getLocalIdOfMenu(), regularPreorder.getAmount());
                     preorderMenuDetail.setRegularPreorder(regularPreorder);
                     em.persist(preorderMenuDetail);
@@ -577,6 +593,19 @@ public class PreorderDAOService {
             currentDate = CalendarUtils.addDays(currentDate, 1);
         }
     }
+
+    /*@Transactional
+    public void generatePreordersBySchedule() {
+        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.startDate < :date and r.endDate > date");
+        query.setParameter("date", new Date());
+        List<RegularPreorder> list = query.getResultList();
+        for (RegularPreorder regularPreorder : list) {
+            PreorderComplex preorderComplex = null;
+            if (regularPreorder.getIdOfComplex() != null) {
+                createPreordersFromRegular(regularPreorder, null);
+            }
+        }
+    }*/
 
     private Date getStartDateForGeneratePreorders(Date currentDate, List<SpecialDate> specialDates, int forbiddenDays, boolean isSixWorkWeek, RegularPreorder regularPreorder) {
         int i = 0;
