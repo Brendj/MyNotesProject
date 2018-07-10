@@ -542,7 +542,7 @@ public class PreorderDAOService {
                 continue;
             }
 
-            if (regularPreorder.getIdOfComplex() != null) {
+            if (StringUtils.isEmpty(regularPreorder.getItemCode())) {
                 //предзаказ на комплекс
                 PreorderComplex preorderComplex = findPreorderComplex(currentDate, regularPreorder.getClient(),
                         regularPreorder.getIdOfComplex());
