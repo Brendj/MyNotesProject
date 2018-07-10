@@ -166,6 +166,27 @@ public class DAOService {
         return (List<ECafeSettings>) criteria.list();
     }
 
+    public List<ECafeSettings> geteCafeSettingsesWithoutFiveElm(final Long idOfOrg, final SettingsIds settingsIds,
+            final Boolean deleted) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(ECafeSettings.class);
+        if (idOfOrg == null && settingsIds == null) {
+            return new ArrayList<ECafeSettings>(0);
+        }
+        if (idOfOrg != null) {
+            criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        }
+        if (settingsIds != null) {
+            criteria.add(Restrictions.eq("settingsId", settingsIds));
+        } else {
+            criteria.add(Restrictions.ne("settingsId", SettingsIds.fromInteger(5)));
+        }
+        if (!deleted) {
+            criteria.add(Restrictions.eq("deletedState", false));
+        }
+        return (List<ECafeSettings>) criteria.list();
+    }
+
     public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser,
             List<Long> idOfOrgList) throws Exception {
         ConfigurationProvider cp = entityManager
