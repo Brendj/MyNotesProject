@@ -8627,13 +8627,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date,
-            @WebParam(name = "goodType") Long goodType, @WebParam(name = "ageGroup") Long ageGroup) {
+    public PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date) {
         authenticateRequest(contractId);
         PreorderComplexesResult result = new PreorderComplexesResult();
         try {
             PreorderListWithComplexesGroupResult res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getPreorderComplexesWithMenuListWithGoodsParams(contractId, date, goodType, ageGroup);
+                    .getPreorderComplexesWithMenuList(contractId, date);
             ComplexGroup complexGroup = new ComplexGroup();
             complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
             result.setComplexGroup(complexGroup);
