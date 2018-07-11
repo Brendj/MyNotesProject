@@ -110,6 +110,12 @@ public class PreorderRequestsReportService {
 
                 try {
                     if (null == item.getIdOfGoodsRequestPosition()) {
+                        if (item.clientBalance < item.complexPrice) {
+                            logger.warn(String.format("PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
+                                            + "idOfPreorderComplex=%d, idOfPreorderMenuDetail%d)",
+                                    item.idOfClient, item.idOfPreorderComplex, item.idOfPreorderMenuDetail));
+                            continue;
+                        }
                         createRequestFromPreorder(session, item, fireTime);
                     } else {
                          updateRequestFromPreorder(session, item, fireTime);
@@ -322,7 +328,8 @@ public class PreorderRequestsReportService {
               + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
               + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
               + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
-              + "   pc.preorderdate "
+              + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
+              + "   c.balance, c.idofclient "
               + "FROM cf_preorder_complex pc "
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -345,8 +352,18 @@ public class PreorderRequestsReportService {
             Integer amount = (Integer) o[5];
             Long idOfGoodsRequest = (null != o[6]) ? ((BigInteger) o[6]).longValue() : null;
             Date preorderDate = (null != o[7]) ? new Date(((BigInteger) o[7]).longValue()) : null;
-            preorderItemList.add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
-                    createdDate, idOfGoodsRequest, preorderDate));
+
+            Long complexPrice = (null != o[8]) ? ((BigInteger) o[8]).longValue() : 0L;
+            Integer complexAmount = (null != o[9]) ? (Integer) o[9] : 0;
+            Long menuDetailPrice = (null != o[10]) ? ((BigInteger) o[10]).longValue() : 0L;
+            Integer menuDetailAmount = (null != o[11]) ? (Integer) o[11] : 0;
+            Long clientBalance = (null != o[12]) ? ((BigInteger) o[12]).longValue() : 0L;
+            Long idOfClient = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
+
+            preorderItemList
+                    .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
+                            createdDate, idOfGoodsRequest, preorderDate,
+                            complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance, idOfClient));
         }
         return preorderItemList;
     }
@@ -753,9 +770,12 @@ public class PreorderRequestsReportService {
         private Date createdDate;
         private Long idOfGoodsRequestPosition;
         private Date preorderDate;
+        private Long complexPrice;
+        private Long clientBalance;
+        private Long idOfClient;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
-                Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate) {
+                Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance, Long idOfClient) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -764,6 +784,9 @@ public class PreorderRequestsReportService {
             this.createdDate = createdDate;
             this.idOfGoodsRequestPosition = idOfGoodsRequestPosition;
             this.preorderDate = preorderDate;
+            this.complexPrice = complexPrice;
+            this.clientBalance = clientBalance;
+            this.idOfClient = idOfClient;
         }
 
         public PreorderItem() {
@@ -832,6 +855,30 @@ public class PreorderRequestsReportService {
 
         public void setPreorderDate(Date preorderDate) {
             this.preorderDate = preorderDate;
+        }
+
+        public Long getComplexPrice() {
+            return complexPrice;
+        }
+
+        public void setComplexPrice(Long complexPrice) {
+            this.complexPrice = complexPrice;
+        }
+
+        public Long getClientBalance() {
+            return clientBalance;
+        }
+
+        public void setClientBalance(Long clientBalance) {
+            this.clientBalance = clientBalance;
+        }
+
+        public Long getIdOfClient() {
+            return idOfClient;
+        }
+
+        public void setIdOfClient(Long idOfClient) {
+            this.idOfClient = idOfClient;
         }
     }
 
