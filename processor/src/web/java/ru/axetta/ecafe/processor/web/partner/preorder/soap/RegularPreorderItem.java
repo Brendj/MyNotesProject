@@ -27,6 +27,8 @@ public class RegularPreorderItem {
     private Date endDate;
     @XmlAttribute(name = "price")
     private Long price;
+    @XmlAttribute(name = "amount")
+    private Integer amount;
 
     @XmlAttribute(name = "monday")
     private Boolean monday;
@@ -51,6 +53,7 @@ public class RegularPreorderItem {
         this.startDate = regularPreorder.getStartDate();
         this.endDate = regularPreorder.getEndDate();
         this.price = regularPreorder.getPrice();
+        this.amount = regularPreorder.getAmount();
         this.monday = regularPreorder.getMonday();
         this.tuesday = regularPreorder.getTuesday();
         this.wednesday = regularPreorder.getWednesday();
@@ -145,5 +148,13 @@ public class RegularPreorderItem {
 
     public void setSaturday(Boolean saturday) {
         this.saturday = saturday;
+    }
+
+    public Integer getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 }

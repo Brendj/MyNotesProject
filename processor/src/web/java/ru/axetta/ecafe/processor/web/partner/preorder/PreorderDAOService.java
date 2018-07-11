@@ -762,30 +762,18 @@ public class PreorderDAOService {
 
     @Transactional
     public Long getPreordersSum(Client client, Date startDate, Date endDate) {
-        Query query = emReport.createQuery("select pc, ci from PreorderComplex pc, ComplexInfo ci "
-                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate "
-                + "and ci.menuDate between :startDate and :endDate "
-                + "and ci.org.idOfOrg = :idOfOrg and pc.preorderDate = ci.menuDate and pc.armComplexId = ci.idOfComplex");
+        Query query = emReport.createQuery("select pc from PreorderComplex pc "
+                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate and pc.deletedState = false");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
-        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
-        List list = query.getResultList();
+        List<PreorderComplex> list = query.getResultList();
         Long sum = 0L;
         Session session = (Session)emReport.getDelegate();
-        //for (PreorderComplex complex : list) {
-        for (Object obj : list) {
-            Object[] row = (Object[]) obj;
-            PreorderComplex complex = (PreorderComplex) row[0];
-            ComplexInfo ci = (ComplexInfo) row[1];
-            if (ci != null) {
-                sum += ci.getCurrentPrice() * complex.getAmount() - complex.getUsedSum();
-                for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
-                    MenuDetail menuDetail = DAOUtils.getPreorderMenuDetail(session, pmd);
-                    if (menuDetail != null) {
-                        sum += menuDetail.getPrice() * pmd.getAmount();
-                    }
-                }
+        for (PreorderComplex complex : list) {
+            sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
+            for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
+                sum += pmd.getMenuDetailPrice() * pmd.getAmount();
             }
         }
         return client.getBalance() - sum;
@@ -1044,7 +1032,7 @@ public class PreorderDAOService {
         }
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            if (two_days < forbiddenDays) {
+            if (two_days <= forbiddenDays) {
                 c.add(Calendar.DATE, 1);
                 map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
                 if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)

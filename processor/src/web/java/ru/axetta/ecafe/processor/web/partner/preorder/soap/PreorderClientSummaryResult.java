@@ -23,8 +23,11 @@ public class PreorderClientSummaryResult extends Result {
     @XmlElement(name = "forbiddenDays")
     private Integer forbiddenDays;
 
-    @XmlElement(name = "balanceWithPreorders")
-    private Long balanceWithPreorders;
+    @XmlElement(name = "preorderSum14Days")
+    private Long preorderSum14Days;
+
+    @XmlElement(name = "preorderSum3Days")
+    private Long preorderSum3Days;
 
     @XmlElement(name = "calendar")
     private PreorderCalendar calendar;
@@ -49,19 +52,27 @@ public class PreorderClientSummaryResult extends Result {
         this.forbiddenDays = forbiddenDays;
     }
 
-    public Long getBalanceWithPreorders() {
-        return balanceWithPreorders;
-    }
-
-    public void setBalanceWithPreorders(Long balanceWithPreorders) {
-        this.balanceWithPreorders = balanceWithPreorders;
-    }
-
     public PreorderCalendar getCalendar() {
         return calendar;
     }
 
     public void setCalendar(PreorderCalendar calendar) {
         this.calendar = calendar;
+    }
+
+    public Long getPreorderSum14Days() {
+        return preorderSum14Days;
+    }
+
+    public void setPreorderSum14Days(Long preorderSum14Days) {
+        this.preorderSum14Days = preorderSum14Days;
+    }
+
+    public Long getPreorderSum3Days() {
+        return preorderSum3Days;
+    }
+
+    public void setPreorderSum3Days(Long preorderSum3Days) {
+        this.preorderSum3Days = preorderSum3Days;
     }
 }
