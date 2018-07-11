@@ -8453,18 +8453,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Client client = cr.getClient();
 
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
-            Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders(); //preorderDAOService.getMenuSyncCountDays(client.getOrg().getIdOfOrg());
+            Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
             Date today = CalendarUtils.startOfDay(new Date());
 
-            Date endDate = CalendarUtils.addDays(today, 14);
+            Date endDate = CalendarUtils.addDays(today, 13);
             endDate = CalendarUtils.endOfDay(endDate);
             Long preordersSum14 = preorderDAOService.getPreordersSum(client, today, endDate);
             result.setPreorderSum14Days(preordersSum14);
 
-            endDate = CalendarUtils.addDays(today, 3);
+            endDate = CalendarUtils.addDays(today, 2);
             endDate = CalendarUtils.endOfDay(endDate);
             Long preordersSum3 = preorderDAOService.getPreordersSum(client, today, endDate);
-            result.setPreorderSum3Days(preordersSum14);
+            result.setPreorderSum3Days(preordersSum3);
 
             result.setForbiddenDays(DAOUtils.getPreorderFeedingForbiddenDays(client));
             Map<String, Integer[]> sd = preorderDAOService.getSpecialDates(new Date(), syncCountDays, client.getOrg().getIdOfOrg(), client);
