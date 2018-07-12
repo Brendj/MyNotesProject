@@ -191,10 +191,13 @@ public class PreorderDAOService {
     }
 
     private PreorderGoodParamsContainer getGoodParamsOfFirstElm(PreorderComplexItemExt item) {
-        PreorderMenuItemExt firstElement = item.getMenuItemExtList().get(0);
-        Integer goodTypeCode = 0;
-        Integer ageGroupCode = 0;
+        Integer goodTypeCode = GoodType.UNSPECIFIED.getCode();
+        Integer ageGroupCode = GoodAgeGroupType.UNSPECIFIED.getCode();
         try {
+            if(item.getMenuItemExtList().isEmpty()){
+                throw new Exception("MenuItemExtList of item is Empty");
+            }
+            PreorderMenuItemExt firstElement = item.getMenuItemExtList().get(0);
             Query query = emReport.createNativeQuery(" select go.goodType, go.ageGroup from cf_goods go "
                     + " join cf_menudetails md on go.idofgood = md.idofgood "
                     + " where md.itemcode = :itemCode and md.localIdOfMenu = :idOfMenu");
@@ -230,7 +233,7 @@ public class PreorderDAOService {
 
     private String getPreorderComplexGroup(PreorderComplexItemExt item, PreorderGoodParamsContainer container) {
         String groupName = "";
-        if(container.getGoodType() != 0) {
+        if(!container.getGoodType().equals(GoodType.UNSPECIFIED.getCode())) {
             groupName = GoodType.fromInteger(container.getGoodType()).toString();
         } else {
             if (match(item, "завтрак")) {
@@ -246,7 +249,7 @@ public class PreorderDAOService {
                 groupName = "Ужин";
             }
         }
-        if(container.getAgeGroup() != 0){
+        if(!container.getAgeGroup().equals(GoodAgeGroupType.UNSPECIFIED.getCode())){
             groupName += " " + GoodAgeGroupType.fromInteger(container.getAgeGroup()).toString();
         }
         return groupName;
@@ -805,7 +808,8 @@ public class PreorderDAOService {
             Boolean hasDiscount, PreorderGoodParamsContainer container) {
         if (client.getIdOfClientGroup() == null) return false;
         String clientGroupName = client.getClientGroup().getGroupName();
-        if(container.getAgeGroup() != 0 && container.getGoodType() != 0){
+        if(!container.getAgeGroup().equals(GoodAgeGroupType.UNSPECIFIED.getCode())
+                && !container.getGoodType().equals(GoodType.UNSPECIFIED.getCode())){
             String goodType = GoodType.fromInteger(container.getGoodType()).toString();
             String ageGroup = GoodAgeGroupType.fromInteger(container.getAgeGroup()).toString();
             if (!hasDiscount) {
