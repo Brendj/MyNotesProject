@@ -48,6 +48,8 @@ public class PreorderMenuItemExt {
     private Boolean isRegular;
     @XmlAttribute(name = "itemCode")
     private String itemCode;
+    @XmlAttribute(name = "availableForRegular")
+    private Boolean availableForRegular;
 
     public PreorderMenuItemExt() {
 
@@ -194,5 +196,13 @@ public class PreorderMenuItemExt {
 
     public void setIsRegular(Boolean regular) {
         isRegular = regular;
+    }
+
+    public Boolean getAvailableForRegular() {
+        return availableForRegular;
+    }
+
+    public void setAvailableForRegular(Boolean availableForRegular) {
+        this.availableForRegular = availableForRegular;
     }
 }
