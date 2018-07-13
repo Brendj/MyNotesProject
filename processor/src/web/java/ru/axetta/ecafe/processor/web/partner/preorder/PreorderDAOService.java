@@ -130,6 +130,10 @@ public class PreorderDAOService {
         Set<CategoryDiscount> clientDiscounts = client.getCategories();
         Boolean hasDiscount = false;
         for (CategoryDiscount categoryDiscount : clientDiscounts) {
+            if(categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
+                hasDiscount = false;
+                continue;
+            }
             hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         }
 
@@ -167,9 +171,9 @@ public class PreorderDAOService {
             }
         }
         for (PreorderComplexItemExt item : list) {
-            PreorderGoodParamsContainer paramsContainerFirstElm = getGoodParamsOfFirstElm(item);
-            if (isAcceptableComplex(item, client, hasDiscount, paramsContainerFirstElm)) {
-                String groupName = getPreorderComplexGroup(item, paramsContainerFirstElm);
+            PreorderGoodParamsContainer complexParams = getComplexParams(item, client);
+            if (isAcceptableComplex(item, client, hasDiscount, complexParams)) {
+                String groupName = getPreorderComplexGroup(item, complexParams);
                 if (groupName == null) continue;
                 item.setType(getPreorderComplexSubgroup(item));
                 PreorderComplexGroup group = groupMap.get(groupName);
@@ -190,22 +194,20 @@ public class PreorderDAOService {
         return groupResult;
     }
 
-    private PreorderGoodParamsContainer getGoodParamsOfFirstElm(PreorderComplexItemExt item) {
+    private PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client) {
         Integer goodTypeCode = GoodType.UNSPECIFIED.getCode();
         Integer ageGroupCode = GoodAgeGroupType.UNSPECIFIED.getCode();
         try {
-            if(item.getMenuItemExtList().isEmpty()){
-                throw new Exception("MenuItemExtList of item is Empty");
-            }
-            PreorderMenuItemExt firstElement = item.getMenuItemExtList().get(0);
-            Query query = emReport.createNativeQuery(" select go.goodType, go.ageGroup from cf_goods go "
-                    + " join cf_menudetails md on go.idofgood = md.idofgood "
-                    + " where md.itemcode = :itemCode and md.localIdOfMenu = :idOfMenu");
-            query.setParameter("itemCode", firstElement.getItemCode());
-            query.setParameter("idOfMenu", firstElement.getIdOfMenuDetail());
+            Query query = emReport.createNativeQuery(" select g.goodType, g.ageGroup from cf_preorder_complex pc "
+                    + " join cf_clients c on c.idofclient = pc.idofclient "
+                    + " join cf_complexinfo ci on c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid"
+                    + " join cf_goods g on g.idofgood = ci.idofgood"
+                    + " where g.nameofgood like :nameOfGood and c.idofclient = :idOfClient");
+            query.setParameter("nameOfGood", item.getComplexName());
+            query.setParameter("idOfClient", client.getIdOfClient());
             query.setMaxResults(1);
             Object[] result = (Object[]) query.getSingleResult();
-            if (result.length != 0 && !match(item, "на выбор")) {
+            if (result.length != 0) {
                 goodTypeCode = (Integer) result[0];
                 ageGroupCode = (Integer) result[1];
             }
