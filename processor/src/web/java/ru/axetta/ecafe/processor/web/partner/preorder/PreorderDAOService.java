@@ -130,11 +130,9 @@ public class PreorderDAOService {
         Set<CategoryDiscount> clientDiscounts = client.getCategories();
         Boolean hasDiscount = false;
         for (CategoryDiscount categoryDiscount : clientDiscounts) {
-            if(categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
-                hasDiscount = false;
-                continue;
+            if(!categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
+                hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
             }
-            hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         }
 
         Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder "
