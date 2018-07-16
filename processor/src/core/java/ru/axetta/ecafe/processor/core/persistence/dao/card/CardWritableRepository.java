@@ -40,17 +40,23 @@ public class CardWritableRepository extends WritableJpaDao {
         return entityManager.find( Card.class, id );
     }
 
-    public Card findByCardNo( Long cardno ){
-        TypedQuery<Card> query = entityManager.createQuery("from Card c left join fetch c.client where c.cardNo=:cardno", Card.class);
+    public Card findByCardNo( Long cardno, Long idOfOrg ){
+        TypedQuery<Card> query = entityManager.createQuery(
+                "from Card c left join fetch c.client inner join fetch c.org "
+                 + "where c.cardNo=:cardno and c.org.idOfOrg=:idOfOrg", Card.class);
         query.setParameter("cardno",cardno);
+        query.setParameter("idOfOrg", idOfOrg);
         List<Card> resultList = query.getResultList();
         if(resultList.size()> 0){
             return query.getResultList().get(0);
         }else return null;
     }
-    public Card findByCardNoWithoutClient( Long cardno ){
-        TypedQuery<Card> query = entityManager.createQuery("from Card c where c.cardNo=:cardno", Card.class);
+    public Card findByCardNoWithoutClient( Long cardno, Long idOfOrg ){
+        TypedQuery<Card> query = entityManager.createQuery(
+                "from Card c inner join fetch c.org "
+                 + "where c.cardNo=:cardno and c.org.idOfOrg=:idOfOrg", Card.class);
         query.setParameter("cardno",cardno);
+        query.setParameter("idOfOrg", idOfOrg);
         List<Card> resultList = query.getResultList();
         if(resultList.size()> 0){
             return query.getResultList().get(0);
@@ -157,10 +163,12 @@ public class CardWritableRepository extends WritableJpaDao {
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
                 + " updateTime = :updateTime "
-                + " where cardNo = :cardNo")
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.TEMPBLOCKED.getValue())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
@@ -171,12 +179,14 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " validTime = :validTime,"
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime "
-                + " where cardNo = :cardNo")
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.BLOCKED.getValue())
                 .setParameter("validTime", new Date())
                 .setParameter("issueTime", new Date())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
@@ -187,12 +197,14 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime, "
                 + " validTime = :validTime "
-                + " where cardNo = :cardNo")
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.FREE.getValue())
                 .setParameter("validTime", new Date())
                 .setParameter("issueTime", new Date())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
@@ -205,13 +217,15 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime, "
                 + " visitor = :visitor "
-                + " where cardNo = :cardNo")
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.ISSUED.getValue())
                 .setParameter("validTime", o.getValidDate())
                 .setParameter("issueTime", o.getOperationDate())
                 .setParameter("updateTime", new Date())
                 .setParameter("visitor", visitor)
                 .setParameter("cardNo", o.getCardNo())
+                .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
@@ -240,13 +254,15 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime, "
                 + " visitor = null "
-                + " where cardNo = :cardNo")
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.ISSUED.getValue())
                 .setParameter("client", client)
                 .setParameter("validTime", o.getValidDate())
                 .setParameter("issueTime", o.getOperationDate())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", o.getCardNo())
+                .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
@@ -259,13 +275,43 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime, "
                 + " visitor = null "
-                + " where cardNo = :cardNo")
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.TEMPISSUED.getValue())
                 .setParameter("client", client)
                 .setParameter("validTime", o.getValidDate())
                 .setParameter("issueTime", o.getOperationDate())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", o.getCardNo())
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int blockPermanent(long cardNo, long idOfOrg) {
+        return entityManager.createQuery("update Card set "
+                + " state = :state, "
+                + " updateTime = :updateTime "
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
+                .setParameter("state", CardState.BLOCKED.getValue())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
+                .executeUpdate();
+    }
+
+    public int returnCardToClient(long cardNo, long idOfOrg) {
+        return entityManager.createQuery("update Card set "
+                + " state = :state, "
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime "
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg")
+                .setParameter("state", CardState.ISSUED.getValue())
+                .setParameter("issueTime", new Date())
+                .setParameter("updateTime", new Date())
+                .setParameter("cardNo", cardNo)
+                .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 }

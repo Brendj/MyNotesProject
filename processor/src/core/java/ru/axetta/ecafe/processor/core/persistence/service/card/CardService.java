@@ -5,10 +5,8 @@
 package ru.axetta.ecafe.processor.core.persistence.service.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
@@ -21,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -75,7 +74,7 @@ public class CardService {
 
     //1. Регистрация карты
     public ResCardsOperationsRegistryItem registerNew(CardsOperationsRegistryItem o, long idOfOrg){
-        Card card = cardWritableRepository.findByCardNoWithoutClient(o.getCardNo());
+        Card card = cardWritableRepository.findByCardNoWithoutClient(o.getCardNo(), idOfOrg);
         if(card != null){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
         }else {
@@ -180,7 +179,7 @@ public class CardService {
     }
 
     public ResCardsOperationsRegistryItem unblock(CardsOperationsRegistryItem o, long idOfOrg) {
-        Card card = cardWritableRepository.findByCardNo(o.getCardNo());
+        Card card = cardWritableRepository.findByCardNo(o.getCardNo(), idOfOrg);
         if (card == null){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
         }
@@ -199,6 +198,84 @@ public class CardService {
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND, ResCardsOperationsRegistryItem.ERROR_CARD_NOT_FOUND_MESSAGE);
         }else {
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE);
+        }
+    }
+
+    public void unblockOrReturnCard(Long cardNo, Long idOfOrg) throws Exception {
+        Card card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
+        if (null == card) {
+            throw new Exception(String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg));
+        }
+
+        if (CardState.TEMPBLOCKED.getValue() == card.getState()) {
+            unblock(card);
+        } else if ((CardState.BLOCKED.getValue() == card.getState()) || (CardState.TEMPISSUED.getValue() == card.getState())) {
+            returnCard(card);
+        } else {
+            throw new Exception(String.format("UnblockOrReturnCard error: wrong card state was found - state=%d", card.getState()));
+        }
+    }
+
+    private void unblock(Card card) throws Exception {
+        CardState newState;
+
+        if (CardState.TEMPBLOCKED.getValue() == card.getState()) {
+            if (null != card.getClient()) {
+                newState = CardState.ISSUED;
+            } else {
+                newState = CardState.FREE;
+            }
+
+            List<Card> cardList = CardReadOnlyRepository.getInstance().findAllByClient(card.getClient());
+            for (Card c : cardList) {
+                if (CardState.TEMPISSUED.getValue() == c.getState()) {
+                    if (0 != cardWritableRepository.blockPermanent(c.getCardNo(), c.getOrg().getIdOfOrg())) {
+                        throw new Exception(String.format("Unblock card error: unable to block temp card with cardNo=%d and idOfOrg=%d",
+                                c.getCardNo(), c.getOrg().getIdOfOrg()));
+                    }
+                } else if (CardState.ISSUED.getValue() == c.getState()) {
+                    throw new Exception(String.format("Unblock card error: wrong card state was found - state=%d", c.getState()));
+                }
+            }
+
+            card.setState(newState.getValue());
+            card.setIssueTime(new Date());
+            card.setUpdateTime(new Date());
+            cardWritableRepository.saveEntity(card);
+        } else {
+            throw new Exception(String.format("Unblock card error: wrong card state was found - state=%d", card.getState()));
+        }
+    }
+
+    private void returnCard(Card card) throws Exception {
+        if (CardTransitionState.GIVEN_AWAY_NOT_SYNC == card.getTransitionState() ||
+                CardTransitionState.GIVEN_AWAY_SYNC == card.getTransitionState()) {
+            throw new Exception("Return card error: card's uid was given away");
+        }
+        if (CardState.TEMPISSUED.getValue() == card.getState()) {
+            if (0 == cardWritableRepository.reset(card.getCardNo(), card.getOrg().getIdOfOrg())) {
+                throw new Exception(
+                        String.format("Return card error: unable to return card with cardNo=%d and idOfOrg=%d",
+                                card.getCardNo(), card.getOrg().getIdOfOrg()));
+            }
+            List<Card> cardList = CardReadOnlyRepository.getInstance().findAllByClient(card.getClient());
+            for (Card c : cardList) {
+                if (CardState.TEMPBLOCKED.getValue() == c.getState()) {
+                    if (0 == cardWritableRepository.returnCardToClient(card.getCardNo(), card.getOrg().getIdOfOrg())) {
+                        throw new Exception(String.format("Return card error: unable to unblock card with cardNo=%d and idOfOrg=%d",
+                                c.getCardNo(), c.getOrg().getIdOfOrg()));
+                    }
+                    break;
+                }
+            }
+        } else if (CardState.BLOCKED.getValue() == card.getState()) {
+            if (0 == cardWritableRepository.reset(card.getCardNo(), card.getOrg().getIdOfOrg())) {
+                throw new Exception(
+                        String.format("Return card error: unable to return card with cardNo=%d and idOfOrg=%d",
+                                card.getCardNo(), card.getOrg().getIdOfOrg()));
+            }
+        } else {
+            throw new Exception(String.format("Return card error: wrong card state was found - state=%d", card.getState()));
         }
     }
 }

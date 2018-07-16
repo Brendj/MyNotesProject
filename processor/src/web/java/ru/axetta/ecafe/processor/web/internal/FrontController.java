@@ -1716,4 +1716,22 @@ public class FrontController extends HttpServlet {
     public String getServerDateTime() {
         return CalendarUtils.dateTimeToString(new Date());
     }
+
+
+    @WebMethod(operationName = "unblockOrReturnCard")
+    public ResponseItem unblockOrReturnCard(@WebParam(name="cardNo") Long cardNo, @WebParam(name="idOfOrg") Long idOfOrg)
+        throws FrontControllerException{
+        checkRequestValidity(idOfOrg);
+        ResponseItem responseItem = new ResponseItem();
+        try {
+            CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
+            responseItem.code = ResponseItem.OK;
+            responseItem.message = ResponseItem.OK_MESSAGE;
+        } catch (Exception e) {
+            logger.error("Error in unblockOrReturnCard", e);
+            responseItem.code = ResponseItem.ERROR_INTERNAL;
+            responseItem.message = ResponseItem.ERROR_INTERNAL_MESSAGE;
+        }
+        return responseItem;
+    }
 }
