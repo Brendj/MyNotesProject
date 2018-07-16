@@ -204,15 +204,16 @@ public class CardService {
     public void unblockOrReturnCard(Long cardNo, Long idOfOrg) throws Exception {
         Card card = cardWritableRepository.findByCardNo(cardNo, idOfOrg);
         if (null == card) {
-            throw new Exception(String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg));
+            throw new CardNotFoundException(String.format("UnblockOrReturnCard error: unable to find card with cardNo=%d and idOfOrg=%d", cardNo, idOfOrg));
         }
 
         if (CardState.TEMPBLOCKED.getValue() == card.getState()) {
             unblock(card);
-        } else if ((CardState.BLOCKED.getValue() == card.getState()) || (CardState.TEMPISSUED.getValue() == card.getState())) {
+        } else if ((CardState.BLOCKED.getValue() == card.getState()) || (CardState.TEMPISSUED.getValue() == card.getState()) ||
+                (CardState.ISSUED.getValue() == card.getState())) {
             returnCard(card);
         } else {
-            throw new Exception(String.format("UnblockOrReturnCard error: wrong card state was found - state=%d", card.getState()));
+            throw new CardWrongStateException(String.format("UnblockOrReturnCard error: wrong card state was found - state=%d", card.getState()));
         }
     }
 
@@ -234,7 +235,7 @@ public class CardService {
                                 c.getCardNo(), c.getOrg().getIdOfOrg()));
                     }
                 } else if (CardState.ISSUED.getValue() == c.getState()) {
-                    throw new Exception(String.format("Unblock card error: wrong card state was found - state=%d", c.getState()));
+                    throw new CardWrongStateException(String.format("Unblock card error: wrong card state was found - state=%d", c.getState()));
                 }
             }
 
@@ -243,14 +244,14 @@ public class CardService {
             card.setUpdateTime(new Date());
             cardWritableRepository.saveEntity(card);
         } else {
-            throw new Exception(String.format("Unblock card error: wrong card state was found - state=%d", card.getState()));
+            throw new CardWrongStateException(String.format("Unblock card error: wrong card state was found - state=%d", card.getState()));
         }
     }
 
     private void returnCard(Card card) throws Exception {
         if (CardTransitionState.GIVEN_AWAY_NOT_SYNC == card.getTransitionState() ||
                 CardTransitionState.GIVEN_AWAY_SYNC == card.getTransitionState()) {
-            throw new Exception("Return card error: card's uid was given away");
+            throw new CardUidGivenAwayException("Return card error: card's uid was given away");
         }
         if (CardState.TEMPISSUED.getValue() == card.getState()) {
             if (0 == cardWritableRepository.reset(card.getCardNo(), card.getOrg().getIdOfOrg())) {
@@ -275,7 +276,7 @@ public class CardService {
                                 card.getCardNo(), card.getOrg().getIdOfOrg()));
             }
         } else {
-            throw new Exception(String.format("Return card error: wrong card state was found - state=%d", card.getState()));
+            throw new CardWrongStateException(String.format("Return card error: wrong card state was found - state=%d", card.getState()));
         }
     }
 }
