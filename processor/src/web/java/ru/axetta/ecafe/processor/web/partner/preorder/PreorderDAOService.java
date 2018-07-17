@@ -169,7 +169,7 @@ public class PreorderDAOService {
             }
         }
         for (PreorderComplexItemExt item : list) {
-            PreorderGoodParamsContainer complexParams = getComplexParams(item, client);
+            PreorderGoodParamsContainer complexParams = getComplexParams(item);
             if (isAcceptableComplex(item, client, hasDiscount, complexParams)) {
                 String groupName = getPreorderComplexGroup(item, complexParams);
                 if (groupName == null) continue;
@@ -192,17 +192,16 @@ public class PreorderDAOService {
         return groupResult;
     }
 
-    private PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client) {
+    private PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item) {
         Integer goodTypeCode = GoodType.UNSPECIFIED.getCode();
         Integer ageGroupCode = GoodAgeGroupType.UNSPECIFIED.getCode();
         try {
             Query query = emReport.createNativeQuery(" select g.goodType, g.ageGroup from cf_preorder_complex pc "
-                    + " join cf_clients c on c.idofclient = pc.idofclient "
-                    + " join cf_complexinfo ci on c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid"
+                    + " join cf_complexinfo ci on ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid"
                     + " join cf_goods g on g.idofgood = ci.idofgood"
-                    + " where g.nameofgood like :nameOfGood and c.idofclient = :idOfClient");
+                    + " where g.nameofgood like :nameOfGood and ci.idofcomplex = :idOfComplex");
             query.setParameter("nameOfGood", item.getComplexName());
-            query.setParameter("idOfClient", client.getIdOfClient());
+            query.setParameter("idOfComplex", item.getIdOfComplexInfo());
             query.setMaxResults(1);
             Object[] result = (Object[]) query.getSingleResult();
             if (result.length != 0) {
@@ -239,13 +238,13 @@ public class PreorderDAOService {
             if (match(item, "завтрак")) {
                 groupName = "Завтрак";
             }
-            if (match(item, "обед")) {
+            else if (match(item, "обед")) {
                 groupName = "Обед";
             }
-            if (match(item, "полдник")) {
+            else if (match(item, "полдник")) {
                 groupName = "Полдник";
             }
-            if (match(item, "ужин")) {
+            else if (match(item, "ужин")) {
                 groupName = "Ужин";
             }
         }
@@ -820,7 +819,9 @@ public class PreorderDAOService {
                             // б) комплексы с параметром discount = false при условии наличия у них в названии "(1-4)"
                             !complex.getDiscount() && ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) ||
                             // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                            !complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()))) {
+                            !complex.getDiscount()
+                                    && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())
+                                    && !ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_3_7.getCode()))) {
                         return true;
                     }
                 }
@@ -828,14 +829,20 @@ public class PreorderDAOService {
                 else if (clientGroupName.startsWith("5-") || clientGroupName.startsWith("6-") || clientGroupName.startsWith("7-") || clientGroupName.startsWith("8-") || clientGroupName.startsWith("9-")
                         || clientGroupName.startsWith("10-") || clientGroupName.startsWith("11-") || clientGroupName.startsWith("12-")) {
                     // а) комплексы с параметром discount = false при условии наличия у них в названии "(5-11)"
-                    if (!complex.getDiscount() && ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())) {
+                    if (!complex.getDiscount() && ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()) ||
+                    // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11) ("
+                    !complex.getDiscount()
+                            && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())
+                            && !ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_3_7.getCode()))) {
                         return true;
                     }
                 }
                 // 1.2.1.3. если навазвание группы начинается на другие символы (отличные от двух предыдущих условий), то выводим следующие комплексы:
                 else {
                     // а) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                    if (!complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()))) {
+                    if (!complex.getDiscount()
+                            && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())
+                            && !ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_3_7.getCode()))) {
                         return true;
                     }
                 }
@@ -847,7 +854,8 @@ public class PreorderDAOService {
                             // б) комплексы с параметром discount = false при условии наличия у них в названии "(1-4)"
                             !complex.getDiscount() && ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) ||
                             // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                            !complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()))) {
+                            !complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())
+                                    && !ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_3_7.getCode()))) {
                         return true;
                     }
                 }
@@ -859,14 +867,16 @@ public class PreorderDAOService {
                             // б) комплексы с параметром discount = false при условии наличия у них в названии "(5-11)"
                             !complex.getDiscount() && ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()) ||
                             // в) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                            !complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()))) {
+                            !complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())
+                                    && !ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_3_7.getCode()))) {
                         return true;
                     }
                 }
                 // 1.2.2.3. если навазвание группы начинается на другие символы (отличные от двух предыдущих условий), то выводим следующие комплексы:
                 else {
                     // а) комплексы с параметром discount = false при условии отсутствия у них в названии "(1-4)" и/или "(5-11)"
-                    if (!complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode()))) {
+                    if (!complex.getDiscount() && (!ageGroup.equals(GoodAgeGroupType.G_1_4.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_5_11.getCode())
+                                && !ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) && !ageGroup.equals(GoodAgeGroupType.G_3_7.getCode()))) {
                         return true;
                     }
                 }
