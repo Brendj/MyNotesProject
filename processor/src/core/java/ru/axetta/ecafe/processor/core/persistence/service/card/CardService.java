@@ -249,8 +249,8 @@ public class CardService {
     }
 
     private void returnCard(Card card) throws Exception {
-        if (CardTransitionState.GIVEN_AWAY_NOT_SYNC == card.getTransitionState() ||
-                CardTransitionState.GIVEN_AWAY_SYNC == card.getTransitionState()) {
+        if (CardTransitionState.GIVEN_AWAY_NOT_SYNC == card.getTransitionState()
+                || CardTransitionState.GIVEN_AWAY_SYNC == card.getTransitionState()) {
             throw new CardUidGivenAwayException("Return card error: card's uid was given away");
         }
         if (CardState.TEMPISSUED.getValue() == card.getState()) {
@@ -269,7 +269,7 @@ public class CardService {
                     break;
                 }
             }
-        } else if (CardState.BLOCKED.getValue() == card.getState()) {
+        } else if (CardState.BLOCKED.getValue() == card.getState() || CardState.ISSUED.getValue() == card.getState()) {
             if (0 == cardWritableRepository.reset(card.getCardNo(), card.getOrg().getIdOfOrg())) {
                 throw new Exception(
                         String.format("Return card error: unable to return card with cardNo=%d and idOfOrg=%d",
