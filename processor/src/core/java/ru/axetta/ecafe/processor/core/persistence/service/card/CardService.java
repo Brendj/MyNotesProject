@@ -65,6 +65,13 @@ public class CardService {
         return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
     }
 
+    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+            Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
+        Org org = orgRepository.findOne(idOfOrg);
+        return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                isLongUid, cardTransitionState);
+    }
+
     public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type,
             Integer cardSignCertNum) throws Exception {
         Org org = orgRepository.findOne(idOfOrg);
@@ -249,8 +256,8 @@ public class CardService {
     }
 
     private void returnCard(Card card) throws Exception {
-        if (CardTransitionState.GIVEN_AWAY_NOT_SYNC == card.getTransitionState()
-                || CardTransitionState.GIVEN_AWAY_SYNC == card.getTransitionState()) {
+        if (CardTransitionState.GIVEN_AWAY_NOT_SYNC.getCode().equals(card.getTransitionState())
+                || CardTransitionState.GIVEN_AWAY_SYNC.getCode().equals(card.getTransitionState())) {
             throw new CardUidGivenAwayException("Return card error: card's uid was given away");
         }
         if (CardState.TEMPISSUED.getValue() == card.getState()) {

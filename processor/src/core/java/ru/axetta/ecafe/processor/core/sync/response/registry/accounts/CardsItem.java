@@ -35,7 +35,7 @@ public class CardsItem {
     private Long printedNo;       //Номер, нанесенный на карту - опционально
     private Boolean isLongUid;    //Признак длинного идентификатора карты - опционально
     private Long idOfCard;        //Идентификатор карты в БД процессинга
-    private CardTransitionState transitionState;    //Состояние перехода
+    private Integer transitionState;    //Состояние перехода
 
 
     public CardsItem(long cardNo, int cardType, int state, long idOfClient, String lockReason, Date validDate,
@@ -243,7 +243,7 @@ public class CardsItem {
             element.setAttribute("P_CardId", this.idOfCard.toString());
         }
         if (null != transitionState) {
-            element.setAttribute("Trn_State", this.transitionState.getCode().toString());
+            element.setAttribute("Trn_State", this.transitionState.toString());
         }
 
         return element;

@@ -46,11 +46,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HistoryCard"/>
         </set>
         <property name="isLongUid" column="IsLongUid" type="boolean"/>
-        <property name="transitionState" column="transitionstate">
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.CardTransitionState</param>
-            </type>
-        </property>
+        <property name="transitionState" column="transitionstate" type="integer" not-null="true"/>
     </class>
 </hibernate-mapping>
 

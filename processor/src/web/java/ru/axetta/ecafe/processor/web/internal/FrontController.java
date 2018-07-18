@@ -1315,7 +1315,7 @@ public class FrontController extends HttpServlet {
                 card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                         isLongUid);
                 idOfCard = card.getIdOfCard();
-                transitionState = card.getTransitionState();
+                transitionState = CardTransitionState.fromInteger(card.getTransitionState());
             } else {
                 String clientVersionProperty =
                         runtimeContext.getPropertiesValue("ecafe.processor.card.registration.client.version", "2.7.86.1");
@@ -1347,14 +1347,14 @@ public class FrontController extends HttpServlet {
                         }
                     }
                     card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
-                            isLongUid);
-                    card = (Card) persistenceSession.load(Card.class, card.getIdOfCard());
-                    card.setTransitionState(CardTransitionState.BORROWED);
-                    persistenceSession.flush();
+                            isLongUid, CardTransitionState.BORROWED.getCode());
                     idOfCard = card.getIdOfCard();
-                    transitionState = card.getTransitionState();
-                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY_NOT_SYNC);
+                    transitionState = CardTransitionState.fromInteger(card.getTransitionState());
+
+                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY_NOT_SYNC.getCode());
                     persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
                 }
             }
         } catch (CardResponseItem.CardAlreadyExist e) {

@@ -109,6 +109,12 @@ public class CardWritableRepository extends WritableJpaDao {
         return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid);
     }
 
+    public Card createCard(Org org, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+            Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
+        checkVerifyCardSign(org, cardSignVerifyRes, cardSignCertNum, type, cardNo);
+        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid, cardTransitionState);
+    }
+
     public Card createCardSpecial(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignCertNum) throws Exception {
         if (cardExistsInSpecial(cardNo)) {
@@ -117,14 +123,14 @@ public class CardWritableRepository extends WritableJpaDao {
             throw new Exception("cardNo not found");
         }
     }
-
+    
     private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
-            Integer cardSignCertNum, Boolean isLongUid) throws Exception {
+            Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);
         card.setUpdateTime(new Date());
         card.setValidTime(new Date());
         card.setCreateTime(new Date());
-        card.setTransitionState(CardTransitionState.OWN);
+        card.setTransitionState(cardTransitionState);
         if (null != isLongUid)
             card.setIsLongUid(isLongUid);
         if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !isSocial(type))
@@ -132,6 +138,12 @@ public class CardWritableRepository extends WritableJpaDao {
 
         entityManager.persist(card);
         return card;
+    }
+
+    private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
+            Integer cardSignCertNum, Boolean isLongUid) throws Exception {
+        return createCardInternal(org, cardNo, cardPrintedNo, type, cardSignCertNum, isLongUid,
+                CardTransitionState.OWN.getCode());
     }
 
     public void update(Card card) {

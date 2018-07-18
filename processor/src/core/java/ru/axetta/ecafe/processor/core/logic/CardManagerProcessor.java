@@ -116,7 +116,7 @@ public class CardManagerProcessor implements CardManager {
         card.setIssueTime(issueTime);
         card.setLockReason(lockReason);
         card.setOrg(client.getOrg());
-        card.setTransitionState(CardTransitionState.OWN);
+        card.setTransitionState(CardTransitionState.OWN.getCode());
         persistenceSession.save(card);
 
         //История карты при создании новой карты
@@ -235,6 +235,12 @@ public class CardManagerProcessor implements CardManager {
 
             Client newCardOwner = getClientReference(persistenceSession, idOfClient);
             Card updatedCard = getCardReference(persistenceSession, idOfCard);
+
+            if ((CardTransitionState.GIVEN_AWAY_SYNC.getCode().equals(updatedCard.getTransitionState()) ||
+                    CardTransitionState.GIVEN_AWAY_NOT_SYNC.getCode().equals(updatedCard.getTransitionState())) &&
+                    state != updatedCard.getState()) {
+                throw new Exception("УИД карты передан в пользование другой ОО");
+            }
 
             if (state == Card.ACTIVE_STATE) {
                 Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
@@ -573,7 +579,7 @@ public class CardManagerProcessor implements CardManager {
         card.setIssueTime(issueTime);
         card.setLockReason(lockReason);
         card.setOrg(client.getOrg());
-        card.setTransitionState(CardTransitionState.OWN);
+        card.setTransitionState(CardTransitionState.OWN.getCode());
         persistenceSession.save(card);
 
         //История карты при создании новой карты
