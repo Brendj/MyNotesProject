@@ -169,7 +169,7 @@ public class PreorderDAOService {
             }
         }
         for (PreorderComplexItemExt item : list) {
-            PreorderGoodParamsContainer complexParams = getComplexParams(item);
+            PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
             if (isAcceptableComplex(item, client, hasDiscount, complexParams)) {
                 String groupName = getPreorderComplexGroup(item, complexParams);
                 if (groupName == null) continue;
@@ -192,16 +192,24 @@ public class PreorderDAOService {
         return groupResult;
     }
 
-    private PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item) {
+    private PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {
         Integer goodTypeCode = GoodType.UNSPECIFIED.getCode();
         Integer ageGroupCode = GoodAgeGroupType.UNSPECIFIED.getCode();
         try {
-            Query query = emReport.createNativeQuery(" select g.goodType, g.ageGroup from cf_preorder_complex pc "
-                    + " join cf_complexinfo ci on ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid"
-                    + " join cf_goods g on g.idofgood = ci.idofgood"
-                    + " where g.nameofgood like :nameOfGood and ci.idofcomplex = :idOfComplex");
-            query.setParameter("nameOfGood", item.getComplexName());
+            Query query = emReport.createNativeQuery("SELECT g.goodtype, g.agegroup "
+                    + " FROM  cf_clients c "
+                    + " INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg "
+                    + " INNER JOIN cf_menu m ON c.idoforg = m.idoforg   "
+                    + " INNER JOIN cf_goods g ON ci.idofgood = g.idofgood "
+                    + " WHERE ci.idofcomplex = :idOfComplex "
+                    + " AND c.contractid = :contractID "
+                    + " AND ci.complexname like :nameOfComplex "
+                    + " AND ci.MenuDate BETWEEN :startDate AND :endDate ");
             query.setParameter("idOfComplex", item.getIdOfComplexInfo());
+            query.setParameter("contractID", client.getContractId());
+            query.setParameter("nameOfComplex", item.getComplexName());
+            query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
+            query.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
             query.setMaxResults(1);
             Object[] result = (Object[]) query.getSingleResult();
             if (result.length != 0) {
