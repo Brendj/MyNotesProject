@@ -10,9 +10,8 @@ import java.util.Map;
 public enum CardTransitionState {
 
     /*0*/ OWN(0, "Своя"),
-    /*1*/ GIVEN_AWAY_NOT_SYNC(1, "Отдана не синхронизирована"),
-    /*2*/ GIVEN_AWAY_SYNC(2, "Отдана синхронизирована"),
-    /*4*/ BORROWED(4, "Заимствована");
+    /*1*/ GIVEN_AWAY(1, "Отдана"),
+    /*2*/ BORROWED(2, "Заимствована");
 
     private final Integer code;
     private final String description;

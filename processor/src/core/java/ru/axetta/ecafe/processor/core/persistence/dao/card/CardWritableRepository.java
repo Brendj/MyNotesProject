@@ -123,7 +123,7 @@ public class CardWritableRepository extends WritableJpaDao {
             throw new Exception("cardNo not found");
         }
     }
-    
+
     private Card createCardInternal(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
         Card card = new Card(org,cardNo,type, CardState.FREE.getValue(),cardPrintedNo,Card.READY_LIFE_STATE);

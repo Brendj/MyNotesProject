@@ -256,8 +256,7 @@ public class CardService {
     }
 
     private void returnCard(Card card) throws Exception {
-        if (CardTransitionState.GIVEN_AWAY_NOT_SYNC.getCode().equals(card.getTransitionState())
-                || CardTransitionState.GIVEN_AWAY_SYNC.getCode().equals(card.getTransitionState())) {
+        if (CardTransitionState.GIVEN_AWAY.getCode().equals(card.getTransitionState())) {
             throw new CardUidGivenAwayException("Return card error: card's uid was given away");
         }
         if (CardState.TEMPISSUED.getValue() == card.getState()) {

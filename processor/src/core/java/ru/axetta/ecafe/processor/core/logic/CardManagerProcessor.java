@@ -236,8 +236,7 @@ public class CardManagerProcessor implements CardManager {
             Client newCardOwner = getClientReference(persistenceSession, idOfClient);
             Card updatedCard = getCardReference(persistenceSession, idOfCard);
 
-            if ((CardTransitionState.GIVEN_AWAY_SYNC.getCode().equals(updatedCard.getTransitionState()) ||
-                    CardTransitionState.GIVEN_AWAY_NOT_SYNC.getCode().equals(updatedCard.getTransitionState())) &&
+            if (CardTransitionState.GIVEN_AWAY.getCode().equals(updatedCard.getTransitionState()) &&
                     state != updatedCard.getState()) {
                 throw new Exception("УИД карты передан в пользование другой ОО");
             }

@@ -1351,7 +1351,7 @@ public class FrontController extends HttpServlet {
                     idOfCard = card.getIdOfCard();
                     transitionState = CardTransitionState.fromInteger(card.getTransitionState());
 
-                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY_NOT_SYNC.getCode());
+                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY.getCode());
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
