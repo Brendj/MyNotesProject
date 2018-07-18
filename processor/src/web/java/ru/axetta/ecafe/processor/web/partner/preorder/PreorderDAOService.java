@@ -199,7 +199,6 @@ public class PreorderDAOService {
             Query query = emReport.createNativeQuery("SELECT g.goodtype, g.agegroup "
                     + " FROM  cf_clients c "
                     + " INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg "
-                    + " INNER JOIN cf_menu m ON c.idoforg = m.idoforg   "
                     + " INNER JOIN cf_goods g ON ci.idofgood = g.idofgood "
                     + " WHERE ci.idofcomplex = :idOfComplex "
                     + " AND c.contractid = :contractID "
