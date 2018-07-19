@@ -535,6 +535,9 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getPreorderComplexes")
     PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);
 
+    @WebMethod(operationName = "getPeopleQuantityByOrg")
+    public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn);
+
     @WebMethod()
     Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders);
 }

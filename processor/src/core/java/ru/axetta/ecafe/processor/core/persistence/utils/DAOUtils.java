@@ -3268,4 +3268,14 @@ public class DAOUtils {
         criteria.add(Restrictions.between("doneDate", startDate, endDate));
         return criteria.list();
     }
+
+    public static BigInteger getNumberAllUsersInOrg(Session session, String ogrn) {
+        Query query = session.createSQLQuery("select count(distinct c.idofclient) "
+                +" from cf_clientgroups gr "
+                +" join cf_clients c on gr.idofclientgroup = c.idofclientgroup and gr.idoforg = c.idoforg "
+                +" join cf_orgs o on gr.idoforg = o.idoforg "
+                +" where o.ogrn ilike :ogrn ");
+        query.setParameter("ogrn", ogrn);
+        return (BigInteger) query.list().get(0);
+    }
 }

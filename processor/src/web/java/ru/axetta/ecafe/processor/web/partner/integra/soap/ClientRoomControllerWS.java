@@ -8671,4 +8671,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return result;
     }
+
+    @Override
+    public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn){
+        authenticateRequest(null);
+        PeopleQuantityInOrgResult result = new PeopleQuantityInOrgResult();
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            if(ogrn.isEmpty()){
+                throw new IllegalArgumentException("organizationUid is empty string");
+            }
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            BigInteger peopleQuantity = DAOUtils.getNumberAllUsersInOrg(session, ogrn);
+            result.setPeopleQuantity(peopleQuantity);
+            result.setTimeUpdate(new Date());
+            result.setOrganizationUid(ogrn.toString());
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e){
+            logger.error("Error in putPreorderComplex", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 }
