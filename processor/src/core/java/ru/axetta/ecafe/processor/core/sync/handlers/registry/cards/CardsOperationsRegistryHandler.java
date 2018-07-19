@@ -35,9 +35,10 @@ public class CardsOperationsRegistryHandler {
         ResCardsOperationsRegistryItem item;
         for (CardsOperationsRegistryItem o : request.getCardsOperationsRegistry().getItems()) {
             try{
-                item = handle(o, idOfOrg);
+                item = handle(o, null == o.getOrgOwner() ? idOfOrg : o.getOrgOwner());
             }catch (Exception e){
-                logger.error("CardsOperationsRegistry.handler org:"+idOfOrg + " , idOfOperation:" + o.getIdOfOperation()+ " , error:" + e.getMessage(), e);
+                logger.error("CardsOperationsRegistry.handler org:"+idOfOrg + " , idOfOperation:" + o.getIdOfOperation()
+                        + " , orgOwner:" + o.getOrgOwner() + " , error:" + e.getMessage(), e);
                 item = new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.ERROR, ResCardsOperationsRegistryItem.ERROR_MESSAGE);
             }
             resCardsOperationsRegistry.getItemList().add(item);
