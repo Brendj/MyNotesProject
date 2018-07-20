@@ -8683,9 +8683,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if(ogrn.isEmpty()){
                 throw new IllegalArgumentException("organizationUid is empty string");
             }
+            Date eventDate = new Date();
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            List<Object[]> dataFromDB = DAOUtils.getNumberAllUsersInOrg(session, ogrn);
+            List<Object[]> dataFromDB = DAOUtils.getNumberAllUsersInOrg(session, ogrn, eventDate);
             for(Object[] row : dataFromDB){
                 String groupname = (String) row[0];
                 BigInteger quantity = (BigInteger) row[1];
@@ -8695,7 +8696,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 items.add(item);
             }
             result.setPeopleQuantity(items);
-            result.setTimeUpdate(new Date());
+            result.setTimeUpdate(eventDate);
             result.setOrganizationUid(ogrn.toString());
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
