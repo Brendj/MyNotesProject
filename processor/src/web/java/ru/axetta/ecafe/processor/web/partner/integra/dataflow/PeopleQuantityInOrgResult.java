@@ -7,7 +7,9 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -20,7 +22,7 @@ public class PeopleQuantityInOrgResult extends Result {
     @XmlElement(name = "organizationUid")
     private String organizationUid;
     @XmlElement(name = "peopleQuantity")
-    private BigInteger peopleQuantity;
+    private List<PeopleQuantityInGroup> peopleQuantity;
     @XmlElement(name = "timeUpdate")
     private Date timeUpdate;
 
@@ -32,11 +34,14 @@ public class PeopleQuantityInOrgResult extends Result {
         this.organizationUid = organizationUid;
     }
 
-    public BigInteger getPeopleQuantity() {
-        return peopleQuantity;
+    public List<PeopleQuantityInGroup> getPeopleQuantity() {
+        if(peopleQuantity == null){
+            this.peopleQuantity = new ArrayList<PeopleQuantityInGroup>();
+        }
+        return this.peopleQuantity;
     }
 
-    public void setPeopleQuantity(BigInteger peopleQuantity) {
+    public void setPeopleQuantity(List<PeopleQuantityInGroup> peopleQuantity) {
         this.peopleQuantity = peopleQuantity;
     }
 

@@ -8676,6 +8676,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn){
         authenticateRequest(null);
         PeopleQuantityInOrgResult result = new PeopleQuantityInOrgResult();
+        List<PeopleQuantityInGroup> items = new LinkedList<PeopleQuantityInGroup>();
         Session session = null;
         Transaction transaction = null;
         try{
@@ -8684,8 +8685,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            BigInteger peopleQuantity = DAOUtils.getNumberAllUsersInOrg(session, ogrn);
-            result.setPeopleQuantity(peopleQuantity);
+            List<Object[]> dataFromDB = DAOUtils.getNumberAllUsersInOrg(session, ogrn);
+            for(Object[] row : dataFromDB){
+                String groupname = (String) row[0];
+                BigInteger quantity = (BigInteger) row[1];
+                PeopleQuantityInGroup item = new PeopleQuantityInGroup();
+                item.setGroupName(groupname);
+                item.setQuantity(quantity);
+                items.add(item);
+            }
+            result.setPeopleQuantity(items);
             result.setTimeUpdate(new Date());
             result.setOrganizationUid(ogrn.toString());
             result.resultCode = RC_OK;
