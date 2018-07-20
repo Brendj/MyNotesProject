@@ -109,8 +109,22 @@ public class PreorderRequestsReportService {
                 }
 
                 try {
+                    Date startDate = new Date();
+                    Date endDate = new Date();
+                    Integer forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(item.getIdOfOrg());
+                    if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
+                        forbiddenDaysCount -= 1;
+
+                    getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate);
+
+                    if (!CalendarUtils.betweenOrEqualDate(item.getPreorderDate(), startDate, endDate)) {
+                        continue;
+                    }
+
                     if (null == item.getIdOfGoodsRequestPosition()) {
-                        if (item.clientBalance < item.complexPrice) {
+                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, fireTime, item.getPreorderDate());
+
+                        if ((item.clientBalance - item.complexPrice - preordersPrice) < 0L) {
                             logger.warn(String.format("PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
                                             + "idOfPreorderComplex=%d, idOfPreorderMenuDetail%d)",
                                     item.idOfClient, item.idOfPreorderComplex, item.idOfPreorderMenuDetail));
@@ -118,7 +132,7 @@ public class PreorderRequestsReportService {
                         }
                         createRequestFromPreorder(session, item, fireTime);
                     } else {
-                         updateRequestFromPreorder(session, item, fireTime);
+                        updateRequestFromPreorder(session, item, fireTime);
                     }
                 } catch (Exception e) {
                     logger.warn("PreorderRequestsReportService: could not create GoodRequest");
@@ -177,43 +191,10 @@ public class PreorderRequestsReportService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
-            Date startDate = CalendarUtils.truncateToDayOfMonth(new Date());
-            Date specialDaysMonth = CalendarUtils.addMonth(startDate, 1);
+            Date startDate = new Date();
+            Date endDate = new Date();
 
-            Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
-            specialDaysCriteria.add(Restrictions.eq("idOfOrg", idOfSourceOrg));
-            specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
-            specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
-            specialDaysCriteria.add(Restrictions.between("date", startDate, specialDaysMonth));
-
-            List<SpecialDate> specialDates = specialDaysCriteria.list();
-
-            Integer forbiddenCout = forbiddenDaysCount;
-            Date endDate = CalendarUtils.endOfDay(startDate);
-
-            Boolean hasWeekend = false;
-            do {
-                Date endDateStart = CalendarUtils.startOfDay(endDate);
-                Date endDateEnd = CalendarUtils.endOfDay(endDate);
-
-                Boolean isWeekend = false;
-                for (SpecialDate date : specialDates) {
-                    if (CalendarUtils.betweenDate(date.getDate(), endDateStart, endDateEnd)) {
-                        isWeekend = true;
-                        break;
-                    }
-                }
-                hasWeekend |= isWeekend;
-                endDate = CalendarUtils.addOneDay(endDate);
-                if (!isWeekend) {
-                    forbiddenCout--;
-                }
-            } while (forbiddenCout >= 0);
-
-            if (!hasWeekend) {
-                startDate = CalendarUtils.startOfDay(endDate);
-            }
+            getPreorderDates(session, orgOwner, forbiddenDaysCount, startDate, endDate);
 
             Criteria criteria = session.createCriteria(GoodRequestPosition.class);
             criteria.createAlias("goodRequest", "gr");
@@ -232,6 +213,49 @@ public class PreorderRequestsReportService {
             HibernateUtils.close(session, logger);
         }
         return resultList;
+    }
+
+    private void getPreorderDates(Session session, Long orgOwner, Integer forbiddenDaysCount, Date startDate, Date endDate) {
+        Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
+        Date _startDate = CalendarUtils.truncateToDayOfMonth(new Date());
+        Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
+
+        Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
+        specialDaysCriteria.add(Restrictions.eq("idOfOrg", idOfSourceOrg));
+        specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
+        specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
+        specialDaysCriteria.add(Restrictions.between("date", _startDate, specialDaysMonth));
+
+        List<SpecialDate> specialDates = specialDaysCriteria.list();
+
+        Integer forbiddenCout = forbiddenDaysCount;
+        Date _endDate = CalendarUtils.endOfDay(_startDate);
+
+        Boolean hasWeekend = false;
+        do {
+            Date endDateStart = CalendarUtils.startOfDay(_endDate);
+            Date endDateEnd = CalendarUtils.endOfDay(_endDate);
+
+            Boolean isWeekend = false;
+            for (SpecialDate date : specialDates) {
+                if (CalendarUtils.betweenDate(date.getDate(), endDateStart, endDateEnd)) {
+                    isWeekend = true;
+                    break;
+                }
+            }
+            hasWeekend |= isWeekend;
+            _endDate = CalendarUtils.addOneDay(_endDate);
+            if (!isWeekend) {
+                forbiddenCout--;
+            }
+        } while (forbiddenCout >= 0);
+
+        if (!hasWeekend) {
+            _startDate = CalendarUtils.startOfDay(_endDate);
+        }
+
+        startDate.setTime(_startDate.getTime());
+        endDate.setTime(_endDate.getTime());
     }
 
     private void updateDate() {
