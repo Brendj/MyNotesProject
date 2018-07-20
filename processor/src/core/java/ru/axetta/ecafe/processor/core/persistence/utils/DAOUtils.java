@@ -3269,13 +3269,19 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static BigInteger getNumberAllUsersInOrg(Session session, String ogrn) {
-        Query query = session.createSQLQuery("select count(distinct c.idofclient) "
+    public static List<Object[]> getNumberAllUsersInOrg(Session session, String ogrn) {
+        Query query = session.createSQLQuery("select gr.groupname, count(distinct c.idofclient) "
                 +" from cf_clientgroups gr "
-                +" join cf_clients c on gr.idofclientgroup = c.idofclientgroup and gr.idoforg = c.idoforg "
+                +" left join cf_clients c on gr.idofclientgroup = c.idofclientgroup and gr.idoforg = c.idoforg "
                 +" join cf_orgs o on gr.idoforg = o.idoforg "
-                +" where o.ogrn ilike :ogrn ");
+                +" where o.ogrn ilike :ogrn "
+                +" group by gr.groupname "
+                +" order by gr.groupname ");
         query.setParameter("ogrn", ogrn);
-        return (BigInteger) query.list().get(0);
+        List result = query.list();
+        if(result == null){
+            result = new ArrayList<Object[]>();
+        }
+        return  result;
     }
 }
