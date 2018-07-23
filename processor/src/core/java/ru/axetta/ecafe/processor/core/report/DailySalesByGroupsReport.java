@@ -775,7 +775,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 totalCount = 0;
                 totalSum = 0;
 
-                String menuGroupUnPaidTempClients = "Бeсплатное комплексное питание временно обучающихся другой ОО";
+                String menuGroupUnPaidTempClients = "Бесплатное комплексное питание временно обучающихся другой ОО";
 
                 MealRow mealRowUnPaidTempClients = new MealRow(menuGroupUnPaidTempClients, new ArrayList<SubReportMealRow>());
                 mealRowHashMap.put(menuGroupUnPaidTempClients, mealRowUnPaidTempClients);
