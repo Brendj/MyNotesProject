@@ -16,6 +16,7 @@ public class ResMenusCalendarItem {
     private String guid;
     private Integer resultCode;
     private String errorMessage;
+    private Long version;
 
     public ResMenusCalendarItem() {
 
@@ -28,6 +29,7 @@ public class ResMenusCalendarItem {
         if (resultCode != null && resultCode != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
         }
+        XMLUtils.setAttributeIfNotNull(element, "V", version);
         return element;
     }
 
@@ -53,5 +55,13 @@ public class ResMenusCalendarItem {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

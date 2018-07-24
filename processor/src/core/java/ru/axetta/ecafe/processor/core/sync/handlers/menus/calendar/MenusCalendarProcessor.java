@@ -48,6 +48,7 @@ public class MenusCalendarProcessor extends AbstractProcessor<ResMenusCalendar> 
                     resItem.setGuid(item.getGuid());
                     resItem.setResultCode(1);
                     resItem.setErrorMessage(item.getErrorMessage());
+                    resItem.setVersion(item.getVersion());
                     items.add(resItem);
                 } else {
                     MenusCalendar menusCalendar = DAOUtils.getMenusCalendarForOrgByGuid(session, item.getIdOfOrg(), item.getGuid());
@@ -88,6 +89,7 @@ public class MenusCalendarProcessor extends AbstractProcessor<ResMenusCalendar> 
                     resItem.setGuid(item.getGuid());
                     resItem.setResultCode(0);
                     resItem.setErrorMessage("OK");
+                    resItem.setVersion(nextVersion);
                     items.add(resItem);
                 }
             }
