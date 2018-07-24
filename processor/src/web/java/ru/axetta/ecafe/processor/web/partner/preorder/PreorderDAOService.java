@@ -170,9 +170,9 @@ public class PreorderDAOService {
         }
         for (PreorderComplexItemExt item : list) {
             PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-            if (isAcceptableComplex(item, client, hasDiscount, complexParams)) {
+            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams)) {
                 String groupName = getPreorderComplexGroup(item, complexParams);
-                if (groupName == null) continue;
+                if (groupName.isEmpty()) continue;
                 item.setType(getPreorderComplexSubgroup(item));
                 PreorderComplexGroup group = groupMap.get(groupName);
                 if (group == null) {
@@ -810,10 +810,10 @@ public class PreorderDAOService {
         return map;
     }
 
-    private boolean isAcceptableComplex(PreorderComplexItemExt complex, Client client,
+    public boolean isAcceptableComplex(PreorderComplexItemExt complex, ClientGroup clientGroup,
             Boolean hasDiscount, PreorderGoodParamsContainer container) {
-        if (client.getIdOfClientGroup() == null) return false;
-        String clientGroupName = client.getClientGroup().getGroupName();
+        if (clientGroup == null) return false;
+        String clientGroupName = clientGroup.getGroupName();
         if(!container.getAgeGroup().equals(GoodAgeGroupType.UNSPECIFIED.getCode())
                 && !container.getGoodType().equals(GoodType.UNSPECIFIED.getCode())){
             Integer goodType = container.getGoodType();
