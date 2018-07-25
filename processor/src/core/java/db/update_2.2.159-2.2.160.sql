@@ -73,3 +73,6 @@ alter table cf_cards add column transitionstate integer not null default 0;
 
 --дубли уидов
 alter table cf_cards drop constraint cf_cards_cardno;
+
+--EP-1407
+ALTER TABLE cf_menuexchange ALTER COLUMN menudata TYPE character varying (600000);
