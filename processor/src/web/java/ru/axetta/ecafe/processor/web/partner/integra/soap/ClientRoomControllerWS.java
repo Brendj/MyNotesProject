@@ -8697,7 +8697,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             result.setPeopleQuantity(items);
             result.setTimeUpdate(eventDate);
-            result.setOrganizationUid(ogrn.toString());
+            result.setOrganizationUid(ogrn);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
             transaction.commit();

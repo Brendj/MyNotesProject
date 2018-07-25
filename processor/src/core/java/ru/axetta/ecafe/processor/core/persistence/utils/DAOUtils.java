@@ -3270,58 +3270,66 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List<Object[]> getNumberAllUsersInOrg(Session session, String ogrn, Date eventDate) throws Exception{
-        Org org = getOrgByOGRN(session, ogrn);
-
-        List<BigInteger> noValidClients = new ArrayList<BigInteger>();
-        noValidClients.add(BigInteger.valueOf(ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
-        noValidClients.add(BigInteger.valueOf(ClientGroup.Predefined.CLIENT_DELETED.getValue()));
-
-        List<Integer> enterPassDirection = new ArrayList<Integer>();
-        enterPassDirection.add(EnterEvent.ENTRY);
-        enterPassDirection.add(EnterEvent.RE_ENTRY);
-        enterPassDirection.add(EnterEvent.DETECTED_INSIDE);
-        enterPassDirection.add(EnterEvent.CHECKED_BY_TEACHER_EXT);
-        enterPassDirection.add(EnterEvent.CHECKED_BY_TEACHER_INT);
-
-        List<BigInteger> idOfClients = new LinkedList<BigInteger>();
-
-        List<Client> detectedClients = getDetectedClientnFromBeginningDayOfOrg(session, org, eventDate);
-        if(detectedClients == null){
-            detectedClients = new ArrayList<Client>();
-        }
-
-        for(Client client : detectedClients){
-            EnterEvent event = getLastEnterEvent(session, client);
-            if(!enterPassDirection.contains(event.getPassDirection())){
-                detectedClients.remove(client);
-                continue;
+    public static List<Object[]> getNumberAllUsersInOrg(Session session, String ogrn, Date eventDate)throws Exception{
+        try {
+            Org org = getOrgByOGRN(session, ogrn);
+            if (org == null) {
+                throw new IllegalArgumentException("No find Org by OGRN");
             }
-            idOfClients.add(BigInteger.valueOf(client.getIdOfClient()));
-        }
 
-        if(idOfClients.isEmpty()){
+            List<BigInteger> noValidClients = new ArrayList<BigInteger>();
+            noValidClients.add(BigInteger.valueOf(ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
+            noValidClients.add(BigInteger.valueOf(ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+
+            List<Integer> enterPassDirection = new ArrayList<Integer>();
+            enterPassDirection.add(EnterEvent.ENTRY);
+            enterPassDirection.add(EnterEvent.RE_ENTRY);
+            enterPassDirection.add(EnterEvent.DETECTED_INSIDE);
+            enterPassDirection.add(EnterEvent.CHECKED_BY_TEACHER_EXT);
+            enterPassDirection.add(EnterEvent.CHECKED_BY_TEACHER_INT);
+
+            List<BigInteger> idOfClients = new LinkedList<BigInteger>();
+
+            List<Client> detectedClients = getDetectedClientnFromBeginningDayOfOrg(session, org, eventDate);
+            if (detectedClients == null) {
+                detectedClients = new ArrayList<Client>();
+            }
+
+            for (Client client : detectedClients) {
+                EnterEvent event = getLastEnterEvent(session, client);
+                if (!enterPassDirection.contains(event.getPassDirection())) {
+                    continue;
+                }
+                idOfClients.add(BigInteger.valueOf(client.getIdOfClient()));
+            }
+
+            if (idOfClients.isEmpty()) {
+                throw new Exception("No detect users in Org: " + org.getIdOfOrg());
+            }
+
+            Query query = session.createSQLQuery(
+                    "select gr.groupname, count(distinct cl.idofclient) " + " from cf_clientgroups gr "
+                            + " left join cf_clients cl on gr.idofclientgroup = cl.idofclientgroup and gr.idoforg = cl.idoforg "
+                            + " where cl.idofclient in (:listOfIdClients) "
+                            + " and gr.idofclientgroup not in (:noValidClients) " + " group by gr.groupname "
+                            + " order by gr.groupname ");
+            query.setParameterList("listOfIdClients", idOfClients);
+            query.setParameterList("noValidClients", noValidClients);
+            List result = query.list();
+            if (result == null) {
+                throw new Exception("Query return empty list");
+            }
+            return result;
+        } catch (IllegalArgumentException e){
+            throw e;
+        } catch (Exception e){
+            logger.error("Can't find users in Org: " + e.getMessage());
             return new ArrayList<Object[]>();
         }
-
-        Query query = session.createSQLQuery("select gr.groupname, count(distinct cl.idofclient) "
-                +" from cf_clientgroups gr "
-                +" left join cf_clients cl on gr.idofclientgroup = cl.idofclientgroup and gr.idoforg = cl.idoforg "
-                +" where cl.idofclient in (:listOfIdClients) "
-                +" and gr.idofclientgroup not in (:noValidClients) "
-                +" group by gr.groupname "
-                +" order by gr.groupname ");
-        query.setParameterList("listOfIdClients", idOfClients);
-        query.setParameterList("noValidClients", noValidClients);
-        List result = query.list();
-        if(result == null){
-            result = new ArrayList<Object[]>();
-        }
-        return result;
     }
 
     private static List<Client> getDetectedClientnFromBeginningDayOfOrg(Session session, Org org, Date eventDate) {
-        Query query = session.createQuery("select e.client from EnterEvent e"
+        Query query = session.createQuery("select distinct e.client from EnterEvent e"
                 +" where e.org = :org "
                 +" and e.evtDateTime between :startDate and :eventDate");
         query.setParameter("org", org);
