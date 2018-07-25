@@ -255,9 +255,6 @@ public class PreorderDAOService {
                 groupName = "Ужин";
             }
         }
-        if(!container.getAgeGroup().equals(GoodAgeGroupType.UNSPECIFIED.getCode())){
-            groupName += " " + GoodAgeGroupType.fromInteger(container.getAgeGroup()).toString();
-        }
         return groupName;
     }
 
