@@ -413,6 +413,7 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
         criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
         criteria.add(Restrictions.eq("date", compositeIdOfSpecialDate.getDate()));
+        criteria.add(Restrictions.isNull("idOfClientGroup"));
         return (SpecialDate)criteria.uniqueResult();
     }
 
