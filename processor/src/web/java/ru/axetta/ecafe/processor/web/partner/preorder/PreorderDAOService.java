@@ -276,7 +276,7 @@ public class PreorderDAOService {
                 + "(SELECT pmd.amount FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
                    + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu and pmd.deletedstate = 0) AS amount, "
                 + "(SELECT pmd.idofregularpreorder FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
-                    + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu) AS idofregularpreorder, "
+                    + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu and pmd.deletedstate = 0) AS idofregularpreorder, "
                 + "(SELECT pmd.state FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
                 + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.armidofmenu = md.localidofmenu and pmd.deletedstate = 0) AS state, "
                 + "g.dailysale "
