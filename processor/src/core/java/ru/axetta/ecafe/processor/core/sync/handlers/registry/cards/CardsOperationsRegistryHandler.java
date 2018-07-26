@@ -4,15 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.cards;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardState;
-import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.response.registry.ResCardsOperationsRegistryItem;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,26 @@ public class CardsOperationsRegistryHandler {
         if (byCardNo != null && byCardNo.getState() == CardState.BLOCKED.getValue()){
             return new ResCardsOperationsRegistryItem(o.getIdOfOperation(), ResCardsOperationsRegistryItem.OK, ResCardsOperationsRegistryItem.OK_MESSAGE );
         }*/
+        Boolean isOldArm = Boolean.FALSE;
+        RuntimeContext runtimeContext;
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            if (VersionUtils.compareClientVersionForRegisterCard(session, idOfOrg) < 0) {
+                isOldArm = Boolean.TRUE;
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error while handling card operation", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
         switch (o.getType()){
             case 0:
                 registryItem = cardService.registerNew(o, idOfOrg);
@@ -68,16 +90,16 @@ public class CardsOperationsRegistryHandler {
                 registryItem = cardService.issueToVisitor(o, idOfOrg);
                 break;
             case 4:
-                registryItem = cardService.reset(o, idOfOrg);
+                registryItem = cardService.reset(o, idOfOrg, isOldArm);
                 break;
             case 5:
-                registryItem = cardService.tempblock(o, idOfOrg);
+                registryItem = cardService.tempblock(o, idOfOrg, isOldArm);
                 break;
             case 6:
-                registryItem = cardService.block(o, idOfOrg);
+                registryItem = cardService.block(o, idOfOrg, isOldArm);
                 break;
             case 7:
-                registryItem = cardService.unblock(o, idOfOrg);
+                registryItem = cardService.unblock(o, idOfOrg, isOldArm);
                 break;
             default:
                 registryItem = null;

@@ -22,10 +22,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
-import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.core.utils.VersionV2;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -1317,16 +1314,7 @@ public class FrontController extends HttpServlet {
                 idOfCard = card.getIdOfCard();
                 transitionState = CardTransitionState.fromInteger(card.getTransitionState());
             } else {
-                String clientVersionProperty =
-                        runtimeContext.getPropertiesValue("ecafe.processor.card.registration.client.version", "2.7.86.1");
-                OrgSync orgSync = DAOUtils.getOrgSyncForOrg(persistenceSession, idOfOrg);
-                if (null == orgSync) {
-                    throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
-                }
-                String clientVersion = orgSync.getClientVersion();
-                VersionV2 propVersion = new VersionV2(clientVersionProperty);
-                VersionV2 clVersion = new VersionV2(clientVersion);
-                if (clVersion.compareTo(propVersion) < 0) {
+                if (VersionUtils.compareClientVersionForRegisterCard(persistenceSession, idOfOrg) < 0) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                 }
 

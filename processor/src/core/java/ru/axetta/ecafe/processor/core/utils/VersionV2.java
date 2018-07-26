@@ -48,5 +48,4 @@ public class VersionV2 implements Comparable<VersionV2> {
             return false;
         return this.compareTo((VersionV2) that) == 0;
     }
-
 }
