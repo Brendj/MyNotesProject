@@ -480,11 +480,13 @@ public class PreorderDAOService {
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
         Date dateFrom = getStartDateForGeneratePreorders(regularPreorder);
-        Query delQuery = em.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0 "
+        long nextVersion = nextVersionByPreorderComplex();
+        Query delQuery = em.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, version = :version "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
         delQuery.setParameter("lastUpdate", new Date());
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
+        delQuery.setParameter("version", nextVersion);
         delQuery.executeUpdate();
 
         delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
@@ -541,15 +543,19 @@ public class PreorderDAOService {
             if (preorderComplex == null) {
                 //на искомую дату нет предзаказа, надо создавать
                 ComplexInfo complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate); //комплекс на дату и с ценой рег. заказа
+                if (complexInfo == null) {
+                    currentDate = CalendarUtils.addDays(currentDate, 1);
+                    continue;
+                }
                 boolean comparePrice = StringUtils.isEmpty(regularPreorder.getItemCode()); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
                 boolean menuDetailNotFoundInDay = false;
                 if (!comparePrice) {
-                    menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice());
+                    menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
                         menuDetailNotFoundInDay = true;
                     }
                 }
-                if (complexInfo == null || (comparePrice ? !complexInfo.getCurrentPrice().equals(regularPreorder.getPrice()) : false) || menuDetailNotFoundInDay) { //не найден комплекс или цена не совпадает с рег. заказом
+                if ((comparePrice ? !complexInfo.getCurrentPrice().equals(regularPreorder.getPrice()) : false) || menuDetailNotFoundInDay) { //не найден комплекс или цена не совпадает с рег. заказом
                     currentDate = CalendarUtils.addDays(currentDate, 1);
                     continue;
                 }
@@ -730,9 +736,10 @@ public class PreorderDAOService {
         }
     }
 
-    private MenuDetail getMenuDetail(Client client, String itemCode, Date date, Long price) {
-        Query query = emReport.createQuery("select md from MenuDetail md where md.menu.org.idOfOrg = :idOfOrg "
-                + "and md.itemCode = :itemCode and md.menu.menuDate between :startDate and :endDate and md.price = :price");
+    private MenuDetail getMenuDetail(Client client, String itemCode, Date date, Long price, Long idOfComplexInfo) {
+        Query query = emReport.createQuery("select cid.menuDetail from ComplexInfoDetail cid where cid.complexInfo.idOfComplexInfo = :idOfComplexInfo and cid.complexInfo.org.idOfOrg = :idOfOrg "
+                + "and cid.menuDetail.itemCode = :itemCode and cid.complexInfo.menuDate between :startDate and :endDate and cid.menuDetail.price = :price");
+        query.setParameter("idOfComplexInfo", idOfComplexInfo);
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
         query.setParameter("itemCode", itemCode);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
