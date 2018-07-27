@@ -117,7 +117,7 @@ public class PreorderRequestsReportService {
 
                     getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate);
 
-                    if (!CalendarUtils.betweenOrEqualDate(item.getPreorderDate(), startDate, endDate)) {
+                    if (!CalendarUtils.betweenDate(item.getPreorderDate(), startDate, endDate)) {
                         continue;
                     }
 
@@ -229,29 +229,37 @@ public class PreorderRequestsReportService {
         List<SpecialDate> specialDates = specialDaysCriteria.list();
 
         Integer forbiddenCout = forbiddenDaysCount;
-        Date _endDate = CalendarUtils.endOfDay(_startDate);
 
-        Boolean hasWeekend = false;
         do {
-            Date endDateStart = CalendarUtils.startOfDay(_endDate);
-            Date endDateEnd = CalendarUtils.endOfDay(_endDate);
-
+            Date endDateStart = CalendarUtils.startOfDay(_startDate);
+            Date endDateEnd = CalendarUtils.endOfDay(_startDate);
             Boolean isWeekend = false;
+
+            //check special dates
             for (SpecialDate date : specialDates) {
                 if (CalendarUtils.betweenDate(date.getDate(), endDateStart, endDateEnd)) {
                     isWeekend = true;
                     break;
                 }
             }
-            hasWeekend |= isWeekend;
-            _endDate = CalendarUtils.addOneDay(_endDate);
+
+            //check weekend
+            if (!CalendarUtils.isWorkDateWithoutParser(false, _startDate)) {
+                isWeekend = true;
+            }
+
+            _startDate = CalendarUtils.addOneDay(_startDate);
             if (!isWeekend) {
                 forbiddenCout--;
             }
         } while (forbiddenCout >= 0);
 
-        if (!hasWeekend) {
-            _startDate = CalendarUtils.startOfDay(_endDate);
+        Date _endDate;
+        int dayOfWeek = CalendarUtils.getDayOfWeek(_startDate);
+        if (Calendar.SATURDAY == dayOfWeek) {
+            _endDate = CalendarUtils.endOfDay(CalendarUtils.addDays(_startDate, 2));
+        } else {
+            _endDate = CalendarUtils.endOfDay(_startDate);
         }
 
         startDate.setTime(_startDate.getTime());
@@ -358,10 +366,10 @@ public class PreorderRequestsReportService {
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
               + "   AND ci.idofcomplex = pc.armcomplexid "
-              + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
+              + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pmd.deletedstate = 0 "
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.lastupdate BETWEEN :startTime AND :endTime";
+              + "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
         Query query = session.createSQLQuery(sqlQuery);
         query.setParameter("startTime", startDate.getTime());
         query.setParameter("endTime", endDate.getTime());

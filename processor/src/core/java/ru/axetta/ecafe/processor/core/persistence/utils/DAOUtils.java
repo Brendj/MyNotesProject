@@ -3372,8 +3372,8 @@ public class DAOUtils {
 
         Object values[] = (Object[])query.uniqueResult();
 
-        Long complexPrice =  ((BigDecimal) values[0]).longValue();
-        Long menuDetailPrice =  ((BigDecimal) values[1]).longValue();
+        Long complexPrice =  (null == values[0]) ? 0 : ((BigDecimal) values[0]).longValue();
+        Long menuDetailPrice = (null == values[1]) ? 0 : ((BigDecimal) values[1]).longValue();
 
         return complexPrice + menuDetailPrice;
     }
