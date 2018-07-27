@@ -3273,10 +3273,7 @@ public class DAOUtils {
 
     public static List<Object[]> getNumberAllUsersInOrg(Session session, String ogrn, Date eventDate)throws Exception{
         try {
-            Org org = getOrgByOGRN(session, ogrn);
-            if (org == null) {
-                throw new IllegalArgumentException("No find Org by OGRN");
-            }
+            Long idoforg = getOrgByOGRN(session, ogrn);
 
             List<BigInteger> noValidClients = new ArrayList<BigInteger>();
             noValidClients.add(BigInteger.valueOf(ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
@@ -3289,36 +3286,39 @@ public class DAOUtils {
             enterPassDirection.add(EnterEvent.CHECKED_BY_TEACHER_EXT);
             enterPassDirection.add(EnterEvent.CHECKED_BY_TEACHER_INT);
 
-            List<BigInteger> idOfClients = new LinkedList<BigInteger>();
+            List<BigInteger> idOfActiveDetectedClients = new LinkedList<BigInteger>();
 
-            List<Client> detectedClients = getDetectedClientnFromBeginningDayOfOrg(session, org, eventDate);
-            if (detectedClients == null) {
-                detectedClients = new ArrayList<Client>();
+            List<Object[]> latestEvents = getDetectedClientnFromBeginningDayOfOrg(session, idoforg, eventDate);
+            if (latestEvents == null || latestEvents.isEmpty()) {
+                throw new Exception("No detect users in Org ID: " + idoforg + " ORGN: " + ogrn);
             }
 
-            for (Client client : detectedClients) {
-                EnterEvent event = getLastEnterEvent(session, client);
-                if (!enterPassDirection.contains(event.getPassDirection())) {
+            for (Object[] row : latestEvents) {
+                BigInteger idofDetectClient = (BigInteger) row[0];
+                Integer passDirection = (Integer) row[1];
+                if (!enterPassDirection.contains(passDirection)) {
                     continue;
                 }
-                idOfClients.add(BigInteger.valueOf(client.getIdOfClient()));
+                idOfActiveDetectedClients.add(idofDetectClient);
             }
 
-            if (idOfClients.isEmpty()) {
-                throw new Exception("No detect users in Org: " + org.getIdOfOrg());
+            if (idOfActiveDetectedClients.isEmpty()) {
+                throw new Exception("No detect users in Org ID: " + idoforg + " ORGN: " + ogrn);
             }
 
             Query query = session.createSQLQuery(
-                    "select gr.groupname, count(distinct cl.idofclient) " + " from cf_clientgroups gr "
+                    "select gr.groupname, count(distinct cl.idofclient) "
+                            + " from cf_clientgroups gr "
                             + " left join cf_clients cl on gr.idofclientgroup = cl.idofclientgroup and gr.idoforg = cl.idoforg "
                             + " where cl.idofclient in (:listOfIdClients) "
-                            + " and gr.idofclientgroup not in (:noValidClients) " + " group by gr.groupname "
+                            + " and gr.idofclientgroup not in (:noValidClients) "
+                            + " group by gr.groupname "
                             + " order by gr.groupname ");
-            query.setParameterList("listOfIdClients", idOfClients);
+            query.setParameterList("listOfIdClients", idOfActiveDetectedClients);
             query.setParameterList("noValidClients", noValidClients);
             List result = query.list();
             if (result == null) {
-                throw new Exception("Query return empty list");
+                throw new Exception("Query return empty list for Org ID " + idoforg + " OGRN: " + ogrn);
             }
             return result;
         } catch (IllegalArgumentException e){
@@ -3329,28 +3329,30 @@ public class DAOUtils {
         }
     }
 
-    private static List<Client> getDetectedClientnFromBeginningDayOfOrg(Session session, Org org, Date eventDate) {
-        Query query = session.createQuery("select distinct e.client from EnterEvent e"
-                +" where e.org = :org "
-                +" and e.evtDateTime between :startDate and :eventDate");
-        query.setParameter("org", org);
-        query.setParameter("startDate", CalendarUtils.startOfDay(eventDate));
-        query.setParameter("eventDate", eventDate);
+    private static List<Object[]> getDetectedClientnFromBeginningDayOfOrg(Session session, Long org, Date eventDate) {
+        Query query = session.createSQLQuery("select ee.idofclient, ee.PassDirection from cf_EnterEvents ee "
+                + " join ( select e.idofclient, max(e.evtDateTime) as evtDateTime from cf_EnterEvents e where e.evtDateTime between :startDate and :eventDate and e.idoforg = :idoforg group by e.idofclient ) q "
+                + " on ee.idofclient = q.idofclient and ee.evtDateTime = q.evtDateTime ");
+        query.setParameter("idoforg", org);
+        query.setParameter("startDate", CalendarUtils.startOfDay(eventDate).getTime());
+        query.setParameter("eventDate", eventDate.getTime());
         return query.list();
     }
 
 
-    private static Org getOrgByOGRN(Session session, String ogrn) {
-        if(ogrn == null){
-            throw new IllegalArgumentException("OGRN is null");
+    private static Long getOrgByOGRN(Session session, String ogrn) {
+        if(ogrn == null || ogrn.isEmpty()){
+            throw new IllegalArgumentException("Not correct OGRN");
         }
-        if(ogrn.isEmpty()){
-            throw  new IllegalArgumentException("OGRN is empty");
+        Query query = session.createSQLQuery("select idoforg from cf_orgs "
+                                        + " where ogrn like :OGRN ");
+        query.setParameter("OGRN", ogrn);
+        query.setMaxResults(1);
+        BigInteger idoforg = (BigInteger) query.uniqueResult();
+        if(idoforg == null){
+            throw new IllegalArgumentException("No find Org by OGRN " + ogrn);
         }
-        Criteria criteria = session.createCriteria(Org.class);
-        criteria.add(Restrictions.eq("OGRN", ogrn));
-        criteria.setMaxResults(1);
-        return (Org) criteria.uniqueResult();
+        return idoforg.longValue();
     }
 
 	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate) {
