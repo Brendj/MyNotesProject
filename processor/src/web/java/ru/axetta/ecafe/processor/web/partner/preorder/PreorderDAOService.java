@@ -560,7 +560,7 @@ public class PreorderDAOService {
                     continue;
                 }
                 preorderComplex = createPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
-                        complexInfo.getMenuDate(), regularPreorder.getAmount(), complexInfo, nextVersion);
+                        complexInfo.getMenuDate(), StringUtils.isEmpty(regularPreorder.getItemCode()) ? regularPreorder.getAmount() : 0, complexInfo, nextVersion);
                 preorderComplex.setRegularPreorder(regularPreorder);
                 em.persist(preorderComplex);
             }
@@ -780,7 +780,7 @@ public class PreorderDAOService {
     public Map<Date, Long> existPreordersByDate(Long idOfClient, Date startDate, Date endDate) {
         Map map = new HashMap<Date, Long>();
         Query query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderComplex p "
-                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate "
+                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.deletedState = false "
                 + "group by p.preorderDate");
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
@@ -794,7 +794,7 @@ public class PreorderDAOService {
         }
 
         query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderMenuDetail p "
-                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate "
+                + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.preorderComplex.deletedState = false "
                 + "group by p.preorderDate");
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(startDate));

@@ -55,9 +55,10 @@ create table cf_regular_preorders (
 alter table cf_generators add column idofregularpreorder bigint NOT NULL DEFAULT 0,
 add column idofspecialdate bigint NOT NULL DEFAULT 0;
 
---индексы по ид. регулярного заказа в таблицах предзаказов
+--индексы по ид. регулярного заказа в таблицах предзаказов + индекс по дате предзаказа
 CREATE INDEX cf_preorder_complex_idofregularpreorder_idx ON cf_preorder_complex USING btree (idofregularpreorder);
 CREATE INDEX cf_preorder_menudetail_idofregularpreorder_idx ON cf_preorder_menudetail USING btree (idofregularpreorder);
+CREATE INDEX cf_preorder_complex_preorderdate_idx ON cf_preorder_complex USING btree (preorderdate);
 
 --группа в календаре учебных дней
 alter table cf_specialdates add column idofclientgroup bigint,

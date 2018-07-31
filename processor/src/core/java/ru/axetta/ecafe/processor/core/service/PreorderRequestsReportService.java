@@ -9,7 +9,10 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
+import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
@@ -28,7 +31,10 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.quartz.*;
@@ -99,7 +105,9 @@ public class PreorderRequestsReportService {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
 
-            List<PreorderItem> preorderItemList = loadPreorders(session);
+            List<PreorderItem> preorderItemList = loadPreorders(session); //все актуальные предзаказы на завтра и дальше
+            Map<Long, Integer> forbiddenDaysMap = new HashMap<Long, Integer>();
+            Map<Long, DatesForPreorder> datesMap = new HashMap<Long, DatesForPreorder>();
 
             for (PreorderItem item : preorderItemList) {
                 if (null == item.getIdOfGood()) {
@@ -111,11 +119,24 @@ public class PreorderRequestsReportService {
                 try {
                     Date startDate = new Date();
                     Date endDate = new Date();
-                    Integer forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(item.getIdOfOrg());
+                    Integer forbiddenDaysCount = forbiddenDaysMap.get(item.getIdOfOrg());
+                    if (forbiddenDaysCount == null) {
+                        forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(item.getIdOfOrg());
+                        forbiddenDaysMap.put(item.getIdOfOrg(), forbiddenDaysCount);
+                    }
                     if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
                         forbiddenDaysCount -= 1;
 
-                    getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate);
+                    DatesForPreorder dates = datesMap.get(item.getIdOfOrg());
+                    if (dates == null) {
+                        getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate);
+                        dates = new DatesForPreorder();
+                        dates.startDate = startDate;
+                        dates.endDate = endDate;
+                        datesMap.put(item.getIdOfOrg(), dates);
+                    }
+                    startDate = dates.startDate;
+                    endDate = dates.endDate;
 
                     if (!CalendarUtils.betweenDate(item.getPreorderDate(), startDate, endDate)) {
                         continue;
@@ -369,10 +390,12 @@ public class PreorderRequestsReportService {
               + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pmd.deletedstate = 0 "
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
+              + "WHERE pc.preorderdate > :date AND pc.deletedstate=0";
+              //+ "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
         Query query = session.createSQLQuery(sqlQuery);
-        query.setParameter("startTime", startDate.getTime());
-        query.setParameter("endTime", endDate.getTime());
+        query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
+        //query.setParameter("startTime", startDate.getTime());
+        //query.setParameter("endTime", endDate.getTime());
         List data = query.list();
         for (Object entry : data) {
             Object o[] = (Object[]) entry;
@@ -424,7 +447,7 @@ public class PreorderRequestsReportService {
         goodRequest.setState(DocumentState.FOLLOW);
         goodRequest.setDeletedState(false);
         goodRequest.setCreatedDate(fireTime);
-        goodRequest.setLastUpdate(fireTime);
+        //goodRequest.setLastUpdate(fireTime);
         goodRequest.setComment(PREORDER_COMMENT);
         goodRequest.setRequestType(0);
         goodRequest.setStaff(staff);
@@ -441,8 +464,10 @@ public class PreorderRequestsReportService {
         pos.setNetWeight(good.getNetWeight());
         pos.setCreatedDate(fireTime);
         pos.setTotalCount(preorderItem.getAmount() * 1000L);
+        pos.setDailySampleCount(0L);
+        pos.setTempClientsCount(0L);
         pos.setNotified(false);
-        pos.setLastUpdate(fireTime);
+        //pos.setLastUpdate(fireTime);
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
         if (null != preorderItem.getIdOfPreorderComplex()) {
@@ -470,6 +495,7 @@ public class PreorderRequestsReportService {
             Long lastTotal = pos.getTotalCount();
             pos.setTotalCount(item.getAmount() * 1000L);
             pos.setLastTotalCount(lastTotal);
+            pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
             isUpdated = true;
         }
 
@@ -478,6 +504,7 @@ public class PreorderRequestsReportService {
         if (!item.getPreorderDate().equals(request.getDoneDate())) {
             request.setDoneDate(item.getPreorderDate());
             request.setLastUpdate(fireTime);
+            request = save(session, request, GoodRequest.class.getSimpleName());
             isUpdated = true;
         }
 
@@ -508,6 +535,7 @@ public class PreorderRequestsReportService {
         object.setGlobalVersion(version);
 
         if(object.getGlobalId()==null){
+            object.setGlobalVersionOnCreate(version);
             session.save(object);
         } else {
             object = (T) session.merge(object);
@@ -925,6 +953,11 @@ public class PreorderRequestsReportService {
                 logger.error("Failed to run PreorderRequestsReport service job:", e);
             }
         }
+    }
+
+    public static class DatesForPreorder {
+        public Date startDate;
+        public Date endDate;
     }
 }
 

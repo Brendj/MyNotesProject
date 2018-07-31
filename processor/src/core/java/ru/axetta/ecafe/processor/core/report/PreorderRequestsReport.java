@@ -106,7 +106,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
 
             String idOfMenuSourceOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
             List<String> idOfMenuSourceOrgStrList = Arrays.asList(StringUtils.split(idOfMenuSourceOrgs, ','));
-            List<Long> idOfMenuSourceOrgList = new ArrayList<Long>(idOfMenuSourceOrgStrList.size());
+            Set<Long> idOfMenuSourceOrgList = new HashSet();
             for (String idOfMenuSourceOrg : idOfMenuSourceOrgStrList) {
                 idOfMenuSourceOrgList.add(Long.parseLong(idOfMenuSourceOrg));
             }
@@ -116,7 +116,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             List<String> guidFilter = new ArrayList<String>(Arrays.asList(guidFilterArray));
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, hideDailySampleValue, generateEndTime,
-                    idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, hideGeneratePeriod, hideLastValue,
+                    idOfOrgList, new ArrayList<Long>(idOfMenuSourceOrgList), hideMissedColumns, hideGeneratePeriod, hideLastValue,
                     guidFilter);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date genEndTime = new Date();
@@ -136,7 +136,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             TreeSet<Date> dates = new TreeSet<Date>();
 
             String sqlQuery =
-                    "SELECT ci.idoforg, "
+                    "SELECT distinct ci.idoforg, "
                   + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
                   + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex "
                   + "FROM cf_preorder_complex pc "
@@ -146,7 +146,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                   + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
                   + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                   + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                  + "WHERE ci.idOfOrg IN (:orgList) AND ci.menuDate BETWEEN :startDate AND :endDate";
+                  + "WHERE ci.idOfOrg IN (:orgList) AND ci.menuDate BETWEEN :startDate AND :endDate and pc.deletedState = 0 and pmd.deletedState = 0";
 
             Query query = session.createSQLQuery(sqlQuery);
             query.setParameterList("orgList", orgMap.keySet());
@@ -368,7 +368,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                 if (row[3] != null) {
                     Long sourceMenuOrg = Long.parseLong(row[3].toString());
                     educationItem.setSourceMenuOrg(sourceMenuOrg);
-                    idOfMenuSourceOrgList.add(sourceMenuOrg);
+                    if (!idOfMenuSourceOrgList.contains(sourceMenuOrg)) idOfMenuSourceOrgList.add(sourceMenuOrg);
                 }
                 orgMap.put(idOfOrg, educationItem);
             }
@@ -388,8 +388,6 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                 Long newTempClients, int hideDailySampleValue, int hideLastValue, GoodType goodType, Long notificationMark) {
             itemList.add(new Item(org, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
                     newDailySample, newTempClients, hideDailySampleValue, hideLastValue, goodType, notificationMark));
-            itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
-                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, goodType, 0L));
         }
     }
 

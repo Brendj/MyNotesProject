@@ -3080,7 +3080,7 @@ public class DAOUtils {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Criteria criteria = persistenceSession.createCriteria(ECafeSettings.class);
