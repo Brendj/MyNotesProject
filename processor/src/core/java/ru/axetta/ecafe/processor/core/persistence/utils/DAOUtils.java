@@ -3377,4 +3377,38 @@ public class DAOUtils {
 
         return complexPrice + menuDetailPrice;
     }
+
+    public static Long getLastVersionOfGroupNameToOrg(Session session){
+        BigInteger version = BigInteger.valueOf(0L);
+        Query query = session.createSQLQuery(
+                "SELECT g.version FROM cf_GroupNames_To_Orgs AS g ORDER BY g.version DESC LIMIT 1 FOR UPDATE");
+        Object o = query.uniqueResult();
+        if(o != null){
+            version = (BigInteger) o;
+        }
+        return version.longValue();
+    }
+
+    public static void createGroupNamesToOrg(Session session, Org org, Long version, String groupName) {
+        Long idOfMainOrg = null;
+        try{
+            for (Org friendlyOrg : org.getFriendlyOrg()) {
+                if (friendlyOrg.isMainBuilding()) {
+                    idOfMainOrg = friendlyOrg.getIdOfOrg();
+                }
+            }
+            if(idOfMainOrg == null){
+                idOfMainOrg = org.getIdOfOrg();
+            }
+            GroupNamesToOrgs groupNamesToOrgs = new GroupNamesToOrgs();
+            groupNamesToOrgs.setIdOfOrg(org.getIdOfOrg());
+            groupNamesToOrgs.setMainBuilding(1);
+            groupNamesToOrgs.setGroupName(groupName);
+            groupNamesToOrgs.setIdOfMainOrg(idOfMainOrg);
+            groupNamesToOrgs.setVersion(version);
+            session.save(groupNamesToOrgs);
+        } catch (Exception e) {
+            logger.error("Save GroupNamesToOrgs to database error:" + e.getMessage());
+        }
+    }
 }

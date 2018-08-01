@@ -1308,10 +1308,15 @@ public class ImportRegisterClientsService {
 
             Boolean migration = false;
 
+            Long versionForGroupNameToOrg = DAOUtils.getLastVersionOfGroupNameToOrg(session);
+            String group = groupName == null ? change.getGroupName() : groupName;
+
             switch (change.getOperation()) {
                 case CREATE_OPERATION:
                     //  добавление нового клиента
                     String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
+
+                    checkGroupNamesToOrgs(session, group, versionForGroupNameToOrg, change.getIdOfOrg());
 
                     String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
                     String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
@@ -1371,6 +1376,8 @@ public class ImportRegisterClientsService {
 
                     Org beforeMigrateOrg = dbClient.getOrg();
 
+                    checkGroupNamesToOrgs(session, change.getGroupName(), versionForGroupNameToOrg, newOrg.getIdOfOrg());
+
                     GroupNamesToOrgs groupNamesToOrgs = DAOUtils
                             .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, newOrg.getIdOfOrg(),
                                     change.getGroupName());
@@ -1393,6 +1400,8 @@ public class ImportRegisterClientsService {
                 case MODIFY_OPERATION:
                     Org newOrg1 = (Org)session.load(Org.class, change.getIdOfOrg());
                     Org beforeModifyOrg = dbClient.getOrg();
+
+                    checkGroupNamesToOrgs(session, group, versionForGroupNameToOrg, change.getIdOfOrg());
 
                     String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
@@ -1436,6 +1445,19 @@ public class ImportRegisterClientsService {
             change.setApplied(true);
             session.update(change);
 
+    }
+
+    private void checkGroupNamesToOrgs(Session session, String groupName, Long version, Long idofOrg) {
+        try {
+            Org org = (Org) session.get(Org.class, idofOrg);
+            GroupNamesToOrgs groupNamesToOrgs = DAOUtils
+                    .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), groupName);
+            if (groupNamesToOrgs == null) {
+                DAOUtils.createGroupNamesToOrg(session, org, version, groupName);
+            }
+        } catch (Exception e){
+            logger.error("Can't check GroupNamesToOrgs: " + e.getMessage());
+        }
     }
 
     public static void clientGroupProcess(Session session, Client dbClient, GroupNamesToOrgs groupNamesToOrgs)
