@@ -523,7 +523,7 @@ public class PreorderDAOService {
         currentDate = getStartDateForGeneratePreorders(regularPreorder);
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
 
-        while (currentDate.before(dateTo)) {
+        while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
 
             boolean isWorkDate = getIsWorkDate(isSixWorkWeek, currentDate, specialDates, regularPreorder);
 
