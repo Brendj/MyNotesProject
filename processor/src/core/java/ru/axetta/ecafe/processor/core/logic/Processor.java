@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
+import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
@@ -5268,6 +5269,9 @@ public class Processor implements SyncProcessor {
                             clientFromEnterEvent == null ? null : clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
 
+                    if(RuntimeContext.RegistryType.isSpb() && ScudManager.isOn()){
+                        DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
+                    }
 
                     SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
                             0, null);

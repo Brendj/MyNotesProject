@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
+import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -220,6 +221,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
             manager.sendToExternal(10);
         } catch (Exception e) {
             getLogger().error("Error in test meal run: ", e);
+            printError(e.getMessage());
+        }
+    }
+
+    public void runScudTest() {
+        ScudManager manager = RuntimeContext.getAppContext().getBean(ScudManager.class);
+        try {
+            manager.sendToExternal(10);
+        } catch (Exception e) {
+            getLogger().error("Error in test SCUD run: ", e);
             printError(e.getMessage());
         }
     }

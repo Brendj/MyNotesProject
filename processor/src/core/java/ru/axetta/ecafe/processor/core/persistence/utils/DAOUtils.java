@@ -50,6 +50,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.Buffer;
 import java.security.PublicKey;
 import java.text.DateFormat;
 import java.util.*;
@@ -3410,5 +3411,78 @@ public class DAOUtils {
         } catch (Exception e) {
             logger.error("Save GroupNamesToOrgs to database error:" + e.getMessage());
         }
+    }
+
+    public static void createEnterEventsSendInfo(EnterEvent enterEvent, Session session) {
+        try {
+            Card card = enterEvent.getIdOfCard() == null ? null : (Card) session.get(Card.class, enterEvent.getIdOfCard());
+            EnterEventSendInfo enterEventSendInfo = new EnterEventSendInfo();
+            enterEventSendInfo.setCompositeIdOfEnterEventSendInfo(
+                    new CompositeIdOfEnterEventSendInfo(
+                            enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
+                            enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
+                            )
+            );
+            enterEventSendInfo.setClient(enterEvent.getClient());
+            enterEventSendInfo.setCard(card);
+            enterEventSendInfo.setDirectionType(enterEvent.getPassDirection());
+            enterEventSendInfo.setEvtDateTime(enterEvent.getEvtDateTime());
+            enterEventSendInfo.setOrg(enterEvent.getOrg());
+            enterEventSendInfo.setSendToExternal(false);
+            enterEventSendInfo.setResponseCode(false);
+            enterEventSendInfo.setEnterEvent(enterEvent);
+            session.save(enterEventSendInfo);
+        } catch (Exception e){
+            logger.error("Save EnterEventSendInfo to database error: " + e.getMessage());
+        }
+    }
+
+    public static String findClientGUIDByCardNo(Session session, Long cardNo) {
+        try {
+            Query query = session.createSQLQuery(
+                            " select c.clientguid from cf_clients c "
+                            + " join cf_cards crd on crd.idofclient = c.idofclient "
+                            + " where crd.cardno = :cardNo ");
+            query.setParameter("cardNo", cardNo);
+            query.setMaxResults(1);
+            return (String) query.uniqueResult();
+        } catch (Exception e){
+            logger.error("Can't find client GUID by CardNo: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static Long findCardNoByClientGUID(Session session, String GUID) {
+        try {
+            Query query = session.createSQLQuery(
+                            " select crd.cardno from cf_cards crd "
+                            + " join cf_clients c on c.idofclient = crd.idofcard "
+                            + " where c.clientguid like :guid and crd.state = 0 "
+                            + " order by crd.createddate desc ");
+            query.setParameter("guid", GUID);
+            query.setMaxResults(1);
+            BigInteger buffer = (BigInteger) query.uniqueResult();
+            if(buffer == null) {
+                return null;
+            }
+            return  buffer.longValue();
+        } catch (Exception e){
+            logger.error("Can't find CardNo by client GUID: " + e.getMessage());
+            return  null;
+        }
+    }
+
+    public static void updateEnterEventsSendInfo(Session session, Long idofEnterEvent, Long idofOrg,
+            Integer responseCode, Integer sendToExternal) throws Exception {
+        Query query = session.createSQLQuery(
+                        " UPDATE cf_EnterEvents_Send_Info "
+                         + " SET sendtoexternal = :sendToExternal, responsecode = :responseCode "
+                         + " WHERE idoforg = :idofOrg and idofenterevent = :idofEnterEvent "
+                )
+                .setParameter("sendToExternal", sendToExternal)
+                .setParameter("responseCode", responseCode)
+                .setParameter("idofOrg", idofOrg)
+                .setParameter("idofEnterEvent", idofEnterEvent);
+        query.executeUpdate();
     }
 }

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
+  -->
+
+<definitions name="SCUDService"
+    targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:tns = "http://petersburgedu.ru/service/webservice/scud/wsdl"
+    xmlns:soap = "http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <documentation>
+        Служба регистрации событий системы контроля удаленного доступа
+    </documentation>
+
+    <types>
+        <xs:schema
+            xmlns:cmn = "http://petersburgedu.ru/service/webservice/scudTypes"
+            targetNamespace = "http://petersburgedu.ru/service/webservice/scudTypes">
+            <xs:include schemaLocation="SCUDxsd.xml" />
+        </xs:schema>
+
+        <xs:schema
+            xmlns:cmn="http://petersburgedu.ru/service/webservice/scudTypes"
+            targetNamespace="http://petersburgedu.ru/service/webservice/scud/wsdl">
+
+            <xs:element name="login">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[a-zA-Z0-9\-_]{4,}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="password">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[a-zA-Z0-9]{6,}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+
+            <xs:element name="pushZipFileRequest">
+                <xs:annotation>
+                    <xs:documentation>
+                        Кодированное в base64 содержимое zip архива, в который упакованы данные
+                        Структура данных соответствует структуре элемента eventList
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+
+            <xs:element name="eventList">
+                <xs:annotation>
+                    <xs:documentation>
+                        Список событий СКУД
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="event" type="cmn:eventType" minOccurs="1" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="pushResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="result"  type="xs:boolean" minOccurs="1" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Результат постановки в очередь принятого пакета
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="queueId"  type="xs:string" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    Идентификатор принятого пакета в очереди обработки
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </types>
+
+    <message name="pushZipFileRequest">
+        <part name="data" element="tns:pushZipFileRequest" />
+    </message>
+
+    <message name="pushDataRequest">
+        <part name="data" element="tns:eventList"/>
+    </message>
+
+    <message name="pushResponse">
+        <part name="result" element="tns:pushResponse"/>
+    </message>
+
+    <message name="packageHeader">
+        <part name="login" element="tns:login"/>
+        <part name="password" element="tns:password"/>
+    </message>
+
+    <portType name="pushScudPort">
+        <documentation>
+            Загрузка данных СКУД
+        </documentation>
+        <operation name="pushZipFile">
+            <documentation>
+                Передача данных в zip архиве
+            </documentation>
+            <input message="tns:pushZipFileRequest"/>
+            <output message="tns:pushResponse"/>
+        </operation>
+        <operation name="pushData">
+            <documentation>
+                Передача данных в несжатом виде
+            </documentation>
+            <input message="tns:pushDataRequest"/>
+            <output message="tns:pushResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="pushScudBinding" type="tns:pushScudPort">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="pushZipFile">
+            <soap:operation soapAction="pushZipFile" />
+            <input>
+                <soap:header message="tns:packageHeader" part="login" use="literal"/>
+                <soap:header message="tns:packageHeader" part="password" use="literal"/>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+        <operation name="pushData">
+            <soap:operation soapAction="pushData" />
+            <input>
+                <soap:header message="tns:packageHeader" part="login" use="literal"/>
+                <soap:header message="tns:packageHeader" part="password" use="literal"/>
+                <soap:body use="literal" />
+            </input>
+            <output>
+                <soap:body use="literal" />
+            </output>
+        </operation>
+    </binding>
+    <service name="ScudWebService">
+        <documentation>Служба регистрации событий системы контроля удаленного доступа</documentation>
+        <port name="pushScudPort" binding="tns:pushScudBinding">
+            <soap:address location="http://petersburgedu.ru/service/webservice/scud"/>
+        </port>
+    </service>
+</definitions>
+

@@ -110,6 +110,22 @@ public class RuntimeContext implements ApplicationContextAware {
         return httpSessionJournal;
     }
 
+    public String getScudLogin() {
+        return scudLogin;
+    }
+
+    public void setScudLogin(String scudLogin) {
+        this.scudLogin = scudLogin;
+    }
+
+    public String getScudPassword() {
+        return scudPassword;
+    }
+
+    public void setScudPassword(String scudPassword) {
+        this.scudPassword = scudPassword;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -153,6 +169,9 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String MEAL = PROCESSOR_PARAM_BASE + ".meal";
     public static final String MEAL_LOGIN = MEAL + ".login";
     public static final String MEAL_PASSWORD = MEAL + ".password";
+    public static final String SCUD = PROCESSOR_PARAM_BASE + ".SCUD";
+    public static final String SCUD_LOGIN = MEAL + ".login";
+    public static final String SCUD_PASSWORD = MEAL + ".password";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
@@ -205,6 +224,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private String mealLogin;
     private String mealPassword;
+
+    private String scudLogin;
+    private String scudPassword;
+
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -506,6 +529,10 @@ public class RuntimeContext implements ApplicationContextAware {
         RuntimeContext.externalServicesSessionFactory = externalServicesSessionFactory;
     }
 
+    public void setConfigProperties(Properties configProperties) {
+        this.configProperties = configProperties;
+    }
+
     @PostConstruct
     public void init() throws Exception {
         // to run in transaction
@@ -592,6 +619,9 @@ public class RuntimeContext implements ApplicationContextAware {
 
             this.mealLogin = properties.getProperty(MEAL_LOGIN);
             this.mealPassword = properties.getProperty(MEAL_PASSWORD);
+
+            this.scudLogin = properties.getProperty(SCUD_LOGIN);
+            this.scudPassword = properties.getProperty(SCUD_PASSWORD);
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;

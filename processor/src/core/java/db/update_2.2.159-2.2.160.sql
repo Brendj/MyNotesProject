@@ -77,3 +77,25 @@ alter table cf_cards drop constraint cf_cards_cardno;
 
 --EP-1407
 ALTER TABLE cf_menuexchange ALTER COLUMN menudata TYPE character varying (600000);
+
+-- Таблица для записи результата отправки EnterEvent на ИС "ПОРТАЛ"
+CREATE TABLE cf_EnterEvents_Send_Info
+(
+  idofEnterEvents BIGINT NOT NULL,
+  idoforg BIGINT NOT NULL,
+  idofclient BIGINT,
+  idofcard BIGINT,
+  evtDateTime BIGINT NOT NULL,
+  sendToExternal INTEGER NOT NULL DEFAULT 0,
+  responseCode INTEGER NOT NULL DEFAULT 0,
+  directionType INTEGER,
+  CONSTRAINT cf_EnterEvents_Send_Info_fk PRIMARY KEY (idofEnterEvents, idoforg)
+) WITH (
+  OIDS = FALSE
+);
+
+CREATE INDEX cf_EnterEvents_Send_Info_evttime_idx ON cf_EnterEvents_Send_Info(evtDateTime);
+/*CREATE INDEX cf_EnterEvents_Send_Info_Evt_Org_idx ON cf_EnterEvents_Send_Info(idofEnterEvents, idoforg);
+CREATE INDEX cf_EnterEvents_Send_Info_Evt_Inf_idx ON cf_EnterEvents_Send_Info(idofEnterEventsSendInfo, idofEnterEvents);
+CREATE INDEX cf_EnterEvents_Send_Info_clnt_crd_idx ON cf_EnterEvents_Send_Info(idofcard, idofclient);
+CREATE INDEX cf_EnterEvents_Send_Info_clnt_evttime ON cf_EnterEvents_Send_Info(evtDateTime, idofclient);*/
