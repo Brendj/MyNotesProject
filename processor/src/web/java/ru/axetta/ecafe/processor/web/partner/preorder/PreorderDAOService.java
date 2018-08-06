@@ -650,7 +650,9 @@ public class PreorderDAOService {
                     isWorkDate = !specialDate.getIsWeekend();
                     break; //нашли в таблице календаря запись по группе клиента - выходим
                 }
-                isWorkDate = !specialDate.getIsWeekend(); //нашли в таблице календаря запись по ОО клиента
+                if (specialDate.getIdOfClientGroup() == null) {
+                    isWorkDate = !specialDate.getIsWeekend(); //нашли в таблице календаря запись по ОО клиента (у записи не указана какая-либо группа)
+                }
             }
         }
         return isWorkDate;
