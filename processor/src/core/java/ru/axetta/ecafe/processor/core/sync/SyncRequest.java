@@ -1210,6 +1210,8 @@ public class SyncRequest {
                     builder.append(modeGrant);
                     builder.append(modeOfAdd);
                     builder.append(usedSubscriptionFeeding);
+                    builder.append(usedVariableFeeding);
+                    builder.append(usedSpecialMenu);
                     builder.append(useTrDiscount);
                     builder.append(currentPrice);
                     builder.append(goodsGuid);
