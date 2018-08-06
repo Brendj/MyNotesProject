@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
@@ -39,13 +40,14 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
 
-@Component
+@Component(value = "daoService")
 @Scope("singleton")
 @Transactional
 public class DAOService {
 
     private final static Logger logger = LoggerFactory.getLogger(DAOService.class);
 
+    private IPreorderDAOOperations preorderDAOOperationsImpl;
     //public final static int GROUP_TYPE_STUDENTS = 0, GROUP_TYPE_NON_STUDENTS = 1;
 
     @PersistenceContext(unitName = "processorPU")
@@ -2543,5 +2545,13 @@ public class DAOService {
 
     private String getStrForDate(String str) {
         return (str.length() == 1) ? "0" + str : str;
+    }
+
+    public IPreorderDAOOperations getPreorderDAOOperationsImpl() {
+        return preorderDAOOperationsImpl;
+    }
+
+    public void setPreorderDAOOperationsImpl(IPreorderDAOOperations preorderDAOOperationsImpl) {
+        this.preorderDAOOperationsImpl = preorderDAOOperationsImpl;
     }
 }

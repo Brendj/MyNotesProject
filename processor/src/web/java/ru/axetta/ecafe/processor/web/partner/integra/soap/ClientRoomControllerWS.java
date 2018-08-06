@@ -3565,13 +3565,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         ClientsWithResultCode data = new ClientsWithResultCode();
         try {
-            Map<Client, ClientCreatedFromType> clients = extractClientsFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
+            Map<Client, ClientWithAddInfo> clients = extractClientsFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile), session);
             if (clients.isEmpty()) {
                 data.resultCode = RC_CLIENT_NOT_FOUND;
                 data.description = "Клиент не найден";
             } else {
                 boolean onlyNotActiveCG = true;
-                for (Map.Entry<Client, ClientCreatedFromType> entry : clients.entrySet()) {
+                for (Map.Entry<Client, ClientWithAddInfo> entry : clients.entrySet()) {
                     if (entry.getValue() != null) {
                         onlyNotActiveCG = false;
                         break;
@@ -3594,8 +3594,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return data;
     }
 
-    public Map<Client, ClientCreatedFromType> extractClientsFromGuardByGuardMobile(String guardMobile, Session session) throws Exception {
-        Map<Client, ClientCreatedFromType> result = new HashMap<Client, ClientCreatedFromType>();
+    public Map<Client, ClientWithAddInfo> extractClientsFromGuardByGuardMobile(String guardMobile, Session session) throws Exception {
+        Map<Client, ClientWithAddInfo> result = new HashMap<Client, ClientWithAddInfo>();
         String query = "select client.idOfClient from cf_clients client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
                 + "and client.IdOfClientGroup not in (:leaving, :deleted)"; //все клиенты с номером телефона
         Query q = session.createSQLQuery(query);
@@ -3616,14 +3616,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     for (Object o : list) {
                         Object[] row = (Object[])o;
                         ClientGuardian cg = (ClientGuardian) row[1];
+                        ClientWithAddInfo addInfo = new ClientWithAddInfo();
+                        addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
                         if (!cg.isDisabled()) {
-                            result.put((Client) row[0], cg.getCreatedFrom());
-                        } else {
-                            result.put((Client) row[0], null);
+                            addInfo.setClientCreatedFrom(cg.getCreatedFrom());
                         }
+                        result.put((Client)row[0], addInfo);
                     }
                 } else {
-                    result.put(DAOUtils.findClient(session, londId), ClientCreatedFromType.DEFAULT);
+                    ClientWithAddInfo addInfo = new ClientWithAddInfo();
+                    addInfo.setInformedSpecialMenu(null);
+                    addInfo.setClientCreatedFrom(ClientCreatedFromType.DEFAULT);
+                    result.put(DAOUtils.findClient(session, londId), addInfo);
                 }
             }
         }
@@ -3979,7 +3983,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientsWithResultCode cd = getClientsByGuardMobile(guardMobile, session);
 
             if (cd != null && cd.getClients() != null) {
-                for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
                     if (entry.getValue() == null) continue;
                     Data dataProcess = new ClientRequest().process(entry.getKey(), session, new Processor() {
                         public void process(Client client, Data dataProcess, ObjectFactory objectFactory,
@@ -3989,7 +3993,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     });
                     ClientSummaryResult cs = new ClientSummaryResult();
                     if (!entry.getValue().equals(ClientCreatedFromType.DEFAULT)) {
-                        dataProcess.getClientSummaryExt().setGuardianCreatedWhere(entry.getValue().getValue());
+                        dataProcess.getClientSummaryExt().setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     }
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
@@ -8306,10 +8310,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientsWithResultCode cd = getClientsByGuardMobile(guardMobile, session);
 
             if (cd != null && cd.getClients() != null) {
-                for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
                     if (entry.getValue() == null) continue;
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
-                    base.setGuardianCreatedWhere(entry.getValue().getValue());
+                    base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
+                    base.setInformedSpecialMenu(entry.getValue().getInformedSpecialMenu());
                     base.setIsInside(DAOReadExternalsService.getInstance().isClientInside(session, entry.getKey().getIdOfClient()));
                     if (base != null) {
                         clientSummaries.add(base);

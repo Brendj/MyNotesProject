@@ -4795,6 +4795,17 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    private SyncRequest.ReqMenu.Item.ReqComplexInfo findReqComplexInfo(SyncRequest.ReqMenu.Item item, Integer armComplexId) {
+        SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = null;
+        for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : item.getReqComplexInfos()) {
+            if (armComplexId.equals(reqComplexInfo.getComplexId())) {
+                reqComplexInfoMatch = reqComplexInfo;
+                break;
+            }
+        }
+        return reqComplexInfoMatch;
+    }
+
     private void processPreorders(Session persistenceSession, Org organization, Date menuDate,
             SyncRequest.ReqMenu.Item item) throws Exception {
         if (menuDate.before(CalendarUtils.startOfDay(new Date()))) return; //пропускаем для прошедших дат
@@ -4802,7 +4813,40 @@ public class Processor implements SyncProcessor {
         Date endDate = CalendarUtils.endOfDay(menuDate);
         Date now = new Date();
 
-        Query query = persistenceSession.createQuery("select pc from PreorderComplex pc "
+        Query query = persistenceSession.createQuery("select rp from RegularPreorder rp where rp.client.org = :org and rp.startDate <= :date "
+                + "and rp.endDate >= :date and rp.deletedState = false");
+        query.setParameter("org", organization);
+        query.setParameter("date", menuDate);
+        List<RegularPreorder> rpList = query.list();
+        for (RegularPreorder regularPreorder : rpList) {
+            boolean found = false;
+            if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
+                //заказ на блюдо
+                SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
+                Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
+                while (reqMenuDetails.hasNext()) {
+                    SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
+                    if (regularPreorder.getPrice().equals(reqMenuDetail.getPrice())
+                            && equalsNullSafe(regularPreorder.getItemCode(), reqMenuDetail.getItemCode())) { //ищем по цене и коду товара
+                        reqMenuDetailMatch = reqMenuDetail;
+                        break;
+                    }
+                }
+                if (reqMenuDetailMatch == null) {
+                    RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                            .deleteRegularPreorder(persistenceSession, regularPreorder);
+                }
+            } else {
+                //заказ на комплекс
+                SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = findReqComplexInfo(item, regularPreorder.getIdOfComplex());
+                if (reqComplexInfoMatch == null) {
+                    RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                            .deleteRegularPreorder(persistenceSession, regularPreorder);
+                }
+            }
+        }
+
+        query = persistenceSession.createQuery("select pc from PreorderComplex pc "
                 + "where pc.client.org = :org and pc.preorderDate between :begDate and :endDate and pc.deletedState = false "
                 + "and pc.amount is not null and pc.amount > 0");  //предзаказы по ОО на день меню
         query.setParameter("org", organization);

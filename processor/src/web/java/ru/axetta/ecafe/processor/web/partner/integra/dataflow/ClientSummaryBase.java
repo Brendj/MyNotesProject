@@ -43,6 +43,8 @@ public class ClientSummaryBase {
     protected String guid;
     @XmlAttribute(name = "SpecialMenu")
     private Integer specialMenu;
+    @XmlAttribute(name = "InformedSpecialMenu")
+    private Integer informedSpecialMenu;
 
     @XmlAttribute(name = "GuardianCreatedWhere")
     protected Integer guardianCreatedWhere;
@@ -317,5 +319,13 @@ public class ClientSummaryBase {
 
     public void setSpecialMenu(Integer specialMenu) {
         this.specialMenu = specialMenu;
+    }
+
+    public Integer getInformedSpecialMenu() {
+        return informedSpecialMenu;
+    }
+
+    public void setInformedSpecialMenu(Integer informedSpecialMenu) {
+        this.informedSpecialMenu = informedSpecialMenu;
     }
 }

@@ -331,8 +331,6 @@
                 <h:outputText escape="true" value="Согласие на предзаказ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" styleClass="output-text" />
-            <br/>
-            <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" rendered="#{!clientWard.isCreatedWhereDefault}"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

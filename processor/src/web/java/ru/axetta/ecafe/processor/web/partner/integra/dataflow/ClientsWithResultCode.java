@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 
 import java.util.Map;
 
@@ -17,15 +16,15 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientsWithResultCode {
-    private Map<Client, ClientCreatedFromType> clients;
+    private Map<Client, ClientWithAddInfo> clients;
     public Long resultCode;
     public String description;
 
-    public Map<Client, ClientCreatedFromType> getClients() {
+    public Map<Client, ClientWithAddInfo> getClients() {
         return clients;
     }
 
-    public void setClients(Map<Client, ClientCreatedFromType> clients) {
+    public void setClients(Map<Client, ClientWithAddInfo> clients) {
         this.clients = clients;
     }
 }

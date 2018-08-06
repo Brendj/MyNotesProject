@@ -390,7 +390,7 @@ public class PreorderRequestsReportService {
               + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pmd.deletedstate = 0 "
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.preorderdate > :date AND pc.deletedstate=0";
+              + "WHERE pc.preorderdate > :date AND pc.deletedstate=0 and pc.idOfGoodsRequestPosition is null";
               //+ "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
         Query query = session.createSQLQuery(sqlQuery);
         query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());

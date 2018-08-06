@@ -5,16 +5,19 @@
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBaseListResult;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientWithAddInfo;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientsWithResultCode;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.RegularPreorderItem;
@@ -25,11 +28,13 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -45,6 +50,7 @@ import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomContr
  */
 @Component
 @Scope("singleton")
+@DependsOn("daoService")
 public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
 
@@ -54,7 +60,16 @@ public class PreorderDAOService {
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager emReport;
 
-
+    @PostConstruct
+    public void createPreorderDAOOperationsImpl() {
+        IPreorderDAOOperations impl = new IPreorderDAOOperations() {
+            @Override
+            public void deleteRegularPreorder(Session session, RegularPreorder regularPreorder) throws Exception {
+                deleteRegularPreorderInternal(session, regularPreorder);
+            }
+        };
+        RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
+    }
 
     @Transactional
     public void saveToken(SudirToken token, ClientSummaryBaseListResult clientSummary) {
@@ -308,9 +323,13 @@ public class PreorderDAOService {
     }
 
     public Client getClientByContractId(Long contractId) {
-        Query query = emReport.createQuery("select c from Client c where c.contractId = :contractId");
-        query.setParameter("contractId", contractId);
-        return (Client)query.getSingleResult();
+        try {
+            Query query = emReport.createQuery("select c from Client c where c.contractId = :contractId");
+            query.setParameter("contractId", contractId);
+            return (Client) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -339,12 +358,14 @@ public class PreorderDAOService {
             Integer idOfComplex = complex.getIdOfComplex();
             boolean complexSelected = (complexAmount > 0);
             boolean regularMenuItems = false;
-            for (MenuItemParam menuItem : complex.getMenuItems()) {
-                if (menuItem.getAmount() > 0) {
-                    complexSelected = true;
-                }
-                if (menuItem.getRegularMenuDetail() != null) {
-                    regularMenuItems = true;
+            if (complex.getMenuItems() != null) {
+                for (MenuItemParam menuItem : complex.getMenuItems()) {
+                    if (menuItem.getAmount() > 0) {
+                        complexSelected = true;
+                    }
+                    if (menuItem.getRegularMenuDetail() != null) {
+                        regularMenuItems = true;
+                    }
                 }
             }
             RegularPreorderParam regularComplex = complex.getRegularComplex();
@@ -381,30 +402,32 @@ public class PreorderDAOService {
             }
 
             Set<PreorderMenuDetail> set = new HashSet<PreorderMenuDetail>();
-            for (MenuItemParam menuItem : complex.getMenuItems()) {
-                RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
-                if (regularMenuItem != null) {
-                    if (regularMenuItem.getEnabled()) {
-                        createRegularPreorder(client, regularMenuItem, menuItem.getAmount(),
-                                idOfComplex, date, false, menuItem.getIdOfMenuDetail());
-                    } else {
-                        deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date);
+            if (complex.getMenuItems() != null) {
+                for (MenuItemParam menuItem : complex.getMenuItems()) {
+                    RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
+                    if (regularMenuItem != null) {
+                        if (regularMenuItem.getEnabled()) {
+                            createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
+                                    false, menuItem.getIdOfMenuDetail());
+                        } else {
+                            deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date);
+                        }
+                        continue;
                     }
-                    continue;
+                    queryMenuSelect.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+                    queryMenuSelect.setParameter("armIdOfMenu", menuItem.getIdOfMenuDetail());
+                    boolean menuSelected = (menuItem.getAmount() > 0);
+                    PreorderMenuDetail preorderMenuDetail;
+                    try {
+                        preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
+                        preorderMenuDetail.setAmount(menuItem.getAmount());
+                        preorderMenuDetail.setDeletedState(!menuSelected);
+                        em.merge(preorderMenuDetail);
+                    } catch (NoResultException e) {
+                        preorderMenuDetail = createPreorderMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(), menuItem.getAmount());
+                    }
+                    set.add(preorderMenuDetail);
                 }
-                queryMenuSelect.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
-                queryMenuSelect.setParameter("armIdOfMenu",menuItem.getIdOfMenuDetail());
-                boolean menuSelected = (menuItem.getAmount() > 0);
-                PreorderMenuDetail preorderMenuDetail;
-                try {
-                    preorderMenuDetail = (PreorderMenuDetail)queryMenuSelect.getSingleResult();
-                    preorderMenuDetail.setAmount(menuItem.getAmount());
-                    preorderMenuDetail.setDeletedState(!menuSelected);
-                    em.merge(preorderMenuDetail);
-                } catch (NoResultException e) {
-                    preorderMenuDetail = createPreorderMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(), menuItem.getAmount());
-                }
-                set.add(preorderMenuDetail);
             }
             if (preorderComplex != null) {
                 preorderComplex.setPreorderMenuDetails(set);
@@ -479,9 +502,13 @@ public class PreorderDAOService {
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
+        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder);
+    }
+
+    private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder) throws Exception {
         Date dateFrom = getStartDateForGeneratePreorders(regularPreorder);
-        long nextVersion = nextVersionByPreorderComplex();
-        Query delQuery = em.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, version = :version "
+        long nextVersion = DAOUtils.nextVersionByPreorderComplex(session);
+        org.hibernate.Query delQuery = session.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, version = :version "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
         delQuery.setParameter("lastUpdate", new Date());
         delQuery.setParameter("regularPreorder", regularPreorder);
@@ -489,7 +516,7 @@ public class PreorderDAOService {
         delQuery.setParameter("version", nextVersion);
         delQuery.executeUpdate();
 
-        delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
+        delQuery = session.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
@@ -497,10 +524,8 @@ public class PreorderDAOService {
 
         regularPreorder.setDeletedState(true);
         regularPreorder.setLastUpdate(new Date());
-        em.merge(regularPreorder);
+        session.update(regularPreorder);
     }
-
-
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void createPreordersFromRegular(RegularPreorder regularPreorder) throws Exception {
@@ -540,22 +565,23 @@ public class PreorderDAOService {
             PreorderComplex preorderComplex = findPreorderComplex(currentDate, regularPreorder.getClient(),
                     regularPreorder.getIdOfComplex());
             MenuDetail menuDetail = null;
+            ComplexInfo complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate); //комплекс на дату и с ценой рег. заказа
+            if (complexInfo == null) {
+                currentDate = CalendarUtils.addDays(currentDate, 1);
+                continue;
+            }
             if (preorderComplex == null) {
                 //на искомую дату нет предзаказа, надо создавать
-                ComplexInfo complexInfo = getComplexInfo(regularPreorder.getClient(), regularPreorder.getIdOfComplex(), currentDate); //комплекс на дату и с ценой рег. заказа
-                if (complexInfo == null) {
-                    currentDate = CalendarUtils.addDays(currentDate, 1);
-                    continue;
-                }
+
                 boolean comparePrice = StringUtils.isEmpty(regularPreorder.getItemCode()); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
-                boolean menuDetailNotFoundInDay = false;
                 if (!comparePrice) {
                     menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
-                        menuDetailNotFoundInDay = true;
+                        currentDate = CalendarUtils.addDays(currentDate, 1);
+                        continue;
                     }
                 }
-                if ((comparePrice ? !complexInfo.getCurrentPrice().equals(regularPreorder.getPrice()) : false) || menuDetailNotFoundInDay) { //не найден комплекс или цена не совпадает с рег. заказом
+                if (comparePrice ? !complexInfo.getCurrentPrice().equals(regularPreorder.getPrice()) : false) { //не найден комплекс или цена не совпадает с рег. заказом
                     currentDate = CalendarUtils.addDays(currentDate, 1);
                     continue;
                 }
@@ -565,6 +591,13 @@ public class PreorderDAOService {
                 em.persist(preorderComplex);
             }
             if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
+                if (preorderComplex != null && menuDetail == null) {
+                    menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
+                    if (menuDetail == null) {
+                        currentDate = CalendarUtils.addDays(currentDate, 1);
+                        continue;
+                    }
+                }
                 PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(), menuDetail.getLocalIdOfMenu());
                 if (preorderMenuDetail == null) {
                     //на искомую дату нет предзаказа, надо создавать
@@ -612,8 +645,8 @@ public class PreorderDAOService {
     private boolean getIsWorkDate(boolean isSixWorkWeek, Date currentDate, List<SpecialDate> specialDates, RegularPreorder regularPreorder) {
         boolean isWorkDate = CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate); //без учета проиводственного календаря
         for (SpecialDate specialDate : specialDates) {
-            if (specialDate.getDate().equals(currentDate)) {
-                if (specialDate.getIdOfClientGroup().equals(regularPreorder.getClient().getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup())) {
+            if (CalendarUtils.betweenDate(specialDate.getDate(), CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate))) {
+                if (specialDate.getIdOfClientGroup() != null && specialDate.getIdOfClientGroup().equals(regularPreorder.getClient().getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup())) {
                     isWorkDate = !specialDate.getIsWeekend();
                     break; //нашли в таблице календаря запись по группе клиента - выходим
                 }
@@ -969,10 +1002,10 @@ public class PreorderDAOService {
             ClientsWithResultCode cd = getClientsByGuardMobile(mobile);
 
             if (cd != null && cd.getClients() != null) {
-                for (Map.Entry<Client, ClientCreatedFromType> entry : cd.getClients().entrySet()) {
+                for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
                     if (entry.getValue() == null) continue;
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
-                    base.setGuardianCreatedWhere(entry.getValue().getValue());
+                    base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     if (base != null) {
                         clientSummaries.add(base);
                     }
@@ -993,10 +1026,10 @@ public class PreorderDAOService {
 
         ClientsWithResultCode data = new ClientsWithResultCode();
         try {
-            Map<Client, ClientCreatedFromType> clients = extractClientsFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile));
+            Map<Client, ClientWithAddInfo> clients = extractClientsFromGuardByGuardMobile(Client.checkAndConvertMobile(mobile));
             if (!clients.isEmpty()) {
                 boolean onlyNotActiveCG = true;
-                for (Map.Entry<Client, ClientCreatedFromType> entry : clients.entrySet()) {
+                for (Map.Entry<Client, ClientWithAddInfo> entry : clients.entrySet()) {
                     if (entry.getValue() != null) {
                         onlyNotActiveCG = false;
                         break;
@@ -1016,8 +1049,8 @@ public class PreorderDAOService {
         return data;
     }
 
-    public Map<Client, ClientCreatedFromType> extractClientsFromGuardByGuardMobile(String guardMobile) throws Exception {
-        Map<Client, ClientCreatedFromType> result = new HashMap<Client, ClientCreatedFromType>();
+    public Map<Client, ClientWithAddInfo> extractClientsFromGuardByGuardMobile(String guardMobile) throws Exception {
+        Map<Client, ClientWithAddInfo> result = new HashMap<Client, ClientWithAddInfo>();
         String query = "select client.idOfClient from cf_clients client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
                 + "and client.IdOfClientGroup not in (:leaving, :deleted)"; //все клиенты с номером телефона
         Query q = emReport.createNativeQuery(query);
@@ -1039,11 +1072,13 @@ public class PreorderDAOService {
                     for (Object o : list) {
                         Object[] row = (Object[])o;
                         ClientGuardian cg = (ClientGuardian) row[1];
+                        ClientWithAddInfo addInfo = new ClientWithAddInfo();
                         if (!cg.isDisabled()) {
-                            result.put((Client) row[0], cg.getCreatedFrom());
-                        } else {
-                            result.put((Client) row[0], null);
+                            addInfo.setClientCreatedFrom(cg.getCreatedFrom());
+                            addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : 0);
+                            //result.put((Client) row[0], cg.getCreatedFrom());
                         }
+                        result.put((Client) row[0], addInfo);
                     }
                 } else {
                     Query q3 = emReport.createQuery("select c from Client c "
@@ -1056,7 +1091,10 @@ public class PreorderDAOService {
                     List list1 = q3.getResultList();
                     if (!list1.isEmpty()) {
                         Client c = (Client)list1.get(0);
-                        result.put(c, ClientCreatedFromType.DEFAULT);
+                        ClientWithAddInfo addInfo = new ClientWithAddInfo();
+                        addInfo.setClientCreatedFrom(ClientCreatedFromType.DEFAULT);
+                        addInfo.setInformedSpecialMenu(0);
+                        result.put(c, addInfo);
                     }
                 }
             }
