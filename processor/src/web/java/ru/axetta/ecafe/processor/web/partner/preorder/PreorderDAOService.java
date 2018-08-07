@@ -436,6 +436,17 @@ public class PreorderDAOService {
         }
     }
 
+    private boolean regularEquals(RegularPreorderParam regularComplex, RegularPreorder regularPreorder) {
+        return regularComplex.getMonday().equals(regularPreorder.getMonday())
+                && regularComplex.getTuesday().equals(regularPreorder.getTuesday())
+                && regularComplex.getWednesday().equals(regularPreorder.getWednesday())
+                && regularComplex.getThursday().equals(regularPreorder.getThursday())
+                && regularComplex.getFriday().equals(regularPreorder.getFriday())
+                && regularComplex.getSaturday().equals(regularPreorder.getSaturday())
+                && regularComplex.getStartDate().equals(regularPreorder.getStartDate())
+                && regularComplex.getEndDate().equals(regularPreorder.getEndDate());
+    }
+
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu) throws Exception {
         String menuDetailName = null;
@@ -457,6 +468,7 @@ public class PreorderDAOService {
         RegularPreorder regularPreorder = null;
         try {
             regularPreorder = (RegularPreorder) query.getSingleResult();
+            if (regularEquals(regularComplex, regularPreorder)) return;
             regularPreorder.setMonday(regularComplex.getMonday());
             regularPreorder.setTuesday(regularComplex.getTuesday());
             regularPreorder.setWednesday(regularComplex.getWednesday());
@@ -506,6 +518,14 @@ public class PreorderDAOService {
     }
 
     private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder) throws Exception {
+        deleteGeneratedPreordersByRegular(session, regularPreorder);
+
+        regularPreorder.setDeletedState(true);
+        regularPreorder.setLastUpdate(new Date());
+        session.update(regularPreorder);
+    }
+
+    private void deleteGeneratedPreordersByRegular(Session session, RegularPreorder regularPreorder) throws Exception {
         Date dateFrom = getStartDateForGeneratePreorders(regularPreorder);
         long nextVersion = DAOUtils.nextVersionByPreorderComplex(session);
         org.hibernate.Query delQuery = session.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, version = :version "
@@ -521,10 +541,6 @@ public class PreorderDAOService {
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
         delQuery.executeUpdate();
-
-        regularPreorder.setDeletedState(true);
-        regularPreorder.setLastUpdate(new Date());
-        session.update(regularPreorder);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -541,12 +557,9 @@ public class PreorderDAOService {
 
         boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(regularPreorder.getClient().getOrg().getIdOfOrg()); //шестидневка в целом по ОО
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(currentDate, dateTo, regularPreorder.getClient().getOrg().getIdOfOrg());//данные из производственного календаря за период
-        /*Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(regularPreorder.getClient()); //настройка - количество дней запрета редактирования
-        if (forbiddenDays == null) {
-            forbiddenDays = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
-        }*/
         currentDate = getStartDateForGeneratePreorders(regularPreorder);
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
+        deleteGeneratedPreordersByRegular((Session)em.getDelegate(), regularPreorder);
 
         while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
 
@@ -554,9 +567,6 @@ public class PreorderDAOService {
 
             boolean doGenerate = doGenerate(currentDate, regularPreorder);  //генерить ли предзаказ по дню недели в регулярном заказе
             if (!isWorkDate || !doGenerate) {
-                if (!doGenerate) {
-                    deletePreorders(regularPreorder, currentDate, nextVersion); //удаление предзаказа на день, если этого дня нет в расписании на неделю рег заказа
-                }
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
@@ -659,7 +669,7 @@ public class PreorderDAOService {
     }
 
     private void deletePreorders(RegularPreorder regularPreorder, Date currentDate, Long nextVersion) {
-        Query query = em.createQuery("update PreorderComplex pc set pc.deletedState = true, pc.lastUpdate = :lastUpdate, pc.version = :version "
+        Query query = em.createQuery("update PreorderComplex pc set pc.deletedState = true, pc.amount = 0, pc.lastUpdate = :lastUpdate, pc.version = :version "
                 + "where preorderDate between :startDate and :endDate and regularPreorder = :regularPreorder");
         query.setParameter("lastUpdate", new Date());
         query.setParameter("version", nextVersion);
