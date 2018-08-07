@@ -64,8 +64,8 @@ public class PreorderDAOService {
     public void createPreorderDAOOperationsImpl() {
         IPreorderDAOOperations impl = new IPreorderDAOOperations() {
             @Override
-            public void deleteRegularPreorder(Session session, RegularPreorder regularPreorder) throws Exception {
-                deleteRegularPreorderInternal(session, regularPreorder);
+            public void deleteRegularPreorder(Session session, RegularPreorder regularPreorder, PreorderState preorderState) throws Exception {
+                deleteRegularPreorderInternal(session, regularPreorder, preorderState);
             }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
@@ -468,7 +468,7 @@ public class PreorderDAOService {
         RegularPreorder regularPreorder = null;
         try {
             regularPreorder = (RegularPreorder) query.getSingleResult();
-            if (regularEquals(regularComplex, regularPreorder)) return;
+            if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
             regularPreorder.setMonday(regularComplex.getMonday());
             regularPreorder.setTuesday(regularComplex.getTuesday());
             regularPreorder.setWednesday(regularComplex.getWednesday());
@@ -514,32 +514,34 @@ public class PreorderDAOService {
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
-        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder);
+        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK);
     }
 
-    private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder) throws Exception {
-        deleteGeneratedPreordersByRegular(session, regularPreorder);
+    private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder, PreorderState state) throws Exception {
+        deleteGeneratedPreordersByRegular(session, regularPreorder, state);
 
         regularPreorder.setDeletedState(true);
         regularPreorder.setLastUpdate(new Date());
         session.update(regularPreorder);
     }
 
-    private void deleteGeneratedPreordersByRegular(Session session, RegularPreorder regularPreorder) throws Exception {
+    private void deleteGeneratedPreordersByRegular(Session session, RegularPreorder regularPreorder, PreorderState state) throws Exception {
         Date dateFrom = getStartDateForGeneratePreorders(regularPreorder);
         long nextVersion = DAOUtils.nextVersionByPreorderComplex(session);
-        org.hibernate.Query delQuery = session.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, version = :version "
+        org.hibernate.Query delQuery = session.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, state = :state, version = :version "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
         delQuery.setParameter("lastUpdate", new Date());
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
+        delQuery.setParameter("state", state);
         delQuery.setParameter("version", nextVersion);
         delQuery.executeUpdate();
 
-        delQuery = session.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 "
+        delQuery = session.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0, state = :state "
                 + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
+        delQuery.setParameter("state", state);
         delQuery.executeUpdate();
     }
 
@@ -559,7 +561,7 @@ public class PreorderDAOService {
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(currentDate, dateTo, regularPreorder.getClient().getOrg().getIdOfOrg());//данные из производственного календаря за период
         currentDate = getStartDateForGeneratePreorders(regularPreorder);
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
-        deleteGeneratedPreordersByRegular((Session)em.getDelegate(), regularPreorder);
+        deleteGeneratedPreordersByRegular((Session)em.getDelegate(), regularPreorder, PreorderState.OK);
 
         while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
 

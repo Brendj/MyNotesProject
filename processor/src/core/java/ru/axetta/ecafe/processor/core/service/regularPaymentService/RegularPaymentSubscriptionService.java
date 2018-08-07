@@ -215,7 +215,7 @@ public class RegularPaymentSubscriptionService {
                 logger.error("Http request has status {}", statusCode);
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Error in mfr send request: ", ex);
         } finally {
             httpMethod.releaseConnection();
             logger.info("Response from MFR: {}", paymentResponse.toString());

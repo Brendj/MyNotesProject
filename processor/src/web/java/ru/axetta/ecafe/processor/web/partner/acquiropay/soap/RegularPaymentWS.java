@@ -209,7 +209,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                     idOfClient, handler.getData().getOperationType());
             result = !bs.isActive() || rpService.deactivateSubscription(regularPaymentSubscriptionID);
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Error in delete regular payment subscription: ", ex);
         }
         if (result) {
             requestResult.setErrorCode(0);

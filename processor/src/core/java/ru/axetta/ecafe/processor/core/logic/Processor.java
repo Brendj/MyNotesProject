@@ -4834,14 +4834,19 @@ public class Processor implements SyncProcessor {
                 }
                 if (reqMenuDetailMatch == null) {
                     RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                            .deleteRegularPreorder(persistenceSession, regularPreorder);
+                            .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
                 }
             } else {
                 //заказ на комплекс
                 SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = findReqComplexInfo(item, regularPreorder.getIdOfComplex());
                 if (reqComplexInfoMatch == null) {
                     RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                            .deleteRegularPreorder(persistenceSession, regularPreorder);
+                            .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
+                } else {
+                    if (!reqComplexInfoMatch.getCurrentPrice().equals(regularPreorder.getPrice())) {
+                        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                                .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
+                    }
                 }
             }
         }
