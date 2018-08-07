@@ -3473,14 +3473,14 @@ public class DAOUtils {
     }
 
     public static void updateEnterEventsSendInfo(Session session, Long idofEnterEvent, Long idofOrg,
-            Integer responseCode, Integer sendToExternal) throws Exception {
+            Boolean responseCode, Boolean sendToExternal) throws Exception {
         Query query = session.createSQLQuery(
                         " UPDATE cf_EnterEvents_Send_Info "
-                         + " SET sendtoexternal = :sendToExternal, responsecode = :responseCode "
+                         + " SET sendToExternal = :sendToExternal, responseCode = :responseCode "
                          + " WHERE idoforg = :idofOrg and idofenterevent = :idofEnterEvent "
                 )
-                .setParameter("sendToExternal", sendToExternal)
-                .setParameter("responseCode", responseCode)
+                .setParameter("sendToExternal", sendToExternal? 1:0)
+                .setParameter("responseCode", responseCode? 1:0)
                 .setParameter("idofOrg", idofOrg)
                 .setParameter("idofEnterEvent", idofEnterEvent);
         query.executeUpdate();

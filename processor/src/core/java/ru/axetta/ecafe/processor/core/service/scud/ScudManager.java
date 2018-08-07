@@ -71,7 +71,7 @@ public class ScudManager {
     }
 
     private void sendEnterEventsToExternal(Session session, Integer limitRecords) {
-        Integer sendToExternal = null;
+        Boolean sendToExternal = false;
         List<EventDataItem> list = null;
         try {
             list = findEnterEvents(session, limitRecords);
@@ -79,28 +79,28 @@ public class ScudManager {
                 throw new Exception("No EnterEventSendInfo records");
             }
             PushResponse response = service.sendEvent(list);
-            sendToExternal = 1;
+            sendToExternal = true;
             Integer responseCode = response.isResult()? 1 : 0;
             logger.info("Sending completed, sent list with " + list.size() + " elements, ResultCode is: " + responseCode);
-            updateEnterEventsSendInfo(session, list, responseCode, sendToExternal);
+            updateEnterEventsSendInfo(session, list, response.isResult(), sendToExternal);
         } catch (Exception e){
             logger.error("Can't send record to external: " + e.getMessage());
-            sendToExternal = 0;
-            updateEnterEventsSendInfo(session, list, 0, sendToExternal);
+            sendToExternal = false;
+            updateEnterEventsSendInfo(session, list, false, sendToExternal);
         }
 
     }
 
-    private void updateEnterEventsSendInfo(Session session, List<EventDataItem> list, Integer responseCode,
-            Integer sendToExternal) {
-        try{
+    private void updateEnterEventsSendInfo(Session session, List<EventDataItem> list, Boolean result,
+            Boolean sendToExternal){
+        try {
             if(list == null || list.isEmpty()){
                 throw  new Exception("List of EnterEventsSendInfo is null or empty");
             }
             for(EventDataItem element: list){
                 Long idofEnterEvent = element.getIdOfEnterEvent().longValue();
                 Long idofOrg = element.getIdOfOrg().longValue();
-                DAOUtils.updateEnterEventsSendInfo(session, idofEnterEvent, idofOrg, responseCode, sendToExternal);
+                DAOUtils.updateEnterEventsSendInfo(session, idofEnterEvent, idofOrg, result, sendToExternal);
             }
         } catch (Exception e){
             logger.error("Can't update EnterEventSendInfo records in DB: " + e.getMessage());
@@ -113,12 +113,13 @@ public class ScudManager {
             Query query = session.createSQLQuery(
                             "SELECT o.ogrn, oa.idofaccessory, c.clientguid, crd.cardno, ee.passdirection, ee.evtdatetime, ee.idofenterevent, ee.idoforg "
                             + " FROM cf_enterevents_send_info eesi "
-                            + " INNER JOIN cf_enterevents ee ON eesi.idofenterevent = ee.idofenterevent "
-                            + " INNER JOIN cf_orgs o ON o.idoforg = eesi.idoforg "
+                            + " INNER JOIN cf_enterevents ee ON eesi.idofenterevent = ee.idofenterevent and eesi.idoforg = ee.idoforg "
+                            + " INNER JOIN cf_orgs o ON eesi.idoforg = o.idoforg "
                             + " LEFT JOIN cf_clients c ON eesi.idofclient = c.idofclient "
                             + " LEFT JOIN cf_cards crd ON eesi.idofcard = crd.idofcard "
                             + " LEFT JOIN cf_org_accessories oa ON ee.turnstileaddr = oa.accessorynumber "
-                            + " WHERE eesi.sendtoexternal = 0 or eesi.responsecode = 0 "
+                            + " AND idofsourceorg = eesi.idoforg "
+                            + " WHERE eesi.sendtoexternal = 0 OR eesi.responsecode = 0 "
                             + " ORDER BY eesi.evtdatetime DESC "
                             + " LIMIT :limit ");
             query.setParameter("limit", limitRecords);

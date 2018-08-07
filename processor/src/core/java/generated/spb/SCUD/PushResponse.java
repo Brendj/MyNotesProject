@@ -1,10 +1,7 @@
 
 package generated.spb.SCUD;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -32,10 +29,12 @@ import javax.xml.bind.annotation.XmlType;
     "result",
     "queueId"
 })
-@XmlRootElement(name = "pushResponse")
+@XmlRootElement(name = "pushResponse", namespace = "http://service.petersburgedu.ru/webservice/scud")
 public class PushResponse {
 
+    @XmlElement(namespace = "http://service.petersburgedu.ru/webservice/scud")
     protected boolean result;
+    @XmlElement(namespace = "http://service.petersburgedu.ru/webservice/scud")
     protected String queueId;
 
     /**

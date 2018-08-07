@@ -41,7 +41,7 @@ public interface PushScudPort {
      *     returns generated.spb.SCUD.PushResponse
      */
     @WebMethod(action = "pushData")
-    @WebResult(name = "pushResponse", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", partName = "result")
+    @WebResult(name = "pushResponse", targetNamespace = "http://service.petersburgedu.ru/webservice/scud", partName = "result")
     public PushResponse pushData(
         @WebParam(name = "eventList", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", partName = "data")
         EventList data);
