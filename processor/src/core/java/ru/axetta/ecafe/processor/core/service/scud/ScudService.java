@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service.scud;
 
 import generated.spb.SCUD.*;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.nsi.SOAPLoggingHandler;
 
 import org.apache.cxf.endpoint.Client;
@@ -21,6 +22,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 @Component
 @Scope("singleton")
@@ -28,6 +30,12 @@ public class ScudService {
     private static final Logger logger = LoggerFactory.getLogger(ScudService.class);
     private PushScudPort pushScudService;
     private ObjectFactory scudObjectFactory = new ObjectFactory();
+    private final String ENDPOINT_ADDRESS = getEndPointAdressFromConfig();
+
+    private String getEndPointAdressFromConfig() {
+        Properties properties = RuntimeContext.getInstance().getConfigProperties();
+        return properties.getProperty("ecafe.processor.scudmanager.endpointadress", "http://10.146.136.36/service/webservice/SCUD/");
+    }
 
     private PushScudPort createEventController() {
         if(pushScudService != null) {
@@ -40,7 +48,7 @@ public class ScudService {
             Client proxy = ClientProxy.getClient(controller);
             BindingProvider bp = (BindingProvider) controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
-            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://10.146.136.36/service/webservice/SCUD/");
+            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.ENDPOINT_ADDRESS);
             proxy.getOutInterceptors().add(new HeaderHandler());
 
             final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();

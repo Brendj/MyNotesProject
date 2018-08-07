@@ -94,6 +94,9 @@ public class ScudManager {
     private void updateEnterEventsSendInfo(Session session, List<EventDataItem> list, Integer responseCode,
             Integer sendToExternal) {
         try{
+            if(list == null || list.isEmpty()){
+                throw  new Exception("List of EnterEventsSendInfo is null or empty");
+            }
             for(EventDataItem element: list){
                 Long idofEnterEvent = element.getIdOfEnterEvent().longValue();
                 Long idofOrg = element.getIdOfOrg().longValue();
@@ -110,12 +113,12 @@ public class ScudManager {
             Query query = session.createSQLQuery(
                             "SELECT o.ogrn, oa.idofaccessory, c.clientguid, crd.cardno, ee.passdirection, ee.evtdatetime, ee.idofenterevent, ee.idoforg "
                             + " FROM cf_enterevents_send_info eesi "
-                            + " INNER JOIN cf_enterevents ee ON eesi.idofenterevents = ee.idofenterevent "
+                            + " INNER JOIN cf_enterevents ee ON eesi.idofenterevent = ee.idofenterevent "
                             + " INNER JOIN cf_orgs o ON o.idoforg = eesi.idoforg "
-                            + " LEFT JOIN cf_clients c ON ee.idofclient = c.idofclient "
-                            + " LEFT JOIN cf_cards crd ON ee.idofcard = crd.idofcard "
+                            + " LEFT JOIN cf_clients c ON eesi.idofclient = c.idofclient "
+                            + " LEFT JOIN cf_cards crd ON eesi.idofcard = crd.idofcard "
                             + " LEFT JOIN cf_org_accessories oa ON ee.turnstileaddr = oa.accessorynumber "
-                            + " WHERE eesi.sendtoexternal = 0 or eesi.responscode = 0 "
+                            + " WHERE eesi.sendtoexternal = 0 or eesi.responsecode = 0 "
                             + " ORDER BY eesi.evtdatetime DESC "
                             + " LIMIT :limit ");
             query.setParameter("limit", limitRecords);
@@ -123,7 +126,7 @@ public class ScudManager {
             for(Object[] row : result ){
                 String studentUid = null;
                 Long cardUid = null;
-                String ogrn = row[0] == null? DEFAULT_VALUE :(String) row[0];
+                String ogrn = stringIsNullOrEmpty((String) row[0]) ? DEFAULT_VALUE :(String) row[0];
                 String turnstile = row[1] == null? DEFAULT_VALUE : String.valueOf(row[1]);
                 if(row[2] == null && row[3] == null){
                     continue;
@@ -135,11 +138,10 @@ public class ScudManager {
                     if(cardUid == null) cardUid = Long.parseLong(DEFAULT_VALUE);
                 } else {
                     studentUid = (String) row[2];
-                    BigInteger buf = (BigInteger) row[3];
-                    cardUid = buf.longValue();
+                    cardUid = ((BigInteger)row[3]).longValue();
                 }
                 Integer passDirection = (Integer) row[4];
-                Date eventDate = new Date((Long)row[5]);
+                Date eventDate = new Date(((BigInteger) row[5]).longValue());
                 BigInteger idofEnterEvent = (BigInteger) row[6];
                 BigInteger idofOrg = (BigInteger) row[7];
                 EventDataItem item = new EventDataItem(ogrn, null, turnstile,
@@ -151,5 +153,9 @@ public class ScudManager {
             logger.error("Can't get records for sent to SCUD: " + e.getMessage());
             return null;
         }
+    }
+
+    private boolean stringIsNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 }
