@@ -31,6 +31,7 @@ public class ScudService {
     private PushScudPort pushScudService;
     private ObjectFactory scudObjectFactory = new ObjectFactory();
     private final String ENDPOINT_ADDRESS = getEndPointAdressFromConfig();
+    private final String TEST_ENDPOINT_ADDRESS = "http://petersburgedu.ru/service/webservice/scud";
 
     private String getEndPointAdressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
@@ -52,8 +53,12 @@ public class ScudService {
             proxy.getOutInterceptors().add(new HeaderHandler());
 
             final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+            final ScudServiceHandler scudServiceHandler = new ScudServiceHandler();
             final List<Handler> handlerChain = new ArrayList<Handler>();
             handlerChain.add(soapLoggingHandler);
+            if(this.ENDPOINT_ADDRESS.contains(this.TEST_ENDPOINT_ADDRESS)) {
+                handlerChain.add(scudServiceHandler);
+            }
             bp.getBinding().setHandlerChain(handlerChain);
 
             HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
