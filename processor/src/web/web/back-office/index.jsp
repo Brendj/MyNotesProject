@@ -46,56 +46,6 @@
     <link rel="shortcut icon" href="<c:url value="/images/ecafe-favicon.png"/>" type="image/x-icon">
     <link rel="stylesheet" href="<c:url value="/back-office/styles.css"/>" type="text/css">
     <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>-->
-
-    <script type="text/javascript" language="javascript">
-        //TODO Экранирование не работает на 100%, так же скрипт срабатывает, если просто обновить страницу
-        //Выключен на время поисков более эффективного решения
-
-        /*var waitActivity = 5000; // 5 sec
-        var validNavigation = false;
-
-        onInactive(waitActivity, function () {
-            validNavigation = false;
-        });
-
-        function onInactive(ms, cb) {
-            var wait = setTimeout(cb, ms);
-            document.onmousemove = document.mousedown = document.mouseup = document.onkeydown = document.onkeyup = document.focus = function () {
-                clearTimeout(wait);
-                sayHello();
-            };
-        }
-
-        function wireUpEvents() {
-
-            window.addEventListener("unload", function () {
-                sayGoodbye();
-            });
-
-            jQuery("a").bind("click", function () {
-                onInactive(waitActivity, function () {
-                    validNavigation = false;
-                });
-            });
-
-            jQuery("form").bind("submit", function () {
-                onInactive(waitActivity, function () {
-                    validNavigation = false;
-                });
-            });
-
-            jQuery("input[type=submit]").bind("click", function () {
-                onInactive(waitActivity, function () {
-                    validNavigation = false;
-                });
-            });
-        }
-
-        jQuery(document).ready(function () {
-            sayHello();
-            wireUpEvents();
-        });*/
-    </script>
 </head>
 
 <body style="margin: 4px; padding: 0;">

@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.login;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.HttpSessionJournal;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -295,23 +294,10 @@ public class JBossLoginModule implements LoginModule {
 
                 throw new LoginException("Password is invalid");
             }
-            HttpSessionJournal journal = RuntimeContext.getInstance().getHttpSessionJournal();
-
-            if(!journal.isEnableMultipleAuthorizations()){
-                if(journal.userIsAuth(this.username)){
-                    throw new LoginException("The user is already authorized");
-                }
-                HttpSession httpSession = request.getSession(true);
-                httpSession.setAttribute(User.USER_ID_ATTRIBUTE_NAME, user.getIdOfUser());
-                httpSession.setAttribute(User.USER_IP_ADDRESS_ATTRIBUTE_NAME, request.getRemoteAddr());
-                journal.putNewHttpSession(this.username, httpSession);
-                loginSucceeded = true;
-            } else {
-                HttpSession httpSession = request.getSession(true);
-                httpSession.setAttribute(User.USER_ID_ATTRIBUTE_NAME, user.getIdOfUser());
-                httpSession.setAttribute(User.USER_IP_ADDRESS_ATTRIBUTE_NAME, request.getRemoteAddr());
-                loginSucceeded = true;
-            }
+            HttpSession httpSession = request.getSession(true);
+            httpSession.setAttribute(User.USER_ID_ATTRIBUTE_NAME, user.getIdOfUser());
+            httpSession.setAttribute(User.USER_IP_ADDRESS_ATTRIBUTE_NAME, request.getRemoteAddr());
+            loginSucceeded = true;
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
