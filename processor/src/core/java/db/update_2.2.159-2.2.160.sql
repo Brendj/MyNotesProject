@@ -81,7 +81,7 @@ ALTER TABLE cf_menuexchange ALTER COLUMN menudata TYPE character varying (600000
 -- Таблица для записи результата отправки EnterEvent на ИС "ПОРТАЛ"
 CREATE TABLE cf_EnterEvents_Send_Info
 (
-  idofEnterEvents BIGINT NOT NULL,
+  idofEnterEvent BIGINT NOT NULL,
   idoforg BIGINT NOT NULL,
   idofclient BIGINT,
   idofcard BIGINT,
@@ -89,7 +89,7 @@ CREATE TABLE cf_EnterEvents_Send_Info
   sendToExternal INTEGER NOT NULL DEFAULT 0,
   responseCode INTEGER NOT NULL DEFAULT 0,
   directionType INTEGER,
-  CONSTRAINT cf_EnterEvents_Send_Info_fk PRIMARY KEY (idofEnterEvents, idoforg)
+  CONSTRAINT cf_EnterEvents_Send_Info_fk PRIMARY KEY (idofEnterEvent, idoforg)
 ) WITH (
   OIDS = FALSE
 );

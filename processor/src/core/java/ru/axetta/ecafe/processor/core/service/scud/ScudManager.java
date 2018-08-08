@@ -135,10 +135,12 @@ public class ScudManager {
                 if(row[2] == null && row[3] == null){
                     continue;
                 } else if(row[2] == null) {
-                    studentUid = DAOUtils.findClientGUIDByCardNo(session, (Long)row[3]);
+                    studentUid = DAOUtils.findClientGUIDByCardNo(session, ((BigInteger)row[3]).longValue());
+                    cardUid = ((BigInteger)row[3]).longValue();
                     if(studentUid == null) studentUid = DEFAULT_VALUE;
                 } else if(row[3] == null) {
                     cardUid = DAOUtils.findCardNoByClientGUID(session, (String) row[2]);
+                    studentUid = (String) row[2];
                     if(cardUid == null) cardUid = Long.parseLong(DEFAULT_VALUE);
                 } else {
                     studentUid = (String) row[2];

@@ -3415,7 +3415,7 @@ public class DAOUtils {
 
     public static void createEnterEventsSendInfo(EnterEvent enterEvent, Session session) {
         try {
-            Card card = enterEvent.getIdOfCard() == null ? null : (Card) session.get(Card.class, enterEvent.getIdOfCard());
+            Card card = enterEvent.getIdOfCard() == null ? null : findCardByCardNo(session, enterEvent.getIdOfCard());
             EnterEventSendInfo enterEventSendInfo = new EnterEventSendInfo();
             enterEventSendInfo.setCompositeIdOfEnterEventSendInfo(
                     new CompositeIdOfEnterEventSendInfo(
