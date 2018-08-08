@@ -8309,9 +8309,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
-                    if (entry.getValue() == null) continue;
+                    if (entry.getValue().getClientCreatedFrom() == null) continue;
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
-                    base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom() == null ? null : entry.getValue().getClientCreatedFrom().getValue());
+                    base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     base.setInformedSpecialMenu(entry.getValue().getInformedSpecialMenu());
                     base.setIsInside(DAOReadExternalsService.getInstance().isClientInside(session, entry.getKey().getIdOfClient()));
                     if (base != null) {
