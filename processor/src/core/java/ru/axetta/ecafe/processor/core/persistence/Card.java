@@ -21,7 +21,8 @@ public class Card {
     public static final String UNKNOWN_TYPE_NAME = "Неизвестный";
     public static final String[] TYPE_NAMES = {UNKNOWN_TYPE_NAME, "Mifare", "EM-Marine", "Соц. карта", "УЭК",
             "Транспортная карта", "Банковская карта", "Соц. карта учащегося", "Соц. карта москвича", "Браслет (Mifare)",
-            "Часы (Mifare)", "Брелок (Mifare)", "Тройка-Москвёнок карта", "Тройка-Москвёнок браслет", "Тройка-Москвёнок брелок"};
+            "Часы (Mifare)", "Брелок (Mifare)", "Тройка-Москвёнок карта", "Тройка-Москвёнок браслет", "Тройка-Москвёнок брелок",
+            "Фитнес-Браслет", "Смарт-Кольцо"};
     public static final int TYPE_UEC=4;
     public static final Integer[] DEPRECATED_TYPES = {2, 3, 4}; //Устаревшие типы карт, скрываем из списка типов на странице регистрации карты
 
