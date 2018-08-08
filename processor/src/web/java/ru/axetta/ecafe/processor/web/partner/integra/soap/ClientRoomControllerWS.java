@@ -3618,9 +3618,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         ClientGuardian cg = (ClientGuardian) row[1];
                         ClientWithAddInfo addInfo = new ClientWithAddInfo();
                         addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
-                        if (!cg.isDisabled()) {
-                            addInfo.setClientCreatedFrom(cg.getCreatedFrom());
-                        }
+                        addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                         result.put((Client)row[0], addInfo);
                     }
                 } else {
@@ -8313,7 +8311,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
                     if (entry.getValue() == null) continue;
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
-                    base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
+                    base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom() == null ? null : entry.getValue().getClientCreatedFrom().getValue());
                     base.setInformedSpecialMenu(entry.getValue().getInformedSpecialMenu());
                     base.setIsInside(DAOReadExternalsService.getInstance().isClientInside(session, entry.getKey().getIdOfClient()));
                     if (base != null) {
