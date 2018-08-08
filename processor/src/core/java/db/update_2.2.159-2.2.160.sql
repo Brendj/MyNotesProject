@@ -95,7 +95,5 @@ CREATE TABLE cf_EnterEvents_Send_Info
 );
 
 CREATE INDEX cf_EnterEvents_Send_Info_evttime_idx ON cf_EnterEvents_Send_Info(evtDateTime);
-/*CREATE INDEX cf_EnterEvents_Send_Info_Evt_Org_idx ON cf_EnterEvents_Send_Info(idofEnterEvents, idoforg);
-CREATE INDEX cf_EnterEvents_Send_Info_Evt_Inf_idx ON cf_EnterEvents_Send_Info(idofEnterEventsSendInfo, idofEnterEvents);
-CREATE INDEX cf_EnterEvents_Send_Info_clnt_crd_idx ON cf_EnterEvents_Send_Info(idofcard, idofclient);
-CREATE INDEX cf_EnterEvents_Send_Info_clnt_evttime ON cf_EnterEvents_Send_Info(evtDateTime, idofclient);*/
+
+--! ФИНАЛИЗИРОВАН 08.08.2018, НЕ МЕНЯТЬ
