@@ -81,10 +81,11 @@ public class ScudManager {
             PushResponse response = service.sendEvent(list);
             sendToExternal = true;
             Integer responseCode = response.isResult()? 1 : 0;
-            logger.info("Sending completed, sent list with " + list.size() + " elements, ResultCode is: " + responseCode);
+            logger.info("Sending EnterEvent to SCUD completed, sent list with " + list.size() + " elements, ResultCode is: " + responseCode);
             updateEnterEventsSendInfo(session, list, response.isResult(), sendToExternal);
         } catch (Exception e){
             logger.error("Can't send record to external: " + e.getMessage());
+            e.printStackTrace();
             sendToExternal = false;
             updateEnterEventsSendInfo(session, list, false, sendToExternal);
         }
@@ -104,6 +105,7 @@ public class ScudManager {
             }
         } catch (Exception e){
             logger.error("Can't update EnterEventSendInfo records in DB: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -119,7 +121,8 @@ public class ScudManager {
                             + " LEFT JOIN cf_cards crd ON eesi.idofcard = crd.idofcard "
                             + " LEFT JOIN cf_org_accessories oa ON ee.turnstileaddr = oa.accessorynumber "
                             + " AND idofsourceorg = eesi.idoforg "
-                            + " WHERE eesi.sendtoexternal = 0 OR eesi.responsecode = 0 "
+                            + " WHERE ( eesi.sendtoexternal = 0 OR eesi.responsecode = 0 ) "
+                            + " AND (c.clientguid IS NOT NULL OR crd.cardno IS NOT NULL) "
                             + " ORDER BY eesi.evtdatetime DESC "
                             + " LIMIT :limit ");
             query.setParameter("limit", limitRecords);
@@ -152,6 +155,7 @@ public class ScudManager {
             return dataItems;
         } catch (Exception e){
             logger.error("Can't get records for sent to SCUD: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
