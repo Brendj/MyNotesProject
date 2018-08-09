@@ -76,7 +76,8 @@ public class ScudManager {
         try {
             list = findEnterEvents(session, limitRecords);
             if(list == null || list.isEmpty()){
-                throw new Exception("No EnterEventSendInfo records");
+                logger.warn("No EnterEventSendInfo records for send to SCUD");
+                return;
             }
             PushResponse response = service.sendEvent(list);
             sendToExternal = true;
