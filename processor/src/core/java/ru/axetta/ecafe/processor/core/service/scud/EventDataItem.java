@@ -28,8 +28,10 @@ public class EventDataItem {
             EnterEvent.RE_ENTRY,                // повторный вход
             EnterEvent.TURNSTILE_IS_BROKEN,     // взлом турникета
             EnterEvent.DETECTED_INSIDE,         // обнаружен на подносе карты внутри здания
-            EnterEvent.CHECKED_BY_TEACHER_EXT,  //отмечен в классном журнале через внешнюю систему
-            EnterEvent.CHECKED_BY_TEACHER_INT); //отмечен учителем внутри здания
+            EnterEvent.CHECKED_BY_TEACHER_EXT,  // отмечен в классном журнале через внешнюю систему
+            EnterEvent.CHECKED_BY_TEACHER_INT,  // отмечен учителем внутри здания
+            EnterEvent.ENTRY_WITHOUT_CARD       // проход без карты
+    );
 
     public EventDataItem(String organizationUid, String systemUid, String readerUid, String studentUid,
             String cardUid, Integer direction, Date eventDate, BigInteger idOfEnterEvent, BigInteger idOfOrg){

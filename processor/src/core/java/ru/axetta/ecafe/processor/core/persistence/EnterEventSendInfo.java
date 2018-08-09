@@ -19,12 +19,15 @@ public class EnterEventSendInfo {
     private Boolean responseCode;
     private Boolean directionType;
 
+
     public static final List<Integer> VALID_ENTER_CODES = Arrays.asList(
             EnterEvent.ENTRY,                   // вход
             EnterEvent.RE_ENTRY,                // повторный вход
             EnterEvent.DETECTED_INSIDE,         // обнаружен на подносе карты внутри здания
-            EnterEvent.CHECKED_BY_TEACHER_EXT,  //отмечен в классном журнале через внешнюю систему
-            EnterEvent.CHECKED_BY_TEACHER_INT );//отмечен учителем внутри здания
+            EnterEvent.CHECKED_BY_TEACHER_EXT,  // отмечен в классном журнале через внешнюю систему
+            EnterEvent.CHECKED_BY_TEACHER_INT,  // отмечен учителем внутри здания
+            EnterEvent.ENTRY_WITHOUT_CARD       // проход без карты
+    );
 
     public static final List<Integer> VALID_EXIT_CODES = Arrays.asList(
             EnterEvent.EXIT, // выход
