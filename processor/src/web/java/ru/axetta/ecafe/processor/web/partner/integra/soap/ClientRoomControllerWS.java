@@ -3982,7 +3982,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
-                    if (entry.getValue() == null) continue;
+                    if (entry.getValue().getClientCreatedFrom() == null) continue;
                     Data dataProcess = new ClientRequest().process(entry.getKey(), session, new Processor() {
                         public void process(Client client, Data dataProcess, ObjectFactory objectFactory,
                                 Session session) throws Exception {
