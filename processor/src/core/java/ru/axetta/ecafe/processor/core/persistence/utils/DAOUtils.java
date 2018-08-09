@@ -3415,6 +3415,14 @@ public class DAOUtils {
 
     public static void createEnterEventsSendInfo(EnterEvent enterEvent, Session session) {
         try {
+            if(!EnterEventSendInfo.VALID_ENTER_CODES.contains(enterEvent.getPassDirection()) &&
+                    !EnterEventSendInfo.VALID_EXIT_CODES.contains(enterEvent.getPassDirection())){
+                logger.debug("EnterEvent record EVT Time: " + enterEvent.getEvtDateTime()
+                        + " ORG: " + enterEvent.getOrg().getIdOfOrg()
+                        + " have PassDirection: " + enterEvent.getPassDirection()
+                );
+                return;
+            }
             Card card = enterEvent.getIdOfCard() == null ? null : findCardByCardNo(session, enterEvent.getIdOfCard());
             EnterEventSendInfo enterEventSendInfo = new EnterEventSendInfo();
             enterEventSendInfo.setCompositeIdOfEnterEventSendInfo(

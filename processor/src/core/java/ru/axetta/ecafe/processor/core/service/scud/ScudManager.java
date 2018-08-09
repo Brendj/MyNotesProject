@@ -36,7 +36,7 @@ public class ScudManager {
     public static boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.scudmanager.sendtoexternal", "false");
-        return Boolean.getBoolean(reqInstance);
+        return Boolean.parseBoolean(reqInstance);
     }
 
     private static Integer getLimitRecords(){
@@ -113,7 +113,7 @@ public class ScudManager {
         List<EventDataItem> dataItems = new LinkedList<EventDataItem>();
         try {
             Query query = session.createSQLQuery(
-                            "SELECT o.ogrn, oa.idofaccessory, c.clientguid, crd.cardno, ee.passdirection, ee.evtdatetime, ee.idofenterevent, ee.idoforg "
+                            "SELECT o.ogrn, oa.idofaccessory, c.clientguid, crd.cardno, eesi.directiontype, ee.evtdatetime, ee.idofenterevent, ee.idoforg "
                             + " FROM cf_enterevents_send_info eesi "
                             + " INNER JOIN cf_enterevents ee ON eesi.idofenterevent = ee.idofenterevent and eesi.idoforg = ee.idoforg "
                             + " INNER JOIN cf_orgs o ON eesi.idoforg = o.idoforg "
@@ -122,7 +122,7 @@ public class ScudManager {
                             + " LEFT JOIN cf_org_accessories oa ON ee.turnstileaddr = oa.accessorynumber "
                             + " AND idofsourceorg = eesi.idoforg "
                             + " WHERE ( eesi.sendtoexternal = 0 OR eesi.responsecode = 0 ) "
-                            + " AND (c.clientguid IS NOT NULL OR crd.cardno IS NOT NULL) "
+                            + " AND (eesi.idofclient IS NOT NULL OR eesi.idofcard IS NOT NULL) "
                             + " ORDER BY eesi.evtdatetime DESC "
                             + " LIMIT :limit ");
             query.setParameter("limit", limitRecords);
@@ -146,7 +146,7 @@ public class ScudManager {
                     studentUid = (String) row[2];
                     cardUid = ((BigInteger)row[3]).longValue();
                 }
-                Integer passDirection = (Integer) row[4];
+                Boolean passDirection = (Integer) row[4] == 1;
                 Date eventDate = new Date(((BigInteger) row[5]).longValue());
                 BigInteger idofEnterEvent = (BigInteger) row[6];
                 BigInteger idofOrg = (BigInteger) row[7];

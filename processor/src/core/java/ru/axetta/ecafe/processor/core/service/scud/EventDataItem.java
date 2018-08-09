@@ -45,13 +45,13 @@ public class EventDataItem {
     }
 
     public EventDataItem(String organizationUid, String systemUid, String readerUid, String studentUid,
-            Long cardNo, Integer direction, Date eventDate, BigInteger idOfEnterEvent, BigInteger idOfOrg){
+            Long cardNo, Boolean direction, Date eventDate, BigInteger idOfEnterEvent, BigInteger idOfOrg){
         this.organizationUid = organizationUid;
         this.systemUid = systemUid == null? "1" : studentUid;
         this.readerUid = readerUid == null? "1" : readerUid;
         this.studentUid = studentUid;
         this.cardUid = Long.toHexString(cardNo).toUpperCase();
-        this.directionType = enterCodes.contains(direction) ? "input" : "output";
+        this.directionType = direction ? "input" : "output";
         this.eventDate = eventDate;
         this.idOfEnterEvent = idOfEnterEvent;
         this.idOfOrg = idOfOrg;

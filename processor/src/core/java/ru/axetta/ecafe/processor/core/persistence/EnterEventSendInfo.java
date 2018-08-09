@@ -19,7 +19,7 @@ public class EnterEventSendInfo {
     private Boolean responseCode;
     private Boolean directionType;
 
-    private final List<Integer> ENTER_CODES = Arrays.asList(
+    public static final List<Integer> VALID_ENTER_CODES = Arrays.asList(
             EnterEvent.ENTRY,                   // вход
             EnterEvent.RE_ENTRY,                // повторный вход
             EnterEvent.TURNSTILE_IS_BROKEN,     // взлом турникета
@@ -27,8 +27,13 @@ public class EnterEventSendInfo {
             EnterEvent.CHECKED_BY_TEACHER_EXT,  //отмечен в классном журнале через внешнюю систему
             EnterEvent.CHECKED_BY_TEACHER_INT );//отмечен учителем внутри здания
 
+    public static final List<Integer> VALID_EXIT_CODES = Arrays.asList(
+            EnterEvent.EXIT,
+            EnterEvent.RE_EXIT
+    );
+
     public boolean isEnterPassDirection(Integer direction){
-        return ENTER_CODES.contains(direction);
+        return VALID_ENTER_CODES.contains(direction);
     }
 
     public EnterEvent getEnterEvent() {
