@@ -20,6 +20,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -65,6 +66,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
+        Date validDate = CalendarUtils.startOfDay(new Date());
         criteria.createAlias("staff","s", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
@@ -77,6 +79,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("requestType"), "requestType");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         criteria.setProjection(projectionList);
+        criteria.add(Property.forName("doneDate").ge(validDate));
     }
 
     @Override

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,10 +20,12 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,6 +70,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
+        Date validDate = CalendarUtils.startOfDay(new Date());
         criteria.createAlias("goodRequest", "gr", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("good", "g", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN);
@@ -87,6 +91,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("g.guid"), "guidOfG");
         projectionList.add(Projections.property("p.guid"), "guidOfP");
         criteria.setProjection(projectionList);
+        criteria.add((Restrictions.ge("gr.doneDate", validDate)));
     }
 
     @Override
