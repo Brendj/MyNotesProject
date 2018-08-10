@@ -50,7 +50,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.Buffer;
 import java.security.PublicKey;
 import java.text.DateFormat;
 import java.util.*;
@@ -3090,7 +3089,7 @@ public class DAOUtils {
             criteria.add(Restrictions.eq("deletedState", false));
             List list = criteria.list();
             if (list == null || list.isEmpty()) {
-                logger.error("Отсутствуют настройки предзаказанного питания для организации с id=" + idOfOrg);
+                //logger.error("Отсутствуют настройки предзаказанного питания для организации с id=" + idOfOrg);
                 return null;
             }
             if (list.size() > 1) {
