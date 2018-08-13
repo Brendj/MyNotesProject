@@ -22,11 +22,13 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.utils.Base64;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -1712,7 +1714,7 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name="cardNo") Long cardNo, @WebParam(name="idOfOrg") Long idOfOrg)
         throws FrontControllerException{
-        checkRequestValidity(idOfOrg);
+        //checkRequestValidity(idOfOrg);
         ResponseItem responseItem = new ResponseItem();
         try {
             CardService.getInstance().unblockOrReturnCard(cardNo, idOfOrg);
