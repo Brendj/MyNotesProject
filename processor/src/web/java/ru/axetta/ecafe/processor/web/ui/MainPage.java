@@ -10381,7 +10381,4 @@ public class MainPage implements Serializable {
     public void setUserFilterOfSelectUserListSelectPage(String userFilterOfSelectUserListSelectPage) {
         this.userFilterOfSelectUserListSelectPage = userFilterOfSelectUserListSelectPage;
     }
-
-    // Методы userSaidGoodbye и userSaidHello заведены как тестовые в рамках задачи EP-1383,
-    // необходимы для грамотной обработки событий unload на стороне клиента
 }

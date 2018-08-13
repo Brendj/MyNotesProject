@@ -41,13 +41,7 @@ public class CardTypeMenu {
     private static SelectItem[] readCardOperatorItems() {
         List<SelectItem> items = new ArrayList<SelectItem>();
         for(int i = 0; i < Card.TYPE_NAMES.length; i++) {
-            if (Card.TYPE_NAMES[i].equals("Неизвестный")){
-                items.add(new SelectItem(i, Card.TYPE_NAMES[i]));
-            } else if(Card.TYPE_NAMES[i].equals("Mifare")){
-                items.add(new SelectItem(i, Card.TYPE_NAMES[i]));
-            } else if(Card.TYPE_NAMES[i].equals("Транспортная карта")) {
-                items.add(new SelectItem(i, Card.TYPE_NAMES[i]));
-            } else if(Card.TYPE_NAMES[i].equals("Банковская карта")) {
+            if(Card.TYPE_NAMES[i].equals("Mifare")){
                 items.add(new SelectItem(i, Card.TYPE_NAMES[i]));
             } else if(Card.TYPE_NAMES[i].equals("Браслет (Mifare)")) {
                 items.add(new SelectItem(i, Card.TYPE_NAMES[i]));
