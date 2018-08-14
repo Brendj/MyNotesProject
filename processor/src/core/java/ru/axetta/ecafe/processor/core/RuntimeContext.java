@@ -31,10 +31,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
-import ru.axetta.ecafe.processor.core.service.CheckSumsMessageDigitsService;
-import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
-import ru.axetta.ecafe.processor.core.service.ImportMigrantsFileService;
-import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
+import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
@@ -123,6 +120,10 @@ public class RuntimeContext implements ApplicationContextAware {
         this.scudPassword = scudPassword;
     }
 
+    public IAuthorizeUserBySms getSmsUserCodeSender() {
+        return smsUserCodeSender;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -190,7 +191,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private PaymentProcessor paymentProcessor;
     private IntegroLogger integroLogger;
     private Processor processor;
-
+    private IAuthorizeUserBySms smsUserCodeSender;
 
     private OnlinePaymentProcessor onlinePaymentProcessor;
     private ClientPaymentOrderProcessor clientPaymentOrderProcessor;
@@ -660,6 +661,8 @@ public class RuntimeContext implements ApplicationContextAware {
             this.syncCollector.setProperties(getOptionValueBool(Option.OPTION_SAVE_SYNC_CALC));
 
             eventNotificator = createEventNotificator(properties, executorService, sessionFactory, ruleProcessor);
+
+            smsUserCodeSender = createUserCodeSender(properties);
 
             processor = createProcessor(properties, sessionFactory, eventNotificator);
             this.syncProcessor = processor;
@@ -1224,6 +1227,14 @@ public class RuntimeContext implements ApplicationContextAware {
             logger.debug("Rule processor created.");
         }
         return ruleProcessor;
+    }
+
+    private IAuthorizeUserBySms createUserCodeSender(Properties properties) {
+        IAuthorizeUserBySms service = null;
+        if (properties.getProperty("ecafe.processor.userCode.service", "").equals("EMP")) {
+            service = applicationContext.getBean(EMPAuthorizeUserBySmsService.class);
+        }
+        return service;
     }
 
     private static AutoReportGenerator createAutoReportGenerator(String basePath, Properties properties,

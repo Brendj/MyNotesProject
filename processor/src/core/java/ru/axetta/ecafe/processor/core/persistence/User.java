@@ -564,47 +564,10 @@ public class User {
                 .createUserEditRecord(SecurityJournalAuthenticate.EventType.GENERATE_SMS, request.getRemoteAddr(),
                         user.getUserName(), user, true, null, comment);
         DAOService.getInstance().writeAuthJournalRecord(record);
-        return "0";
-        /*NameValuePair[] parameters = new NameValuePair[] {
-            new NameValuePair("login", "i-teco"),
-            new NameValuePair("passwd", "e2GDH0"),
-            new NameValuePair("service", "14"),
-            new NameValuePair("msisdn", user.getPhone()),
-            new NameValuePair("text", String.format("Код авторизации - %s", code)),
-            new NameValuePair("operation", "send"),
-            new NameValuePair("type", "sms"),
-        };
-
-        GetMethod httpMethod = new GetMethod("http://utils.services.altarix.ru:8000/sms/output/");
-        httpMethod.setQueryString(parameters);
-
-        try {
-            HttpClient httpClient = new HttpClient();
-            httpClient.getParams().setContentCharset("UTF-8");
-            int statusCode = httpClient.executeMethod(httpMethod);
-            if (statusCode != HttpStatus.SC_OK) {
-                return "Ошибка сети или неправильный формат мобильного телефона";
-            }
-
-            String response = httpMethod.getResponseBodyAsString();
-
-            logger.info(String.format("Retrieved response for User auth code generation from SMS service: %s", response));
-
-            String errCode = "";
-            if (response != null) {
-                StringTokenizer st = new StringTokenizer(response, "|");
-                if (!st.hasMoreTokens()) {
-                    return "Ошибка при обращении к сервису отправки СМС";
-                }
-                errCode = st.nextToken();
-            }
-            return errCode;
-        } catch (Exception e) {
-            return "Ошибка при обращении к сервису отправки СМС";
+        if (RuntimeContext.getInstance().getSmsUserCodeSender() != null) {
+            return RuntimeContext.getInstance().getSmsUserCodeSender().sendCodeAndGetError(user, code);
         }
-        finally {
-            httpMethod.releaseConnection();
-        }*/
+        return "В системе не определен сервис отправки смс";
     }
 
 

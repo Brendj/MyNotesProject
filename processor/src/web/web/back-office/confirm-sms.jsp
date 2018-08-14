@@ -1,4 +1,3 @@
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.User" %>
 <%@ page language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2016. Axetta LLC. All Rights Reserved.
@@ -46,7 +45,6 @@
             </td>
         </tr>
     </table>
-    <img src="<% out.print(User.getStubSMS(request.getRemoteUser())); %>" width="0" height="0" />
 </f:view>
 </body>
 </html>
