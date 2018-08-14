@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -958,7 +959,8 @@ public class MonitoringOfReportService {
             for (Long idOfOrg : idOfOrgList) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
                 ReportItem reportItem = new ReportItem();
-                reportItem.setOrgNum(org.getOrgNumberInName());
+                Org mainOrg = OrgService.getInstance().getMainBulding(org);
+                reportItem.setOrgNum(mainOrg.getOrgNumberFromNameInfoService());
                 reportItem.setShortName(org.getShortNameInfoService());
                 reportItem.setAddress(org.getAddress());
                 reportItem.setIdOfOrg(String.valueOf(org.getIdOfOrg()));

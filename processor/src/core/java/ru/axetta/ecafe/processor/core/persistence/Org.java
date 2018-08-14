@@ -225,6 +225,10 @@ public class Org implements Serializable {
         return "";
     }
 
+    public String getOrgNumberFromNameInfoService() {
+        return extractOrgNumberFromName(shortNameInfoService);
+    }
+
     private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
         MessageDigest hash = MessageDigest.getInstance("SHA1");
         ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());

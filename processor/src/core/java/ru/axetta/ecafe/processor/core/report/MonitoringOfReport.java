@@ -138,7 +138,9 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            Date date = CalendarUtils.startOfDay(new Date());//вызов из построения по расписанию
+            Date date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);//вызов из построения по расписанию
+            int day = CalendarUtils.getDayOfWeek(date);
+            if (day == 1) return null; //на Вск не генерируем
             return buildInternal(date, endTime, calendar);
         }
 
