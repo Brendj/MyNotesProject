@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
 import ru.axetta.ecafe.processor.web.ui.addpayment.*;
@@ -10140,6 +10141,8 @@ public class MainPage implements Serializable {
     }
 
     public Object verificationCardData(){
+        Long timeStamp = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_VALID_REGISTRY_DATE);
+        Date validRegistryDate = CalendarUtils.endOfDay(new Date(timeStamp));
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -10159,12 +10162,20 @@ public class MainPage implements Serializable {
                 Card lastCard = DAOUtils.getLastCardByClient(persistenceSession, client);
                 if(lastCard != null) {
                     String cardLockReason = lastCard.getLockReason();
+                    Date createDate = lastCard.getCreateTime();
+                    String typeOfLastCard = Card.TYPE_NAMES[lastCard.getCardType()];
                     if (cardLockReason != null) {
-                        if (cardLockReason.equals(CardLockReason.REISSUE_BROKEN.getDescription()) || cardLockReason.equals(CardLockReason.REISSUE_LOSS.getDescription())) {
+                        if ((cardLockReason.equals(CardLockReason.REISSUE_BROKEN.getDescription()) || cardLockReason.equals(CardLockReason.REISSUE_LOSS.getDescription()))
+                                || createDate.before(validRegistryDate) || (typeOfLastCard.equals("Mifare") && cardType.equals("Браслет (Mifare)"))) {
                             modalPages.push(cardRegistrationConfirm);
                             cardRegistrationConfirm.prepareADialogue(cardType);
                         } else doCreateCard = true;
-                    } else doCreateCard = true;
+                    } else if(createDate.before(validRegistryDate) || (typeOfLastCard.equals("Mifare") && cardType.equals("Браслет (Mifare)"))){
+                        modalPages.push(cardRegistrationConfirm);
+                        cardRegistrationConfirm.prepareADialogue(cardType);
+                    } else {
+                        doCreateCard = true;
+                    }
                 } else doCreateCard = true;
             } else doCreateCard = true;
             if(doCreateCard) cardRegistrationAndIssuePage.createCard();

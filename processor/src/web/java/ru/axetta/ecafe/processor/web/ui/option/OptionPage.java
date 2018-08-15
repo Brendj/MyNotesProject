@@ -124,6 +124,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPTSAServer;
     private Boolean useXadesT;
     private Boolean disableEmailEdit;
+    private Date validRegistryDate;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -945,6 +946,9 @@ public class OptionPage extends BasicWorkspacePage {
         defaultOverdraftLimit = runtimeContext.getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
         defaultExpenditureLimit = runtimeContext.getOptionValueLong(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);
 
+        Long timeStamp = runtimeContext.getOptionValueLong(Option.OPTION_VALID_REGISTRY_DATE);
+        validRegistryDate = new Date(timeStamp == null? 0L : timeStamp);
+
     }
 
     public Object save() {
@@ -1052,6 +1056,8 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_READER_FOR_WEB_STRING, readerForWebInterfaceString);
 
+            runtimeContext.setOptionValue(Option.OPTION_VALID_REGISTRY_DATE, validRegistryDate.getTime());
+
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {
@@ -1103,5 +1109,13 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void turnOffSverka() {
         DAOService.getInstance().setSverkaEnabled(false);
+    }
+
+    public Date getValidRegistryDate() {
+        return validRegistryDate;
+    }
+
+    public void setValidRegistryDate(Date validRegistryDate) {
+        this.validRegistryDate = validRegistryDate;
     }
 }

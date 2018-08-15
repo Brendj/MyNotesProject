@@ -112,7 +112,13 @@
             <h:outputText escape="true" value="Запрет редактирования поля e-mail клиента" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.disableEmailEdit}" styleClass="output-text" />
         </h:panelGrid>
-
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Дата выдачи карты" styleClass="output-text"/>
+            <rich:calendar value="#{optionPage.validRegistryDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text"
+                           showWeeksBar="false">
+            </rich:calendar>
+        </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />
