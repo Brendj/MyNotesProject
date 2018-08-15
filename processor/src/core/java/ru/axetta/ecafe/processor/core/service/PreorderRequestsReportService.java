@@ -400,7 +400,7 @@ public class PreorderRequestsReportService {
               + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
               + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
               + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
-              + "   c.balance, c.idofclient, pc.deletedstate OR pmd.deletedstate AS isdeleted "
+              + "   c.balance, c.idofclient, (pc.deletedstate=1 OR pmd.deletedstate=1) AS isdeleted "
               + "FROM cf_preorder_complex pc "
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
