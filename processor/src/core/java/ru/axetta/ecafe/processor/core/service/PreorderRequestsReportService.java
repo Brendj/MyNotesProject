@@ -99,6 +99,10 @@ public class PreorderRequestsReportService {
 
         Date fireTime = new Date();
 
+        int dayNum = CalendarUtils.getDayOfWeek(fireTime);
+        if (Calendar.SATURDAY == dayNum || Calendar.SUNDAY == dayNum)
+            return;
+
         Session session = null;
         Transaction transaction = null;
         try {
@@ -129,7 +133,8 @@ public class PreorderRequestsReportService {
 
                     DatesForPreorder dates = datesMap.get(item.getIdOfOrg());
                     if (dates == null) {
-                        getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate);
+                        if (!getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate))
+                            continue;
                         dates = new DatesForPreorder();
                         dates.startDate = startDate;
                         dates.endDate = endDate;
@@ -143,7 +148,7 @@ public class PreorderRequestsReportService {
                     }
 
                     if (null == item.getIdOfGoodsRequestPosition()) {
-                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, fireTime, item.getPreorderDate());
+                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, CalendarUtils.startOfDay(fireTime));
 
                         if ((item.clientBalance - item.complexPrice - preordersPrice) < 0L) {
                             logger.warn(String.format("PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
@@ -215,7 +220,8 @@ public class PreorderRequestsReportService {
             Date startDate = new Date();
             Date endDate = new Date();
 
-            getPreorderDates(session, orgOwner, forbiddenDaysCount, startDate, endDate);
+            if (!getPreorderDates(session, orgOwner, forbiddenDaysCount, startDate, endDate))
+                return new ArrayList<String>();
 
             Criteria criteria = session.createCriteria(GoodRequestPosition.class);
             criteria.createAlias("goodRequest", "gr");
@@ -236,7 +242,7 @@ public class PreorderRequestsReportService {
         return resultList;
     }
 
-    private void getPreorderDates(Session session, Long orgOwner, Integer forbiddenDaysCount, Date startDate, Date endDate) {
+    private Boolean getPreorderDates(Session session, Long orgOwner, Integer forbiddenDaysCount, Date startDate, Date endDate) {
         Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
         Date _startDate = CalendarUtils.truncateToDayOfMonth(new Date());
         Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
@@ -285,6 +291,15 @@ public class PreorderRequestsReportService {
 
         startDate.setTime(_startDate.getTime());
         endDate.setTime(_endDate.getTime());
+
+        Date fireTimeStart = CalendarUtils.startOfDay(new Date());
+        Date fireTimeEnd = CalendarUtils.endOfDay(new Date());
+        for (SpecialDate date : specialDates) {
+            if (CalendarUtils.betweenOrEqualDate(date.getDate(), fireTimeStart, fireTimeEnd)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void updateDate() {
@@ -371,6 +386,9 @@ public class PreorderRequestsReportService {
         //properties.setProperty(GoodRequestsNewReport.P_NAME_FILTER, nameFiler);
         //properties.setProperty(GoodRequestsNewReport.P_ORG_REQUEST_FILTER, "1");        //OrgRequestFilterConverter.OrgRequestFilterEnum.ORG_WITH_DATA("Только с данными");
         properties.setProperty(GoodRequestsNewReport.P_HIDE_TOTAL_ROW, Boolean.toString(true));
+        //TODO
+        properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(false));
+        properties.setProperty(GoodRequestsNewReport.P_PREORDERS_ONLY, Boolean.toString(true));
         return properties;
     }
 
@@ -382,15 +400,15 @@ public class PreorderRequestsReportService {
               + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
               + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
               + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
-              + "   c.balance, c.idofclient "
+              + "   c.balance, c.idofclient, pc.deletedstate OR pmd.deletedstate AS isdeleted "
               + "FROM cf_preorder_complex pc "
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
               + "   AND ci.idofcomplex = pc.armcomplexid "
-              + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pmd.deletedstate = 0 "
+              + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "//AND pmd.deletedstate = 0 "
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.preorderdate > :date AND pc.deletedstate=0 and pc.idOfGoodsRequestPosition is null";
+              + "WHERE pc.preorderdate > :date and pc.idOfGoodsRequestPosition is null"; //AND pc.deletedstate=0
               //+ "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
         Query query = session.createSQLQuery(sqlQuery);
         query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
@@ -414,11 +432,13 @@ public class PreorderRequestsReportService {
             Integer menuDetailAmount = (null != o[11]) ? (Integer) o[11] : 0;
             Long clientBalance = (null != o[12]) ? ((BigInteger) o[12]).longValue() : 0L;
             Long idOfClient = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
+            Boolean isDeleted = (Boolean) o[14];
 
             preorderItemList
                     .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                             createdDate, idOfGoodsRequest, preorderDate,
-                            complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance, idOfClient));
+                            complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance, idOfClient,
+                            isDeleted));
         }
         return preorderItemList;
     }
@@ -491,21 +511,28 @@ public class PreorderRequestsReportService {
         }
         Boolean isUpdated = false;
 
-        if ((item.getAmount() * 1000L) != pos.getTotalCount()) {
-            Long lastTotal = pos.getTotalCount();
-            pos.setTotalCount(item.getAmount() * 1000L);
-            pos.setLastTotalCount(lastTotal);
-            pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
-            isUpdated = true;
-        }
-
         GoodRequest request = pos.getGoodRequest();
 
-        if (!item.getPreorderDate().equals(request.getDoneDate())) {
-            request.setDoneDate(item.getPreorderDate());
-            request.setLastUpdate(fireTime);
+        if (item.getDeleted()) {
+            pos.setDeletedState(true);
+            pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
+            request.setDeletedState(true);
             request = save(session, request, GoodRequest.class.getSimpleName());
             isUpdated = true;
+        } else {
+            if ((item.getAmount() * 1000L) != pos.getTotalCount()) {
+                Long lastTotal = pos.getTotalCount();
+                pos.setTotalCount(item.getAmount() * 1000L);
+                pos.setLastTotalCount(lastTotal);
+                pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
+                isUpdated = true;
+            }
+            if (!item.getPreorderDate().equals(request.getDoneDate())) {
+                request.setDoneDate(item.getPreorderDate());
+                request.setLastUpdate(fireTime);
+                request = save(session, request, GoodRequest.class.getSimpleName());
+                isUpdated = true;
+            }
         }
 
         if (isUpdated) {
@@ -683,6 +710,9 @@ public class PreorderRequestsReportService {
         properties.setProperty(GoodRequestsNewReport.P_HIDE_TOTAL_ROW, Boolean.toString(true));
         properties.setProperty(GoodRequestsNewReport.P_NOTIFICATION, Boolean.toString(true));
         properties.setProperty(PreorderRequestsReport.P_GUID_FILTER, StringUtils.join(guids, ","));
+        //TODO
+        properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(false));
+        properties.setProperty(GoodRequestsNewReport.P_PREORDERS_ONLY, Boolean.toString(true));
         builder.setReportProperties(properties);
         BasicReportJob reportJob = null;
         /* создаем отчет */
@@ -833,9 +863,11 @@ public class PreorderRequestsReportService {
         private Long complexPrice;
         private Long clientBalance;
         private Long idOfClient;
+        private Boolean isDeleted;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
-                Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance, Long idOfClient) {
+                Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance,
+                Long idOfClient, Boolean isDeleted) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -847,6 +879,7 @@ public class PreorderRequestsReportService {
             this.complexPrice = complexPrice;
             this.clientBalance = clientBalance;
             this.idOfClient = idOfClient;
+            this.isDeleted = isDeleted;
         }
 
         public PreorderItem() {
@@ -939,6 +972,14 @@ public class PreorderRequestsReportService {
 
         public void setIdOfClient(Long idOfClient) {
             this.idOfClient = idOfClient;
+        }
+
+        public Boolean getDeleted() {
+            return isDeleted;
+        }
+
+        public void setDeleted(Boolean deleted) {
+            isDeleted = deleted;
         }
     }
 

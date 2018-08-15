@@ -150,6 +150,13 @@
                                      styleClass="output-text"
                                      rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
 
+            <h:outputText escape="true" value="Типы заявок" styleClass="output-text" />
+            <h:selectOneMenu value="#{mainPage.goodRequestsNewReportPage.preorderType}"
+                             styleClass="output-text">
+                <f:converter converterId="preorderTypeConverter" />
+                <f:selectItems value="#{mainPage.goodRequestsNewReportPage.preorderTypeItems}" />
+            </h:selectOneMenu>
+
         </h:panelGrid>
     </rich:simpleTogglePanel>
 

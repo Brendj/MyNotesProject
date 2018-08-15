@@ -220,6 +220,12 @@
     </converter>
 
     <converter>
+        <description>Preorder Requests Type Converter</description>
+        <converter-id>preorderTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PreorderTypeConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Document State Filter Converter</description>
         <converter-id>documentStateFilterConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DocumentStateFilterConverter</converter-class>

@@ -25,10 +25,12 @@ public class PreorderReportItem {
     private Long idOfPreorderComplex;
     private String menuDetailName;
     private Integer amountMenuDetail;
+    private Boolean isRegularPreorder;
 
     public PreorderReportItem(Long idOfContragent, String contragentName, Long idOfOrg, String shortNameInfoService,
             String address, Long contractId, String surname, String firstname, String secondname, Date preorderDate,
-            Integer amountComplex, String complexName, Long idOfPreorderComplex, String menuDetailName, Integer amountMenuDetail) {
+            Integer amountComplex, String complexName, Long idOfPreorderComplex, String menuDetailName,
+            Integer amountMenuDetail, Boolean isRegularPreorder) {
         this.idOfContragent = idOfContragent;
         this.contragentName = contragentName;
         this.idOfOrg = idOfOrg;
@@ -44,6 +46,7 @@ public class PreorderReportItem {
         this.idOfPreorderComplex = idOfPreorderComplex;
         this.menuDetailName = menuDetailName;
         this.amountMenuDetail = amountMenuDetail;
+        this.isRegularPreorder = isRegularPreorder;
     }
 
     public Long getIdOfContragent() {
@@ -164,5 +167,13 @@ public class PreorderReportItem {
 
     public void setAmountMenuDetail(Integer amountMenuDetail) {
         this.amountMenuDetail = amountMenuDetail;
+    }
+
+    public Boolean getIsRegularPreorder() {
+        return isRegularPreorder;
+    }
+
+    public void setIsRegularPreorder(Boolean regularPreorder) {
+        isRegularPreorder = regularPreorder;
     }
 }

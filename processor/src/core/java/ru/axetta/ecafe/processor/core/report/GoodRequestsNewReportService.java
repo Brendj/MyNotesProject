@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
@@ -23,9 +24,12 @@ import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService.PREORDER_COMMENT;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,13 +39,6 @@ import java.util.*;
 public class GoodRequestsNewReportService {
 
     final private static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportService.class);
-    private static HashMap<FeedingPlanType, String> priorety = new HashMap<FeedingPlanType, String>();
-
-    static {
-        priorety.put(FeedingPlanType.REDUCED_PRICE_PLAN, "Льготное питание");
-        priorety.put(FeedingPlanType.PAY_PLAN, "Платное питание");
-        priorety.put(FeedingPlanType.SUBSCRIPTION_FEEDING, "Абонементное питание");
-    }
 
     final private String OVERALL;
     final private String OVERALL_TITLE;
@@ -58,8 +55,7 @@ public class GoodRequestsNewReportService {
     public List<Item> buildReportItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
             int hideDailySampleValue, Date generateBeginTime, Date generateEndTime, List<Long> idOfOrgList,
             List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
-            boolean notification) {
-
+            boolean notification, boolean hidePreorders, boolean preordersOnly) {
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(idOfOrgList, idOfMenuSourceOrgList);
 
         List<Item> itemList = new LinkedList<Item>();
@@ -67,50 +63,102 @@ public class GoodRequestsNewReportService {
         Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date endDate = CalendarUtils.endOfDay(endTime);
         TreeSet<Date> dates = new TreeSet<Date>();
-
-        Criteria criteriaComplex = session.createCriteria(ComplexInfo.class);
-        criteriaComplex.createAlias("org", "o");
-        criteriaComplex.add(Restrictions.isNotNull("good"));
-        criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
-        criteriaComplex.add(Restrictions.between("menuDate", beginDate, endDate));
-        List complexList = criteriaComplex.list();
         Map<Long, ComplexInfoItem> complexOrgDictionary = new HashMap<Long, ComplexInfoItem>();
         Map<Long, GoodInfo> allGoodsInfo = new HashMap<Long, GoodInfo>();
-        for (Object obj : complexList) {
-            ComplexInfo complexInfo = (ComplexInfo) obj;
-            FeedingPlanType feedingPlanType = null;
-            if (complexInfo != null) {
-                if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
-                        == 1)) {
-                    //feedingPlanType = "Абонементное питание";
-                    feedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING;
-                } else {
-                    if (complexInfo.getModeFree() == 1) {
-                        //feedingPlanType = "Льготное питание";
-                        feedingPlanType = FeedingPlanType.REDUCED_PRICE_PLAN;
+
+        if (!preordersOnly) {
+            Criteria criteriaComplex = session.createCriteria(ComplexInfo.class);
+            criteriaComplex.createAlias("org", "o");
+            criteriaComplex.add(Restrictions.isNotNull("good"));
+            criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
+            criteriaComplex.add(Restrictions.between("menuDate", beginDate, endDate));
+            List complexList = criteriaComplex.list();
+            for (Object obj : complexList) {
+                ComplexInfo complexInfo = (ComplexInfo) obj;
+                FeedingPlanType feedingPlanType = null;
+                if (complexInfo != null) {
+                    if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
+                            == 1)) {
+                        //feedingPlanType = "Абонементное питание";
+                        feedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING;
                     } else {
-                        //feedingPlanType = "Платное питание";
-                        feedingPlanType = FeedingPlanType.PAY_PLAN;
+                        if (complexInfo.getModeFree() == 1) {
+                            //feedingPlanType = "Льготное питание";
+                            feedingPlanType = FeedingPlanType.REDUCED_PRICE_PLAN;
+                        } else {
+                            //feedingPlanType = "Платное питание";
+                            feedingPlanType = FeedingPlanType.PAY_PLAN;
+                        }
                     }
                 }
+                final Long globalId = complexInfo.getGood().getGlobalId();
+                final Long idOfOrg = complexInfo.getOrg().getIdOfOrg();
+                ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
+                GoodInfo info = new GoodInfo(globalId, "", feedingPlanType);
+                if (infoItem == null) {
+                    infoItem = new ComplexInfoItem(idOfOrg);
+                }
+                infoItem.goodInfos.put(globalId, info);
+                complexOrgDictionary.put(idOfOrg, infoItem);
+                allGoodsInfo.put(globalId, info);
             }
-            final Long globalId = complexInfo.getGood().getGlobalId();
-            final Long idOfOrg = complexInfo.getOrg().getIdOfOrg();
-            ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
-            GoodInfo info = new GoodInfo(globalId, "", feedingPlanType);
-            if (infoItem == null) {
-                infoItem = new ComplexInfoItem(idOfOrg);
+        }
+
+        if (!hidePreorders) {
+            String sqlQuery =
+                    "SELECT distinct ci.idoforg, "
+                            + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
+                            + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex "
+                            + "FROM cf_preorder_complex pc "
+                            + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                            + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
+                            + "   AND ci.idofcomplex = pc.armcomplexid "
+                            + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
+                            + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
+                            + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
+                            + "WHERE ci.idOfOrg IN (:orgList) AND ci.menuDate BETWEEN :startDate AND :endDate and pc.deletedState = 0 and pmd.deletedState = 0";
+
+            Query query = session.createSQLQuery(sqlQuery);
+            query.setParameterList("orgList", orgMap.keySet());
+            query.setParameter("startDate", beginDate.getTime());
+            query.setParameter("endDate", endDate.getTime());
+
+            List complexList = query.list();
+
+            for (Object obj : complexList) {
+                Object values[] = (Object[])obj;
+
+                //globalId
+                if (null == values[1])
+                    continue;
+
+                FeedingPlanType planType;
+                final Long idOfOrg = ((BigInteger) values[0]).longValue();
+                final Long globalId = ((BigInteger) values[1]).longValue();
+                Boolean isComplex = (Boolean) values[2];
+
+                if (isComplex) {
+                    planType = FeedingPlanType.COMPLEX;
+                } else {
+                    planType = FeedingPlanType.DISH;
+                }
+
+                ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
+                GoodInfo info = new GoodInfo(globalId, "", planType);
+                if (infoItem == null) {
+                    infoItem = new ComplexInfoItem(idOfOrg);
+                }
+                infoItem.goodInfos.put(globalId, info);
+                complexOrgDictionary.put(idOfOrg, infoItem);
+                allGoodsInfo.put(globalId, info);
             }
-            infoItem.goodInfos.put(globalId, info);
-            complexOrgDictionary.put(idOfOrg, infoItem);
-            allGoodsInfo.put(globalId, info);
         }
 
         List<GoodRequestPosition> goodRequestPositionList = getGoodRequestPositions(nameFilter, generateEndTime,
-                hideGeneratePeriod, false, orgMap, beginDate, endDate);
+                hideGeneratePeriod, false, orgMap, beginDate, endDate, !hidePreorders);
         if (notification) {
             List<GoodRequestPosition> goodRequestPositionListN = getGoodRequestPositions(nameFilter, generateEndTime,
-                    hideGeneratePeriod, true, orgMap, beginDate, endDate);
+                    hideGeneratePeriod, true, orgMap, beginDate, endDate, !hidePreorders);
             if (goodRequestPositionListN.size() > 0) {
                 goodRequestPositionList.addAll(goodRequestPositionListN);
             }
@@ -186,6 +234,16 @@ public class GoodRequestsNewReportService {
                     hideDailySampleValue, hideLastValue, null, 0L));
         }
         return itemList;
+    }
+
+    public List<Item> buildReportItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
+            int hideDailySampleValue, Date generateBeginTime, Date generateEndTime, List<Long> idOfOrgList,
+            List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
+            boolean notification) {
+
+        return buildReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue, generateBeginTime,
+                generateEndTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, hideGeneratePeriod,
+                hideLastValue, notification, false, false);
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(List<Long> idOfOrgList,
@@ -268,7 +326,11 @@ public class GoodRequestsNewReportService {
             if (complexOrgDictionary.get(position.getOrgOwner()).goodInfos.containsKey(good.getGlobalId())) {
                 feedingPlanType = complexOrgDictionary.get(position.getOrgOwner()).goodInfos
                         .get(good.getGlobalId()).feedingPlanType;
+            } else {
+                return;
             }
+        } else {
+            return;
         }
         String name = good.getFullName();
         if (StringUtils.isEmpty(name)) {
@@ -302,12 +364,17 @@ public class GoodRequestsNewReportService {
 
     private List<GoodRequestPosition> getGoodRequestPositions(String nameFilter, Date generateEndTime,
             boolean hideGeneratePeriod, boolean notification, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
-            Date beginDate, Date endDate) {
+            Date beginDate, Date endDate, boolean needPreorders) {
         Criteria criteria = session.createCriteria(GoodRequestPosition.class);
         criteria.createAlias("goodRequest", "gr");
         criteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
         criteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
         criteria.add(Restrictions.isNotNull("good"));
+        if (!needPreorders) {
+            criteria.add(Restrictions.ne("gr.comment", PREORDER_COMMENT));
+        } else {
+            criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
+        }
 
         if (notification) {
             criteria.add(Restrictions.eq("deletedState", true));
@@ -354,30 +421,42 @@ public class GoodRequestsNewReportService {
         }
     }
 
-    private static enum FeedingPlanType {
-        /*0*/ REDUCED_PRICE_PLAN,
-        /*1*/ PAY_PLAN,
-        /*2*/ SUBSCRIPTION_FEEDING
+    public enum FeedingPlanType {
+        /*0*/ REDUCED_PRICE_PLAN("Льготное питание"),
+        /*1*/ PAY_PLAN("Платное питание"),
+        /*2*/ SUBSCRIPTION_FEEDING("Абонементное питание"),
+        /*3*/ COMPLEX("Вариативное платное питание. Комплексы"),
+        /*4*/ DISH("Вариативное платное питание. Отдельные блюда");
+
+        private String name;
+
+        FeedingPlanType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
-    private static class ComplexInfoItem {
+    public static class ComplexInfoItem {
 
         final long idOfOrg;
         final Map<Long, GoodInfo> goodInfos = new HashMap<Long, GoodInfo>();
 
-        private ComplexInfoItem(long idOfOrg) {
+        public ComplexInfoItem(long idOfOrg) {
             this.idOfOrg = idOfOrg;
         }
 
     }
 
-    private static class GoodInfo {
+    public static class GoodInfo {
 
         final long idOfGood;
         final String name;
         final FeedingPlanType feedingPlanType;
 
-        private GoodInfo(long idOfGood, String name, FeedingPlanType feedingPlanType) {
+        public GoodInfo(long idOfGood, String name, FeedingPlanType feedingPlanType) {
             this.idOfGood = idOfGood;
             this.name = name;
             this.feedingPlanType = feedingPlanType;
@@ -456,7 +535,7 @@ public class GoodRequestsNewReportService {
                 feedingPlanTypeStr = "";
                 feedingPlanTypeNum = -1;
             } else {
-                feedingPlanTypeStr = priorety.get(feedingPlanType);
+                feedingPlanTypeStr = feedingPlanType.getName();
                 feedingPlanTypeNum = feedingPlanType.ordinal();
             }
             this.notificationMark = notificationMark;

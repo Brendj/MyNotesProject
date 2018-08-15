@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -38,10 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,7 +55,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     //private final static String generateEndDateKey = "goodRequestsReport.generateEndDate";
 
     private String htmlReport = null;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
     private Date generateBeginDate = new Date();
     private Date generateEndDate = new Date();
     private Boolean hideMissedColumns = true;
@@ -70,6 +67,25 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private User currentUser;
     //private String lastGoodRequestUpdateDateTiem;
     private Date lastGoodRequestUpdateDateTime;
+    private List<SelectItem> preorderTypeItems = readAllPreordersPresenceItems();
+    private PreordersPresenceTypeEnum preorderType = PreordersPresenceTypeEnum.WITH_PREORDERS;
+
+    public enum PreordersPresenceTypeEnum {
+        WITH_PREORDERS("Включить предзаказы"),
+        WITHOUT_PREORDERS("Исключить предзаказы"),
+        ONLY_PREORDERS("Только предзаказы");
+
+        private final String description;
+
+        private PreordersPresenceTypeEnum(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+    }
 
     public void applyOfOrgList(ActionEvent ae) {
         if (applyUserSettings) {
@@ -457,6 +473,18 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(hideLastValue));
         properties.setProperty(GoodRequestsNewReport.P_NAME_FILTER, nameFiler);
         properties.setProperty(GoodRequestsNewReport.P_ORG_REQUEST_FILTER, Integer.toString(orgRequest.getOrgRequestFilterEnum().ordinal()));
+        //TODO
+
+        boolean hidePreorders = false, preordersOnly = false;
+        switch (preorderType) {
+            case ONLY_PREORDERS: preordersOnly = true; hidePreorders = false; break;
+            case WITH_PREORDERS: preordersOnly = false; hidePreorders = false; break;
+            case WITHOUT_PREORDERS: preordersOnly = false; hidePreorders = true; break;
+            default: break;
+        }
+
+        properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(hidePreorders));
+        properties.setProperty(GoodRequestsNewReport.P_PREORDERS_ONLY, Boolean.toString(preordersOnly));
         return properties;
     }
 
@@ -491,10 +519,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
     public String getHtmlReport() {
         return htmlReport;
-    }
-
-    public PeriodTypeMenu getPeriodTypeMenu() {
-        return periodTypeMenu;
     }
 
     public Date getGenerateBeginDate() {
@@ -551,5 +575,30 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
     public void setHideLastValue(Boolean hideLastValue) {
         this.hideLastValue = hideLastValue;
+    }
+
+    public List<SelectItem> getPreorderTypeItems() {
+        return preorderTypeItems;
+    }
+
+    public void setPreorderTypeItems(List<SelectItem> preorderTypeItems) {
+        this.preorderTypeItems = preorderTypeItems;
+    }
+
+    public PreordersPresenceTypeEnum getPreorderType() {
+        return preorderType;
+    }
+
+    public void setPreorderType(PreordersPresenceTypeEnum preorderType) {
+        this.preorderType = preorderType;
+    }
+
+    private static List<SelectItem> readAllPreordersPresenceItems() {
+        PreordersPresenceTypeEnum[] preordersPresenceTypeEnums = PreordersPresenceTypeEnum.values();
+        List<SelectItem> items = new ArrayList<SelectItem>(preordersPresenceTypeEnums.length);
+        for (PreordersPresenceTypeEnum type : preordersPresenceTypeEnums) {
+            items.add(new SelectItem(type, type.toString()));
+        }
+        return items;
     }
 }

@@ -3355,7 +3355,7 @@ public class DAOUtils {
         return idoforg.longValue();
     }
 
-	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate) {
+	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate) {
         Query query = session.createSQLQuery(
           "SELECT sum(CASE WHEN pc.complexprice IS NOT NULL AND pc.amount IS NOT NULL THEN pc.complexprice * pc.amount ELSE 0 END) AS complexprice, "
            + "    sum(CASE WHEN pmd.menudetailprice IS NOT NULL AND pmd.amount IS NOT NULL THEN pmd.menudetailprice * pmd.amount ELSE 0 END) AS menudetailprice "
@@ -3363,12 +3363,11 @@ public class DAOUtils {
            + "INNER JOIN cf_goods_requests_positions grp ON gr.idofgoodsrequest = grp.idofgoodsrequest AND grp.notified = true "
            + "LEFT JOIN cf_preorder_complex pc ON pc.idofgoodsrequestposition = grp.idofgoodsrequestposition "
            + "LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofgoodsrequestposition = grp.idofgoodsrequestposition "
-           + "WHERE gr.comment LIKE :comment AND (pc.idofclient = :idOfClient OR pmd.idofclient = :idOfClient) AND gr.donedate between :startDate AND :endDate ");
+           + "WHERE gr.comment LIKE :comment AND (pc.idofclient = :idOfClient OR pmd.idofclient = :idOfClient) AND gr.donedate >= :startDate");
 
         query.setParameter("comment", PREORDER_COMMENT);
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", startDate.getTime());
-        query.setParameter("endDate", endDate.getTime());
 
         Object values[] = (Object[])query.uniqueResult();
 

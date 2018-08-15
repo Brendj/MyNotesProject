@@ -88,7 +88,7 @@ public class PreordersReport extends BasicReportForListOrgsJob {
             }
             Query query = session.createSQLQuery("SELECT ctg.idofcontragent, ctg.contragentname, o.idoforg, o.shortnameinfoservice, o.address, "
                     + "c.contractid, p.surname, p.firstname, p.secondname, pc.preorderdate, pc.amount as complexAmount, ci.complexname, pc.idofpreordercomplex, "
-                    + "md.menudetailname, pmd.amount as menudetailAmount "
+                    + "md.menudetailname, pmd.amount as menudetailAmount, pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder "
                     + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                     + "INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
@@ -128,9 +128,10 @@ public class PreordersReport extends BasicReportForListOrgsJob {
                 Long idOfPreorderComplex = ((BigInteger) row[12]).longValue();
                 String menuDetailName = (String) row[13];
                 Integer amountMenuDetail = (Integer) row[14];
+                Boolean isRegularPreorder = (Boolean) row[15];
                 PreorderReportItem item = new PreorderReportItem(idOfContragent, contragentName, idOfOrg, shortNameInfoService,
-                        address, contractId, surname, firstname, secondname, preorderDate,
-                        amountComplex, complexName, idOfPreorderComplex, menuDetailName, amountMenuDetail);
+                        address, contractId, surname, firstname, secondname, preorderDate, amountComplex, complexName,
+                        idOfPreorderComplex, menuDetailName, amountMenuDetail, isRegularPreorder);
                 result.add(item);
             }
             return new JRBeanCollectionDataSource(result);

@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -56,6 +57,8 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_LAST_CREATE_OR_UPDATE_DATE = "lastCreateOrUpdateDate";
     final public static String P_HIDE_TOTAL_ROW = "hideTotalRow";
     final public static String P_NOTIFICATION = "notification";
+    final public static String P_HIDE_PREORDERS = "hidePreorders";
+    final public static String P_PREORDERS_ONLY = "preordersOnly";
 
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
@@ -135,6 +138,12 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             String notificationString = reportProperties.getProperty(P_NOTIFICATION, "false");
             final boolean notification = Boolean.parseBoolean(notificationString);
 
+            String hidePreordersString = reportProperties.getProperty(P_HIDE_PREORDERS, "true");
+            final boolean hidePreorders = Boolean.parseBoolean(hidePreordersString);
+
+            String preordersOnlyString = reportProperties.getProperty(P_PREORDERS_ONLY, "false");
+            final boolean preordersOnly = Boolean.parseBoolean(preordersOnlyString);
+
             // пока нет необходимости
             //parameterMap.put("overall",Long.toString(OVERALL));
             //parameterMap.put("overall_all",Long.toString(OVERALL_TOTAL));
@@ -142,13 +151,11 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             //        OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE, hideTotalRow);
             GoodRequestsNewReportService service;
             service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
+
             return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
-                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification));
+                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly));
         }
-
-
-
     }
 
     public GoodRequestsNewReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
