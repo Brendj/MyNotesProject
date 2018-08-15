@@ -1116,6 +1116,10 @@ public class OptionPage extends BasicWorkspacePage {
     }
 
     public void setValidRegistryDate(Date validRegistryDate) {
-        this.validRegistryDate = validRegistryDate;
+        if(validRegistryDate == null){
+            this.validRegistryDate = new Date(0L);
+        } else {
+            this.validRegistryDate = validRegistryDate;
+        }
     }
 }
