@@ -155,10 +155,10 @@ public class GoodRequestsNewReportService {
         }
 
         List<GoodRequestPosition> goodRequestPositionList = getGoodRequestPositions(nameFilter, generateEndTime,
-                hideGeneratePeriod, false, orgMap, beginDate, endDate, !hidePreorders);
+                hideGeneratePeriod, false, orgMap, beginDate, endDate, preordersOnly, hidePreorders);
         if (notification) {
             List<GoodRequestPosition> goodRequestPositionListN = getGoodRequestPositions(nameFilter, generateEndTime,
-                    hideGeneratePeriod, true, orgMap, beginDate, endDate, !hidePreorders);
+                    hideGeneratePeriod, true, orgMap, beginDate, endDate, preordersOnly, hidePreorders);
             if (goodRequestPositionListN.size() > 0) {
                 goodRequestPositionList.addAll(goodRequestPositionListN);
             }
@@ -233,6 +233,7 @@ public class GoodRequestsNewReportService {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
                     hideDailySampleValue, hideLastValue, null, 0L));
         }
+
         return itemList;
     }
 
@@ -364,16 +365,17 @@ public class GoodRequestsNewReportService {
 
     private List<GoodRequestPosition> getGoodRequestPositions(String nameFilter, Date generateEndTime,
             boolean hideGeneratePeriod, boolean notification, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
-            Date beginDate, Date endDate, boolean needPreorders) {
+            Date beginDate, Date endDate, boolean preordersOnly, boolean hidePreorders) {
         Criteria criteria = session.createCriteria(GoodRequestPosition.class);
         criteria.createAlias("goodRequest", "gr");
         criteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
         criteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
         criteria.add(Restrictions.isNotNull("good"));
-        if (!needPreorders) {
-            criteria.add(Restrictions.ne("gr.comment", PREORDER_COMMENT));
-        } else {
+        if (preordersOnly) {
             criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
+        }
+        if (hidePreorders) {
+            criteria.add(Restrictions.ne("gr.comment", PREORDER_COMMENT));
         }
 
         if (notification) {
