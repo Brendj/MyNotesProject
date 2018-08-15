@@ -67,7 +67,7 @@ alter table cf_specialdates add column idofclientgroup bigint,
 
 alter table cf_specialdates add CONSTRAINT cf_specialdates_pk PRIMARY KEY (idofspecialdate);
 
-update cf_generators set idOfSpecialDate = (select (max(idOfspecialdate)+1) from cf_specialdates );
+update cf_generators set idOfSpecialDate = (select (coalesce(max(idOfspecialdate), 0)+1) from cf_specialdates );
 
 --Статус перехода УИД карты от одной организации к другой
 alter table cf_cards add column transitionstate integer not null default 0;
