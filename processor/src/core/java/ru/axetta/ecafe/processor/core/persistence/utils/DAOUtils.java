@@ -51,6 +51,7 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -2923,12 +2924,12 @@ public class DAOUtils {
             idOfMainOrg = o.getIdOfOrg();
         }
 
-        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
-        criteria.add(Restrictions.eq("idOfMainOrg", idOfMainOrg));
-        criteria.add(Restrictions.eq("groupName", groupName));
-
-        List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) criteria.list();
-
+        Query query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
+                                          + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+        query.setParameter("idOfMainOrg", idOfMainOrg);
+        query.setParameter("groupName", groupName.toLowerCase());
+        
+        List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) query.list();
         GroupNamesToOrgs groupNamesToOrgs = null;
 
         for (GroupNamesToOrgs namesToOrgs: list) {
