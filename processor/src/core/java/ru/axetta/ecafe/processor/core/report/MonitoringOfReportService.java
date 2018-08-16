@@ -122,6 +122,7 @@ public class MonitoringOfReportService {
             monitoringOfItem.setNumberOfPassesEmployees(numberOfPasses.getEmployees());
             monitoringOfItem.setNumberOfUniquePassesEmployees(numberOfPasses.getUniqueEmployees());
             monitoringOfItem.setNumberOfPassesGuardians(numberOfPasses.getGuardians());
+            monitoringOfItem.setNumberOfUniquePassesGuardians(numberOfPasses.getUniqueGuardians());
             monitoringOfItem.setSummaryOfPasses(
                     monitoringOfItem.getNumberOfPassesStudents() + monitoringOfItem.getNumberOfPassesEmployees()
                             + monitoringOfItem.getNumberOfPassesGuardians());
@@ -197,7 +198,9 @@ public class MonitoringOfReportService {
                                 + "                   AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday)) "
                                 + "                   THEN idofclient END)) AS number_of_unique_passes_employees_monday, "
                                 + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday))"
-                                + "                   THEN idofclient END)) AS number_of_passes_guardians_monday ";
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_monday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeMonday AND :endTimeMonday))"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_monday ";
             }
 
             if (datePeriodList.size() >= 2) {
@@ -213,7 +216,9 @@ public class MonitoringOfReportService {
                                 + "                   AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday)) "
                                 + "                   THEN idofclient END)) AS number_of_unique_passes_employees_tuesday, "
                                 + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday))"
-                                + "                   THEN idofclient END)) AS number_of_passes_guardians_tuesday ";
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_tuesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeTuesday AND :endTimeTuesday))"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_tuesday ";
             }
 
             if (datePeriodList.size() >= 3) {
@@ -229,7 +234,9 @@ public class MonitoringOfReportService {
                                 + "                   AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday)) "
                                 + "                   THEN idofclient END)) AS number_of_unique_passes_employees_wednesday, "
                                 + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday))"
-                                + "                   THEN idofclient END)) AS number_of_passes_guardians_wednesday ";
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_wednesday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeWednesday AND :endTimeWednesday))"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_wednesday ";
             }
 
             if (datePeriodList.size() >= 4) {
@@ -245,7 +252,9 @@ public class MonitoringOfReportService {
                                 + "                   AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday)) "
                                 + "                   THEN idofclient END)) AS number_of_unique_passes_employees_thursday, "
                                 + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday))"
-                                + "                   THEN idofclient END)) AS number_of_passes_guardians_thursday ";
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_thursday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeThursday AND :endTimeThursday))"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_thursday ";
             }
 
             if (datePeriodList.size() >= 5) {
@@ -261,7 +270,9 @@ public class MonitoringOfReportService {
                                 + "                   AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday)) "
                                 + "                   THEN idofclient END)) AS number_of_unique_passes_employees_friday, "
                                 + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday))"
-                                + "                   THEN idofclient END)) AS number_of_passes_guardians_friday ";
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_friday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeFriday AND :endTimeFriday))"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_friday ";
             }
 
             if (datePeriodList.size() == 6) {
@@ -277,7 +288,9 @@ public class MonitoringOfReportService {
                                 + "                   AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday)) "
                                 + "                   THEN idofclient END)) AS number_of_unique_passes_employees_saturday, "
                                 + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday))"
-                                + "                   THEN idofclient END)) AS number_of_passes_guardians_saturday ";
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_saturday, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTimeSaturday AND :endTimeSaturday))"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_saturday ";
             }
             String orgCondition = "";
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -320,32 +333,32 @@ public class MonitoringOfReportService {
                 List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>();
                 if (datePeriodList.size() >= 1) {
                     NumberOfPasses numberOfPassesMonday = new NumberOfPasses(((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(),
-                            ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue());
+                            ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue(), ((BigInteger) object[6]).longValue());
                     numberOfPassesList.add(numberOfPassesMonday);
                 }
                 if (datePeriodList.size() >= 2) {
-                    NumberOfPasses numberOfPassesTuesday = new NumberOfPasses(((BigInteger) object[6]).longValue(), ((BigInteger) object[7]).longValue(), ((BigInteger) object[8]).longValue(),
-                            ((BigInteger) object[9]).longValue(), ((BigInteger) object[10]).longValue());
+                    NumberOfPasses numberOfPassesTuesday = new NumberOfPasses(((BigInteger) object[7]).longValue(), ((BigInteger) object[8]).longValue(), ((BigInteger) object[9]).longValue(),
+                            ((BigInteger) object[10]).longValue(), ((BigInteger) object[11]).longValue(), ((BigInteger) object[12]).longValue());
                     numberOfPassesList.add(numberOfPassesTuesday);
                 }
                 if (datePeriodList.size() >= 3) {
-                    NumberOfPasses numberOfPassesWednesday = new NumberOfPasses(((BigInteger) object[11]).longValue(), ((BigInteger) object[12]).longValue(), ((BigInteger) object[13]).longValue(),
-                            ((BigInteger) object[14]).longValue(), ((BigInteger) object[15]).longValue());
+                    NumberOfPasses numberOfPassesWednesday = new NumberOfPasses(((BigInteger) object[13]).longValue(), ((BigInteger) object[14]).longValue(), ((BigInteger) object[15]).longValue(),
+                            ((BigInteger) object[16]).longValue(), ((BigInteger) object[17]).longValue(), ((BigInteger) object[18]).longValue());
                     numberOfPassesList.add(numberOfPassesWednesday);
                 }
                 if (datePeriodList.size() >= 4) {
-                    NumberOfPasses numberOfPassesThursday = new NumberOfPasses(((BigInteger) object[16]).longValue(), ((BigInteger) object[17]).longValue(), ((BigInteger) object[18]).longValue(),
-                            ((BigInteger) object[19]).longValue(), ((BigInteger) object[20]).longValue());
+                    NumberOfPasses numberOfPassesThursday = new NumberOfPasses(((BigInteger) object[19]).longValue(), ((BigInteger) object[20]).longValue(), ((BigInteger) object[21]).longValue(),
+                            ((BigInteger) object[22]).longValue(), ((BigInteger) object[23]).longValue(), ((BigInteger) object[24]).longValue());
                     numberOfPassesList.add(numberOfPassesThursday);
                 }
                 if (datePeriodList.size() >= 5) {
-                    NumberOfPasses numberOfPassesFriday = new NumberOfPasses(((BigInteger) object[21]).longValue(), ((BigInteger) object[22]).longValue(), ((BigInteger) object[23]).longValue(),
-                            ((BigInteger) object[24]).longValue(), ((BigInteger) object[25]).longValue());
+                    NumberOfPasses numberOfPassesFriday = new NumberOfPasses(((BigInteger) object[25]).longValue(), ((BigInteger) object[26]).longValue(), ((BigInteger) object[27]).longValue(),
+                            ((BigInteger) object[28]).longValue(), ((BigInteger) object[29]).longValue(), ((BigInteger) object[30]).longValue());
                     numberOfPassesList.add(numberOfPassesFriday);
                 }
                 if (datePeriodList.size() == 6) {
-                    NumberOfPasses numberOfPassesSaturday = new NumberOfPasses(((BigInteger) object[26]).longValue(), ((BigInteger) object[27]).longValue(), ((BigInteger) object[28]).longValue(),
-                            ((BigInteger) object[29]).longValue(), ((BigInteger) object[30]).longValue());
+                    NumberOfPasses numberOfPassesSaturday = new NumberOfPasses(((BigInteger) object[31]).longValue(), ((BigInteger) object[32]).longValue(), ((BigInteger) object[33]).longValue(),
+                            ((BigInteger) object[34]).longValue(), ((BigInteger) object[35]).longValue(), ((BigInteger) object[36]).longValue());
                     numberOfPassesList.add(numberOfPassesSaturday);
                 }
                 result.put(((BigInteger) object[0]).longValue(), numberOfPassesList);
@@ -356,7 +369,7 @@ public class MonitoringOfReportService {
                 if (result.get(idOfOrg) == null) {
                     List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>();
                     for (int ii = 1; ii <= datePeriodList.size(); ii++) {
-                        NumberOfPasses numberOfPasses = new NumberOfPasses(0L, 0L, 0L, 0L, 0L);
+                        NumberOfPasses numberOfPasses = new NumberOfPasses(0L, 0L, 0L, 0L, 0L, 0L);
                         numberOfPassesList.add(numberOfPasses);
                     }
                     result.put(idOfOrg, numberOfPassesList);
@@ -1276,6 +1289,7 @@ public class MonitoringOfReportService {
         private Long numberOfPassesEmployees;
         private Long numberOfUniquePassesEmployees;
         private Long numberOfPassesGuardians;
+        private Long numberOfUniquePassesGuardians;
         private Long summaryOfPasses;
 
         private Long numberOfLgotnoe;
@@ -1293,7 +1307,7 @@ public class MonitoringOfReportService {
         }
 
         public MonitoringOfItem(Date sDate, Long numberOfPassesStudents, Long numberOfUniquePassesStudents,
-                Long numberOfPassesEmployees, Long numberOfUniquePassesEmployees, Long numberOfPassesGuardians,
+                Long numberOfPassesEmployees, Long numberOfUniquePassesEmployees, Long numberOfPassesGuardians, Long numberOfUniquePassesGuardians,
                 Long summaryOfPasses, Long numberOfLgotnoe, Long numberOfReserve, Long numberOfBuffetStudent,
                 Long numberOfBuffetGuardians, Long numberOfSubFeedStudents, Long numberOfSubFeedGuardians,
                 Long numberOfPaidStudents, Long numberOfPaidGuardians) {
@@ -1303,6 +1317,7 @@ public class MonitoringOfReportService {
             this.numberOfPassesEmployees = numberOfPassesEmployees;
             this.numberOfUniquePassesEmployees = numberOfUniquePassesEmployees;
             this.numberOfPassesGuardians = numberOfPassesGuardians;
+            this.numberOfUniquePassesGuardians = numberOfUniquePassesGuardians;
             this.summaryOfPasses = summaryOfPasses;
             this.numberOfLgotnoe = numberOfLgotnoe;
             this.numberOfReserve = numberOfReserve;
@@ -1449,6 +1464,14 @@ public class MonitoringOfReportService {
         public void setNumberOfUniquePassesEmployees(Long numberOfUniquePassesEmployees) {
             this.numberOfUniquePassesEmployees = numberOfUniquePassesEmployees;
         }
+
+        public Long getNumberOfUniquePassesGuardians() {
+            return numberOfUniquePassesGuardians;
+        }
+
+        public void setNumberOfUniquePassesGuardians(Long numberOfUniquePassesGuardians) {
+            this.numberOfUniquePassesGuardians = numberOfUniquePassesGuardians;
+        }
     }
 
     public static class DatePeriods {
@@ -1487,13 +1510,15 @@ public class MonitoringOfReportService {
         private Long employees;
         private Long uniqueEmployees;
         private Long guardians;
+        private Long uniqueGuardians;
 
-        public NumberOfPasses(Long students, Long uniqueStudents, Long employees, Long uniqueEmployees, Long guardians) {
+        public NumberOfPasses(Long students, Long uniqueStudents, Long employees, Long uniqueEmployees, Long guardians, Long uniqueGuardians) {
             this.students = students;
             this.uniqueStudents = uniqueStudents;
             this.employees = employees;
             this.uniqueEmployees = uniqueEmployees;
             this.guardians = guardians;
+            this.uniqueGuardians = uniqueGuardians;
         }
 
         public Long getStudents() {
@@ -1534,6 +1559,14 @@ public class MonitoringOfReportService {
 
         public void setGuardians(Long guardians) {
             this.guardians = guardians;
+        }
+
+        public Long getUniqueGuardians() {
+            return uniqueGuardians;
+        }
+
+        public void setUniqueGuardians(Long uniqueGuardians) {
+            this.uniqueGuardians = uniqueGuardians;
         }
     }
 
