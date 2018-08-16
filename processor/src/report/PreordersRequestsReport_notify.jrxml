@@ -57,8 +57,8 @@
 	<field name="newDailySample" class="java.lang.Long"/>
 	<field name="hideDailySample" class="java.lang.Integer"/>
 	<field name="hideLastValue" class="java.lang.Integer"/>
-	<field name="goodTypeStr" class="java.lang.String"/>
-	<field name="goodTypeNum" class="java.lang.Integer"/>
+	<field name="feedingPlanTypeStr" class="java.lang.String"/>
+	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<field name="notificationMark" class="java.lang.Long"/>
 	<field name="tempClients" class="java.lang.Long"/>
 	<field name="newTempClients" class="java.lang.Long"/>
@@ -114,7 +114,7 @@
 				</crosstabHeaderCell>
 				<rowGroup name="feedingPlanTypeNum" width="0">
 					<bucket class="java.lang.Integer">
-						<bucketExpression><![CDATA[$F{goodTypeNum}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{feedingPlanTypeNum}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents/>
@@ -125,7 +125,7 @@
 				</rowGroup>
 				<rowGroup name="feedingPlanTypeStr" width="0">
 					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{goodTypeStr}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{feedingPlanTypeStr}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents/>
