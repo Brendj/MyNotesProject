@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfSubReport" pageWidth="1085" pageHeight="27" columnWidth="1085" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2bf994d8-e604-40e4-a634-d361bc64a1ec">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfSubReport" pageWidth="1170" pageHeight="27" columnWidth="1170" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="2bf994d8-e604-40e4-a634-d361bc64a1ec">
 	<property name="ireport.zoom" value="0.9090909090909105"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -19,6 +19,7 @@
 	<field name="numberOfLgotnoeOtherOrg" class="java.lang.Long"/>
 	<field name="numberOfUniquePassesStudents" class="java.lang.Long"/>
 	<field name="numberOfUniquePassesEmployees" class="java.lang.Long"/>
+	<field name="numberOfUniquePassesGuardians" class="java.lang.Long"/>
 	<detail>
 		<band height="27" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
@@ -64,7 +65,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPassesGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="b90681fe-58f0-4db2-ba60-e3bd332c985a" positionType="Float" stretchType="RelativeToBandHeight" x="380" y="0" width="70" height="27">
+				<reportElement uuid="b90681fe-58f0-4db2-ba60-e3bd332c985a" positionType="Float" stretchType="RelativeToBandHeight" x="465" y="0" width="70" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -78,7 +79,7 @@
 				<textFieldExpression><![CDATA[$F{summaryOfPasses}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ab0094f9-4274-4791-a65c-83eba43ff7b3" positionType="Float" stretchType="RelativeToBandHeight" x="1025" y="0" width="60" height="27">
+				<reportElement uuid="ab0094f9-4274-4791-a65c-83eba43ff7b3" positionType="Float" stretchType="RelativeToBandHeight" x="1110" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -92,7 +93,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPaidGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2" positionType="Float" stretchType="RelativeToBandHeight" x="965" y="0" width="60" height="27">
+				<reportElement uuid="1b80a190-92a2-4386-b1be-bf9f9b64d7a2" positionType="Float" stretchType="RelativeToBandHeight" x="1050" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -106,7 +107,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfPaidStudents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6" positionType="Float" stretchType="RelativeToBandHeight" x="905" y="0" width="60" height="27">
+				<reportElement uuid="d33aaaeb-6561-4690-8b41-199bd1a852d6" positionType="Float" stretchType="RelativeToBandHeight" x="990" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -120,7 +121,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfSubFeedGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9" positionType="Float" stretchType="RelativeToBandHeight" x="845" y="0" width="60" height="27">
+				<reportElement uuid="5c6a3c66-0a5e-4990-aaaf-10e14b46dca9" positionType="Float" stretchType="RelativeToBandHeight" x="930" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -134,7 +135,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfSubFeedStudents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="d0f31606-6e4a-4339-b966-27ff01758cf6" positionType="Float" stretchType="RelativeToBandHeight" x="450" y="0" width="70" height="27">
+				<reportElement uuid="d0f31606-6e4a-4339-b966-27ff01758cf6" positionType="Float" stretchType="RelativeToBandHeight" x="535" y="0" width="70" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -148,7 +149,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfLgotnoe}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="093ece74-6707-40f2-a8bd-32382c98cf07" positionType="Float" stretchType="RelativeToBandHeight" x="675" y="0" width="50" height="27">
+				<reportElement uuid="093ece74-6707-40f2-a8bd-32382c98cf07" positionType="Float" stretchType="RelativeToBandHeight" x="760" y="0" width="50" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -162,7 +163,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfReserve}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" positionType="Float" stretchType="RelativeToBandHeight" x="785" y="0" width="60" height="27">
+				<reportElement uuid="fb9ebf4a-31f1-4117-813b-7a68b8cc81d7" positionType="Float" stretchType="RelativeToBandHeight" x="870" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -176,7 +177,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfBuffetGuardians}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" positionType="Float" stretchType="RelativeToBandHeight" x="725" y="0" width="60" height="27">
+				<reportElement uuid="12ab7497-fb44-45ea-9a1f-21cc315539ad" positionType="Float" stretchType="RelativeToBandHeight" x="810" y="0" width="60" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -190,7 +191,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfBuffetStudent}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="42019b29-3830-46d6-8e48-5446f7179f43" positionType="Float" stretchType="RelativeToBandHeight" x="520" y="0" width="70" height="27">
+				<reportElement uuid="42019b29-3830-46d6-8e48-5446f7179f43" positionType="Float" stretchType="RelativeToBandHeight" x="605" y="0" width="70" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -204,7 +205,7 @@
 				<textFieldExpression><![CDATA[$F{numberOfLgotnoeFriendlyOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="c585bb5a-fcc8-4385-ba83-49d6d5a7d778" positionType="Float" stretchType="RelativeToBandHeight" x="590" y="0" width="85" height="27">
+				<reportElement uuid="c585bb5a-fcc8-4385-ba83-49d6d5a7d778" positionType="Float" stretchType="RelativeToBandHeight" x="675" y="0" width="85" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -246,6 +247,20 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfUniquePassesEmployees}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="bb604242-6cc3-4635-b3ea-0e7dff16fad6" positionType="Float" stretchType="RelativeToBandHeight" x="380" y="0" width="85" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numberOfUniquePassesGuardians}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

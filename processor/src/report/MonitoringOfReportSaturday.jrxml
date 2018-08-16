@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="8830" pageHeight="30000" columnWidth="8790" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="9340" pageHeight="30000" columnWidth="9300" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.9075000000000024"/>
-	<property name="ireport.x" value="784"/>
+	<property name="ireport.x" value="793"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="dateMonday" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -216,7 +216,7 @@
 				<text><![CDATA[Учащихся с картами]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" x="2280" y="0" width="1085" height="25"/>
+				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" x="2280" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -230,7 +230,7 @@
 				<textFieldExpression><![CDATA[$P{dateMonday}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="0a42c746-99c3-4e3d-abf0-3ef43f82c467" x="4450" y="0" width="1085" height="25"/>
+				<reportElement uuid="0a42c746-99c3-4e3d-abf0-3ef43f82c467" x="4620" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -244,7 +244,7 @@
 				<textFieldExpression><![CDATA[$P{dateWednesday}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="ea4cba3f-8424-4fb0-ab31-3b60c0019cf1" x="3365" y="0" width="1085" height="25"/>
+				<reportElement uuid="ea4cba3f-8424-4fb0-ab31-3b60c0019cf1" x="3450" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -258,7 +258,7 @@
 				<textFieldExpression><![CDATA[$P{dateTuesday}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="aea30fa1-da29-456e-92fd-85b914cc7922" x="5535" y="0" width="1085" height="25"/>
+				<reportElement uuid="aea30fa1-da29-456e-92fd-85b914cc7922" x="5790" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -272,7 +272,7 @@
 				<textFieldExpression><![CDATA[$P{dateThursday}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="8aa624cd-5ecf-4848-9938-219a3b7129a1" x="7705" y="0" width="1085" height="25"/>
+				<reportElement uuid="8aa624cd-5ecf-4848-9938-219a3b7129a1" x="8130" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -286,7 +286,7 @@
 				<textFieldExpression><![CDATA[$P{dateFriday}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="8430" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="8940" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -300,7 +300,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="8085" y="25" width="70" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="8595" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -314,7 +314,7 @@
 				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="8670" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="9180" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -328,7 +328,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="8730" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="9240" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -342,7 +342,7 @@
 				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="8550" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="9060" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -356,7 +356,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="8380" y="25" width="50" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="8890" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -370,7 +370,7 @@
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="a27072c2-bf6f-4bdb-9624-a5ee6f5c7e0b" x="6620" y="0" width="1085" height="25"/>
+				<reportElement uuid="a27072c2-bf6f-4bdb-9624-a5ee6f5c7e0b" x="6960" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -384,7 +384,7 @@
 				<textFieldExpression><![CDATA[$P{dateSaturday}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="8015" y="25" width="70" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="8440" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -398,7 +398,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="8610" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="9120" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -412,7 +412,7 @@
 				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="8155" y="25" width="70" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="8665" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -426,7 +426,7 @@
 				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="8490" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="9000" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -440,7 +440,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="8225" y="25" width="70" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="8735" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -454,7 +454,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="8295" y="25" width="85" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="8805" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -468,7 +468,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="7775" y="25" width="85" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="8200" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -482,7 +482,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="7705" y="25" width="70" height="110"/>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="8130" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -496,7 +496,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="7860" y="25" width="70" height="110"/>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="8285" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -510,7 +510,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="7930" y="25" width="85" height="110"/>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="8355" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -524,7 +524,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="7465" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="7890" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -538,7 +538,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="7070" y="25" width="70" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="7495" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -552,7 +552,7 @@
 				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="6690" y="25" width="85" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="7030" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -566,7 +566,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="6930" y="25" width="70" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="7270" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -580,7 +580,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="7210" y="25" width="85" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="7635" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -594,7 +594,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="7000" y="25" width="70" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="7425" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -608,7 +608,7 @@
 				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="7525" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="7950" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -622,7 +622,7 @@
 				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="6845" y="25" width="85" height="110"/>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="7185" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -636,7 +636,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="6620" y="25" width="70" height="110"/>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="6960" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -650,7 +650,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="7585" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="8010" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -664,7 +664,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="7345" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="7770" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -678,7 +678,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="7140" y="25" width="70" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="7565" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -692,7 +692,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="7295" y="25" width="50" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="7720" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -706,7 +706,7 @@
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="7645" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="8070" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -720,7 +720,7 @@
 				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="6775" y="25" width="70" height="110"/>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="7115" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -734,7 +734,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="7405" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="7830" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -748,7 +748,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="6380" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="6720" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -762,7 +762,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="5985" y="25" width="70" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="6325" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -776,7 +776,7 @@
 				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="5605" y="25" width="85" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="5860" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -790,7 +790,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="5845" y="25" width="70" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="6100" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -804,7 +804,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="6125" y="25" width="85" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="6465" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -818,7 +818,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="5915" y="25" width="70" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="6255" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -832,7 +832,7 @@
 				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="6440" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="6780" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -846,7 +846,7 @@
 				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="5760" y="25" width="85" height="110"/>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="6015" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -860,7 +860,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="5535" y="25" width="70" height="110"/>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="5790" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -874,7 +874,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="6500" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="6840" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -888,7 +888,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="6260" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="6600" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -902,7 +902,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="6560" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="6900" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -916,7 +916,7 @@
 				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="5690" y="25" width="70" height="110"/>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="5945" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -930,7 +930,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="6320" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="6660" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -944,7 +944,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="6055" y="25" width="70" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="6395" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -958,7 +958,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="6210" y="25" width="50" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="6550" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -972,7 +972,7 @@
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="5295" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="5550" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -986,7 +986,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="4900" y="25" width="70" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="5155" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1000,7 +1000,7 @@
 				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="4520" y="25" width="85" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="4690" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1014,7 +1014,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="4760" y="25" width="70" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="4930" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1028,7 +1028,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="5040" y="25" width="85" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="5295" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1042,7 +1042,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="4830" y="25" width="70" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="5085" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1056,7 +1056,7 @@
 				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="5355" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="5610" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1070,7 +1070,7 @@
 				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="4675" y="25" width="85" height="110"/>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="4845" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1084,7 +1084,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="4450" y="25" width="70" height="110"/>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="4620" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1098,7 +1098,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="5415" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="5670" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1112,7 +1112,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="5175" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="5430" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1126,7 +1126,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="5475" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="5730" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1140,7 +1140,7 @@
 				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="4605" y="25" width="70" height="110"/>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="4775" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1154,7 +1154,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="5235" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="5490" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1168,7 +1168,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="4970" y="25" width="70" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="5225" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1182,7 +1182,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="5125" y="25" width="50" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="5380" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1196,7 +1196,7 @@
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="4210" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="4380" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1210,7 +1210,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="3815" y="25" width="70" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="3985" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1224,7 +1224,7 @@
 				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="3435" y="25" width="85" height="110"/>
+				<reportElement uuid="023f82b2-b419-4f0e-a9d6-c8451b4d8a1e" x="3520" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1238,7 +1238,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="3675" y="25" width="70" height="110"/>
+				<reportElement uuid="88c06e20-3feb-4e04-92d1-503756d47fe4" x="3760" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1252,7 +1252,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="3955" y="25" width="85" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="4125" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1266,7 +1266,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="3745" y="25" width="70" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="3915" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1280,7 +1280,7 @@
 				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="4270" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="4440" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1294,7 +1294,7 @@
 				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="3590" y="25" width="85" height="110"/>
+				<reportElement uuid="5d57584f-7884-4c43-a3a3-4f744283c81c" x="3675" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1308,7 +1308,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="3365" y="25" width="70" height="110"/>
+				<reportElement uuid="2bd89577-78eb-4e1d-9818-ba3dae9159b8" x="3450" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1322,7 +1322,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="4330" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="4500" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1336,7 +1336,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="4090" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="4260" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1350,7 +1350,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="4390" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="4560" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1364,7 +1364,7 @@
 				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="3520" y="25" width="70" height="110"/>
+				<reportElement uuid="61f7424e-8e0c-4405-86fb-294e287607d1" x="3605" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1378,7 +1378,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="4150" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="4320" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1392,7 +1392,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="3885" y="25" width="70" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="4055" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1406,7 +1406,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="4040" y="25" width="50" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="4210" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1420,7 +1420,7 @@
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="3125" y="25" width="60" height="110"/>
+				<reportElement uuid="b7ffc29c-3d02-4a87-9239-30439f393838" x="3210" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1434,7 +1434,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="2730" y="25" width="70" height="110"/>
+				<reportElement uuid="05e6203e-ac54-4859-9d5e-f3c7a7d16bb0" x="2815" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1476,7 +1476,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="2870" y="25" width="85" height="110"/>
+				<reportElement uuid="d2db4d5d-7e18-4573-a5ef-c909ed489914" x="2955" y="25" width="85" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1490,7 +1490,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="2660" y="25" width="70" height="110"/>
+				<reportElement uuid="61be167c-db34-46db-927a-65c546254261" x="2745" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1504,7 +1504,7 @@
 				<text><![CDATA[Общее кол-во проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="3185" y="25" width="60" height="110"/>
+				<reportElement uuid="14d9f8f9-15d8-4640-a132-3901e374f2f6" x="3270" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1546,7 +1546,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="3245" y="25" width="60" height="110"/>
+				<reportElement uuid="5ba0afd1-09c2-483f-97f6-c250f76f30c3" x="3330" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1560,7 +1560,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="3005" y="25" width="60" height="110"/>
+				<reportElement uuid="cffeff74-a3e6-4fe1-b9a8-7b4eef4830b3" x="3090" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1574,7 +1574,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="3305" y="25" width="60" height="110"/>
+				<reportElement uuid="81522743-d36c-4af3-b020-8f4247d8036c" x="3390" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1602,7 +1602,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="3065" y="25" width="60" height="110"/>
+				<reportElement uuid="19a0132f-0ee2-4085-82ac-aebcf95291a7" x="3150" y="25" width="60" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1616,7 +1616,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="2800" y="25" width="70" height="110"/>
+				<reportElement uuid="dddcfce4-f3da-4cef-9f46-744ed009d876" x="2885" y="25" width="70" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1630,7 +1630,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="2955" y="25" width="50" height="110"/>
+				<reportElement uuid="70425075-b5bd-4efe-92a4-b67c5953b5d1" x="3040" y="25" width="50" height="110"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -1655,6 +1655,90 @@
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Статус ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4079669b-52ca-4924-beb0-b4ec488f7cfe" x="8510" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="54d85c76-34cd-4599-acde-8673505d7b4c" x="7340" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="82a82e99-c366-433b-9807-04af805315e5" x="6170" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b744f711-b161-4b18-91b4-a65593962861" x="5000" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fa7f63bf-5be0-4cf8-93f0-2747d7e23caa" x="3830" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cb1126e8-8af7-4a91-b708-b8b1949b3d7e" x="2660" y="25" width="85" height="110"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -1830,42 +1914,42 @@
 				<textFieldExpression><![CDATA[$F{otherEmployees}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" stretchType="RelativeToBandHeight" x="2280" y="0" width="1085" height="27">
+				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" stretchType="RelativeToBandHeight" x="2280" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsMonday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="f27c8e58-0d9e-4a43-87ff-2d07effaa8fd" stretchType="RelativeToBandHeight" x="3365" y="0" width="1085" height="27">
+				<reportElement uuid="f27c8e58-0d9e-4a43-87ff-2d07effaa8fd" stretchType="RelativeToBandHeight" x="3450" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsTuesday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="461aee88-5803-4d7b-8004-3f511d4ca52f" stretchType="RelativeToBandHeight" x="4450" y="0" width="1085" height="27">
+				<reportElement uuid="461aee88-5803-4d7b-8004-3f511d4ca52f" stretchType="RelativeToBandHeight" x="4620" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsWednesday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="3bcb7720-7da9-45d4-aae0-f24162fd717b" stretchType="RelativeToBandHeight" x="5535" y="0" width="1085" height="27">
+				<reportElement uuid="3bcb7720-7da9-45d4-aae0-f24162fd717b" stretchType="RelativeToBandHeight" x="5790" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsThursday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="5c0b20b6-5cf9-4141-a4d7-b88721547798" stretchType="RelativeToBandHeight" x="6620" y="0" width="1085" height="27">
+				<reportElement uuid="5c0b20b6-5cf9-4141-a4d7-b88721547798" stretchType="RelativeToBandHeight" x="6960" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsFriday})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport>
-				<reportElement uuid="92958c1b-9b37-418c-a55e-6bd6747b30a9" stretchType="RelativeToBandHeight" x="7705" y="0" width="1085" height="27">
+				<reportElement uuid="92958c1b-9b37-418c-a55e-6bd6747b30a9" stretchType="RelativeToBandHeight" x="8130" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItemsSaturday})]]></dataSourceExpression>
