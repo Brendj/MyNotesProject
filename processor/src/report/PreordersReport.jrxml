@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport" pageWidth="1290" pageHeight="20000" columnWidth="1250" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="632a3386-cd83-4545-a5d3-959d9b582229">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="83"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="endDate" class="java.lang.String" isForPrompting="false"/>
@@ -20,6 +20,7 @@
 	<field name="idOfPreorderComplex" class="java.lang.Long"/>
 	<field name="menuDetailName" class="java.lang.String"/>
 	<field name="amountMenuDetail" class="java.lang.Integer"/>
+	<field name="isRegularPreorder" class="java.lang.Boolean"/>
 	<group name="idOfContragent">
 		<groupExpression><![CDATA[$F{idOfContragent}]]></groupExpression>
 		<groupHeader>
@@ -266,7 +267,9 @@
 	<detail>
 		<band height="41" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="25f749a7-894b-491a-ad89-f411a3a12065" stretchType="RelativeToBandHeight" x="548" y="0" width="100" height="21"/>
+				<reportElement uuid="25f749a7-894b-491a-ad89-f411a3a12065" stretchType="RelativeToBandHeight" x="548" y="0" width="100" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -278,7 +281,9 @@
 				<textFieldExpression><![CDATA[$F{firstname}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="66852971-84f1-490e-be3d-9e27b7c2b682" stretchType="RelativeToBandHeight" x="1029" y="0" width="149" height="21"/>
+				<reportElement uuid="66852971-84f1-490e-be3d-9e27b7c2b682" stretchType="RelativeToBandHeight" x="1029" y="0" width="149" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -290,7 +295,9 @@
 				<textFieldExpression><![CDATA[$F{menuDetailName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="2ef7aa72-222d-4ba2-be5d-78bb7491468e" stretchType="RelativeToBandHeight" x="178" y="0" width="100" height="21"/>
+				<reportElement uuid="2ef7aa72-222d-4ba2-be5d-78bb7491468e" stretchType="RelativeToBandHeight" x="178" y="0" width="100" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -302,7 +309,9 @@
 				<textFieldExpression><![CDATA[$F{shortNameInfoService}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="9403cfa0-efa2-4957-9bf7-b46aafc6897a" stretchType="RelativeToBandHeight" x="139" y="0" width="39" height="21"/>
+				<reportElement uuid="9403cfa0-efa2-4957-9bf7-b46aafc6897a" stretchType="RelativeToBandHeight" x="139" y="0" width="39" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -314,7 +323,9 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="278940b2-6a9a-4b4c-b8c7-9bf23ac067c0" stretchType="RelativeToBandHeight" x="648" y="0" width="100" height="21"/>
+				<reportElement uuid="278940b2-6a9a-4b4c-b8c7-9bf23ac067c0" stretchType="RelativeToBandHeight" x="648" y="0" width="100" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -326,7 +337,9 @@
 				<textFieldExpression><![CDATA[$F{secondname}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="5dbcfff8-8b52-4d2e-a87e-a9307aa8effe" stretchType="RelativeToBandHeight" x="378" y="0" width="70" height="21"/>
+				<reportElement uuid="5dbcfff8-8b52-4d2e-a87e-a9307aa8effe" stretchType="RelativeToBandHeight" x="378" y="0" width="70" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -338,7 +351,9 @@
 				<textFieldExpression><![CDATA[$F{contractId}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="999dbeaa-7dba-4397-89e0-5e09afa57257" stretchType="RelativeToBandHeight" x="961" y="0" width="68" height="21"/>
+				<reportElement uuid="999dbeaa-7dba-4397-89e0-5e09afa57257" stretchType="RelativeToBandHeight" x="961" y="0" width="68" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -350,7 +365,9 @@
 				<textFieldExpression><![CDATA[$F{amountComplex}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="893f05ce-a6d0-432a-89b3-a4843d1995bb" stretchType="RelativeToBandHeight" x="448" y="0" width="100" height="21"/>
+				<reportElement uuid="893f05ce-a6d0-432a-89b3-a4843d1995bb" stretchType="RelativeToBandHeight" x="448" y="0" width="100" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -362,7 +379,9 @@
 				<textFieldExpression><![CDATA[$F{surname}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="ec31b059-2603-4429-9e81-89ed2307eb7b" stretchType="RelativeToBandHeight" x="278" y="0" width="100" height="21"/>
+				<reportElement uuid="ec31b059-2603-4429-9e81-89ed2307eb7b" stretchType="RelativeToBandHeight" x="278" y="0" width="100" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -374,7 +393,9 @@
 				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="39f4572d-f094-4e32-99b7-abacf60a4cd3" stretchType="RelativeToBandHeight" x="825" y="0" width="136" height="21"/>
+				<reportElement uuid="39f4572d-f094-4e32-99b7-abacf60a4cd3" stretchType="RelativeToBandHeight" x="825" y="0" width="136" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -386,7 +407,9 @@
 				<textFieldExpression><![CDATA[$F{complexName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="e3ff5020-3d8b-4fb1-8dc4-cda33eb3689a" stretchType="RelativeToBandHeight" x="748" y="0" width="77" height="21"/>
+				<reportElement uuid="e3ff5020-3d8b-4fb1-8dc4-cda33eb3689a" stretchType="RelativeToBandHeight" x="748" y="0" width="77" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -398,7 +421,9 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($F{preorderDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="8fa798ed-d046-46a1-8402-832c5419046b" stretchType="RelativeToBandHeight" x="1178" y="0" width="72" height="21"/>
+				<reportElement uuid="8fa798ed-d046-46a1-8402-832c5419046b" stretchType="RelativeToBandHeight" x="1178" y="0" width="72" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -410,7 +435,9 @@
 				<textFieldExpression><![CDATA[$F{amountMenuDetail}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="af664daa-f881-483c-9638-a9ee05c91698" stretchType="RelativeToTallestObject" x="0" y="0" width="39" height="21"/>
+				<reportElement uuid="af664daa-f881-483c-9638-a9ee05c91698" stretchType="RelativeToTallestObject" x="0" y="0" width="39" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -422,7 +449,9 @@
 				<textFieldExpression><![CDATA[$F{idOfContragent}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement uuid="e9b059d0-4e4c-4c26-a15c-2beb22205336" stretchType="RelativeToTallestObject" x="39" y="0" width="100" height="21"/>
+				<reportElement uuid="e9b059d0-4e4c-4c26-a15c-2beb22205336" stretchType="RelativeToTallestObject" x="39" y="0" width="100" height="21">
+					<printWhenExpression><![CDATA[Boolean.FALSE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -432,6 +461,202 @@
 				</box>
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{contragentName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="e3ff5020-3d8b-4fb1-8dc4-cda33eb3689a" stretchType="RelativeToBandHeight" mode="Opaque" x="748" y="0" width="77" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($F{preorderDate})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="9403cfa0-efa2-4957-9bf7-b46aafc6897a" stretchType="RelativeToBandHeight" mode="Opaque" x="139" y="0" width="39" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="278940b2-6a9a-4b4c-b8c7-9bf23ac067c0" stretchType="RelativeToBandHeight" mode="Opaque" x="648" y="0" width="100" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{secondname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="39f4572d-f094-4e32-99b7-abacf60a4cd3" stretchType="RelativeToBandHeight" mode="Opaque" x="825" y="0" width="136" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{complexName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="66852971-84f1-490e-be3d-9e27b7c2b682" stretchType="RelativeToBandHeight" mode="Opaque" x="1029" y="0" width="149" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{menuDetailName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="e9b059d0-4e4c-4c26-a15c-2beb22205336" stretchType="RelativeToTallestObject" mode="Opaque" x="39" y="0" width="100" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{contragentName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="5dbcfff8-8b52-4d2e-a87e-a9307aa8effe" stretchType="RelativeToBandHeight" mode="Opaque" x="378" y="0" width="70" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{contractId}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="999dbeaa-7dba-4397-89e0-5e09afa57257" stretchType="RelativeToBandHeight" mode="Opaque" x="961" y="0" width="68" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{amountComplex}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="ec31b059-2603-4429-9e81-89ed2307eb7b" stretchType="RelativeToBandHeight" mode="Opaque" x="278" y="0" width="100" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="2ef7aa72-222d-4ba2-be5d-78bb7491468e" stretchType="RelativeToBandHeight" mode="Opaque" x="178" y="0" width="100" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{shortNameInfoService}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="25f749a7-894b-491a-ad89-f411a3a12065" stretchType="RelativeToBandHeight" mode="Opaque" x="548" y="0" width="100" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{firstname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="af664daa-f881-483c-9638-a9ee05c91698" stretchType="RelativeToTallestObject" mode="Opaque" x="0" y="0" width="39" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{idOfContragent}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="8fa798ed-d046-46a1-8402-832c5419046b" stretchType="RelativeToBandHeight" mode="Opaque" x="1178" y="0" width="72" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{amountMenuDetail}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+				<reportElement uuid="893f05ce-a6d0-432a-89b3-a4843d1995bb" stretchType="RelativeToBandHeight" mode="Opaque" x="448" y="0" width="100" height="21" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[Boolean.TRUE.equals($F{isRegularPreorder})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{surname}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
