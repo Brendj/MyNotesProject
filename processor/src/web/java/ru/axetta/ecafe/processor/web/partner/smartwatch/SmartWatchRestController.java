@@ -34,6 +34,7 @@ import java.util.*;
 public class SmartWatchRestController {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
+    private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -174,12 +175,12 @@ public class SmartWatchRestController {
             if(!isRelatives(session, parent, child)){
                 throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
             }
-            if(childHasAnActiveSmartWatch(child)){
+            if(childHasAnActiveSmartWatch(session, child)){
                 throw new IllegalArgumentException("The client witch contractID: " + child.getContractId() + " has an active SmartWatch");
             }
 
             Date issueTime = new Date();
-            Date validTime = new Date(issueTime.getTime() + Card.DEFAULT_CARD_VALID_TIME);
+            Date validTime = new Date(issueTime.getTime() + this.DEFAULT_SMART_WATCH_VALID_TIME);
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
             Long idOfCard = cardManager.createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE,
@@ -246,7 +247,7 @@ public class SmartWatchRestController {
             Card card = (Card) session.get(Card.class, watch.getIdOfCard());
 
             if(card.getState().equals(CardState.BLOCKED.getValue())){
-                throw new IllegalArgumentException("Card already blocked");
+                throw new IllegalArgumentException("SmartWatch already blocked");
             }
 
             blockActiveCard(child, card);
@@ -298,11 +299,16 @@ public class SmartWatchRestController {
         return clientGuardian != null;
     }
 
-    private boolean childHasAnActiveSmartWatch(Client child) throws Exception {
+    private boolean childHasAnActiveSmartWatch(Session session, Client child) throws Exception {
         List<Card> cards = new LinkedList<Card>(child.getCards());
         for(Card card : cards){
             if(Card.TYPE_NAMES[card.getCardType()].equals("Часы (Mifare)")
                     && !(card.getState().equals(CardState.BLOCKED.getValue())) || card.getState().equals(CardState.TEMPBLOCKED.getValue())){
+                SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, card.getCardPrintedNo(), card.getCardNo());
+                if(watch == null){
+                    logger.warn("Client (contractID: " + child.getContractId() + ") have active card types \"SmartWatch\", but no SmartWatch Entity");
+                    return false;
+                }
                 return true;
             }
         }
