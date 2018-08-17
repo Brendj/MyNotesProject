@@ -2554,4 +2554,31 @@ public class DAOService {
     public void setPreorderDAOOperationsImpl(IPreorderDAOOperations preorderDAOOperationsImpl) {
         this.preorderDAOOperationsImpl = preorderDAOOperationsImpl;
     }
+
+    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception{
+        org.hibernate.Query query = session.createQuery("delete from LinkingTokenForSmartWatch where phoneNumber like :phoneNumber");
+        query.setParameter("phoneNumber", phone);
+        query.executeUpdate();
+        SecureRandom secureRandom = new SecureRandom();
+        String randomToken;
+        int nSize = 9;
+        for (int nCycle = 0; ; nCycle++) {
+            if (nCycle == 10) {
+                nSize++;
+                nCycle = 0;
+            }
+            randomToken = new BigInteger(nSize * 5, secureRandom).toString(32);
+            query = session.createQuery("from LinkingToken where token=:token");
+            query.setParameter("token", randomToken);
+            List l = query.list();
+            if (l.size() == 0) {
+                break;
+            }
+        }
+        LinkingTokenForSmartWatch token = new LinkingTokenForSmartWatch();
+        token.setPhoneNumber(phone);
+        token.setToken(randomToken);
+        session.save(token);
+        return token.getToken();
+    }
 }

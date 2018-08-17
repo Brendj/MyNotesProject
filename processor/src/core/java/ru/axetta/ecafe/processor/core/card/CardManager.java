@@ -58,6 +58,9 @@ public interface CardManager {
     void reissueCard(Session persistenceSession, Long idOfClient, Long cardNo, Integer cardType, Integer state, Date validTime, Integer lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo, User user) throws Exception;
 
+    Long createSmartWatchAsCard(Session session, Long idOfClient, Long trackerIdAsCardPrintedNo, Integer state, Date validTime, Integer lifeState,
+            String lockReason, Date issueTime, Long trackerUidAsCardNo, User user) throws Exception;
+
     class NewCardItem{
         private Long cardPrintedNo;
         private Integer cardType;

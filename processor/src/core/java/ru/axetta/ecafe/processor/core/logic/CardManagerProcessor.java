@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -18,9 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
 
@@ -592,6 +591,45 @@ public class CardManagerProcessor implements CardManager {
         return card.getIdOfCard();
     }
 
+    public Long createSmartWatchAsCard(Session session, Long idOfClient, Long trackerIdAsCardPrintedNo, Integer state, Date validTime, Integer lifeState,
+            String lockReason, Date issueTime, Long trackerUidAsCardNo, User user) throws Exception{
+        Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+        logger.debug("check valid date");
+        if (validTime.after(CalendarUtils.AFTER_DATE)) {
+            throw new Exception("Не верно введена дата");
+        }
+        logger.debug("check issue date");
+        if (issueTime != null && validTime.before(issueTime)) {
+            throw new Exception("Не верно введена дата");
+        }
+        logger.debug("check exist client");
+        Client client = getClientReference(session, idOfClient);
+        if (client == null) {
+            throw new Exception("Клиент не найден: " + idOfClient);
+        }
+        logger.debug("check exist smartWatch");
+        Card c = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerUidAsCardNo, trackerIdAsCardPrintedNo, cardType);
+        if (c != null && c.getClient() != null) {
+            throw new Exception("Смарт-часы уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
+        }
+        logger.debug("create card");
+        Card card = new Card(client, trackerUidAsCardNo, cardType, state, validTime, lifeState, trackerIdAsCardPrintedNo);
+        card.setIssueTime(issueTime);
+        card.setLockReason(lockReason);
+        card.setOrg(client.getOrg());
+        card.setCreateTime(new Date());
+        card.setTransitionState(CardTransitionState.OWN.getCode());
+        session.save(card);
+
+        HistoryCard historyCard = new HistoryCard();
+        historyCard.setCard(card);
+        historyCard.setUpDatetime(new Date());
+        historyCard.setNewOwner(client);
+        historyCard.setInformationAboutCard("Регистрация новых часов №: " + card.getCardNo() + " как карту");
+        session.save(historyCard);
+
+        return card.getIdOfCard();
+    }
 
     public static void lockActiveCards(Session persistenceSession, Set<Card> lockableCards) throws Exception {
         for (Card card : lockableCards) {

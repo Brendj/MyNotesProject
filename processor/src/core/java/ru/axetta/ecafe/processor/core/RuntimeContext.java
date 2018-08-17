@@ -124,6 +124,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return smsUserCodeSender;
     }
 
+    public String getGeoplanerApiKey() {
+        return geoplanerApiKey;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -225,6 +229,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private String scudLogin;
     private String scudPassword;
 
+    private String geoplanerApiKey;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -619,6 +624,8 @@ public class RuntimeContext implements ApplicationContextAware {
 
             this.scudLogin = properties.getProperty(SCUD_LOGIN);
             this.scudPassword = properties.getProperty(SCUD_PASSWORD);
+
+            this.geoplanerApiKey = properties.getProperty(PROCESSOR_PARAM_BASE + ".geoplaner.apikey");
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;

@@ -3492,4 +3492,50 @@ public class DAOUtils {
                 .setParameter("idofEnterEvent", idofEnterEvent);
         query.executeUpdate();
     }
+
+
+    public static LinkingTokenForSmartWatch findLinkingTokenForSmartWatch(Session session, String phone, String token) {
+        Criteria criteria = session.createCriteria(LinkingTokenForSmartWatch.class);
+        criteria
+                .add(Restrictions.like("token", token))
+                .add(Restrictions.like("phoneNumber", phone));
+        return (LinkingTokenForSmartWatch) criteria.uniqueResult();
+    }
+
+    public static List<ClientGuardian> findListOfClientGuardianByIdOfGuardian(Session session, Long idOfClient) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        return criteria.list();
+    }
+
+    public static Card findSmartWatchAsCardByCardNoAndCardPrintedNo(Session session, Long trackerIdAsCardPrintedNo, Long trackerUidAsCardNo,
+            Integer cardType) {
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria
+                .add(Restrictions.eq("cardNo", trackerUidAsCardNo))
+                .add(Restrictions.eq("cardPrintedNo", trackerIdAsCardPrintedNo))
+                .add(Restrictions.eq("cardType", cardType));
+        return (Card) criteria.uniqueResult();
+    }
+
+    public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
+            Long trackerUid, Long trackerId) throws Exception{
+        SmartWatch watch = new SmartWatch();
+        watch.setIdOfCard(idOfCard);
+        watch.setIdOfClient(idOfClient);
+        watch.setTrackerId(trackerId);
+        watch.setTrackerUid(trackerUid);
+        watch.setModel(model);
+        watch.setColor(color);
+        session.save(watch);
+        return watch.getIdOfSmartWatch();
+    }
+
+    public static SmartWatch findSmartWatchByTrackerUidAndTrackerId(Session session, Long trackerId, Long trackerUid) throws Exception{
+        Criteria criteria = session.createCriteria(SmartWatch.class);
+        criteria
+                .add(Restrictions.eq("trackerUid", trackerUid))
+                .add(Restrictions.eq("trackerId", trackerId));
+        return (SmartWatch) criteria.uniqueResult();
+    }
 }
