@@ -1454,6 +1454,11 @@ public class ImportRegisterClientsService {
                     .getAllGroupnamesToOrgsByIdOfMainOrgAndGroupName(session, org.getIdOfOrg(), groupName);
             if (groupNamesToOrgs == null) {
                 DAOUtils.createGroupNamesToOrg(session, org, version, groupName);
+            } else {
+                if(!groupNamesToOrgs.getGroupName().equals(groupName)){
+                    groupNamesToOrgs.setGroupName(groupName);
+                    session.update(groupNamesToOrgs);
+                }
             }
         } catch (Exception e){
             logger.error("Can't check GroupNamesToOrgs: " + e.getMessage());
