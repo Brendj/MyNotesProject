@@ -95,7 +95,7 @@ public class SmartWatchRestController {
         }
     }
 
-    @POST
+    @GET
     @Path(value = "getListInfoOfChildrens")
     @Transactional
     public JsonListInfo getListOfChildrenByPhoneAndToken(@QueryParam(value="mobilePhone") String mobilePhone,
@@ -107,7 +107,7 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
             }
 
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             mobilePhone = checkAndConvertPhone(mobilePhone);
             if(!isValidPhoneAndToken(session, mobilePhone, token)){
                 throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
@@ -212,7 +212,6 @@ public class SmartWatchRestController {
                     .build());
         }
     }
-
 
     @POST
     @Path(value = "blockSmartWatch")
