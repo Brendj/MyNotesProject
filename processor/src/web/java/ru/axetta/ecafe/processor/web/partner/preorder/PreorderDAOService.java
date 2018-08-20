@@ -334,6 +334,38 @@ public class PreorderDAOService {
 
     @Transactional(rollbackFor = Exception.class)
     public void savePreorderComplexes(PreorderSaveListParam list) throws Exception {
+        //Собираем коллекцию в нужном виде
+        Map<Integer, ComplexListParam> map = new HashMap<Integer, ComplexListParam>();
+        for (ComplexListParam complex : list.getComplexes()) {
+            Integer idOfComplex = complex.getIdOfComplex();
+            ComplexListParam param = map.get(idOfComplex);
+            if (param == null) {
+                param = new ComplexListParam();
+                param.setAmount(complex.getAmount());
+                param.setIdOfComplex(complex.getIdOfComplex());
+                param.setRegularComplex(complex.getRegularComplex());
+                param.setMenuItems(complex.getMenuItems());
+                map.put(complex.getIdOfComplex(), param);
+            } else {
+                if (param.getMenuItems() != null) {
+                    param.getMenuItems().addAll(complex.getMenuItems());
+                } else {
+                    param.setMenuItems(complex.getMenuItems());
+                }
+            }
+        }
+        List<ComplexListParam> complexes = new ArrayList<ComplexListParam>();
+        for (Map.Entry<Integer, ComplexListParam> entry : map.entrySet()) {
+            ComplexListParam param = new ComplexListParam();
+            param.setIdOfComplex(entry.getKey());
+            param.setAmount(entry.getValue().getAmount());
+            param.setRegularComplex(entry.getValue().getRegularComplex());
+            param.setMenuItems(entry.getValue().getMenuItems());
+            complexes.add(param);
+        }
+        list.setComplexes(complexes);
+        //собрали
+
         Long contractId = list.getContractId();
         Client client = getClientByContractId(contractId);
         Date date = CalendarUtils.parseDate(list.getDate());
