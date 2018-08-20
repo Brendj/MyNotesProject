@@ -97,11 +97,17 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
             parameterMap.put(GoodRequestsNewReport.P_GENERATE_END_DATE, format.format(lastCreateOrUpdateDateTime));
 
-            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-            List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
-            List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
-            for (String idOfOrg : stringOrgList) {
-                idOfOrgList.add(Long.parseLong(idOfOrg));
+            String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            Long idOfOrg = Long.parseLong(idOfOrgString);
+
+            Org org = (Org) session.load(Org.class, idOfOrg);
+
+            if (null != org) {
+                parameterMap.put("address", org.getShortAddress());
+                parameterMap.put("shortName", org.getShortNameInfoService());
+            } else {
+                parameterMap.put("address", "не указан");
+                parameterMap.put("shortName", "не указано");
             }
 
             String idOfMenuSourceOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
@@ -116,7 +122,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             List<String> guidFilter = new ArrayList<String>(Arrays.asList(guidFilterArray));
 
             JRDataSource dataSource = createDataSource(session, startTime, endTime, hideDailySampleValue, generateEndTime,
-                    idOfOrgList, new ArrayList<Long>(idOfMenuSourceOrgList), hideMissedColumns, hideGeneratePeriod, hideLastValue,
+                    idOfOrg, new ArrayList<Long>(idOfMenuSourceOrgList), hideMissedColumns, hideGeneratePeriod, hideLastValue,
                     guidFilter);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date genEndTime = new Date();
@@ -125,9 +131,9 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
         }
 
         public static List<GoodRequestsNewReportService.Item> loadAllItems(Session session, Date startTime, Date endTime, int hideDailySampleValue,
-                Date generateEndTime, List<Long> idOfOrgList, List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns,
+                Date generateEndTime, Long _idOfOrg, List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns,
                 boolean hideGeneratePeriod, int hideLastValue, List<String> guidFilter, boolean notify) {
-            HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(session, idOfOrgList, idOfMenuSourceOrgList);
+            HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(session, _idOfOrg, idOfMenuSourceOrgList);
             List<GoodRequestsNewReportService.Item> itemList = new LinkedList<GoodRequestsNewReportService.Item>();
 
             Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
@@ -258,11 +264,11 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, int hideDailySampleValue,
-                Date generateEndTime, List<Long> idOfOrgList, List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns,
+                Date generateEndTime, Long idOfOrg, List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns,
                 boolean hideGeneratePeriod, int hideLastValue, List<String> guidFilter) {
 
             return new JRBeanCollectionDataSource(loadAllItems(session, startTime, endTime, hideDailySampleValue,
-                    generateEndTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, hideGeneratePeriod,
+                    generateEndTime, idOfOrg, idOfMenuSourceOrgList, hideMissedColumns, hideGeneratePeriod,
                     hideLastValue, guidFilter, true));
         }
 
@@ -362,11 +368,11 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             }
         }
 
-        private static HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(Session session, List<Long> idOfOrgList,
+        private static HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(Session session, Long idOfOrg,
                 List<Long> idOfMenuSourceOrgList) {
             Criteria orgCriteria = session.createCriteria(Org.class);
-            if (!CollectionUtils.isEmpty(idOfOrgList)) {
-                orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+            if (null != idOfOrg) {
+                orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
             }
             orgCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
             if (!CollectionUtils.isEmpty(idOfMenuSourceOrgList)) {
@@ -380,15 +386,15 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                     orgList.size());
             for (Object obj : orgList) {
                 Object[] row = (Object[]) obj;
-                long idOfOrg = Long.parseLong(row[0].toString());
+                long _idOfOrg = Long.parseLong(row[0].toString());
                 BasicReportJob.OrgShortItem educationItem;
-                educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
+                educationItem = new BasicReportJob.OrgShortItem(_idOfOrg, row[1].toString(), row[2].toString());
                 if (row[3] != null) {
                     Long sourceMenuOrg = Long.parseLong(row[3].toString());
                     educationItem.setSourceMenuOrg(sourceMenuOrg);
                     if (!idOfMenuSourceOrgList.contains(sourceMenuOrg)) idOfMenuSourceOrgList.add(sourceMenuOrg);
                 }
-                orgMap.put(idOfOrg, educationItem);
+                orgMap.put(_idOfOrg, educationItem);
             }
             return orgMap;
         }
