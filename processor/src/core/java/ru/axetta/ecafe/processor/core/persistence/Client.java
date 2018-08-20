@@ -136,6 +136,7 @@ public class Client {
     private Boolean specialMenu;
     private String passportNumber;
     private String passportSeries;
+    private Boolean hasActiveSmartWatch;
 
     protected Client() {
         // For Hibernate only
@@ -1107,5 +1108,13 @@ public class Client {
 
     public void setPassportSeries(String passportSeries) {
         this.passportSeries = passportSeries;
+    }
+
+    public Boolean getHasActiveSmartWatch() {
+        return hasActiveSmartWatch;
+    }
+
+    public void setHasActiveSmartWatch(Boolean hasActiveSmartWatch) {
+        this.hasActiveSmartWatch = hasActiveSmartWatch;
     }
 }

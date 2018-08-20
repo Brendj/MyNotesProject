@@ -3519,7 +3519,8 @@ public class DAOUtils {
     }
 
     public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
-            Long trackerUid, Long trackerId) throws Exception{
+            Long trackerUid, Long trackerId, Long trackerActivateUserId, Integer status, Date trackerActivateTime,
+            String simIccid) throws Exception{
         SmartWatch watch = new SmartWatch();
         watch.setIdOfCard(idOfCard);
         watch.setIdOfClient(idOfClient);
@@ -3527,6 +3528,10 @@ public class DAOUtils {
         watch.setTrackerUid(trackerUid);
         watch.setModel(model);
         watch.setColor(color);
+        watch.setTrackerActivateUserId(trackerActivateUserId);
+        watch.setStatus(status);
+        watch.setTrackerActivateTime(trackerActivateTime);
+        watch.setSimIccid(simIccid);
         session.save(watch);
         return watch.getIdOfSmartWatch();
     }

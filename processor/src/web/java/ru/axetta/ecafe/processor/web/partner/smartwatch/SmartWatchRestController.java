@@ -81,8 +81,8 @@ public class SmartWatchRestController {
             return result;
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
-            result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());
@@ -129,8 +129,8 @@ public class SmartWatchRestController {
             return result;
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());
@@ -149,7 +149,9 @@ public class SmartWatchRestController {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
     public Result registrySmartWatch(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
             @NotNull @QueryParam(value="contractId") Long contractId, @QueryParam(value="model") String model, @QueryParam(value="color") String color,
-            @NotNull @QueryParam(value="trackerUid") Long trackerUid, @NotNull @QueryParam(value="trackerID") Long trackerId) throws Exception{
+            @NotNull @QueryParam(value="trackerUid") Long trackerUid, @NotNull @QueryParam(value="trackerID") Long trackerId,
+            @QueryParam(value="trackerActivateUserId") Long trackerActivateUserId, @QueryParam(value="status") Integer status,
+            @QueryParam(value="trackerActivateTime") Long trackerActivateTime, @QueryParam(value="simIccid") String simIccid) throws Exception{
         Result result = new Result();
         Session session = null;
         try {
@@ -182,16 +184,25 @@ public class SmartWatchRestController {
             Date issueTime = new Date();
             Date validTime = new Date(issueTime.getTime() + this.DEFAULT_SMART_WATCH_VALID_TIME);
 
+            blockActiveCards(child);
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
             Long idOfCard = cardManager.createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE,
                     validTime, Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
 
-            blockActiveCards(child);
+            child.setHasActiveSmartWatch(true);
+            session.update(child);
 
             SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
             if(watch == null) {
-                DAOUtils.createSmartWatch(session, idOfCard, child.getIdOfClient(), model, color, trackerUid, trackerId);
-            } else{
+                Date trackerActivateTimeDate = null;
+                if(trackerActivateTime == null){
+                    trackerActivateTimeDate = new Date();
+                } else {
+                    trackerActivateTimeDate = new Date(trackerActivateTime);
+                }
+                DAOUtils.createSmartWatch(session, idOfCard, child.getIdOfClient(), model, color,
+                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
+            } else {
                 this.updateSmartWatch(watch, session, idOfCard, child.getIdOfClient());
             }
             result.resultCode = ResponseCodes.RC_OK.getCode();
@@ -199,8 +210,8 @@ public class SmartWatchRestController {
             return result;
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
-            result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                                 .entity(result)
                                 .build());
@@ -251,14 +262,16 @@ public class SmartWatchRestController {
             }
 
             blockActiveCard(child, card);
+            child.setHasActiveSmartWatch(false);
+            session.update(child);
 
             result.resultCode = ResponseCodes.RC_OK.getCode();
             result.description = ResponseCodes.RC_OK.toString();
             return result;
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
-            result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());

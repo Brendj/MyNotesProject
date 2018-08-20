@@ -25,6 +25,10 @@ CREATE TABLE cf_smartwatchs
   idOfClient BIGINT NOT NULL,
   trackerUid BIGINT NOT NULL,
   trackerId BIGINT NOT NULL,
+  trackerActivateTime BIGINT,
+  rackerActivateUserId BIGINT,
+  status INTEGER,
+  simiccid CHARACTER VARYING(64),
   model CHARACTER VARYING(128),
   color CHARACTER VARYING(128),
   CONSTRAINT cf_smartwatchs_pk PRIMARY KEY (idOfSmartWatch)
@@ -35,3 +39,7 @@ OIDS = FALSE
 CREATE INDEX cf_smartwatchs_client_card_idx ON cf_smartwatchs(idOfCard, idOfClient);
 CREATE INDEX cf_smartwatchs_card_idx ON cf_smartwatchs(idOfCard);
 CREATE INDEX cf_smartwatchs_tracker_ID_UID_idx ON cf_smartwatchs(trackerId, trackerUid);
+
+-- Флаг, что клиент имеет активные часы, нет параметра по умолчанию т.к. большая таблица
+ALTER TABLE cf_clients
+ADD COLUMN hasActiveSmartWatch INTEGER

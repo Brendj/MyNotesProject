@@ -10,7 +10,8 @@ import java.util.Map;
 
 public enum ResponseCodes {
     RC_OK(0L, "OK"),
-    RC_INTERNAL_ERROR(100L, "Внутренняя ошибка");
+    RC_INTERNAL_ERROR(100L, "Внутренняя ошибка"),
+    RC_BAD_ARGUMENTS_ERROR(110L, "Не корректные параметры запроса");
 
 
     private final Long code;

@@ -4,12 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Date;
+
 public class SmartWatch {
     private Long idOfSmartWatch;
     private Long idOfCard;
     private Long idOfClient;
     private Long trackerUid;
     private Long trackerId;
+    private Date trackerActivateTime;
+    private Long trackerActivateUserId;
+    private Integer status;
+    private String simIccid;
     private String model;
     private String color;
 
@@ -67,5 +73,37 @@ public class SmartWatch {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Date getTrackerActivateTime() {
+        return trackerActivateTime;
+    }
+
+    public void setTrackerActivateTime(Date trackerActivateTime) {
+        this.trackerActivateTime = trackerActivateTime;
+    }
+
+    public Long getTrackerActivateUserId() {
+        return trackerActivateUserId;
+    }
+
+    public void setTrackerActivateUserId(Long rackerActivateUserId) {
+        this.trackerActivateUserId = rackerActivateUserId;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public String getSimIccid() {
+        return simIccid;
+    }
+
+    public void setSimIccid(String simIccid) {
+        this.simIccid = simIccid;
     }
 }

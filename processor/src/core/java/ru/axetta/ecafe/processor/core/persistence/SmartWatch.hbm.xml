@@ -11,6 +11,10 @@
         <id name="idOfSmartWatch" column="idOfSmartWatch" type="long">
             <generator class="identity"/>
         </id>
+        <property name="trackerActivateTime" column="trackerActivateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="trackerActivateUserId" column="trackerActivateUserId" type="long"/>
+        <property name="status" column="status" type="int"/>
+        <property name="simIccid" column="simIccid" type="string"/>
         <property name="idOfClient" column="idOfClient" type="long" not-null="true" update="false"/>
         <property name="idOfCard" column="idOfCard" type="long" not-null="true"/>
         <property name="trackerId" column="trackerId" type="long" not-null="true"/>
