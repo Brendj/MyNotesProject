@@ -7,7 +7,8 @@ package ru.axetta.ecafe.processor.core.persistence;
 public enum PreorderState {
     /*0*/ OK("ОК"),
     /*1*/ DELETED("Удалено поставщиком"),
-    /*2*/ CHANGED_PRICE("Изменение цены у поставщика");
+    /*2*/ CHANGED_PRICE("Изменение цены у поставщика"),
+    /*3*/ NOT_ENOUGH_BALANCE("Недостаточно средств на балансе л/с");
 
     private final String description;
 

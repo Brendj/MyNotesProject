@@ -6,6 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
+
 import java.util.Date;
 import java.util.Set;
 
@@ -42,6 +45,22 @@ public class PreorderComplex {
 
     public PreorderComplex() {
 
+    }
+
+    public static void delete(Session session, Long idOfPreorderComplex, Long nextVersion, PreorderState state) {
+        Query query = session.createQuery("update PreorderComplex pc set pc.deletedState = true, state = :state, amount = 0, "
+                + "version = :version, lastUpdate =:lastUpdate where pc.idOfPreorderComplex = :idOfPreorderComplex");
+        query.setParameter("state", state);
+        query.setParameter("version", nextVersion);
+        query.setParameter("lastUpdate", new Date());
+        query.setParameter("idOfPreorderComplex", idOfPreorderComplex);
+        query.executeUpdate();
+
+        query = session.createQuery("update PreorderMenuDetail pmd set pmd.deletedState = true, state = :state, amount = 0 "
+                + "where pmd.preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
+        query.setParameter("state", state);
+        query.setParameter("idOfPreorderComplex", idOfPreorderComplex);
+        query.executeUpdate();
     }
 
     public void deleteBySupplier(Long nextVersion, boolean doDelete) {

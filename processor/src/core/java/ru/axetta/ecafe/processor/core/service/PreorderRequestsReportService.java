@@ -9,10 +9,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
-import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
-import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
@@ -87,6 +84,13 @@ public class PreorderRequestsReportService {
         return true;
     }
 
+    private void deletePreorderForNotEnoughMoney(Session session, PreorderItem item) {
+        Long version = DAOUtils.nextVersionByPreorderComplex(session);
+        if (item.getIdOfPreorderComplex() != null) {
+            PreorderComplex.delete(session, item.getIdOfPreorderComplex(), version, PreorderState.NOT_ENOUGH_BALANCE);
+        }
+    }
+
     public void runTask() throws Exception {
         updateDate();
 
@@ -154,6 +158,7 @@ public class PreorderRequestsReportService {
                             logger.warn(String.format("PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
                                             + "idOfPreorderComplex=%d, idOfPreorderMenuDetail%d)",
                                     item.idOfClient, item.idOfPreorderComplex, item.idOfPreorderMenuDetail));
+                            deletePreorderForNotEnoughMoney(session, item);
                             continue;
                         }
                         createRequestFromPreorder(session, item, fireTime);
