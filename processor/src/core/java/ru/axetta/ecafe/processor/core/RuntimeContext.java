@@ -171,9 +171,9 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String MEAL = PROCESSOR_PARAM_BASE + ".meal";
     public static final String MEAL_LOGIN = MEAL + ".login";
     public static final String MEAL_PASSWORD = MEAL + ".password";
-    public static final String SCUD = PROCESSOR_PARAM_BASE + ".SCUD";
-    public static final String SCUD_LOGIN = MEAL + ".login";
-    public static final String SCUD_PASSWORD = MEAL + ".password";
+    public static final String SCUD = PROCESSOR_PARAM_BASE + ".scud";
+    public static final String SCUD_LOGIN = SCUD + ".login";
+    public static final String SCUD_PASSWORD = SCUD + ".password";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
