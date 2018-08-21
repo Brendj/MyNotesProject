@@ -444,8 +444,10 @@ public class Processor implements SyncProcessor {
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncMenu", timeForDelta);
 
         try {
+            int daysToAdd = request.getOrganizationComplexesStructureRequest() == null ||request.getOrganizationComplexesStructureRequest().getMenuSyncCountDays() == null
+                    ? getMenuSyncCountDays(request) : request.getOrganizationComplexesStructureRequest().getMenuSyncCountDays();
             resMenuExchange = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
-                    DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
+                    DateUtils.addDays(syncStartTime, daysToAdd));
         } catch (Exception e) {
             String message = String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
@@ -1473,8 +1475,9 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
         try {
+            int daysToAdd = getMenuSyncCountDays(request);
             SyncResponse.ResMenuExchangeData menuExchangeData = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
-                    DateUtils.addDays(syncStartTime, RESPONSE_MENU_PERIOD_IN_DAYS));
+                    DateUtils.addDays(syncStartTime, daysToAdd));
             addToResponseSections(menuExchangeData, responseSections);
         } catch (Exception e) {
             String message = String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg());
@@ -1483,6 +1486,27 @@ public class Processor implements SyncProcessor {
         }
         // Process ComplexRoles
         fullProcessingComplexRoles(responseSections);
+    }
+
+    private int getMenuSyncCountDays(SyncRequest request) {
+        int result = RESPONSE_MENU_PERIOD_IN_DAYS;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Query query = persistenceSession.createQuery("select cp.menuSyncCountDays from ConfigurationProvider cp "
+                    + "where cp.idOfConfigurationProvider = :id");
+            query.setParameter("id", request.getOrg().getConfigurationProvider().getIdOfConfigurationProvider());
+            result = (Integer)query.uniqueResult();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception ignore) {} //если не можем получить значение из конфигурации, берем дефолт
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
     }
 
     private void fullProcessingGoodsBasicBaskerData(SyncRequest request, SyncHistory syncHistory,
