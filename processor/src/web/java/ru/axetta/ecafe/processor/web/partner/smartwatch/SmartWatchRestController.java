@@ -35,13 +35,23 @@ public class SmartWatchRestController {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
     private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
+    private boolean debug;
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
         for (CardState state : CardState.values()) {
             this.cardState.put(state.getValue(), state.getDescription());
         }
+        this.debug = this.isDebug();
     }
+
+    private boolean isDebug() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String reqInstance = runtimeContext
+                .getConfigProperties().getProperty("ecafe.processor.geoplaner.restcontroller.debug", "false");
+        return Boolean.parseBoolean(reqInstance);
+    }
+
 
     @POST
     @Path(value = "getTokenByMobile")
@@ -60,7 +70,7 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("No clients found for this mobilePhone number: " + mobilePhone);
             }
             if(!isGuardian(session, client)){
-                throw new Exception("Client with contractID: " + client.getContractId()
+                throw new IllegalArgumentException("Client with contractID: " + client.getContractId()
                         + ", found by mobilePhone number: " + mobilePhone
                         + ", is not a guardian");
             }
@@ -82,14 +92,24 @@ public class SmartWatchRestController {
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            if(debug){
+                result.description = e.getMessage();
+            } else {
+                result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());
         } catch (Exception e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            if(debug){
+                result.description = e.getMessage();
+            } else {
+                result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build());
@@ -130,14 +150,24 @@ public class SmartWatchRestController {
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
             result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            if(debug){
+                result.getResult().description = e.getMessage();
+            } else {
+                result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());
         } catch (Exception e){
             logger.error(e.getMessage());
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            if(debug){
+                result.getResult().description = e.getMessage();
+            } else {
+                result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build());
@@ -218,14 +248,23 @@ public class SmartWatchRestController {
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            if(debug){
+                result.description = e.getMessage();
+            } else {
+                result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());
         } catch (Exception e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            if(debug){
+                result.description = e.getMessage();
+            } else {
+                result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build());
@@ -279,14 +318,24 @@ public class SmartWatchRestController {
         } catch (IllegalArgumentException e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            if(debug){
+                result.description = e.getMessage();
+            } else {
+                result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build());
         } catch (Exception e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+            if(debug){
+                result.description = e.getMessage();
+            } else {
+                result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            }
+
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build());
