@@ -27,8 +27,8 @@ CREATE TABLE cf_smartwatchs
   trackerId BIGINT NOT NULL,
   trackerActivateTime BIGINT,
   trackerActivateUserId BIGINT,
-  status INTEGER,
-  simiccid CHARACTER VARYING(64),
+  status CHARACTER VARYING(64),
+  simiccid CHARACTER VARYING(128),
   model CHARACTER VARYING(128),
   color CHARACTER VARYING(128),
   CONSTRAINT cf_smartwatchs_pk PRIMARY KEY (idOfSmartWatch)
@@ -44,16 +44,9 @@ CREATE INDEX cf_smartwatchs_tracker_ID_UID_idx ON cf_smartwatchs(trackerId, trac
 ALTER TABLE cf_clients
 ADD COLUMN hasActiveSmartWatch INTEGER;
 
-alter table cf_preorder_complex
-  add column modefree integer,
-  add column modeofadd integer;
+-- Флаги для контроля отправки уведомлений в geoplaner, нет параметра по умолчанию т.к. большие таблицы
+ALTER TABLE CF_EnterEvents_Send_Info
+ADD COLUMN sendToGeoplaner INTEGER;
 
-alter table cf_preorder_menudetail
-  add column groupname character varying(60),
-  add column shortname character varying(256),
-  add column protein numeric(10,2),
-  add column fat numeric(10,2),
-  add column carbohydrates numeric(10,2),
-  add column calories numeric(10,2),
-  add column availablenow integer,
-  add column menudetailoutput character varying(32);
+ALTER TABLE CF_Transactions
+ADD COLUMN sendToGeoplaner INTEGER;

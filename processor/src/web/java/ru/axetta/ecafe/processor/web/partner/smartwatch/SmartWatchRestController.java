@@ -181,7 +181,7 @@ public class SmartWatchRestController {
     public Result registrySmartWatch(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
             @QueryParam(value="contractId") Long contractId, @QueryParam(value="model") String model, @QueryParam(value="color") String color,
             @QueryParam(value="trackerUid") Long trackerUid, @QueryParam(value="trackerID") Long trackerId,
-            @QueryParam(value="trackerActivateUserId") Long trackerActivateUserId, @QueryParam(value="status") Integer status,
+            @QueryParam(value="trackerActivateUserId") Long trackerActivateUserId, @QueryParam(value="status") String status,
             @QueryParam(value="trackerActivateTime") Long trackerActivateTime, @QueryParam(value="simIccid") String simIccid) throws Exception{
         Result result = new Result();
         Session session = null;
@@ -250,6 +250,9 @@ public class SmartWatchRestController {
 
             blockActiveCards(child, idOfCard);
             session.update(child);
+
+            session.flush();
+            session.beginTransaction().commit();
             result.resultCode = ResponseCodes.RC_OK.getCode();
             result.description = ResponseCodes.RC_OK.toString();
             return result;
@@ -319,6 +322,8 @@ public class SmartWatchRestController {
             child.setHasActiveSmartWatch(false);
             session.update(child);
 
+            session.flush();
+            session.beginTransaction().commit();
             result.resultCode = ResponseCodes.RC_OK.getCode();
             result.description = ResponseCodes.RC_OK.toString();
             return result;
@@ -351,7 +356,7 @@ public class SmartWatchRestController {
 
     private void updateSmartWatch(SmartWatch watch, Session session, Long idOfCard, Long idOfClient, String color,
             String model, Long trackerUid, Long trackerId, Long trackerActivateUserId,
-            Integer status, Date trackerActivateTimeDate, String simIccid) {
+            String status, Date trackerActivateTimeDate, String simIccid) {
         try {
             watch.setIdOfCard(idOfCard);
             watch.setIdOfClient(idOfClient);

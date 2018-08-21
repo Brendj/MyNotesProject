@@ -3519,7 +3519,7 @@ public class DAOUtils {
     }
 
     public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
-            Long trackerUid, Long trackerId, Long trackerActivateUserId, Integer status, Date trackerActivateTime,
+            Long trackerUid, Long trackerId, Long trackerActivateUserId, String status, Date trackerActivateTime,
             String simIccid) {
         try {
             SmartWatch watch = new SmartWatch();

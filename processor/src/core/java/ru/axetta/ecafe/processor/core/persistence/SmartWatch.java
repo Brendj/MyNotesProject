@@ -14,7 +14,7 @@ public class SmartWatch {
     private Long trackerId;
     private Date trackerActivateTime;
     private Long trackerActivateUserId;
-    private Integer status;
+    private String status;
     private String simIccid;
     private String model;
     private String color;
@@ -91,11 +91,11 @@ public class SmartWatch {
         this.trackerActivateUserId = rackerActivateUserId;
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

@@ -13,12 +13,12 @@
         </id>
         <property name="trackerActivateTime" column="trackerActivateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="trackerActivateUserId" column="trackerActivateUserId" type="long"/>
-        <property name="status" column="status" type="int"/>
-        <property name="simIccid" column="simIccid" type="string"/>
+        <property name="status" column="status" type="string" length="64"/>
+        <property name="simIccid" column="simIccid" type="string" length="128"/>
         <property name="idOfClient" column="idOfClient" type="long" not-null="true" update="false"/>
         <property name="idOfCard" column="idOfCard" type="long" not-null="true"/>
         <property name="trackerId" column="trackerId" type="long" not-null="true"/>
-        <property name="trackerUid" column="trackerUid" type="long" length="40" not-null="true"/>
+        <property name="trackerUid" column="trackerUid" type="long" not-null="true"/>
         <property name="model" column="model" type="string" length="128"/>
         <property name="color" column="color" type="string" length="128"/>
     </class>
