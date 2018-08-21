@@ -50,6 +50,14 @@ public class PreorderComplexItemExt implements Comparable {
         this.setDiscount(ci.getModeFree() == 1 ? true : false);
     }
 
+    public PreorderComplexItemExt(Integer idOfComplex, String complexName, Long currentPrice, Integer modeOfAdd, Integer modeFree) {
+        this.setIdOfComplexInfo(idOfComplex);
+        this.setComplexName(complexName);
+        this.setCurrentPrice(currentPrice);
+        this.setComplexType(modeOfAdd);
+        this.setDiscount(modeFree == 1 ? true : false);
+    }
+
     public List<PreorderMenuItemExt> getMenuItemExtList() {
         return menuItemExtList;
     }

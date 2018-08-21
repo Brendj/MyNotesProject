@@ -26,7 +26,7 @@ CREATE TABLE cf_smartwatchs
   trackerUid BIGINT NOT NULL,
   trackerId BIGINT NOT NULL,
   trackerActivateTime BIGINT,
-  rackerActivateUserId BIGINT,
+  trackerActivateUserId BIGINT,
   status INTEGER,
   simiccid CHARACTER VARYING(64),
   model CHARACTER VARYING(128),
@@ -42,4 +42,18 @@ CREATE INDEX cf_smartwatchs_tracker_ID_UID_idx ON cf_smartwatchs(trackerId, trac
 
 -- Флаг, что клиент имеет активные часы, нет параметра по умолчанию т.к. большая таблица
 ALTER TABLE cf_clients
-ADD COLUMN hasActiveSmartWatch INTEGER
+ADD COLUMN hasActiveSmartWatch INTEGER;
+
+alter table cf_preorder_complex
+  add column modefree integer,
+  add column modeofadd integer;
+
+alter table cf_preorder_menudetail
+  add column groupname character varying(60),
+  add column shortname character varying(256),
+  add column protein numeric(10,2),
+  add column fat numeric(10,2),
+  add column carbohydrates numeric(10,2),
+  add column calories numeric(10,2),
+  add column availablenow integer,
+  add column menudetailoutput character varying(32);

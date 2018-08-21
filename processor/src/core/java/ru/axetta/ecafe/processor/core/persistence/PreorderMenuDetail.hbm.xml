@@ -30,5 +30,13 @@
         <property name="idOfGoodsRequestPosition" column="idofgoodsrequestposition" type="long"/>
         <many-to-one name="regularPreorder" class="ru.axetta.ecafe.processor.core.persistence.RegularPreorder"
                      column="IdOfRegularPreorder" fetch="select"/>
+        <property name="shortName" column="ShortName" type="string" length="256"/>
+        <property name="menuDetailOutput" column="MenuDetailOutput" type="string" length="32"/>
+        <property name="availableNow" column="AvailableNow" type="int" not-null="true"/>
+        <property name="groupName" column="GroupName" type="string" length="60" not-null="true"/>
+        <property name="fat" column="Fat" type="double" update="false"/>
+        <property name="carbohydrates" column="Carbohydrates" type="double" update="false"/>
+        <property name="protein" column="Protein" type="double" update="false"/>
+        <property name="calories" column="Calories" type="double" update="false"/>
     </class>
 </hibernate-mapping>

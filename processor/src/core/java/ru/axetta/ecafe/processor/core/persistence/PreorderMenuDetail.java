@@ -24,6 +24,14 @@ public class PreorderMenuDetail {
     private PreorderState state;
     private Long idOfGoodsRequestPosition;
     private RegularPreorder regularPreorder;
+    private String menuDetailOutput;
+    private Double protein;
+    private Double fat;
+    private Double carbohydrates;
+    private Double calories;
+    private String groupName;
+    private Integer availableNow;
+    private String shortName;
 
     public PreorderMenuDetail() {
 
@@ -155,5 +163,69 @@ public class PreorderMenuDetail {
 
     public void setRegularPreorder(RegularPreorder regularPreorder) {
         this.regularPreorder = regularPreorder;
+    }
+
+    public String getMenuDetailOutput() {
+        return menuDetailOutput;
+    }
+
+    public void setMenuDetailOutput(String menuDetailOutput) {
+        this.menuDetailOutput = menuDetailOutput;
+    }
+
+    public Double getProtein() {
+        return protein;
+    }
+
+    public void setProtein(Double protein) {
+        this.protein = protein;
+    }
+
+    public Double getFat() {
+        return fat;
+    }
+
+    public void setFat(Double fat) {
+        this.fat = fat;
+    }
+
+    public Double getCarbohydrates() {
+        return carbohydrates;
+    }
+
+    public void setCarbohydrates(Double carbohydrates) {
+        this.carbohydrates = carbohydrates;
+    }
+
+    public Double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Double calories) {
+        this.calories = calories;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public Integer getAvailableNow() {
+        return availableNow;
+    }
+
+    public void setAvailableNow(Integer availableNow) {
+        this.availableNow = availableNow;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 }

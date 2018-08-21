@@ -6,6 +6,7 @@
 package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -68,6 +69,21 @@ public class PreorderMenuItemExt {
         this.setFat(menuDetail.getFat());
         this.setIdOfMenuDetail(menuDetail.getLocalIdOfMenu());
         this.setItemCode(menuDetail.getItemCode());
+    }
+
+    public PreorderMenuItemExt(PreorderMenuDetail pmd) {
+        this.setGroup(pmd.getGroupName());
+        this.setName(pmd.getShortName());
+        this.setFullName(pmd.getMenuDetailName());
+        this.setPrice(pmd.getMenuDetailPrice());
+        this.setCalories(pmd.getCalories());
+        this.setOutput(pmd.getMenuDetailOutput());
+        this.setAvailableNow(pmd.getAvailableNow());
+        this.setProtein(pmd.getProtein());
+        this.setCarbohydrates(pmd.getCarbohydrates());
+        this.setFat(pmd.getFat());
+        this.setIdOfMenuDetail(pmd.getArmIdOfMenu());
+        this.setItemCode(pmd.getItemCode());
     }
 
     public String getGroup() {

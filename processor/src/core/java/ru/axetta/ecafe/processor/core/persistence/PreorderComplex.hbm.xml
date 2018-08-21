@@ -28,6 +28,8 @@
         <property name="complexPrice" column="complexprice" type="long"/>
         <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="modeFree" column="ModeFree" type="int"/>
+        <property name="modeOfAdd" column="ModeOfAdd" type="int"/>
         <set name="preorderMenuDetails" inverse="true" cascade="all">
             <key column="idOfPreorderComplex"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail"/>

@@ -37,6 +37,8 @@ public class PreorderComplex {
     private PreorderState state;
     private Long idOfGoodsRequestPosition;
     private RegularPreorder regularPreorder;
+    private Integer modeOfAdd;
+    private Integer modeFree;
 
     public static Integer getDaysOfRegularPreorders() {
         return Integer.parseInt(RuntimeContext
@@ -229,5 +231,21 @@ public class PreorderComplex {
 
     public void setRegularPreorder(RegularPreorder regularPreorder) {
         this.regularPreorder = regularPreorder;
+    }
+
+    public Integer getModeOfAdd() {
+        return modeOfAdd;
+    }
+
+    public void setModeOfAdd(Integer modeOfAdd) {
+        this.modeOfAdd = modeOfAdd;
+    }
+
+    public Integer getModeFree() {
+        return modeFree;
+    }
+
+    public void setModeFree(Integer modeFree) {
+        this.modeFree = modeFree;
     }
 }
