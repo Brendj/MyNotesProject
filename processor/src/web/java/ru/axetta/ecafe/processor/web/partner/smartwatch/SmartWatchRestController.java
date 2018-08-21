@@ -5,8 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 
-import com.sun.istack.NotNull;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -19,6 +17,7 @@ import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +30,7 @@ import java.util.*;
 
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+@Controller
 public class SmartWatchRestController {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
@@ -146,15 +146,21 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "registrySmartWatch")
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public Result registrySmartWatch(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @NotNull @QueryParam(value="contractId") Long contractId, @QueryParam(value="model") String model, @QueryParam(value="color") String color,
-            @NotNull @QueryParam(value="trackerUid") Long trackerUid, @NotNull @QueryParam(value="trackerID") Long trackerId,
+            @QueryParam(value="contractId") Long contractId, @QueryParam(value="model") String model, @QueryParam(value="color") String color,
+            @QueryParam(value="trackerUid") Long trackerUid, @QueryParam(value="trackerID") Long trackerId,
             @QueryParam(value="trackerActivateUserId") Long trackerActivateUserId, @QueryParam(value="status") Integer status,
             @QueryParam(value="trackerActivateTime") Long trackerActivateTime, @QueryParam(value="simIccid") String simIccid) throws Exception{
         Result result = new Result();
         Session session = null;
         try {
+            if(trackerUid == null || trackerId == null){
+                throw new IllegalArgumentException("TrackerUID or trackerID is null");
+            }
+            if(contractId == null){
+                throw new IllegalArgumentException("ContractID is null");
+            }
             if(mobilePhone == null || mobilePhone.isEmpty()){
                 throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
             }
@@ -184,27 +190,28 @@ public class SmartWatchRestController {
             Date issueTime = new Date();
             Date validTime = new Date(issueTime.getTime() + this.DEFAULT_SMART_WATCH_VALID_TIME);
 
-            blockActiveCards(child);
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
             Long idOfCard = cardManager.createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE,
                     validTime, Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
 
             child.setHasActiveSmartWatch(true);
-            session.update(child);
-
+            Date trackerActivateTimeDate = null;
+            if(trackerActivateTime == null){
+                trackerActivateTimeDate = new Date();
+            } else {
+                trackerActivateTimeDate = new Date(trackerActivateTime);
+            }
             SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
             if(watch == null) {
-                Date trackerActivateTimeDate = null;
-                if(trackerActivateTime == null){
-                    trackerActivateTimeDate = new Date();
-                } else {
-                    trackerActivateTimeDate = new Date(trackerActivateTime);
-                }
                 DAOUtils.createSmartWatch(session, idOfCard, child.getIdOfClient(), model, color,
                         trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
             } else {
-                this.updateSmartWatch(watch, session, idOfCard, child.getIdOfClient());
+                this.updateSmartWatch(watch, session, idOfCard, child.getIdOfClient(), color, model,
+                        trackerUid, trackerId, trackerActivateUserId, status, trackerActivateTimeDate, simIccid);
             }
+
+            blockActiveCards(child, idOfCard);
+            session.update(child);
             result.resultCode = ResponseCodes.RC_OK.getCode();
             result.description = ResponseCodes.RC_OK.toString();
             return result;
@@ -213,8 +220,8 @@ public class SmartWatchRestController {
             result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
             result.description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
             throw new WebApplicationException(Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                                .entity(result)
-                                .build());
+                    .entity(result)
+                    .build());
         } catch (Exception e){
             logger.error(e.getMessage());
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
@@ -227,12 +234,16 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "blockSmartWatch")
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
+    @Transactional(rollbackFor = Exception.class)
     public Result blockSmartWatch(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @NotNull @QueryParam(value="trackerUid") Long trackerUid, @NotNull @QueryParam(value="trackerID") Long trackerId)throws Exception{
+            @QueryParam(value="trackerUid") Long trackerUid, @QueryParam(value="trackerID") Long trackerId)throws Exception{
         Result result = new Result();
         Session session = null;
+        Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
         try {
+            if(trackerUid == null || trackerId == null){
+                throw new IllegalArgumentException("TrackerUID or trackerID is NULL");
+            }
             if(mobilePhone == null || mobilePhone.isEmpty()){
                 throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
             }
@@ -244,18 +255,15 @@ public class SmartWatchRestController {
             token = "";
 
             Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
-            if(watch == null){
-                throw new IllegalArgumentException("No SmartWatch found by trackerUid: " + trackerUid + " and trackerId: " + trackerId);
+            Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid, cardType);
+            if(card == null){
+                throw new Exception("No SmartWatch as card found by trackerUid: " + trackerUid + " and trackerId: " + trackerId);
             }
 
-            Client child = (Client) session.get(Client.class, watch.getIdOfClient());
-
+            Client child = card.getClient();
             if(!isRelatives(session, parent, child)){
                 throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
             }
-
-            Card card = (Card) session.get(Card.class, watch.getIdOfCard());
 
             if(card.getState().equals(CardState.BLOCKED.getValue())){
                 throw new IllegalArgumentException("SmartWatch already blocked");
@@ -285,10 +293,24 @@ public class SmartWatchRestController {
         }
     }
 
-    private void updateSmartWatch(SmartWatch watch, Session session, Long idOfCard, Long idOfClient) throws Exception {
-        watch.setIdOfClient(idOfClient);
-        watch.setIdOfCard(idOfCard);
-        session.update(watch);
+    private void updateSmartWatch(SmartWatch watch, Session session, Long idOfCard, Long idOfClient, String color,
+            String model, Long trackerUid, Long trackerId, Long trackerActivateUserId,
+            Integer status, Date trackerActivateTimeDate, String simIccid) {
+        try {
+            watch.setIdOfCard(idOfCard);
+            watch.setIdOfClient(idOfClient);
+            watch.setTrackerId(trackerId);
+            watch.setTrackerUid(trackerUid);
+            watch.setModel(model);
+            watch.setColor(color);
+            watch.setTrackerActivateUserId(trackerActivateUserId);
+            watch.setStatus(status);
+            watch.setTrackerActivateTime(trackerActivateTimeDate);
+            watch.setSimIccid(simIccid);
+            session.update(watch);
+        } catch (Exception e) {
+            logger.error("Can't update SmartWatch with ID " + watch.getIdOfSmartWatch() + " : " + e.getMessage());
+        }
     }
 
     private void blockActiveCard(Client client, Card card) throws Exception {
@@ -300,9 +322,12 @@ public class SmartWatchRestController {
         }
     }
 
-    private void blockActiveCards(Client child) throws Exception{
+    private void blockActiveCards(Client child, Long idofCardAsSmartWatch) throws Exception{
         Set<Card> cardSet = child.getCards();
         for(Card card : cardSet) {
+            if(card.getIdOfCard().equals(idofCardAsSmartWatch)){
+                continue;
+            }
             this.blockActiveCard(child, card);
         }
     }

@@ -3520,20 +3520,25 @@ public class DAOUtils {
 
     public static Long createSmartWatch(Session session, Long idOfCard, Long idOfClient, String model, String color,
             Long trackerUid, Long trackerId, Long trackerActivateUserId, Integer status, Date trackerActivateTime,
-            String simIccid) throws Exception{
-        SmartWatch watch = new SmartWatch();
-        watch.setIdOfCard(idOfCard);
-        watch.setIdOfClient(idOfClient);
-        watch.setTrackerId(trackerId);
-        watch.setTrackerUid(trackerUid);
-        watch.setModel(model);
-        watch.setColor(color);
-        watch.setTrackerActivateUserId(trackerActivateUserId);
-        watch.setStatus(status);
-        watch.setTrackerActivateTime(trackerActivateTime);
-        watch.setSimIccid(simIccid);
-        session.save(watch);
-        return watch.getIdOfSmartWatch();
+            String simIccid) {
+        try {
+            SmartWatch watch = new SmartWatch();
+            watch.setIdOfCard(idOfCard);
+            watch.setIdOfClient(idOfClient);
+            watch.setTrackerId(trackerId);
+            watch.setTrackerUid(trackerUid);
+            watch.setModel(model);
+            watch.setColor(color);
+            watch.setTrackerActivateUserId(trackerActivateUserId);
+            watch.setStatus(status);
+            watch.setTrackerActivateTime(trackerActivateTime);
+            watch.setSimIccid(simIccid);
+            session.persist(watch);
+            return watch.getIdOfSmartWatch();
+        } catch (Exception e){
+            logger.error("Can't create SmartWatch Entity: " + e.getMessage());
+            return null;
+        }
     }
 
     public static SmartWatch findSmartWatchByTrackerUidAndTrackerId(Session session, Long trackerId, Long trackerUid) throws Exception{
