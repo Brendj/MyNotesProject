@@ -36,6 +36,7 @@ public class SmartWatchRestController {
     private Map<Integer, String> cardState;
     private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private boolean debug;
+    private Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -221,16 +222,23 @@ public class SmartWatchRestController {
             Date validTime = new Date(issueTime.getTime() + this.DEFAULT_SMART_WATCH_VALID_TIME);
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
-            Long idOfCard = cardManager.createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE,
-                    validTime, Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
+
+            Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid, cardType);
+            Long idOfCard = null;
+            if(card == null) {
+                idOfCard = cardManager
+                        .createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE, validTime,
+                                Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
+            } else {
+                cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                        CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(),
+                        CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId());
+                idOfCard = card.getIdOfCard();
+            }
 
             child.setHasActiveSmartWatch(true);
-            Date trackerActivateTimeDate = null;
-            if(trackerActivateTime == null){
-                trackerActivateTimeDate = new Date();
-            } else {
-                trackerActivateTimeDate = new Date(trackerActivateTime);
-            }
+
+            Date trackerActivateTimeDate = trackerActivateTime == null ? new Date() : new Date(trackerActivateTime);
             SmartWatch watch = DAOUtils.findSmartWatchByTrackerUidAndTrackerId(session, trackerId, trackerUid);
             if(watch == null) {
                 DAOUtils.createSmartWatch(session, idOfCard, child.getIdOfClient(), model, color,
@@ -278,7 +286,6 @@ public class SmartWatchRestController {
             @QueryParam(value="trackerUid") Long trackerUid, @QueryParam(value="trackerID") Long trackerId)throws Exception{
         Result result = new Result();
         Session session = null;
-        Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
         try {
             if(trackerUid == null || trackerId == null){
                 throw new IllegalArgumentException("TrackerUID or trackerID is NULL");

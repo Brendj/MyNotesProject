@@ -3533,7 +3533,7 @@ public class DAOUtils {
             watch.setStatus(status);
             watch.setTrackerActivateTime(trackerActivateTime);
             watch.setSimIccid(simIccid);
-            session.persist(watch);
+            session.save(watch);
             return watch.getIdOfSmartWatch();
         } catch (Exception e){
             logger.error("Can't create SmartWatch Entity: " + e.getMessage());
