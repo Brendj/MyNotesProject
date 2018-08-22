@@ -44,9 +44,3 @@ CREATE INDEX cf_smartwatchs_tracker_ID_UID_idx ON cf_smartwatchs(trackerId, trac
 ALTER TABLE cf_clients
 ADD COLUMN hasActiveSmartWatch INTEGER;
 
--- Флаги для контроля отправки уведомлений в geoplaner, нет параметра по умолчанию т.к. большие таблицы
-ALTER TABLE CF_EnterEvents_Send_Info
-ADD COLUMN sendToGeoplaner INTEGER;
-
-ALTER TABLE CF_Transactions
-ADD COLUMN sendToGeoplaner INTEGER;

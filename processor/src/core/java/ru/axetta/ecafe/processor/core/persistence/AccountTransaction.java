@@ -66,7 +66,6 @@ public class AccountTransaction {
     private Set<SubscriptionFee> subscriptionFees = new HashSet<SubscriptionFee>();
     private Org org;
     private boolean sendToExternal;
-    private boolean sendToGeoplaner;
 
     protected AccountTransaction() {
         // For Hibernate only
@@ -326,13 +325,5 @@ public class AccountTransaction {
                 + ", transactionSum=" + transactionSum + ", source='" + source + '\'' + ", sourceType=" + sourceType
                 + ", transactionTime=" + transactionTime +
                 ", idOfOrg=" + (org != null ? org.getOfficialName() : "unknown") + '}';
-    }
-
-    public boolean isSendToGeoplaner() {
-        return sendToGeoplaner;
-    }
-
-    public void setSendToGeoplaner(boolean sendToGeoplaner) {
-        this.sendToGeoplaner = sendToGeoplaner;
     }
 }

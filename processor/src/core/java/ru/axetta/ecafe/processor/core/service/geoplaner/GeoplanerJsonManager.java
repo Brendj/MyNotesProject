@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service.geoplaner;
 
-import ru.CryptoPro.JCP.ControlPane.L;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -25,6 +23,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+//TODO изменить реализацию методов класса для передачи данных в Geoplaner онлайн (во время синхронизации)
 @Component
 @Scope("prototype")
 public class GeoplanerJsonManager {

@@ -53,7 +53,6 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SubscriptionFee"/>
         </set>
         <property name="sendToExternal" column="SendToExternal" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
-        <property name="sendToGeoplaner" column="sendToGeoplaner" type="ru.axetta.ecafe.processor.core.persistence.BoolType" />
     </class>
 </hibernate-mapping>
 
