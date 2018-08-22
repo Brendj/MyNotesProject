@@ -98,7 +98,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[Наименование ОО:]]></text>
+				<text><![CDATA[Наименование организации:]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="false">
 				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" x="230" y="20" width="604" height="20"/>
@@ -112,7 +112,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[Адрес ОО:]]></text>
+				<text><![CDATA[Адрес организации:]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
@@ -179,7 +179,7 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent" style="table">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="300" height="24"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 									<font size="12"/>
