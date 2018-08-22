@@ -44,3 +44,16 @@ CREATE INDEX cf_smartwatchs_tracker_ID_UID_idx ON cf_smartwatchs(trackerId, trac
 ALTER TABLE cf_clients
 ADD COLUMN hasActiveSmartWatch INTEGER;
 
+alter table cf_preorder_complex
+  add column modefree integer,
+  add column modeofadd integer;
+
+alter table cf_preorder_menudetail
+  add column groupname character varying(60),
+  add column shortname character varying(256),
+  add column protein numeric(10,2),
+  add column fat numeric(10,2),
+  add column carbohydrates numeric(10,2),
+  add column calories numeric(10,2),
+  add column availablenow integer,
+  add column menudetailoutput character varying(32);
