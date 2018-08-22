@@ -53,6 +53,7 @@ import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomContr
 @DependsOn("daoService")
 public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
+    private final String NEW_LINE_DELIMITER = ";";
 
 
     @PersistenceContext(unitName = "processorPU")
@@ -299,7 +300,8 @@ public class PreorderDAOService {
         if (item.getDiscount()) {
             return "За счет средств бюджета города Москвы";
         } else {
-            return "За счет средств представителей обучающихся";
+            return "За счет родителей (представителей) обучающегося. " + NEW_LINE_DELIMITER
+                 + "В случае, если вашему ребенку предоставляется льготное питание, то вы в дополнение можете заказать платное питание.";
         }
     }
 
