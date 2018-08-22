@@ -190,12 +190,7 @@ public class PreorderDAOService {
             String complexName = (String) row[8];
             Long complexPrice = ((BigInteger)row[9]).longValue();
             Long idOfPreorderComplex = (row[10] == null ? null : ((BigInteger)row[10]).longValue());
-            PreorderComplexItemExt complexItemExt = null;
-            if (!id.equals(-1L)) {
-                complexItemExt = new PreorderComplexItemExt(ci);
-            } else {
-                complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, modeOfAdd, modeFree);
-            }
+            PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, modeOfAdd, modeFree);
             complexItemExt.setAmount(amount == null ? 0 : amount);
             complexItemExt.setState(state == null ? 0 : state);
             complexItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
@@ -319,7 +314,7 @@ public class PreorderDAOService {
                     + "left join (SELECT pmd.amount, pmd.idofregularpreorder, pmd.state, pmd.armidofmenu, pmd.idofpreordermenudetail "
                     + "FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
                     + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.deletedstate = 0) as pmd on pmd.armidofmenu = md.localidofmenu "
-                    + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo");
+                    + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo and md.itemcode is not null and md.itemcode <> ''");
             query.setParameter("idOfComplexInfo", idOfComplexInfo);
             query.setParameter("idOfClient", idOfClient);
             query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
@@ -335,14 +330,14 @@ public class PreorderDAOService {
         for (Object o : res) {
             Object[] row = (Object[]) o;
             Long id = ((BigInteger)row[0]).longValue();
-            MenuDetail menuDetail = emReport.find(MenuDetail.class, id);
             Integer amount = (Integer) row[1];
             Long idOfRegularPreorder = row[2] == null ? null : ((BigInteger)row[2]).longValue();
             Integer state = (Integer) row[3];
             Boolean isAvailableForRegular = (Integer) row[4] == 1;
             Long idOfPreorderMenuDetail = (row[5] == null ? null : ((BigInteger)row[5]).longValue());
             PreorderMenuItemExt menuItemExt = null;
-            if (menuDetail != null) {
+            if (idOfPreorderMenuDetail == null) {
+                MenuDetail menuDetail = emReport.find(MenuDetail.class, id);
                 menuItemExt = new PreorderMenuItemExt(menuDetail);
             } else {
                 PreorderMenuDetail pmd = em.find(PreorderMenuDetail.class, idOfPreorderMenuDetail);
