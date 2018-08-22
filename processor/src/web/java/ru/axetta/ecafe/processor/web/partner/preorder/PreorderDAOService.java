@@ -180,7 +180,7 @@ public class PreorderDAOService {
         for (Object o : res) {
             Object[] row = (Object[]) o;
             Long id = ((BigInteger)row[0]).longValue();
-            ComplexInfo ci = emReport.find(ComplexInfo.class, id);
+            //ComplexInfo ci = emReport.find(ComplexInfo.class, id);
             Integer amount = (Integer) row[1];
             Integer state = (Integer) row[3];
             Long idOfRegularPreorder = row[4] == null ? null : ((BigInteger)row[4]).longValue();
@@ -307,7 +307,7 @@ public class PreorderDAOService {
     private List<PreorderMenuItemExt> getMenuItemsExt (Long idOfComplexInfo, Long idOfClient, Date date, Long idOfPreorderComplex) {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<PreorderMenuItemExt>();
         Query query = null;
-        if (!idOfComplexInfo.equals(-1L)) {
+        if (idOfPreorderComplex == null) {
             query = emReport.createNativeQuery("SELECT md.idofmenudetail, pmd.amount, pmd.idofregularpreorder, pmd.state, g.dailysale, pmd.idofpreordermenudetail "
                     + "FROM CF_MenuDetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
                     + "JOIN CF_Goods g ON md.IdOfGood = g.IdOfGood "
