@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import javax.swing.text.StyledEditorKit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +19,7 @@ public class EnterEventSendInfo {
     private Boolean sendToExternal;
     private Boolean responseCode;
     private Boolean directionType;
+    private Boolean sendToGeoplaner;
 
 
     public static final List<Integer> VALID_ENTER_CODES = Arrays.asList(
@@ -112,5 +114,13 @@ public class EnterEventSendInfo {
 
     public void setCompositeIdOfEnterEventSendInfo(CompositeIdOfEnterEventSendInfo compositeIdOfEnterEventSendInfo) {
         this.compositeIdOfEnterEventSendInfo = compositeIdOfEnterEventSendInfo;
+    }
+
+    public Boolean getSendToGeoplaner() {
+        return sendToGeoplaner;
+    }
+
+    public void setSendToGeoplaner(Boolean sendToGeoplaner) {
+        this.sendToGeoplaner = sendToGeoplaner;
     }
 }

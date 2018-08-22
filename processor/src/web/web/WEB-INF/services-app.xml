@@ -93,6 +93,7 @@
         <task:scheduled ref="migrantsManager" method="checkMigrantsByClientGroup" cron="0 0 0 * * ?"/>
         <task:scheduled ref="mealManager" method="sendData" cron="0 * * * * ?"/>
         <task:scheduled ref="scudManager" method="sendData" cron="0 * * * * ?"/>
+        <task:scheduled ref="geoplanerJsonManager" method="sendEvents" cron="0 * * * * ?"/>
         <task:scheduled ref="SMSResendingService" method="executeResending" fixed-delay="60000"/>
         <!--EP-320 <task:scheduled ref="projectStateReportService" method="runInitContragetsChartTypeAtStartup"
                         fixed-delay="60000"/> -->

@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerJsonManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
@@ -5343,7 +5344,7 @@ public class Processor implements SyncProcessor {
                             clientFromEnterEvent == null ? null : clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
 
-                    if(RuntimeContext.RegistryType.isSpb() && ScudManager.isOn()){
+                    if((RuntimeContext.RegistryType.isSpb() && ScudManager.isOn()) || GeoplanerJsonManager.managerIsOn()){
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
 

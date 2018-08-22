@@ -23,5 +23,6 @@
         <property name="sendToExternal" column="sendToExternal" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="directionType" column="directionType" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="responseCode" column="responseCode" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="sendToGeoplaner" column="sendToGeoplaner" type="ru.axetta.ecafe.processor.core.persistence.BoolType" />
     </class>
 </hibernate-mapping>
