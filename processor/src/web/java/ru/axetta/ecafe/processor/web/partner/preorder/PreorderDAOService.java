@@ -151,7 +151,9 @@ public class PreorderDAOService {
         }
 
         Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder, "
-                + "ci.modeofadd, ci.modefree, ci.idofcomplex, ci.complexname, ci.currentprice, pc.idofpreordercomplex "
+                + "coalesce(pc.modeofadd, ci.modeofadd) as modeofadd, coalesce(pc.modefree, ci.modefree) as modefree, ci.idofcomplex, "
+                + "coalesce(pc.complexname, ci.complexname) as complexname, "
+                + "coalesce(pc.complexprice, ci.currentprice) as currentprice, pc.idofpreordercomplex "
                 + " from cf_complexinfo ci join cf_orgs o on o.idoforg = ci.idoforg "
                 + " left outer join (select * from cf_preorder_complex pc where pc.idofclient = :idOfClient "
                 + " and pc.preorderdate between :startDate and :endDate and pc.deletedstate = 0) as pc on (ci.idoforg = :idOfOrg and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
@@ -162,7 +164,8 @@ public class PreorderDAOService {
                 + "select cast(-1 as bigint) as idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder, pc.modeofadd, pc.modefree, "
                 + "pc.armcomplexid, pc.complexname, pc.complexprice, pc.idofpreordercomplex "
                 + "from cf_preorder_complex pc where pc.idofclient = :idOfClient and pc.preorderdate between :startDate and :endDate and pc.deletedstate = 0 "
-                + "and not exists (select idofcomplexinfo from cf_complexinfo ci2 where ci2.idoforg = :idOfOrg and ci2.menudate = pc.preorderdate and ci2.idofcomplex = pc.armcomplexid) "
+                + "and not exists (select idofcomplexinfo from cf_complexinfo ci2 where ci2.idoforg = :idOfOrg and ci2.menudate = pc.preorderdate and ci2.idofcomplex = pc.armcomplexid "
+                + " and ci2.modevisible = 1 and (ci2.usedspecialmenu = 1 or ci2.modefree = 1)) "
                 + "order by modeOfAdd");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
