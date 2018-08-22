@@ -4941,6 +4941,9 @@ public class Processor implements SyncProcessor {
             version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
             //Integer days = getDaysToAdd(organization.getIdOfOrg(), now, CalendarUtils.addDays(now, PreorderComplex.getDaysOfRegularPreorders()));
             Integer days = DAOUtils.getPreorderFeedingForbiddenDays(organization.getIdOfOrg() + 1);
+            if (days == null) {
+                days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
+            }
             dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(now, days)); //дата, начиная с которой нужно удалять измененные предзаказы
         }
         for (PreorderComplex preorderComplex : deletedPreorders) {
