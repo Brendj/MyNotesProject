@@ -194,6 +194,9 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
 
             List<GoodRequestPosition> goodRequestPositionList = getGoodRequestPositions(session, guidFilter, generateEndTime,
                     hideGeneratePeriod, orgMap, beginDate, endDate);
+            //adding old positions, which already notified
+            goodRequestPositionList.addAll(getGoodRequestPositions(session, new ArrayList<String>(), generateEndTime,
+                    hideGeneratePeriod, orgMap, beginDate, endDate));
 
             Map<Long, GoodRequestsNewReportService.GoodInfo> requestGoodsInfo = new HashMap<Long, GoodRequestsNewReportService.GoodInfo>();
             for (Object obj : goodRequestPositionList) {
@@ -284,8 +287,11 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             criteria.add(Restrictions.eq("gr.deletedState", false));
             criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
 
-            if (!guidFilter.isEmpty())
+            if (!guidFilter.isEmpty()) {
                 criteria.add(Restrictions.or(Restrictions.eq("notified", false), Restrictions.isNull("notified")));
+            } else {
+                criteria.add(Restrictions.eq("notified", true));
+            }
 
             if (hideGeneratePeriod) {
                 Disjunction dateDisjunction = Restrictions.disjunction();
