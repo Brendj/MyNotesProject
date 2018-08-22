@@ -103,8 +103,8 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             Org org = (Org) session.load(Org.class, idOfOrg);
 
             if (null != org) {
-                parameterMap.put("address", org.getShortAddress());
-                parameterMap.put("shortName", org.getShortNameInfoService());
+                parameterMap.put("address", org.getAddress());
+                parameterMap.put("shortName", org.getOfficialName());
             } else {
                 parameterMap.put("address", "не указан");
                 parameterMap.put("shortName", "не указано");
