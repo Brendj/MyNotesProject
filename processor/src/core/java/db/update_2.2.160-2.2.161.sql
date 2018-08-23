@@ -59,3 +59,5 @@ alter table cf_preorder_menudetail
   add column menudetailoutput character varying(32);
 
 CREATE INDEX cf_groupnames_to_orgs_idofmainorg ON cf_groupnames_to_orgs USING btree (idofmainorg);
+
+--! ФИНАЛИЗИРОВАН 23.08.2018, НЕ МЕНЯТЬ

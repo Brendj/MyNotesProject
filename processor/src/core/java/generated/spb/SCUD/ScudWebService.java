@@ -1,15 +1,11 @@
 
 package generated.spb.SCUD;
 
+import javax.xml.namespace.QName;
+import javax.xml.ws.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.WebEndpoint;
-import javax.xml.ws.WebServiceClient;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.WebServiceFeature;
 
 
 /**
@@ -50,25 +46,25 @@ public class ScudWebService
         super(__getWsdlLocation(), SCUDWEBSERVICE_QNAME);
     }
 
-    public ScudWebService(WebServiceFeature... features) {
-        super(__getWsdlLocation(), SCUDWEBSERVICE_QNAME, features);
-    }
+    //public ScudWebService(WebServiceFeature... features) {
+    //    super(__getWsdlLocation(), SCUDWEBSERVICE_QNAME, features);
+    //}
 
     public ScudWebService(URL wsdlLocation) {
         super(wsdlLocation, SCUDWEBSERVICE_QNAME);
     }
 
-    public ScudWebService(URL wsdlLocation, WebServiceFeature... features) {
-        super(wsdlLocation, SCUDWEBSERVICE_QNAME, features);
-    }
+    //public ScudWebService(URL wsdlLocation, WebServiceFeature... features) {
+    //    super(wsdlLocation, SCUDWEBSERVICE_QNAME, features);
+    //}
 
     public ScudWebService(URL wsdlLocation, QName serviceName) {
         super(wsdlLocation, serviceName);
     }
 
-    public ScudWebService(URL wsdlLocation, QName serviceName, WebServiceFeature... features) {
-        super(wsdlLocation, serviceName, features);
-    }
+    //public ScudWebService(URL wsdlLocation, QName serviceName, WebServiceFeature... features) {
+    //    super(wsdlLocation, serviceName, features);
+    //}
 
     /**
      * 
