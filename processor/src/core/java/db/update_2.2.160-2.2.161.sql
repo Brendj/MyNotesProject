@@ -57,3 +57,5 @@ alter table cf_preorder_menudetail
   add column calories numeric(10,2),
   add column availablenow integer,
   add column menudetailoutput character varying(32);
+
+CREATE INDEX cf_groupnames_to_orgs_idofmainorg ON cf_groupnames_to_orgs USING btree (idofmainorg);
