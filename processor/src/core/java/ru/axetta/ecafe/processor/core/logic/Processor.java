@@ -765,6 +765,7 @@ public class Processor implements SyncProcessor {
 
         //process groups organization
         fullProcessingGroupsOrganization(request,syncHistory,responseSections);
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "fullProcessingGroupsOrganization", timeForDelta);
 
         //info messages
         processInfoMessageSections(request, responseSections);

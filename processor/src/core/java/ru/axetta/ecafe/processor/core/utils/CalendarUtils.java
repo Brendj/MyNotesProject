@@ -491,6 +491,13 @@ public class CalendarUtils {
         return (isSixWorkWeek ? (day != Calendar.SUNDAY) : (day != Calendar.SUNDAY && day != Calendar.SATURDAY));
     }
 
+    public static boolean isWorkDateWithoutParserForPreorder(boolean isSixWorkWeek, Date date) {
+        int day = getDayOfWeek(date);
+        int day2 = getDayOfWeek(new Date());
+        if (day2 == Calendar.THURSDAY && day == Calendar.SATURDAY) return false;
+        return isWorkDateWithoutParser(isSixWorkWeek, date);
+    }
+
     public static Date calculateNextWorkDate(SubscriberFeedingSettingSettingValue parser, Date date) {
         Date firstWorkDate = CalendarUtils.addOneDay(date);
         while (!isWorkDate(parser, firstWorkDate)) {

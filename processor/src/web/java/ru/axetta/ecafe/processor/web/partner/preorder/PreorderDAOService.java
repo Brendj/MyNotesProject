@@ -1234,7 +1234,7 @@ public class PreorderDAOService {
             if (two_days <= forbiddenDays) {
                 c.add(Calendar.DATE, 1);
                 map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
-                if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)
+                if (CalendarUtils.isWorkDateWithoutParserForPreorder(isSixWorkWeek, currentDate)
                         && !isSpecialConfigDate(client, currentDate)) {
                     two_days++;
                 }
