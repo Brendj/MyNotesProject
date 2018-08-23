@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
@@ -130,6 +131,8 @@ public class PreorderRequestsReportService {
                     Integer forbiddenDaysCount = forbiddenDaysMap.get(item.getIdOfOrg());
                     if (forbiddenDaysCount == null) {
                         forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(item.getIdOfOrg());
+                        if (forbiddenDaysCount == null)
+                            forbiddenDaysCount = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
                         forbiddenDaysMap.put(item.getIdOfOrg(), forbiddenDaysCount);
                     }
                     if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
@@ -161,7 +164,8 @@ public class PreorderRequestsReportService {
                             deletePreorderForNotEnoughMoney(session, item);
                             continue;
                         }
-                        createRequestFromPreorder(session, item, fireTime);
+                        if (null == item.getDeleted() || !item.getDeleted())
+                            createRequestFromPreorder(session, item, fireTime);
                     } else {
                         updateRequestFromPreorder(session, item, fireTime);
                     }
@@ -413,7 +417,7 @@ public class PreorderRequestsReportService {
               + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "//AND pmd.deletedstate = 0 "
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.preorderdate > :date and pc.idOfGoodsRequestPosition is null"; //AND pc.deletedstate=0
+              + "WHERE pc.preorderdate > :date"; //AND pc.deletedstate=0
               //+ "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
         Query query = session.createSQLQuery(sqlQuery);
         query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
@@ -518,7 +522,7 @@ public class PreorderRequestsReportService {
 
         GoodRequest request = pos.getGoodRequest();
 
-        if (item.getDeleted()) {
+        if (null != item.getDeleted() && item.getDeleted()) {
             pos.setDeletedState(true);
             pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
             request.setDeletedState(true);

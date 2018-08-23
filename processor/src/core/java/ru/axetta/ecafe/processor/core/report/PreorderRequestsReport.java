@@ -151,8 +151,8 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
                             + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                             + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                            + "WHERE ci.idOfOrg IN (:orgList) AND ci.menuDate BETWEEN :startDate AND :endDate "
-                            + "   AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)";
+                            + "WHERE ci.idOfOrg IN (:orgList) AND ci.menuDate BETWEEN :startDate AND :endDate ";
+                            //+ "   AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)";
             //and pc.deletedState = 0 and pmd.deletedState = 0";
 
             Query query = session.createSQLQuery(sqlQuery);
@@ -195,7 +195,8 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             List<GoodRequestPosition> goodRequestPositionList = getGoodRequestPositions(session, guidFilter, generateEndTime,
                     hideGeneratePeriod, orgMap, beginDate, endDate);
             //adding old positions, which already notified
-            goodRequestPositionList.addAll(getGoodRequestPositions(session, new ArrayList<String>(), generateEndTime,
+            if (!goodRequestPositionList.isEmpty())
+                goodRequestPositionList.addAll(getGoodRequestPositions(session, new ArrayList<String>(), generateEndTime,
                     hideGeneratePeriod, orgMap, beginDate, endDate));
 
             Map<Long, GoodRequestsNewReportService.GoodInfo> requestGoodsInfo = new HashMap<Long, GoodRequestsNewReportService.GoodInfo>();
@@ -368,7 +369,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                     hideDailySampleValue, hideLastValue, planType, notificationMark);
             dates.add(doneDate);
 
-            if (notify) {
+            if (notify && !position.getNotified()) {
                 position.setNotified(true);
                 session.persist(position);
             }
