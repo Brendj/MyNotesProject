@@ -329,6 +329,12 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             Long newTempClients = tempClientsCount - getSafeValue(position.getLastTempClientsCount()) / 1000L;
 
             Long notificationMark = 0L;
+
+            if (notify && !position.getNotified()) {
+                if (0L != totalCount)
+                    notificationMark = 1L;
+            }
+
             if (position.getDeletedState()) {
                 totalCount = 0L;
                 notificationMark = 1L;
