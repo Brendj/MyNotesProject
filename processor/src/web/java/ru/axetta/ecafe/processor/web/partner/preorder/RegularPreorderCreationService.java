@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("singleton")
+@Deprecated
+//Генерация встроена в метод отправки заявок
 public class RegularPreorderCreationService {
     private static final Logger logger = LoggerFactory.getLogger(RegularPreorderCreationService.class);
 
