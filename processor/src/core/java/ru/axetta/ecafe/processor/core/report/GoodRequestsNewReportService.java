@@ -511,6 +511,7 @@ public class GoodRequestsNewReportService {
         private Long newDailySample;
         private Long newTempClients;
         private Long notificationMark;
+        private Long needToMark;
 
         protected Item(Item item, Date doneDate) {
             this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L, 0L, 0L,
@@ -518,9 +519,17 @@ public class GoodRequestsNewReportService {
                     item.getNotificationMark());
         }
 
-        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount,
-                Long dailySample, Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, Long notificationMark) {
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
+                Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
+            this(orgNum, officialName, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount,
+                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark,
+                    1L);
+        }
+
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
+                Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark) {
             this.orgNum = orgNum;
             this.officialName = officialName;
             this.goodName = goodName;
@@ -543,7 +552,13 @@ public class GoodRequestsNewReportService {
                 feedingPlanTypeNum = feedingPlanType.ordinal();
             }
             this.notificationMark = notificationMark;
+            this.needToMark = needToMark;
+        }
 
+        public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark) {
+            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue,
+                    hideLastValue, feedingPlanType, notificationMark, needToMark);
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
@@ -554,10 +569,18 @@ public class GoodRequestsNewReportService {
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample, Long tempClients,
                 Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, Long notificationMark) {
+                FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark) {
             this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName, doneDate,
                     totalCount, dailySample, tempClients, newTotalCount, newDailySample, newTempClients, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark);
+                    feedingPlanType, notificationMark, needToMark);
+
+        }
+
+        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample, Long tempClients,
+                Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue, int hideLastValue,
+                FeedingPlanType feedingPlanType, Long notificationMark) {
+            this(item, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount, newDailySample, newTempClients,
+                    hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, 1L);
 
         }
 
@@ -730,6 +753,14 @@ public class GoodRequestsNewReportService {
 
         public void setNewTempClients(Long newTempClients) {
             this.newTempClients = newTempClients;
+        }
+
+        public Long getNeedToMark() {
+            return needToMark;
+        }
+
+        public void setNeedToMark(Long needToMark) {
+            this.needToMark = needToMark;
         }
     }
 }

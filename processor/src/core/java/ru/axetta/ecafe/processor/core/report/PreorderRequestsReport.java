@@ -239,14 +239,14 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                                 if (hideMissedColumns) {
                                     for (Date date : dates) {
                                         addItemsFromList(itemList, item, date, goodInfo.name, hideDailySampleValue,
-                                                hideLastValue, goodInfo.feedingPlanType, 0L);
+                                                hideLastValue, goodInfo.feedingPlanType, 0L, 0L);
                                     }
                                 } else {
                                     beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
                                     endDate = CalendarUtils.endOfDay(endTime);
                                     while (beginDate.getTime() <= endDate.getTime()) {
                                         addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
-                                                hideLastValue, goodInfo.feedingPlanType, 0L);
+                                                hideLastValue, goodInfo.feedingPlanType, 0L, 0L);
                                         beginDate = CalendarUtils.addOneDay(beginDate);
                                     }
                                 }
@@ -330,11 +330,6 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
 
             Long notificationMark = 0L;
 
-            if (notify && !position.getNotified()) {
-                if (0L != totalCount)
-                    notificationMark = 1L;
-            }
-
             if (position.getDeletedState()) {
                 totalCount = 0L;
                 notificationMark = 1L;
@@ -365,14 +360,18 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             if (!hideMissedColumns && goodRequestPositionList.indexOf(obj) == 0) {
                 while (beginDate.getTime() <= endDate.getTime()) {
                     itemList.add(new GoodRequestsNewReportService.Item(org, name, beginDate, 0L, 0L, 0L, 0L,
-                            0L, 0L, hideDailySampleValue, hideLastValue, planType, 0L));
+                            0L, 0L, hideDailySampleValue, hideLastValue, planType, 0L, 0L));
                     dates.add(beginDate);
                     beginDate = CalendarUtils.addOneDay(beginDate);
                 }
             }
 
+            Long needToMark = 0L;
+            if (notify && !position.getNotified())
+                needToMark = 1L;
+
             addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, tempClientsCount, newTotalCount, newDailySample, newTempClients,
-                    hideDailySampleValue, hideLastValue, planType, notificationMark);
+                    hideDailySampleValue, hideLastValue, planType, notificationMark, needToMark);
             dates.add(doneDate);
 
             if (notify && !position.getNotified()) {
@@ -413,18 +412,19 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
         }
 
         private static void addItemsFromList(List<GoodRequestsNewReportService.Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
-                int hideDailySampleValue, int hideLastValue, GoodRequestsNewReportService.FeedingPlanType goodType, Long notificationMark) {
+                int hideDailySampleValue, int hideLastValue, GoodRequestsNewReportService.FeedingPlanType goodType, Long notificationMark, Long needToMark) {
             itemList.add(
                     new GoodRequestsNewReportService.Item(org, name, doneDate, hideDailySampleValue, hideLastValue, goodType, notificationMark));
             itemList.add(new GoodRequestsNewReportService.Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
-                    goodType, notificationMark));
+                    goodType, notificationMark, needToMark));
         }
 
         private static void addItemsFromList(List<GoodRequestsNewReportService.Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
                 Long totalCount, Long dailySampleCount, Long tempClientsCount, Long newTotalCount, Long newDailySample,
-                Long newTempClients, int hideDailySampleValue, int hideLastValue, GoodRequestsNewReportService.FeedingPlanType goodType, Long notificationMark) {
+                Long newTempClients, int hideDailySampleValue, int hideLastValue, GoodRequestsNewReportService.FeedingPlanType goodType, Long notificationMark,
+                Long needToMark) {
             itemList.add(new GoodRequestsNewReportService.Item(org, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
-                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, goodType, notificationMark));
+                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, goodType, notificationMark, needToMark));
         }
     }
 
