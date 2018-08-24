@@ -68,6 +68,11 @@ public class PreorderDAOService {
             public void deleteRegularPreorder(Session session, RegularPreorder regularPreorder, PreorderState preorderState) throws Exception {
                 deleteRegularPreorderInternal(session, regularPreorder, preorderState);
             }
+
+            @Override
+            public void generatePreordersBySchedule() {
+                generatePreordersByScheduleInternal();
+            }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
     }
@@ -591,6 +596,15 @@ public class PreorderDAOService {
         regularPreorder.setDeletedState(true);
         regularPreorder.setLastUpdate(new Date());
         session.update(regularPreorder);
+    }
+
+    private void generatePreordersByScheduleInternal() {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).generatePreordersBySchedule();
+            logger.info("Successful end of generating regular preorders");
+        } catch (Exception e) {
+            logger.error("Error in generating regular preorders: ", e);
+        }
     }
 
     private void deleteGeneratedPreordersByRegular(Session session, RegularPreorder regularPreorder, PreorderState state) throws Exception {

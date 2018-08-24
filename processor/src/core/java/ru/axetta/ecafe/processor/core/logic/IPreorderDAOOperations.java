@@ -14,4 +14,5 @@ import org.hibernate.Session;
  */
 public interface IPreorderDAOOperations {
     void deleteRegularPreorder(Session session, RegularPreorder regularPreorder, PreorderState preorderState) throws Exception;
+    void generatePreordersBySchedule();
 }

@@ -9,7 +9,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.Processor;
+import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
@@ -59,6 +59,7 @@ public class PreorderRequestsReportService {
     public static final String NODE_PROPERTY = "ecafe.processor.report.PreorderRequestsReport.node";
     public static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
+    private IPreorderDAOOperations preorderDAOOperations;
 
     private Calendar localCalendar;
     private Date startDate;
@@ -93,6 +94,9 @@ public class PreorderRequestsReportService {
     }
 
     public void runTask() throws Exception {
+        //генерация предзаказов по регулярному правилу
+        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
+
         updateDate();
 
         orgItems = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems();
