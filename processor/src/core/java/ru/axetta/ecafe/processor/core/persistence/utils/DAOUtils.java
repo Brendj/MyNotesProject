@@ -51,7 +51,6 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -3376,17 +3375,6 @@ public class DAOUtils {
         Long menuDetailPrice = (null == values[1]) ? 0 : ((BigDecimal) values[1]).longValue();
 
         return complexPrice + menuDetailPrice;
-    }
-
-    public static Long getLastVersionOfGroupNameToOrg(Session session){
-        BigInteger version = BigInteger.valueOf(0L);
-        Query query = session.createSQLQuery(
-                "SELECT g.version FROM cf_GroupNames_To_Orgs AS g ORDER BY g.version DESC LIMIT 1 FOR UPDATE");
-        Object o = query.uniqueResult();
-        if(o != null){
-            version = (BigInteger) o;
-        }
-        return version.longValue();
     }
 
     public static void createGroupNamesToOrg(Session session, Org org, Long version, String groupName) {
