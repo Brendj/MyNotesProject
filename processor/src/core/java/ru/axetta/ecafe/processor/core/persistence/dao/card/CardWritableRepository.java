@@ -324,7 +324,8 @@ public class CardWritableRepository extends WritableJpaDao {
             }
         }
         Client client = ClientReadOnlyRepository.getInstance().findById(o.getIdOfClient());
-        return entityManager.createQuery("update Card set "
+        String condition = o.getOrgOwner() == null ? " and idOfOrg in :idOfOrgs" : " and idOfOrg = :idOfOrg";
+        Query query = entityManager.createQuery("update Card set "
                 + " client = :client, "
                 + " state = :state, "
                 + " validTime = :validTime,"
@@ -332,15 +333,21 @@ public class CardWritableRepository extends WritableJpaDao {
                 + " updateTime = :updateTime, "
                 + " visitor = null "
                 + " where cardNo = :cardNo"
-                + "     and org.idOfOrg = :idOfOrg")
-                .setParameter("state", CardState.ISSUED.getValue())
-                .setParameter("client", client)
-                .setParameter("validTime", o.getValidDate())
-                .setParameter("issueTime", o.getOperationDate())
-                .setParameter("updateTime", new Date())
-                .setParameter("cardNo", o.getCardNo())
-                .setParameter("idOfOrg", idOfOrg)
-                .executeUpdate();
+                + condition);
+
+        query.setParameter("state", CardState.ISSUED.getValue());
+        query.setParameter("client", client);
+        query.setParameter("validTime", o.getValidDate());
+        query.setParameter("issueTime", o.getOperationDate());
+        query.setParameter("updateTime", new Date());
+        query.setParameter("cardNo", o.getCardNo());
+        if (o.getOrgOwner() == null) {
+            query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));
+        } else {
+            query.setParameter("idOfOrg", o.getOrgOwner());
+        }
+
+        return query.executeUpdate();
     }
 
     public int issueToClientTemp(CardsOperationsRegistryItem o, long idOfOrg) {
