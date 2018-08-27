@@ -57,6 +57,10 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
+import ru.axetta.ecafe.processor.web.partner.iac.CardRegistrationService;
+import ru.axetta.ecafe.processor.web.partner.iac.ClientNotFoundException;
+import ru.axetta.ecafe.processor.web.partner.iac.OrganizationNotFoundException;
+import ru.axetta.ecafe.processor.web.partner.iac.RequiredFieldsAreNotFilledException;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
@@ -167,6 +171,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     //private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
     private static final Long RC_START_WEEK_POSITION_NOT_CORRECT = 630L;
     private static final Long RC_NOT_INFORMED_SPECIAL_MENU = 640L;
+    private static final Long RC_ORGANIZATION_NOT_FOUND = 650L;
+    private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -204,6 +210,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     //private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
     private static final String RC_START_WEEK_POSITION_NOT_CORRECT_DESC = "Номер стартовой недели некорректен";
     private static final String RC_NOT_INFORMED_SPECIAL_MENU_DESC = "Представитель не проинформирован об условиях предоставления услуги";
+    private static final String RC_ORGANIZATION_NOT_FOUND_DESC = "Организация не найдена";
+    private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8707,6 +8715,74 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction = null;
         } catch (Exception e){
             logger.error("Error in putPreorderComplex", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public AddRegistrationCardResult addRegistrationCard(String regid, String suid, String organizationSuid, Long cardId,
+            Date validdate, String firstName, String surname, String secondName, Date birthDate, String grade,
+            String codeBenefit, Date startDate, Date endDate) {
+        authenticateRequest(null);
+        AddRegistrationCardResult result = new AddRegistrationCardResult();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            CardRegistrationService service = RuntimeContext.getAppContext().getBean(CardRegistrationService.class);
+
+            Client client = DAOUtils.findClientByGuid(session, suid);
+
+            Org org = null;
+            if (null == client) {
+                client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
+                        organizationSuid);
+            } else {
+                org = DAOUtils.findOrgByGuid(session, organizationSuid);
+
+                if (null == org || !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()))
+                    throw new OrganizationNotFoundException(
+                            String.format("%s: guid = %s", RC_ORGANIZATION_NOT_FOUND_DESC, organizationSuid));
+            }
+
+            service.registerCard(session, cardId, validdate, client);
+
+            String contragentName = "";
+            String contragentInn = "";
+            if (null != org.getDefaultSupplier()) {
+                if (null != org.getDefaultSupplier().getContragentName()) {
+                    contragentName = org.getDefaultSupplier().getContragentName();
+                }
+                contragentInn = org.getDefaultSupplier().getInn();
+            }
+
+            result.setContractId(client.getContractId());
+            result.setSupplierName(contragentName);
+            result.setSupplierINN(contragentInn);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            transaction.commit();
+            transaction = null;
+        } catch (ClientNotFoundException e) {
+            logger.error("Error in addRegistrationCard", e);
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (OrganizationNotFoundException e) {
+            logger.error("Error in addRegistrationCard", e);
+            result.resultCode = RC_ORGANIZATION_NOT_FOUND;
+            result.description = RC_ORGANIZATION_NOT_FOUND_DESC;
+        } catch (RequiredFieldsAreNotFilledException e) {
+            logger.error("Error in addRegistrationCard", e);
+            result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
+            result.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
+        } catch(Exception e) {
+            logger.error("Error in addRegistrationCard", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {

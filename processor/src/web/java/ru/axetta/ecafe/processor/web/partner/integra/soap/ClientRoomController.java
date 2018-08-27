@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.AddRegistrationCardResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderClientSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderComplexesResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderParam;
@@ -540,4 +541,13 @@ public interface ClientRoomController {
 
     @WebMethod()
     Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders);
+
+    @WebMethod(operationName = "addRegistrationCard")
+    AddRegistrationCardResult addRegistrationCard(@WebParam(name = "regid") String regid, @WebParam(name = "suid") String suid,
+            @WebParam(name = "organizationSuid") String organizationSuid, @WebParam(name = "cardId") Long cardId,
+            @WebParam(name = "validdate") Date validdate, @WebParam(name = "firstName") String firstName,
+            @WebParam(name = "surname") String surname, @WebParam(name = "secondName") String secondName,
+            @WebParam(name = "birthDate") Date birthDate, @WebParam(name = "grade") String grade,
+            @WebParam(name = "codeBenefit") String codeBenefit, @WebParam(name = "startDate") Date startDate,
+            @WebParam(name = "endDate") Date endDate);
 }

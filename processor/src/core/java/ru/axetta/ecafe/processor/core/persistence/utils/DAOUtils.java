@@ -3536,4 +3536,20 @@ public class DAOUtils {
                 .add(Restrictions.eq("trackerId", trackerId));
         return (SmartWatch) criteria.uniqueResult();
     }
+
+    public static Org findOrgByGuid(Session session, String guid) {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("guid", guid));
+        return (Org) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.add(Restrictions.eq("org", idOfOrg));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
+    }
+
 }
