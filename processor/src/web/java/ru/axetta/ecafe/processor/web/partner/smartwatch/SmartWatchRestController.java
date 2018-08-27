@@ -338,6 +338,7 @@ public class SmartWatchRestController {
         if(trackerUid == null || trackerId == null){
             throw new IllegalArgumentException("TrackerUID or trackerID is null");
         }
+        mobilePhone = checkAndConvertPhone(mobilePhone);
         if(mobilePhone == null || mobilePhone.isEmpty()){
             throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
         }
