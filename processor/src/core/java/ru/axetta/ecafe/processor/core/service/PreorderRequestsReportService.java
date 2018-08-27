@@ -446,12 +446,13 @@ public class PreorderRequestsReportService {
             Long clientBalance = (null != o[12]) ? ((BigInteger) o[12]).longValue() : 0L;
             Long idOfClient = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
             Boolean isDeleted = (Boolean) o[14];
+            Boolean isComplex = !complexAmount.equals(0);
 
             preorderItemList
                     .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                             createdDate, idOfGoodsRequest, preorderDate,
                             complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance, idOfClient,
-                            isDeleted));
+                            isDeleted, isComplex));
         }
         return preorderItemList;
     }
@@ -503,11 +504,11 @@ public class PreorderRequestsReportService {
         //pos.setLastUpdate(fireTime);
         pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
-        if (null != preorderItem.getIdOfPreorderComplex()) {
+        if (preorderItem.getComplex()) {
             PreorderComplex complex = (PreorderComplex) session.get(PreorderComplex.class, preorderItem.getIdOfPreorderComplex());
             complex.setIdOfGoodsRequestPosition(pos.getGlobalId());
             session.update(complex);
-        } else if (null != preorderItem.getIdOfPreorderMenuDetail()) {
+        } else {
             PreorderMenuDetail detail = (PreorderMenuDetail) session.get(PreorderMenuDetail.class,
                     preorderItem.getIdOfPreorderMenuDetail());
             detail.setIdOfGoodsRequestPosition(pos.getGlobalId());
@@ -877,10 +878,11 @@ public class PreorderRequestsReportService {
         private Long clientBalance;
         private Long idOfClient;
         private Boolean isDeleted;
+        private Boolean isComplex;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
                 Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance,
-                Long idOfClient, Boolean isDeleted) {
+                Long idOfClient, Boolean isDeleted, Boolean isComplex) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -893,6 +895,7 @@ public class PreorderRequestsReportService {
             this.clientBalance = clientBalance;
             this.idOfClient = idOfClient;
             this.isDeleted = isDeleted;
+            this.isComplex = isComplex;
         }
 
         public PreorderItem() {
@@ -993,6 +996,14 @@ public class PreorderRequestsReportService {
 
         public void setDeleted(Boolean deleted) {
             isDeleted = deleted;
+        }
+
+        public Boolean getComplex() {
+            return isComplex;
+        }
+
+        public void setComplex(Boolean complex) {
+            isComplex = complex;
         }
     }
 
