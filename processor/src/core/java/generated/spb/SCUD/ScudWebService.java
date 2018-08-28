@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "ScudWebService", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", wsdlLocation = "META-INF/spb/SCUDWebService.wsdl")
+@WebServiceClient(name = "ScudWebService", targetNamespace = "http://service.petersburgedu.ru/webservice/scud/wsdl", wsdlLocation = "META-INF/spb/SCUDWebService.wsdl")
 public class ScudWebService
     extends Service
 {
@@ -24,7 +24,7 @@ public class ScudWebService
 
     private final static URL SCUDWEBSERVICE_WSDL_LOCATION;
     private final static WebServiceException SCUDWEBSERVICE_EXCEPTION;
-    private final static QName SCUDWEBSERVICE_QNAME = new QName("http://petersburgedu.ru/service/webservice/scud/wsdl", "ScudWebService");
+    private final static QName SCUDWEBSERVICE_QNAME = new QName("http://service.petersburgedu.ru/webservice/scud/wsdl", "ScudWebService");
 
     static {
         URL url = null;
@@ -73,7 +73,7 @@ public class ScudWebService
      */
     @WebEndpoint(name = "pushScudPort")
     public PushScudPort getPushScudPort() {
-        return super.getPort(new QName("http://petersburgedu.ru/service/webservice/scud/wsdl", "pushScudPort"), PushScudPort.class);
+        return super.getPort(new QName("http://service.petersburgedu.ru/webservice/scud/wsdl", "pushScudPort"), PushScudPort.class);
     }
 
     /**
@@ -85,7 +85,7 @@ public class ScudWebService
      */
     @WebEndpoint(name = "pushScudPort")
     public PushScudPort getPushScudPort(WebServiceFeature... features) {
-        return super.getPort(new QName("http://petersburgedu.ru/service/webservice/scud/wsdl", "pushScudPort"), PushScudPort.class, features);
+        return super.getPort(new QName("http://service.petersburgedu.ru/webservice/scud/wsdl", "pushScudPort"), PushScudPort.class, features);
     }
 
     private static URL __getWsdlLocation() {

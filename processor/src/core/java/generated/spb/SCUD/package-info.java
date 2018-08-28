@@ -1,2 +1,2 @@
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://petersburgedu.ru/service/webservice/scud/wsdl")
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://service.petersburgedu.ru/webservice/scud/wsdl")
 package generated.spb.SCUD;

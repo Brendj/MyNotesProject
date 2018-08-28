@@ -35,7 +35,7 @@ public class ScudService {
 
     private String getEndPointAdressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.scudmanager.endpointadress", "http://10.146.136.36/service/webservice/scud/");
+        return properties.getProperty("ecafe.processor.scudmanager.endpointadress", "http://10.146.136.36/service/webservice/scud");
     }
 
     private PushScudPort createEventController() {

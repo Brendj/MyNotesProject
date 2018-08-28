@@ -43,7 +43,7 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
                 final Document source_doc = soapPart.getEnvelope().getOwnerDocument();
                 String sss = toString(source_doc)
-                        .replaceAll(" xmlns=\"http://petersburgedu.ru/service/webservice/scud\" xmlns:ns2=\"http://petersburgedu.ru/service/webservice/scud/wsdl\" xmlns:ns3=\"petersburgedu.ru/service/webservice/scud/wsdl\"",
+                        .replaceAll(" xmlns=\"http://service.petersburgedu.ru/webservice/scud\" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/scud/wsdl\" xmlns:ns3=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"",
                                 " xmlns=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"")
                         .replaceAll("ns3:", "")
                         .replaceAll("ns2:", "");

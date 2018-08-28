@@ -31,9 +31,9 @@ import java.util.List;
 @XmlRegistry
 public class ObjectFactory {
 
-    public final static QName _Login_QNAME = new QName("http://petersburgedu.ru/service/webservice/scud/wsdl", "login");
-    public final static QName _PushZipFileRequest_QNAME = new QName("http://petersburgedu.ru/service/webservice/scud/wsdl", "pushZipFileRequest");
-    public final static QName _Password_QNAME = new QName("http://petersburgedu.ru/service/webservice/scud/wsdl", "password");
+    public final static QName _Login_QNAME = new QName("http://service.petersburgedu.ru/webservice/scud/wsdl", "login");
+    public final static QName _PushZipFileRequest_QNAME = new QName("http://service.petersburgedu.ru/webservice/scud/wsdl", "pushZipFileRequest");
+    public final static QName _Password_QNAME = new QName("http://service.petersburgedu.ru/webservice/scud/wsdl", "password");
 
     private final String FORMATER = "yyyy-MM-dd'T'HH:mm:ss";
 
@@ -100,7 +100,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", name = "login")
+    @XmlElementDecl(namespace = "http://service.petersburgedu.ru/webservice/scud/wsdl", name = "login")
     public JAXBElement<String> createLogin(String value) {
         return new JAXBElement<String>(_Login_QNAME, String.class, null, value);
     }
@@ -109,7 +109,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", name = "pushZipFileRequest")
+    @XmlElementDecl(namespace = "http://service.petersburgedu.ru/webservice/scud/wsdl", name = "pushZipFileRequest")
     public JAXBElement<String> createPushZipFileRequest(String value) {
         return new JAXBElement<String>(_PushZipFileRequest_QNAME, String.class, null, value);
     }
@@ -118,7 +118,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", name = "password")
+    @XmlElementDecl(namespace = "http://service.petersburgedu.ru/webservice/scud/wsdl", name = "password")
     public JAXBElement<String> createPassword(String value) {
         return new JAXBElement<String>(_Password_QNAME, String.class, null, value);
     }

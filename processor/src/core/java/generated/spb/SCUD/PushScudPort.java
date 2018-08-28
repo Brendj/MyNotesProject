@@ -30,9 +30,9 @@ public interface PushScudPort {
      *     returns generated.spb.SCUD.PushResponse
      */
     @WebMethod(action = "pushZipFile")
-    @WebResult(name = "pushResponse", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", partName = "result")
+    @WebResult(name = "pushResponse", targetNamespace = "http://service.petersburgedu.ru/webservice/scud/wsdl", partName = "result")
     public PushResponse pushZipFile(
-        @WebParam(name = "pushZipFileRequest", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", partName = "data")
+        @WebParam(name = "pushZipFileRequest", targetNamespace = "http://service.petersburgedu.ru/webservice/scud/wsdl", partName = "data")
         String data);
 
     /**
@@ -43,7 +43,7 @@ public interface PushScudPort {
     @WebMethod(action = "pushData")
     @WebResult(name = "pushResponse", targetNamespace = "http://service.petersburgedu.ru/webservice/scud", partName = "result")
     public PushResponse pushData(
-        @WebParam(name = "eventList", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl", partName = "data")
+        @WebParam(name = "eventList", targetNamespace = "http://service.petersburgedu.ru/webservice/scud", partName = "data")
         EventList data);
 
 }

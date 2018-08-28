@@ -19,14 +19,14 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="organizationUid" type="{http://petersburgedu.ru/service/webservice/scudTypes}guidType"/>
- *         &lt;element name="systemUid" type="{http://petersburgedu.ru/service/webservice/scudTypes}notNullStringType"/>
- *         &lt;element name="readerUid" type="{http://petersburgedu.ru/service/webservice/scudTypes}notNullStringType"/>
- *         &lt;element name="studentUid" type="{http://petersburgedu.ru/service/webservice/scudTypes}notNullStringType"/>
- *         &lt;element name="cardUid" type="{http://petersburgedu.ru/service/webservice/scudTypes}notNullStringType"/>
+ *         &lt;element name="organizationUid" type="{http://service.petersburgedu.ru/webservice/scudTypes}guidType"/>
+ *         &lt;element name="systemUid" type="{http://service.petersburgedu.ru/webservice/scudTypes}notNullStringType"/>
+ *         &lt;element name="readerUid" type="{http://service.petersburgedu.ru/webservice/scudTypes}notNullStringType"/>
+ *         &lt;element name="studentUid" type="{http://service.petersburgedu.ru/webservice/scudTypes}notNullStringType"/>
+ *         &lt;element name="cardUid" type="{http://service.petersburgedu.ru/webservice/scudTypes}notNullStringType"/>
  *         &lt;element name="directionType" minOccurs="0">
  *           &lt;simpleType>
- *             &lt;restriction base="{http://petersburgedu.ru/service/webservice/scudTypes}notNullStringType">
+ *             &lt;restriction base="{http://service.petersburgedu.ru/webservice/scudTypes}notNullStringType">
  *               &lt;enumeration value="input"/>
  *               &lt;enumeration value="output"/>
  *             &lt;/restriction>
@@ -42,7 +42,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "eventType", namespace = "http://petersburgedu.ru/service/webservice/scudTypes", propOrder = {
+@XmlType(name = "eventType", namespace = "http://service.petersburgedu.ru/webservice/scudTypes", propOrder = {
     "organizationUid",
     "systemUid",
     "readerUid",
