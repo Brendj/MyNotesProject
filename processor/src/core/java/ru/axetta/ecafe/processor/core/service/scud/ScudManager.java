@@ -41,7 +41,7 @@ public class ScudManager {
 
     private static Integer getLimitRecords(){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.scudmanager.node", "1");
+        String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.scudmanager.samplesize", "1000");
         return Integer.parseInt(reqInstance);
     }
 
