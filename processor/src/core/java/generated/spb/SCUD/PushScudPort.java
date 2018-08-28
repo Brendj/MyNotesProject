@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * Generated source version: 2.2
  * 
  */
-@WebService(name = "pushScudPort", targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl")
+@WebService(name = "pushScudPort", targetNamespace = "http://service.petersburgedu.ru/webservice/scud/wsdl")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @XmlSeeAlso({
     ObjectFactory.class
