@@ -4,9 +4,9 @@
   -->
 
 <definitions name="SCUDService"
-    targetNamespace = "http://petersburgedu.ru/service/webservice/scud/wsdl"
+    targetNamespace = "http://service.petersburgedu.ru/webservice/scud/wsdl"
     xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:tns = "http://petersburgedu.ru/service/webservice/scud/wsdl"
+    xmlns:tns = "http://service.petersburgedu.ru/webservice/scud/wsdl"
     xmlns:soap = "http://schemas.xmlsoap.org/wsdl/soap/"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
@@ -23,7 +23,7 @@
 
         <xs:schema
             xmlns:cmn="http://petersburgedu.ru/service/webservice/scudTypes"
-            targetNamespace="http://petersburgedu.ru/service/webservice/scud/wsdl">
+            targetNamespace="http://service.petersburgedu.ru/webservice/scud/wsdl">
 
             <xs:element name="login">
                 <xs:simpleType>
