@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.service.scud;
 import generated.spb.SCUD.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.nsi.SOAPLoggingHandler;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -52,13 +51,13 @@ public class ScudService {
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.ENDPOINT_ADDRESS);
             proxy.getOutInterceptors().add(new HeaderHandler());
 
-            final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+            //final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
             final ScudServiceHandler scudServiceHandler = new ScudServiceHandler();
             final List<Handler> handlerChain = new ArrayList<Handler>();
-            handlerChain.add(soapLoggingHandler);
-            if(this.ENDPOINT_ADDRESS.contains(this.TEST_ENDPOINT_ADDRESS)) {
+            //handlerChain.add(soapLoggingHandler);
+            //if(this.ENDPOINT_ADDRESS.contains(this.TEST_ENDPOINT_ADDRESS)) {
                 handlerChain.add(scudServiceHandler);
-            }
+            //}
             bp.getBinding().setHandlerChain(handlerChain);
 
             HTTPConduit conduit = (HTTPConduit) proxy.getConduit();

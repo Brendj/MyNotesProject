@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service.scud;
 
-import ru.axetta.ecafe.processor.core.service.meal.MealManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -24,7 +22,10 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.Set;
 
 public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
@@ -43,8 +44,7 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
                 final Document source_doc = soapPart.getEnvelope().getOwnerDocument();
                 String sss = toString(source_doc)
-                        .replaceAll(" xmlns=\"http://service.petersburgedu.ru/webservice/scud\" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/scud/wsdl\" xmlns:ns3=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"",
-                                " xmlns=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"")
+                        .replaceAll(" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/scud\" xmlns:ns3=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"", "")
                         .replaceAll("ns3:", "")
                         .replaceAll("ns2:", "");
                 InputStream in = new ByteArrayInputStream(sss.getBytes("UTF-8"));
@@ -56,9 +56,9 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
         } catch (Exception e) {
             logger.error("Error in filter chain", e);
         }
-        if (!MealManager.isOn()) {
+        //if (!MealManager.isOn()) {
             logToSystemOut(smc);
-        }
+        //}
         return true;
     }
 
