@@ -107,6 +107,7 @@
         <property name="createdFromDesc" column="CreatedFromDesc" type="string" length="128" not-null="false"/>
         <property name="hasActiveSmartWatch" column="hasActiveSmartWatch"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="iacRegId" column="iacregid" type="string" length="40"/>
 
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>

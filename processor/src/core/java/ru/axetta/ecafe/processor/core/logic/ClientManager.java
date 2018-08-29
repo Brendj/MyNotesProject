@@ -82,7 +82,8 @@ public class ClientManager {
         BENEFIT,
         CHECKBENEFITS,
         CREATED_FROM,
-        MIDDLE_GROUP
+        MIDDLE_GROUP,
+        IAC_REG_ID
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -131,6 +132,7 @@ public class ClientManager {
             new FieldProcessor.Def(41, false, false, "Источник создания записи", Integer.toString(ClientCreatedFromType.DEFAULT.getValue()),
                     FieldId.CREATED_FROM, false),
             new FieldProcessor.Def(42, false, false, "Подгруппа", null, FieldId.MIDDLE_GROUP, false),
+            new FieldProcessor.Def(43, false, false, "ИАЦ regID", null, FieldId.IAC_REG_ID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -911,6 +913,10 @@ public class ClientManager {
                         idOfClient);
             }
             ///
+
+            if (fieldConfig.getValue(FieldId.IAC_REG_ID) != null) {
+                client.setIacRegId(fieldConfig.getValue(FieldId.IAC_REG_ID));
+            }
 
             logger.debug("save clientMigration");
             ClientMigration clientMigration;

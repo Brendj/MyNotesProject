@@ -137,6 +137,7 @@ public class Client {
     private String passportNumber;
     private String passportSeries;
     private Boolean hasActiveSmartWatch;
+    private String iacRegId;
 
     protected Client() {
         // For Hibernate only
@@ -1119,5 +1120,13 @@ public class Client {
 
     public void setHasActiveSmartWatch(Boolean hasActiveSmartWatch) {
         this.hasActiveSmartWatch = hasActiveSmartWatch;
+    }
+
+    public String getIacRegId() {
+        return iacRegId;
+    }
+
+    public void setIacRegId(String iacRegId) {
+        this.iacRegId = iacRegId;
     }
 }
