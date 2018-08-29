@@ -33,7 +33,7 @@ public class CardRegistrationService {
     public static final String COMMENT_ADDED_FROM_IAC = "{Добавлен из ИАЦ}";
 
     public Client registerNewClient(Session session, String firstName, String secondName, String surname, Date birthDate, String guid,
-            String extId, String organizationGuid) throws Exception {
+            String extId, String organizationGuid, String group, String benefit) throws Exception {
         ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, guid);
         fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(surname));
@@ -42,6 +42,8 @@ public class CardRegistrationService {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, dateFormat.format(birthDate));
         fieldConfig.setValue(ClientManager.FieldId.IAC_REG_ID, extId);
+        fieldConfig.setValue(ClientManager.FieldId.GROUP, group);
+        fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
         fieldConfig.setValue(ClientManager.FieldId.COMMENTS, COMMENT_ADDED_FROM_IAC);
 
         Org org = DAOUtils.findOrgByGuid(session, organizationGuid);

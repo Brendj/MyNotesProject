@@ -8742,7 +8742,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Org org = null;
             if (null == client) {
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
-                        organizationSuid);
+                        organizationSuid, grade, codeBenefit);
             } else {
                 org = DAOUtils.findOrgByGuid(session, organizationSuid);
 

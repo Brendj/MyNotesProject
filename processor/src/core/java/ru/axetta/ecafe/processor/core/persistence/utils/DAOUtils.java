@@ -3546,7 +3546,7 @@ public class DAOUtils {
     public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
-        criteria.add(Restrictions.eq("org", idOfOrg));
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
