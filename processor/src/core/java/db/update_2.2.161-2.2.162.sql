@@ -6,3 +6,5 @@
 
 -- внешний ид приходящий из ИАЦ
 ALTER TABLE cf_clients ADD COLUMN iacregid character varying(40);
+
+--! ФИНАЛИЗИРОВАН 29.08.2018, НЕ МЕНЯТЬ
