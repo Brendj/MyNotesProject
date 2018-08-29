@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
@@ -3314,6 +3315,7 @@ public class Processor implements SyncProcessor {
             List<Long> errorClientIds, List<Long> allocatedClients) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        AccountTransaction transaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -3480,7 +3482,7 @@ public class Processor implements SyncProcessor {
                                 SJBalanceSourceEnum.SJBALANCE_SOURCE_ORDER, idOfOrg);
 
                 // Create order
-                RuntimeContext.getFinancialOpsManager()
+                transaction =  RuntimeContext.getFinancialOpsManager()
                         .createOrderCharge(persistenceSession, payment, idOfOrg, client, card,
                                 payment.getConfirmerId(), isFromFriendlyOrg);
                 long totalPurchaseDiscount = 0;
@@ -3621,7 +3623,7 @@ public class Processor implements SyncProcessor {
                         SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
                     }
                     // Update client balance
-                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                    transaction = RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -3631,13 +3633,25 @@ public class Processor implements SyncProcessor {
                                     payment.getIdOfOrder()));
                 }
             }
-
+            if(GeoplanerManager.isOn() && transactionOwnerHaveSmartWatch(transaction)){
+                GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
+                manager.sendTransactionalInfoToGeoplaner(transaction);
+            }
             // Return no errors
             return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0, null);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private boolean transactionOwnerHaveSmartWatch(AccountTransaction transaction) {
+        if(transaction.getClient() != null){
+            return transaction.getClient().getHasActiveSmartWatch();
+        } else if(transaction.getCard() != null) {
+            return transaction.getCard().getClient().getHasActiveSmartWatch();
+        }
+        return false;
     }
 
     private String getComplexName(Payment payment) {
@@ -5352,6 +5366,10 @@ public class Processor implements SyncProcessor {
                     if(RuntimeContext.RegistryType.isSpb() && ScudManager.isOn()){
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
+                    if(GeoplanerManager.isOn() && enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)){
+                        GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
+                        manager.sendEnterEventsToGeoplaner(enterEvent);
+                    }
 
                     SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),
                             0, null);
@@ -5490,6 +5508,18 @@ public class Processor implements SyncProcessor {
         }
 
         return resEnterEvents;
+    }
+
+    private boolean enterEventOwnerHaveSmartWatch(Session session, EnterEvent enterEvent) {
+        if(enterEvent.getClient() != null){
+            return enterEvent.getClient().getHasActiveSmartWatch();
+        } else if (enterEvent.getIdOfCard() != null){
+            Card card = (Card) session.get(Card.class, enterEvent.getIdOfCard());
+            if(card != null && card.getClient() != null){
+                return card.getClient().getHasActiveSmartWatch();
+            }
+        }
+        return false;
     }
 
     private ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg,

@@ -4,15 +4,47 @@
 
 package ru.axetta.ecafe.processor.core.service.geoplaner;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Date;
 
 public class JsonTransactionInfo {
     private Long trackerUid;
     private Long trackerId;
+    private Date transactionTime;
+    private Integer sourceType;
+    private Long transactionSum;
+    private String sourceName;
 
-    private List<JsonTransactionInfoItem> transactions;
+    public Date getTransactionTime() {
+        return transactionTime;
+    }
 
+    public void setTransactionTime(Date transactionTime) {
+        this.transactionTime = transactionTime;
+    }
+
+    public Integer getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(Integer sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public Long getTransactionSum() {
+        return transactionSum;
+    }
+
+    public void setTransactionSum(Long transactionSum) {
+        this.transactionSum = transactionSum;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
 
     public Long getTrackerUid() {
         return trackerUid;
@@ -28,16 +60,5 @@ public class JsonTransactionInfo {
 
     public void setTrackerId(Long trackerId) {
         this.trackerId = trackerId;
-    }
-
-    public List<JsonTransactionInfoItem> getTransactions() {
-        if(this.transactions == null){
-            this.transactions = new LinkedList<JsonTransactionInfoItem>();
-        }
-        return transactions;
-    }
-
-    public void setTransactions(List<JsonTransactionInfoItem> transactions) {
-        this.transactions = transactions;
     }
 }

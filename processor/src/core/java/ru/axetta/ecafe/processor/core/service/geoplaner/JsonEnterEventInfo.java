@@ -4,14 +4,47 @@
 
 package ru.axetta.ecafe.processor.core.service.geoplaner;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Date;
 
 public class JsonEnterEventInfo {
     private Long trackerUid;
     private Long trackerId;
+    private Date evtDateTime;
+    private Integer direction;
+    private String shortName;
+    private String shortAddress;
 
-    private List<JsonEnterEventInfoItem> events;
+    public Date getEvtDateTime() {
+        return evtDateTime;
+    }
+
+    public void setEvtDateTime(Date evtDateTime) {
+        this.evtDateTime = evtDateTime;
+    }
+
+    public Integer getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Integer direction) {
+        this.direction = direction;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
+    }
 
     public Long getTrackerUid() {
         return trackerUid;
@@ -27,16 +60,5 @@ public class JsonEnterEventInfo {
 
     public void setTrackerId(Long trackerId) {
         this.trackerId = trackerId;
-    }
-
-    public List<JsonEnterEventInfoItem> getEvents() {
-        if(events == null){
-            events = new LinkedList<JsonEnterEventInfoItem>();
-        }
-        return events;
-    }
-
-    public void setEvents(List<JsonEnterEventInfoItem> events) {
-        this.events = events;
     }
 }

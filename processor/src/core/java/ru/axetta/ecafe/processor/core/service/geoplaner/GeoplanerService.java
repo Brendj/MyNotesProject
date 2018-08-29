@@ -14,23 +14,22 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Properties;
 
 @Component
 @Scope("singleton")
-public class GeoplanerJsonService {
+public class GeoplanerService {
     private HttpClient httpClient = new HttpClient();
     private final String URL_FOR_ENTER_EVENTS = getGeoplanerURLEnterEvents();
     private final String URL_FOR_TRANSACTIONS = getGeoplanerURLTransaction();
     private final String TEST_ENDPOINT_ADDRESS = "https://testrestcontroller.herokuapp.com/test"; // Тестовый сервер на heroku
 
-    public Integer sendPost(List eventsList, Boolean isEnterEvents) throws Exception{
+    public Integer sendPost(Object event, Boolean isEnterEvents) throws Exception{
         PostMethod method = new PostMethod(isEnterEvents ? URL_FOR_ENTER_EVENTS : URL_FOR_TRANSACTIONS);
         method.addRequestHeader("Content-Type", "application/json");
 
         ObjectMapper mapper = new ObjectMapper();
-        String JSONString = mapper.writeValueAsString(eventsList);
+        String JSONString = mapper.writeValueAsString(event);
 
         StringRequestEntity requestEntity = new StringRequestEntity(
                 JSONString,
