@@ -56,7 +56,7 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "getTokenByMobile")
-    public Response sendLinkingTokenByMobile(@QueryParam(value="mobilePhone") String mobilePhone)throws Exception{
+    public Response sendLinkingTokenByMobile(@FormParam(value="mobilePhone") String mobilePhone)throws Exception{
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -177,11 +177,11 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "registrySmartWatch")
-    public Response registrySmartWatch(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @QueryParam(value="contractId") Long contractId, @QueryParam(value="model") String model, @QueryParam(value="color") String color,
-            @QueryParam(value="trackerUid") Long trackerUid, @QueryParam(value="trackerID") Long trackerId,
-            @QueryParam(value="trackerActivateUserId") Long trackerActivateUserId, @QueryParam(value="status") String status,
-            @QueryParam(value="trackerActivateTime") Long trackerActivateTime, @QueryParam(value="simIccid") String simIccid) throws Exception{
+    public Response registrySmartWatch(@FormParam(value="mobilePhone") String mobilePhone, @FormParam(value="token") String token,
+            @FormParam(value="contractId") Long contractId, @FormParam(value="model") String model, @FormParam(value="color") String color,
+            @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId,
+            @FormParam(value="trackerActivateUserId") Long trackerActivateUserId, @FormParam(value="status") String status,
+            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception{
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -276,8 +276,8 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "blockSmartWatch")
-    public Response blockSmartWatch(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @QueryParam(value="trackerUid") Long trackerUid, @QueryParam(value="trackerID") Long trackerId)throws Exception{
+    public Response blockSmartWatch(@FormParam(value="mobilePhone") String mobilePhone, @FormParam(value="token") String token,
+            @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId)throws Exception{
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
