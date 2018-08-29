@@ -189,7 +189,7 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
+            mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
             if(contractId == null){
                 throw new IllegalArgumentException("ContractID is null");
@@ -285,7 +285,7 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
+            mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
             Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
             Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid, cardType);
@@ -334,7 +334,7 @@ public class SmartWatchRestController {
         }
     }
 
-    private void inputParamsIsValidOrTrowException(Session session, Long trackerId, Long trackerUid, String mobilePhone, String token) throws Exception{
+    private String inputParamsIsValidOrTrowException(Session session, Long trackerId, Long trackerUid, String mobilePhone, String token) throws Exception{
         if(trackerUid == null || trackerId == null){
             throw new IllegalArgumentException("TrackerUID or trackerID is null");
         }
@@ -346,6 +346,7 @@ public class SmartWatchRestController {
             throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
         }
         token = "";
+        return  mobilePhone;
     }
 
     private void updateSmartWatch(SmartWatch watch, Session session, Long idOfCard, Long idOfClient, String color,
