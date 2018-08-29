@@ -85,8 +85,7 @@ public class ScudManager {
             logger.info("Sending EnterEvent to SCUD completed, sent list with " + list.size() + " elements, ResultCode is: " + responseCode);
             updateEnterEventsSendInfo(session, list, response.isResult(), sendToExternal);
         } catch (Exception e){
-            logger.error("Can't send record to external: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Can't send record to external: ", e);
             sendToExternal = false;
             updateEnterEventsSendInfo(session, list, false, sendToExternal);
         }
@@ -105,8 +104,7 @@ public class ScudManager {
                 DAOUtils.updateEnterEventsSendInfo(session, idofEnterEvent, idofOrg, result, sendToExternal);
             }
         } catch (Exception e){
-            logger.error("Can't update EnterEventSendInfo records in DB: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Can't update EnterEventSendInfo records in DB: ", e);
         }
     }
 
@@ -157,8 +155,7 @@ public class ScudManager {
             }
             return dataItems;
         } catch (Exception e){
-            logger.error("Can't get records for sent to SCUD: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Can't get records for sent to SCUD: ", e);
             return null;
         }
     }
