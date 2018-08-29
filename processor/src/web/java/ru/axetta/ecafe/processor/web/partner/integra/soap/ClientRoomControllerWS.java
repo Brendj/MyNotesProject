@@ -8739,17 +8739,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Client client = DAOUtils.findClientByGuid(session, suid);
 
-            Org org = null;
             if (null == client) {
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
                         organizationSuid, grade, codeBenefit);
-            } else {
-                org = DAOUtils.findOrgByGuid(session, organizationSuid);
-
-                if (null == org || !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()))
-                    throw new OrganizationNotFoundException(
-                            String.format("%s: guid = %s", RC_ORGANIZATION_NOT_FOUND_DESC, organizationSuid));
             }
+
+            Org org = DAOUtils.findOrgByGuid(session, organizationSuid);
+
+            if (null == org || !client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()))
+                throw new OrganizationNotFoundException(
+                        String.format("%s: guid = %s", RC_ORGANIZATION_NOT_FOUND_DESC, organizationSuid));
 
             service.registerCard(session, cardId, validdate, client);
 

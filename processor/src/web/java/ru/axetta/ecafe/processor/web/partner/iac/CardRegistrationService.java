@@ -43,7 +43,7 @@ public class CardRegistrationService {
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, dateFormat.format(birthDate));
         fieldConfig.setValue(ClientManager.FieldId.IAC_REG_ID, extId);
         fieldConfig.setValue(ClientManager.FieldId.GROUP, group);
-        fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
+        //fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
         fieldConfig.setValue(ClientManager.FieldId.COMMENTS, COMMENT_ADDED_FROM_IAC);
 
         Org org = DAOUtils.findOrgByGuid(session, organizationGuid);
