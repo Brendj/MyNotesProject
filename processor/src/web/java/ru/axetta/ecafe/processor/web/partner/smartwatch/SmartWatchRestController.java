@@ -36,7 +36,7 @@ public class SmartWatchRestController {
     private Map<Integer, String> cardState;
     private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private boolean debug;
-    private Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+    private final Integer CARD_TYPE_SMARTWATCH = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -217,16 +217,20 @@ public class SmartWatchRestController {
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
 
-            Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid, cardType);
+            Card card = DAOUtils.findCardByCardNo(session, trackerUid);
             Long idOfCard = null;
             if(card == null) {
                 idOfCard = cardManager
                         .createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE, validTime,
                                 Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
             } else {
-                cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
-                        CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(),
-                        CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId());
+                if((card.getClient() == null || card.getClient().equals(child) || card.getState().equals(CardState.BLOCKED.getValue()))
+                        && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {
+                    cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(),
+                            CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId());
+                } else {
+                    throw new Exception("Card CardNo: " + card.getCardNo() + " is registered and owned Client contractID: " + card.getClient().getContractId());
+                }
                 idOfCard = card.getIdOfCard();
             }
 
@@ -288,7 +292,8 @@ public class SmartWatchRestController {
             mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
             Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid, cardType);
+            Card card = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerId, trackerUid,
+                    CARD_TYPE_SMARTWATCH);
             if(card == null){
                 throw new Exception("No SmartWatch as card found by trackerUid: " + trackerUid + " and trackerId: " + trackerId);
             }

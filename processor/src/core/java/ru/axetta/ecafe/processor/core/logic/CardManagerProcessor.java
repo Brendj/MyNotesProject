@@ -608,7 +608,7 @@ public class CardManagerProcessor implements CardManager {
             throw new Exception("Клиент не найден: " + idOfClient);
         }
         logger.debug("check exist smartWatch");
-        Card c = DAOUtils.findSmartWatchAsCardByCardNoAndCardPrintedNo(session, trackerUidAsCardNo, trackerIdAsCardPrintedNo, cardType);
+        Card c = DAOUtils.findCardByCardNo(session, trackerUidAsCardNo);
         if (c != null && c.getClient() != null) {
             throw new Exception("Смарт-часы уже зарегистрированы на клиента: " + c.getClient().getIdOfClient());
         }
