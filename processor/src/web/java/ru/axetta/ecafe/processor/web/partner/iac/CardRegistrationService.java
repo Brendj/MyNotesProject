@@ -13,8 +13,10 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -64,7 +66,7 @@ public class CardRegistrationService {
         Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, client.getOrg().getIdOfOrg());
 
         if (null == card) {
-            blockAllOtherClientCards(session, client);
+            blockAllOtherClientCards(client);
             if (null == validDate)
                 validDate = CalendarUtils.addYear(new Date(), 5);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
@@ -76,7 +78,7 @@ public class CardRegistrationService {
                         cardId, client.getOrg().getIdOfOrg(), client.getIdOfClient()));
             } else {
                 if (card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
-                    blockAllOtherClientCards(session, client);
+                    blockAllOtherClientCards(client);
                     card.setState(CardState.ISSUED.getValue());
                 } else {
                     throw new CardAlreadyUsedException(String.format("Card already used: cardId = %d, orgId = %d, clientId = %d",
@@ -86,15 +88,27 @@ public class CardRegistrationService {
         }
     }
 
-    private void blockAllOtherClientCards(Session session, Client client) throws Exception {
-        List<Card> cardList = DAOUtils.getAllCardByClient(session, client);
-        CardManager cardManager = RuntimeContext.getInstance().getCardManager();
+    private void blockAllOtherClientCards(Client client) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            List<Card> cardList = DAOUtils.getAllCardByClient(session, client);
+            CardManager cardManager = RuntimeContext.getInstance().getCardManager();
 
-        for (Card card : cardList) {
-            if (card.getState() != CardState.BLOCKED.getValue() && card.getState() != CardState.TEMPBLOCKED.getValue())
-                cardManager.updateCard(card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
-                        CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
-                        card.getIssueTime(), card.getExternalId());
+            for (Card card : cardList) {
+                if (card.getState() != CardState.BLOCKED.getValue() && card.getState() != CardState.TEMPBLOCKED.getValue())
+                    cardManager.updateCard(card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                            CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
+                            card.getIssueTime(), card.getExternalId());
+            }
+
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
