@@ -53,9 +53,9 @@ public class GeoplanerManager {
             if(!statusCode.equals(200)){
                 logger.error("The Geoplaner returned code " + statusCode);
             } else {
-                logger.info("EnterEvent ID: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()
+                logger.info("Sends  EnterEvent ID: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()
                         + " idOfOrg: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
-                        + " send to Geoplaner");
+                        + " to Geoplaner");
             }
 
             transaction.commit();
@@ -150,7 +150,7 @@ public class GeoplanerManager {
     private Card getCardFromEnterEvent(Session session, EnterEvent event) throws Exception {
         Card card = null;
         if(event.getIdOfCard() != null){
-            card = DAOUtils.findCardByCardNo(session, event.getIdOfCard());
+            card = DAOUtils.findCardByCardNoAndOrg(session, event.getIdOfCard(), event.getCompositeIdOfEnterEvent().getIdOfOrg());
         } else if(event.getClient() != null){
             card = DAOUtils.getLastCardByClient(session, event.getClient());
         } else {
@@ -173,7 +173,7 @@ public class GeoplanerManager {
     private Card getCardFromPaymentAndClient(Session session, Payment payment, Client client)throws Exception {
         Card card = null;
         if(payment.getCardNo() != null){
-            card = DAOUtils.findCardByCardNo(session, payment.getCardNo());
+            card = DAOUtils.findCardByCardNoAndOrg(session, payment.getCardNo(), client.getOrg().getIdOfOrg());
         } else if(client.getCards() != null){
             for(Card cardOfClient : client.getCards()){
                 if(cardOfClient.getState().equals(CardState.ISSUED.getValue())){
