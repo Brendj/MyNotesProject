@@ -3315,7 +3315,6 @@ public class Processor implements SyncProcessor {
             List<Long> errorClientIds, List<Long> allocatedClients) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        AccountTransaction transaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -3482,7 +3481,7 @@ public class Processor implements SyncProcessor {
                                 SJBalanceSourceEnum.SJBALANCE_SOURCE_ORDER, idOfOrg);
 
                 // Create order
-                transaction =  RuntimeContext.getFinancialOpsManager()
+                RuntimeContext.getFinancialOpsManager()
                         .createOrderCharge(persistenceSession, payment, idOfOrg, client, card,
                                 payment.getConfirmerId(), isFromFriendlyOrg);
                 long totalPurchaseDiscount = 0;
@@ -3556,6 +3555,10 @@ public class Processor implements SyncProcessor {
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
                 if (client != null) {
+                    if(GeoplanerManager.isOn() && client.getHasActiveSmartWatch()){
+                        GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
+                        manager.sendPaymentInfoToGeoplaner(payment, client, idOfOrg);
+                    }
 
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
                     if (payment.getOrderType().equals(OrderTypeEnumType.UNKNOWN) ||
@@ -3623,7 +3626,7 @@ public class Processor implements SyncProcessor {
                         SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
                     }
                     // Update client balance
-                    transaction = RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -3632,10 +3635,6 @@ public class Processor implements SyncProcessor {
                             String.format("Unknown order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                     payment.getIdOfOrder()));
                 }
-            }
-            if(GeoplanerManager.isOn() && transactionOwnerHaveSmartWatch(transaction)){
-                GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                manager.sendTransactionalInfoToGeoplaner(transaction);
             }
             // Return no errors
             return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0, null);

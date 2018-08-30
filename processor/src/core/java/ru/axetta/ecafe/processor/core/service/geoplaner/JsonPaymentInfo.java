@@ -6,13 +6,13 @@ package ru.axetta.ecafe.processor.core.service.geoplaner;
 
 import java.util.Date;
 
-public class JsonTransactionInfo {
+public class JsonPaymentInfo {
     private Long trackerUid;
     private Long trackerId;
     private Date transactionTime;
-    private Integer sourceType;
+    private Integer orderType;
     private Long transactionSum;
-    private String sourceName;
+    private String purchasesName;
 
     public Date getTransactionTime() {
         return transactionTime;
@@ -22,12 +22,12 @@ public class JsonTransactionInfo {
         this.transactionTime = transactionTime;
     }
 
-    public Integer getSourceType() {
-        return sourceType;
+    public Integer getOrderType() {
+        return orderType;
     }
 
-    public void setSourceType(Integer sourceType) {
-        this.sourceType = sourceType;
+    public void setOrderType(Integer orderType) {
+        this.orderType = orderType;
     }
 
     public Long getTransactionSum() {
@@ -38,12 +38,12 @@ public class JsonTransactionInfo {
         this.transactionSum = transactionSum;
     }
 
-    public String getSourceName() {
-        return sourceName;
+    public String getPurchasesName() {
+        return purchasesName;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public void setPurchasesName(String purchasesName) {
+        this.purchasesName = purchasesName;
     }
 
     public Long getTrackerUid() {

@@ -130,7 +130,7 @@ public class FinancialOpsManager {
         return subscriptionFee;
     }
 
-    public AccountTransaction createOrderCharge(Session session, Payment payment, Long idOfOrg,
+    public void createOrderCharge(Session session, Payment payment, Long idOfOrg,
             Client client, Card card, Long confirmerId, boolean isFromFriendlyOrg) throws Exception {
         // By default we have no transaction
         AccountTransaction orderTransaction = null;
@@ -203,7 +203,6 @@ public class FinancialOpsManager {
                 }
             }
         }
-        return orderTransaction;
     }
 
     protected Contragent getDefaultSupplier(Session session, long idoforg) {
@@ -212,8 +211,7 @@ public class FinancialOpsManager {
         return supplier;
     }
 
-    public AccountTransaction cancelOrder(Session session, Order order) throws Exception {
-        AccountTransaction result = null;
+    public void cancelOrder(Session session, Order order) throws Exception {
         if (order.getState() != Order.STATE_COMMITED) {
         } else {
             order.setState(Order.STATE_CANCELED);
@@ -235,7 +233,7 @@ public class FinancialOpsManager {
             if (0 != order.getSumByCard()) {
                 AccountTransaction transaction = order.getTransaction();
                 canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
-                result = ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+                ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
             }
 
             session.save(canceledOrder);
@@ -244,7 +242,6 @@ public class FinancialOpsManager {
             Long budgetSum = order.getSocDiscount() + order.getGrantSum();
             getCurrentPositionsManager(session).changeOrderPosition(-sumByCard, -budgetSum, order.getContragent());
         }
-        return result;
     }
 
 

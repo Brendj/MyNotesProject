@@ -5,11 +5,10 @@
 package ru.axetta.ecafe.processor.core.service.geoplaner;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
@@ -70,33 +69,32 @@ public class GeoplanerManager {
     }
 
     @Async
-    public void sendTransactionalInfoToGeoplaner(AccountTransaction accountTransaction) throws Exception{
+    public void sendPaymentInfoToGeoplaner(Payment payment, Client client, Long idOfOrg) throws Exception{
         Session session = null;
         Transaction hibernateTransaction = null;
         try {
-            if(accountTransaction == null){
-                throw new Exception("Transaction is null");
+            if(payment == null || client == null){
+                throw new NullPointerException("Payment or Client is null");
             }
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
-            JsonTransactionInfo infoList = buildJsonTransactionInfo(session, accountTransaction);
-            if (infoList == null) {
-                logger.warn("No Transaction records for send to Geoplaner App");
+            JsonPaymentInfo info = buildJsonPaymentInfo(session, payment, client, idOfOrg);
+            if (info == null) {
+                logger.warn("No PaymentInfo records for send to Geoplaner App");
                 return;
             }
-            Integer statusCode = service.sendPost(infoList, false);
+            Integer statusCode = service.sendPost(info, false);
             if(!statusCode.equals(200)){
                 logger.error("The Geoplaner returned code " + statusCode);
             } else {
-                logger.info("Transaction ID: " + accountTransaction.getIdOfTransaction()
-                        + " send to Geoplaner");
+                logger.info("Sends PaymentInfo of Order ID= " + payment.getIdOfOrder() + " to Geoplaner ");
             }
 
             hibernateTransaction.commit();
             hibernateTransaction = null;
         } catch (Exception e) {
-            logger.error("Can't send EnterEventSendInfo to Geoplaner App: " + e.getMessage());
+            logger.error("Can't send PaymentInfo to Geoplaner App: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
@@ -127,20 +125,24 @@ public class GeoplanerManager {
         return info;
     }
 
-    private JsonTransactionInfo buildJsonTransactionInfo(Session session, AccountTransaction transaction) throws Exception{
-        JsonTransactionInfo info = new JsonTransactionInfo();
-        Card card = getCardFromTransaction(session, transaction);
+    private JsonPaymentInfo buildJsonPaymentInfo(Session session, Payment payment, Client client, Long idOfOrg) throws Exception{
+        JsonPaymentInfo info = new JsonPaymentInfo();
+        Card card = getCardFromPaymentAndClient(session, payment, client);
         if(card == null){
-            logger.error("No found Card for Transaction ID" + transaction.getIdOfTransaction());
+            logger.error("Can't get Card for Client contractID = " + client.getContractId());
             return null;
         }
 
         info.setTrackerId(card.getCardPrintedNo());
         info.setTrackerUid(card.getCardNo());
-        info.setTransactionTime(transaction.getTransactionTime());
-        info.setSourceType(transaction.getSourceType());
-        info.setTransactionSum(transaction.getTransactionSum());
-        info.setSourceName(transaction.getSource());
+        info.setTransactionTime(payment.getTime());
+        info.setOrderType(payment.getOrderType().ordinal());
+        info.setTransactionSum(payment.getRSum());
+        String purchasesNames = "";
+        for(Purchase pc : payment.getPurchases()){
+            purchasesNames += pc.getName() + ";";
+        }
+        info.setPurchasesName(purchasesNames);
 
         return info;
     }
@@ -168,14 +170,19 @@ public class GeoplanerManager {
         return card;
     }
 
-    private Card getCardFromTransaction(Session session, AccountTransaction transaction)throws Exception {
+    private Card getCardFromPaymentAndClient(Session session, Payment payment, Client client)throws Exception {
         Card card = null;
-        if(transaction.getCard() != null){
-            card = transaction.getCard();
-        } else if(transaction.getClient() != null){
-            card = DAOUtils.getLastCardByClient(session, transaction.getClient());
+        if(payment.getCardNo() != null){
+            card = DAOUtils.findCardByCardNo(session, payment.getCardNo());
+        } else if(client.getCards() != null){
+            for(Card cardOfClient : client.getCards()){
+                if(cardOfClient.getState().equals(CardState.ISSUED.getValue())){
+                    card = cardOfClient;
+                    break;
+                }
+            }
         } else {
-            throw new Exception("Transaction ID: " + transaction.getIdOfTransaction() + " without Client and Card");
+            throw new Exception("Can't get Card for Client contractID = " + client.getContractId());
         }
         if(card == null){
             return null;
