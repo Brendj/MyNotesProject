@@ -8725,7 +8725,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public AddRegistrationCardResult addRegistrationCard(String regid, String suid, String organizationSuid, Long cardId,
+    public AddRegistrationCardResult addRegistrationCard(String regid, String suid, String organizationSuid, String cardId,
             Date validdate, String firstName, String surname, String secondName, Date birthDate, String grade,
             String codeBenefit, Date startDate, Date endDate) {
         authenticateRequest(null);
@@ -8750,7 +8750,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new OrganizationNotFoundException(
                         String.format("%s: guid = %s", RC_ORGANIZATION_NOT_FOUND_DESC, organizationSuid));
 
-            service.registerCard(session, cardId, validdate, client);
+            service.registerCard(session, Long.parseLong(cardId,16), validdate, client);
 
             String contragentName = "";
             String contragentInn = "";

@@ -544,7 +544,7 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "addRegistrationCard")
     AddRegistrationCardResult addRegistrationCard(@WebParam(name = "regid") String regid, @WebParam(name = "suid") String suid,
-            @WebParam(name = "organizationSuid") String organizationSuid, @WebParam(name = "cardId") Long cardId,
+            @WebParam(name = "organizationSuid") String organizationSuid, @WebParam(name = "cardId") String cardId,
             @WebParam(name = "validdate") Date validdate, @WebParam(name = "firstName") String firstName,
             @WebParam(name = "surname") String surname, @WebParam(name = "secondName") String secondName,
             @WebParam(name = "birthDate") Date birthDate, @WebParam(name = "grade") String grade,
