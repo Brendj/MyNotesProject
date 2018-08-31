@@ -3552,4 +3552,19 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardAsSmartWatchByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
+        Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+        Integer state = CardState.ISSUED.getValue();
+        Query query = session.createSQLQuery(" select cr.idofcard from cf_cards cr "
+                + " left join (select friendlyorg from cf_friendly_organization where currentorg = :friendlyOrg)as q on cr.idoforg = q.friendlyorg "
+                + " where cr.cardtype = :cardType and state = :lifeState and cr.cardno = :cardNo");
+        query
+                .setParameter("friendlyOrg", idOfOrg)
+                .setParameter("cardType", cardType)
+                .setParameter("lifeState", state)
+                .setParameter("cardNo", cardNo);
+        BigInteger idOfCard = (BigInteger) query.uniqueResult();
+        return (Card) session.get(Card.class, idOfCard.longValue());
+    }
+
 }

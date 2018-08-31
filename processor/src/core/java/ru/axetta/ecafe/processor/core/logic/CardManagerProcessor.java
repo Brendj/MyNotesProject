@@ -219,13 +219,19 @@ public class CardManagerProcessor implements CardManager {
 
     @Override
     public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, String externalId) throws Exception {
-        updateCard(idOfClient, idOfCard, cardType, state, validTime, lifeState, lockReason, issueTime, externalId, null);
+            String lockReason, Date issueTime, String externalId, User user) throws Exception {
+        updateCard(idOfClient, idOfCard, cardType, state, validTime, lifeState, lockReason, issueTime, externalId, user, null);
     }
 
     @Override
     public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, String externalId, User cardOperatorUser) throws Exception {
+            String lockReason, Date issueTime, String externalId) throws Exception {
+        updateCard(idOfClient, idOfCard, cardType, state, validTime, lifeState, lockReason, issueTime, externalId, null, null);
+    }
+
+    @Override
+    public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -273,6 +279,10 @@ public class CardManagerProcessor implements CardManager {
                 historyCard.setFormerOwner(updatedCard.getClient());
                 historyCard.setUser(cardOperatorUser);
                 persistenceSession.save(historyCard);
+            }
+            if(idOfOrg != null){
+                Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+                if(org != null) updatedCard.setOrg(org);
             }
 
             updatedCard.setClient(newCardOwner);

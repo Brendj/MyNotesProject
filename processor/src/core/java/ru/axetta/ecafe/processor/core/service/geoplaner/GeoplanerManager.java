@@ -48,6 +48,7 @@ public class GeoplanerManager {
             JsonEnterEventInfo info = buildJsonEnterEventInfo(session, enterEvent);
             if (info == null) {
                 logger.warn("No EnterEventSendInfo records for send to Geoplaner App");
+                return;
             }
             Integer statusCode = service.sendPost(info, true);
             if(!statusCode.equals(200)){
@@ -69,7 +70,7 @@ public class GeoplanerManager {
     }
 
     @Async
-    public void sendPaymentInfoToGeoplaner(Payment payment, Client client, Long idOfOrg) throws Exception{
+    public void sendPaymentInfoToGeoplaner(Payment payment, Client client) throws Exception{
         Session session = null;
         Transaction hibernateTransaction = null;
         try {
@@ -79,7 +80,7 @@ public class GeoplanerManager {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
-            JsonPaymentInfo info = buildJsonPaymentInfo(session, payment, client, idOfOrg);
+            JsonPaymentInfo info = buildJsonPaymentInfo(session, payment, client);
             if (info == null) {
                 logger.warn("No PaymentInfo records for send to Geoplaner App");
                 return;
@@ -106,7 +107,7 @@ public class GeoplanerManager {
         Org org = null;
         Card card = getCardFromEnterEvent(session, event);
         if(card == null){
-            logger.error("No found Card by ID: " + event.getIdOfCard());
+            logger.error("No found Card by EnterEvent, construction of the message is interrupted");
             return null;
         }
 
@@ -125,7 +126,7 @@ public class GeoplanerManager {
         return info;
     }
 
-    private JsonPaymentInfo buildJsonPaymentInfo(Session session, Payment payment, Client client, Long idOfOrg) throws Exception{
+    private JsonPaymentInfo buildJsonPaymentInfo(Session session, Payment payment, Client client) throws Exception{
         JsonPaymentInfo info = new JsonPaymentInfo();
         Card card = getCardFromPaymentAndClient(session, payment, client);
         if(card == null){
@@ -150,7 +151,8 @@ public class GeoplanerManager {
     private Card getCardFromEnterEvent(Session session, EnterEvent event) throws Exception {
         Card card = null;
         if(event.getIdOfCard() != null){
-            card = DAOUtils.findCardByCardNoAndOrg(session, event.getIdOfCard(), event.getCompositeIdOfEnterEvent().getIdOfOrg());
+            card = DAOUtils.findCardAsSmartWatchByCardNoAndIdOfFriendlyOrg(session, event.getIdOfCard(),
+                    event.getCompositeIdOfEnterEvent().getIdOfOrg());
         } else if(event.getClient() != null){
             card = DAOUtils.getLastCardByClient(session, event.getClient());
         } else {

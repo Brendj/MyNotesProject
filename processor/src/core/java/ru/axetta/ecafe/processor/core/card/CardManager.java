@@ -38,6 +38,9 @@ public interface CardManager {
             String lockReason, Date issueTime, String externalId) throws Exception;
 
     void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, String externalId, User user, Long IdOfOrg) throws Exception;
+
+    void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId, User user) throws Exception;
 
     void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;

@@ -11,6 +11,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -19,17 +21,20 @@ import java.util.Properties;
 @Component
 @Scope("singleton")
 public class GeoplanerService {
-    private HttpClient httpClient = new HttpClient();
+    private Logger logger = LoggerFactory.getLogger(GeoplanerService.class);
+
     private final String URL_FOR_ENTER_EVENTS = getGeoplanerURLEnterEvents();
     private final String URL_FOR_TRANSACTIONS = getGeoplanerURLTransaction();
     private final String TEST_ENDPOINT_ADDRESS = "https://testrestcontroller.herokuapp.com/test"; // Тестовый сервер на heroku
 
     public Integer sendPost(Object event, Boolean isEnterEvents) throws Exception{
+        HttpClient httpClient = new HttpClient();
         PostMethod method = new PostMethod(isEnterEvents ? URL_FOR_ENTER_EVENTS : URL_FOR_TRANSACTIONS);
         method.addRequestHeader("Content-Type", "application/json");
 
         ObjectMapper mapper = new ObjectMapper();
         String JSONString = mapper.writeValueAsString(event);
+        //logger.info(JSONString);
 
         StringRequestEntity requestEntity = new StringRequestEntity(
                 JSONString,
@@ -37,7 +42,7 @@ public class GeoplanerService {
                 "UTF-8");
         method.setRequestEntity(requestEntity);
 
-        return this.httpClient.executeMethod(method);
+        return httpClient.executeMethod(method);
     }
 
     private String getGeoplanerURLTransaction() {
@@ -47,6 +52,6 @@ public class GeoplanerService {
 
     private String getGeoplanerURLEnterEvents() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.geoplaner.sendevents.transactionEndPointAddress", TEST_ENDPOINT_ADDRESS);
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentEndPointAddress", TEST_ENDPOINT_ADDRESS);
     }
 }

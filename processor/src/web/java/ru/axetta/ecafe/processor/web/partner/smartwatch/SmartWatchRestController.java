@@ -227,7 +227,7 @@ public class SmartWatchRestController {
                 if((card.getClient() == null || card.getClient().equals(child) || card.getState().equals(CardState.BLOCKED.getValue()))
                         && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {
                     cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(),
-                            CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId());
+                            CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId(), null, child.getOrg().getIdOfOrg());
                 } else {
                     throw new Exception("Card CardNo: " + card.getCardNo() + " is registered and owned Client contractID: " + card.getClient().getContractId());
                 }

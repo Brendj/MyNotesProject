@@ -3557,7 +3557,7 @@ public class Processor implements SyncProcessor {
                 if (client != null) {
                     if(GeoplanerManager.isOn() && client.getHasActiveSmartWatch()){
                         GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                        manager.sendPaymentInfoToGeoplaner(payment, client, idOfOrg);
+                        manager.sendPaymentInfoToGeoplaner(payment, client);
                     }
 
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
@@ -5509,11 +5509,11 @@ public class Processor implements SyncProcessor {
         return resEnterEvents;
     }
 
-    private boolean enterEventOwnerHaveSmartWatch(Session session, EnterEvent enterEvent) {
+    private boolean enterEventOwnerHaveSmartWatch(Session session, EnterEvent enterEvent) throws  Exception{
         if(enterEvent.getClient() != null){
             return enterEvent.getClient().getHasActiveSmartWatch();
         } else if (enterEvent.getIdOfCard() != null){
-            Card card = (Card) session.get(Card.class, enterEvent.getIdOfCard());
+            Card card = DAOUtils.findCardAsSmartWatchByCardNoAndIdOfFriendlyOrg(session, enterEvent.getIdOfCard(), enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg());
             if(card != null && card.getClient() != null){
                 return card.getClient().getHasActiveSmartWatch();
             }
