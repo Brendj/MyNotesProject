@@ -27,6 +27,11 @@ public class GeoplanerService {
     private final String URL_FOR_TRANSACTIONS = getGeoplanerURLTransaction();
     private final String TEST_ENDPOINT_ADDRESS = "https://testrestcontroller.herokuapp.com/test"; // Тестовый сервер на heroku
 
+    private boolean debug = isDebug();
+
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_RESET = "\u001B[0m";
+
     public Integer sendPost(Object event, Boolean isEnterEvents) throws Exception{
         HttpClient httpClient = new HttpClient();
         PostMethod method = new PostMethod(isEnterEvents ? URL_FOR_ENTER_EVENTS : URL_FOR_TRANSACTIONS);
@@ -34,13 +39,17 @@ public class GeoplanerService {
 
         ObjectMapper mapper = new ObjectMapper();
         String JSONString = mapper.writeValueAsString(event);
-        //logger.info(JSONString);
 
         StringRequestEntity requestEntity = new StringRequestEntity(
                 JSONString,
                 "application/json",
                 "UTF-8");
         method.setRequestEntity(requestEntity);
+
+        if(debug){
+            String outputMessage = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(event);
+            logger.info("\n\n" + ANSI_YELLOW + outputMessage + ANSI_RESET + "\n\n");
+        }
 
         return httpClient.executeMethod(method);
     }
@@ -53,5 +62,12 @@ public class GeoplanerService {
     private String getGeoplanerURLEnterEvents() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentEndPointAddress", TEST_ENDPOINT_ADDRESS);
+    }
+
+    private boolean isDebug() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String reqInstance = runtimeContext
+                .getConfigProperties().getProperty("ecafe.processor.geoplaner.restcontroller.debug", "false");
+        return Boolean.parseBoolean(reqInstance);
     }
 }
