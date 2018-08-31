@@ -513,7 +513,14 @@ public class PreorderDAOService {
                 }
             }
             if (preorderComplex != null) {
-                preorderComplex.setPreorderMenuDetails(set);
+                if (set.size() > 0) {
+                    preorderComplex.setPreorderMenuDetails(set);
+                }
+                if (preorderComplex.getDeletedState()) {
+                    Query delQuery = em.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0 where preorderComplex.idOfPreorderComplex = :idOfPreorderComplex");
+                    delQuery.setParameter("idOfPreorderComplex", preorderComplex.getIdOfPreorderComplex());
+                    delQuery.executeUpdate();
+                }
                 em.merge(preorderComplex);
             }
         }
