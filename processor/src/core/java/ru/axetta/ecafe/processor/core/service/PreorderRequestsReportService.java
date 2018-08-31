@@ -60,6 +60,7 @@ public class PreorderRequestsReportService {
     public static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
     private IPreorderDAOOperations preorderDAOOperations;
+    public final Integer PREORDER_REQUEST_TYPE = 3;
 
     private Calendar localCalendar;
     private Date startDate;
@@ -483,7 +484,7 @@ public class PreorderRequestsReportService {
         goodRequest.setCreatedDate(fireTime);
         //goodRequest.setLastUpdate(fireTime);
         goodRequest.setComment(PREORDER_COMMENT);
-        goodRequest.setRequestType(0);
+        goodRequest.setRequestType(PREORDER_REQUEST_TYPE);
         goodRequest.setStaff(staff);
         goodRequest.setGuidOfStaff(staff.getGuid());
         goodRequest = save(session, goodRequest, GoodRequest.class.getSimpleName());
