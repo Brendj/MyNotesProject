@@ -41,6 +41,7 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public void cancelOrgSelection() {
+        setFilterMode(0);
         completeHandlers.clear();
     }
 

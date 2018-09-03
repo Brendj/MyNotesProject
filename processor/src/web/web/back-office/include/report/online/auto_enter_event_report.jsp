@@ -50,7 +50,9 @@
                          styleClass="input-text long-field" style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="7" target="#{mainPage.orgSelectPage.filterMode}" />
+            </a4j:commandButton>
         </h:panelGroup>
 
     </h:panelGrid>

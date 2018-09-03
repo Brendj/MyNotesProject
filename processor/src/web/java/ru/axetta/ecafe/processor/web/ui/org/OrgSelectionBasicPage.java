@@ -261,6 +261,12 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                 break;
             case 6:
                 setOrgFilterModeParameters(false, false, false, false, false, false, false);
+                setSupplierFilter(0);
+                break;
+            case 7:
+                setOrgFilterModeParameters(true, false, true, false, false, false, false);
+                setSupplierFilter(1);
+                break;
             default:
                 setOrgFilterModeParameters(false, false, false, false, false, false, false);
                 setSupplierFilter(0);
