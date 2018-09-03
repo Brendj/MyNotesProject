@@ -67,6 +67,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResu
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
@@ -173,6 +174,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_INFORMED_SPECIAL_MENU = 640L;
     private static final Long RC_ORGANIZATION_NOT_FOUND = 650L;
     private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
+    private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -212,6 +214,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_NOT_INFORMED_SPECIAL_MENU_DESC = "Представитель не проинформирован об условиях предоставления услуги";
     private static final String RC_ORGANIZATION_NOT_FOUND_DESC = "Организация не найдена";
     private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
+    private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8675,6 +8678,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(preorderSaveListParam);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
+        } catch (MenuDetailNotExistsException e) {
+            result.resultCode = RC_NOT_FOUND_MENUDETAIL;
+            result.description = RC_NOT_FOUND_MENUDETAIL_DESC;
         } catch(Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;

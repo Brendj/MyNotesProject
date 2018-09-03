@@ -838,7 +838,7 @@ public class PreorderDAOService {
         return preorderComplex;
     }
 
-    private Set<PreorderMenuDetail> createPreorderMenuDetails(Integer idOfComplex, Client client, Date date, PreorderComplex preorderComplex) {
+    private Set<PreorderMenuDetail> createPreorderMenuDetails(Integer idOfComplex, Client client, Date date, PreorderComplex preorderComplex) throws Exception {
         Set<PreorderMenuDetail> result = new HashSet<PreorderMenuDetail>();
         ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
         Query query = emReport.createNativeQuery("SELECT md.idofmenudetail, md.LocalIdOfMenu "
@@ -856,7 +856,7 @@ public class PreorderDAOService {
         return result;
     }
 
-    private PreorderMenuDetail createPreorderMenuDetail(Client client, PreorderComplex preorderComplex, MenuDetail md, Date date, Long idOfMenu, Integer amount) {
+    private PreorderMenuDetail createPreorderMenuDetail(Client client, PreorderComplex preorderComplex, MenuDetail md, Date date, Long idOfMenu, Integer amount) throws MenuDetailNotExistsException {
         PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
         preorderMenuDetail.setPreorderComplex(preorderComplex);
         preorderMenuDetail.setArmIdOfMenu(idOfMenu);
@@ -866,19 +866,20 @@ public class PreorderDAOService {
         preorderMenuDetail.setDeletedState(false);
         preorderMenuDetail.setState(PreorderState.OK);
         if (md == null) md = getMenuDetail(client, idOfMenu, date);
-        if (md != null) {
-            preorderMenuDetail.setMenuDetailName(md.getMenuDetailName());
-            preorderMenuDetail.setMenuDetailPrice(md.getPrice());
-            preorderMenuDetail.setItemCode(md.getItemCode());
-            preorderMenuDetail.setAvailableNow(md.getAvailableNow());
-            preorderMenuDetail.setCalories(md.getCalories());
-            preorderMenuDetail.setCarbohydrates(md.getCarbohydrates());
-            preorderMenuDetail.setFat(md.getFat());
-            preorderMenuDetail.setGroupName(md.getGroupName());
-            preorderMenuDetail.setMenuDetailOutput(md.getMenuDetailOutput());
-            preorderMenuDetail.setProtein(md.getProtein());
-            preorderMenuDetail.setShortName(md.getShortName());
+        if (md == null) {
+            throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfMenu.toString());
         }
+        preorderMenuDetail.setMenuDetailName(md.getMenuDetailName());
+        preorderMenuDetail.setMenuDetailPrice(md.getPrice());
+        preorderMenuDetail.setItemCode(md.getItemCode());
+        preorderMenuDetail.setAvailableNow(md.getAvailableNow());
+        preorderMenuDetail.setCalories(md.getCalories());
+        preorderMenuDetail.setCarbohydrates(md.getCarbohydrates());
+        preorderMenuDetail.setFat(md.getFat());
+        preorderMenuDetail.setGroupName(md.getGroupName());
+        preorderMenuDetail.setMenuDetailOutput(md.getMenuDetailOutput());
+        preorderMenuDetail.setProtein(md.getProtein());
+        preorderMenuDetail.setShortName(md.getShortName());
         return preorderMenuDetail;
     }
 
