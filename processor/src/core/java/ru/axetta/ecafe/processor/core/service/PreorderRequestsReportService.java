@@ -97,7 +97,10 @@ public class PreorderRequestsReportService {
     public void runTask() throws Exception {
         //генерация предзаказов по регулярному правилу
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
+        runTaskNextTimePerDay();
+    }
 
+    public void runTaskNextTimePerDay() throws Exception {
         updateDate();
 
         orgItems = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems();

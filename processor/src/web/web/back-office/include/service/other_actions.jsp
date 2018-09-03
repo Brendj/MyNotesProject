@@ -114,6 +114,10 @@
 
     <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}" id="loadESZMigrants"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <a4j:commandButton value="Сгенерировать регулярные предзаказы" action="#{otherActionsPage.createRegularPreorders()}" id="createRegularPreorders"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>
@@ -139,8 +143,6 @@
             </rich:fileUpload>
         </rich:panel>
     </h:panelGrid>
-    <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
-                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
 
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">

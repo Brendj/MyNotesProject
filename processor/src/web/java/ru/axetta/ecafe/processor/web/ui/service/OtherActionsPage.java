@@ -446,11 +446,21 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void sendGoodRequestsNewReports() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runTask();
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runTaskNextTimePerDay();
             printMessage("Отправка отчетов завершена");
         } catch (Exception e) {
             getLogger().error("Error send PreorderRequestsReport: ", e);
             printError("Во время отправки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void createRegularPreorders() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
+            printMessage("Создание регулярных предзаказов завершено");
+        } catch (Exception e) {
+            getLogger().error("Error create RegularPreorders: ", e);
+            printError("Во время создания регулярных предзаказов произошла ошибка с текстом " + e.getMessage());
         }
     }
 }
