@@ -3940,12 +3940,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             Card card = DAOUtils.findCardByCardNo(session, cardId);
             if (card.getState() == Card.ACTIVE_STATE) {
                 contractId = card.getClient().getContractId();
             }
+            transaction.commit();
+            transaction = null;
         }
         finally {
             HibernateUtils.rollback(transaction, logger);

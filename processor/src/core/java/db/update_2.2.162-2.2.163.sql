@@ -7,3 +7,6 @@
 -- ограничение на уникальность
 CREATE UNIQUE INDEX cf_preorder_complex_idofclient_preorderdate_armcomplexid_unique ON cf_preorder_complex (idofclient, preorderdate, armcomplexid) WHERE deletedState = 0;
 
+--индекс по номеру карты
+CREATE INDEX cf_cards_cardno_idx ON cf_cards USING btree (cardno);
+
