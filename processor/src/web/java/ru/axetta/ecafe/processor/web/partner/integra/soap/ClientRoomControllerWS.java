@@ -8582,7 +8582,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Long version = getClientGuardiansResultVersion(session);
             boolean guardianWithMobileFound = false;
             for (Client guardian : guardians) {
-                if (guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
                     guardianWithMobileFound = true;
                     ClientManager.setInformSpecialMenu(session, client.getIdOfClient(), guardian.getIdOfClient(), version);
                 }
