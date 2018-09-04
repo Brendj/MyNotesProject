@@ -42,6 +42,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigInteger;
@@ -51,12 +52,15 @@ import java.util.Calendar;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
-public class PreorderRequestsReportService {
+public class PreorderRequestsReportService extends RecoverableService {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PreorderRequestsReportService.class);
 
     public final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.report.PreorderRequestsReport.cronExpression";
     public static final String NODE_PROPERTY = "ecafe.processor.report.PreorderRequestsReport.node";
+    public static final String STATUS_FILENAME_PROPERTY = "ecafe.processor.report.PreorderRequestsReport.status.filename";
+    private final String STATUS_FILENAME_DEFAULT_VALUE = "/home/jbosser/processor/tasks/PreorderRequestsReport.";
+
     public static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
     private IPreorderDAOOperations preorderDAOOperations;
@@ -73,7 +77,23 @@ public class PreorderRequestsReportService {
     public void run() throws Exception {
         if (!isOn())
             return;
+
+        updateStatusFile(new Date(), Status.RUNNING);
         runTask();
+        updateStatusFile(new Date(), Status.FINISHED);
+    }
+
+    @Override
+    public void recoveryRun() throws Exception {
+        if (!isOn())
+            return;
+
+        if (isFinishedToday())
+            return;
+
+        updateStatusFile(new Date(), Status.RUNNING);
+        runTaskNextTimePerDay();
+        updateStatusFile(new Date(), Status.FINISHED);
     }
 
     public static boolean isOn() {
@@ -867,6 +887,28 @@ public class PreorderRequestsReportService {
         } catch(Exception e) {
             logger.error("Failed to schedule PreorderRequestsReport service job:", e);
         }
+
+        scheduleSyncRecovery();
+    }
+
+    public void scheduleSyncRecovery() {
+        Date fireTime = getFireTime();
+        try {
+            logger.info("Scheduling PreorderRequestsReportRecovery service job: " + fireTime.toString());
+            JobDetail job = new JobDetail("PreorderRequestsReportRecovery", Scheduler.DEFAULT_GROUP, PreorderRequestsReportRecoveryJob.class);
+
+            SchedulerFactory sfb = new StdSchedulerFactory();
+            Scheduler scheduler = sfb.getScheduler();
+
+            SimpleTrigger trigger = new SimpleTrigger("PreorderRequestsReportRecovery", fireTime);
+            if (scheduler.getTrigger("PreorderRequestsReportRecovery", Scheduler.DEFAULT_GROUP) != null) {
+                scheduler.deleteJob("PreorderRequestsReportRecovery", Scheduler.DEFAULT_GROUP);
+            }
+            scheduler.scheduleJob(job, trigger);
+            scheduler.start();
+        } catch(Exception e) {
+            logger.error("Failed to schedule PreorderRequestsReportRecovery service job:", e);
+        }
     }
 
     public static class PreorderItem {
@@ -1011,6 +1053,12 @@ public class PreorderRequestsReportService {
         }
     }
 
+    @PostConstruct
+    private void init() {
+        setStatusFileNameProperty(STATUS_FILENAME_PROPERTY);
+        setStatusFileNameDefaultValue(STATUS_FILENAME_DEFAULT_VALUE);
+    }
+
     public static class PreorderRequestsReportJob implements Job {
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
@@ -1020,6 +1068,19 @@ public class PreorderRequestsReportService {
                 throw e;
             } catch (Exception e) {
                 logger.error("Failed to run PreorderRequestsReport service job:", e);
+            }
+        }
+    }
+
+    public static class PreorderRequestsReportRecoveryJob implements Job {
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            try {
+                RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).recoveryRun();
+            } catch (JobExecutionException e) {
+                throw e;
+            } catch (Exception e) {
+                logger.error("Failed to run PreorderRequestsReportRecovery service job:", e);
             }
         }
     }

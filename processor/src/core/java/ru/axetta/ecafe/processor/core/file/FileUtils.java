@@ -126,6 +126,11 @@ public class FileUtils {
         return  result;
     }
 
+    public static boolean isFileExists(String fileName) {
+        File file = new File(fileName);
+        return file.exists();
+    }
+
     public static class FileUtilsException extends Exception {
         public FileUtilsException() {}
 
