@@ -5513,7 +5513,7 @@ public class Processor implements SyncProcessor {
         if(enterEvent.getClient() != null){
             return enterEvent.getClient().getHasActiveSmartWatch();
         } else if (enterEvent.getIdOfCard() != null){
-            return DAOUtils.findClientByUidSmartWatchAndTheyIsActive(session, enterEvent.getIdOfCard(), enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg());
+            return DAOUtils.findClientByCardNoAndHeHaveActiveSW(session, enterEvent.getIdOfCard(), enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg());
         }
         return false;
     }

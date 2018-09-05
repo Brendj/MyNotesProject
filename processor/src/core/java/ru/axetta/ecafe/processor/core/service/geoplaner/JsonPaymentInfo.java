@@ -13,6 +13,7 @@ public class JsonPaymentInfo {
     private Integer orderType;
     private Long transactionSum;
     private String purchasesName;
+    private Integer cardType;
 
     public Date getTransactionTime() {
         return transactionTime;
@@ -60,5 +61,13 @@ public class JsonPaymentInfo {
 
     public void setTrackerId(Long trackerId) {
         this.trackerId = trackerId;
+    }
+
+    public Integer getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
     }
 }

@@ -5,16 +5,20 @@
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.geoplaner.JsonEnterEventInfo;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -37,6 +41,14 @@ public class SmartWatchRestController {
     private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private boolean debug;
     private final Integer CARD_TYPE_SMARTWATCH = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+
+    private final int PERIOD_ONE_DAY = 0;
+    private final int PERIOD_THREE_DAYS = 1;
+    private final int PERIOD_ONE_WEEK = 2;
+    private final int PERIOD_TWO_WEEKS = 3;
+    private final int PERIOD_ONE_MONTH = 4;
+    private final int PERIOD_THREE_MONTH = 5;
+    private final int DEFAULT_PERIOD = 0;
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -144,7 +156,7 @@ public class SmartWatchRestController {
                             + ", but passed the TokenValidator");
             }
 
-            List<JsonChildrenDataInfoItem> items = buildItems(session, parent);
+            List<JsonChildrenDataInfoItem> items = buildChildrenDataInfoItems(session, parent);
             result.setItems(items);
 
             transaction.commit();
@@ -339,7 +351,166 @@ public class SmartWatchRestController {
         }
     }
 
-    private String inputParamsIsValidOrTrowException(Session session, Long trackerId, Long trackerUid, String mobilePhone, String token) throws Exception{
+    @GET
+    @Path(value="getEnterEvents")
+    public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
+            @QueryParam(value="contractId") Long contractId, @QueryParam(value="period") Integer period){
+        JsonEnterEvents result = new JsonEnterEvents();
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            if(mobilePhone == null || mobilePhone.isEmpty()){
+                throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
+            }
+
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkAndConvertPhone(mobilePhone);
+            if(!isValidPhoneAndToken(session, mobilePhone, token)){
+                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
+            }
+            token = "";
+
+            if(contractId == null){
+                throw new IllegalArgumentException("ContractID is null");
+            }
+
+            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+            if(parent == null){
+                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
+                        + ", but passed the TokenValidator");
+            }
+
+            Client child = DAOUtils.findClientByContractId(session, contractId);
+            if(child == null){
+                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            }
+            if(!isRelatives(session, parent, child)){
+                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+            }
+
+            if(period == null){
+                period = DEFAULT_PERIOD;
+            }
+            Date beginDate = calcPeriod(period);
+            List<JsonEnterEventInfo> items = buildEnterEventItem(session, child, beginDate);
+            result.setItems(items);
+            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
+            result.getResult().description = ResponseCodes.RC_OK.toString();
+
+            transaction.commit();
+            transaction = null;
+
+            return Response.status(HttpURLConnection.HTTP_OK)
+                    .entity(result)
+                    .build();
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get EnterEvents ", e);
+            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(result)
+                    .build();
+        } catch (Exception e){
+            logger.error("Can't get EnterEvents ", e);
+            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(result)
+                    .build();
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private Date calcPeriod(Integer period) {
+        Date endDay = CalendarUtils.endOfDay(new Date());
+        Date duration = null;
+        switch (period){
+            case PERIOD_ONE_DAY:
+                duration = CalendarUtils.addDays(endDay, -1);
+                break;
+            case PERIOD_THREE_DAYS:
+                duration = CalendarUtils.addDays(endDay, -3);
+                break;
+            case PERIOD_ONE_WEEK:
+                duration = CalendarUtils.addDays(endDay, -7);
+                break;
+            case PERIOD_TWO_WEEKS:
+                duration = CalendarUtils.addDays(endDay, -14);
+                break;
+            case PERIOD_ONE_MONTH:
+                duration = CalendarUtils.addMonth(endDay, -1);
+                break;
+            case PERIOD_THREE_MONTH:
+                duration = CalendarUtils.addMonth(endDay, -3);
+                break;
+            default:
+                logger.warn("Get unknown code of period: " + period
+                        + " set default period as 1 day");
+                duration = CalendarUtils.addDays(endDay, -1);
+        }
+        return duration;
+    }
+
+    private List<JsonEnterEventInfo> buildEnterEventItem(Session session, Client child, Date beginDate) throws Exception{
+        List<JsonEnterEventInfo> items = new LinkedList<JsonEnterEventInfo>();
+        List<Long> cardNoOfOwner = new LinkedList<Long>();
+        List<EnterEvent> events = null;
+        Date endDate = CalendarUtils.endOfDay(new Date());
+
+        for(Card card : child.getCards()){
+            cardNoOfOwner.add(card.getCardNo());
+        }
+
+        Query query = session.createQuery("from EnterEvent "
+                + " where (client =:client or idOfCard in (:cardNoOfOwner)) "
+                + " and evtDateTime between :beginDate and :endDate");
+        query
+                .setParameter("client", child)
+                .setParameter("beginDate", beginDate)
+                .setParameter("endDate", endDate)
+                .setParameterList("cardNoOfOwner", cardNoOfOwner);
+        events = query.list();
+        if(events == null){
+            throw new Exception("Not found event for client contractID: " + child.getContractId());
+        }
+
+        for(EnterEvent event : events){
+            JsonEnterEventInfo info = new JsonEnterEventInfo();
+            info.setTrackerUid(event.getIdOfCard());
+            info.setDirection(event.getPassDirection());
+            info.setEvtDateTime(event.getEvtDateTime());
+            info.setShortAddress(event.getOrg().getShortAddress());
+            info.setShortName(event.getOrg().getShortName());
+            if(event.getIdOfCard() != null){
+                Card card = findClientCardByCardNo(child.getCards(), event.getIdOfCard());
+                if(card != null) {
+                    info.setCardType(card.getCardType());
+                    info.setTrackerId(card.getCardPrintedNo());
+                }
+            }
+            items.add(info);
+        }
+        return items;
+    }
+
+    private Card findClientCardByCardNo(Set<Card> cards, Long idOfCard) {
+        if(cards == null){
+            return null;
+        }
+        for(Card card : cards){
+            if(card.getCardNo().equals(idOfCard)){
+                return card;
+            }
+        }
+        return null;
+    }
+
+    private String inputParamsIsValidOrTrowException(Session session, Long trackerId, Long trackerUid,
+            String mobilePhone, String token) throws Exception{
         if(trackerUid == null || trackerId == null){
             throw new IllegalArgumentException("TrackerUID or trackerID is null");
         }
@@ -414,7 +585,7 @@ public class SmartWatchRestController {
         return false;
     }
 
-    private List<JsonChildrenDataInfoItem> buildItems(Session session, Client client) throws Exception{
+    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, Client client) throws Exception{
         List<JsonChildrenDataInfoItem> resultList = new LinkedList<JsonChildrenDataInfoItem>();
         try{
             List<ClientGuardian> childrens = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, client.getIdOfClient());

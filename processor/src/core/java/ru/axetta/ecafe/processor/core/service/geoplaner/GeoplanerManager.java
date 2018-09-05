@@ -106,11 +106,11 @@ public class GeoplanerManager {
         JsonEnterEventInfo info = new JsonEnterEventInfo();
         Org org = null;
         Card card = getCardFromEnterEvent(session, event);
-        if(card == null){
+        if(card == null) {
             logger.error("No found Card by EnterEvent, construction of the message is interrupted");
             return null;
         }
-
+        info.setCardType(card.getCardType());
         info.setTrackerId(card.getCardPrintedNo());
         info.setTrackerUid(card.getCardNo());
         info.setEvtDateTime(event.getEvtDateTime());
@@ -122,6 +122,7 @@ public class GeoplanerManager {
         }
         info.setShortAddress(org.getShortAddress());
         info.setShortName(org.getShortName());
+
 
         return info;
     }
@@ -136,6 +137,7 @@ public class GeoplanerManager {
 
         info.setTrackerId(card.getCardPrintedNo());
         info.setTrackerUid(card.getCardNo());
+        info.setCardType(card.getCardType());
         info.setTransactionTime(payment.getTime());
         info.setOrderType(payment.getOrderType().ordinal());
         info.setTransactionSum(payment.getRSum());
@@ -151,7 +153,7 @@ public class GeoplanerManager {
     private Card getCardFromEnterEvent(Session session, EnterEvent event) throws Exception {
         Card card = null;
         if(event.getIdOfCard() != null){
-            card = DAOUtils.findCardAsSmartWatchByCardNoAndIdOfFriendlyOrg(session, event.getIdOfCard(),
+            card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrg(session, event.getIdOfCard(),
                     event.getCompositeIdOfEnterEvent().getIdOfOrg());
         } else if(event.getClient() != null){
             card = DAOUtils.getLastCardByClient(session, event.getClient());
@@ -175,7 +177,7 @@ public class GeoplanerManager {
     private Card getCardFromPaymentAndClient(Session session, Payment payment, Client client)throws Exception {
         Card card = null;
         if(payment.getCardNo() != null){
-            card = DAOUtils.findCardByCardNoAndOrg(session, payment.getCardNo(), client.getOrg().getIdOfOrg());
+            card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrg(session, payment.getCardNo(), client.getOrg().getIdOfOrg());
         } else if(client.getCards() != null){
             for(Card cardOfClient : client.getCards()){
                 if(cardOfClient.getState().equals(CardState.ISSUED.getValue())){

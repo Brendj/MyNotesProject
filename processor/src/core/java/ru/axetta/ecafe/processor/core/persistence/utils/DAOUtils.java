@@ -3552,43 +3552,32 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
-    public static Card findCardAsSmartWatchByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
-        Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+    public static Card findCardByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
         Integer state = CardState.ISSUED.getValue();
         Query query = session.createSQLQuery(" select cr.idofcard from cf_cards cr "
                 + " left join (select friendlyorg from cf_friendly_organization where currentorg = :friendlyOrg)as q on cr.idoforg = q.friendlyorg "
-                + " where cr.cardtype = :cardType and state = :lifeState and cr.cardno = :cardNo");
+                + " where state = :lifeState and cr.cardno = :cardNo");
         query
                 .setParameter("friendlyOrg", idOfOrg)
-                .setParameter("cardType", cardType)
                 .setParameter("lifeState", state)
                 .setParameter("cardNo", cardNo);
         BigInteger idOfCard = (BigInteger) query.uniqueResult();
         return (Card) session.get(Card.class, idOfCard.longValue());
     }
 
-    public static Boolean findClientByUidSmartWatchAndTheyIsActive(Session session, Long cardNo, Long idOfOrg){
-        Integer cardType = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+    public static Boolean findClientByCardNoAndHeHaveActiveSW(Session session, Long cardNo, Long idOfOrg){
         Integer state = CardState.ISSUED.getValue();
         try {
             Query query = session.createSQLQuery(" select c.hasactiveSmartWatch from cf_cards cr "
                     + " left join (select friendlyorg from cf_friendly_organization where currentorg = :friendlyOrg)as q on cr.idoforg = q.friendlyorg "
                     + " join cf_clients c on cr.idofclient = c.idofclient "
-                    + " where cr.cardtype = :cardType and state = :lifeState and cr.cardno = :cardNo ");
+                    + " where state = :lifeState and cr.cardno = :cardNo ");
             query
                     .setParameter("friendlyOrg", idOfOrg)
-                    .setParameter("cardType", cardType)
                     .setParameter("lifeState", state)
                     .setParameter("cardNo", cardNo);
             Integer hasActiveSmartWatch = (Integer) query.uniqueResult();
-            if(hasActiveSmartWatch == null ){
-                return false;
-            } else if(hasActiveSmartWatch.equals(0)){
-                throw new Exception("Card cardNo: " + cardNo + " is active SmartWatch,"
-                        + " but the owner in the field is the value False");
-            } else {
-                return true;
-            }
+            return hasActiveSmartWatch != null && hasActiveSmartWatch.equals(1);
         } catch (Exception e){
             logger.error("", e);
             return false;
