@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -59,6 +60,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_NOTIFICATION = "notification";
     final public static String P_HIDE_PREORDERS = "hidePreorders";
     final public static String P_PREORDERS_ONLY = "preordersOnly";
+    final public static String P_IS_EMAIL_NOTIFY = "isEmailNotify";
 
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
@@ -143,6 +145,25 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
 
             String preordersOnlyString = reportProperties.getProperty(P_PREORDERS_ONLY, "false");
             final boolean preordersOnly = Boolean.parseBoolean(preordersOnlyString);
+
+            String isEmailNotifyString = reportProperties.getProperty(P_IS_EMAIL_NOTIFY, "false");
+            final boolean isEmailNotify = Boolean.parseBoolean(isEmailNotifyString);
+
+            String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            if (isEmailNotify) {
+                Long idOfOrg = Long.parseLong(idOfOrgString);
+
+                parameterMap.put("idOfOrg", idOfOrg);
+                Org org = (Org) session.load(Org.class, idOfOrg);
+
+                if (null != org) {
+                    parameterMap.put("address", org.getAddress());
+                    parameterMap.put("shortName", org.getOfficialName());
+                } else {
+                    parameterMap.put("address", "не указан");
+                    parameterMap.put("shortName", "не указано");
+                }
+            }
 
             // пока нет необходимости
             //parameterMap.put("overall",Long.toString(OVERALL));

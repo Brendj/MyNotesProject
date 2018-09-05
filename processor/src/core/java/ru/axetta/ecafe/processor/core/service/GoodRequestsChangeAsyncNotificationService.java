@@ -230,6 +230,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             properties.setProperty(GoodRequestsNewReport.P_NOTIFICATION, Boolean.toString(true));
             properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(true));
             properties.setProperty(GoodRequestsNewReport.P_PREORDERS_ONLY, Boolean.toString(false));
+            properties.setProperty(GoodRequestsNewReport.P_IS_EMAIL_NOTIFY, Boolean.toString(true));
             builder.setReportProperties(properties);
             BasicReportJob reportJob = null;
             /* создаем отчет */

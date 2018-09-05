@@ -262,7 +262,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                             hideLastValue, null, 0L));
                 }
                 itemList.add(new GoodRequestsNewReportService.Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                        hideDailySampleValue, hideLastValue, null, 0L));
+                        hideDailySampleValue, hideLastValue, null, 0L, 0L, ""));
             }
             return itemList;
         }
@@ -416,7 +416,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             itemList.add(
                     new GoodRequestsNewReportService.Item(org, name, doneDate, hideDailySampleValue, hideLastValue, goodType, notificationMark));
             itemList.add(new GoodRequestsNewReportService.Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
-                    goodType, notificationMark, needToMark));
+                    goodType, notificationMark, needToMark, 0L, ""));
         }
 
         private static void addItemsFromList(List<GoodRequestsNewReportService.Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,

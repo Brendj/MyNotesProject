@@ -233,7 +233,7 @@ public class GoodRequestsNewReportService {
                         hideLastValue, null, 0L));
             }
             itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                    hideDailySampleValue, hideLastValue, null, 0L));
+                    hideDailySampleValue, hideLastValue, null, 0L, null, ""));
         }
 
         return itemList;
@@ -261,7 +261,8 @@ public class GoodRequestsNewReportService {
         }
         orgCriteria.setProjection(
                 Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
-                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg")));
+                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg"))
+                        .add(Projections.property("address")));
         List orgList = orgCriteria.list();
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(
                 orgList.size());
@@ -274,6 +275,9 @@ public class GoodRequestsNewReportService {
                 Long sourceMenuOrg = Long.parseLong(row[3].toString());
                 educationItem.setSourceMenuOrg(sourceMenuOrg);
                 idOfMenuSourceOrgList.add(sourceMenuOrg);
+            }
+            if (null != row[4]) {
+                educationItem.setAddress(row[4].toString());
             }
             orgMap.put(idOfOrg, educationItem);
         }
@@ -410,7 +414,7 @@ public class GoodRequestsNewReportService {
                 new Item(org, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark));
+                    feedingPlanType, notificationMark, null, ""));
         }
     }
 
@@ -421,7 +425,7 @@ public class GoodRequestsNewReportService {
                 hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
-                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, 0L));
+                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, 0L, null, ""));
         }
     }
 
@@ -512,24 +516,27 @@ public class GoodRequestsNewReportService {
         private Long newTempClients;
         private Long notificationMark;
         private Long needToMark;
+        private Long idOfOrg;
+        private String address;
 
         protected Item(Item item, Date doneDate) {
             this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L, 0L, 0L,
                     item.getHideDailySample(), item.getHideLastValue(), item.getFeedingPlanType(),
-                    item.getNotificationMark());
+                    item.getNotificationMark(), item.getIdOfOrg(), item.getAddress());
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
                 Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long idOfOrg, String address) {
             this(orgNum, officialName, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount,
                     newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark,
-                    1L);
+                    1L, idOfOrg, address);
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
                 Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark) {
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark, Long idOfOrg,
+                String address) {
             this.orgNum = orgNum;
             this.officialName = officialName;
             this.goodName = goodName;
@@ -553,18 +560,21 @@ public class GoodRequestsNewReportService {
             }
             this.notificationMark = notificationMark;
             this.needToMark = needToMark;
+            this.idOfOrg = idOfOrg;
+            this.address = address;
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark) {
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark, Long idOfOrg,
+                String address) {
             this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue,
-                    hideLastValue, feedingPlanType, notificationMark, needToMark);
+                    hideLastValue, feedingPlanType, notificationMark, needToMark, idOfOrg, address);
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark) {
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long idOfOrg, String address) {
             this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue,
-                    hideLastValue, feedingPlanType, notificationMark);
+                    hideLastValue, feedingPlanType, notificationMark, idOfOrg, address);
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample, Long tempClients,
@@ -572,7 +582,7 @@ public class GoodRequestsNewReportService {
                 FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark) {
             this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName, doneDate,
                     totalCount, dailySample, tempClients, newTotalCount, newDailySample, newTempClients, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark, needToMark);
+                    feedingPlanType, notificationMark, needToMark, item.getIdOfOrg(), item.getAddress());
 
         }
 
@@ -761,6 +771,22 @@ public class GoodRequestsNewReportService {
 
         public void setNeedToMark(Long needToMark) {
             this.needToMark = needToMark;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(Long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
         }
     }
 }

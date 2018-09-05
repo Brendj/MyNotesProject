@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" printOrder="Horizontal" pageWidth="345" pageHeight="140" whenNoDataType="AllSectionsNoDetail" columnWidth="345" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" printOrder="Horizontal" pageWidth="340" pageHeight="140" whenNoDataType="AllSectionsNoDetail" columnWidth="340" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -45,13 +45,15 @@
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<field name="tempClients" class="java.lang.Long"/>
 	<field name="newTempClients" class="java.lang.Long"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="address" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="52" splitType="Stretch">
 			<textField>
-				<reportElement uuid="c1367527-9067-446c-9652-1babb24832df" x="0" y="0" width="345" height="52"/>
+				<reportElement uuid="c1367527-9067-446c-9652-1babb24832df" x="0" y="0" width="340" height="52"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -71,29 +73,43 @@
 	<summary>
 		<band height="70">
 			<crosstab>
-				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" style="table" mode="Transparent" x="0" y="0" width="345" height="50" forecolor="#FFFFFF"/>
+				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" style="table" mode="Transparent" x="0" y="0" width="340" height="50" forecolor="#FFFFFF"/>
 				<crosstabHeaderCell>
 					<cellContents style="table">
 						<staticText>
-							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="141" y="0" width="164" height="34" backcolor="#F0F8FF"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="341" y="0" width="164" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Товар]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="36" y="0" width="105" height="34" backcolor="#F0F8FF"/>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="241" y="0" width="100" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
-							<text><![CDATA[Наименование ОО]]></text>
+							<text><![CDATA[Адрес]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="7761f0ef-0e43-407c-9d37-6bdea874dc36" style="table" mode="Opaque" x="0" y="0" width="36" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="36" y="0" width="100" height="34" backcolor="#F0F8FF"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Идентификатор ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="136" y="0" width="105" height="34" backcolor="#F0F8FF"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Наименование ОО]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -104,7 +120,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#FFFFFF" mode="Transparent" style="table">
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="36" height="49"/>
+								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="36" height="49"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
 							</textField>
@@ -122,6 +138,23 @@
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
+				<rowGroup name="idOfOrg" width="100" totalPosition="End" headerPosition="Middle">
+					<bucket order="Descending" class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{idOfOrg}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="ed0e9180-538e-4cf6-971b-ac69b56542d9" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="49"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
 				<rowGroup name="officialName" width="105" totalPosition="End" headerPosition="Middle">
 					<bucket order="Descending" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{officialName}]]></bucketExpression>
@@ -129,7 +162,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#CCFFFF" mode="Transparent" style="table">
 							<textField>
-								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="105" height="44"/>
+								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="105" height="44"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
@@ -139,6 +172,25 @@
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#000000" mode="Opaque"/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="address" width="100" totalPosition="End" headerPosition="Middle">
+					<bucket order="Descending" class="java.lang.String">
+						<bucketExpression><![CDATA[$F{address}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="3e7fbf5c-7b64-418e-83a4-1ddd8541ffd0" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="44"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="feedingPlanTypeNum" width="0">
@@ -374,6 +426,24 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="feedingPlanTypeNum" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="idOfOrg">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="address">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

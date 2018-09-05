@@ -51,6 +51,8 @@
 	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<field name="tempClients" class="java.lang.Long"/>
 	<field name="newTempClients" class="java.lang.Long"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -73,18 +75,18 @@
 				<crosstabHeaderCell>
 					<cellContents style="table">
 						<staticText>
-							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="285" y="0" width="214" height="34" backcolor="#F0F8FF"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="415" y="0" width="207" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="12" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Товар]]></text>
+							<text><![CDATA[Адрес ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="78" y="0" width="207" height="34" backcolor="#F0F8FF"/>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="78" y="0" width="130" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="12" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Наименование ОО]]></text>
+							<text><![CDATA[Идентификатор ОО]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="7761f0ef-0e43-407c-9d37-6bdea874dc36" style="table" mode="Opaque" x="0" y="0" width="78" height="34" backcolor="#F0F8FF"/>
@@ -92,6 +94,20 @@
 								<font size="12" isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="622" y="0" width="214" height="34" backcolor="#F0F8FF"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="12" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Товар]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="208" y="0" width="207" height="34" backcolor="#F0F8FF"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="12" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Наименование ОО]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -113,13 +129,32 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#000000" mode="Transparent">
 							<staticText>
-								<reportElement uuid="9cb16bc5-8dcf-4346-9771-0a08fb6d6c21" style="table" x="0" y="0" width="499" height="40"/>
+								<reportElement uuid="9cb16bc5-8dcf-4346-9771-0a08fb6d6c21" style="table" x="0" y="0" width="836" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[ВСЕГО]]></text>
 							</staticText>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="idOfOrg" width="130" totalPosition="End" headerPosition="Middle">
+					<bucket order="Descending" class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{idOfOrg}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="d506aba1-d7ff-481a-86df-387ee041b6dd" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="130" height="87"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="officialName" width="207" totalPosition="End" headerPosition="Middle">
@@ -147,6 +182,25 @@
 								<text><![CDATA[Static text]]></text>
 							</staticText>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="address" width="207" totalPosition="End" headerPosition="Middle">
+					<bucket order="Descending" class="java.lang.String">
+						<bucketExpression><![CDATA[$F{address}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="73d72894-3631-44bd-9924-7f451b74cae5" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="1" width="207" height="80"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="feedingPlanTypeNum" width="0">
@@ -255,7 +309,7 @@
 				<measure name="newTempClientsMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{newTempClients}]]></measureExpression>
 				</measure>
-				<crosstabCell width="90" height="41">
+				<crosstabCell width="91" height="41">
 					<cellContents style="table">
 						<textField>
 							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="90" height="41" forecolor="#FFFFFF" backcolor="#FF6666">
@@ -312,10 +366,10 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="90" height="41" rowTotalGroup="orgNum">
+				<crosstabCell width="91" height="41" rowTotalGroup="orgNum">
 					<cellContents backcolor="#000000" mode="Transparent">
 						<textField>
-							<reportElement uuid="75b7be62-4feb-4f53-b204-0e6987a61483" style="table" x="0" y="0" width="90" height="40"/>
+							<reportElement uuid="75b7be62-4feb-4f53-b204-0e6987a61483" style="table" x="0" y="0" width="91" height="40"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="12" isBold="true"/>
 							</textElement>
@@ -344,7 +398,7 @@ $V{tempClientsMeasure}/2L))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="90" height="4" rowTotalGroup="officialName">
+				<crosstabCell width="91" height="4" rowTotalGroup="officialName">
 					<cellContents backcolor="#000000" mode="Opaque" style="style2">
 						<staticText>
 							<reportElement uuid="30270492-c0d6-4af8-bb02-c45b81d040c7" style="style2" x="0" y="0" width="57" height="3" forecolor="#000000" backcolor="#000000"/>
@@ -358,7 +412,7 @@ $V{tempClientsMeasure}/2L))]]></textFieldExpression>
 				<crosstabCell rowTotalGroup="officialName" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="90" height="40" rowTotalGroup="goodName">
+				<crosstabCell width="91" height="40" rowTotalGroup="goodName">
 					<cellContents backcolor="#99CCFF" mode="Opaque" style="style2">
 						<staticText>
 							<reportElement uuid="59c14182-de93-4b3f-b3c9-6cca48484167" mode="Transparent" x="0" y="0" width="40" height="3" forecolor="#005FB3" backcolor="#005FB3"/>
@@ -390,7 +444,7 @@ $V{tempClientsMeasure}/2L))]]></textFieldExpression>
 				<crosstabCell rowTotalGroup="goodName" columnTotalGroup="doneDate">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="90" height="3" rowTotalGroup="feedingPlanTypeStr">
+				<crosstabCell width="91" height="3" rowTotalGroup="feedingPlanTypeStr">
 					<cellContents backcolor="#005FB3" mode="Opaque"/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="feedingPlanTypeStr" columnTotalGroup="doneDate">
@@ -406,6 +460,24 @@ $V{tempClientsMeasure}/2L))]]></textFieldExpression>
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="feedingPlanTypeNum" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell width="91" height="0" rowTotalGroup="address">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="idOfOrg">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>
