@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderRequestsReport" pageWidth="900" pageHeight="145" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="900" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderRequestsReport" pageWidth="900" pageHeight="165" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="900" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -48,6 +48,7 @@
 	<parameter name="generateEndDate" class="java.lang.String"/>
 	<parameter name="address" class="java.lang.String"/>
 	<parameter name="shortName" class="java.lang.String"/>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
 	<field name="orgNum" class="java.lang.Long"/>
 	<field name="officialName" class="java.lang.String"/>
 	<field name="goodName" class="java.lang.String"/>
@@ -65,6 +66,7 @@
 	<field name="tempClients" class="java.lang.Long"/>
 	<field name="newTempClients" class="java.lang.Long"/>
 	<field name="needToMark" class="java.lang.Long"/>
+	<field name="goodsCode" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -72,16 +74,16 @@
 		<band splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band height="60">
+		<band height="80">
 			<staticText>
-				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="40" width="230" height="20"/>
+				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="60" width="230" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[Время формирования заявок:]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="230" y="40" width="604" height="20"/>
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="230" y="60" width="604" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
@@ -106,10 +108,24 @@
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="20" width="230" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Идентификатор организации:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="230" y="40" width="604" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="40" width="230" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
@@ -140,6 +156,13 @@
 								<font size="12" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA["<font size=\"5\">Товар</font>"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="e6acfcff-3fa4-4c53-9568-a19131f91cf3" mode="Opaque" x="300" y="0" width="140" height="24"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+								<font size="12" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["<font size=\"5\">Код товара</font>"]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -201,6 +224,25 @@
 								<textFieldExpression><![CDATA["<font size=\"5\">" + $V{feedingPlanTypeStr} + "</font>"]]></textFieldExpression>
 							</textField>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="goodsCode" width="140" totalPosition="Start" headerPosition="Middle">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{goodsCode}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="d7d6d032-060f-40a5-85ba-d031d6638920" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="140" height="24"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+									<font size="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA["<font size=\"5\">" + $V{goodsCode} + "</font>"]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="doneDate" height="0">
@@ -344,6 +386,15 @@ $V{tempClientsMeasure}))
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="feedingPlanTypeNum" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="goodsCode">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="goodsCode" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="goodsCode" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

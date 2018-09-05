@@ -237,7 +237,9 @@ public class PreorderRequestsReportService extends RecoverableService {
 
         for (Long orgOwner : goodRequestOrgOwnerList) {
             Integer forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(orgOwner);
-            if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
+            if (null == forbiddenDaysCount)
+                forbiddenDaysCount = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
+            if (forbiddenDaysCount != 0)
                 forbiddenDaysCount -= 1;
 
             List<String> guids = getGoodRequestPositionGuids(orgOwner, forbiddenDaysCount);
