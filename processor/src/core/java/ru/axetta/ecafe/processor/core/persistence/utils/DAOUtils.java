@@ -3428,7 +3428,7 @@ public class DAOUtils {
             enterEventSendInfo.setEnterEvent(enterEvent);
             session.save(enterEventSendInfo);
         } catch (Exception e){
-            logger.error("Save EnterEventSendInfo to database error: " + e.getMessage());
+            logger.error("Save EnterEventSendInfo to database error: ", e);
         }
     }
 
