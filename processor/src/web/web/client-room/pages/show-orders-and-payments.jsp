@@ -465,7 +465,7 @@
         <%
 
             Long clientPaymentSum = clientPayment.getPaySum();
-            String transferInfo = PaymentTextUtils.buildTransferInfo(clientPayment);%>
+            String transferInfo = PaymentTextUtils.buildTransferInfo(persistenceSession, clientPayment);%>
         <div class="output-text topup-info">Пополнение баланса
             +<%=StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(clientPaymentSum))%>
             (<%=StringEscapeUtils.escapeHtml(transferInfo)%>)
