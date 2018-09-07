@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
-import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -58,6 +57,7 @@ public class OrganizationComplexesStructure implements AbstractToElement{
     }
 
     public void fillComplexesStructureAndApplyChanges(Session session, Long idOfOrg, Long maxVersion, Integer menuSyncCountDays, Integer menuSyncCountDaysInPast) {
+        if (menuSyncCountDays == null && menuSyncCountDaysInPast == null) return;
         providerComplexesList.clear();
         Org org = (Org) session.load(Org.class, idOfOrg);
         Set<Org> friendlyOrgs = org.getFriendlyOrg();
@@ -68,8 +68,10 @@ public class OrganizationComplexesStructure implements AbstractToElement{
         for (ConfigurationProvider configurationProvider : uniqueProviders) {
             //здесь смотрим на версию и записываем menuSyncCountDays
             if (maxVersion != null && maxVersion >= configurationProvider.getVersion()) {
-                configurationProvider.setMenuSyncCountDays(menuSyncCountDays);
-                configurationProvider.setMenuSyncCountDaysInPast(menuSyncCountDaysInPast);
+                if (menuSyncCountDays != null)
+                    configurationProvider.setMenuSyncCountDays(menuSyncCountDays);
+                if (menuSyncCountDaysInPast != null)
+                    configurationProvider.setMenuSyncCountDaysInPast(menuSyncCountDaysInPast);
                 ConfigurationProviderService.updateWithVersion(session, configurationProvider);
             }
             ProviderComplexesItem providerComplexesItem = createProviderComplexesItem(session, idOfOrg, friendlyOrgs,
