@@ -349,7 +349,7 @@ public class SmartWatchRestController {
     @GET
     @Path(value="getEnterEvents")
     public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @QueryParam(value="contractId") Long contractId, @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="startDate") Long endDateTime){
+            @QueryParam(value="contractId") Long contractId, @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
         JsonEnterEvents result = new JsonEnterEvents();
         Session session = null;
         Transaction transaction = null;
