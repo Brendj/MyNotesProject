@@ -56,12 +56,12 @@ public class GeoplanerService {
 
     private String getGeoplanerURLTransaction() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.geoplaner.sendevents.enterEventsEndPointAddress", TEST_ENDPOINT_ADDRESS);
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.entereventsendpointaddress", TEST_ENDPOINT_ADDRESS);
     }
 
     private String getGeoplanerURLEnterEvents() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentEndPointAddress", TEST_ENDPOINT_ADDRESS);
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentendpointaddress", TEST_ENDPOINT_ADDRESS);
     }
 
     private boolean isDebug() {

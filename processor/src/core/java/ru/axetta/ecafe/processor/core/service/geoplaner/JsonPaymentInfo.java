@@ -9,18 +9,18 @@ import java.util.Date;
 public class JsonPaymentInfo {
     private Long trackerUid;
     private Long trackerId;
-    private Date transactionTime;
+    private Date orderTime;
     private Integer orderType;
-    private Long transactionSum;
+    private Long RSum;
     private String purchasesName;
-    private Integer cardType;
+    private String cardType;
 
-    public Date getTransactionTime() {
-        return transactionTime;
+    public Date getOrderTime() {
+        return orderTime;
     }
 
-    public void setTransactionTime(Date transactionTime) {
-        this.transactionTime = transactionTime;
+    public void setOrderTime(Date orderTime) {
+        this.orderTime = orderTime;
     }
 
     public Integer getOrderType() {
@@ -31,12 +31,12 @@ public class JsonPaymentInfo {
         this.orderType = orderType;
     }
 
-    public Long getTransactionSum() {
-        return transactionSum;
+    public Long getRSum() {
+        return RSum;
     }
 
-    public void setTransactionSum(Long transactionSum) {
-        this.transactionSum = transactionSum;
+    public void setRSum(Long RSum) {
+        this.RSum = RSum;
     }
 
     public String getPurchasesName() {
@@ -63,11 +63,11 @@ public class JsonPaymentInfo {
         this.trackerId = trackerId;
     }
 
-    public Integer getCardType() {
+    public String getCardType() {
         return cardType;
     }
 
-    public void setCardType(Integer cardType) {
+    public void setCardType(String cardType) {
         this.cardType = cardType;
     }
 }

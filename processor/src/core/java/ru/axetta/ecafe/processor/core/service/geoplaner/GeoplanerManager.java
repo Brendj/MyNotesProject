@@ -110,7 +110,7 @@ public class GeoplanerManager {
             logger.error("No found Card by EnterEvent, construction of the message is interrupted");
             return null;
         }
-        info.setCardType(card.getCardType());
+        info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setTrackerId(card.getCardPrintedNo());
         info.setTrackerUid(card.getCardNo());
         info.setEvtDateTime(event.getEvtDateTime());
@@ -122,7 +122,6 @@ public class GeoplanerManager {
         }
         info.setShortAddress(org.getShortAddress());
         info.setShortName(org.getShortName());
-
 
         return info;
     }
@@ -137,10 +136,10 @@ public class GeoplanerManager {
 
         info.setTrackerId(card.getCardPrintedNo());
         info.setTrackerUid(card.getCardNo());
-        info.setCardType(card.getCardType());
-        info.setTransactionTime(payment.getTime());
+        info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
+        info.setOrderTime(payment.getTime());
         info.setOrderType(payment.getOrderType().ordinal());
-        info.setTransactionSum(payment.getRSum());
+        info.setRSum(payment.getRSum());
         String purchasesNames = "";
         for(Purchase pc : payment.getPurchases()){
             purchasesNames += pc.getName() + ";";

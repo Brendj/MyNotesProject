@@ -13,7 +13,7 @@ public class JsonEnterEventInfo {
     private Integer direction;
     private String shortName;
     private String shortAddress;
-    private Integer cardType;
+    private String cardType;
 
     public Date getEvtDateTime() {
         return evtDateTime;
@@ -63,11 +63,11 @@ public class JsonEnterEventInfo {
         this.trackerId = trackerId;
     }
 
-    public Integer getCardType() {
+    public String getCardType() {
         return cardType;
     }
 
-    public void setCardType(Integer cardType) {
+    public void setCardType(String cardType) {
         this.cardType = cardType;
     }
 }

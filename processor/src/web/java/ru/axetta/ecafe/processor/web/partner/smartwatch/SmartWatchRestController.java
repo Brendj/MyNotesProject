@@ -13,14 +13,17 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.JsonEnterEventInfo;
+import ru.axetta.ecafe.processor.core.service.geoplaner.JsonPaymentInfo;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
-import org.hibernate.Query;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -41,14 +44,6 @@ public class SmartWatchRestController {
     private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private boolean debug;
     private final Integer CARD_TYPE_SMARTWATCH = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
-
-    private final int PERIOD_ONE_DAY = 0;
-    private final int PERIOD_THREE_DAYS = 1;
-    private final int PERIOD_ONE_WEEK = 2;
-    private final int PERIOD_TWO_WEEKS = 3;
-    private final int PERIOD_ONE_MONTH = 4;
-    private final int PERIOD_THREE_MONTH = 5;
-    private final int DEFAULT_PERIOD = 0;
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -354,7 +349,7 @@ public class SmartWatchRestController {
     @GET
     @Path(value="getEnterEvents")
     public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @QueryParam(value="contractId") Long contractId, @QueryParam(value="period") Integer period){
+            @QueryParam(value="contractId") Long contractId, @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="startDate") Long endDateTime){
         JsonEnterEvents result = new JsonEnterEvents();
         Session session = null;
         Transaction transaction = null;
@@ -390,11 +385,24 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
             }
 
-            if(period == null){
-                period = DEFAULT_PERIOD;
+            Date startDate;
+            Date endDate;
+
+            if(startDateTime == null){
+                logger.warn("Start date is Null, set as yesterday");
+                startDate = CalendarUtils.addDays(new Date(), -1);
+            } else {
+                startDate = new Date(startDateTime);
             }
-            Date beginDate = calcPeriod(period);
-            List<JsonEnterEventInfo> items = buildEnterEventItem(session, child, beginDate);
+
+            if(endDateTime == null){
+                logger.warn("End date is Null, set as now");
+                endDate = new Date();
+            } else {
+                endDate = new Date(endDateTime);
+            }
+
+            List<JsonEnterEventInfo> items = buildEnterEventItem(session, child, startDate, endDate);
             result.setItems(items);
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
@@ -425,57 +433,153 @@ public class SmartWatchRestController {
         }
     }
 
-    private Date calcPeriod(Integer period) {
-        Date endDay = CalendarUtils.endOfDay(new Date());
-        Date duration = null;
-        switch (period){
-            case PERIOD_ONE_DAY:
-                duration = CalendarUtils.addDays(endDay, -1);
-                break;
-            case PERIOD_THREE_DAYS:
-                duration = CalendarUtils.addDays(endDay, -3);
-                break;
-            case PERIOD_ONE_WEEK:
-                duration = CalendarUtils.addDays(endDay, -7);
-                break;
-            case PERIOD_TWO_WEEKS:
-                duration = CalendarUtils.addDays(endDay, -14);
-                break;
-            case PERIOD_ONE_MONTH:
-                duration = CalendarUtils.addMonth(endDay, -1);
-                break;
-            case PERIOD_THREE_MONTH:
-                duration = CalendarUtils.addMonth(endDay, -3);
-                break;
-            default:
-                logger.warn("Get unknown code of period: " + period
-                        + " set default period as 1 day");
-                duration = CalendarUtils.addDays(endDay, -1);
+    @GET
+    @Path(value="getPurchases")
+    public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
+            @QueryParam(value="contractId") Long contractId,
+            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
+        Session session = null;
+        Transaction transaction = null;
+        JsonPurchases result = new JsonPurchases();
+        try {
+            if (mobilePhone == null || mobilePhone.isEmpty()) {
+                throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
+            }
+
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkAndConvertPhone(mobilePhone);
+            if (!isValidPhoneAndToken(session, mobilePhone, token)) {
+                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
+            }
+            token = "";
+
+            if (contractId == null) {
+                throw new IllegalArgumentException("ContractID is null");
+            }
+
+            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+            if (parent == null) {
+                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
+                        + ", but passed the TokenValidator");
+            }
+
+            Client child = DAOUtils.findClientByContractId(session, contractId);
+            if (child == null) {
+                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            }
+            if (!isRelatives(session, parent, child)) {
+                throw new IllegalArgumentException(
+                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+            }
+
+            Date startDate;
+            Date endDate;
+
+            if(startDateTime == null){
+                logger.warn("Start date is Null, set as yesterday");
+                startDate = CalendarUtils.addDays(new Date(), -1);
+            } else {
+                startDate = new Date(startDateTime);
+            }
+
+            if(endDateTime == null){
+                logger.warn("End date is Null, set as now");
+                endDate = new Date();
+            } else {
+                endDate = new Date(endDateTime);
+            }
+
+            List<JsonPaymentInfo> items = buildPaymentsInfo(session, child, startDate, endDate);
+            result.setItems(items);
+            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
+            result.getResult().description = ResponseCodes.RC_OK.toString();
+
+            transaction.commit();
+            transaction = null;
+
+            return Response.status(HttpURLConnection.HTTP_OK)
+                    .entity(result)
+                    .build();
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get Purchases ", e);
+            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(result)
+                    .build();
+        } catch (Exception e){
+            logger.error("Can't get Purchases  ", e);
+            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(result)
+                    .build();
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
-        return duration;
     }
 
-    private List<JsonEnterEventInfo> buildEnterEventItem(Session session, Client child, Date beginDate) throws Exception{
+    private List<JsonPaymentInfo> buildPaymentsInfo(Session session, Client child, Date startDate, Date endDate) throws Exception{
+        List<JsonPaymentInfo> items = new LinkedList<JsonPaymentInfo>();
+        List<Order> ordersOfClient = null;
+
+        Criteria criteria = session.createCriteria(Order.class);
+        criteria.add(Restrictions.eq("client", child));
+        criteria.add(Restrictions.between("orderDate", startDate, endDate));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("orderDate"));
+
+        ordersOfClient = criteria.list();
+
+        if(ordersOfClient == null || ordersOfClient.isEmpty()){
+            logger.warn("No found Orders of Client contractID: " + child.getContractId());
+            return Collections.emptyList();
+        }
+
+        for(Order o: ordersOfClient){
+            JsonPaymentInfo info = new JsonPaymentInfo();
+            info.setOrderType(o.getOrderType().ordinal());
+            info.setRSum(o.getRSum());
+            info.setOrderTime(o.getOrderDate());
+
+            String purchasesName = "";
+            for(OrderDetail detail: o.getOrderDetails()){
+                purchasesName += detail.getMenuDetailName() + ";";
+            }
+            info.setPurchasesName(purchasesName);
+
+            if(o.getCard() != null){
+                info.setCardType(Card.TYPE_NAMES[o.getCard().getCardType()]);
+                info.setTrackerId(o.getCard().getCardPrintedNo());
+                info.setTrackerUid(o.getCard().getCardNo());
+            }
+            items.add(info);
+        }
+        return items;
+    }
+
+    private List<JsonEnterEventInfo> buildEnterEventItem(Session session, Client child, Date startDate, Date endDate) throws Exception{
         List<JsonEnterEventInfo> items = new LinkedList<JsonEnterEventInfo>();
         List<Long> cardNoOfOwner = new LinkedList<Long>();
         List<EnterEvent> events = null;
-        Date endDate = CalendarUtils.endOfDay(new Date());
 
         for(Card card : child.getCards()){
             cardNoOfOwner.add(card.getCardNo());
         }
 
-        Query query = session.createQuery("from EnterEvent "
-                + " where (client =:client or idOfCard in (:cardNoOfOwner)) "
-                + " and evtDateTime between :beginDate and :endDate");
-        query
-                .setParameter("client", child)
-                .setParameter("beginDate", beginDate)
-                .setParameter("endDate", endDate)
-                .setParameterList("cardNoOfOwner", cardNoOfOwner);
-        events = query.list();
-        if(events == null){
-            throw new Exception("Not found event for client contractID: " + child.getContractId());
+        Criteria criteria = session.createCriteria(EnterEvent.class);
+        Criterion cardNoRestriction = Restrictions.in("idOfCard", cardNoOfOwner);
+        Criterion clientRestriction = Restrictions.eq("client", child);
+        criteria.add(Restrictions.or(cardNoRestriction, clientRestriction));
+        criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("evtDateTime"));
+
+        events = criteria.list();
+        if(events == null || events.isEmpty()){
+            logger.warn("Not found event for client contractID: " + child.getContractId());
+            return Collections.emptyList();
         }
 
         for(EnterEvent event : events){
@@ -488,7 +592,7 @@ public class SmartWatchRestController {
             if(event.getIdOfCard() != null){
                 Card card = findClientCardByCardNo(child.getCards(), event.getIdOfCard());
                 if(card != null) {
-                    info.setCardType(card.getCardType());
+                    info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
                     info.setTrackerId(card.getCardPrintedNo());
                 }
             }
@@ -664,5 +768,4 @@ public class SmartWatchRestController {
             throw e;
         }
     }
-
 }
