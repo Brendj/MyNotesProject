@@ -158,7 +158,7 @@
 							<textFieldExpression><![CDATA["<font size=\"5\">Товар</font>"]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="e6acfcff-3fa4-4c53-9568-a19131f91cf3" mode="Opaque" x="300" y="0" width="140" height="24"/>
+							<reportElement uuid="e6acfcff-3fa4-4c53-9568-a19131f91cf3" style="table" mode="Opaque" x="300" y="0" width="140" height="24"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
 								<font size="12" isBold="true"/>
 							</textElement>
@@ -185,7 +185,7 @@
 						<cellContents/>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents>
+						<cellContents style="table">
 							<textField>
 								<reportElement uuid="4675ad94-88eb-4875-a2bc-0831e27026a9" mode="Opaque" x="0" y="0" width="300" height="24"/>
 								<box leftPadding="10"/>
@@ -213,9 +213,9 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents backcolor="#99CCFF" mode="Opaque" style="style2">
+						<cellContents backcolor="#99CCFF" mode="Opaque" style="table">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement uuid="f25ffeb0-d0ba-4c96-a6cb-c6bf252b0ced" style="Crosstab Data Text" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="300" height="24" backcolor="#99CCFF"/>
+								<reportElement uuid="f25ffeb0-d0ba-4c96-a6cb-c6bf252b0ced" style="table" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="300" height="24" backcolor="#99CCFF"/>
 								<box leftPadding="4"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle" markup="html">
 									<font size="12"/>
@@ -231,7 +231,7 @@
 						<bucketExpression><![CDATA[$F{goodsCode}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents style="table">
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="d7d6d032-060f-40a5-85ba-d031d6638920" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="140" height="24"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
@@ -242,7 +242,15 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents style="table">
+							<textField>
+								<reportElement uuid="e6acfcff-3fa4-4c53-9568-a19131f91cf3" mode="Opaque" x="0" y="0" width="140" height="0"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA["<font size=\"5\">Код товара</font>"]]></textFieldExpression>
+							</textField>
+						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="doneDate" height="0">
