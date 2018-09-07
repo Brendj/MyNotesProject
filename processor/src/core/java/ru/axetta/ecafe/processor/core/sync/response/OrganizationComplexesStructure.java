@@ -57,7 +57,6 @@ public class OrganizationComplexesStructure implements AbstractToElement{
     }
 
     public void fillComplexesStructureAndApplyChanges(Session session, Long idOfOrg, Long maxVersion, Integer menuSyncCountDays, Integer menuSyncCountDaysInPast) {
-        if (menuSyncCountDays == null && menuSyncCountDaysInPast == null) return;
         providerComplexesList.clear();
         Org org = (Org) session.load(Org.class, idOfOrg);
         Set<Org> friendlyOrgs = org.getFriendlyOrg();
@@ -72,7 +71,8 @@ public class OrganizationComplexesStructure implements AbstractToElement{
                     configurationProvider.setMenuSyncCountDays(menuSyncCountDays);
                 if (menuSyncCountDaysInPast != null)
                     configurationProvider.setMenuSyncCountDaysInPast(menuSyncCountDaysInPast);
-                ConfigurationProviderService.updateWithVersion(session, configurationProvider);
+                if (menuSyncCountDays != null || menuSyncCountDaysInPast != null)
+                    ConfigurationProviderService.updateWithVersion(session, configurationProvider);
             }
             ProviderComplexesItem providerComplexesItem = createProviderComplexesItem(session, idOfOrg, friendlyOrgs,
                     configurationProvider);
