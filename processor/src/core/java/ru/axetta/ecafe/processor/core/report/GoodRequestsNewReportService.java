@@ -340,10 +340,10 @@ public class GoodRequestsNewReportService {
                 feedingPlanType = complexOrgDictionary.get(position.getOrgOwner()).goodInfos
                         .get(good.getGlobalId()).feedingPlanType;
             } else {
-                return;
+                feedingPlanType = FeedingPlanType.PAY_PLAN;
             }
         } else {
-            return;
+            feedingPlanType = FeedingPlanType.PAY_PLAN;
         }
         String name = good.getFullName();
         if (StringUtils.isEmpty(name)) {
@@ -603,7 +603,7 @@ public class GoodRequestsNewReportService {
                 Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue, int hideLastValue,
                 FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode) {
             this(item, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount, newDailySample, newTempClients,
-                    hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, 1L, goodsCode);
+                    hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, 0L, goodsCode);
 
         }
 
