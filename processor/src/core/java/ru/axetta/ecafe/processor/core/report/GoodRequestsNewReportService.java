@@ -541,7 +541,7 @@ public class GoodRequestsNewReportService {
                 String goodsCode) {
             this(orgNum, officialName, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount,
                     newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark,
-                    1L, idOfOrg, address, goodsCode);
+                    0L, idOfOrg, address, goodsCode);
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
