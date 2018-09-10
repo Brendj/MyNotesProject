@@ -12,7 +12,7 @@ import java.util.List;
 
 public class JsonPurchases {
     private Result result;
-    private List<JsonPaymentInfo> items;
+    private List<JsonOrder> items;
 
     public JsonPurchases(){
         this.result = new Result();
@@ -26,14 +26,14 @@ public class JsonPurchases {
         this.result = result;
     }
 
-    public List<JsonPaymentInfo> getItems() {
+    public List<JsonOrder> getItems() {
         if(this.items == null){
-            this.items = new LinkedList<JsonPaymentInfo>();
+            this.items = new LinkedList<JsonOrder>();
         }
         return items;
     }
 
-    public void setItems(List<JsonPaymentInfo> items) {
+    public void setItems(List<JsonOrder> items) {
         this.items = items;
     }
 }

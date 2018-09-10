@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.geoplaner.JsonEnterEventInfo;
 import ru.axetta.ecafe.processor.core.service.geoplaner.JsonPaymentInfo;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -114,7 +113,7 @@ public class SmartWatchRestController {
         } catch (Exception e){
             logger.error("Can't generate or send token :", e);
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build();
@@ -172,7 +171,7 @@ public class SmartWatchRestController {
         } catch (Exception e){
             logger.error("Can't get List Of Children's", e);
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build();
@@ -274,7 +273,7 @@ public class SmartWatchRestController {
         } catch (Exception e){
             logger.error("Can't registry SmartWatch ", e);
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build();
@@ -336,7 +335,7 @@ public class SmartWatchRestController {
         } catch (Exception e){
             logger.error("Can't block SmartWatch", e);
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build();
@@ -348,20 +347,17 @@ public class SmartWatchRestController {
 
     @GET
     @Path(value="getEnterEvents")
-    public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @QueryParam(value="contractId") Long contractId, @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
+    public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
+            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
         JsonEnterEvents result = new JsonEnterEvents();
         Session session = null;
         Transaction transaction = null;
         try{
-            if(mobilePhone == null || mobilePhone.isEmpty()){
-                throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
-            }
-
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
+            /*mobilePhone = checkAndConvertPhone(mobilePhone);
             if(!isValidPhoneAndToken(session, mobilePhone, token)){
                 throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
             }
@@ -375,34 +371,34 @@ public class SmartWatchRestController {
             if(parent == null){
                 throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                         + ", but passed the TokenValidator");
-            }
+            }*/
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if(child == null){
                 throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
+            }/*
             if(!isRelatives(session, parent, child)){
                 throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            }*/
 
             Date startDate;
             Date endDate;
 
             if(startDateTime == null){
                 logger.warn("Start date is Null, set as yesterday");
-                startDate = CalendarUtils.addDays(new Date(), -1);
+                startDate = CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1));
             } else {
-                startDate = new Date(startDateTime);
+                startDate = CalendarUtils.startOfDay(new Date(startDateTime));
             }
 
             if(endDateTime == null){
                 logger.warn("End date is Null, set as now");
-                endDate = new Date();
+                endDate = CalendarUtils.endOfDay(new Date());
             } else {
-                endDate = new Date(endDateTime);
+                endDate = CalendarUtils.endOfDay(new Date(endDateTime));
             }
 
-            List<JsonEnterEventInfo> items = buildEnterEventItem(session, child, startDate, endDate);
+            List<JsonEnterEventItem> items = buildEnterEventItem(session, child, startDate, endDate);
             result.setItems(items);
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
@@ -423,7 +419,7 @@ public class SmartWatchRestController {
         } catch (Exception e){
             logger.error("Can't get EnterEvents ", e);
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build();
@@ -435,21 +431,17 @@ public class SmartWatchRestController {
 
     @GET
     @Path(value="getPurchases")
-    public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone, @QueryParam(value="token") String token,
-            @QueryParam(value="contractId") Long contractId,
+    public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
             @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
         Session session = null;
         Transaction transaction = null;
         JsonPurchases result = new JsonPurchases();
         try {
-            if (mobilePhone == null || mobilePhone.isEmpty()) {
-                throw new IllegalArgumentException("Invalid mobilePhone number: is null or is empty");
-            }
-
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
+           /* mobilePhone = checkAndConvertPhone(mobilePhone);
             if (!isValidPhoneAndToken(session, mobilePhone, token)) {
                 throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
             }
@@ -463,35 +455,35 @@ public class SmartWatchRestController {
             if (parent == null) {
                 throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                         + ", but passed the TokenValidator");
-            }
+            }*/
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if (child == null) {
                 throw new IllegalArgumentException("No clients found by contractID: " + contractId);
             }
-            if (!isRelatives(session, parent, child)) {
+            /*if (!isRelatives(session, parent, child)) {
                 throw new IllegalArgumentException(
                         "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            }*/
 
             Date startDate;
             Date endDate;
 
             if(startDateTime == null){
                 logger.warn("Start date is Null, set as yesterday");
-                startDate = CalendarUtils.addDays(new Date(), -1);
+                startDate = CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1));
             } else {
-                startDate = new Date(startDateTime);
+                startDate = CalendarUtils.startOfDay(new Date(startDateTime));
             }
 
             if(endDateTime == null){
                 logger.warn("End date is Null, set as now");
-                endDate = new Date();
+                endDate = CalendarUtils.endOfDay(new Date());
             } else {
-                endDate = new Date(endDateTime);
+                endDate = CalendarUtils.endOfDay(new Date(endDateTime));
             }
 
-            List<JsonPaymentInfo> items = buildPaymentsInfo(session, child, startDate, endDate);
+            List<JsonOrder> items = buildPaymentsInfo(session, child, startDate, endDate);
             result.setItems(items);
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
@@ -512,7 +504,7 @@ public class SmartWatchRestController {
         } catch (Exception e){
             logger.error("Can't get Purchases  ", e);
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
                     .entity(result)
                     .build();
@@ -522,8 +514,8 @@ public class SmartWatchRestController {
         }
     }
 
-    private List<JsonPaymentInfo> buildPaymentsInfo(Session session, Client child, Date startDate, Date endDate) throws Exception{
-        List<JsonPaymentInfo> items = new LinkedList<JsonPaymentInfo>();
+    private List<JsonOrder> buildPaymentsInfo(Session session, Client child, Date startDate, Date endDate) throws Exception{
+        List<JsonOrder> items = new LinkedList<JsonOrder>();
         List<Order> ordersOfClient = null;
 
         Criteria criteria = session.createCriteria(Order.class);
@@ -539,29 +531,38 @@ public class SmartWatchRestController {
         }
 
         for(Order o: ordersOfClient){
-            JsonPaymentInfo info = new JsonPaymentInfo();
-            info.setOrderType(o.getOrderType().ordinal());
-            info.setRSum(o.getRSum());
-            info.setOrderTime(o.getOrderDate());
-
-            String purchasesName = "";
-            for(OrderDetail detail: o.getOrderDetails()){
-                purchasesName += detail.getMenuDetailName() + ";";
+            JsonOrder item = new JsonOrder();
+            item.setOrderDate(o.getOrderDate());
+            if(o.getTransaction() != null){
+                item.setTransactionType(o.getTransaction().getSourceTypeAsString());
             }
-            info.setPurchasesName(purchasesName);
-
+            item.setOrderType(o.getOrderType().toString());
+            item.setrSum(o.getRSum());
+            item.setSocDiscount(o.getSocDiscount());
+            item.setTrdDiscount(o.getTrdDiscount());
+            item.setGrantSum(o.getGrantSum());
+            item.setSumByCard(o.getSumByCard());
+            item.setSumByCash(o.getSumByCash());
             if(o.getCard() != null){
-                info.setCardType(Card.TYPE_NAMES[o.getCard().getCardType()]);
-                info.setTrackerId(o.getCard().getCardPrintedNo());
-                info.setTrackerUid(o.getCard().getCardNo());
+                item.setCardType(Card.TYPE_NAMES[o.getCard().getCardType()]);
             }
-            items.add(info);
+            if(o.getClient() != null){
+                item.setClient(o.getClient().getPerson().getFullName());
+            }
+            for(OrderDetail detail : o.getOrderDetails()){
+                JsonOrderDetail jsonOrderDetail = new JsonOrderDetail();
+                jsonOrderDetail.setGoodName(detail.getMenuDetailName());
+                jsonOrderDetail.setrPrice(detail.getRPrice());
+                jsonOrderDetail.setQty(detail.getQty());
+                item.getOrderDetails().add(jsonOrderDetail);
+            }
+            items.add(item);
         }
         return items;
     }
 
-    private List<JsonEnterEventInfo> buildEnterEventItem(Session session, Client child, Date startDate, Date endDate) throws Exception{
-        List<JsonEnterEventInfo> items = new LinkedList<JsonEnterEventInfo>();
+    private List<JsonEnterEventItem> buildEnterEventItem(Session session, Client child, Date startDate, Date endDate) throws Exception{
+        List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
         List<Long> cardNoOfOwner = new LinkedList<Long>();
         List<EnterEvent> events = null;
 
@@ -583,20 +584,19 @@ public class SmartWatchRestController {
         }
 
         for(EnterEvent event : events){
-            JsonEnterEventInfo info = new JsonEnterEventInfo();
-            info.setTrackerUid(event.getIdOfCard());
-            info.setDirection(event.getPassDirection());
-            info.setEvtDateTime(event.getEvtDateTime());
-            info.setShortAddress(event.getOrg().getShortAddress());
-            info.setShortName(event.getOrg().getShortName());
+            JsonEnterEventItem item = new JsonEnterEventItem();
+            item.setDirection(event.getPassDirection());
+            item.setEvtDateTime(event.getEvtDateTime());
             if(event.getIdOfCard() != null){
                 Card card = findClientCardByCardNo(child.getCards(), event.getIdOfCard());
                 if(card != null) {
-                    info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
-                    info.setTrackerId(card.getCardPrintedNo());
+                    item.setCardType(Card.TYPE_NAMES[card.getCardType()]);
                 }
             }
-            items.add(info);
+            if(event.getClient() != null){
+                item.setClient(child.getPerson().getFullName());
+            }
+            items.add(item);
         }
         return items;
     }
@@ -695,7 +695,7 @@ public class SmartWatchRestController {
             List<ClientGuardian> childrens = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, client.getIdOfClient());
             for(ClientGuardian el : childrens){
                 Client child = (Client) session.get(Client.class, el.getIdOfChildren());
-                List<Card> cardList = new LinkedList<Card>(child.getCards());
+                Card card = DAOUtils.getLastCardByClient(session, client);
                 JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
                 item.setContractID(child.getContractId());
                 if(child.getPerson() != null) {
@@ -704,16 +704,13 @@ public class SmartWatchRestController {
                     item.setSurName(child.getPerson().getSurname());
                 }
                 item.setGroupName(child.getClientGroup().getGroupName());
-                for(Card card : cardList){
-                    if(Card.TYPE_NAMES[card.getCardType()].equals("Часы (Mifare)")) {
-                        JsonSmartWatchInfo info = new JsonSmartWatchInfo();
-                            info.setTrackerId(card.getCardPrintedNo());
-                            info.setTrackerUid(card.getCardNo());
-                            info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
-                            info.setState(this.cardState.get(card.getState()));
-                            item.getSmartWatchInfoList().add(info);
-                    }
-                }
+                JsonCardInfo info = new JsonCardInfo();
+                info.setCardPrintedNo(card.getCardPrintedNo());
+                info.setCardNo(card.getCardNo());
+                info.setCardType(card.getCardType());
+                info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
+                info.setState(this.cardState.get(card.getState()));
+                item.setCardInfo(info);
                 resultList.add(item);
             }
             return resultList;
