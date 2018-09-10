@@ -3030,12 +3030,11 @@ public class DAOUtils {
 
     public static List<PreorderComplex> getPreorderComplexForOrgSinceVersion(Session session,
             long orgOwner, long version) throws Exception {
-        Criteria criteria = session.createCriteria(PreorderComplex.class);
-        Org org = (Org) session.load(Org.class, orgOwner);
-        criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.org", org));
-        criteria.add(Restrictions.gt("version", version));
-        return criteria.list();
+        Query query = session.createQuery("select pc from PreorderComplex pc "
+                + "where pc.version > :version and (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg))");
+        query.setParameter("version", version);
+        query.setParameter("idOfOrg", orgOwner);
+        return query.list();
     }
 
     public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,

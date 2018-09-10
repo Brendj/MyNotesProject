@@ -846,6 +846,7 @@ public class PreorderDAOService {
         preorderComplex.setCreatedDate(new Date());
         preorderComplex.setLastUpdate(new Date());
         preorderComplex.setState(PreorderState.OK);
+        preorderComplex.setIdOfOrgOnCreate(client.getOrg().getIdOfOrg());
         if (ci == null) ci = getComplexInfo(client, idOfComplex, date);
         if (ci != null) {
             preorderComplex.setComplexName(ci.getComplexName());
@@ -859,9 +860,9 @@ public class PreorderDAOService {
     }
 
     private boolean preorderMenuDetailExists(PreorderComplex preorderComplex, Client client, Date date, Long idOfMenu) {
-        Query query = em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd where pmd.preorderComplex = :preorderComplex "
+        Query query = em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd where pmd.preorderComplex.idOfPreorderComplex = :preorderComplex "
                 + "and pmd.client = :client and pmd.preorderDate = :preorderDate and pmd.armIdOfMenu = :idOfMenu");
-        query.setParameter("preorderComplex", preorderComplex);
+        query.setParameter("preorderComplex", preorderComplex.getIdOfPreorderComplex());
         query.setParameter("client", client);
         query.setParameter("preorderDate", date);
         query.setParameter("idOfMenu", idOfMenu);

@@ -39,6 +39,7 @@ public class PreorderComplex {
     private RegularPreorder regularPreorder;
     private Integer modeOfAdd;
     private Integer modeFree;
+    private Long idOfOrgOnCreate;
 
     public static Integer getDaysOfRegularPreorders() {
         return Integer.parseInt(RuntimeContext
@@ -247,5 +248,13 @@ public class PreorderComplex {
 
     public void setModeFree(Integer modeFree) {
         this.modeFree = modeFree;
+    }
+
+    public Long getIdOfOrgOnCreate() {
+        return idOfOrgOnCreate;
+    }
+
+    public void setIdOfOrgOnCreate(Long idOfOrgOnCreate) {
+        this.idOfOrgOnCreate = idOfOrgOnCreate;
     }
 }
