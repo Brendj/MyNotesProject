@@ -4851,7 +4851,7 @@ public class Processor implements SyncProcessor {
         Date endDate = CalendarUtils.endOfDay(menuDate);
         Date now = new Date();
 
-        Query query = persistenceSession.createQuery("select rp from RegularPreorder rp where rp.client.org = :org and rp.startDate <= :date "
+        Query query = persistenceSession.createQuery("select rp from RegularPreorder rp where rp.client.org = :org "
                 + "and rp.endDate >= :date and rp.deletedState = false");
         query.setParameter("org", organization);
         query.setParameter("date", menuDate);
