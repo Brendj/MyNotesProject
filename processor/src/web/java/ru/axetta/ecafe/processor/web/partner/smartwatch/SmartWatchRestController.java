@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.geoplaner.JsonPaymentInfo;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
@@ -357,7 +356,7 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            /*mobilePhone = checkAndConvertPhone(mobilePhone);
+            mobilePhone = checkAndConvertPhone(mobilePhone);
             if(!isValidPhoneAndToken(session, mobilePhone, token)){
                 throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
             }
@@ -371,15 +370,15 @@ public class SmartWatchRestController {
             if(parent == null){
                 throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                         + ", but passed the TokenValidator");
-            }*/
+            }
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if(child == null){
                 throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }/*
+            }
             if(!isRelatives(session, parent, child)){
                 throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }*/
+            }
 
             Date startDate;
             Date endDate;
@@ -441,7 +440,7 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-           /* mobilePhone = checkAndConvertPhone(mobilePhone);
+            mobilePhone = checkAndConvertPhone(mobilePhone);
             if (!isValidPhoneAndToken(session, mobilePhone, token)) {
                 throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
             }
@@ -455,16 +454,16 @@ public class SmartWatchRestController {
             if (parent == null) {
                 throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                         + ", but passed the TokenValidator");
-            }*/
+            }
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if (child == null) {
                 throw new IllegalArgumentException("No clients found by contractID: " + contractId);
             }
-            /*if (!isRelatives(session, parent, child)) {
+            if (!isRelatives(session, parent, child)) {
                 throw new IllegalArgumentException(
                         "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }*/
+            }
 
             Date startDate;
             Date endDate;
@@ -707,7 +706,7 @@ public class SmartWatchRestController {
                 JsonCardInfo info = new JsonCardInfo();
                 info.setCardPrintedNo(card.getCardPrintedNo());
                 info.setCardNo(card.getCardNo());
-                info.setCardType(card.getCardType());
+                info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
                 info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
                 info.setState(this.cardState.get(card.getState()));
                 item.setCardInfo(info);

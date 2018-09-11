@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.smartwatch;
 public class JsonCardInfo {
     private Long cardPrintedNo;
     private Long cardNo;
-    private Integer cardType;
+    private String cardType;
     private String state;
     private String lifeState;
 
@@ -27,11 +27,11 @@ public class JsonCardInfo {
         this.cardNo = trackerUid;
     }
 
-    public Integer getCardType() {
+    public String getCardType() {
         return cardType;
     }
 
-    public void setCardType(Integer cardType) {
+    public void setCardType(String cardType) {
         this.cardType = cardType;
     }
 
