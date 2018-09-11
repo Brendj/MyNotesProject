@@ -6,9 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -21,9 +19,9 @@ public class PreOrderFeedingDetail {
     private final Long price;
     private final String itemCode;
 
-    public PreOrderFeedingDetail(Session session, PreorderMenuDetail menuDetail, Integer complexId, String guid) {
+    public PreOrderFeedingDetail(PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getArmIdOfMenu();
-        this.name = DAOUtils.getPreorderMenuDetailName(session, menuDetail); // menuDetail.getMenuDetail().getMenuDetailName();
+        this.name = menuDetail.getMenuDetailName(); //DAOUtils.getPreorderMenuDetailName(session, menuDetail);
         this.qty = menuDetail.getAmount();
         this.complexId = complexId;
         this.guid = guid;
@@ -31,9 +29,9 @@ public class PreOrderFeedingDetail {
         this.itemCode = menuDetail.getItemCode();
     }
 
-    public PreOrderFeedingDetail(Session session, PreorderComplex complex) {
+    public PreOrderFeedingDetail(PreorderComplex complex) {
         this.complexId = complex.getArmComplexId();
-        this.name = DAOUtils.getPreorderComplexName(session, complex); // complex.getComplexInfo().getComplexName();
+        this.name = complex.getComplexName(); //DAOUtils.getPreorderComplexName(session, complex);
         this.qty = complex.getAmount();
         this.idOfMenu = null;
         this.guid = complex.getGuid();

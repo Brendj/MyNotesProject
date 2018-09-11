@@ -32,15 +32,15 @@ public class PreOrdersFeedingItem {
         this.dateStart = preorderComplex.getPreorderDate();
         this.version = preorderComplex.getVersion();
         this.isDeleted = preorderComplex.getDeletedState();
-        this.idOfOrg = preorderComplex.getClient().getOrg().getIdOfOrg();
+        this.idOfOrg = preorderComplex.getIdOfOrgOnCreate() == null ? preorderComplex.getClient().getOrg().getIdOfOrg() : preorderComplex.getIdOfOrgOnCreate();
         this.createdDate = preorderComplex.getCreatedDate();
         this.lastUpdate = preorderComplex.getLastUpdate();
 
-        PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(session, preorderComplex);
+        PreOrderFeedingDetail feedingDetail = new PreOrderFeedingDetail(preorderComplex);
         this.preOrderFeedingDetailList.add(feedingDetail);
 
         for (PreorderMenuDetail menuDetail : preorderComplex.getPreorderMenuDetails()) {
-            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(session, menuDetail,
+            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(menuDetail,
                     preorderComplex.getArmComplexId(), preorderComplex.getGuid());
             this.preOrderFeedingDetailList.add(preOrderFeedingDetail);
         }
