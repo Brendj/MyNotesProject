@@ -67,18 +67,22 @@ public class PreorderComplex {
     }
 
     public void deleteBySupplier(Long nextVersion, boolean doDelete) {
-        this.version = nextVersion;
-        this.deletedState = doDelete;
-        if (doDelete) this.amount = 0;
-        this.state = PreorderState.DELETED;
-        this.lastUpdate = new Date();
+        doDelete(nextVersion, doDelete, PreorderState.DELETED);
     }
 
     public void changeBySupplier(Long nextVersion, boolean doDelete) {
+        doDelete(nextVersion, doDelete, PreorderState.CHANGED_PRICE);
+    }
+
+    public void deleteByChangeOrg(Long nextVersion, boolean doDelete) {
+        doDelete(nextVersion, doDelete, PreorderState.CHANGE_ORG);
+    }
+
+    private void doDelete(Long nextVersion, boolean doDelete, PreorderState state) {
         this.version = nextVersion;
         this.deletedState = doDelete;
         if (doDelete) this.amount = 0;
-        this.state = PreorderState.CHANGED_PRICE;
+        this.state = state;
         this.lastUpdate = new Date();
     }
 

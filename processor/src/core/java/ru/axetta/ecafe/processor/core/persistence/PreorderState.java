@@ -8,7 +8,8 @@ public enum PreorderState {
     /*0*/ OK("ОК"),
     /*1*/ DELETED("Удалено поставщиком"),
     /*2*/ CHANGED_PRICE("Изменение цены у поставщика"),
-    /*3*/ NOT_ENOUGH_BALANCE("Недостаточно средств на балансе л/с");
+    /*3*/ NOT_ENOUGH_BALANCE("Недостаточно средств на балансе л/с"),
+    /*4*/ CHANGE_ORG("Перевод в другую ОО");
 
     private final String description;
 

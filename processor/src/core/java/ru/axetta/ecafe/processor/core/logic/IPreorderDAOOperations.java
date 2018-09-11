@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.PreorderState;
 import ru.axetta.ecafe.processor.core.persistence.RegularPreorder;
 
@@ -15,4 +16,5 @@ import org.hibernate.Session;
 public interface IPreorderDAOOperations {
     void deleteRegularPreorder(Session session, RegularPreorder regularPreorder, PreorderState preorderState) throws Exception;
     void generatePreordersBySchedule();
+    void deletePreordersByClient(Client client);
 }

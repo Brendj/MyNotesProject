@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Li
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 
 import org.apache.commons.codec.binary.Base64;
@@ -451,6 +452,9 @@ public class Client {
     }
 
     public void setOrg(Org org) {
+        if (this.org != null && org != null && !this.org.equals(org)) {
+            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().deletePreordersByClient(this);
+        }
         this.org = org;
     }
 

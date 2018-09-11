@@ -73,6 +73,11 @@ public class PreorderDAOService {
             public void generatePreordersBySchedule() {
                 generatePreordersByScheduleInternal();
             }
+
+            @Override
+            public void deletePreordersByClient(Client client) {
+                deletePreordersByClientInternal(client);
+            }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
     }
@@ -1341,6 +1346,42 @@ public class PreorderDAOService {
         query.setParameter("idOfChildren", child.getIdOfClient());
         query.setParameter("guardianMobile", guardianMobile);
         return query.getResultList();
+    }
+
+    public void deletePreordersByClientInternal(Client client) {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).deletePreordersByClient(client);
+        } catch (Exception e) {
+            logger.error("Error in deleting preorders by client: ", e);
+        }
+    }
+
+    @Transactional
+    public void deletePreordersByClient(Client client) {
+        Query query = em.createQuery("select pc from PreorderComplex pc where pc.client = :client and pc.preorderDate > :date and pc.deletedState = false");
+        query.setParameter("client", client);
+        query.setParameter("date", new Date());
+        List<PreorderComplex> list = query.getResultList();
+        if (list.size() == 0) return;
+        Integer days = DAOUtils.getPreorderFeedingForbiddenDays(client.getOrg().getIdOfOrg());
+        if (days != null) days++;
+        else {
+            days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
+        }
+        Date dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), days));
+        long nextVersion = nextVersionByPreorderComplex();
+        for (PreorderComplex preorderComplex : list) {
+            preorderComplex.deleteByChangeOrg(nextVersion, preorderComplex.getPreorderDate().after(dateFrom));
+            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                preorderMenuDetail.deleteByChangeOrg(nextVersion, preorderComplex.getPreorderDate().after(dateFrom));
+                em.merge(preorderMenuDetail);
+            }
+            em.merge(preorderComplex);
+        }
+        query = em.createQuery("update RegularPreorder set deletedState = true, lastUpdate = :date where client = :client and endDate > :date");
+        query.setParameter("date", new Date());
+        query.setParameter("client", client);
+        query.executeUpdate();
     }
 
     @Transactional
