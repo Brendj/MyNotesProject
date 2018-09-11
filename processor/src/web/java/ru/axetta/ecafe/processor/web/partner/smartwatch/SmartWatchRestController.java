@@ -113,7 +113,7 @@ public class SmartWatchRestController {
             logger.error("Can't generate or send token :", e);
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build();
         } finally {
@@ -171,7 +171,7 @@ public class SmartWatchRestController {
             logger.error("Can't get List Of Children's", e);
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build();
         } finally {
@@ -273,7 +273,7 @@ public class SmartWatchRestController {
             logger.error("Can't registry SmartWatch ", e);
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build();
         } finally {
@@ -335,7 +335,7 @@ public class SmartWatchRestController {
             logger.error("Can't block SmartWatch", e);
             result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build();
         } finally {
@@ -419,7 +419,7 @@ public class SmartWatchRestController {
             logger.error("Can't get EnterEvents ", e);
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build();
         } finally{
@@ -504,13 +504,90 @@ public class SmartWatchRestController {
             logger.error("Can't get Purchases  ", e);
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
                     .entity(result)
                     .build();
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    @GET
+    @Path(value="getBalance")
+    public Response getBalance(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId) {
+        JsonBalance result = new JsonBalance();
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkAndConvertPhone(mobilePhone);
+            if (!isValidPhoneAndToken(session, mobilePhone, token)) {
+                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
+            }
+            token = "";
+
+            if (contractId == null) {
+                throw new IllegalArgumentException("ContractID is null");
+            }
+
+            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+            if (parent == null) {
+                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
+                        + ", but passed the TokenValidator");
+            }
+
+            Client child = DAOUtils.findClientByContractId(session, contractId);
+            if (child == null) {
+                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            }
+            if (!isRelatives(session, parent, child)) {
+                throw new IllegalArgumentException(
+                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+            }
+
+            JsonBalanceInfo info = buildBalanceInfo(session, child);
+            result.setBalanceInfo(info);
+
+            transaction.commit();
+            transaction = null;
+
+            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
+            result.getResult().description = ResponseCodes.RC_OK.toString();
+
+            return Response.status(HttpURLConnection.HTTP_OK)
+                    .entity(result)
+                    .build();
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get Balance ", e);
+            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(result)
+                    .build();
+        } catch (Exception e){
+            logger.error("Can't get Balance ", e);
+            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .entity(result)
+                    .build();
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private JsonBalanceInfo buildBalanceInfo(Session session, Client child) throws Exception {
+        JsonBalanceInfo info = new JsonBalanceInfo();
+        if(child.getBalance() != null){
+            info.setTotalBalance(child.getBalance());
+        }
+        //TODO Подсчет резерва на предзаказы и возвраты
+        return info;
     }
 
     private List<JsonOrder> buildPaymentsInfo(Session session, Client child, Date startDate, Date endDate) throws Exception{
@@ -688,13 +765,13 @@ public class SmartWatchRestController {
         return false;
     }
 
-    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, Client client) throws Exception{
+    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, Client guardian) throws Exception{
         List<JsonChildrenDataInfoItem> resultList = new LinkedList<JsonChildrenDataInfoItem>();
         try{
-            List<ClientGuardian> childrens = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, client.getIdOfClient());
+            List<ClientGuardian> childrens = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardian.getIdOfClient());
             for(ClientGuardian el : childrens){
                 Client child = (Client) session.get(Client.class, el.getIdOfChildren());
-                Card card = DAOUtils.getLastCardByClient(session, client);
+                Card card = DAOUtils.getLastCardByClient(session, child);
                 JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
                 item.setContractID(child.getContractId());
                 if(child.getPerson() != null) {
