@@ -332,13 +332,13 @@ public class PreorderDAOService {
         } else {
             query = emReport.createNativeQuery("select cast(-1 as bigint) as idofmenudetail, pmd.amount, pmd.idofregularpreorder, pmd.state, "
                     + "cast(0 as integer) as dailysale, pmd.idofpreordermenudetail "
-                    + "from cf_preorder_menudetail pmd where pmd.idofpreordercomplex = :idOfPreorderComplex and pmd.deletedState = 0 "
+                    + "from cf_preorder_menudetail pmd where pmd.idofpreordercomplex = :idOfPreorderComplex and pmd.deletedState = 0 and pmd.amount > 0 "
                     + "union "
                     + "select md.idofmenudetail, null, null, null, g.dailysale, null from cf_menudetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
                     + "JOIN CF_Goods g ON md.IdOfGood = g.IdOfGood "
                     + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo and md.itemcode is not null and md.itemcode <> ''"
                     + "and not exists (select idofpreordermenudetail from cf_preorder_menudetail pmd2 "
-                    + "where pmd2.armidofmenu = md.localidofmenu and pmd2.preorderdate between :startDate AND :endDate and pmd2.idofclient = :idOfClient and pmd2.deletedstate = 0) ");
+                    + "where pmd2.armidofmenu = md.localidofmenu and pmd2.preorderdate between :startDate AND :endDate and pmd2.idofclient = :idOfClient and pmd2.deletedstate = 0 and pmd2.amount > 0) ");
             query.setParameter("idOfPreorderComplex", idOfPreorderComplex);
             query.setParameter("idOfComplexInfo", idOfComplexInfo);
             query.setParameter("idOfClient", idOfClient);
