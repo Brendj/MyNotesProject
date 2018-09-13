@@ -643,7 +643,7 @@ public class PreorderDAOService {
         delQuery.executeUpdate();
 
         delQuery = session.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0, state = :state "
-                + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
+                + "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex where regularPreorder = :regularPreorder) and preorderDate > :dateFrom");
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
         delQuery.setParameter("state", state);

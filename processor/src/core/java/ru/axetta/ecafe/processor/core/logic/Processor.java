@@ -4857,22 +4857,25 @@ public class Processor implements SyncProcessor {
         query.setParameter("date", menuDate);
         List<RegularPreorder> rpList = query.list();
         for (RegularPreorder regularPreorder : rpList) {
-            boolean found = false;
             if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
                 //заказ на блюдо
                 SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
                 Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
                 while (reqMenuDetails.hasNext()) {
                     SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-                    if (regularPreorder.getPrice().equals(reqMenuDetail.getPrice())
-                            && equalsNullSafe(regularPreorder.getItemCode(), reqMenuDetail.getItemCode())) { //ищем по цене и коду товара
+                    if (equalsNullSafe(regularPreorder.getItemCode(), reqMenuDetail.getItemCode())) { //ищем по цене и коду товара
                         reqMenuDetailMatch = reqMenuDetail;
-                        break;
+                        if (regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) { //проверяем на цену отдельно, т.к. в меню могут быть несколько позиций с одинаковым itemCode
+                            break;
+                        }
                     }
                 }
                 if (reqMenuDetailMatch == null) {
                     RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
                             .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
+                } else if(!regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) {
+                    RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                            .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
                 }
             } else {
                 //заказ на комплекс
@@ -4936,7 +4939,9 @@ public class Processor implements SyncProcessor {
                         && equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
                     found = true;
                     reqMenuDetailMatch = reqMenuDetail;
-                    break;
+                    if (preorderMenuDetail.getMenuDetailPrice().equals(reqMenuDetailMatch.getPrice())) {
+                        break;
+                    }
                 }
             }
             if (!found) {
