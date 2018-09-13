@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport_subreportClient" pageWidth="850" pageHeight="100" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="850" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="0c4cd73d-08d1-4515-a0fc-371d19370122">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\jboss-jsf2\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="isOutcome" class="java.lang.Boolean"/>
+	<parameter name="1" class="java.lang.Boolean">
+		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
+	</parameter>
+	<field name="clientName" class="java.lang.String"/>
+	<field name="clientGroup" class="java.lang.String"/>
+	<field name="allAmount" class="java.lang.Integer"/>
+	<field name="allPreorderSum" class="java.lang.Long"/>
+	<field name="allDiscount" class="java.lang.Long"/>
+	<field name="allTotalPrice" class="java.lang.Long"/>
+	<field name="preorderItems" class="java.util.List"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20">
+			<textField>
+				<reportElement uuid="17965593-3a94-4094-bb88-60ee2ad95eaa" style="table" isPrintRepeatedValues="false" x="0" y="0" width="100" height="20" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{clientGroup}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="200" y="0" width="150" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="100" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="550" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="750" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="450" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="650" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="350" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+		<band height="60">
+			<staticText>
+				<reportElement uuid="f7c380d2-5034-4e3d-a251-995534f53b26" style="table" x="100" y="0" width="750" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Горячее питание]]></text>
+			</staticText>
+			<subreport>
+				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="100" y="40" width="750" height="20"/>
+				<subreportParameter name="1"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{preorderItems})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PreordersReport_subreport.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="750" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Итого]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="63c6581a-7ed1-4f60-a78a-051e12017e0d" style="table" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="100" height="60"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{clientName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="19e250ba-4231-4131-9a84-3650085abf60" style="table" x="100" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Дата]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19e250ba-4231-4131-9a84-3650085abf60" style="table" x="200" y="20" width="150" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Название]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="350" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Цена]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="550" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Сумма]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="650" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Скидка]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="450" y="20" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Кол-во]]></text>
+			</staticText>
+		</band>
+		<band height="40">
+			<staticText>
+				<reportElement uuid="e7c6fc0b-4160-4ee4-b1c9-27a25dcfe3a2" style="table" x="200" y="0" width="150" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ВСЕГО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19e250ba-4231-4131-9a84-3650085abf60" style="table" x="100" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="650" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{allDiscount}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="350" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19e250ba-4231-4131-9a84-3650085abf60" style="table" x="0" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="750" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{allTotalPrice}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="450" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{allAmount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="550" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{allPreorderSum}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="750" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="100" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="0" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="200" y="20" width="150" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="650" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="550" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="450" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="350" y="20" width="100" height="20" backcolor="#999999"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

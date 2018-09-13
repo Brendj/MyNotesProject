@@ -142,6 +142,7 @@ public class ClientFilter {
     private boolean includeFriendlyOrg = true;
     private String mobileNumber;
     private String email;
+    private Long permanentOrgId;
 
     public ClientBalanceFilter getClientBalanceMenu() {
         return clientBalanceMenu;
@@ -193,6 +194,10 @@ public class ClientFilter {
 
     public OrgItem getOrg() {
         return org;
+    }
+
+    public void setOrg(OrgItem org) {
+        this.org = org;
     }
 
     public String getContractId() {
@@ -259,10 +264,23 @@ public class ClientFilter {
         return clientGroupsCustomItems;
     }
 
+    public Long getPermanentOrgId() {
+        return permanentOrgId;
+    }
+
+    public void setPermanentOrgId(Long permanentOrgId) {
+        this.permanentOrgId = permanentOrgId;
+    }
+
     public boolean isEmpty() {
-        return ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
-                && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty()
-                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID);
+        if (ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
+                && StringUtils.isEmpty(filterClientId) && person.isEmpty() && contractPerson.isEmpty()
+                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(email) && StringUtils.isEmpty(filterClientGUID)) {
+            if (!org.isEmpty() && org.getIdOfOrg().equals(getPermanentOrgId()) || org.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getStatus() {
@@ -273,7 +291,10 @@ public class ClientFilter {
     }
 
     public void clear() {
-        org = new OrgItem();
+        if (null == permanentOrgId || null == org || !permanentOrgId.equals(org.getIdOfOrg())) {
+            org = new OrgItem();
+            permanentOrgId = null;
+        }
         contractId = null;
         filterClientId = null;
         person = new PersonItem();

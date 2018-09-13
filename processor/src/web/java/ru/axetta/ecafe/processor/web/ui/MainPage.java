@@ -2144,6 +2144,23 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object cancelClientListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            clientSelectListPage.cancelButtonClick();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == clientSelectListPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete client list selection", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при обработке выбора физ лиц: " + e.getMessage(), null));
+        }
+        return null;
+    }
+
     public Object completeOrgListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -3404,6 +3421,10 @@ public class MainPage implements Serializable {
     }
 
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
+        return showClientSelectListPage(clientList, null);
+    }
+
+    public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList, Long idOfOrg) {
         BasicPage currentTopMostPage = getTopMostPage();
         //if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -3414,6 +3435,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            clientSelectListPage.updatePermanentOrg(persistenceSession, idOfOrg);
             clientSelectListPage.fill(persistenceSession, clientList);
             persistenceTransaction.commit();
             persistenceTransaction = null;

@@ -19,19 +19,17 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup id="orgFilter">
-            <a4j:commandButton value="..." action="#{preordersReportPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+            <a4j:commandButton value="..." action="#{preordersReportPage.showOrgSelectPage()}"
+                               reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{preordersReportPage.getStringIdOfOrgList}"
-                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{preordersReportPage.filter}}" />
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Физ. лицо" />
         <h:panelGroup id="clientFilter">
-            <a4j:commandButton value="..." action="#{mainPage.showClientSelectListPage(preordersReportPage.getClientList())}"
+            <a4j:commandButton value="..." action="#{mainPage.showClientSelectListPage(preordersReportPage.getClientList(), preordersReportPage.idOfOrg)}"
                                reRender="modalClientListSelectorPanel,selectedClientList"
                                oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalClientListSelectorPanel')}.show();"

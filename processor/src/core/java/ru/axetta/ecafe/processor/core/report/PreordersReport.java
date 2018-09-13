@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -18,10 +19,11 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.*;
 
-public class PreordersReport extends BasicReportForListOrgsJob {
+public class PreordersReport extends BasicReportForOrgJob {
     /*
     * Параметры отчета для добавления в правила и шаблоны
     *
@@ -42,7 +44,7 @@ public class PreordersReport extends BasicReportForListOrgsJob {
 
     final private static Logger logger = LoggerFactory.getLogger(PreordersReport.class);
 
-    public static class Builder extends BasicReportForListOrgsJob.Builder {
+    public static class Builder extends BasicReportForOrgJob.Builder {
 
         private final String templateFilename;
 
@@ -58,11 +60,16 @@ public class PreordersReport extends BasicReportForListOrgsJob {
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("reportName", REPORT_NAME);
 
-            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
-            List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
-            List<Long> idOfOrgList = new ArrayList<Long>();
-            for (String idOfOrg : stringOrgList) {
-                idOfOrgList.add(Long.parseLong(idOfOrg));
+            String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            Long idOfOrg = Long.parseLong(idOfOrgString);
+
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            if (null != org) {
+                parameterMap.put("shortName", org.getShortNameInfoService());
+                parameterMap.put("address", org.getAddress());
+            } else {
+                parameterMap.put("shortName", "не указано");
+                parameterMap.put("address", "не указано");
             }
 
             String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_OF_CLIENTS));
@@ -72,80 +79,111 @@ public class PreordersReport extends BasicReportForListOrgsJob {
                 idOfClientList.add(Long.parseLong(idOfClient));
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, idOfClientList);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrg, idOfClientList, parameterMap);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
-            return new PreordersReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
+            return new PreordersReport(generateTime, generateDuration, jasperPrint, startTime, endTime, idOfOrg);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
-                List<Long> idOfOrgList, List<Long> idOfClientList) throws Exception {
-            List<PreorderReportItem> result = new ArrayList<PreorderReportItem>();
-            String conditions = (idOfOrgList.size() == 0) ? "" : " and o.idoforg in (:orgs) ";
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg,
+                List<Long> idOfClientList, Map<String, Object> parameterMap) throws Exception {
+            HashMap<Long, PreorderReportClientItem> result = new HashMap<Long, PreorderReportClientItem>();
+            PreorderReportTotalItem preorderReportTotalItem = new PreorderReportTotalItem();
+            HashMap<String, PreorderReportItem> preorderReportTotalItems = new HashMap<String, PreorderReportItem>();
+            String conditions = "";
             if (idOfClientList.size() > 0) {
                 conditions += " and c.idofclient in (:clients) ";
             }
-            Query query = session.createSQLQuery("SELECT ctg.idofcontragent, ctg.contragentname, o.idoforg, o.shortnameinfoservice, o.address, "
-                    + "c.contractid, p.surname, p.firstname, p.secondname, pc.preorderdate, pc.amount as complexAmount, ci.complexname, pc.idofpreordercomplex, "
-                    + "md.menudetailname, pmd.amount as menudetailAmount, pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder "
-                    + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+            Query query = session.createSQLQuery(
+                   "SELECT o.shortnameinfoservice, o.address, "
+                    + "     c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
+                    + "     pc.preorderdate, "
+                    + "     CASE WHEN pc.amount > 0 THEN pc.amount ELSE pmd.amount END AS amount, "
+                    + "     CASE WHEN pc.amount > 0 THEN ci.complexname ELSE "
+                    + "         CASE WHEN md.menudetailname is null OR md.menudetailname LIKE '' THEN ci.complexname ELSE md.menudetailname END "
+                    + "     END AS preordername, "
+                    + "     CASE WHEN pc.amount > 0 THEN pc.complexPrice ELSE pmd.menudetailPrice END AS preorderPrice, "
+                    + "     0 AS discount, "
+                    + "     pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder "
+                    + "FROM cf_preorder_complex pc "
+                    + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
+                    + "INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
                     + "INNER JOIN cf_complexinfo ci ON o.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
-                    + "INNER JOIN cf_contragents ctg ON o.defaultsupplier = ctg.idofcontragent "
                     + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
                     + "LEFT JOIN cf_menu m ON o.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                     + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                     + "WHERE (pc.amount > 0 OR pmd.amount > 0) "
-                    + "and (pc.preorderdate between :startDate and :endDate "
-                    + "or pmd.preorderdate between :startDate and :endDate) "
+                    + "     and (pc.preorderdate between :startDate and :endDate "
+                    + "     or pmd.preorderdate between :startDate and :endDate) "
+                    + "     and o.idoforg = :idOfOrg "
                     + conditions
-                    + "ORDER BY ctg.idofcontragent, o.idoforg, c.contractid, pc.idofpreordercomplex, md.menudetailname");
+                    + "ORDER BY o.idoforg, cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, md.menudetailname");
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
-            if (idOfOrgList.size() > 0) {
-                query.setParameterList("orgs", idOfOrgList);
-            }
+            query.setParameter("idOfOrg", idOfOrg);
             if (idOfClientList.size() > 0) {
                 query.setParameterList("clients", idOfClientList);
             }
             List list = query.list();
             for (Object o : list) {
                 Object[] row = (Object[]) o;
-                Long idOfContragent = ((BigInteger) row[0]).longValue();
-                String contragentName = (String) row[1];
-                Long idOfOrg = ((BigInteger) row[2]).longValue();
-                String shortNameInfoService = (String) row[3];
-                String address = (String) row[4];
-                Long contractId = ((BigInteger) row[5]).longValue();
-                String surname = (String) row[6];
-                String firstname = (String) row[7];
-                String secondname = (String) row[8];
-                Date preorderDate = new Date(((BigInteger) row[9]).longValue());
-                Integer amountComplex = (Integer) row[10];
-                String complexName = (String) row[11];
-                Long idOfPreorderComplex = ((BigInteger) row[12]).longValue();
-                String menuDetailName = (String) row[13];
-                Integer amountMenuDetail = (Integer) row[14];
-                Boolean isRegularPreorder = (Boolean) row[15];
-                PreorderReportItem item = new PreorderReportItem(idOfContragent, contragentName, idOfOrg, shortNameInfoService,
-                        address, contractId, surname, firstname, secondname, preorderDate, amountComplex, complexName,
-                        idOfPreorderComplex, menuDetailName, amountMenuDetail, isRegularPreorder);
-                result.add(item);
+                String shortNameInfoService = (String) row[0];
+                String address = (String) row[1];
+                Long contractId = ((BigInteger) row[2]).longValue();
+                String clientName = (String) row[3];
+                String clientGroup = (String) row[4];
+                Date preorderDate = new Date(((BigInteger) row[5]).longValue());
+                Integer amount = (Integer) row[6];
+                String preorderName = (String) row[7];
+                Long preorderPrice = ((BigInteger) row[8]).longValue();
+                Integer discount = (Integer) row[9];
+                Boolean isRegularPreorder = (Boolean) row[10];
+                if (!result.containsKey(contractId)) {
+                    result.put(contractId, new PreorderReportClientItem(idOfOrg, shortNameInfoService, address, contractId,
+                            clientName, clientGroup));
+                }
+                result.get(contractId).getPreorderItems().add(new PreorderReportItem(preorderDate, amount, preorderName,
+                        preorderPrice, discount.longValue(), isRegularPreorder));
+
+                if (!preorderReportTotalItems.containsKey(preorderName)) {
+                    PreorderReportItem preorderReportItem = new PreorderReportItem(preorderName);
+                    preorderReportItem.setPreorderPrice(preorderPrice);
+                    preorderReportTotalItems.put(preorderName, preorderReportItem);
+                }
+
+                PreorderReportItem item = preorderReportTotalItems.get(preorderName);
+                item.setAmount(item.getAmount() + amount);
+                item.setTotalPrice(item.getTotalPrice() + preorderPrice * amount);
+                item.setDiscount(item.getDiscount() + discount);
             }
-            return new JRBeanCollectionDataSource(result);
+
+            List<PreorderReportClientItem> resultClientList = new ArrayList<PreorderReportClientItem>(result.values());
+            Collections.sort(resultClientList);
+            List<PreorderReportItem> totalItemList = new ArrayList<PreorderReportItem>(preorderReportTotalItems.values());
+            Collections.sort(totalItemList);
+
+            preorderReportTotalItem.setPreorderReportClientItems(resultClientList);
+            preorderReportTotalItem.setPreorderReportItems(totalItemList);
+            preorderReportTotalItem.calculateTotalItem();
+
+            ArrayList<PreorderReportTotalItem> reportTotalItems = new ArrayList<PreorderReportTotalItem>();
+            reportTotalItems.add(preorderReportTotalItem);
+
+            return new JRBeanCollectionDataSource(reportTotalItems);
         }
     }
 
     public PreordersReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime) {
-        super(generateTime, generateDuration, print, startTime, endTime);
+            Date endTime, Long idOfOrg) {
+        super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
     }
 
 
     @Override
-    public BasicReportForAllOrgJob createInstance() {
+    public BasicReportForOrgJob createInstance() {
         return new PreordersReport();
     }
 

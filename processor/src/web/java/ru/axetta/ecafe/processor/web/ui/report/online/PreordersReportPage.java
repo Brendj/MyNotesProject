@@ -57,8 +57,9 @@ public class PreordersReportPage extends OnlineReportPage {
         onReportPeriodChanged(null);
     }
 
-    public void showOrgListSelectPage() {
-        MainPage.getSessionInstance().showOrgListSelectPage();
+    public void showOrgSelectPage() {
+        MainPage.getSessionInstance().showOrgSelectPage();
+        getClientList().clear();
     }
 
     public String getReportName() {
@@ -70,6 +71,10 @@ public class PreordersReportPage extends OnlineReportPage {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) {
+            return null;
+        }
+        if (null == idOfOrg) {
+            printError("Выберите организацию");
             return null;
         }
         PreordersReport.Builder builder = new PreordersReport.Builder(templateFilename);
@@ -117,6 +122,10 @@ public class PreordersReportPage extends OnlineReportPage {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile(".jasper");
         if (StringUtils.isEmpty(templateFilename)) return ;
+        if (null == idOfOrg) {
+            printError("Выберите организацию");
+            return;
+        }
         Date generateTime = new Date();
         PreordersReport.Builder builder = new PreordersReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
@@ -175,11 +184,7 @@ public class PreordersReportPage extends OnlineReportPage {
 
     private Properties buildProperties() {
         Properties properties = new Properties();
-        String idOfOrgString = "";
-        if(idOfOrgList != null) {
-            idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
-        }
-        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, (null != idOfOrg) ? idOfOrg.toString() : "0");
         String idOfClients = "";
         if(getClientList() != null && getClientList().size() > 0) {
             for (ClientSelectListPage.Item item : getClientList()) {
@@ -200,5 +205,9 @@ public class PreordersReportPage extends OnlineReportPage {
             return null;
         }
         return templateFilename;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
     }
 }

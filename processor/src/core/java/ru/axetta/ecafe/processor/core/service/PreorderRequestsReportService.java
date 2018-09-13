@@ -439,7 +439,7 @@ public class PreorderRequestsReportService extends RecoverableService {
               + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
               + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
               + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
-              + "   c.balance, c.idofclient, (pc.deletedstate=1 OR pmd.deletedstate=1) AS isdeleted "
+              + "   c.balance, c.idofclient, (coalesce(pc.deletedstate=1, false) OR coalesce(pmd.deletedstate=1, false)) AS isdeleted "
               + "FROM cf_preorder_complex pc "
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -447,7 +447,8 @@ public class PreorderRequestsReportService extends RecoverableService {
               + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 "
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.preorderdate > :date"; //AND pc.deletedstate=0
+              + "WHERE pc.preorderdate > :date "
+              + "   and ((pc.amount <> 0 OR pmd.amount <> 0) OR (coalesce(pc.deletedstate = 1, false) OR coalesce(pmd.deletedstate = 1, false)))"; //AND pc.deletedstate=0
               //+ "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
         Query query = session.createSQLQuery(sqlQuery);
         query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());

@@ -9,116 +9,40 @@ import java.util.Date;
 /**
  * Created by i.semenov on 11.04.2018.
  */
-public class PreorderReportItem {
-    private Long idOfContragent;
-    private String contragentName;
-    private Long idOfOrg;
-    private String shortNameInfoService;
-    private String address;
-    private Long contractId;
-    private String surname;
-    private String firstname;
-    private String secondname;
+public class PreorderReportItem implements Comparable<PreorderReportItem> {
     private Date preorderDate;
-    private Integer amountComplex;
-    private String complexName;
-    private Long idOfPreorderComplex;
-    private String menuDetailName;
-    private Integer amountMenuDetail;
+    private Integer amount;
+    private String preorderName;
+    private Long preorderPrice;
+    private Long discount;
+    private Long preorderSum;
+    private Long totalPrice;
     private Boolean isRegularPreorder;
 
-    public PreorderReportItem(Long idOfContragent, String contragentName, Long idOfOrg, String shortNameInfoService,
-            String address, Long contractId, String surname, String firstname, String secondname, Date preorderDate,
-            Integer amountComplex, String complexName, Long idOfPreorderComplex, String menuDetailName,
-            Integer amountMenuDetail, Boolean isRegularPreorder) {
-        this.idOfContragent = idOfContragent;
-        this.contragentName = contragentName;
-        this.idOfOrg = idOfOrg;
-        this.shortNameInfoService = shortNameInfoService;
-        this.address = address;
-        this.contractId = contractId;
-        this.surname = surname;
-        this.firstname = firstname;
-        this.secondname = secondname;
+    public PreorderReportItem(Date preorderDate, Integer amount, String preorderName,
+            Long preorderPrice, Long discount, Boolean isRegularPreorder) {
         this.preorderDate = preorderDate;
-        this.amountComplex = amountComplex;
-        this.complexName = complexName;
-        this.idOfPreorderComplex = idOfPreorderComplex;
-        this.menuDetailName = menuDetailName;
-        this.amountMenuDetail = amountMenuDetail;
+        this.amount = amount;
+        this.preorderName = preorderName;
+        this.preorderPrice = preorderPrice;
+        this.discount = discount;
         this.isRegularPreorder = isRegularPreorder;
+
+        calculateTotalPrice();
     }
 
-    public Long getIdOfContragent() {
-        return idOfContragent;
+    public PreorderReportItem(String preorderName) {
+        this.amount = 0;
+        this.preorderName = preorderName;
+        this.preorderPrice = 0L;
+        this.preorderSum = 0L;
+        this.totalPrice = 0L;
+        this.discount = 0L;
     }
 
-    public void setIdOfContragent(Long idOfContragent) {
-        this.idOfContragent = idOfContragent;
-    }
-
-    public String getContragentName() {
-        return contragentName;
-    }
-
-    public void setContragentName(String contragentName) {
-        this.contragentName = contragentName;
-    }
-
-    public Long getIdOfOrg() {
-        return idOfOrg;
-    }
-
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
-    }
-
-    public String getShortNameInfoService() {
-        return shortNameInfoService;
-    }
-
-    public void setShortNameInfoService(String shortNameInfoService) {
-        this.shortNameInfoService = shortNameInfoService;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Long getContractId() {
-        return contractId;
-    }
-
-    public void setContractId(Long contractId) {
-        this.contractId = contractId;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getSecondname() {
-        return secondname;
-    }
-
-    public void setSecondname(String secondname) {
-        this.secondname = secondname;
+    public void calculateTotalPrice() {
+        this.preorderSum = this.preorderPrice * this.amount;
+        this.totalPrice = this.preorderSum - this.discount;
     }
 
     public Date getPreorderDate() {
@@ -129,44 +53,20 @@ public class PreorderReportItem {
         this.preorderDate = preorderDate;
     }
 
-    public Integer getAmountComplex() {
-        return amountComplex;
+    public Integer getAmount() {
+        return amount;
     }
 
-    public void setAmountComplex(Integer amountComplex) {
-        this.amountComplex = amountComplex;
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 
-    public String getComplexName() {
-        return complexName;
+    public String getPreorderName() {
+        return preorderName;
     }
 
-    public void setComplexName(String complexName) {
-        this.complexName = complexName;
-    }
-
-    public Long getIdOfPreorderComplex() {
-        return idOfPreorderComplex;
-    }
-
-    public void setIdOfPreorderComplex(Long idOfPreorderComplex) {
-        this.idOfPreorderComplex = idOfPreorderComplex;
-    }
-
-    public String getMenuDetailName() {
-        return menuDetailName;
-    }
-
-    public void setMenuDetailName(String menuDetailName) {
-        this.menuDetailName = menuDetailName;
-    }
-
-    public Integer getAmountMenuDetail() {
-        return amountMenuDetail;
-    }
-
-    public void setAmountMenuDetail(Integer amountMenuDetail) {
-        this.amountMenuDetail = amountMenuDetail;
+    public void setPreorderName(String preorderName) {
+        this.preorderName = preorderName;
     }
 
     public Boolean getIsRegularPreorder() {
@@ -175,5 +75,42 @@ public class PreorderReportItem {
 
     public void setIsRegularPreorder(Boolean regularPreorder) {
         isRegularPreorder = regularPreorder;
+    }
+
+    public Long getPreorderPrice() {
+        return preorderPrice;
+    }
+
+    public void setPreorderPrice(Long preorderPrice) {
+        this.preorderPrice = preorderPrice;
+    }
+
+    public Long getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Long discount) {
+        this.discount = discount;
+    }
+
+    public Long getPreorderSum() {
+        return preorderSum;
+    }
+
+    public void setPreorderSum(Long preorderSum) {
+        this.preorderSum = preorderSum;
+    }
+
+    public Long getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Long totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    @Override
+    public int compareTo(PreorderReportItem item) {
+        return this.preorderName.compareTo(item.getPreorderName());
     }
 }

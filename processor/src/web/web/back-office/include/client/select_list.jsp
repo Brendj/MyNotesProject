@@ -34,7 +34,8 @@ background-image: url("/images/16x16/delete.png");
                         <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
                                            reRender="modalOrgSelectorPanel"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
-                                           styleClass="command-link" style="width: 25px;" />
+                                           styleClass="command-link" style="width: 25px;"
+                                           disabled="#{mainPage.clientSelectListPage.clientFilter.permanentOrgId != null}" />
                     </h:panelGroup>
                     <h:outputText escape="true" value="Номер лицевого счета" styleClass="output-text" />
                     <h:inputText value="#{mainPage.clientSelectListPage.clientFilter.contractId}" maxlength="16"
@@ -158,7 +159,7 @@ background-image: url("/images/16x16/delete.png");
                                reRender="#{mainPage.topMostPage.pageComponent.id}"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientListSelectorPanel')}.hide();"
                                styleClass="command-button" style="width: 80px; margin-right: 4px;" />
-            <a4j:commandButton value="Отмена" action="#{mainPage.clientSelectListPage.cancelButtonClick()}"
+            <a4j:commandButton value="Отмена" action="#{mainPage.cancelClientListSelection}"
                                reRender="#{mainPage.topMostPage.pageComponent.id}"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientListSelectorPanel')}.hide();"
                                styleClass="command-button" style="width: 80px;">

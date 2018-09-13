@@ -128,7 +128,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date genEndTime = new Date();
             long generateDuration = genEndTime.getTime() - generateTime.getTime();
-            return new PreordersReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
+            return new PreorderRequestsReport(generateTime, generateDuration, jasperPrint, startTime, endTime, idOfOrg);
         }
 
         public static List<GoodRequestsNewReportService.Item> loadAllItems(Session session, Date startTime, Date endTime, int hideDailySampleValue,

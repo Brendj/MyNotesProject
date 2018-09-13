@@ -281,10 +281,17 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             completeHandlers.peek().completeClientSelection(session, selectedItems);
             completeHandlers.pop();
         }
+        clientFilter.setPermanentOrgId(null);
+        clientFilter.setOrg(new ClientFilter.OrgItem());
+        removeAllFromSelected();
     }
 
     public void cancelButtonClick() {
-        selectedItems.clear();
+        removeAllFromSelected();
+        items.clear();
+        clientFilter.clear();
+        clientFilter.setPermanentOrgId(null);
+        clientFilter.setOrg(new ClientFilter.OrgItem());
         /*for (Item item : selectedItems) {
             item.setSelected(true);
         }*/
@@ -403,6 +410,21 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             selectedItems.clear();
             for (Item item : clientList) {
                 selectedItems.add(item);
+            }
+        }
+    }
+
+    public void updatePermanentOrg(Session session, Long idOfOrg) {
+        if (null == idOfOrg)
+            return;
+
+        if (!idOfOrg.equals(clientFilter.getPermanentOrgId()) ||
+                (null != clientFilter.getOrg() && clientFilter.getOrg().getIdOfOrg().equals(idOfOrg))) {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            if (null != org) {
+                clientFilter.setOrg(new ClientFilter.OrgItem(org));
+                clientFilter.setPermanentOrgId(idOfOrg);
+                removeAllFromSelected();
             }
         }
     }
