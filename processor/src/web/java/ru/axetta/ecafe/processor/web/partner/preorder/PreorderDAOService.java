@@ -452,7 +452,7 @@ public class PreorderDAOService {
             }
             RegularPreorderParam regularComplex = complex.getRegularComplex();
             if (regularComplex != null) {
-                if (regularComplex.getEnabled()) {
+                if (regularComplex.getEnabled() && complex.getAmount() > 0) {
                     createRegularPreorder(client, regularComplex, complex.getAmount(),
                             complex.getIdOfComplex(), date, true, null);
                 } else {
@@ -494,7 +494,7 @@ public class PreorderDAOService {
                 for (MenuItemParam menuItem : complex.getMenuItems()) {
                     RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
                     if (regularMenuItem != null) {
-                        if (regularMenuItem.getEnabled()) {
+                        if (regularMenuItem.getEnabled() && menuItem.getAmount() > 0) {
                             createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
                                     false, menuItem.getIdOfMenuDetail());
                         } else {
