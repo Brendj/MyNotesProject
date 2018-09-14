@@ -21,3 +21,5 @@ alter table cf_preorder_complex add column idOfOrgOnCreate bigint,
   ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 CREATE INDEX cf_preorder_complex_idoforgoncreate_idx ON cf_preorder_complex (idoforgoncreate);
+
+alter table cf_preorder_menudetail alter column menudetailprice set not null;
