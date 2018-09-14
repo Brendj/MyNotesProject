@@ -27,6 +27,10 @@ public class GeoplanerManager {
     private final static boolean isOn = managerIsOn();
     private GeoplanerService service = RuntimeContext.getAppContext().getBean(GeoplanerService.class);
 
+    private final int ENTER_EVENTS = 1;
+    private final int PURCHASES = 2;
+    private final int PAYMENTS = 3;
+
     private static boolean managerIsOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String reqInstance = runtimeContext
@@ -50,9 +54,11 @@ public class GeoplanerManager {
                 logger.warn("No EnterEventSendInfo records for send to Geoplaner App");
                 return;
             }
-            Integer statusCode = service.sendPost(info, true);
+            Integer statusCode = service.sendPost(info, ENTER_EVENTS);
             if(!statusCode.equals(200)){
-                logger.error("The Geoplaner returned code " + statusCode);
+                logger.error("The Geoplaner returned code " + statusCode
+                        + " when sent EnterEvent IdOfOrg " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
+                        + " ID enterEvent " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent());
             } else {
                 logger.info("Sends  EnterEvent ID: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()
                         + " idOfOrg: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
@@ -70,32 +76,65 @@ public class GeoplanerManager {
     }
 
     @Async
-    public void sendPaymentInfoToGeoplaner(Payment payment, Client client) throws Exception{
+    public void sendPurchasesInfoToGentler(Payment purchases, Client client) throws Exception{
         Session session = null;
         Transaction hibernateTransaction = null;
         try {
-            if(payment == null || client == null){
-                throw new NullPointerException("Payment or Client is null");
+            if(purchases == null || client == null){
+                throw new NullPointerException("Purchases or Client is null");
             }
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
-            JsonPaymentInfo info = buildJsonPaymentInfo(session, payment, client);
+            JsonPurchasesInfo info = buildJsonPurchasesInfo(session, purchases, client);
             if (info == null) {
-                logger.warn("No PaymentInfo records for send to Geoplaner App");
+                logger.warn("No Purchases records for send to Geoplaner App");
                 return;
             }
-            Integer statusCode = service.sendPost(info, false);
+            Integer statusCode = service.sendPost(info, PURCHASES);
             if(!statusCode.equals(200)){
-                logger.error("The Geoplaner returned code " + statusCode);
+                logger.error("The Geoplaner returned code " + statusCode + " when sent Purchases ID " + purchases.getIdOfOrder());
             } else {
-                logger.info("Sends PaymentInfo of Order ID= " + payment.getIdOfOrder() + " to Geoplaner ");
+                logger.info("Sends PurchasesInfo of Order ID= " + purchases.getIdOfOrder() + " to Geoplaner ");
             }
 
             hibernateTransaction.commit();
             hibernateTransaction = null;
         } catch (Exception e) {
-            logger.error("Can't send PaymentInfo to Geoplaner App: " + e.getMessage());
+            logger.error("Can't send PurchasesInfo to Geoplaner App: ", e);
+        } finally {
+            HibernateUtils.rollback(hibernateTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @Async
+    public void sendPaymentInfoToGeoplaner(ClientPayment clientPayment, Client client) throws Exception{
+        Session session = null;
+        Transaction hibernateTransaction = null;
+        try {
+            if(clientPayment == null || client == null){
+                throw new NullPointerException("clientPayment or Client is null");
+            }
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            hibernateTransaction = session.beginTransaction();
+
+            JsonPaymentInfo info = buildJsonPaymentInfo(session, clientPayment, client);
+            if (info == null) {
+                logger.warn("No clientPayment records for send to Geoplaner App");
+                return;
+            }
+            Integer statusCode = service.sendPost(info, PAYMENTS);
+            if(!statusCode.equals(200)){
+                logger.error("The Geoplaner returned code " + statusCode + " when sent clientPayment ID " + clientPayment.getIdOfPayment());
+            } else {
+                logger.info("Sends clientPayment of Order ID= " + clientPayment.getIdOfPayment() + " to Geoplaner ");
+            }
+
+            hibernateTransaction.commit();
+            hibernateTransaction = null;
+        } catch (Exception e) {
+            logger.error("Can't send clientPayment to Geoplaner App: ", e);
         } finally {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
@@ -105,14 +144,23 @@ public class GeoplanerManager {
     private JsonEnterEventInfo buildJsonEnterEventInfo(Session session, EnterEvent event) throws Exception{
         JsonEnterEventInfo info = new JsonEnterEventInfo();
         Org org = null;
+        Client client;
         Card card = getCardFromEnterEvent(session, event);
         if(card == null) {
             logger.error("No found Card by EnterEvent, construction of the message is interrupted");
-            return null;
+            if(event.getClient() != null){
+                client = event.getClient();
+            } else {
+                throw new Exception("No found Client and Card by EnterEvent");
+            }
+        } else {
+            client = card.getClient();
         }
+
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
-        info.setTrackerId(card.getCardPrintedNo());
-        info.setTrackerUid(card.getCardNo());
+        info.setCardPrintedNo(card.getCardPrintedNo());
+        info.setCardNo(card.getCardNo());
+        info.setContractId(client.getContractId());
         info.setEvtDateTime(event.getEvtDateTime());
         info.setDirection(event.getPassDirection());
         if(event.getOrg() == null){
@@ -126,27 +174,61 @@ public class GeoplanerManager {
         return info;
     }
 
-    private JsonPaymentInfo buildJsonPaymentInfo(Session session, Payment payment, Client client) throws Exception{
-        JsonPaymentInfo info = new JsonPaymentInfo();
-        Card card = getCardFromPaymentAndClient(session, payment, client);
+    private JsonPurchasesInfo buildJsonPurchasesInfo(Session session, Payment purchases, Client client) throws Exception{
+        JsonPurchasesInfo info = new JsonPurchasesInfo();
+        Card card = getCardFromPaymentAndClient(session, purchases, client);
         if(card == null){
             logger.error("Can't get Card for Client contractID = " + client.getContractId());
             return null;
         }
-
-        info.setTrackerId(card.getCardPrintedNo());
-        info.setTrackerUid(card.getCardNo());
+        info.setCardNo(card.getCardPrintedNo());
+        info.setCardPrintedNo(card.getCardNo());
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
-        info.setOrderTime(payment.getTime());
-        info.setOrderType(payment.getOrderType().ordinal());
-        info.setRSum(payment.getRSum());
+        info.setContractID(client.getContractId());
+        info.setOrderTime(purchases.getTime());
+        info.setOrderType(purchases.getOrderType().ordinal());
+        info.setRSum(purchases.getRSum());
+
         String purchasesNames = "";
-        for(Purchase pc : payment.getPurchases()){
+        for(Purchase pc : purchases.getPurchases()){
             purchasesNames += pc.getName() + ";";
         }
         info.setPurchasesName(purchasesNames);
 
         return info;
+    }
+
+    private JsonPaymentInfo buildJsonPaymentInfo(Session session, ClientPayment clientPayment, Client client) throws Exception{
+        JsonPaymentInfo info = new JsonPaymentInfo();
+        Card card = getCardFromClientPaymentAndClient(session, clientPayment, client);
+        if(card == null){
+            logger.error("Can't get Card for Client contractID = " + client.getContractId());
+            return null;
+        }
+        info.setCardNo(card.getCardNo());
+        info.setCardPrintedNo(card.getCardPrintedNo());
+        info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
+        info.setContractId(client.getContractId());
+        info.setCreateTime(clientPayment.getCreateTime());
+        if(clientPayment.getTransaction()!= null){
+            info.setSourceType(clientPayment.getTransaction().getSourceType());
+            info.setBalanceBefore(clientPayment.getTransaction().getBalanceBeforeTransaction());
+        } else {
+            info.setBalanceBefore(client.getBalance() - clientPayment.getPaySum());
+        }
+        info.setPaySum(clientPayment.getPaySum());
+
+        return info;
+    }
+
+    private Card getCardFromClientPaymentAndClient(Session session, ClientPayment clientPayment, Client client) {
+        Card card = null;
+        if(clientPayment.getTransaction() != null && clientPayment.getTransaction().getCard() != null){
+            card = clientPayment.getTransaction().getCard();
+        } else {
+            card = DAOUtils.getLastCardByClient(session, client);
+        }
+        return card;
     }
 
     private Card getCardFromEnterEvent(Session session, EnterEvent event) throws Exception {
@@ -161,15 +243,6 @@ public class GeoplanerManager {
                     + " Org ID: " +  event.getCompositeIdOfEnterEvent().getIdOfOrg()
                     + " without Client and Card");
         }
-        if(card == null){
-            return null;
-        }
-
-        if(!Card.TYPE_NAMES[card.getCardType()].equals("Часы (Mifare)")){
-            throw new Exception("Card with CardNo: " + card.getCardNo()
-                    + " and CardPrintedNo: " + card.getCardPrintedNo()
-                    + " is not SmartWatch");
-        }
         return card;
     }
 
@@ -177,24 +250,8 @@ public class GeoplanerManager {
         Card card = null;
         if(payment.getCardNo() != null){
             card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrg(session, payment.getCardNo(), client.getOrg().getIdOfOrg());
-        } else if(client.getCards() != null){
-            for(Card cardOfClient : client.getCards()){
-                if(cardOfClient.getState().equals(CardState.ISSUED.getValue())){
-                    card = cardOfClient;
-                    break;
-                }
-            }
         } else {
-            throw new Exception("Can't get Card for Client contractID = " + client.getContractId());
-        }
-        if(card == null){
-            return null;
-        }
-
-        if(!Card.TYPE_NAMES[card.getCardType()].equals("Часы (Mifare)")){
-            throw new Exception("Card with CardNo: " + card.getCardNo()
-                    + " and CardPrintedNo: " + card.getCardPrintedNo()
-                    + " is not SmartWatch");
+            card = DAOUtils.getLastCardByClient(session, client);
         }
         return card;
     }

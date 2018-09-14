@@ -7,60 +7,29 @@ package ru.axetta.ecafe.processor.core.service.geoplaner;
 import java.util.Date;
 
 public class JsonPaymentInfo {
-    private Long trackerUid;
-    private Long trackerId;
-    private Date orderTime;
-    private Integer orderType;
-    private Long RSum;
-    private String purchasesName;
+    private Long cardNo;
+    private Long cardPrintedNo;
     private String cardType;
+    private Long contractId;
+    private Integer sourceType;
+    private Long paySum;
+    private Long balanceBefore;
+    private Date createTime;
 
-    public Date getOrderTime() {
-        return orderTime;
+    public Long getCardNo() {
+        return cardNo;
     }
 
-    public void setOrderTime(Date orderTime) {
-        this.orderTime = orderTime;
+    public void setCardNo(Long cardNo) {
+        this.cardNo = cardNo;
     }
 
-    public Integer getOrderType() {
-        return orderType;
+    public Long getCardPrintedNo() {
+        return cardPrintedNo;
     }
 
-    public void setOrderType(Integer orderType) {
-        this.orderType = orderType;
-    }
-
-    public Long getRSum() {
-        return RSum;
-    }
-
-    public void setRSum(Long RSum) {
-        this.RSum = RSum;
-    }
-
-    public String getPurchasesName() {
-        return purchasesName;
-    }
-
-    public void setPurchasesName(String purchasesName) {
-        this.purchasesName = purchasesName;
-    }
-
-    public Long getTrackerUid() {
-        return trackerUid;
-    }
-
-    public void setTrackerUid(Long trackerUid) {
-        this.trackerUid = trackerUid;
-    }
-
-    public Long getTrackerId() {
-        return trackerId;
-    }
-
-    public void setTrackerId(Long trackerId) {
-        this.trackerId = trackerId;
+    public void setCardPrintedNo(Long cardPrintedNo) {
+        this.cardPrintedNo = cardPrintedNo;
     }
 
     public String getCardType() {
@@ -69,5 +38,45 @@ public class JsonPaymentInfo {
 
     public void setCardType(String cardType) {
         this.cardType = cardType;
+    }
+
+    public Integer getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(Integer sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public Long getPaySum() {
+        return paySum;
+    }
+
+    public void setPaySum(Long paySum) {
+        this.paySum = paySum;
+    }
+
+    public Long getBalanceBefore() {
+        return balanceBefore;
+    }
+
+    public void setBalanceBefore(Long balanceBefore) {
+        this.balanceBefore = balanceBefore;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Long getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(Long contractId) {
+        this.contractId = contractId;
     }
 }

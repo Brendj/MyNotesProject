@@ -3557,7 +3557,7 @@ public class Processor implements SyncProcessor {
                 if (client != null) {
                     if(GeoplanerManager.isOn() && client.getHasActiveSmartWatch()){
                         GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                        manager.sendPaymentInfoToGeoplaner(payment, client);
+                        manager.sendPurchasesInfoToGentler(payment, client);
                     }
 
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);

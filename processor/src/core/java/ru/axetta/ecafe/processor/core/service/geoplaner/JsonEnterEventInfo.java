@@ -7,13 +7,14 @@ package ru.axetta.ecafe.processor.core.service.geoplaner;
 import java.util.Date;
 
 public class JsonEnterEventInfo {
-    private Long trackerUid;
-    private Long trackerId;
+    private Long cardNo;
+    private Long cardPrintedNo;
+    private String cardType;
+    private Long contractId;
     private Date evtDateTime;
     private Integer direction;
     private String shortName;
     private String shortAddress;
-    private String cardType;
 
     public Date getEvtDateTime() {
         return evtDateTime;
@@ -47,20 +48,20 @@ public class JsonEnterEventInfo {
         this.shortAddress = shortAddress;
     }
 
-    public Long getTrackerUid() {
-        return trackerUid;
+    public Long getCardNo() {
+        return cardNo;
     }
 
-    public void setTrackerUid(Long trackerUid) {
-        this.trackerUid = trackerUid;
+    public void setCardNo(Long cardNo) {
+        this.cardNo = cardNo;
     }
 
-    public Long getTrackerId() {
-        return trackerId;
+    public Long getCardPrintedNo() {
+        return cardPrintedNo;
     }
 
-    public void setTrackerId(Long trackerId) {
-        this.trackerId = trackerId;
+    public void setCardPrintedNo(Long cardPrintedNo) {
+        this.cardPrintedNo = cardPrintedNo;
     }
 
     public String getCardType() {
@@ -69,5 +70,13 @@ public class JsonEnterEventInfo {
 
     public void setCardType(String cardType) {
         this.cardType = cardType;
+    }
+
+    public Long getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(Long contractId) {
+        this.contractId = contractId;
     }
 }

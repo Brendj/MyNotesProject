@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
-import ru.axetta.ecafe.processor.core.service.geoplaner.JsonPaymentInfo;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
 import java.util.LinkedList;

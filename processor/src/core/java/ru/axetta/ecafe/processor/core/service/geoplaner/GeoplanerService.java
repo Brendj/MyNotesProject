@@ -24,7 +24,8 @@ public class GeoplanerService {
     private Logger logger = LoggerFactory.getLogger(GeoplanerService.class);
 
     private final String URL_FOR_ENTER_EVENTS = getGeoplanerURLEnterEvents();
-    private final String URL_FOR_TRANSACTIONS = getGeoplanerURLTransaction();
+    private final String URL_FOR_PURCHASES = getGeoplanerURLPurchases();
+    private final String URL_FOR_PAYMENTS = getGeoplanerURLPayments();
     private final String TEST_ENDPOINT_ADDRESS = "https://testrestcontroller.herokuapp.com/test"; // Тестовый сервер на heroku
 
     private boolean debug = isDebug();
@@ -32,9 +33,10 @@ public class GeoplanerService {
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RESET = "\u001B[0m";
 
-    public Integer sendPost(Object event, Boolean isEnterEvents) throws Exception{
+    public Integer sendPost(Object event, int code) throws Exception{
+        String endPointAddress = getAddress(code);
         HttpClient httpClient = new HttpClient();
-        PostMethod method = new PostMethod(isEnterEvents ? URL_FOR_ENTER_EVENTS : URL_FOR_TRANSACTIONS);
+        PostMethod method = new PostMethod(endPointAddress);
         method.addRequestHeader("Content-Type", "application/json");
 
         ObjectMapper mapper = new ObjectMapper();
@@ -54,12 +56,29 @@ public class GeoplanerService {
         return httpClient.executeMethod(method);
     }
 
-    private String getGeoplanerURLTransaction() {
+    private String getAddress(int code) throws Exception{
+        if(code == 1){
+            return URL_FOR_ENTER_EVENTS;
+        } else if(code == 2){
+            return  URL_FOR_PURCHASES;
+        } else if(code == 3){
+            return URL_FOR_PAYMENTS;
+        } else {
+            throw new IllegalArgumentException("Unknown code: " + code);
+        }
+    }
+
+    private String getGeoplanerURLPurchases() {
+        Properties properties = RuntimeContext.getInstance().getConfigProperties();
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.purchasesendpointaddress", TEST_ENDPOINT_ADDRESS);
+    }
+
+    private String getGeoplanerURLEnterEvents() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties.getProperty("ecafe.processor.geoplaner.sendevents.entereventsendpointaddress", TEST_ENDPOINT_ADDRESS);
     }
 
-    private String getGeoplanerURLEnterEvents() {
+    private String getGeoplanerURLPayments() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentendpointaddress", TEST_ENDPOINT_ADDRESS);
     }
