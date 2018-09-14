@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderReport" pageWidth="650" pageHeight="300" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="650" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderReport" pageWidth="700" pageHeight="300" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="700" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -62,7 +62,7 @@
 	<title>
 		<band height="120" splitType="Stretch">
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="20" width="650" height="20">
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="20" width="700" height="20">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -71,28 +71,28 @@
 				<textFieldExpression><![CDATA[$P{shortName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="0" width="650" height="20"/>
+				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="0" width="700" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[Наименование образовательной организации (структурного подразделения)]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="100" width="650" height="20"/>
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="100" width="700" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["С " + $P{startDate} + " по " + $P{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="80" width="650" height="20"/>
+				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="80" width="700" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Отчет по предварительным заказам]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
-				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToBandHeight" x="100" y="40" width="550" height="40"/>
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToBandHeight" x="100" y="40" width="600" height="40"/>
 				<textElement verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
@@ -110,51 +110,55 @@
 	<detail>
 		<band height="100">
 			<subreport>
-				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="0" y="0" width="650" height="100"/>
-				<subreportParameter name="1"/>
+				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="0" y="0" width="700" height="100"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{preorderReportClientItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PreordersReport_subreportClient.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="60">
 			<staticText>
-				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="350" y="20" width="100" height="20"/>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="400" y="20" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Цена]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f7c380d2-5034-4e3d-a251-995534f53b26" style="table" x="100" y="0" width="550" height="20"/>
+				<reportElement uuid="f7c380d2-5034-4e3d-a251-995534f53b26" style="table" x="100" y="0" width="600" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Горячее питание]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="450" y="20" width="100" height="20"/>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="500" y="20" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="550" y="20" width="100" height="20"/>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="600" y="20" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="19e250ba-4231-4131-9a84-3650085abf60" style="table" x="200" y="20" width="150" height="20"/>
+				<reportElement uuid="19e250ba-4231-4131-9a84-3650085abf60" style="table" x="200" y="20" width="200" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Название]]></text>
 			</staticText>
 			<subreport>
-				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="100" y="40" width="550" height="20"/>
-				<subreportParameter name="1"/>
+				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="100" y="40" width="600" height="20"/>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{preorderReportItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PreordersReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
@@ -176,21 +180,21 @@
 		</band>
 		<band height="20">
 			<staticText>
-				<reportElement uuid="e7c6fc0b-4160-4ee4-b1c9-27a25dcfe3a2" style="table" x="200" y="0" width="150" height="20"/>
+				<reportElement uuid="e7c6fc0b-4160-4ee4-b1c9-27a25dcfe3a2" style="table" x="200" y="0" width="200" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ВСЕГО]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="450" y="0" width="100" height="20"/>
+				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="500" y="0" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{allAmount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="550" y="0" width="100" height="20"/>
+				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="600" y="0" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
@@ -211,7 +215,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="350" y="0" width="100" height="20"/>
+				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="400" y="0" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>

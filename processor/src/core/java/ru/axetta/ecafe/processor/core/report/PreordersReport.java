@@ -9,7 +9,9 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -59,6 +61,7 @@ public class PreordersReport extends BasicReportForOrgJob {
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             parameterMap.put("reportName", REPORT_NAME);
+            parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
 
             String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             Long idOfOrg = Long.parseLong(idOfOrgString);
@@ -100,26 +103,22 @@ public class PreordersReport extends BasicReportForOrgJob {
                     + "     c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
                     + "     pc.preorderdate, "
                     + "     CASE WHEN pc.amount > 0 THEN pc.amount ELSE pmd.amount END AS amount, "
-                    + "     CASE WHEN pc.amount > 0 THEN ci.complexname ELSE "
-                    + "         CASE WHEN md.menudetailname is null OR md.menudetailname LIKE '' THEN ci.complexname ELSE md.menudetailname END "
-                    + "     END AS preordername, "
+                    + "     CASE WHEN pc.amount > 0 THEN pc.complexname ELSE  pmd.menudetailname END AS preordername, "
                     + "     CASE WHEN pc.amount > 0 THEN pc.complexPrice ELSE pmd.menudetailPrice END AS preorderPrice, "
-                    + "     pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder "
+                    + "     pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder,"
+                    + "     pc.idofpreordercomplex, pc.amount > 0 AS isComplex "
                     + "FROM cf_preorder_complex pc "
                     + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                     + "INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
-                    + "INNER JOIN cf_complexinfo ci ON o.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
                     + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
-                    + "LEFT JOIN cf_menu m ON o.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
-                    + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                     + "WHERE (pc.amount > 0 OR pmd.amount > 0) "
                     + "     and (pc.preorderdate between :startDate and :endDate "
                     + "     or pmd.preorderdate between :startDate and :endDate) "
-                    + "     and o.idoforg = :idOfOrg "
+                    + "     and o.idoforg = :idOfOrg and coalesce(pc.deletedstate, 0) = 0 and coalesce(pmd.deletedstate, 0) = 0 "
                     + conditions
-                    + "ORDER BY o.idoforg, cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, md.menudetailname");
+                    + "ORDER BY o.idoforg, cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, pmd.menudetailname");
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
             query.setParameter("idOfOrg", idOfOrg);
@@ -139,6 +138,13 @@ public class PreordersReport extends BasicReportForOrgJob {
                 String preorderName = (String) row[7];
                 Long preorderPrice = ((BigInteger) row[8]).longValue();
                 Boolean isRegularPreorder = (Boolean) row[9];
+
+                Boolean isComplex = (Boolean) row[11];
+                if (isComplex) {
+                    Long idOfPreorderComplex = ((BigInteger) row[10]).longValue();
+                    List<String> dishes = DAOUtils.getDishesByPreorderComplexId(session, idOfPreorderComplex);
+                    preorderName += String.format(" (%s)", StringUtils.join(dishes, ", "));
+                }
                 if (!result.containsKey(contractId)) {
                     result.put(contractId, new PreorderReportClientItem(idOfOrg, shortNameInfoService, address, contractId,
                             clientName, clientGroup));

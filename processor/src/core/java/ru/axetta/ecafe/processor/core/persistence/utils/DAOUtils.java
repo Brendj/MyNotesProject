@@ -3583,4 +3583,25 @@ public class DAOUtils {
         }
     }
 
+    public static List<Client> findClientsByOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return criteria.list();
+    }
+
+    public static List<Card> getAllCardByClientAndCardState(Session session, Client client, CardState state) {
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("state", state.getValue()));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createTime"));
+        return criteria.list();
+    }
+
+    public static List<String> getDishesByPreorderComplexId(Session session, Long idOfPreorderComplex) {
+        Criteria criteria = session.createCriteria(PreorderMenuDetail.class);
+        criteria.add(Restrictions.eq("preorderComplex.idOfPreorderComplex", idOfPreorderComplex));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("menuDetailName"));
+        criteria.setProjection(Projections.projectionList().add(Projections.property("menuDetailName")));
+        return criteria.list();
+    }
 }
