@@ -49,6 +49,11 @@ public class PreorderMenuDetail {
         doDelete(nextVersion, doDelete, PreorderState.CHANGE_ORG);
     }
 
+    public void modifyArmIdOfMenu(Long version) {
+        this.preorderComplex.setVersion(version);
+        this.preorderComplex.setLastUpdate(new Date());
+    }
+
     private void doDelete(Long nextVersion, boolean doDelete, PreorderState state) {
         this.preorderComplex.setVersion(nextVersion);
         this.deletedState = doDelete;

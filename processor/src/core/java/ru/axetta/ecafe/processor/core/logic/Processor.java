@@ -4929,17 +4929,21 @@ public class Processor implements SyncProcessor {
         List<PreorderMenuDetail> pmdList = query.list();
         List<PreorderMenuDetail> deletedPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
         List<PreorderMenuDetail> changedPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
+        List<PreorderMenuDetail> modifiedIdsPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
         for (PreorderMenuDetail preorderMenuDetail : pmdList) {
             boolean found = false;
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
             Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
             while (reqMenuDetails.hasNext()) {
                 SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-                if (preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())
-                        && equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
+                if (equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
                     found = true;
                     reqMenuDetailMatch = reqMenuDetail;
                     if (preorderMenuDetail.getMenuDetailPrice().equals(reqMenuDetailMatch.getPrice())) {
+                        if (!preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())) {
+                            preorderMenuDetail.setArmIdOfMenu(reqMenuDetail.getIdOfMenu());
+                            modifiedIdsPreorderMenuDetails.add(preorderMenuDetail);
+                        }
                         break;
                     }
                 }
@@ -4980,6 +4984,10 @@ public class Processor implements SyncProcessor {
         }
         for (PreorderMenuDetail preorderMenuDetail : changedPreorderMenuDetails) {
             preorderMenuDetail.changeBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
+            persistenceSession.update(preorderMenuDetail);
+        }
+        for (PreorderMenuDetail preorderMenuDetail : modifiedIdsPreorderMenuDetails) {
+            preorderMenuDetail.modifyArmIdOfMenu(version);
             persistenceSession.update(preorderMenuDetail);
         }
     }
