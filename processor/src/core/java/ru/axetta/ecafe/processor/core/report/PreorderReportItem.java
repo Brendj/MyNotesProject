@@ -14,18 +14,15 @@ public class PreorderReportItem implements Comparable<PreorderReportItem> {
     private Integer amount;
     private String preorderName;
     private Long preorderPrice;
-    private Long discount;
     private Long preorderSum;
-    private Long totalPrice;
     private Boolean isRegularPreorder;
 
     public PreorderReportItem(Date preorderDate, Integer amount, String preorderName,
-            Long preorderPrice, Long discount, Boolean isRegularPreorder) {
+            Long preorderPrice, Boolean isRegularPreorder) {
         this.preorderDate = preorderDate;
         this.amount = amount;
         this.preorderName = preorderName;
         this.preorderPrice = preorderPrice;
-        this.discount = discount;
         this.isRegularPreorder = isRegularPreorder;
 
         calculateTotalPrice();
@@ -36,13 +33,10 @@ public class PreorderReportItem implements Comparable<PreorderReportItem> {
         this.preorderName = preorderName;
         this.preorderPrice = 0L;
         this.preorderSum = 0L;
-        this.totalPrice = 0L;
-        this.discount = 0L;
     }
 
     public void calculateTotalPrice() {
         this.preorderSum = this.preorderPrice * this.amount;
-        this.totalPrice = this.preorderSum - this.discount;
     }
 
     public Date getPreorderDate() {
@@ -85,28 +79,12 @@ public class PreorderReportItem implements Comparable<PreorderReportItem> {
         this.preorderPrice = preorderPrice;
     }
 
-    public Long getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(Long discount) {
-        this.discount = discount;
-    }
-
     public Long getPreorderSum() {
         return preorderSum;
     }
 
     public void setPreorderSum(Long preorderSum) {
         this.preorderSum = preorderSum;
-    }
-
-    public Long getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(Long totalPrice) {
-        this.totalPrice = totalPrice;
     }
 
     @Override

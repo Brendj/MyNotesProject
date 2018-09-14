@@ -17,8 +17,6 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
     private String clientGroup;
     private Integer allAmount;
     private Long allPreorderSum;
-    private Long allDiscount;
-    private Long allTotalPrice;
     private List<PreorderReportItem> preorderItems;
 
     public PreorderReportClientItem(Long idOfOrg, String shortNameInfoService, String address, Long contractId,
@@ -35,13 +33,9 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
     public void calculateTotalValues() {
         this.allAmount = 0;
         this.allPreorderSum = 0L;
-        this.allDiscount = 0L;
-        this.allTotalPrice = 0L;
         for (PreorderReportItem item : preorderItems) {
             this.allAmount += getIntSafe(item.getAmount());
             this.allPreorderSum += getLongSafe(item.getPreorderSum());
-            this.allDiscount += getLongSafe(item.getDiscount());
-            this.allTotalPrice += getLongSafe(item.getTotalPrice());
         }
     }
 
@@ -123,22 +117,6 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
 
     public void setAllPreorderSum(Long allPreorderSum) {
         this.allPreorderSum = allPreorderSum;
-    }
-
-    public Long getAllDiscount() {
-        return allDiscount;
-    }
-
-    public void setAllDiscount(Long allDiscount) {
-        this.allDiscount = allDiscount;
-    }
-
-    public Long getAllTotalPrice() {
-        return allTotalPrice;
-    }
-
-    public void setAllTotalPrice(Long allTotalPrice) {
-        this.allTotalPrice = allTotalPrice;
     }
 
     @Override

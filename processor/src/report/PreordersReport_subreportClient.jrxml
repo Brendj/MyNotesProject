@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport_subreportClient" pageWidth="850" pageHeight="100" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="850" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="0c4cd73d-08d1-4515-a0fc-371d19370122">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport_subreportClient" pageWidth="650" pageHeight="100" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="650" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="0c4cd73d-08d1-4515-a0fc-371d19370122">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -43,8 +43,6 @@
 	<field name="clientGroup" class="java.lang.String"/>
 	<field name="allAmount" class="java.lang.Integer"/>
 	<field name="allPreorderSum" class="java.lang.Long"/>
-	<field name="allDiscount" class="java.lang.Long"/>
-	<field name="allTotalPrice" class="java.lang.Long"/>
 	<field name="preorderItems" class="java.util.List"/>
 	<background>
 		<band splitType="Stretch"/>
@@ -74,17 +72,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="750" y="0" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
 				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="450" y="0" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" x="650" y="0" width="100" height="20"/>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>
@@ -96,25 +84,18 @@
 		</band>
 		<band height="60">
 			<staticText>
-				<reportElement uuid="f7c380d2-5034-4e3d-a251-995534f53b26" style="table" x="100" y="0" width="750" height="20"/>
+				<reportElement uuid="f7c380d2-5034-4e3d-a251-995534f53b26" style="table" x="100" y="0" width="550" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Горячее питание]]></text>
 			</staticText>
 			<subreport>
-				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="100" y="40" width="750" height="20"/>
+				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="100" y="40" width="550" height="20"/>
 				<subreportParameter name="1"/>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{preorderItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PreordersReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
-			<staticText>
-				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="750" y="20" width="100" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[Итого]]></text>
-			</staticText>
 			<textField>
 				<reportElement uuid="63c6581a-7ed1-4f60-a78a-051e12017e0d" style="table" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="100" height="60"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -151,13 +132,6 @@
 				<text><![CDATA[Сумма]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="650" y="20" width="100" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[Скидка]]></text>
-			</staticText>
-			<staticText>
 				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="450" y="20" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
@@ -180,13 +154,6 @@
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
-			<textField>
-				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="650" y="0" width="100" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{allDiscount}).movePointLeft(2)]]></textFieldExpression>
-			</textField>
 			<staticText>
 				<reportElement uuid="786cdf61-0a8c-43bd-922f-0c6bb75d690c" style="table" x="350" y="0" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -202,13 +169,6 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="750" y="0" width="100" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{allTotalPrice}).movePointLeft(2)]]></textFieldExpression>
-			</textField>
-			<textField>
 				<reportElement uuid="cf219e5a-8d27-4818-a7be-d2b61b552a76" style="table" x="450" y="0" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
@@ -223,11 +183,6 @@
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{allPreorderSum}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="750" y="20" width="100" height="20" backcolor="#999999"/>
-				<textElement/>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
 				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="100" y="20" width="100" height="20" backcolor="#999999"/>
 				<textElement/>
 				<text><![CDATA[]]></text>
@@ -239,11 +194,6 @@
 			</staticText>
 			<staticText>
 				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="200" y="20" width="150" height="20" backcolor="#999999"/>
-				<textElement/>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="5b775967-2c04-4e81-8f7d-3f8ca1f2c9f2" style="table" mode="Opaque" x="650" y="20" width="100" height="20" backcolor="#999999"/>
 				<textElement/>
 				<text><![CDATA[]]></text>
 			</staticText>

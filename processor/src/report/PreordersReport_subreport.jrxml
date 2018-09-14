@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport_subreport" pageWidth="750" pageHeight="150" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="750" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="0c4cd73d-08d1-4515-a0fc-371d19370122">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreordersReport_subreport" pageWidth="550" pageHeight="150" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="550" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" whenResourceMissingType="Key" isIgnorePagination="true" uuid="0c4cd73d-08d1-4515-a0fc-371d19370122">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -44,22 +44,11 @@
 	<field name="preorderPrice" class="java.lang.Long"/>
 	<field name="amount" class="java.lang.Integer"/>
 	<field name="preorderSum" class="java.lang.Long"/>
-	<field name="discount" class="java.lang.Long"/>
-	<field name="totalPrice" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
 		<band height="20">
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="a5864909-33a9-4171-a801-406dfb4d89c6" style="table" stretchType="RelativeToTallestObject" x="550" y="0" width="100" height="20">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{discount}).movePointLeft(2)]]></textFieldExpression>
-			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement uuid="a5864909-33a9-4171-a801-406dfb4d89c6" style="table" stretchType="RelativeToTallestObject" x="350" y="0" width="100" height="20">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
@@ -95,15 +84,6 @@
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{preorderSum}).movePointLeft(2)]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement uuid="a5864909-33a9-4171-a801-406dfb4d89c6" style="table" stretchType="RelativeToTallestObject" x="650" y="0" width="100" height="20">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{totalPrice}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement uuid="a5864909-33a9-4171-a801-406dfb4d89c6" style="table" stretchType="RelativeToTallestObject" x="250" y="0" width="100" height="20">

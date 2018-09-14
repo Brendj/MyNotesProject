@@ -32,8 +32,6 @@ public class PreorderReportTotalItem {
             item.calculateTotalPrice();
             allAmount += item.getAmount();
             allPreorderSum += item.getPreorderSum();
-            allDiscount += item.getDiscount();
-            allTotalPrice += item.getTotalPrice();
         }
     }
 

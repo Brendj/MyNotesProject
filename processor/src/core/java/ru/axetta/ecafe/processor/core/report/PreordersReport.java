@@ -104,7 +104,6 @@ public class PreordersReport extends BasicReportForOrgJob {
                     + "         CASE WHEN md.menudetailname is null OR md.menudetailname LIKE '' THEN ci.complexname ELSE md.menudetailname END "
                     + "     END AS preordername, "
                     + "     CASE WHEN pc.amount > 0 THEN pc.complexPrice ELSE pmd.menudetailPrice END AS preorderPrice, "
-                    + "     0 AS discount, "
                     + "     pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder "
                     + "FROM cf_preorder_complex pc "
                     + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
@@ -139,14 +138,13 @@ public class PreordersReport extends BasicReportForOrgJob {
                 Integer amount = (Integer) row[6];
                 String preorderName = (String) row[7];
                 Long preorderPrice = ((BigInteger) row[8]).longValue();
-                Integer discount = (Integer) row[9];
-                Boolean isRegularPreorder = (Boolean) row[10];
+                Boolean isRegularPreorder = (Boolean) row[9];
                 if (!result.containsKey(contractId)) {
                     result.put(contractId, new PreorderReportClientItem(idOfOrg, shortNameInfoService, address, contractId,
                             clientName, clientGroup));
                 }
                 result.get(contractId).getPreorderItems().add(new PreorderReportItem(preorderDate, amount, preorderName,
-                        preorderPrice, discount.longValue(), isRegularPreorder));
+                        preorderPrice, isRegularPreorder));
 
                 if (!preorderReportTotalItems.containsKey(preorderName)) {
                     PreorderReportItem preorderReportItem = new PreorderReportItem(preorderName);
@@ -156,8 +154,6 @@ public class PreordersReport extends BasicReportForOrgJob {
 
                 PreorderReportItem item = preorderReportTotalItems.get(preorderName);
                 item.setAmount(item.getAmount() + amount);
-                item.setTotalPrice(item.getTotalPrice() + preorderPrice * amount);
-                item.setDiscount(item.getDiscount() + discount);
             }
 
             List<PreorderReportClientItem> resultClientList = new ArrayList<PreorderReportClientItem>(result.values());
