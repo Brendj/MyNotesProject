@@ -99,7 +99,7 @@ public class PreordersReport extends BasicReportForOrgJob {
                 conditions += " and c.idofclient in (:clients) ";
             }
             Query query = session.createSQLQuery(
-                   "SELECT o.shortnameinfoservice, o.address, "
+                   "SELECT distinct o.shortnameinfoservice, o.address, "
                     + "     c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
                     + "     pc.preorderdate, "
                     + "     CASE WHEN pc.amount > 0 THEN pc.amount ELSE pmd.amount END AS amount, "
@@ -118,7 +118,7 @@ public class PreordersReport extends BasicReportForOrgJob {
                     + "     or pmd.preorderdate between :startDate and :endDate) "
                     + "     and o.idoforg = :idOfOrg and coalesce(pc.deletedstate, 0) = 0 and coalesce(pmd.deletedstate, 0) = 0 "
                     + conditions
-                    + "ORDER BY o.idoforg, cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, pmd.menudetailname");
+                    + "ORDER BY cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, preordername");
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
             query.setParameter("idOfOrg", idOfOrg);
@@ -143,7 +143,8 @@ public class PreordersReport extends BasicReportForOrgJob {
                 if (isComplex) {
                     Long idOfPreorderComplex = ((BigInteger) row[10]).longValue();
                     List<String> dishes = DAOUtils.getDishesByPreorderComplexId(session, idOfPreorderComplex);
-                    preorderName += String.format(" (%s)", StringUtils.join(dishes, ", "));
+                    if (!dishes.isEmpty())
+                        preorderName += String.format(" (%s)", StringUtils.trim(StringUtils.join(dishes, ", ")));
                 }
                 if (!result.containsKey(contractId)) {
                     result.put(contractId, new PreorderReportClientItem(idOfOrg, shortNameInfoService, address, contractId,
