@@ -3492,6 +3492,8 @@ public class DAOUtils {
     public static List<ClientGuardian> findListOfClientGuardianByIdOfGuardian(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.eq("disabled", false));
         return criteria.list();
     }
 
