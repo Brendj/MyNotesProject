@@ -780,18 +780,20 @@ public class SmartWatchRestController {
                     item.setSurName(child.getPerson().getSurname());
                 }
                 item.setGroupName(child.getClientGroup().getGroupName());
-                JsonCardInfo info = new JsonCardInfo();
-                info.setCardPrintedNo(card.getCardPrintedNo());
-                info.setCardNo(card.getCardNo());
-                info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
-                info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
-                info.setState(this.cardState.get(card.getState()));
-                item.setCardInfo(info);
+                if(card != null) {
+                    JsonCardInfo info = new JsonCardInfo();
+                    info.setCardPrintedNo(card.getCardPrintedNo());
+                    info.setCardNo(card.getCardNo());
+                    info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
+                    info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
+                    info.setState(this.cardState.get(card.getState()));
+                    item.setCardInfo(info);
+                }
                 resultList.add(item);
             }
             return resultList;
         }catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("", e);
             throw e;
         }
     }
