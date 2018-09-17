@@ -22,6 +22,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -210,58 +211,6 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                         endDate, dates, complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj, notify);
             }
 
-            if (!idOfMenuSourceOrgList.isEmpty()) {
-                for (BasicReportJob.OrgShortItem item : orgMap.values()) {
-                    if (item.getSourceMenuOrg() != null) {
-                        MultiValueMap fullNameProviderMap = new MultiValueMap();
-                        Criteria goodCriteria = session.createCriteria(Good.class);
-                        goodCriteria.add(Restrictions.in("orgOwner", idOfMenuSourceOrgList));
-                        goodCriteria.setProjection(Projections.projectionList().add(Projections.property("fullName"))
-                                .add(Projections.property("nameOfGood")).add(Projections.property("orgOwner"))
-                                .add(Projections.property("globalId")).add(Projections.property("goodsCode")));
-                        List goodNames = goodCriteria.list();
-                        for (Object obj : goodNames) {
-                            Object[] row = (Object[]) obj;
-                            final Long idOfOrg = Long.valueOf(row[2].toString());
-                            final Long idOfGood = Long.valueOf(row[3].toString());
-                            final String goodsCode = row[4].toString();
-                            String nameOfGood = row[0].toString();
-                            if (StringUtils.isEmpty(nameOfGood)) {
-                                nameOfGood = row[1].toString();
-                            }
-                            if (!requestGoodsInfo.containsKey(idOfGood)) {
-                                GoodRequestsNewReportService.FeedingPlanType planType = null;
-                                if (allGoodsInfo.containsKey(idOfGood)) {
-                                    planType = allGoodsInfo.get(idOfGood).feedingPlanType;
-                                } else {
-                                    continue;
-                                }
-                                fullNameProviderMap.put(idOfOrg, new GoodRequestsNewReportService.GoodInfo(idOfGood, nameOfGood, planType, goodsCode));
-                            }
-                        }
-                        if (fullNameProviderMap.getCollection(item.getSourceMenuOrg()) != null) {
-                            for (Object object : fullNameProviderMap.getCollection(item.getSourceMenuOrg())) {
-                                GoodRequestsNewReportService.GoodInfo goodInfo = (GoodRequestsNewReportService.GoodInfo) object;
-                                if (hideMissedColumns) {
-                                    for (Date date : dates) {
-                                        addItemsFromList(itemList, item, date, goodInfo.name, hideDailySampleValue,
-                                                hideLastValue, goodInfo.feedingPlanType, 0L, 0L, goodInfo.goodsCode);
-                                    }
-                                } else {
-                                    beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-                                    endDate = CalendarUtils.endOfDay(endTime);
-                                    while (beginDate.getTime() <= endDate.getTime()) {
-                                        addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
-                                                hideLastValue, goodInfo.feedingPlanType, 0L, 0L, goodInfo.goodsCode);
-                                        beginDate = CalendarUtils.addOneDay(beginDate);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             if (itemList.isEmpty()) {
                 for (BasicReportJob.OrgShortItem item : orgMap.values()) {
                     itemList.add(new GoodRequestsNewReportService.Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
@@ -293,6 +242,11 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             criteria.add(Restrictions.eq("deletedState", false));
             criteria.add(Restrictions.eq("gr.deletedState", false));
             criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
+            Junction countCondition = Restrictions.disjunction();
+            countCondition.add(Restrictions.ne("totalCount", 0L))
+                    .add(Restrictions.ne("dailySampleCount", 0L))
+                    .add(Restrictions.ne("tempClientsCount", 0L));
+            criteria.add(countCondition);
 
             if (!guidFilter.isEmpty()) {
                 criteria.add(Restrictions.or(Restrictions.eq("notified", false), Restrictions.isNull("notified")));
