@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -106,13 +107,17 @@ public class PreordersReport extends BasicReportForOrgJob {
                     + "     CASE WHEN pc.amount > 0 THEN pc.complexname ELSE  pmd.menudetailname END AS preordername, "
                     + "     CASE WHEN pc.amount > 0 THEN pc.complexPrice ELSE pmd.menudetailPrice END AS preorderPrice, "
                     + "     pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder,"
-                    + "     pc.idofpreordercomplex, pc.amount > 0 AS isComplex "
+                    + "     pc.idofpreordercomplex, pc.amount > 0 AS isComplex, pl.idofpreorderlinkod is not null as isPayed "
                     + "FROM cf_preorder_complex pc "
                     + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                     + "INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
                     + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
+                    + "LEFT JOIN (SELECT idofpreorderlinkod, preorderguid "
+                    + "           FROM cf_preorder_linkod pl "
+                    + "           INNER JOIN cf_orders o ON o.idoforg = pl.idoforg AND o.idoforder = pl.idoforder AND o.state = :orderStateCommited) pl "
+                    + "     ON pl.preorderguid = pc.guid "
                     + "WHERE (pc.amount > 0 OR pmd.amount > 0) "
                     + "     and (pc.preorderdate between :startDate and :endDate "
                     + "     or pmd.preorderdate between :startDate and :endDate) "
@@ -122,6 +127,7 @@ public class PreordersReport extends BasicReportForOrgJob {
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
             query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("orderStateCommited", Order.STATE_COMMITED);
             if (idOfClientList.size() > 0) {
                 query.setParameterList("clients", idOfClientList);
             }
@@ -140,6 +146,7 @@ public class PreordersReport extends BasicReportForOrgJob {
                 Boolean isRegularPreorder = (Boolean) row[9];
 
                 Boolean isComplex = (Boolean) row[11];
+                Boolean isPayed = (Boolean) row[12];
                 if (isComplex) {
                     Long idOfPreorderComplex = ((BigInteger) row[10]).longValue();
                     List<String> dishes = DAOUtils.getDishesByPreorderComplexId(session, idOfPreorderComplex);
@@ -151,7 +158,7 @@ public class PreordersReport extends BasicReportForOrgJob {
                             clientName, clientGroup));
                 }
                 result.get(contractId).getPreorderItems().add(new PreorderReportItem(preorderDate, amount, preorderName,
-                        preorderPrice, isRegularPreorder));
+                        preorderPrice, isRegularPreorder, isPayed));
 
                 if (!preorderReportTotalItems.containsKey(preorderName)) {
                     PreorderReportItem preorderReportItem = new PreorderReportItem(preorderName);
