@@ -23,3 +23,5 @@ alter table cf_preorder_complex add column idOfOrgOnCreate bigint,
 CREATE INDEX cf_preorder_complex_idoforgoncreate_idx ON cf_preorder_complex (idoforgoncreate);
 
 alter table cf_preorder_menudetail alter column menudetailprice set not null;
+
+--! ФИНАЛИЗИРОВАН 18.09.2018, НЕ МЕНЯТЬ
