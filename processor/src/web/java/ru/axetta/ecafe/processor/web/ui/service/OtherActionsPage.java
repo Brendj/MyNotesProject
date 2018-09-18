@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
+import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -46,6 +47,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     private List<Long> clientsIds = null;
     private Date summaryDate;
     private Date summaryFinOperatorDate;
+    private String orgsForSpbCardsUidUpdate;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -205,7 +207,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
         int count = 0;
         try {
-            orgs = getOrgs();
+            orgs = getOrgsForGenGuardians();
             count = ClientService.getInstance().generateGuardians(orgs);
         } catch (Exception e) {
             printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
@@ -283,13 +285,17 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
-    private List<Long> getOrgs() throws Exception {
-        if (orgsForGenerateGuardians.equals("ALL")) {
+    private List<Long> getOrgsForGenGuardians() throws Exception {
+        return getOrgs(orgsForGenerateGuardians);
+    }
+
+    private List<Long> getOrgs(String field) throws Exception {
+        if (field.equals("ALL")) {
             return null;
         }
-        List orgs = new ArrayList();
+        List<Long> orgs = new ArrayList<Long>();
         try {
-            String[] sOrgs = orgsForGenerateGuardians.split(",");
+            String[] sOrgs = field.split(",");
             for (String s : sOrgs) {
                 Long org = Long.parseLong(s.trim());
                 orgs.add(org);
@@ -461,6 +467,30 @@ public class OtherActionsPage extends BasicWorkspacePage {
         } catch (Exception e) {
             getLogger().error("Error create RegularPreorders: ", e);
             printError("Во время создания регулярных предзаказов произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public String getOrgsForSpbCardsUidUpdate() {
+        return orgsForSpbCardsUidUpdate;
+    }
+
+    public void setOrgsForSpbCardsUidUpdate(String orgsForSpbCardsUidUpdate) {
+        this.orgsForSpbCardsUidUpdate = orgsForSpbCardsUidUpdate;
+    }
+
+    public Boolean isSpb() {
+        //TODO
+        return RuntimeContext.RegistryType.isSpb() || RuntimeContext.getInstance().isTestMode() || true;
+    }
+
+    public void runUpdateSpbCardUids() throws Exception {
+        try {
+            List<Long> orgs = getOrgsForGenGuardians();
+            RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).updateCards(orgs);
+            printMessage("Преобразование номеров карт завершено");
+        } catch (Exception e) {
+            getLogger().error("Error update card uids: ", e);
+            printError("Вов время преобразования номеров карт произошла ошибка с текстом " + e.getMessage());
         }
     }
 }
