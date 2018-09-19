@@ -230,22 +230,27 @@ public class CardWritableRepository extends WritableJpaDao {
                 .executeUpdate();
     }
 
-    public int blockAndReset(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
         if (!isOldArm) return blockAndReset(cardNo, idOfOrg);
-        return entityManager.createQuery("update Card set "
+        String condition = (idOfClient == null) ? " and org.idOfOrg in :idOfOrgs" : " and client.idOfClient = :idOfClient";
+        Query query = entityManager.createQuery("update Card set "
                 + " state = :state, "
                 + " validTime = :validTime,"
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime "
                 + " where cardNo = :cardNo"
-                + "     and client.idOfClient = :idOfClient")
-                .setParameter("state", CardState.BLOCKED.getValue())
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
-                .setParameter("updateTime", new Date())
-                .setParameter("cardNo", cardNo)
-                .setParameter("idOfClient", idOfClient)
-                .executeUpdate();
+                + condition);
+        query.setParameter("state", CardState.BLOCKED.getValue());
+        query.setParameter("validTime", new Date());
+        query.setParameter("issueTime", new Date());
+        query.setParameter("updateTime", new Date());
+        query.setParameter("cardNo", cardNo);
+        if (idOfClient == null) {
+            query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));
+        } else {
+            query.setParameter("idOfClient", idOfClient);
+        }
+        return query.executeUpdate();
     }
 
     public int reset(long cardNo, long idOfOrg) {
@@ -266,23 +271,28 @@ public class CardWritableRepository extends WritableJpaDao {
                 .executeUpdate();
     }
 
-    public int reset(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
+    public int reset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
         if (!isOldArm) return reset(cardNo, idOfOrg);
-        return entityManager.createQuery("update Card set "
+        String condition = (idOfClient == null) ? " and org.idOfOrg in :idOfOrgs" : " and client.idOfClient = :idOfClient";
+        Query query = entityManager.createQuery("update Card set "
                 + " client = null, "
                 + " state = :state, "
                 + " issueTime = :issueTime ,"
                 + " updateTime = :updateTime, "
                 + " validTime = :validTime "
                 + " where cardNo = :cardNo"
-                + "     and client.idOfClient = :idOfClient")
-                .setParameter("state", CardState.FREE.getValue())
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
-                .setParameter("updateTime", new Date())
-                .setParameter("cardNo", cardNo)
-                .setParameter("idOfClient", idOfClient)
-                .executeUpdate();
+                + condition);
+        query.setParameter("state", CardState.FREE.getValue());
+        query.setParameter("validTime", new Date());
+        query.setParameter("issueTime", new Date());
+        query.setParameter("updateTime", new Date());
+        query.setParameter("cardNo", cardNo);
+        if (idOfClient == null) {
+            query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));
+        } else {
+            query.setParameter("idOfClient", idOfClient);
+        }
+        return query.executeUpdate();
     }
 
     public int issueToVisitor(CardsOperationsRegistryItem o,  long idOfOrg) {

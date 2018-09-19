@@ -1245,7 +1245,8 @@ public class SyncRequest {
                             && valueEqualNullSafe(reqMenuDetail.getProtein(), menuDetail.getProtein())
                             && valueEqualNullSafe(reqMenuDetail.getFat(), menuDetail.getFat())
                             && valueEqualNullSafe(reqMenuDetail.getCarbohydrates(), menuDetail.getCarbohydrates())
-                            && valueEqualNullSafe(reqMenuDetail.getItemCode(), menuDetail.getItemCode());
+                            && valueEqualNullSafe(reqMenuDetail.getItemCode(), menuDetail.getItemCode())
+                            && valueEqualNullSafe(reqMenuDetail.getIdOfMenu(), menuDetail.getLocalIdOfMenu());
                 }
 
                 private static boolean valueEqualNullSafe(Object str1, Object str2) {

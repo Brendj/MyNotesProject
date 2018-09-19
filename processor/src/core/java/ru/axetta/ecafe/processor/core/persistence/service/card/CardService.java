@@ -127,7 +127,7 @@ public class CardService {
             resetAllCards(client);
         }
     }
-    public int reset(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
+    public int reset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
         return cardWritableRepository.reset(cardNo, idOfOrg, idOfClient, isOldArm);
     }
 
@@ -163,7 +163,7 @@ public class CardService {
 
 
     //7.	Блокировка карты со сбросом
-    public int blockAndReset(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
         return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm);
     }
 

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@Scope("prototype")
+@Scope("singleton")
 public class GeoplanerManager {
     private static final Logger logger = LoggerFactory.getLogger(GeoplanerManager.class);
     private final static boolean isOn = managerIsOn();
