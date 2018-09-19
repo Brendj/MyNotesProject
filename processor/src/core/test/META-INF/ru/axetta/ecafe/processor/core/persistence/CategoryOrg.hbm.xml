@@ -13,7 +13,7 @@
         <property name="categoryName" column="CategoryName" type="string" length="255" not-null="true"/>
 
         <!-- Cвязь многие ко многим между таблицами CategoryOrg и Org -->
-        <set name="orgsInternal" lazy="false" table="CF_CategoryOrg_Orgs">
+        <set name="orgsInternal" table="CF_CategoryOrg_Orgs">
             <key column="IdOfCategoryOrg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>

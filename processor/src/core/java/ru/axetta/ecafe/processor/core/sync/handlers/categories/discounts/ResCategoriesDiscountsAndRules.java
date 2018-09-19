@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Document;
@@ -50,10 +51,12 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
 
     private List getAllDiscountRules(Session session) {
         Criteria criteriaDiscountRule = session.createCriteria(DiscountRule.class);
+        criteriaDiscountRule.setFetchMode("categoryOrgs", FetchMode.SELECT);
         return criteriaDiscountRule.list();
     }
 
     private void addRulesWithEmptyCategoryOrgSet(List discountRules, Long idOfOrg) {
+        List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(idOfOrg);
         for (Object object : discountRules) {
             DiscountRule discountRule = (DiscountRule) object;
             if (containRule(discountRule.getIdOfRule())) {
@@ -61,7 +64,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             }
                 /* если правила не установлены категории организаций то отправляем*/
             if (discountRule.getCategoryOrgs().isEmpty()) {
-                addDCRI(new DiscountCategoryRuleItem(discountRule, idOfOrg));
+                addDCRI(new DiscountCategoryRuleItem(discountRule, idOfOrg, fOrgs));
             }
         }
     }
@@ -73,6 +76,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             existOrgWithEmptyCategoryOrgSet = true;
             return;
         }
+        List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(org.getIdOfOrg());
         for (Object object : discountRules) {
             DiscountRule discountRule = (DiscountRule) object;
             if (containRule(discountRule.getIdOfRule())) {
@@ -93,7 +97,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
                 bIncludeRule = true;
             }
             if (bIncludeRule) {
-                addDCRI(new DiscountCategoryRuleItem(discountRule, org.getIdOfOrg()));
+                addDCRI(new DiscountCategoryRuleItem(discountRule, org.getIdOfOrg(), fOrgs));
             }
         }
     }
@@ -282,7 +286,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         }
         //
 
-        public DiscountCategoryRuleItem(DiscountRule discountRule, Long idOfOrg) {
+        public DiscountCategoryRuleItem(DiscountRule discountRule, Long idOfOrg, List<Long> fOrgs) {
             this.idOfRule = discountRule.getIdOfRule();
             this.description = discountRule.getDescription();
             this.categoryDiscounts = discountRule.getCategoryDiscounts();
@@ -301,7 +305,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             this.complexesMap = discountRule.getComplexesMap();
             this.subCategory = discountRule.getSubCategory();
             Set<Long> orgs = new HashSet<Long>();
-            List<Long> fOrgs = DAOService.getInstance().findFriendlyOrgsIds(idOfOrg);
+
             for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
                 for (Org org : categoryOrg.getOrgs()) {
                     if (fOrgs.contains(org.getIdOfOrg())) {
