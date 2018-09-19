@@ -3555,7 +3555,7 @@ public class Processor implements SyncProcessor {
                 /* в случае анонимного заказа мы не знаем клиента */
                 /* не оповещаем в случае пробития корректировочных заказов */
                 if (client != null) {
-                    if(GeoplanerManager.isOn() && client.getHasActiveSmartWatch()){
+                    if(GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()){
                         GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
                         manager.sendPurchasesInfoToGentler(payment, client);
                     }
@@ -3646,9 +3646,9 @@ public class Processor implements SyncProcessor {
 
     private boolean transactionOwnerHaveSmartWatch(AccountTransaction transaction) {
         if(transaction.getClient() != null){
-            return transaction.getClient().getHasActiveSmartWatch();
+            return transaction.getClient().clientHasActiveSmartWatch();
         } else if(transaction.getCard() != null) {
-            return transaction.getCard().getClient().getHasActiveSmartWatch();
+            return transaction.getCard().getClient().clientHasActiveSmartWatch();
         }
         return false;
     }
@@ -5524,7 +5524,7 @@ public class Processor implements SyncProcessor {
 
     private boolean enterEventOwnerHaveSmartWatch(Session session, EnterEvent enterEvent) throws  Exception{
         if(enterEvent.getClient() != null){
-            return enterEvent.getClient().getHasActiveSmartWatch();
+            return enterEvent.getClient().clientHasActiveSmartWatch();
         } else if (enterEvent.getIdOfCard() != null){
             return DAOUtils.findClientByCardNoAndHeHaveActiveSW(session, enterEvent.getIdOfCard(), enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg());
         }

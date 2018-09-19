@@ -1116,10 +1116,11 @@ public class Client {
     }
 
     public Boolean getHasActiveSmartWatch() {
-        if(hasActiveSmartWatch == null){
-            return false;
-        }
         return hasActiveSmartWatch;
+    }
+
+    public boolean clientHasActiveSmartWatch() {
+        return hasActiveSmartWatch == null ? false : hasActiveSmartWatch;
     }
 
     public void setHasActiveSmartWatch(Boolean hasActiveSmartWatch) {

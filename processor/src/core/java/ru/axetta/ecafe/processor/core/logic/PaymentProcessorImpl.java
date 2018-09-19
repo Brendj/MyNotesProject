@@ -264,7 +264,7 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 RuntimeContext.getAppContext().getBean(PaymentNotificator.class).sendNotification(clientPayment, client, subBalanceNum);
-                if(GeoplanerManager.isOn() && client.getHasActiveSmartWatch()){
+                if(GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()){
                     GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
                     manager.sendPaymentInfoToGeoplaner(clientPayment, client);
                 }
