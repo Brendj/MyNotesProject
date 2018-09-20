@@ -26,7 +26,7 @@
             </h:panelGroup>
 
             <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
-            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardNo}" converter="cardNoConverter" maxlength="10"
+            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardNo}" converter="cardNoConverter" maxlength="16"
                          style="width: 240px;" styleClass="input-text" />
 
             <h:outputText escape="true" value="Номер, нанесённый на карту" styleClass="output-text" />
