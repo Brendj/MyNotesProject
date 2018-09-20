@@ -483,9 +483,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
         return RuntimeContext.RegistryType.isSpb() || RuntimeContext.getInstance().isTestMode() || true;
     }
 
+    private List<Long> getOrgsForCardsUpdate() throws Exception {
+        return getOrgs(orgsForSpbCardsUidUpdate);
+    }
+
     public void runUpdateSpbCardUids() throws Exception {
         try {
-            List<Long> orgs = getOrgsForGenGuardians();
+            List<Long> orgs = getOrgsForCardsUpdate();
             RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).updateCards(orgs);
             printMessage("Преобразование номеров карт завершено");
         } catch (Exception e) {
