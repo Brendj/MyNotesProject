@@ -98,7 +98,7 @@ public class FinancialOpsManager {
 
         textContents = textContents.substring(0, Math.min(textContents.length(), 70));
         Long orgId = idOfSourceOrg == null ? client.getOrg().getIdOfOrg() : idOfSourceOrg;
-        ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsId, contentsType, textContents,
+        ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone == null ? "-" : phone, contentsId, contentsType, textContents,
                 serviceSendTime, priceOfSms, eventTime, orgId);
         clientSms.setSendTime(serviceSendTime);
         clientSms.setContentsId(contentsId);
