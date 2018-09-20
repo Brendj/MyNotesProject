@@ -23,7 +23,7 @@
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
-    <h:inputText value="#{mainPage.cardEditPage.cardNo}" converter="cardNoConverter" readonly="true" maxlength="10"
+    <h:inputText value="#{mainPage.cardEditPage.cardNo}" converter="cardNoConverter" readonly="true" maxlength="16"
                  styleClass="input-text" />
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
     <h:inputText value="#{mainPage.cardEditPage.cardPrintedNo}" converter="cardPrintedNoConverter" readonly="true"
