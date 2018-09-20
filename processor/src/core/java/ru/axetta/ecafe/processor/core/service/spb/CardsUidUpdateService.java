@@ -45,12 +45,12 @@ public class CardsUidUpdateService {
                         for (Card card : DAOUtils.getAllCardByClientAndCardState(session, client, CardState.ISSUED)) {
                             if (card.getCardNo().equals(clientGuid)) {
                                 Long newCardNo = card.getCardNo() * 1000 + 1;
-                                cardManager.createCard(session, session.getTransaction(), client.getIdOfClient(),
-                                        newCardNo, card.getCardType(), CardState.ISSUED.getValue(), CalendarUtils.addYear(new Date(), 10),
-                                        Card.ISSUED_LIFE_STATE, null, new Date(), newCardNo);
                                 cardManager.updateCard(card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                                         CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
                                         card.getIssueTime(), card.getExternalId());
+                                cardManager.createCard(session, session.getTransaction(), client.getIdOfClient(),
+                                        newCardNo, card.getCardType(), CardState.ISSUED.getValue(), CalendarUtils.addYear(new Date(), 10),
+                                        Card.ISSUED_LIFE_STATE, null, new Date(), newCardNo);
                             }
                         }
                     } catch (NumberFormatException e) {
