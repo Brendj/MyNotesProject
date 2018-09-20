@@ -480,7 +480,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public Boolean isSpb() {
         //TODO
-        return RuntimeContext.RegistryType.isSpb() || RuntimeContext.getInstance().isTestMode() || true;
+        return RuntimeContext.RegistryType.isSpb() || RuntimeContext.getInstance().isTestMode();
     }
 
     private List<Long> getOrgsForCardsUpdate() throws Exception {
