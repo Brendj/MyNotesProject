@@ -3261,7 +3261,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public void clientLoadFileListener(UploadEvent event) {
+    public synchronized void clientLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
         InputStream inputStream = null;
@@ -4484,7 +4484,7 @@ public class MainPage implements Serializable {
     }
 
 
-    public void cardLoadFileListener(UploadEvent event) {
+    public synchronized void cardLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
         InputStream inputStream = null;
@@ -4542,7 +4542,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public void newCardLoadFileListener(UploadEvent event) {
+    public synchronized void newCardLoadFileListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UploadItem item = event.getUploadItem();
         InputStream inputStream = null;
