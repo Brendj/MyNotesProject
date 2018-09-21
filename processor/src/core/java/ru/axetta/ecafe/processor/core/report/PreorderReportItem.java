@@ -10,13 +10,13 @@ import java.util.Date;
  * Created by i.semenov on 11.04.2018.
  */
 public class PreorderReportItem implements Comparable<PreorderReportItem> {
-    private Date preorderDate;
-    private Integer amount;
-    private String preorderName;
-    private Long preorderPrice;
-    private Long preorderSum;
-    private Boolean isRegularPreorder;
-    private Boolean isPayed;
+    protected Date preorderDate;
+    protected Integer amount;
+    protected String preorderName;
+    protected Long preorderPrice;
+    protected Long preorderSum;
+    protected Boolean isRegularPreorder;
+    protected Boolean isPayed;
 
     public PreorderReportItem(Date preorderDate, Integer amount, String preorderName,
             Long preorderPrice, Boolean isRegularPreorder, Boolean isPayed) {
@@ -33,6 +33,14 @@ public class PreorderReportItem implements Comparable<PreorderReportItem> {
     public PreorderReportItem(String preorderName) {
         this.amount = 0;
         this.preorderName = preorderName;
+        this.preorderPrice = 0L;
+        this.preorderSum = 0L;
+        this.isPayed = false;
+    }
+
+    public PreorderReportItem() {
+        this.amount = 0;
+        this.preorderName = "";
         this.preorderPrice = 0L;
         this.preorderSum = 0L;
         this.isPayed = false;

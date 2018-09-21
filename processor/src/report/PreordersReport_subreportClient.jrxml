@@ -13,7 +13,11 @@
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5"/>
+			<leftPen lineWidth="0.5"/>
+			<bottomPen lineWidth="0.5"/>
+			<rightPen lineWidth="0.5"/>
 		</box>
 	</style>
 	<style name="table_TH" mode="Opaque" backcolor="#FFFFFF">
@@ -43,7 +47,7 @@
 	<field name="clientGroup" class="java.lang.String"/>
 	<field name="allAmount" class="java.lang.Integer"/>
 	<field name="allPreorderSum" class="java.lang.Long"/>
-	<field name="preorderItems" class="java.util.List"/>
+	<field name="preorderComplexItems" class="java.util.List"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -82,7 +86,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
-		<band height="60">
+		<band height="80">
 			<staticText>
 				<reportElement uuid="f7c380d2-5034-4e3d-a251-995534f53b26" style="table" x="100" y="0" width="600" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -91,15 +95,15 @@
 				<text><![CDATA[Горячее питание]]></text>
 			</staticText>
 			<subreport>
-				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" x="100" y="40" width="600" height="20"/>
+				<reportElement uuid="5bb33b80-f01f-4e30-9678-cf858157a577" positionType="Float" stretchType="RelativeToBandHeight" x="100" y="40" width="600" height="20" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true"/>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{preorderItems})]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PreordersReport_subreport.jasper"]]></subreportExpression>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{preorderComplexItems})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PreordersReport_subreportComplex.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
-				<reportElement uuid="63c6581a-7ed1-4f60-a78a-051e12017e0d" style="table" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="100" height="60"/>
+				<reportElement uuid="63c6581a-7ed1-4f60-a78a-051e12017e0d" style="table" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="100" height="80"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -139,6 +143,31 @@
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Кол-во]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" positionType="Float" x="600" y="60" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" positionType="Float" x="500" y="60" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" positionType="Float" x="200" y="60" width="200" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" positionType="Float" x="100" y="60" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="976f7e72-48d7-4675-9168-11f6b2412179" style="table" positionType="Float" x="400" y="60" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
 			</staticText>
 		</band>
 		<band height="40">

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PreorderReportClientItem implements Comparable<PreorderReportClientItem> {
@@ -17,7 +18,7 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
     private String clientGroup;
     private Integer allAmount;
     private Long allPreorderSum;
-    private List<PreorderReportItem> preorderItems;
+    private List<PreorderReportComplexItem> preorderComplexItems;
 
     public PreorderReportClientItem(Long idOfOrg, String shortNameInfoService, String address, Long contractId,
             String clientName, String clientGroup) {
@@ -27,13 +28,14 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
         this.contractId = contractId;
         this.clientName = clientName;
         this.clientGroup = clientGroup;
-        preorderItems = new ArrayList<PreorderReportItem>();
+        preorderComplexItems = new ArrayList<PreorderReportComplexItem>();
     }
 
     public void calculateTotalValues() {
         this.allAmount = 0;
         this.allPreorderSum = 0L;
-        for (PreorderReportItem item : preorderItems) {
+        for (PreorderReportComplexItem item : preorderComplexItems) {
+            item.calculateTotalPrice();
             this.allAmount += getIntSafe(item.getAmount());
             this.allPreorderSum += getLongSafe(item.getPreorderSum());
         }
@@ -95,12 +97,12 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
         this.clientGroup = clientGroup;
     }
 
-    public List<PreorderReportItem> getPreorderItems() {
-        return preorderItems;
+    public List<PreorderReportComplexItem> getPreorderComplexItems() {
+        return preorderComplexItems;
     }
 
-    public void setPreorderItems(List<PreorderReportItem> preorderItems) {
-        this.preorderItems = preorderItems;
+    public void setPreorderComplexItems(List<PreorderReportComplexItem> preorderComplexItems) {
+        this.preorderComplexItems = preorderComplexItems;
     }
 
     public Integer getAllAmount() {
@@ -123,7 +125,10 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
     public int compareTo(PreorderReportClientItem item) {
         int result = getIntFromGroupName(this.clientGroup).compareTo(getIntFromGroupName(item.getClientGroup()));
         if (0 == result) {
-            result = this.clientName.compareTo(item.getClientName());
+            result = getLetterFromGroupName(this.clientGroup).compareTo(getLetterFromGroupName(item.getClientGroup()));
+            if (0 == result) {
+                result = this.clientName.compareTo(item.getClientName());
+            }
         }
         return result;
     }
@@ -131,5 +136,18 @@ public class PreorderReportClientItem implements Comparable<PreorderReportClient
     public Integer getIntFromGroupName(String clientGroup) {
         String number = clientGroup.replaceAll("\\D", "");
         return number.isEmpty() ? 0 : Integer.parseInt(number);
+    }
+
+    public String getLetterFromGroupName(String clientGroup) {
+        return clientGroup.replaceAll("[^А-Я]+", "");
+    }
+
+    public Boolean isComplexExists(Date preorderDate, String complexName) {
+        for (PreorderReportComplexItem item : this.preorderComplexItems) {
+            if (item.getPreorderDate().equals(preorderDate) && item.getPreorderName().equals(complexName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

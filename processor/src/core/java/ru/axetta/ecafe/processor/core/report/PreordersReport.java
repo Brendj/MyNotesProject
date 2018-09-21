@@ -94,7 +94,8 @@ public class PreordersReport extends BasicReportForOrgJob {
                 List<Long> idOfClientList, Map<String, Object> parameterMap) throws Exception {
             HashMap<Long, PreorderReportClientItem> result = new HashMap<Long, PreorderReportClientItem>();
             PreorderReportTotalItem preorderReportTotalItem = new PreorderReportTotalItem();
-            HashMap<String, PreorderReportItem> preorderReportTotalItems = new HashMap<String, PreorderReportItem>();
+            HashMap<String, PreorderReportComplexItem> preorderReportTotalItems = new HashMap<String, PreorderReportComplexItem>();
+            PreorderReportComplexItem complexItem = null;
             String conditions = "";
             if (idOfClientList.size() > 0) {
                 conditions += " and c.idofclient in (:clients) ";
@@ -102,18 +103,16 @@ public class PreordersReport extends BasicReportForOrgJob {
             Query query = session.createSQLQuery(
                    "SELECT distinct o.shortnameinfoservice, o.address, "
                     + "     c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
-                    + "     pc.preorderdate, "
-                    + "     CASE WHEN pc.amount > 0 THEN pc.amount ELSE pmd.amount END AS amount, "
-                    + "     CASE WHEN pc.amount > 0 THEN pc.complexname ELSE  pmd.menudetailname END AS preordername, "
-                    + "     CASE WHEN pc.amount > 0 THEN pc.complexPrice ELSE pmd.menudetailPrice END AS preorderPrice, "
+                    + "     pc.preorderdate, pc.amount AS complexAmount, pmd.amount AS menudetailAmount, pc.complexname, "
+                    + "     pmd.menudetailname, pc.complexPrice, pmd.menudetailPrice, "
                     + "     pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder,"
-                    + "     pc.idofpreordercomplex, pc.amount > 0 AS isComplex, pl.idofpreorderlinkod is not null as isPayed "
+                    + "     pc.idofpreordercomplex, pl.idofpreorderlinkod is not null as isPayed "
                     + "FROM cf_preorder_complex pc "
                     + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                     + "INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                     + "INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
-                    + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
+                    + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 "
                     + "LEFT JOIN (SELECT idofpreorderlinkod, preorderguid "
                     + "           FROM cf_preorder_linkod pl "
                     + "           INNER JOIN cf_orders o ON o.idoforg = pl.idoforg AND o.idoforder = pl.idoforder AND o.state = :orderStateCommited) pl "
@@ -123,7 +122,7 @@ public class PreordersReport extends BasicReportForOrgJob {
                     + "     or pmd.preorderdate between :startDate and :endDate) "
                     + "     and o.idoforg = :idOfOrg and coalesce(pc.deletedstate, 0) = 0 and coalesce(pmd.deletedstate, 0) = 0 "
                     + conditions
-                    + "ORDER BY cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, preordername");
+                    + "ORDER BY cg.groupname, clientname, pc.preorderdate, pc.idofpreordercomplex, pc.complexname, pmd.menudetailname");
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
             query.setParameter("idOfOrg", idOfOrg);
@@ -140,43 +139,61 @@ public class PreordersReport extends BasicReportForOrgJob {
                 String clientName = (String) row[3];
                 String clientGroup = (String) row[4];
                 Date preorderDate = new Date(((BigInteger) row[5]).longValue());
-                Integer amount = (Integer) row[6];
-                String preorderName = (String) row[7];
-                Long preorderPrice = ((BigInteger) row[8]).longValue();
-                Boolean isRegularPreorder = (Boolean) row[9];
+                Integer complexAmount = (Integer) row[6];
+                Integer menudetailAmount = (Integer) row[7];
+                String complexName = (String) row[8];
+                String menudetailName = (String) row[9];
+                Long complexPrice = ((BigInteger) row[10]).longValue();
+                Long menudetailPrice = (null != row[11]) ? ((BigInteger) row[11]).longValue() : null;
+                Boolean isRegularPreorder = (Boolean) row[12];
 
-                Boolean isComplex = (Boolean) row[11];
-                Boolean isPayed = (Boolean) row[12];
-                if (isComplex) {
-                    Long idOfPreorderComplex = ((BigInteger) row[10]).longValue();
-                    List<String> dishes = DAOUtils.getDishesByPreorderComplexId(session, idOfPreorderComplex);
-                    if (!dishes.isEmpty())
-                        preorderName += String.format(" (%s)", StringUtils.trim(StringUtils.join(dishes, ", ")));
-                }
+                Boolean isPayed = (Boolean) row[14];
                 if (!result.containsKey(contractId)) {
                     result.put(contractId, new PreorderReportClientItem(idOfOrg, shortNameInfoService, address, contractId,
                             clientName, clientGroup));
                 }
-                result.get(contractId).getPreorderItems().add(new PreorderReportItem(preorderDate, amount, preorderName,
-                        preorderPrice, isRegularPreorder, isPayed));
 
-                if (!preorderReportTotalItems.containsKey(preorderName)) {
-                    PreorderReportItem preorderReportItem = new PreorderReportItem(preorderName);
-                    preorderReportItem.setPreorderPrice(preorderPrice);
-                    preorderReportTotalItems.put(preorderName, preorderReportItem);
+                if (!preorderReportTotalItems.containsKey(complexName)) {
+                    PreorderReportComplexItem preorderReportComplexItem = new PreorderReportComplexItem(complexName);
+                    if (0 != complexAmount) {
+                        preorderReportComplexItem.setPreorderPrice(complexPrice);
+                        preorderReportComplexItem.calculateTotalPrice();
+                    }
+                    preorderReportTotalItems.put(complexName, preorderReportComplexItem);
                 }
 
-                PreorderReportItem item = preorderReportTotalItems.get(preorderName);
-                item.setAmount(item.getAmount() + amount);
+                PreorderReportComplexItem item = preorderReportTotalItems.get(complexName);
+                if (!result.get(contractId).isComplexExists(preorderDate, complexName)) {
+                    complexItem = new PreorderReportComplexItem(preorderDate, complexAmount, complexName,
+                            complexAmount == 0 ? null : complexPrice, isRegularPreorder, isPayed);
+                    result.get(contractId).getPreorderComplexItems().add(complexItem);
+
+                    if (0 == complexAmount) {
+                        item.setAmount(item.getAmount() + 1);
+                    }
+                }
+
+                if (null != complexItem && complexItem.getAmount() == 0) {
+                    complexItem.getDishes()
+                            .add(new PreorderReportItem(preorderDate, menudetailAmount, menudetailName, menudetailPrice,
+                                    isRegularPreorder, isPayed));
+                    item.appendToTotalDishes(new PreorderReportItem(null, menudetailAmount, menudetailName,
+                            menudetailPrice, false, false));
+                } else if (null != complexItem && complexItem.getAmount() != 0) {
+                    item.setAmount(item.getAmount() + complexAmount);
+                }
             }
 
             List<PreorderReportClientItem> resultClientList = new ArrayList<PreorderReportClientItem>(result.values());
             Collections.sort(resultClientList);
-            List<PreorderReportItem> totalItemList = new ArrayList<PreorderReportItem>(preorderReportTotalItems.values());
+            List<PreorderReportComplexItem> totalItemList = new ArrayList<PreorderReportComplexItem>(preorderReportTotalItems.values());
             Collections.sort(totalItemList);
+            for (PreorderReportComplexItem item : totalItemList) {
+                Collections.sort(item.getDishes());
+            }
 
             preorderReportTotalItem.setPreorderReportClientItems(resultClientList);
-            preorderReportTotalItem.setPreorderReportItems(totalItemList);
+            preorderReportTotalItem.setPreorderReportComplexItems(totalItemList);
             preorderReportTotalItem.calculateTotalItem();
 
             ArrayList<PreorderReportTotalItem> reportTotalItems = new ArrayList<PreorderReportTotalItem>();

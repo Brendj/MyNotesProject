@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PreorderReportTotalItem {
     private List<PreorderReportClientItem> preorderReportClientItems;
-    private List<PreorderReportItem> preorderReportItems = new ArrayList<PreorderReportItem>();
+    private List<PreorderReportComplexItem> preorderReportComplexItems = new ArrayList<PreorderReportComplexItem>();
     private Integer allAmount;
     private Long allPreorderSum;
     private Long allDiscount;
@@ -28,7 +28,7 @@ public class PreorderReportTotalItem {
         allPreorderSum = 0L;
         allDiscount = 0L;
         allTotalPrice = 0L;
-        for (PreorderReportItem item : preorderReportItems) {
+        for (PreorderReportComplexItem item : preorderReportComplexItems) {
             item.calculateTotalPrice();
             allAmount += item.getAmount();
             allPreorderSum += item.getPreorderSum();
@@ -43,12 +43,12 @@ public class PreorderReportTotalItem {
         this.preorderReportClientItems = preorderReportClientItems;
     }
 
-    public List<PreorderReportItem> getPreorderReportItems() {
-        return preorderReportItems;
+    public List<PreorderReportComplexItem> getPreorderReportComplexItems() {
+        return preorderReportComplexItems;
     }
 
-    public void setPreorderReportItems(List<PreorderReportItem> preorderReportItems) {
-        this.preorderReportItems = preorderReportItems;
+    public void setPreorderReportComplexItems(List<PreorderReportComplexItem> preorderReportComplexItems) {
+        this.preorderReportComplexItems = preorderReportComplexItems;
     }
 
     public Integer getAllAmount() {
