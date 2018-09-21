@@ -1368,6 +1368,7 @@ public class ImportRegisterClientsService {
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
                     commentsAddsDelete(dbClient, deleteCommentsAdds);
                     session.save(dbClient);
+                    addClientMigrationLeaving(session, dbClient, change);
                     break;
                 case MOVE_OPERATION:
                     migration = true;
@@ -1543,6 +1544,24 @@ public class ImportRegisterClientsService {
             // так как сущность client еще не обновлена, то в поле clientGroup хранятся данные старой группы
             migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
             migration.setOldGroupName(client.getClientGroup().getGroupName());
+        }
+        session.save(migration);
+    }
+
+    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change) throws Exception{
+        Org org = (Org) session.get(Org.class, change.getIdOfOrg());
+        ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org, client);
+        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
+                .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
+        migration.setNewGroupName(ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+        ClientGroup oldClientGroup = DAOUtils
+                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session, org.getIdOfOrg(), change.getGroupName());
+        if (client.getIdOfClientGroup() != null) {
+            migration.setNewGroupId(client.getIdOfClientGroup());
+        }
+        if (oldClientGroup != null && oldClientGroup.getCompositeIdOfClientGroup() != null) {
+            migration.setOldGroupId(oldClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            migration.setOldGroupName(oldClientGroup.getGroupName());
         }
         session.save(migration);
     }
