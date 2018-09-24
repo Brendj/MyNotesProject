@@ -44,8 +44,8 @@ public class CardsUidUpdateService {
                         Long clientGuid = Long.parseLong(client.getClientGUID());
                         for (Card card : DAOUtils.getAllCardByClientAndCardState(session, client, CardState.ISSUED)) {
                             if (card.getCardNo().equals(clientGuid)) {
-                                Long newCardNo = card.getCardNo() * 1000 + 1;
-                                Long newCardPrintedNo = card.getCardPrintedNo() * 1000 + 1;
+                                Long newCardNo = Long.parseLong(Long.toString(card.getCardNo() * 1000 + 1), 16);
+                                Long newCardPrintedNo = card.getCardNo() * 1000 + 1;
                                 cardManager.updateCard(card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                                         CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
                                         card.getIssueTime(), card.getExternalId());
