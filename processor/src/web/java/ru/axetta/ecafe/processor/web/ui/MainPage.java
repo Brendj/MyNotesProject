@@ -10198,6 +10198,9 @@ public class MainPage implements Serializable {
                     } else {
                         doCreateCard = true;
                     }
+                } else if(cardType.equals("Браслет (Mifare)" ) && !CardManagerProcessor.getPriceOfMifareBracelet().equals(0L)){
+                    modalPages.push(cardRegistrationConfirm);
+                    cardRegistrationConfirm.prepareADialogue(cardType);
                 } else doCreateCard = true;
             } else doCreateCard = true;
             if(doCreateCard) cardRegistrationAndIssuePage.createCard();
