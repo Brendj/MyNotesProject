@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPInfoMailingEventType;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPMessageLogger;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
@@ -30,12 +31,11 @@ import javax.annotation.Resource;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -207,11 +207,6 @@ public class EMPSmsServiceImpl extends ISmsService {
         SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
         empProcessor.logRequest(eventParam);
         Date timeBefore = new Date();
-        //Здесь можно включить логирование
-        //final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
-        //final List<Handler> handlerChain = new ArrayList<Handler>();
-        //handlerChain.add(soapLoggingHandler);
-        //((BindingProvider) subscription).getBinding().setHandlerChain(handlerChain);
         SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
         Date timeAfter = new Date();
         addResponseTime(timeAfter.getTime() - timeBefore.getTime());
@@ -245,7 +240,11 @@ public class EMPSmsServiceImpl extends ISmsService {
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
             subscriptionService = controller;
-            return controller;
+            final EMPMessageLogger loggingHandler = new RuntimeContext().getAppContext().getBean(EMPMessageLogger.class);
+            final List<Handler> handlerChain = new ArrayList<Handler>();
+            handlerChain.add(loggingHandler);
+            ((BindingProvider) subscriptionService).getBinding().setHandlerChain(handlerChain);
+            return subscriptionService;
         } catch (java.lang.Exception e) {
             logger.error("Failed to create WS controller", e);
             return null;
