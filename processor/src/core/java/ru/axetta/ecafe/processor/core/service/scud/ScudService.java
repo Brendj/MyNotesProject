@@ -19,9 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 @Component
 @Scope("singleton")
@@ -29,15 +27,17 @@ public class ScudService {
     private static final Logger logger = LoggerFactory.getLogger(ScudService.class);
     private PushScudPort pushScudService;
     private ObjectFactory scudObjectFactory = new ObjectFactory();
-    private final String ENDPOINT_ADDRESS = getEndPointAdressFromConfig();
+    private final List<String> ENDPOINT_ADDRESSES = getEndPointAdressFromConfig();
     private final String TEST_ENDPOINT_ADDRESS = "http://petersburgedu.ru/service/webservice/scud";
 
-    private String getEndPointAdressFromConfig() {
+    private List<String> getEndPointAdressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.scudmanager.endpointadress", "http://10.146.136.36/service/webservice/scud");
+        String endPointAddresses  = properties
+                .getProperty("ecafe.processor.scudmanager.endpointadress", "http://10.146.136.36/service/webservice/scud");
+        return Arrays.asList(endPointAddresses.split("\\s*;\\s*"));
     }
 
-    private PushScudPort createEventController() {
+    private PushScudPort createEventController(String endPointAddress) {
         if(pushScudService != null) {
             return pushScudService;
         }
@@ -48,11 +48,11 @@ public class ScudService {
             Client proxy = ClientProxy.getClient(controller);
             BindingProvider bp = (BindingProvider) controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
-            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, this.ENDPOINT_ADDRESS);
+            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endPointAddress);
             proxy.getOutInterceptors().add(new HeaderHandler());
 
             //final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
-            final ScudServiceHandler scudServiceHandler = new ScudServiceHandler();
+            final ScudServiceHandler scudServiceHandler = new ScudServiceHandler(endPointAddress);
             final List<Handler> handlerChain = new ArrayList<Handler>();
             //handlerChain.add(soapLoggingHandler);
             //if(this.ENDPOINT_ADDRESS.contains(this.TEST_ENDPOINT_ADDRESS)) {
@@ -73,12 +73,18 @@ public class ScudService {
         }
     }
 
-    public PushResponse sendEvent(List<EventDataItem> items) throws Exception {
-        PushScudPort subscription = createEventController();
-        if (subscription == null) {
-            throw new Exception("Failed to create connection with SCUD web service");
-        }
+    public HashMap<String, PushResponse> sendEvent(List<EventDataItem> items) throws Exception {
+        HashMap<String, PushResponse> results = new HashMap<String, PushResponse>();
         EventList eventList = this.scudObjectFactory.createEventList(items);
-        return subscription.pushData(eventList);
+        for(String endPointAddress : ENDPOINT_ADDRESSES) {
+            PushScudPort subscription = createEventController(endPointAddress);
+            if (subscription == null) {
+                logger.error(String.format("Failed to create connection with address %s a web service", endPointAddress));
+                results.put(endPointAddress, null);
+            }
+            PushResponse response = subscription.pushData(eventList);
+            results.put(endPointAddress, response);
+        }
+        return results;
     }
 }

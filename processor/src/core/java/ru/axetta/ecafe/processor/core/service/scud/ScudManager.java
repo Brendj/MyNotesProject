@@ -20,9 +20,7 @@ import org.springframework.stereotype.Component;
 
 
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("prototype")
@@ -32,6 +30,13 @@ public class ScudManager {
     private static final Logger logger = LoggerFactory.getLogger(ScudManager.class);
     private final static boolean isOn = isOn();
     private ScudService service = RuntimeContext.getAppContext().getBean(ScudService.class);
+    private final String SCUD_ENDPOINT_ADDRESS = getScudEndPointAdressFromConfig();
+
+    private String getScudEndPointAdressFromConfig() {
+        Properties properties = RuntimeContext.getInstance().getConfigProperties();
+        return properties
+                .getProperty("ecafe.processor.scudmanager.mainendpointadress", "http://10.146.136.36/service/webservice/scud");
+    }
 
     public static boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -79,7 +84,11 @@ public class ScudManager {
                 logger.warn("No EnterEventSendInfo records for send to SCUD");
                 return;
             }
-            PushResponse response = service.sendEvent(list);
+            HashMap<String, PushResponse> responses = service.sendEvent(list);
+            PushResponse response = responses.get(SCUD_ENDPOINT_ADDRESS);
+            if(response == null){
+                throw new Exception("Response from SCUD is null");
+            }
             sendToExternal = true;
             Integer responseCode = response.isResult()? 1 : 0;
             logger.info("Sending EnterEvent to SCUD completed, sent list with " + list.size() + " elements, ResultCode is: " + responseCode);
