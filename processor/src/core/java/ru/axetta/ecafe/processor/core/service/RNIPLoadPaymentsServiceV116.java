@@ -695,6 +695,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
             }
         }
         catch (Exception e) {
+            logger.error("Error parsing rnip response: ", e);
             return "Error parsing response RNIP v1.16";
         }
     }
