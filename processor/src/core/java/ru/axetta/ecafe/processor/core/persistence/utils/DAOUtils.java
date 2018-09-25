@@ -3354,26 +3354,46 @@ public class DAOUtils {
         return idoforg.longValue();
     }
 
-	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate) {
+	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate,
+            Long idOfPreorderComplex, Long idOfPreorderMenudetail) {
+        String complexCondition = "", menudetailCondition = "";
+        if (null != idOfPreorderComplex) {
+            complexCondition = " AND pc.idofpreordercomplex <> :idOfPreorderComplex ";
+        }
+        if (null != idOfPreorderMenudetail) {
+            menudetailCondition = " AND pmd.idofpreordermenudetail <> :idOfPreorderMenudetail ";
+        }
         Query query = session.createSQLQuery(
-          "SELECT sum(CASE WHEN pc.complexprice IS NOT NULL AND pc.amount IS NOT NULL THEN pc.complexprice * pc.amount ELSE 0 END) AS complexprice, "
-           + "    sum(CASE WHEN pmd.menudetailprice IS NOT NULL AND pmd.amount IS NOT NULL THEN pmd.menudetailprice * pmd.amount ELSE 0 END) AS menudetailprice "
-           + "FROM cf_goods_requests gr "
-           + "INNER JOIN cf_goods_requests_positions grp ON gr.idofgoodsrequest = grp.idofgoodsrequest AND grp.notified = true "
-           + "LEFT JOIN cf_preorder_complex pc ON pc.idofgoodsrequestposition = grp.idofgoodsrequestposition "
-           + "LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofgoodsrequestposition = grp.idofgoodsrequestposition "
-           + "WHERE gr.comment LIKE :comment AND (pc.idofclient = :idOfClient OR pmd.idofclient = :idOfClient) AND gr.donedate >= :startDate");
+             "SELECT sum(a.totalprice) AS totalprice "
+              + "FROM ( "
+              + "   SELECT sum(pc.complexprice * pc.amount) AS totalprice "
+              + "   FROM cf_preorder_complex pc "
+              + "   WHERE pc.amount > 0 AND coalesce(pc.deletedstate=0,false) AND pc.idofclient = :idOfClient AND "
+              + "       pc.preorderdate BETWEEN :startDate AND :endDate "
+              + complexCondition
+              + "   UNION ALL "
+              + "   SELECT sum(pmd.menudetailprice * pmd.amount) AS totalprice "
+              + "   FROM cf_preorder_menudetail pmd "
+              + "   WHERE pmd.amount > 0 AND coalesce(pmd.deletedstate=0,false) AND pmd.idofclient = :idOfClient AND "
+              + "       pmd.preorderdate BETWEEN :startDate AND :endDate "
+              + menudetailCondition
+              + ") a");
 
-        query.setParameter("comment", PREORDER_COMMENT);
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
 
-        Object values[] = (Object[])query.uniqueResult();
+        if (!complexCondition.isEmpty()) {
+            query.setParameter("idOfPreorderComplex", idOfPreorderComplex);
+        }
 
-        Long complexPrice =  (null == values[0]) ? 0 : ((BigDecimal) values[0]).longValue();
-        Long menuDetailPrice = (null == values[1]) ? 0 : ((BigDecimal) values[1]).longValue();
+        if (!menudetailCondition.isEmpty()) {
+            query.setParameter("idOfPreorderMenudetail", idOfPreorderMenudetail);
+        }
 
-        return complexPrice + menuDetailPrice;
+        Object value = query.uniqueResult();
+
+        return (null == value) ? 0 : ((BigDecimal) value).longValue();
     }
 
     public static void createGroupNamesToOrg(Session session, Org org, Long version, String groupName) {

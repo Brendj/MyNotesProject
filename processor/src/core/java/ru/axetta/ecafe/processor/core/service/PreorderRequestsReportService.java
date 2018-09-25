@@ -136,6 +136,8 @@ public class PreorderRequestsReportService extends RecoverableService {
         if (Calendar.SATURDAY == dayNum || Calendar.SUNDAY == dayNum)
             return;
 
+        List<PreorderItemForDelete> preorderItemForDeleteList = new ArrayList<PreorderItemForDelete>();
+
         Session session = null;
         Transaction transaction = null;
         try {
@@ -147,8 +149,20 @@ public class PreorderRequestsReportService extends RecoverableService {
             Map<Long, DatesForPreorder> datesMap = new HashMap<Long, DatesForPreorder>();
 
             for (PreorderItem item : preorderItemList) {
+                boolean itemWasDeleted = false;
+                for (PreorderItemForDelete itemForDelete : preorderItemForDeleteList) {
+                    if (itemForDelete.idOfClient.equals(item.idOfClient) &&
+                            itemForDelete.preorderDate.equals(item.preorderDate)) {
+                        deletePreorderForNotEnoughMoney(session, item);
+                        itemWasDeleted = true;
+                        break;
+                    }
+                }
+                if (itemWasDeleted)
+                    continue;
+
                 if (null == item.getIdOfGood()) {
-                    logger.warn(String.format("PreorderRequestsReportService: preorder without good item was found (orgID = %s, createdDate = %s)",
+                    logger.warn(String.format("PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
                             item.getIdOfOrg(), item.getCreatedDate().toString()) );
                     continue;
                 }
@@ -183,13 +197,15 @@ public class PreorderRequestsReportService extends RecoverableService {
                     }
 
                     if (null == item.getIdOfGoodsRequestPosition()) {
-                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, CalendarUtils.startOfDay(fireTime));
+                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, startDate, endDate,
+                            item.getIdOfPreorderComplex(), item.getIdOfPreorderMenuDetail());
 
                         if ((item.clientBalance - item.complexPrice - preordersPrice) < 0L) {
                             logger.warn(String.format("PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
-                                            + "idOfPreorderComplex=%d, idOfPreorderMenuDetail%d)",
+                                            + "idOfPreorderComplex=%d, idOfPreorderMenuDetail=%d)",
                                     item.idOfClient, item.idOfPreorderComplex, item.idOfPreorderMenuDetail));
                             deletePreorderForNotEnoughMoney(session, item);
+                            preorderItemForDeleteList.add(new PreorderItemForDelete(item.getIdOfClient(), item.getPreorderDate()));
                             continue;
                         }
                         if (null == item.getDeleted() || !item.getDeleted())
@@ -1091,6 +1107,16 @@ public class PreorderRequestsReportService extends RecoverableService {
     public static class DatesForPreorder {
         public Date startDate;
         public Date endDate;
+    }
+
+    public static class PreorderItemForDelete {
+        public Long idOfClient;
+        public Date preorderDate;
+
+        public PreorderItemForDelete(Long idOfClient, Date preorderDate) {
+            this.idOfClient = idOfClient;
+            this.preorderDate = preorderDate;
+        }
     }
 }
 
