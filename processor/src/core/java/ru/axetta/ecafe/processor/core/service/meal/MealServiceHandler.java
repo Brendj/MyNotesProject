@@ -37,16 +37,18 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
 
     private static final Logger logger = LoggerFactory.getLogger(MealServiceHandler.class);
     private final String fileName;
-    private final String LOG_PATH_PREFIX = getLogPath();
+    private final String LOG_PATH_PREFIX;
     private final String DEFAULT_LOG_PATH_PREFIX = "/home/jbosser/processor/MEAL_logs/";
     private final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("_dd_MM_yyyy");
     private final String endPointAddress;
 
     public MealServiceHandler(String endPointAddress){
         super();
+        String endPointAddressFolder = parseAddress(endPointAddress);
         this.endPointAddress = endPointAddress;
+        this.LOG_PATH_PREFIX = getLogPath() + endPointAddressFolder + "/";
         String today = DATA_FORMAT.format(new Date());
-        this.fileName = LOG_PATH_PREFIX + parseAddress(endPointAddress) + today + ".log";
+        this.fileName = LOG_PATH_PREFIX + endPointAddressFolder + today + ".log";
     }
 
 
@@ -141,7 +143,7 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
             message.append(endPointAddress);
 
             if (outboundProperty) {
-                message.append("\nOutbound message\n");
+                message.append("\nOutbound message:\n");
             } else {
                 message.append("\nInbound message:\n");
             }

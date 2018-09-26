@@ -32,7 +32,7 @@ import java.util.Set;
 public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
     private static final Logger logger = LoggerFactory.getLogger(ScudServiceHandler.class);
     private final String fileName;
-    private final String LOG_PATH_PREFIX = getLogPath();
+    private final String LOG_PATH_PREFIX;
     private final String DEFAULT_LOG_PATH_PREFIX = "/home/jbosser/processor/SCUD_logs/";
     private final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("_dd_MM_yyyy");
     private final String endPointAddress;
@@ -44,9 +44,11 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
 
     public ScudServiceHandler(String endPointAddress){
         super();
+        String endPointAddressFolder = parseAddress(endPointAddress);
         this.endPointAddress = endPointAddress;
+        this.LOG_PATH_PREFIX = getLogPath() + endPointAddressFolder + "/";
         String today = DATA_FORMAT.format(new Date());
-        this.fileName = LOG_PATH_PREFIX + parseAddress(endPointAddress) + today + ".log";
+        this.fileName = LOG_PATH_PREFIX + endPointAddressFolder + today + ".log";
     }
 
     private String parseAddress(String endPointAddress) {
