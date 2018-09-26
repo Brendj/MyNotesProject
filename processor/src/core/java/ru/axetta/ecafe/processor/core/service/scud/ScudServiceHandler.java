@@ -31,7 +31,6 @@ import java.util.Set;
 
 public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
     private static final Logger logger = LoggerFactory.getLogger(ScudServiceHandler.class);
-    private static PrintStream out = System.out;
     private final String fileName;
     private final String LOG_PATH_PREFIX = getLogPath();
     private final String DEFAULT_LOG_PATH_PREFIX = "/home/jbosser/processor/SCUD_logs/";
@@ -64,7 +63,7 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
         try {
             Boolean outboundProperty = (Boolean)
                     smc.get (MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-            if (outboundProperty.booleanValue()) {
+            if (outboundProperty) {
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
                 final Document source_doc = soapPart.getEnvelope().getOwnerDocument();
                 String sss = toString(source_doc)
@@ -80,13 +79,12 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
         } catch (Exception e) {
             logger.error("Error in filter chain", e);
         }
-        logToSystemOut(smc);
         logToFile(smc);
         return true;
     }
 
     public boolean handleFault(SOAPMessageContext smc) {
-        logToSystemOut(smc);
+        logToFile(smc);
         return true;
     }
 
@@ -113,48 +111,31 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
     public void close(MessageContext messageContext) {
     }
 
-    private void logToSystemOut(SOAPMessageContext smc) {
-        Boolean outboundProperty = (Boolean)
-                smc.get (MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-
-
-        if (outboundProperty) {
-            out.println("\nOutbound message:");
-        } else {
-            out.println("\nInbound message:");
-        }
-
-        try {
-            final SOAPPart soapPart = smc.getMessage().getSOAPPart();
-            final Document doc = soapPart.getEnvelope().getOwnerDocument();
-            System.out.println(toString(doc));
-            out.println("");
-        } catch (Exception e) {
-            logger.error("Exception in handler: " + e);
-        }
-    }
-
     private void logToFile(SOAPMessageContext smc) {
-        Boolean outboundProperty = (Boolean)
-                smc.get (MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-        StringBuilder message = new StringBuilder();
-        SimpleDateFormat eventTimeFormat = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss");
-        message.append(eventTimeFormat.format(new Date()));
-        message.append(" Endpoint address is: ");
-        message.append(endPointAddress);
-        if (outboundProperty) {
-            message.append("\nOutbound message:\n");
-        } else {
-            message.append("\nInbound message:\n");
-        }
-
         try {
+            Boolean outboundProperty = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            StringBuilder message = new StringBuilder();
+            SimpleDateFormat eventTimeFormat = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss");
+
             final SOAPPart soapPart = smc.getMessage().getSOAPPart();
             final Document doc = soapPart.getEnvelope().getOwnerDocument();
+
+            message.append(eventTimeFormat.format(new Date()));
+            message.append(" Endpoint address is: ");
+            message.append(endPointAddress);
+
+            if (outboundProperty) {
+                message.append("\nOutbound message with ");
+                message.append(doc.getElementsByTagName("event").getLength());
+                message.append(" events\n");
+            } else {
+                message.append("\nInbound message:\n");
+            }
+
             message.append(toString(doc));
             message.append("\n");
 
-            synchronized (this){
+            synchronized (this) {
                 checkAndCreateFolder(LOG_PATH_PREFIX);
                 FileWriter fw = new FileWriter(fileName, true);
                 fw.write(message.toString());

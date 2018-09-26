@@ -24,9 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +40,13 @@ public class MealManager {
     private final static String CARDNAME = "Счёт питания";
     private final String updateInitialStatement = "update cf_orderdetails set sendtoexternal = 1 where (idoforderdetail, idoforg) in (";
     private final static Integer LIMIT_RECORDS = 1000;
+    private final static String MEAL_ENDPOINT_ADDRESS = getMainEndPointAddress();
+
+    private static String getMainEndPointAddress() {
+        Properties properties = RuntimeContext.getInstance().getConfigProperties();
+        return properties
+                .getProperty("ecafe.processor.mealmanager.mainendpointaddress", "http://10.146.136.36/service/webservice/meal/");
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(MealManager.class);
 
@@ -105,7 +110,11 @@ public class MealManager {
                     CARDNAME, item.getFoodName(), item.getFoodAmount(), EXPENSE);
             MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getUserToken(), item.getCardUid(), trItem);
             try {
-                PushResponse response = mealService.sendEvent(mItem);
+                HashMap<String, PushResponse> responses = mealService.sendEvent(mItem);
+                PushResponse response = responses.get(MEAL_ENDPOINT_ADDRESS);
+                if(response == null){
+                    throw new Exception("Meal Response is null");
+                }
                 if(response.isResult()) {
                     sendOrders.add(item);
                     i++;
@@ -137,7 +146,11 @@ public class MealManager {
                     CARDNAME, item.getFoodName(), item.getFoodAmount(), item.getAmount() > 0 ? INCOME : EXPENSE);
             MealDataItem mItem = new MealDataItem(item.getOrganizationUid(), item.getStudentUid(), item.getUserToken(), item.getCardUid(), trItem);
             try {
-                PushResponse response = mealService.sendEvent(mItem);
+                HashMap<String, PushResponse> responses = mealService.sendEvent(mItem);
+                PushResponse response = responses.get(MEAL_ENDPOINT_ADDRESS);
+                if(response == null){
+                    throw new Exception("Meal Response is null");
+                }
                 if(response.isResult()) {
                     sendTransactions.add(item);
                     i++;

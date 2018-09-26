@@ -4,11 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.service.meal;
 
+import generated.spb.meal.MealData;
 import generated.spb.meal.MealWebService;
 import generated.spb.meal.PushMealPort;
 import generated.spb.meal.PushResponse;
 
-import ru.axetta.ecafe.processor.core.partner.nsi.SOAPLoggingHandler;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -21,8 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,8 +36,16 @@ public class MealService {
 
     private static final Logger logger = LoggerFactory.getLogger(MealService.class);
     private PushMealPort pushMealService;
+    private final List<String> ENDPOINT_ADDRESSES = getMealEndPointAddresses();
 
-    private PushMealPort createEventController() {
+    private List<String> getMealEndPointAddresses() {
+        Properties properties = RuntimeContext.getInstance().getConfigProperties();
+        String endPointAddresses  = properties
+                .getProperty("ecafe.processor.mealmanager.endpointaddress", "http://10.146.136.36/service/webservice/meal/");
+        return Arrays.asList(endPointAddresses.split("\\s*;\\s*"));
+    }
+
+    private PushMealPort createEventController(String endpointAddress) {
         if(pushMealService != null) {
             return pushMealService;
         }
@@ -48,13 +56,13 @@ public class MealService {
             Client proxy = ClientProxy.getClient(controller);
             BindingProvider bp = (BindingProvider) controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
-            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, "http://10.146.136.36/service/webservice/meal/");
+            bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
             //String endpoint = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.mealmanager.service", "http://10.146.136.36/service/webservice/meal/");
             //bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
             //proxy.getInInterceptors().add(new ContentTypeHandler());
             proxy.getOutInterceptors().add(new HeaderHandler());
 
-            final SOAPLoggingHandler soapLoggingHandler = new SOAPLoggingHandler();
+            final MealServiceHandler soapLoggingHandler = new MealServiceHandler(endpointAddress);
             //final MealServiceHandler soapLoggingHandler = new MealServiceHandler();
             final List<Handler> handlerChain = new ArrayList<Handler>();
             handlerChain.add(soapLoggingHandler);
@@ -73,13 +81,20 @@ public class MealService {
         }
     }
 
-    public PushResponse sendEvent(MealDataItem item) throws Exception {
-        PushMealPort subscription = createEventController();
-        if (subscription == null) {
-            throw new Exception("Failed to create connection with meal web service");
+    public HashMap<String, PushResponse> sendEvent(MealDataItem item) throws Exception {
+        MealData data = MealDataItem.getMealData(item);
+        HashMap<String, PushResponse> results = new HashMap<String, PushResponse>();
+        for(String endPointAddress : ENDPOINT_ADDRESSES) {
+            PushMealPort subscription = createEventController(endPointAddress);
+            if (subscription == null) {
+                logger.info("Failed to create connection with meal web service");
+                results.put(endPointAddress, null);
+                continue;
+            }
+            PushResponse response = subscription.pushData(data);
+            results.put(endPointAddress, response);
         }
-
-        return subscription.pushData(MealDataItem.getMealData(item));
+        return results;
     }
 
 }

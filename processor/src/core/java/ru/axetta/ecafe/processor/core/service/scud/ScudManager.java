@@ -35,7 +35,7 @@ public class ScudManager {
     private String getScudEndPointAdressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties
-                .getProperty("ecafe.processor.scudmanager.mainendpointadress", "http://10.146.136.36/service/webservice/scud");
+                .getProperty("ecafe.processor.scudmanager.mainendpointaddress", "http://10.146.136.36/service/webservice/scud");
     }
 
     public static boolean isOn() {
