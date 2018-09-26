@@ -128,6 +128,14 @@ public class RuntimeContext implements ApplicationContextAware {
         return geoplanerApiKey;
     }
 
+    public boolean isUsePriceSms() {
+        return usePriceSms;
+    }
+
+    public void setUsePriceSms(boolean usePriceSms) {
+        this.usePriceSms = usePriceSms;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -247,6 +255,7 @@ public class RuntimeContext implements ApplicationContextAware {
     boolean criticalErrors;
     Properties configProperties;
     SchemaVersionInfo currentSchemaVersionInfo;
+    private boolean usePriceSms;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
@@ -724,6 +733,8 @@ public class RuntimeContext implements ApplicationContextAware {
             if (!isTestRunning()) {
                 initWSCrypto();
             }
+
+            usePriceSms = getPropertiesValue("ecafe.processor.sms.usePrice", "true").equals("true");
 
             runCheckSums();
 

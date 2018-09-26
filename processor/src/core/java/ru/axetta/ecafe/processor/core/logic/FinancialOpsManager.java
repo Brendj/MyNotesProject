@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
@@ -74,8 +75,10 @@ public class FinancialOpsManager {
             String textContents, Date serviceSendTime, Date eventTime, boolean isDelivered, Long idOfSourceOrg) throws Exception {
 
         Session session = em.unwrap(Session.class);
-        //session.update(client);
-        long priceOfSms = DAOReadonlyService.getInstance().getOrgPriceOfSms(client.getOrg().getIdOfOrg()); //client.getOrg().getPriceOfSms();
+        long priceOfSms = 0L;
+        if (RuntimeContext.getInstance().isUsePriceSms()) {
+            priceOfSms = DAOReadonlyService.getInstance().getOrgPriceOfSms(client.getOrg().getIdOfOrg()); //client.getOrg().getPriceOfSms();
+        }
         int paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         //Card card = DAOUtils.findActiveCard(em, client);
         Date currTime = new Date();
@@ -541,4 +544,16 @@ public class FinancialOpsManager {
         }
     }
 
+    @Transactional
+    public void holdClientBalance(Client client, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent) throws Exception {
+        if (client.getBalance() <= 0L) return;
+        Session session = (Session)em.getDelegate();
+        ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                .createClientBalanceHold(session, client, oldOrg, newOrg, oldContragent, newContragent);
+        AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+                null, -client.getBalance(), "",
+                AccountTransaction.CLIENT_BALANCE_HOLD, null, new Date());
+        clientBalanceHold.setAccountTransaction(accountTransaction);
+        session.save(clientBalanceHold);
+    }
 }
