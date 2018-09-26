@@ -4986,6 +4986,9 @@ public class Processor implements SyncProcessor {
             preorderMenuDetail.changeBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
             persistenceSession.update(preorderMenuDetail);
         }
+        if (modifiedIdsPreorderMenuDetails.size() > 0 && version.equals(0L)) {
+            version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
+        }
         for (PreorderMenuDetail preorderMenuDetail : modifiedIdsPreorderMenuDetails) {
             preorderMenuDetail.modifyArmIdOfMenu(version);
             persistenceSession.update(preorderMenuDetail);
