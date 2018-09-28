@@ -2480,6 +2480,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByClientBalanceHold(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select cbh.version from cf_clientbalance_hold as cbh order by cbh.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByConfigurationProvider(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select max(prov.version) from cf_provider_configurations as prov");
@@ -3032,6 +3042,15 @@ public class DAOUtils {
             long orgOwner, long version) throws Exception {
         Query query = session.createQuery("select pc from PreorderComplex pc "
                 + "where pc.version > :version and (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg))");
+        query.setParameter("version", version);
+        query.setParameter("idOfOrg", orgOwner);
+        return query.list();
+    }
+
+    public static List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,
+            long orgOwner, long version) throws Exception {
+        Query query = session.createQuery("select cbh from ClientBalanceHold cbh "
+                + "where cbh.version > :version and cbh.oldOrg.idOfOrg = :idOfOrg");
         query.setParameter("version", version);
         query.setParameter("idOfOrg", orgOwner);
         return query.list();

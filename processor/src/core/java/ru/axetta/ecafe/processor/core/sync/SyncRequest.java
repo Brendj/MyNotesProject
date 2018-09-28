@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.CategoriesDiscountsAndRulesBuilder;
@@ -2669,6 +2671,7 @@ public class SyncRequest {
             builders.add(new CardRequestsBuilder(idOfOrg));
             builders.add(new MenusCalendarBuilder(idOfOrg));
             builders.add(new MenusCalendarSupplierBuilder());
+            builders.add(new ClientBalanceHoldBuilder(idOfOrg));
             return builders;
         }
 
@@ -2928,6 +2931,10 @@ public class SyncRequest {
 
     public MenusCalendarSupplierRequest getMenusCalendarSupplierRequest() {
         return this.<MenusCalendarSupplierRequest>findSection(MenusCalendarSupplierRequest.class);
+    }
+
+    public ClientBalanceHoldRequest getClientBalanceHoldRequest() {
+        return this.<ClientBalanceHoldRequest>findSection(ClientBalanceHoldRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

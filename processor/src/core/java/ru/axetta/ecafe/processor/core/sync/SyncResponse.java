@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
@@ -1174,6 +1175,7 @@ public class SyncResponse {
     private CardRequestsData cardRequestsData;
     private ResMenusCalendar resMenusCalendar;
     private MenusCalendarData menusCalendarData;
+    private ClientBalanceHoldFeeding clientBalanceHoldFeeding;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1194,7 +1196,7 @@ public class SyncResponse {
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
-            ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData) {
+            ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1248,6 +1250,7 @@ public class SyncResponse {
         this.cardRequestsData = cardRequestsData;
         this.resMenusCalendar = resMenusCalendar;
         this.menusCalendarData = menusCalendarData;
+        this.clientBalanceHoldFeeding = clientBalanceHoldFeeding;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1505,6 +1508,10 @@ public class SyncResponse {
 
         if (menusCalendarData != null) {
             envelopeElement.appendChild(menusCalendarData.toElement(document));
+        }
+
+        if (clientBalanceHoldFeeding != null) {
+            envelopeElement.appendChild(clientBalanceHoldFeeding.toElement(document));
         }
     }
 

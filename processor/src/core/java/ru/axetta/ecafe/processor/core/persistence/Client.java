@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 
 import org.apache.commons.codec.binary.Base64;
@@ -451,9 +452,13 @@ public class Client {
         return org;
     }
 
-    public void setOrg(Org org) {
+    public void setOrg(Org org) throws Exception {
         if (this.org != null && org != null && !this.org.equals(org)) {
             RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().deletePreordersByClient(this);
+        }
+        if (this.org != null && org != null && !org.equals(this.org)) {
+               RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(this, this.org, org,
+                       ClientBalanceHoldCreateStatus.CHANGE_SUPPLIER, ClientBalanceHoldRequestStatus.CREATED);
         }
         this.org = org;
     }
