@@ -112,7 +112,28 @@ public class CardRegistrationService {
         }
     }
 
+    public ExternalInfo loadExternalInfo(Session session, String organiztionGuid, String clientGuid) {
+        ExternalInfo externalInfo = new ExternalInfo();
+        Client client = DAOUtils.findClientByGuid(session, clientGuid);
+        if (null != client)
+            externalInfo.contractId = client.getContractId();
+        Org org = DAOUtils.findOrgByGuid(session, organiztionGuid);
+        if (null != org.getDefaultSupplier()) {
+            if (null != org.getDefaultSupplier().getContragentName()) {
+                externalInfo.contragentName = org.getDefaultSupplier().getContragentName();
+            }
+            externalInfo.contragentInn = org.getDefaultSupplier().getInn();
+        }
+        return externalInfo;
+    }
+
     private String emptyIfNull(String str) {
         return str == null ? "" : str;
+    }
+
+    public static class ExternalInfo {
+        public String contragentName;
+        public String contragentInn;
+        public Long contractId;
     }
 }

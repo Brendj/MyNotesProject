@@ -57,6 +57,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
+import ru.axetta.ecafe.processor.web.internal.CardResponseItem;
 import ru.axetta.ecafe.processor.web.partner.iac.CardRegistrationService;
 import ru.axetta.ecafe.processor.web.partner.iac.ClientNotFoundException;
 import ru.axetta.ecafe.processor.web.partner.iac.OrganizationNotFoundException;
@@ -189,6 +190,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
     private static final String RC_LACK_OF_SUBBALANCE1_DESC = "У клиента недостаточно средств на субсчете АП";
     private static final String RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC = "Неверная дата активация циклограммы";
+    private static final String RC_ERROR_CARD_EXISTS_DESC = "Карта уже существует";
     private static final String RC_SUBSCRIPTION_FEEDING_NOT_FOUND_DESC = "Услуга не подключена";
     private static final String RC_PROHIBIT_EXIST_DESC = "Запрет с данными параметрами уже существует";
     private static final String RC_PROHIBIT_REMOVED_DESC = "Запрет с данными параметрами был удален";
@@ -8740,10 +8742,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         AddRegistrationCardResult result = new AddRegistrationCardResult();
         Session session = null;
         Transaction transaction = null;
+        CardRegistrationService service = RuntimeContext.getAppContext().getBean(CardRegistrationService.class);
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            CardRegistrationService service = RuntimeContext.getAppContext().getBean(CardRegistrationService.class);
 
             Client client = DAOUtils.findClientByGuid(session, suid);
 
@@ -8760,18 +8762,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             service.registerCard(session, Long.parseLong(cardId,16), validdate, client);
 
-            String contragentName = "";
-            String contragentInn = "";
-            if (null != org.getDefaultSupplier()) {
-                if (null != org.getDefaultSupplier().getContragentName()) {
-                    contragentName = org.getDefaultSupplier().getContragentName();
-                }
-                contragentInn = org.getDefaultSupplier().getInn();
-            }
+            CardRegistrationService.ExternalInfo externalInfo = service.loadExternalInfo(session, organizationSuid, suid);
 
-            result.setContractId(client.getContractId());
-            result.setSupplierName(contragentName);
-            result.setSupplierINN(contragentInn);
+            result.setContractId(externalInfo.contractId);
+            result.setSupplierName(externalInfo.contragentName);
+            result.setSupplierINN(externalInfo.contragentInn);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
             transaction.commit();
@@ -8788,6 +8783,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error("Error in addRegistrationCard", e);
             result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
             result.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
+        } catch (CardResponseItem.CardAlreadyExist e) {
+            logger.error("Error in addRegistrationCard", e);
+            CardRegistrationService.ExternalInfo externalInfo = service.loadExternalInfo(session, organizationSuid, suid);
+            result.setContractId(externalInfo.contractId);
+            result.setSupplierName(externalInfo.contragentName);
+            result.setSupplierINN(externalInfo.contragentInn);
+            result.resultCode = RC_ERROR_CARD_EXISTS;
+            result.description = RC_ERROR_CARD_EXISTS_DESC;
         } catch(Exception e) {
             logger.error("Error in addRegistrationCard", e);
             result.resultCode = RC_INTERNAL_ERROR;
