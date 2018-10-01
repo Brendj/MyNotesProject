@@ -47,6 +47,7 @@
 	<field name="newTempClients" class="java.lang.Long"/>
 	<field name="idOfOrg" class="java.lang.Long"/>
 	<field name="address" class="java.lang.String"/>
+	<field name="goodsCode" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -77,11 +78,11 @@
 				<crosstabHeaderCell>
 					<cellContents style="table">
 						<staticText>
-							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="341" y="0" width="164" height="34" backcolor="#F0F8FF"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="505" y="0" width="100" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
-							<text><![CDATA[Товар]]></text>
+							<text><![CDATA[Код товара]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="241" y="0" width="100" height="34" backcolor="#F0F8FF"/>
@@ -111,6 +112,13 @@
 							</textElement>
 							<text><![CDATA[Наименование ОО]]></text>
 						</staticText>
+						<staticText>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="341" y="0" width="164" height="34" backcolor="#F0F8FF"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Товар]]></text>
+						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
 				<rowGroup name="orgNum" width="36" totalPosition="End" headerPosition="Middle">
@@ -129,7 +137,7 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#000000" mode="Transparent" style="table">
 							<staticText>
-								<reportElement uuid="dd7f6140-2f17-4663-856e-ca6eeb816c2f" style="Crosstab Data Text" x="0" y="0" width="305" height="20"/>
+								<reportElement uuid="dd7f6140-2f17-4663-856e-ca6eeb816c2f" style="Crosstab Data Text" x="0" y="0" width="505" height="20"/>
 								<textElement verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
@@ -241,6 +249,25 @@
 								<textFieldExpression><![CDATA[$V{feedingPlanTypeStr}]]></textFieldExpression>
 							</textField>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="goodsCode" width="100" totalPosition="Start">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{goodsCode}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="983c7a3f-0efa-4ce2-8c3b-3aa6409f276c" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{goodsCode}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="doneDate" height="0">
@@ -444,6 +471,15 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="address" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="goodsCode">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="goodsCode" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="goodsCode" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

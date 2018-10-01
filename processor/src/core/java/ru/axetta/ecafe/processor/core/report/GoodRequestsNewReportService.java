@@ -421,7 +421,7 @@ public class GoodRequestsNewReportService {
                 new Item(org, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark, null, "", ""));
+                    feedingPlanType, notificationMark, null, "", goodsCode));
         }
     }
 
@@ -432,7 +432,7 @@ public class GoodRequestsNewReportService {
                 hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
-                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, 0L, null, "", ""));
+                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, 0L, null, "", goodsCode));
         }
     }
 
