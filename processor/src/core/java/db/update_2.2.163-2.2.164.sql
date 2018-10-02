@@ -42,4 +42,4 @@ CREATE TABLE cf_clientbalance_hold
 OIDS = FALSE
 );
 
-
+--! ФИНАЛИЗИРОВАН 02.10.2018, НЕ МЕНЯТЬ
