@@ -69,6 +69,7 @@ public class OrganizationStructure implements AbstractToElement{
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
             session.refresh(org);
+            session.refresh(org.getOfficialPerson());
             OrganizationStructureItem item = new OrganizationStructureItem(org.getIdOfOrg(), org.getType().ordinal(),
                     org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
                     org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),

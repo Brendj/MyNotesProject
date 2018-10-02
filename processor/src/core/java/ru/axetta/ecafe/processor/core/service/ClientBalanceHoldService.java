@@ -27,7 +27,8 @@ public class ClientBalanceHoldService {
     private EntityManager em;
 
     public ClientBalanceHold createClientBalanceHold(Session session, Client client, Org oldOrg, Org newOrg,
-            Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus) {
+            Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus,
+            ClientBalanceHoldRequestStatus requestStatus, Client declarer, String phoneOfDeclarer) {
         Long version = DAOUtils.nextVersionByClientBalanceHold(session);
         ClientBalanceHold clientBalanceHold = new ClientBalanceHold();
         clientBalanceHold.setGuid(UUID.randomUUID().toString());
@@ -40,14 +41,22 @@ public class ClientBalanceHoldService {
         clientBalanceHold.setCreatedDate(new Date());
         clientBalanceHold.setCreateStatus(createStatus);
         clientBalanceHold.setRequestStatus(requestStatus);
+        clientBalanceHold.setDeclarer(declarer);
+        clientBalanceHold.setPhoneOfDeclarer(phoneOfDeclarer);
         clientBalanceHold.setVersion(version);
         return clientBalanceHold;
     }
 
-    public void holdClientBalance(Client client, Org oldOrg, Org newOrg, ClientBalanceHoldCreateStatus createStatus,
-            ClientBalanceHoldRequestStatus requestStatus) throws Exception {
-        if (oldOrg.getDefaultSupplier().equals(newOrg.getDefaultSupplier()) || client.getBalance() <= 0L) return;
-        RuntimeContext.getFinancialOpsManager().holdClientBalance(client, oldOrg, newOrg, oldOrg.getDefaultSupplier(),
-                newOrg.getDefaultSupplier(), createStatus, requestStatus);
+    public void holdClientBalance(Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
+            ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer) throws Exception {
+        if (client.getBalance() <= 0L) return;
+        RuntimeContext.getFinancialOpsManager().holdClientBalance(client, declarer, oldOrg, newOrg, oldContragent,
+                newContragent, createStatus, requestStatus, phoneOfDeclarer);
+    }
+
+    //todo Сделать запуск по расписанию. Просмотр таблицы истории перемещений клиентов и запуск удалений предзаказов +
+    //todo блокировка баланса по этой таблице
+    public void run() {
+
     }
 }

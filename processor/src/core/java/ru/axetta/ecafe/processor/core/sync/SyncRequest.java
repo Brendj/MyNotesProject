@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldData;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsBuilder;
@@ -2672,6 +2673,7 @@ public class SyncRequest {
             builders.add(new MenusCalendarBuilder(idOfOrg));
             builders.add(new MenusCalendarSupplierBuilder());
             builders.add(new ClientBalanceHoldBuilder(idOfOrg));
+            builders.add(new ClientBalanceHoldData.Builder(idOfOrg));
             return builders;
         }
 
@@ -2935,6 +2937,10 @@ public class SyncRequest {
 
     public ClientBalanceHoldRequest getClientBalanceHoldRequest() {
         return this.<ClientBalanceHoldRequest>findSection(ClientBalanceHoldRequest.class);
+    }
+
+    public ClientBalanceHoldData getClientBalanceHoldData() {
+        return this.<ClientBalanceHoldData>findSection(ClientBalanceHoldData.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

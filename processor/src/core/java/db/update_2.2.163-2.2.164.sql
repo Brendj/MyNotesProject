@@ -11,6 +11,7 @@ CREATE TABLE cf_clientbalance_hold
   guid character varying(36),
   idOfClient bigint NOT NULL,
   idOfDeclarer bigint,
+  phoneOfDeclarer character varying(20),
   holdSum bigint NOT NULL,
   idOfTransaction bigint NOT NULL,
   idOfOldOrg bigint NOT NULL,

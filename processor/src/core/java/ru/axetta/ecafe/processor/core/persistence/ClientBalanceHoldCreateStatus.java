@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by i.semenov on 26.09.2018.
  */
@@ -13,6 +16,12 @@ public enum ClientBalanceHoldCreateStatus {
     /*2*/ ARM("АРМ администратора ОУ");
 
     private final String description;
+    static Map<Integer,ClientBalanceHoldCreateStatus> map = new HashMap<Integer,ClientBalanceHoldCreateStatus>();
+    static {
+        for (ClientBalanceHoldCreateStatus questionaryStatus : ClientBalanceHoldCreateStatus.values()) {
+            map.put(questionaryStatus.ordinal(), questionaryStatus);
+        }
+    }
 
     ClientBalanceHoldCreateStatus(String description) {
         this.description = description;
@@ -21,5 +30,9 @@ public enum ClientBalanceHoldCreateStatus {
     @Override
     public String toString() {
         return description;
+    }
+
+    public static ClientBalanceHoldCreateStatus fromInteger(Integer value){
+        return map.get(value);
     }
 }

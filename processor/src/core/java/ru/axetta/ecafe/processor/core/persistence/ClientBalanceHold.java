@@ -13,6 +13,8 @@ public class ClientBalanceHold {
     private Long idOfClientBalanceHold;
     private String guid;
     private Client client;
+    private Client declarer;
+    private String phoneOfDeclarer;
     private Long holdSum;
     private AccountTransaction accountTransaction;
     private Org oldOrg;
@@ -139,5 +141,21 @@ public class ClientBalanceHold {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Client getDeclarer() {
+        return declarer;
+    }
+
+    public void setDeclarer(Client declarer) {
+        this.declarer = declarer;
+    }
+
+    public String getPhoneOfDeclarer() {
+        return phoneOfDeclarer;
+    }
+
+    public void setPhoneOfDeclarer(String phoneOfDeclarer) {
+        this.phoneOfDeclarer = phoneOfDeclarer;
     }
 }
