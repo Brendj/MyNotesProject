@@ -3583,7 +3583,7 @@ public class DAOUtils {
         return (Org) criteria.uniqueResult();
     }
 
-    public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) throws Exception {
+    public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));

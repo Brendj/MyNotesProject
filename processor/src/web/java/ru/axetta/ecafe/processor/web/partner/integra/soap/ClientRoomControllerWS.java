@@ -57,11 +57,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
-import ru.axetta.ecafe.processor.web.internal.CardResponseItem;
-import ru.axetta.ecafe.processor.web.partner.iac.CardRegistrationService;
-import ru.axetta.ecafe.processor.web.partner.iac.ClientNotFoundException;
-import ru.axetta.ecafe.processor.web.partner.iac.OrganizationNotFoundException;
-import ru.axetta.ecafe.processor.web.partner.iac.RequiredFieldsAreNotFilledException;
+import ru.axetta.ecafe.processor.web.partner.iac.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
@@ -8762,7 +8758,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             service.registerCard(session, Long.parseLong(cardId,16), validdate, client);
 
-            CardRegistrationService.ExternalInfo externalInfo = service.loadExternalInfo(session, organizationSuid, suid);
+            CardRegistrationService.ExternalInfo externalInfo = service.loadExternalInfo(session, organizationSuid, suid, null);
 
             result.setContractId(externalInfo.contractId);
             result.setSupplierName(externalInfo.contragentName);
@@ -8783,9 +8779,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error("Error in addRegistrationCard", e);
             result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
             result.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
-        } catch (CardResponseItem.CardAlreadyExist e) {
+        } catch (CardAlreadyUsedException e) {
             logger.error("Error in addRegistrationCard", e);
-            CardRegistrationService.ExternalInfo externalInfo = service.loadExternalInfo(session, organizationSuid, suid);
+            CardRegistrationService.ExternalInfo externalInfo =
+                    service.loadExternalInfo(session, organizationSuid, null,  Long.parseLong(cardId,16));
             result.setContractId(externalInfo.contractId);
             result.setSupplierName(externalInfo.contragentName);
             result.setSupplierINN(externalInfo.contragentInn);

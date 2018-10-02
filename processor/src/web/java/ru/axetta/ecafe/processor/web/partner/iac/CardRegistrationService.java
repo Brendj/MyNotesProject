@@ -112,18 +112,25 @@ public class CardRegistrationService {
         }
     }
 
-    public ExternalInfo loadExternalInfo(Session session, String organiztionGuid, String clientGuid) {
+    public ExternalInfo loadExternalInfo(Session session, String organizationGuid, String clientGuid, Long cardId ) {
         ExternalInfo externalInfo = new ExternalInfo();
-        Client client = DAOUtils.findClientByGuid(session, clientGuid);
-        if (null != client)
-            externalInfo.contractId = client.getContractId();
-        Org org = DAOUtils.findOrgByGuid(session, organiztionGuid);
+        Org org = DAOUtils.findOrgByGuid(session, organizationGuid);
         if (null != org.getDefaultSupplier()) {
             if (null != org.getDefaultSupplier().getContragentName()) {
                 externalInfo.contragentName = org.getDefaultSupplier().getContragentName();
             }
             externalInfo.contragentInn = org.getDefaultSupplier().getInn();
         }
+
+        if (null != clientGuid) {
+            Client client = DAOUtils.findClientByGuid(session, clientGuid);
+            if (null != client)
+                externalInfo.contractId = client.getContractId();
+        } else if (null != cardId) {
+            Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, org.getIdOfOrg());
+            externalInfo.contractId = card.getClient().getContractId();
+        }
+
         return externalInfo;
     }
 
