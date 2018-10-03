@@ -1003,6 +1003,10 @@ public class Processor implements SyncProcessor {
 
         fullProcessingPreOrderFeedingRequest(request, syncHistory, responseSections);
 
+        fullProcessingClientBalanceHoldRequest(request, syncHistory, responseSections);
+
+        fullProcessingClientBalanceHoldData(request, syncHistory, responseSections);
+
         // время окончания обработки
         Date syncEndTime = new Date();
 
@@ -2650,6 +2654,26 @@ public class Processor implements SyncProcessor {
                         .format("Failed to process numbers of Orders and EnterEvent, IdOfOrg == %s", request.getIdOfOrg());
                 logger.error(message, e);
             }
+        }
+
+        try {
+            ClientBalanceHoldRequest clientBalanceHoldRequest = request.getClientBalanceHoldRequest();
+            if (clientBalanceHoldRequest != null) {
+                clientBalanceHoldFeeding = processClientBalanceHoldRequest(clientBalanceHoldRequest);
+            }
+        } catch (Exception e) {
+            String message = String.format("processClientBalanceHoldRequest: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
+        try {
+            ClientBalanceHoldData clientBalanceHoldData = request.getClientBalanceHoldData();
+            if (clientBalanceHoldData != null) {
+                resClientBalanceHoldData = processClientBalanceHoldData(clientBalanceHoldData);
+            }
+        } catch (Exception e) {
+            String message = String.format("processClientBalanceHoldRequest: %s", e.getMessage());
+            logger.error(message, e);
         }
 
         updateOrgSyncDate(request.getIdOfOrg());
@@ -6272,6 +6296,34 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("fullProcessingPreOrderFeedingRequest: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingClientBalanceHoldRequest(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            ClientBalanceHoldRequest clientBalanceHoldRequest = request.getClientBalanceHoldRequest();
+            if (null != clientBalanceHoldRequest) {
+                ClientBalanceHoldFeeding clientBalanceHoldFeeding = processClientBalanceHoldRequest(clientBalanceHoldRequest);
+                addToResponseSections(clientBalanceHoldFeeding, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingClientBalanceHoldRequest: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingClientBalanceHoldData(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            ClientBalanceHoldData clientBalanceHoldData = request.getClientBalanceHoldData();
+            if (null != clientBalanceHoldData) {
+                ResClientBalanceHoldData resClientBalanceHoldData = processClientBalanceHoldData(clientBalanceHoldData);
+                addToResponseSections(resClientBalanceHoldData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingClientBalanceHoldData: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
