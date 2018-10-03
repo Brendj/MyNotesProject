@@ -11,9 +11,9 @@ import java.util.Map;
  * Created by i.semenov on 26.09.2018.
  */
 public enum ClientBalanceHoldCreateStatus {
-    /*0*/ CHANGE_SUPPLIER("Смена поставщика"),
-    /*1*/ MOS_RU("Портал"),
-    /*2*/ ARM("АРМ администратора ОУ");
+    /*0*/ CHANGE_SUPPLIER("Процессинг"),
+    /*1*/ MOS_RU("Арм администратора ОУ"),
+    /*2*/ ARM("Портал");
 
     private final String description;
     static Map<Integer,ClientBalanceHoldCreateStatus> map = new HashMap<Integer,ClientBalanceHoldCreateStatus>();

@@ -26,12 +26,12 @@ public class ClientBalanceHoldService {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
-    public ClientBalanceHold createClientBalanceHold(Session session, Client client, Org oldOrg, Org newOrg,
+    public ClientBalanceHold createClientBalanceHold(Session session, String guid, Client client, Org oldOrg, Org newOrg,
             Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus,
             ClientBalanceHoldRequestStatus requestStatus, Client declarer, String phoneOfDeclarer) {
         Long version = DAOUtils.nextVersionByClientBalanceHold(session);
         ClientBalanceHold clientBalanceHold = new ClientBalanceHold();
-        clientBalanceHold.setGuid(UUID.randomUUID().toString());
+        clientBalanceHold.setGuid(guid == null ? UUID.randomUUID().toString() : guid);
         clientBalanceHold.setClient(client);
         clientBalanceHold.setHoldSum(client.getBalance());
         clientBalanceHold.setOldOrg(oldOrg);
@@ -47,10 +47,10 @@ public class ClientBalanceHoldService {
         return clientBalanceHold;
     }
 
-    public void holdClientBalance(Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
+    public void holdClientBalance(String guid, Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer) throws Exception {
         if (client.getBalance() <= 0L) return;
-        RuntimeContext.getFinancialOpsManager().holdClientBalance(client, declarer, oldOrg, newOrg, oldContragent,
+        RuntimeContext.getFinancialOpsManager().holdClientBalance(guid, client, declarer, oldOrg, newOrg, oldContragent,
                 newContragent, createStatus, requestStatus, phoneOfDeclarer);
     }
 

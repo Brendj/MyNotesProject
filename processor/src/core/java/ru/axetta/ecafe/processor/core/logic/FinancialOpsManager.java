@@ -545,12 +545,12 @@ public class FinancialOpsManager {
     }
 
     @Transactional
-    public void holdClientBalance(Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
+    public void holdClientBalance(String guid, Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer) throws Exception {
         if (client.getBalance() <= 0L) return;
         Session session = (Session)em.getDelegate();
         ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                .createClientBalanceHold(session, client, oldOrg, newOrg, oldContragent, newContragent, createStatus,
+                .createClientBalanceHold(session, guid, client, oldOrg, newOrg, oldContragent, newContragent, createStatus,
                         requestStatus, declarer, phoneOfDeclarer);
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                 null, -client.getBalance(), "",

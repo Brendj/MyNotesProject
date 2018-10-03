@@ -11,11 +11,11 @@ import java.util.Map;
  * Created by i.semenov on 26.09.2018.
  */
 public enum ClientBalanceHoldRequestStatus {
-    /*0*/ CREATED("Предварительный"),
-    /*1*/ MOS_RU("Подано через портал"),
-    /*2*/ ARM("Подано в школе"),
-    /*3*/ ANNULLED("Аннулировано"),
-    /*4*/ REFUNDED("Средства возвращены");
+    /*0*/ CREATED("Создано"),
+    /*1*/ MOS_RU("Подписано"),
+    /*2*/ ARM("Аннулировано"),
+    /*3*/ ANNULLED("Средства возвращены"),
+    /*4*/ REFUNDED("Отказано в возврате средств");
 
     private final String description;
     static Map<Integer,ClientBalanceHoldRequestStatus> map = new HashMap<Integer,ClientBalanceHoldRequestStatus>();

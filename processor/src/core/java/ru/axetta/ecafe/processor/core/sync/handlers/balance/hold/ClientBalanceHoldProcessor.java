@@ -68,7 +68,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     Contragent newContragent = (newOrg == null) ? null : newOrg.getDefaultSupplier();
                     ClientBalanceHoldCreateStatus createStatus = ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus());
                     ClientBalanceHoldRequestStatus requestStatus = ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus());
-                    RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(client, declarer, oldOrg,
+                    RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(item.getGuid(), client, declarer, oldOrg,
                             newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer());
                 } catch (Exception e) {
                     ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 101, "Error in parsing required entities by values");
