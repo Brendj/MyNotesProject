@@ -53,7 +53,7 @@ public class CardRegistrationService {
             throw new OrganizationNotFoundException(String.format("Organization not found: guid = %s", organizationGuid));
         }
 
-        Long idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, true, true);
+        Long idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, false, true);
 
         return (Client) session.load(Client.class, idOfClient);
     }
