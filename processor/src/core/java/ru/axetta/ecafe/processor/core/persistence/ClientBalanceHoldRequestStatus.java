@@ -12,10 +12,10 @@ import java.util.Map;
  */
 public enum ClientBalanceHoldRequestStatus {
     /*0*/ CREATED("Создано"),
-    /*1*/ MOS_RU("Подписано"),
-    /*2*/ ARM("Аннулировано"),
-    /*3*/ ANNULLED("Средства возвращены"),
-    /*4*/ REFUNDED("Отказано в возврате средств");
+    /*1*/ SUBSCRIBED("Подписано"),
+    /*2*/ ANNULLED("Аннулировано"),
+    /*3*/ REFUNDED("Средства возвращены"),
+    /*4*/ DECLINED("Отказано в возврате средств");
 
     private final String description;
     static Map<Integer,ClientBalanceHoldRequestStatus> map = new HashMap<Integer,ClientBalanceHoldRequestStatus>();

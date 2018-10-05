@@ -72,8 +72,14 @@ public class ClientBalanceHoldData implements SectionRequest {
             Long version = (Long)getValue(itemNode, "Version", errorMessage, false, 'L');
             Integer createStatus = (Integer)getValue(itemNode, "CreateStatus", errorMessage, false, 'I');
             Integer requestStatus = (Integer)getValue(itemNode, "RequestStatus", errorMessage, false, 'I');
+            String declarerInn = XMLUtils.getAttributeValue(itemNode, "DeclarerInn");
+            String declarerAccount = XMLUtils.getAttributeValue(itemNode, "DeclarerAccount");
+            String declarerBank = XMLUtils.getAttributeValue(itemNode, "DeclarerBank");
+            String declarerBik = XMLUtils.getAttributeValue(itemNode, "DeclarerBik");
+            String declarerCorrAccount = XMLUtils.getAttributeValue(itemNode, "DeclarerCorrAccount");
             return new ClientBalanceHoldItem(idOfClient, idOfDeclarer, phoneOfDeclarer, guid, holdSum,
-                    idOfOldOrg, null, createdDate, version, createStatus, requestStatus, errorMessage.toString());
+                    idOfOldOrg, null, createdDate, version, createStatus, requestStatus,
+                    declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, errorMessage.toString());
         }
 
         private static Object getValue(Node itemNode, String attr, StringBuilder errorMessage, boolean canBeEmtpy, char type) {

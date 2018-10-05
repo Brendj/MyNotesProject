@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -277,7 +275,7 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
 
     public void completeClientSelection(Session session) throws Exception {
         selectedItems = getSelectedItems();
-        if (!completeHandlers.empty()) {
+        while (!completeHandlers.empty()) {
             completeHandlers.peek().completeClientSelection(session, selectedItems);
             completeHandlers.pop();
         }

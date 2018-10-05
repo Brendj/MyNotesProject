@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public enum ClientBalanceHoldCreateStatus {
     /*0*/ CHANGE_SUPPLIER("Процессинг"),
-    /*1*/ MOS_RU("Арм администратора ОУ"),
-    /*2*/ ARM("Портал");
+    /*1*/ ARM("Арм администратора ОУ"),
+    /*2*/ PORTAL("Портал");
 
     private final String description;
     static Map<Integer,ClientBalanceHoldCreateStatus> map = new HashMap<Integer,ClientBalanceHoldCreateStatus>();

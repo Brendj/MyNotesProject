@@ -26,6 +26,11 @@ public class ClientBalanceHold {
     private Long version;
     private ClientBalanceHoldCreateStatus createStatus;
     private ClientBalanceHoldRequestStatus requestStatus;
+    private String declarerInn;
+    private String declarerAccount;
+    private String declarerBank;
+    private String declarerBik;
+    private String declarerCorrAccount;
 
     public ClientBalanceHold() {
 
@@ -157,5 +162,45 @@ public class ClientBalanceHold {
 
     public void setPhoneOfDeclarer(String phoneOfDeclarer) {
         this.phoneOfDeclarer = phoneOfDeclarer;
+    }
+
+    public String getDeclarerInn() {
+        return declarerInn;
+    }
+
+    public void setDeclarerInn(String declarerInn) {
+        this.declarerInn = declarerInn;
+    }
+
+    public String getDeclarerAccount() {
+        return declarerAccount;
+    }
+
+    public void setDeclarerAccount(String declarerAccount) {
+        this.declarerAccount = declarerAccount;
+    }
+
+    public String getDeclarerBank() {
+        return declarerBank;
+    }
+
+    public void setDeclarerBank(String declarerBank) {
+        this.declarerBank = declarerBank;
+    }
+
+    public String getDeclarerBik() {
+        return declarerBik;
+    }
+
+    public void setDeclarerBik(String declarerBik) {
+        this.declarerBik = declarerBik;
+    }
+
+    public String getDeclarerCorrAccount() {
+        return declarerCorrAccount;
+    }
+
+    public void setDeclarerCorrAccount(String declarerCorrAccount) {
+        this.declarerCorrAccount = declarerCorrAccount;
     }
 }

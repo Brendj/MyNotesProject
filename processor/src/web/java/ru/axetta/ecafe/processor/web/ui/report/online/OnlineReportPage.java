@@ -96,9 +96,14 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     }
 
     protected String filter = "Не выбрано";
+    protected String filterClient = "Не выбрано";
 
     public String getFilter() {
         return filter;
+    }
+
+    public String getFilterClient() {
+        return filterClient;
     }
 
     public String getStringClientList() {
@@ -116,11 +121,12 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
 
     public void completeClientSelection(Session session, List<ClientSelectListPage.Item> items) throws Exception {
         if (items != null) {
-            getClientList().clear();
+            clientList.clear();
             for (ClientSelectListPage.Item item : items) {
-                getClientList().add(item);
+                clientList.add(item);
             }
         }
+        filterClient = getStringClientList();
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {

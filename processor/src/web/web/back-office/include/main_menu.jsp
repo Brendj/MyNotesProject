@@ -1245,6 +1245,7 @@
                             label="Транзакции клиента" action="#{mainPage.showClientTransactionsReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
     <rich:panelMenuGroup id="clientsReportsGroupMenu" binding="#{mainPage.clientReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по балансам" rendered="#{mainPage.eligibleToViewClientReports}">
         <a4j:support event="onclick" action="#{mainPage.showClientReportsGroupMenu}" reRender="workspaceForm" />
@@ -1257,6 +1258,8 @@
                             action="#{mainPage.showBalanceLeavingReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
                             label="Статистика по балансам клиентов" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="clientBalanceHoldMenuItem" binding="#{clientBalanceHoldPage.mainMenuComponent}"
+                            label="Блокировка баланса и вывод средств" action="#{clientBalanceHoldPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"

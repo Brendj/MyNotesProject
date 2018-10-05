@@ -25,6 +25,11 @@ public class ClientBalanceHoldItem {
     private Long version;
     private Integer createStatus;
     private Integer requestStatus;
+    private String declarerInn;
+    private String declarerAccount;
+    private String declarerBank;
+    private String declarerBik;
+    private String declarerCorrAccount;
     private String errorMessage;
     private Integer resCode;
 
@@ -40,10 +45,16 @@ public class ClientBalanceHoldItem {
         this.version = clientBalanceHold.getVersion();
         this.createStatus = clientBalanceHold.getCreateStatus().ordinal();
         this.requestStatus = clientBalanceHold.getRequestStatus().ordinal();
+        this.declarerInn = clientBalanceHold.getDeclarerInn();
+        this.declarerAccount = clientBalanceHold.getDeclarerAccount();
+        this.declarerBank = clientBalanceHold.getDeclarerBank();
+        this.declarerBik = clientBalanceHold.getDeclarerBik();
+        this.declarerCorrAccount = clientBalanceHold.getDeclarerCorrAccount();
     }
 
     public ClientBalanceHoldItem(Long idOfClient, Long idOfDeclarer, String phoneOfDeclarer, String guid, Long holdSum,
-            Long idOfOldOrg, Long idOfNewOrg, Date createdDate, Long version, Integer createStatus, Integer requestStatus, String errorMessage) {
+            Long idOfOldOrg, Long idOfNewOrg, Date createdDate, Long version, Integer createStatus, Integer requestStatus,
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, String errorMessage) {
         this.idOfClient = idOfClient;
         this.idOfDeclarer = idOfDeclarer;
         this.phoneOfDeclarer = phoneOfDeclarer;
@@ -55,6 +66,11 @@ public class ClientBalanceHoldItem {
         this.version = version;
         this.createStatus = createStatus;
         this.requestStatus = requestStatus;
+        this.declarerInn = declarerInn;
+        this.declarerAccount = declarerAccount;
+        this.declarerBank = declarerBank;
+        this.declarerBik = declarerBik;
+        this.declarerCorrAccount = declarerCorrAccount;
         this.errorMessage = errorMessage;
     }
 
@@ -94,6 +110,24 @@ public class ClientBalanceHoldItem {
         }
         if (null != requestStatus) {
             element.setAttribute("RequestStatus", Integer.toString(requestStatus));
+        }
+        if (null != phoneOfDeclarer) {
+            element.setAttribute("DeclarerPhone", phoneOfDeclarer);
+        }
+        if (null != declarerInn) {
+            element.setAttribute("DeclarerInn", declarerInn);
+        }
+        if (null != declarerAccount) {
+            element.setAttribute("DeclarerAccount", declarerAccount);
+        }
+        if (null != declarerBank) {
+            element.setAttribute("DeclarerBank", declarerBank);
+        }
+        if (null != declarerBik) {
+            element.setAttribute("DeclarerBik", declarerBik);
+        }
+        if (null != declarerCorrAccount) {
+            element.setAttribute("DeclarerCorrAccount", declarerCorrAccount);
         }
         if (null != resCode) {
             element.setAttribute("ResCode", Integer.toString(resCode));
@@ -207,5 +241,45 @@ public class ClientBalanceHoldItem {
 
     public void setResCode(Integer resCode) {
         this.resCode = resCode;
+    }
+
+    public String getDeclarerInn() {
+        return declarerInn;
+    }
+
+    public void setDeclarerInn(String declarerInn) {
+        this.declarerInn = declarerInn;
+    }
+
+    public String getDeclarerAccount() {
+        return declarerAccount;
+    }
+
+    public void setDeclarerAccount(String declarerAccount) {
+        this.declarerAccount = declarerAccount;
+    }
+
+    public String getDeclarerBank() {
+        return declarerBank;
+    }
+
+    public void setDeclarerBank(String declarerBank) {
+        this.declarerBank = declarerBank;
+    }
+
+    public String getDeclarerBik() {
+        return declarerBik;
+    }
+
+    public void setDeclarerBik(String declarerBik) {
+        this.declarerBik = declarerBik;
+    }
+
+    public String getDeclarerCorrAccount() {
+        return declarerCorrAccount;
+    }
+
+    public void setDeclarerCorrAccount(String declarerCorrAccount) {
+        this.declarerCorrAccount = declarerCorrAccount;
     }
 }

@@ -34,7 +34,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
         ClientBalanceHoldFeeding result = new ClientBalanceHoldFeeding();
         List<ClientBalanceHoldItem> items = new ArrayList<ClientBalanceHoldItem>();
 
-        List<ClientBalanceHold> list = DAOUtils.getClientBalanceHoldForOrgSinceVersion(session,
+        List<ClientBalanceHold> list = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getClientBalanceHoldForOrgSinceVersion(session,
                 clientBalanceHoldRequest.getOrgOwner(), clientBalanceHoldRequest.getMaxVersion());
         for (ClientBalanceHold clientBalanceHold : list) {
             ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(clientBalanceHold);
@@ -69,19 +69,25 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     ClientBalanceHoldCreateStatus createStatus = ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus());
                     ClientBalanceHoldRequestStatus requestStatus = ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus());
                     RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(item.getGuid(), client, declarer, oldOrg,
-                            newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer());
+                            newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer(),
+                            item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount());
                 } catch (Exception e) {
                     ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 101, "Error in parsing required entities by values");
                     items.add(resItem);
                     continue;
                 }
             } else {
-                //Если объект найден в БД, то меняем только статусы и версию
+                //Если объект найден в БД, то меняем только статусы, данные о заявителе и версию
                 Long nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
                 clientBalanceHold.setVersion(nextVersion);
                 clientBalanceHold.setCreateStatus(ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus()));
                 clientBalanceHold.setRequestStatus(ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus()));
                 clientBalanceHold.setPhoneOfDeclarer(item.getPhoneOfDeclarer());
+                clientBalanceHold.setDeclarerAccount(item.getDeclarerAccount());
+                clientBalanceHold.setDeclarerBank(item.getDeclarerBank());
+                clientBalanceHold.setDeclarerBik(item.getDeclarerBik());
+                clientBalanceHold.setDeclarerInn(item.getDeclarerInn());
+                clientBalanceHold.setDeclarerCorrAccount(item.getDeclarerCorrAccount());
                 session.update(clientBalanceHold);
             }
             ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 0, null);

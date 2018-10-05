@@ -3047,15 +3047,6 @@ public class DAOUtils {
         return query.list();
     }
 
-    public static List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,
-            long orgOwner, long version) throws Exception {
-        Query query = session.createQuery("select cbh from ClientBalanceHold cbh "
-                + "where cbh.version > :version and cbh.oldOrg.idOfOrg = :idOfOrg");
-        query.setParameter("version", version);
-        query.setParameter("idOfOrg", orgOwner);
-        return query.list();
-    }
-
     public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,
             PreorderComplex complex) throws Exception {
         Criteria criteria = session.createCriteria(PreorderMenuDetail.class);
