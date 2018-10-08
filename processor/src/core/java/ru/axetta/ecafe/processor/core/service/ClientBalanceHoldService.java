@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -97,5 +100,21 @@ public class ClientBalanceHoldService {
     //todo блокировка баланса по этой таблице
     public void run() {
 
+    }
+
+    public String getBalanceHoldListAsString(Session session, Long idOfClient) {
+        List clients = new ArrayList<Long>();
+        clients.add(idOfClient);
+        List<ClientBalanceHold> list = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                .getClientBalanceHolds(session, null, clients, 100);
+        if (list.size() == 0) return "Нет";
+
+        String balanceHold = "";
+        for (ClientBalanceHold cbh : list) {
+            balanceHold += String.format("Заблокированная сумма: %s р., создание: %s, дата: %s, статус: %s", CurrencyStringUtils
+                            .copecksToRubles(cbh.getHoldSum()),
+                    cbh.getCreateStatus().toString(), CalendarUtils.dateTimeToString(cbh.getCreatedDate()), cbh.getRequestStatus().toString()) + "<br/>";
+        }
+        return balanceHold;
     }
 }

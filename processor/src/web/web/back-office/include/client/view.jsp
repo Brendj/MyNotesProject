@@ -70,6 +70,8 @@
     <h:outputText escape="true" value="Субсчет АП" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.subBalance1}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Блокировка баланса и вывод средств" styleClass="output-text" />
+    <h:outputText escape="false" value="#{mainPage.clientViewPage.balanceHold}" styleClass="output-text" />
 
     <h:outputText escape="true" value="Статус подписки АП" styleClass="output-text" />
     <h:selectBooleanCheckbox disabled="true" value="#{mainPage.clientViewPage.wasSuspended}" readonly="true"

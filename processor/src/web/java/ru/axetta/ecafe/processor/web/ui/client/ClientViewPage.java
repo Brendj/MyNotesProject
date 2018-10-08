@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.StringUtils;
@@ -68,6 +70,14 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public void setPassportSeries(String passportSeries) {
         this.passportSeries = passportSeries;
+    }
+
+    public String getBalanceHold() {
+        return balanceHold;
+    }
+
+    public void setBalanceHold(String balanceHold) {
+        this.balanceHold = balanceHold;
     }
 
     public static class PersonData {
@@ -172,6 +182,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String passportNumber;
     private String passportSeries;
     private String cardRequest;
+    private String balanceHold;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -566,37 +577,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
 
-        // Категории скидок старое не используется
-        // TODO: переписать использутеся кривая логика с return! По этому не рекомендуется писать ниже код
-        //categoryDiscountNames = new ArrayList<String>();
-        List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
-        if (clientCategories.isEmpty())
-            return;
-
-        List<Long> idOfCategoryDiscountList = new ArrayList<Long>();
-
-        for (Object clientCategory : clientCategories) {
-            if (clientCategory.toString().isEmpty())
-                return;
-            Long idOfCategoryDiscount = Long.parseLong(clientCategory.toString());
-            idOfCategoryDiscountList.add(idOfCategoryDiscount);
-        }
-
-        Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
-        categoryDiscountCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryDiscountList));
-        List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
-          /*
-        for (CategoryDiscount categoryDiscount : categoryDiscountList) {
-            categoryDiscountNames.add(categoryDiscount.getCategoryName());
-        }   */
-
-        //Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
-        //criteria.add(Restrictions.eq("idOfClient", idOfClient));
-        //criteria.setProjection(Projections.projectionList()
-        //        .add(Projections.))
-        //SubscriptionFeeding subscriptionFeeding =
-
-
+        balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
 
     }
 

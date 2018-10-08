@@ -87,6 +87,9 @@ public class ClientBalanceHoldItem {
         if (null != idOfClient) {
             element.setAttribute("ClientId", Long.toString(idOfClient));
         }
+        if (null != idOfDeclarer) {
+            element.setAttribute("DeclarerId", Long.toString(idOfDeclarer));
+        }
         if (null != guid) {
             element.setAttribute("Guid", guid);
         }

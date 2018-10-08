@@ -103,6 +103,8 @@
     <h:outputText escape="true" value="Субсчет АП" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.clientEditPage.subBalance1}" maxlength="20"
                  converter="copeckSumConverter" styleClass="input-text" />
+    <h:outputText escape="true" value="Блокировка баланса и вывод средств" styleClass="output-text" />
+    <h:outputText escape="false" value="#{mainPage.clientEditPage.balanceHold}" styleClass="output-text" />
     <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.limit}" maxlength="20" converter="copeckSumConverter"
                  styleClass="input-text" />

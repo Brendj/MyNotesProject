@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -95,6 +96,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void setPassportSeries(String passportSeries) {
         this.passportSeries = passportSeries;
+    }
+
+    public String getBalanceHold() {
+        return balanceHold;
+    }
+
+    public void setBalanceHold(String balanceHold) {
+        this.balanceHold = balanceHold;
     }
 
     public static class OrgItem {
@@ -294,6 +303,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String passportNumber;
     private String passportSeries;
     private String cardRequest;
+    private String balanceHold;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -1202,6 +1212,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.passportNumber = client.getPassportNumber();
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
+        balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
     }
 
     public String getIdOfCategoryListString() {
