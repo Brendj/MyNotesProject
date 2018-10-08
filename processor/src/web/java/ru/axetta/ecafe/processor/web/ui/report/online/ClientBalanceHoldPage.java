@@ -93,10 +93,29 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
         if (currentItem == null) return;
         for (ClientBalanceHoldPageItem item : items) {
             if (item.equals(currentItem)) {
-                RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusAsRefunded(item.getIdOfClientBalanceHold());
+                RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(item.getIdOfClientBalanceHold(),
+                        ClientBalanceHoldRequestStatus.REFUNDED);
                 currentItem.setRequestStatus(ClientBalanceHoldRequestStatus.REFUNDED.toString());
                 break;
             }
+        }
+    }
+
+    public void decline() {
+        if (currentItem == null) return;
+        try {
+            for (ClientBalanceHoldPageItem item : items) {
+                if (item.equals(currentItem)) {
+                    RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).declineClientBalance(item.getIdOfClientBalanceHold());
+                    RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                            .setStatusWithValue(item.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.DECLINED);
+                    currentItem.setRequestStatus(ClientBalanceHoldRequestStatus.DECLINED.toString());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in decline client balance hold: ", e);
+            printError("Не удалось выполнить запрошенную операцию, ошибка " + e.getMessage());
         }
     }
 

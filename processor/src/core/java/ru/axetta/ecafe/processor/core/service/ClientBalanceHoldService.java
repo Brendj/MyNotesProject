@@ -15,6 +15,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -33,7 +34,7 @@ public class ClientBalanceHoldService {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
-    public ClientBalanceHold createClientBalanceHold(Session session, String guid, Client client, Org oldOrg, Org newOrg,
+    public ClientBalanceHold createClientBalanceHold(Session session, String guid, Client client, Long holdSum, Org oldOrg, Org newOrg,
             Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus,
             ClientBalanceHoldRequestStatus requestStatus, Client declarer, String phoneOfDeclarer,
             String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount) {
@@ -41,7 +42,7 @@ public class ClientBalanceHoldService {
         ClientBalanceHold clientBalanceHold = new ClientBalanceHold();
         clientBalanceHold.setGuid(guid == null ? UUID.randomUUID().toString() : guid);
         clientBalanceHold.setClient(client);
-        clientBalanceHold.setHoldSum(client.getBalance());
+        clientBalanceHold.setHoldSum(holdSum);
         clientBalanceHold.setOldOrg(oldOrg);
         clientBalanceHold.setNewOrg(newOrg);
         clientBalanceHold.setOldContragent(oldContragent);
@@ -60,12 +61,16 @@ public class ClientBalanceHoldService {
         return clientBalanceHold;
     }
 
-    public void holdClientBalance(String guid, Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
+    public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
             String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount) throws Exception {
-        if (client.getBalance() <= 0L) return;
-        RuntimeContext.getFinancialOpsManager().holdClientBalance(guid, client, declarer, oldOrg, newOrg, oldContragent,
+        if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
+        RuntimeContext.getFinancialOpsManager().holdClientBalance(guid, client, holdSum, declarer, oldOrg, newOrg, oldContragent,
                 newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount);
+    }
+
+    public void declineClientBalance(Long idOfClientBalanceHold) throws Exception {
+        RuntimeContext.getFinancialOpsManager().declineClientBalance(idOfClientBalanceHold);
     }
 
     public List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,
@@ -89,10 +94,10 @@ public class ClientBalanceHoldService {
         return query.list();
     }
 
-    @Transactional
-    public void setStatusAsRefunded(Long idOfClientBalanceHold) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void setStatusWithValue(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) {
         javax.persistence.Query query = em.createQuery("update ClientBalanceHold set requestStatus = :status where idOfClientBalanceHold = :id");
-        query.setParameter("status", ClientBalanceHoldRequestStatus.REFUNDED);
+        query.setParameter("status", status);
         query.setParameter("id", idOfClientBalanceHold);
         query.executeUpdate();
     }

@@ -122,10 +122,15 @@
             <h:outputText styleClass="output-text" value="#{item.balanceHold}" converter="copeckSumConverter" />
         </rich:column>
         <rich:column>
-            <a4j:commandButton reRender="clientBalanceHoldTable" rendered="#{item.showButton()}"
+            <a4j:commandLink reRender="clientBalanceHoldTable" rendered="#{item.showButton()}"
                              action="#{clientBalanceHoldPage.confirm()}" value="Подтвердить возврат">
                 <f:setPropertyActionListener value="#{item}" target="#{clientBalanceHoldPage.currentItem}" />
-            </a4j:commandButton>
+            </a4j:commandLink>
+            &nbsp;
+            <a4j:commandLink reRender="clientBalanceHoldTable" rendered="#{item.showButton()}"
+                               action="#{clientBalanceHoldPage.decline()}" value="Отказать в возврате">
+                <f:setPropertyActionListener value="#{item}" target="#{clientBalanceHoldPage.currentItem}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.requestStatus}" />

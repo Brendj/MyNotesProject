@@ -545,18 +545,29 @@ public class FinancialOpsManager {
     }
 
     @Transactional
-    public void holdClientBalance(String guid, Client client, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
+    public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
             String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount) throws Exception {
-        if (client.getBalance() <= 0L) return;
+        if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         Session session = (Session)em.getDelegate();
         ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                .createClientBalanceHold(session, guid, client, oldOrg, newOrg, oldContragent, newContragent, createStatus,
+                .createClientBalanceHold(session, guid, client, holdSum, oldOrg, newOrg, oldContragent, newContragent, createStatus,
                         requestStatus, declarer, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount);
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, -client.getBalance(), "",
+                null, -holdSum, "",
                 AccountTransaction.CLIENT_BALANCE_HOLD, null, new Date());
         clientBalanceHold.setAccountTransaction(accountTransaction);
+        session.save(clientBalanceHold);
+    }
+
+    @Transactional
+    public void declineClientBalance(Long idOfClientBalanceHold) throws Exception {
+        Session session = (Session)em.getDelegate();
+        ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfClientBalanceHold);
+        ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
+                null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
+                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, null, new Date());
+        RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, ClientBalanceHoldRequestStatus.DECLINED);
         session.save(clientBalanceHold);
     }
 }
