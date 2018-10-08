@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
@@ -113,7 +114,9 @@ public class ClientBalanceHoldService {
         for (ClientBalanceHold cbh : list) {
             balanceHold += String.format("Заблокированная сумма: %s р., создание: %s, дата: %s, статус: %s", CurrencyStringUtils
                             .copecksToRubles(cbh.getHoldSum()),
-                    cbh.getCreateStatus().toString(), CalendarUtils.dateTimeToString(cbh.getCreatedDate()), cbh.getRequestStatus().toString()) + "<br/>";
+                    cbh.getCreateStatus().toString(), CalendarUtils.dateTimeToString(cbh.getCreatedDate()), cbh.getRequestStatus().toString());
+            if (!StringUtils.isEmpty(cbh.getPhoneOfDeclarer())) balanceHold += ", телефон представителя: " + cbh.getPhoneOfDeclarer();
+            balanceHold += "<br/>";
         }
         return balanceHold;
     }
