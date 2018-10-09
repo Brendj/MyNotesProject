@@ -8819,6 +8819,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new IllegalArgumentException(
                         "ОО клиента не поддерживает функцию использования клиентами нескольких индификаторов");
             }
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
+            client.setClientRegistryVersion(clientRegistryVersion);
+
             persistenceSession.update(client);
 
             persistenceTransaction.commit();
