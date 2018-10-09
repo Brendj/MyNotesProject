@@ -2581,4 +2581,11 @@ public class DAOService {
         session.save(token);
         return token.getToken();
     }
+
+    public void updateLastProcessOrgChange(Date date) {
+        entityManager.createQuery("update Option set optionText = :value where idOfOption = :idOfOption")
+                .setParameter("value", new Long(date.getTime()).toString())
+                .setParameter("idOfOption", new Long(Option.OPTION_LAST_ORG_CHANGE_PROCESS))
+                .executeUpdate();
+    }
 }

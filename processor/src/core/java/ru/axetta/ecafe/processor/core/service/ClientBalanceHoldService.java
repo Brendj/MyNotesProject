@@ -125,4 +125,8 @@ public class ClientBalanceHoldService {
         }
         return balanceHold;
     }
+
+    public long getClientBalanceHoldSum(Client client) {
+        return client.getBalance();
+    }
 }

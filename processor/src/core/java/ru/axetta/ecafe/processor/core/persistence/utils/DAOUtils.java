@@ -1178,7 +1178,7 @@ public class DAOUtils {
 
     private static void sendNotificationLowBalance(Session session, Client client, Date transactionDate) {
         try {
-            String[] values = generateLowBalanceNotificationParams(client, transactionDate);
+            String[] values = generateLowBalanceNotificationParams(session, client, transactionDate);
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                 .sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_LOW_BALANCE,
                         values, transactionDate);
@@ -1200,13 +1200,16 @@ public class DAOUtils {
         }
     }
 
-    private static String[] generateLowBalanceNotificationParams(Client client, Date trDate) {
+    private static String[] generateLowBalanceNotificationParams(Session session, Client client, Date trDate) {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(trDate);
+        Criteria criteria = session.createCriteria(Person.class);
+        criteria.add(Restrictions.eq("idOfPerson", client.getPerson().getIdOfPerson()));
+        Person person = (Person)criteria.uniqueResult();
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
-                ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
-                "firstName", client.getPerson().getFirstName(), "empTime", empTime,
+                ContractIdFormat.format(client.getContractId()), "surname", person.getSurname(),
+                "firstName", person.getFirstName(), "empTime", empTime,
                 EventNotificationService.PARAM_BALANCE_TO_NOTIFY, CurrencyStringUtils.copecksToRubles(client.getBalanceToNotify())};
     }
 

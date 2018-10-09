@@ -90,6 +90,7 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
     }
 
     public void confirm() {
+        //меняем статус
         if (currentItem == null) return;
         for (ClientBalanceHoldPageItem item : items) {
             if (item.equals(currentItem)) {
@@ -102,6 +103,7 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
     }
 
     public void decline() {
+        //меняем статус и возвращаем деньги на баланс
         if (currentItem == null) return;
         try {
             for (ClientBalanceHoldPageItem item : items) {
