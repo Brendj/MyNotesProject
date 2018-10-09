@@ -12,3 +12,10 @@ ALTER TABLE cf_clientbalance_hold
   add column declarerBik character varying(20),
   add column declarerCorrAccount character varying(20);
 
+-- Флаг "Режим выдачи нескольких активных карт"
+ALTER TABLE cf_clients
+ADD COLUMN multiCardMode INTEGER;
+
+-- Флаг "Использование обучающимися нескольких идентификаторов в ОО"
+ALTER TABLE cf_orgs
+ADD COLUMN multiCardModeEnabled INTEGER;

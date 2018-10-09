@@ -139,6 +139,7 @@ public class Client {
     private String passportSeries;
     private Boolean hasActiveSmartWatch;
     private String iacRegId;
+    private Boolean multiCardMode;
 
     protected Client() {
         // For Hibernate only
@@ -1139,5 +1140,21 @@ public class Client {
 
     public void setIacRegId(String iacRegId) {
         this.iacRegId = iacRegId;
+    }
+
+    public Boolean getMultiCardMode() {
+        return multiCardMode;
+    }
+
+    public void setMultiCardMode(Boolean multiCardMode) {
+        this.multiCardMode = multiCardMode;
+    }
+
+    public boolean activeMultiCardMode(){
+        if(this.multiCardMode == null){
+            return false;
+        } else {
+            return multiCardMode;
+        }
     }
 }

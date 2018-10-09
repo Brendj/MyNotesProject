@@ -254,6 +254,7 @@
         <property name="helpdeskEnabled" column="helpdeskEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="requestForVisitsToOtherOrg" column="RequestForVisitsToOtherOrg" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="preordersEnabled" column="preordersEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="multiCardModeEnabled" column="multiCardModeEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
     </class>
 </hibernate-mapping>
 

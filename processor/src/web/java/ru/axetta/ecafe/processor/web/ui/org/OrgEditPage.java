@@ -129,6 +129,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean allowRegistryChangeEmployee;
     private Boolean helpdeskEnabled;
     private Boolean preordersEnabled;
+    private Boolean multiCardModeEnabled;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -371,6 +372,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
         org.setHelpdeskEnabled(helpdeskEnabled);
         org.setPreordersEnabled(preordersEnabled);
+        org.setMultiCardModeEnabled(multiCardModeEnabled);
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
@@ -529,6 +531,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.helpdeskEnabled = org.getHelpdeskEnabled();
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
         this.preordersEnabled = org.getPreordersEnabled();
+        this.multiCardModeEnabled = org.multiCardModeIsEnabled();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1131,6 +1134,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setPreordersEnabled(Boolean preordersEnabled) {
         this.preordersEnabled = preordersEnabled;
+    }
+
+    public Boolean getMultiCardModeEnabled() {
+        return multiCardModeEnabled;
+    }
+
+    public void setMultiCardModeEnabled(Boolean multiCardModeEnabled) {
+        this.multiCardModeEnabled = multiCardModeEnabled;
     }
 
     public static class ContragentItem {

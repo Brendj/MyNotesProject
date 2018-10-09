@@ -147,6 +147,7 @@ public class Org implements Serializable {
     private Boolean helpdeskEnabled;
     private Boolean requestForVisitsToOtherOrg;
     private Boolean preordersEnabled;
+    private Boolean multiCardModeEnabled;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1159,5 +1160,21 @@ public class Org implements Serializable {
         if (!this.statusDetailing.isEmpty() && !this.statusDetailing.equalsIgnoreCase("/"))
             result += " (" + this.statusDetailing + ")";
         return result;
+    }
+
+    public Boolean getMultiCardModeEnabled() {
+        return multiCardModeEnabled;
+    }
+
+    public void setMultiCardModeEnabled(Boolean multiCardModeEnabled) {
+        this.multiCardModeEnabled = multiCardModeEnabled;
+    }
+
+    public boolean multiCardModeIsEnabled(){
+        if(this.multiCardModeEnabled == null){
+            return false;
+        } else {
+            return this.multiCardModeEnabled;
+        }
     }
 }

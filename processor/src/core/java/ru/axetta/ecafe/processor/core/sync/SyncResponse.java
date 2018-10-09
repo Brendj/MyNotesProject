@@ -377,6 +377,7 @@ public class SyncResponse {
             private final Boolean specialMenu;
             private final String passportNumber;
             private final String passportSeries;
+            private final Boolean multiCardMode;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -419,6 +420,7 @@ public class SyncResponse {
                 this.specialMenu = client.getSpecialMenu();
                 this.passportNumber = client.getPassportNumber();
                 this.passportSeries = client.getPassportSeries();
+                this.multiCardMode = client.activeMultiCardMode();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -612,6 +614,7 @@ public class SyncResponse {
                 if (this.passportSeries != null) {
                     element.setAttribute("PassportSeries", this.passportSeries);
                 }
+                element.setAttribute("multiCardMode", this.multiCardMode ? "1" : "0");
                 return element;
             }
 
@@ -632,6 +635,10 @@ public class SyncResponse {
 
             public String getPassportSeries() {
                 return passportSeries;
+            }
+
+            public Boolean getMultiCardMode() {
+                return multiCardMode;
             }
         }
 

@@ -80,6 +80,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.balanceHold = balanceHold;
     }
 
+    public Boolean getMultiCardMode() {
+        return multiCardMode;
+    }
+
+    public void setMultiCardMode(Boolean multiCardMode) {
+        this.multiCardMode = multiCardMode;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -183,6 +191,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String passportSeries;
     private String cardRequest;
     private String balanceHold;
+    private Boolean multiCardMode;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -515,6 +524,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.ageTypeGroup = client.getAgeTypeGroup();
         this.balanceToNotify = client.getBalanceToNotify();
         this.lastConfirmMobile = client.getLastConfirmMobile();
+        this.multiCardMode = client.activeMultiCardMode();
 
         // опекуны
         // (Kadyrov D) 23.12.2011

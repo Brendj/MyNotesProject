@@ -71,6 +71,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean commodityAccountingParam;
     private Boolean usePlanOrders;
     private Boolean usePaydableSubscriptionFeeding;
+    private Boolean multiCardModeEnabled;
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private OrganizationType organizationTypeInitial;
@@ -273,6 +274,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.helpdeskEnabled = org.getHelpdeskEnabled();
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
         this.preordersEnabled = org.getPreordersEnabled();
+        this.multiCardModeEnabled = org.multiCardModeIsEnabled();
     }
 
     public String getFilterOrgs() {
@@ -737,5 +739,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setPreordersEnabled(Boolean preordersEnabled) {
         this.preordersEnabled = preordersEnabled;
+    }
+
+    public Boolean getMultiCardModeEnabled() {
+        return multiCardModeEnabled;
+    }
+
+    public void setMultiCardModeEnabled(Boolean multiCardModeEnabled) {
+        this.multiCardModeEnabled = multiCardModeEnabled;
     }
 }

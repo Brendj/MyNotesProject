@@ -550,4 +550,10 @@ public interface ClientRoomController {
             @WebParam(name = "birthDate") Date birthDate, @WebParam(name = "grade") String grade,
             @WebParam(name = "codeBenefit") String codeBenefit, @WebParam(name = "startDate") Date startDate,
             @WebParam(name = "endDate") Date endDate);
+
+    @WebMethod(operationName = "setMultiCardModeForClient")
+    Result setMultiCardModeForClient(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
+
+    @WebMethod(operationName = "getClientCardInfo")
+    CardInfo getClientCardInfo(@WebParam(name = "contractId") Long contractId);
 }

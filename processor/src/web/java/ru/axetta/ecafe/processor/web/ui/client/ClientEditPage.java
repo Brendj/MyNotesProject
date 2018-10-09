@@ -106,6 +106,18 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.balanceHold = balanceHold;
     }
 
+    public Boolean getMultiCardMode() {
+        return multiCardMode;
+    }
+
+    public void setMultiCardMode(Boolean multiCardMode) {
+        this.multiCardMode = multiCardMode;
+    }
+
+    public Boolean getInOrgEnabledMultiCardMode() {
+        return inOrgEnabledMultiCardMode;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -304,6 +316,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String passportSeries;
     private String cardRequest;
     private String balanceHold;
+    private Boolean multiCardMode;
+    private Boolean inOrgEnabledMultiCardMode;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -1093,6 +1107,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
         }
 
+        if(client.getOrg() != null && client.getOrg().multiCardModeIsEnabled()){
+            client.setMultiCardMode(multiCardMode);
+        }
+
         resetNewFlags();
 
         client.setGender(this.gender);
@@ -1213,6 +1231,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
+        this.inOrgEnabledMultiCardMode = client.getOrg().multiCardModeIsEnabled();
+        this.multiCardMode = client.activeMultiCardMode();
     }
 
     public String getIdOfCategoryListString() {

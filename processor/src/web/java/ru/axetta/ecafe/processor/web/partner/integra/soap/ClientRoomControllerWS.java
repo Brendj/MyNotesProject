@@ -8798,4 +8798,106 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return result;
     }
+
+    @Override
+    public Result setMultiCardModeForClient(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Result response = new Result();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if(client == null){
+                throw new ClientNotFoundException("Не удалось найти Клиента с л/с: " + contractId);
+            }
+
+            if(client.getOrg() != null && client.getOrg().multiCardModeIsEnabled()){
+                client.setMultiCardMode(value);
+            } else {
+                throw new IllegalArgumentException(
+                        "ОО клиента не поддерживает функцию использования клиентами нескольких индификаторов");
+            }
+            persistenceSession.update(client);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            response.resultCode = RC_OK;
+            response.description = RC_OK_DESC;
+        }catch (IllegalArgumentException e) {
+            logger.error(
+                    "Попытка установить режим \"Использования нескольких индификаторов\" для клиента л/с" + contractId + " , при отключеной опции для ОО клиента", e);
+            response.resultCode = RC_INTERNAL_ERROR;
+            response.description = e.getMessage();
+        }catch (ClientNotFoundException e){
+            logger.error("", e);
+            response.resultCode = RC_CLIENT_NOT_FOUND;
+            response.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (Exception e) {
+            logger.error("Ошибка при попытке установить для Клиента (contractId=" + contractId + ") значение для поля multiCardMode ", e);
+            response.resultCode = RC_INTERNAL_ERROR;
+            response.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return response;
+    }
+
+    @Override
+    public CardInfo getClientCardInfo(@WebParam(name = "contractId") Long contractId){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        CardInfo result = new CardInfo();
+        try{
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if(client == null){
+                throw new ClientNotFoundException("Не удалось найти Клиента с л/с: " + contractId);
+            }
+
+            result.setClientHasActiveMultiCardMode(client.activeMultiCardMode());
+            if(client.getOrg() != null){
+                result.setOrgEnabledMultiCardMod(client.getOrg().multiCardModeIsEnabled());
+            }
+
+            for(Card card : client.getCards()){
+                CardInfoItem item = new CardInfoItem();
+                if(card.getCardType() <= 8 && card.getState().equals(CardState.ISSUED.getValue())){
+                    item.setCardPrintedNo(card.getCardPrintedNo());
+                    item.setCardType(card.getCardType());
+                    item.setState(card.getState());
+                } else if(card.getCardType() > 8){
+                    item.setCardPrintedNo(card.getCardPrintedNo());
+                    item.setCardType(card.getCardType());
+                    item.setState(card.getState());
+                } else {
+                    continue;
+                }
+                result.getItems().add(item);
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        }catch (ClientNotFoundException e){
+            logger.error("", e);
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (Exception e) {
+            logger.error("Ошибка при попытке собрать информацию об картах Клиента (contractId=" + contractId + ")", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
 }

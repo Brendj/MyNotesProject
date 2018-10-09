@@ -64,7 +64,7 @@ public class OrganizationStructure implements AbstractToElement{
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(),
                     o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getShortAddress(),
-                    o.getOrgStructureVersion());
+                    o.getOrgStructureVersion(), o.multiCardModeIsEnabled());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
@@ -75,7 +75,7 @@ public class OrganizationStructure implements AbstractToElement{
                     org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
                     org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(), org.getShortAddress(),
-                    org.getOrgStructureVersion());
+                    org.getOrgStructureVersion(), org.multiCardModeIsEnabled());
             organizationItemMap.put(org.getIdOfOrg(), item);
         }
     }
@@ -107,10 +107,11 @@ public class OrganizationStructure implements AbstractToElement{
         private final Boolean needVerifyCardSign;
         private final Boolean useSpecialMenu;
         private final String shortAddress;
+        private final Boolean multiCardModeEnabled;
 
-        private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName,
-                String shortName, String chief, String address,Boolean useSubscriptionFeeding,Long configurationId,Long defaultSupplier, Boolean isFriendly,
-                String nCounty, Integer state, Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress, Long version) {
+        private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName, String shortName,
+                String chief, String address,Boolean useSubscriptionFeeding,Long configurationId,Long defaultSupplier, Boolean isFriendly, String nCounty,
+                Integer state, Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress, Long version, Boolean multiCardModeEnabled) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -129,6 +130,7 @@ public class OrganizationStructure implements AbstractToElement{
             this.useSpecialMenu = useSpecialMenu;
             this.shortAddress = shortAddress;
             this.version = version;
+            this.multiCardModeEnabled = multiCardModeEnabled;
         }
 
         public Element toElement(Document document) throws Exception{
@@ -155,6 +157,7 @@ public class OrganizationStructure implements AbstractToElement{
             element.setAttribute("NeedVerifyCardSign", needVerifyCardSign ? "1" : "0");
             element.setAttribute("UseSpecialMenu", useSpecialMenu ? "1" : "0");
             element.setAttribute("ShortAddress", shortAddress);
+            element.setAttribute("multiCardModeEnabled", multiCardModeEnabled ? "1" : "0");
             return element;
         }
 
