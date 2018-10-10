@@ -172,6 +172,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ORGANIZATION_NOT_FOUND = 650L;
     private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
     private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
+    private static final Long RC_NOT_ENOUGH_BALANCE = 680L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -213,6 +214,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ORGANIZATION_NOT_FOUND_DESC = "Организация не найдена";
     private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
     private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
+    private static final String RC_NOT_ENOUGH_BALANCE_DESC = "Недостаточно средств на балансе лицевого счета";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8902,5 +8904,72 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(persistenceSession, logger);
         }
         return result;
+    }
+
+    @Override
+    public Result addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "sum") Long sum, @WebParam(name = "guardianDataForCashOut") GuardianDataForCashOut guardianDataForCashOut) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            Query query = session.createQuery("select cg from ClientGuardian cg, Client g "
+                    + "where g.idOfClient = cg.idOfGuardian and cg.idOfChildren = :idOfChildren and g.mobile = :guardianMobile "
+                    + "and cg.deletedState = false and cg.disabled = false");
+            query.setParameter("idOfChildren", client.getIdOfClient());
+            query.setParameter("guardianMobile", guardianMobile);
+            List<ClientGuardian> guardians = query.list();
+            if (guardians.size() == 0) {
+                result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                return result;
+            }
+            Long idOfGuardian = (guardians.size() == 1) ? guardians.get(0).getIdOfGuardian() : null;
+            Client declarer = idOfGuardian == null ? null : (Client) session.get(Client.class, idOfGuardian);
+
+            Date today = CalendarUtils.startOfDay(new Date());
+            Date endDate = CalendarUtils.addDays(today, 13);
+            endDate = CalendarUtils.endOfDay(endDate);
+            Long preordersSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreordersSum(client, today, endDate);
+            if (client.getBalance() - preordersSum < sum) {
+                result.resultCode = RC_NOT_ENOUGH_BALANCE;
+                result.description = RC_NOT_ENOUGH_BALANCE_DESC;
+                return result;
+            }
+            String declarerInn = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerInn();
+            String declarerAccount = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerAccount();
+            String declarerBank = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerBank();
+            String declarerBik = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerBik();
+            String declarerCorrAccount = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerCorrAccount();
+
+            RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(UUID.randomUUID().toString(),
+                    client, sum, declarer, client.getOrg(), null, client.getOrg().getDefaultSupplier(), null,
+                    ClientBalanceHoldCreateStatus.PORTAL, ClientBalanceHoldRequestStatus.CREATED, guardianMobile,
+                    declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount);
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return null;
     }
 }

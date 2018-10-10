@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
 
     private final ClientBalanceHoldRequest clientBalanceHoldRequest;
     private final ClientBalanceHoldData clientBalanceHoldData;
+    private final static Logger logger = LoggerFactory.getLogger(ClientBalanceHoldProcessor.class);
 
     public ClientBalanceHoldProcessor(Session persistenceSession, ClientBalanceHoldRequest clientBalanceHoldRequest, ClientBalanceHoldData clientBalanceHoldData) {
         super(persistenceSession);
@@ -72,6 +75,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                             newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer(),
                             item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount());
                 } catch (Exception e) {
+                    logger.error("Error in processing ClientBalanceHold entity: ", e);
                     ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 101, "Error in processing entity: " + e.getMessage());
                     items.add(resItem);
                     continue;

@@ -556,4 +556,8 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getClientCardInfo")
     CardInfo getClientCardInfo(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "addRequestForCashOut")
+    Result addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "sum") Long sum, @WebParam(name = "guardianDataForCashOut") GuardianDataForCashOut guardianDataForCashOut);
 }
