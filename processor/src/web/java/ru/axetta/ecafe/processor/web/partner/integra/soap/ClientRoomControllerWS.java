@@ -8970,6 +8970,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-        return null;
+        return result;
     }
 }
