@@ -197,7 +197,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                     }
 
                     if (null == item.getIdOfGoodsRequestPosition()) {
-                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, startDate, endDate,
+                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, fireTime, endDate,
                             item.getIdOfPreorderComplex(), item.getIdOfPreorderMenuDetail());
 
                         if ((item.clientBalance - item.complexPrice - preordersPrice) < 0L) {
