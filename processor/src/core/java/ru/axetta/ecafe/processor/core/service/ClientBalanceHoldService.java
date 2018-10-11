@@ -37,8 +37,8 @@ public class ClientBalanceHoldService {
     public ClientBalanceHold createClientBalanceHold(Session session, String guid, Client client, Long holdSum, Org oldOrg, Org newOrg,
             Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus,
             ClientBalanceHoldRequestStatus requestStatus, Client declarer, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount) {
-        Long version = DAOUtils.nextVersionByClientBalanceHold(session);
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) {
+        if (version == null) version = DAOUtils.nextVersionByClientBalanceHold(session);
         ClientBalanceHold clientBalanceHold = new ClientBalanceHold();
         clientBalanceHold.setGuid(guid == null ? UUID.randomUUID().toString() : guid);
         clientBalanceHold.setClient(client);
@@ -63,10 +63,10 @@ public class ClientBalanceHoldService {
 
     public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount) throws Exception {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) throws Exception {
         if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         RuntimeContext.getFinancialOpsManager().holdClientBalance(guid, client, holdSum, declarer, oldOrg, newOrg, oldContragent,
-                newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount);
+                newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version);
     }
 
     public void declineClientBalance(Long idOfClientBalanceHold) throws Exception {
@@ -96,9 +96,12 @@ public class ClientBalanceHoldService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void setStatusWithValue(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) {
-        javax.persistence.Query query = em.createQuery("update ClientBalanceHold set requestStatus = :status where idOfClientBalanceHold = :id");
+        Session session = (Session)em.getDelegate();
+        Long nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
+        javax.persistence.Query query = em.createQuery("update ClientBalanceHold set requestStatus = :status, version = :version where idOfClientBalanceHold = :id");
         query.setParameter("status", status);
         query.setParameter("id", idOfClientBalanceHold);
+        query.setParameter("version", nextVersion);
         query.executeUpdate();
     }
 
@@ -128,5 +131,15 @@ public class ClientBalanceHoldService {
 
     public long getClientBalanceHoldSum(Client client) {
         return client.getBalance();
+    }
+
+    public ClientBalanceHold getClientBalanceHoldByGuid(String guid) {
+        javax.persistence.Query query = em.createQuery("select cbh from ClientBalanceHold cbh where cbh.guid = :guid");
+        query.setParameter("guid", guid);
+        try {
+            return (ClientBalanceHold) query.getSingleResult();
+        } catch(Exception e) {
+            return null;
+        }
     }
 }

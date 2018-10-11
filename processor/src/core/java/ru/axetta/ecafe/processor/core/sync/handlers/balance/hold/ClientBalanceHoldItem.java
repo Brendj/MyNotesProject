@@ -74,10 +74,11 @@ public class ClientBalanceHoldItem {
         this.errorMessage = errorMessage;
     }
 
-    public ClientBalanceHoldItem(String guid, Integer resCode, String errorMessage) {
+    public ClientBalanceHoldItem(String guid, Integer resCode, String errorMessage, Long version) {
         this.guid = guid;
         this.resCode = resCode;
         this.errorMessage = errorMessage;
+        this.version = version;
     }
 
     public Element toElement(Document document) throws Exception{
