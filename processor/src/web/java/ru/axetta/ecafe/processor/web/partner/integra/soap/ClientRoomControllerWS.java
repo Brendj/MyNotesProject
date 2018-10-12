@@ -9038,7 +9038,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                    .setStatusWithValue(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED);
+                    .declineClientBalance(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED);
 
             transaction.commit();
             transaction = null;

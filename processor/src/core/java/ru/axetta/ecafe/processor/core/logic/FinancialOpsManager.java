@@ -560,13 +560,13 @@ public class FinancialOpsManager {
     }
 
     @Transactional
-    public void declineClientBalance(Long idOfClientBalanceHold) throws Exception {
+    public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) throws Exception {
         Session session = (Session)em.getDelegate();
         ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfClientBalanceHold);
         ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
                 null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
                 AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, null, new Date());
-        RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, ClientBalanceHoldRequestStatus.DECLINED);
+        RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, status);
         session.save(clientBalanceHold);
     }
 }

@@ -70,8 +70,8 @@ public class ClientBalanceHoldService {
                 newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version);
     }
 
-    public void declineClientBalance(Long idOfClientBalanceHold) throws Exception {
-        RuntimeContext.getFinancialOpsManager().declineClientBalance(idOfClientBalanceHold);
+    public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) throws Exception {
+        RuntimeContext.getFinancialOpsManager().declineClientBalance(idOfClientBalanceHold, status);
     }
 
     public List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,

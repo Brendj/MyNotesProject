@@ -108,9 +108,8 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
         try {
             for (ClientBalanceHoldPageItem item : items) {
                 if (item.equals(currentItem)) {
-                    RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).declineClientBalance(item.getIdOfClientBalanceHold());
                     RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                            .setStatusWithValue(item.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.DECLINED);
+                            .declineClientBalance(item.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.DECLINED);
                     currentItem.setRequestStatus(ClientBalanceHoldRequestStatus.DECLINED.toString());
                     break;
                 }
