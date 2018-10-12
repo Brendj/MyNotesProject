@@ -173,6 +173,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
     private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
     private static final Long RC_NOT_ENOUGH_BALANCE = 680L;
+    private static final Long RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED = 690L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -215,6 +216,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
     private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
     private static final String RC_NOT_ENOUGH_BALANCE_DESC = "Недостаточно средств на балансе лицевого счета";
+    private static final String RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC = "Заявление не найдено или имеет статус, в котором удаление запрещено";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8994,6 +8996,49 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (list.size() > 0) {
                 result.attachBalanceHoldList(list);
             }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result removeRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "idOfRequest") Long idOfRequest) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfRequest);
+            if (clientBalanceHold == null || !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
+                result.resultCode = RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED;
+                result.description = RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC;
+                return result;
+            }
+
+            RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                    .setStatusWithValue(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED);
 
             transaction.commit();
             transaction = null;

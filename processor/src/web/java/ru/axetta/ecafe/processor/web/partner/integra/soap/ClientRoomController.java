@@ -563,4 +563,7 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getRequestForCashOutList")
     RequestForCashOutList getRequestForCashOutList(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "removeRequestForCashOut")
+    Result removeRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "idOfRequest") Long idOfRequest);
 }
