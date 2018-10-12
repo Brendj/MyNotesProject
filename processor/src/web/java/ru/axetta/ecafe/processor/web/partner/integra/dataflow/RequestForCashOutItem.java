@@ -13,6 +13,9 @@ import java.util.Date;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RequestForCashOutItem")
 public class RequestForCashOutItem {
+    @XmlAttribute(name = "idOfRequest")
+    private Long idOfRequest;
+
     @XmlAttribute(name = "sum")
     private Long sum;
 
@@ -57,5 +60,13 @@ public class RequestForCashOutItem {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public Long getIdOfRequest() {
+        return idOfRequest;
+    }
+
+    public void setIdOfRequest(Long idOfRequest) {
+        this.idOfRequest = idOfRequest;
     }
 }

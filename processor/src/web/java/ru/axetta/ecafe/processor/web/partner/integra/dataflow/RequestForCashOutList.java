@@ -27,6 +27,7 @@ public class RequestForCashOutList extends Result {
         List<RequestForCashOutItem> items2 = new ArrayList<RequestForCashOutItem>();
         for (ClientBalanceHold clientBalanceHold : list) {
             RequestForCashOutItem item = new RequestForCashOutItem();
+            item.setIdOfRequest(clientBalanceHold.getIdOfClientBalanceHold());
             item.setDate(clientBalanceHold.getCreatedDate());
             item.setLastUpdate(clientBalanceHold.getLastUpdate());
             item.setRequestStatus(clientBalanceHold.getRequestStatus().ordinal());
