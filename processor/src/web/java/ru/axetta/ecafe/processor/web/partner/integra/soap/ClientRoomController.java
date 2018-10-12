@@ -560,4 +560,7 @@ public interface ClientRoomController {
     @WebMethod(operationName = "addRequestForCashOut")
     Result addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "sum") Long sum, @WebParam(name = "guardianDataForCashOut") GuardianDataForCashOut guardianDataForCashOut);
+
+    @WebMethod(operationName = "getRequestForCashOutList")
+    RequestForCashOutList getRequestForCashOutList(@WebParam(name = "contractId") Long contractId);
 }

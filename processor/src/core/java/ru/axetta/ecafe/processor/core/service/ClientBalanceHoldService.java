@@ -48,6 +48,7 @@ public class ClientBalanceHoldService {
         clientBalanceHold.setOldContragent(oldContragent);
         clientBalanceHold.setNewContragent(newContragent);
         clientBalanceHold.setCreatedDate(new Date());
+        clientBalanceHold.setLastUpdate(new Date());
         clientBalanceHold.setCreateStatus(createStatus);
         clientBalanceHold.setRequestStatus(requestStatus);
         clientBalanceHold.setDeclarer(declarer);
@@ -98,10 +99,12 @@ public class ClientBalanceHoldService {
     public void setStatusWithValue(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) {
         Session session = (Session)em.getDelegate();
         Long nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
-        javax.persistence.Query query = em.createQuery("update ClientBalanceHold set requestStatus = :status, version = :version where idOfClientBalanceHold = :id");
+        javax.persistence.Query query = em.createQuery("update ClientBalanceHold set requestStatus = :status, version = :version, "
+                + "lastUpdate = :lastUpdate where idOfClientBalanceHold = :id");
         query.setParameter("status", status);
         query.setParameter("id", idOfClientBalanceHold);
         query.setParameter("version", nextVersion);
+        query.setParameter("lastUpdate", new Date());
         query.executeUpdate();
     }
 
@@ -141,5 +144,13 @@ public class ClientBalanceHoldService {
         } catch(Exception e) {
             return null;
         }
+    }
+
+    public List<ClientBalanceHold> getClientBalanceHoldListByClient(Session session, Client client) {
+        Query query = session.createQuery("select cbh from ClientBalanceHold cbh "
+                + "where cbh.client = :client and cbh.requestStatus <> :status order by cbh.createdDate");
+        query.setParameter("client", client);
+        query.setParameter("status", ClientBalanceHoldRequestStatus.ANNULLED);
+        return query.list();
     }
 }

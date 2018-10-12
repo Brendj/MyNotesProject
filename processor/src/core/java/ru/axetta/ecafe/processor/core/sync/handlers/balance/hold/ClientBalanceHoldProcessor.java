@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceHoldFeeding> {
@@ -58,11 +59,11 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
             }
             ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getClientBalanceHoldByGuid(item.getGuid());
 
-            if (clientBalanceHold == null) {
-                //Для нового объекта присваиваем все поля
-                try {
+            try {
+                Client declarer = (item.getIdOfDeclarer() == null) ? null : DAOReadonlyService.getInstance().findClientById(item.getIdOfDeclarer());
+                if (clientBalanceHold == null) {
+                    //Для нового объекта присваиваем все поля
                     Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
-                    Client declarer = (item.getIdOfDeclarer() == null) ? null : DAOReadonlyService.getInstance().findClientById(item.getIdOfDeclarer());
                     Org oldOrg = DAOReadonlyService.getInstance().findOrg(item.getIdOfOldOrg());
                     Org newOrg = (item.getIdOfNewOrg() == null) ? null : DAOReadonlyService.getInstance().findOrg(item.getIdOfNewOrg());
                     Contragent oldContragent = oldOrg.getDefaultSupplier();
@@ -72,24 +73,26 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(item.getGuid(), client, item.getHoldSum(), declarer, oldOrg,
                             newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer(),
                             item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount(), nextVersion);
-                } catch (Exception e) {
-                    logger.error("Error in processing ClientBalanceHold entity: ", e);
-                    ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 101, "Error in processing entity: " + e.getMessage(), null);
-                    items.add(resItem);
-                    continue;
+                } else {
+                    //Если объект найден в БД, то меняем только статусы, данные о заявителе и версию
+                    clientBalanceHold.setVersion(nextVersion);
+                    clientBalanceHold.setCreateStatus(ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus()));
+                    clientBalanceHold.setRequestStatus(ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus()));
+                    clientBalanceHold.setDeclarer(declarer);
+                    clientBalanceHold.setPhoneOfDeclarer(item.getPhoneOfDeclarer());
+                    clientBalanceHold.setDeclarerAccount(item.getDeclarerAccount());
+                    clientBalanceHold.setDeclarerBank(item.getDeclarerBank());
+                    clientBalanceHold.setDeclarerBik(item.getDeclarerBik());
+                    clientBalanceHold.setDeclarerInn(item.getDeclarerInn());
+                    clientBalanceHold.setDeclarerCorrAccount(item.getDeclarerCorrAccount());
+                    clientBalanceHold.setLastUpdate(new Date());
+                    session.update(clientBalanceHold);
                 }
-            } else {
-                //Если объект найден в БД, то меняем только статусы, данные о заявителе и версию
-                clientBalanceHold.setVersion(nextVersion);
-                clientBalanceHold.setCreateStatus(ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus()));
-                clientBalanceHold.setRequestStatus(ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus()));
-                clientBalanceHold.setPhoneOfDeclarer(item.getPhoneOfDeclarer());
-                clientBalanceHold.setDeclarerAccount(item.getDeclarerAccount());
-                clientBalanceHold.setDeclarerBank(item.getDeclarerBank());
-                clientBalanceHold.setDeclarerBik(item.getDeclarerBik());
-                clientBalanceHold.setDeclarerInn(item.getDeclarerInn());
-                clientBalanceHold.setDeclarerCorrAccount(item.getDeclarerCorrAccount());
-                session.update(clientBalanceHold);
+            } catch (Exception e) {
+                logger.error("Error in processing ClientBalanceHold entity: ", e);
+                ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 101, "Error in processing entity: " + e.getMessage(), null);
+                items.add(resItem);
+                continue;
             }
             ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 0, null, nextVersion);
             items.add(resItem);
