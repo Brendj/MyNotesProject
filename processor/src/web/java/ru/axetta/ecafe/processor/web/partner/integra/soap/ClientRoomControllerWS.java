@@ -9031,7 +9031,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfRequest);
-            if (clientBalanceHold == null || !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
+            if (clientBalanceHold == null || !clientBalanceHold.getClient().getContractId().equals(contractId)
+                    || !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
                 result.resultCode = RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED;
                 result.description = RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC;
                 return result;
