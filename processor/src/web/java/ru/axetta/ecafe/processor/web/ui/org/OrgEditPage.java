@@ -372,7 +372,11 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setAllowRegistryChangeEmployee(allowRegistryChangeEmployee);
         org.setHelpdeskEnabled(helpdeskEnabled);
         org.setPreordersEnabled(preordersEnabled);
+
         org.setMultiCardModeEnabled(multiCardModeEnabled);
+        for(Org fo: org.getFriendlyOrg()){
+            fo.setMultiCardModeEnabled(multiCardModeEnabled);
+        }
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 
