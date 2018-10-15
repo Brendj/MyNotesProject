@@ -35,7 +35,6 @@ import java.util.*;
 public class MealService {
 
     private static final Logger logger = LoggerFactory.getLogger(MealService.class);
-    private PushMealPort pushMealService;
     private final List<String> ENDPOINT_ADDRESSES = getMealEndPointAddresses();
 
     private List<String> getMealEndPointAddresses() {
@@ -46,9 +45,6 @@ public class MealService {
     }
 
     private PushMealPort createEventController(String endpointAddress) {
-        if(pushMealService != null) {
-            return pushMealService;
-        }
         PushMealPort controller;
         try {
             MealWebService service = new MealWebService();
@@ -73,7 +69,6 @@ public class MealService {
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
 
-            pushMealService = controller;
             return controller;
         } catch (java.lang.Exception e) {
             logger.error("Failed to create WS controller", e);
@@ -85,14 +80,17 @@ public class MealService {
         MealData data = MealDataItem.getMealData(item);
         HashMap<String, PushResponse> results = new HashMap<String, PushResponse>();
         for(String endPointAddress : ENDPOINT_ADDRESSES) {
-            PushMealPort subscription = createEventController(endPointAddress);
-            if (subscription == null) {
-                logger.info("Failed to create connection with meal web service");
+            try {
+                PushMealPort subscription = createEventController(endPointAddress);
+                if (subscription == null) {
+                    throw new Exception(String.format("Failed to create connection with %s web service ", endPointAddress));
+                }
+                PushResponse response = subscription.pushData(data);
+                results.put(endPointAddress, response);
+            }catch (Exception e){
+                logger.info("Can't send packet to URL: " + endPointAddress, e);
                 results.put(endPointAddress, null);
-                continue;
             }
-            PushResponse response = subscription.pushData(data);
-            results.put(endPointAddress, response);
         }
         return results;
     }

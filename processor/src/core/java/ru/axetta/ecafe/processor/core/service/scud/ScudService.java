@@ -25,7 +25,6 @@ import java.util.*;
 @Scope("singleton")
 public class ScudService {
     private static final Logger logger = LoggerFactory.getLogger(ScudService.class);
-    private PushScudPort pushScudService;
     private ObjectFactory scudObjectFactory = new ObjectFactory();
     private final List<String> ENDPOINT_ADDRESSES = getEndPointAdressFromConfig();
     private final String TEST_ENDPOINT_ADDRESS = "http://petersburgedu.ru/service/webservice/scud";
@@ -38,9 +37,6 @@ public class ScudService {
     }
 
     private PushScudPort createEventController(String endPointAddress) {
-        if(pushScudService != null) {
-            return pushScudService;
-        }
         PushScudPort controller;
         try {
             ScudWebService service = new ScudWebService();
@@ -65,7 +61,6 @@ public class ScudService {
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
 
-            pushScudService = controller;
             return controller;
         } catch (java.lang.Exception e) {
             logger.error("Failed to create WS SCUD controller", e);
@@ -77,13 +72,17 @@ public class ScudService {
         HashMap<String, PushResponse> results = new HashMap<String, PushResponse>();
         EventList eventList = this.scudObjectFactory.createEventList(items);
         for(String endPointAddress : ENDPOINT_ADDRESSES) {
-            PushScudPort subscription = createEventController(endPointAddress);
-            if (subscription == null) {
-                logger.error(String.format("Failed to create connection with address %s a web service", endPointAddress));
+            try {
+                PushScudPort subscription = createEventController(endPointAddress);
+                if (subscription == null) {
+                    throw new Exception(String.format("Failed to create connection with address %s a web service", endPointAddress));
+                }
+                PushResponse response = subscription.pushData(eventList);
+                results.put(endPointAddress, response);
+            } catch (Exception e){
+                logger.error("Can't send packet to URL: " + endPointAddress, e);
                 results.put(endPointAddress, null);
             }
-            PushResponse response = subscription.pushData(eventList);
-            results.put(endPointAddress, response);
         }
         return results;
     }
