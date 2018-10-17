@@ -160,6 +160,12 @@
         <servlet-name>SBKGDOnlinePaymentServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.sberbank_kgd.SBKGDOnlinePaymentServlet</servlet-class>
     </servlet>
+
+    <servlet>
+        <servlet-name>SBMSKOnlinePaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.sberbank_msk.SBMSKOnlinePaymentServlet</servlet-class>
+    </servlet>
+
     <servlet>
         <servlet-name>LastModifiedOrgsServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.newispp.LastModifiedOrgsServlet</servlet-class>
@@ -253,6 +259,11 @@
     <servlet-mapping>
         <servlet-name>SBKGDOnlinePaymentServlet</servlet-name>
         <url-pattern>/payment-sbkgd</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SBMSKOnlinePaymentServlet</servlet-name>
+        <url-pattern>/payment-sbmsk</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
