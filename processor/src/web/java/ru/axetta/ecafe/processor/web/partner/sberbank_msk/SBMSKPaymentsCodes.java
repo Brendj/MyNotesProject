@@ -28,7 +28,6 @@ public enum SBMSKPaymentsCodes {
     private Integer code;
     private String description;
 
-    private String responseXMLPart;
 
     static Map<Integer,SBMSKPaymentsCodes> map = new HashMap<Integer,SBMSKPaymentsCodes>();
     static {
@@ -40,17 +39,6 @@ public enum SBMSKPaymentsCodes {
     private SBMSKPaymentsCodes(int code, String description){
         this.code = code;
         this.description = description;
-
-        StringBuilder sb = new StringBuilder();
-        String message;
-        try {
-            message = new String(description.getBytes("UTF-8"), "windows-1251"); // output windows-1251 as UTF-8
-        } catch (Exception e){
-            message = description;
-        }
-        sb.append(String.format("<CODE>%d</CODE>", code));
-        sb.append(String.format("<MESSAGE>%s</MESSAGE>", message));
-        this.responseXMLPart = sb.toString();
     }
 
     public Integer getCode() {
@@ -76,9 +64,5 @@ public enum SBMSKPaymentsCodes {
         } else if(paymentProcessResultCode.equals(PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode())){
             return DUPLICATE_TRANSACTION_ERROR;
         } else return INTERNAL_ERROR;
-    }
-
-    public String getResponseXMLPart() {
-        return responseXMLPart;
     }
 }
