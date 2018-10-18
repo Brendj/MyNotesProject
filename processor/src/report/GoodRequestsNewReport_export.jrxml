@@ -169,10 +169,12 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#CCFFFF" mode="Transparent" style="table">
-							<textField>
-								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="105" height="44"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="105" height="44">
+									<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="10"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{officialName}]]></textFieldExpression>
 							</textField>
@@ -188,10 +190,12 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="3e7fbf5c-7b64-418e-83a4-1ddd8541ffd0" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="44"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="3e7fbf5c-7b64-418e-83a4-1ddd8541ffd0" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="44">
+									<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
+									<font size="10"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
 							</textField>
@@ -229,8 +233,10 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent" style="table">
-							<textField>
-								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="164" height="20"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="164" height="20">
+									<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>

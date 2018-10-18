@@ -171,7 +171,7 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#CCFFFF" mode="Transparent" style="table">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="207" height="81"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12"/>
@@ -198,7 +198,7 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="73d72894-3631-44bd-9924-7f451b74cae5" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="207" height="81"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12"/>
@@ -239,7 +239,7 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent" style="table">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="214" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12"/>
