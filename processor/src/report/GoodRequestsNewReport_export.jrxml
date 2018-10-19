@@ -235,7 +235,7 @@
 						<cellContents mode="Transparent" style="table">
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="164" height="20">
-									<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+									<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
