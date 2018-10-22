@@ -96,7 +96,7 @@ public class MealService {
                 results.put(endPointAddress, response);
                 logger.info("External service get packet: " + response.isResult());
             }catch (Exception e){
-                logger.info("Can't send packet to URL: " + endPointAddress, e);
+                logger.error("Can't send packet to URL: " + endPointAddress, e);
                 results.put(endPointAddress, null);
             }
         }
