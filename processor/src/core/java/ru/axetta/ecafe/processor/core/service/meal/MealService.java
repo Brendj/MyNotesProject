@@ -36,6 +36,7 @@ public class MealService {
 
     private static final Logger logger = LoggerFactory.getLogger(MealService.class);
     private final List<String> ENDPOINT_ADDRESSES = getMealEndPointAddresses();
+    private final Map<String, PushMealPort> controllersMap = new HashMap<String, PushMealPort>();
 
     private List<String> getMealEndPointAddresses() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
@@ -45,7 +46,10 @@ public class MealService {
     }
 
     private PushMealPort createEventController(String endpointAddress) {
-        PushMealPort controller;
+        PushMealPort controller = controllersMap.get(endpointAddress);
+        if(controller != null){
+            return controller;
+        }
         try {
             MealWebService service = new MealWebService();
             controller = service.getPushMealPort();
@@ -68,6 +72,8 @@ public class MealService {
             HTTPClientPolicy policy = conduit.getClient();
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
+
+            controllersMap.put(endpointAddress, controller);
 
             return controller;
         } catch (java.lang.Exception e) {

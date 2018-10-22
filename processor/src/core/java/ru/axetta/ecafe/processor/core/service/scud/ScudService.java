@@ -28,6 +28,7 @@ public class ScudService {
     private ObjectFactory scudObjectFactory = new ObjectFactory();
     private final List<String> ENDPOINT_ADDRESSES = getEndPointAdressFromConfig();
     private final String TEST_ENDPOINT_ADDRESS = "http://petersburgedu.ru/service/webservice/scud";
+    private final Map<String, PushScudPort> controllersMap = new HashMap<String, PushScudPort>();
 
     private List<String> getEndPointAdressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
@@ -37,7 +38,10 @@ public class ScudService {
     }
 
     private PushScudPort createEventController(String endPointAddress) {
-        PushScudPort controller;
+        PushScudPort controller = controllersMap.get(endPointAddress);
+        if(controller != null){
+            return controller;
+        }
         try {
             ScudWebService service = new ScudWebService();
             controller = service.getPushScudPort();
@@ -60,6 +64,8 @@ public class ScudService {
             HTTPClientPolicy policy = conduit.getClient();
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
+
+            controllersMap.put(endPointAddress, controller);
 
             return controller;
         } catch (java.lang.Exception e) {
