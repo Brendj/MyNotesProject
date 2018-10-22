@@ -89,6 +89,10 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
         }
     }
 
+    public String showClientBalanceHoldCSVList() {
+        return "showClientBalanceHoldCSVList";
+    }
+
     public void confirm() {
         //меняем статус
         if (currentItem == null) return;

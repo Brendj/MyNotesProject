@@ -448,6 +448,7 @@
             <url-pattern>/back-office/change-password.faces</url-pattern>
             <url-pattern>/back-office/client_csv_list.faces</url-pattern>
             <url-pattern>/back-office/client_org_csv_list.faces</url-pattern>
+            <url-pattern>/back-office/client_balance_hold_csv_list.faces</url-pattern>
             <url-pattern>/back-office/free_complex_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/pay_complex_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/sale_csv_list.faces</url-pattern>

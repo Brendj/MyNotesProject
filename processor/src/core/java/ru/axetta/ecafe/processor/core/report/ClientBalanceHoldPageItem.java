@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientBalanceHold;
 import ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldRequestStatus;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import java.util.Date;
 
@@ -59,6 +61,10 @@ public class ClientBalanceHoldPageItem {
 
     public Date getCreatedDate() {
         return createdDate;
+    }
+
+    public String getCreatedDateStr() {
+        return CalendarUtils.dateTimeToString(createdDate);
     }
 
     public void setCreatedDate(Date createdDate) {
@@ -117,12 +123,20 @@ public class ClientBalanceHoldPageItem {
         return balance;
     }
 
+    public String getBalanceStr() {
+        return CurrencyStringUtils.copecksToRubles(balance);
+    }
+
     public void setBalance(Long balance) {
         this.balance = balance;
     }
 
     public Long getBalanceHold() {
         return balanceHold;
+    }
+
+    public String getBalanceHoldStr() {
+        return CurrencyStringUtils.copecksToRubles(balanceHold);
     }
 
     public void setBalanceHold(Long balanceHold) {

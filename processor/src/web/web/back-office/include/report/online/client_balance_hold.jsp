@@ -44,11 +44,14 @@
         </h:panelGroup>
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="1">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Обновить" action="#{clientBalanceHoldPage.reload}"
                            reRender="clientBalanceHoldPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton" />
+        <h:commandButton value="Выгрузить в CSV" action="#{clientBalanceHoldPage.showClientBalanceHoldCSVList}"
+                         styleClass="command-button" />
     </h:panelGrid>
+
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -95,7 +98,7 @@
             </rich:columnGroup>
         </f:facet>
         <rich:column>
-            <h:outputText styleClass="output-text" value="#{item.createdDate}" converter="dateConverter" />
+            <h:outputText styleClass="output-text" value="#{item.createdDate}" converter="timeConverter" />
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.contractId}" />

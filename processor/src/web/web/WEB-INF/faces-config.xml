@@ -468,6 +468,15 @@
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
+            <from-outcome>showClientBalanceHoldCSVList</from-outcome>
+            <to-view-id>/back-office/client_balance_hold_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
             <from-outcome>showPosCSVList</from-outcome>
             <to-view-id>/back-office/pos_csv_list.jsp</to-view-id>
             <redirect/>
