@@ -33,7 +33,7 @@ import java.util.*;
  * Time: 10:37
  */
 @Component
-@Scope("prototype")
+@Scope("singleton")
 public class MealManager {
     private final static String EXPENSE = "expense";
     private final static String INCOME = "income";
@@ -141,6 +141,7 @@ public class MealManager {
         List<TransactionDataItem> sendTransactions = new ArrayList<TransactionDataItem>();
         List<TransactionDataItem> list = findTransactions(session, sendTransactions, limit);
         int i = 0;
+        logger.info("MealManager: start sending Transactions to external system.");
         for(TransactionDataItem item : list) {
             TransactionItem trItem = new TransactionItem(item.getTransactionId(), item.getTransactionDate(), item.getBalance(), Math.abs(item.getAmount()),
                     CARDNAME, item.getFoodName(), item.getFoodAmount(), item.getAmount() > 0 ? INCOME : EXPENSE);

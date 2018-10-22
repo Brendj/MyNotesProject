@@ -72,6 +72,7 @@ public class ScudService {
         HashMap<String, PushResponse> results = new HashMap<String, PushResponse>();
         EventList eventList = this.scudObjectFactory.createEventList(items);
         for(String endPointAddress : ENDPOINT_ADDRESSES) {
+            logger.info("Try sending packet to " + endPointAddress);
             try {
                 PushScudPort subscription = createEventController(endPointAddress);
                 if (subscription == null) {
@@ -79,6 +80,7 @@ public class ScudService {
                 }
                 PushResponse response = subscription.pushData(eventList);
                 results.put(endPointAddress, response);
+                logger.info("External service get packet: " + response.isResult());
             } catch (Exception e){
                 logger.error("Can't send packet to URL: " + endPointAddress, e);
                 results.put(endPointAddress, null);

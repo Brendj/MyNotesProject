@@ -80,6 +80,7 @@ public class MealService {
         MealData data = MealDataItem.getMealData(item);
         HashMap<String, PushResponse> results = new HashMap<String, PushResponse>();
         for(String endPointAddress : ENDPOINT_ADDRESSES) {
+            logger.info("Try sending packet to " + endPointAddress);
             try {
                 PushMealPort subscription = createEventController(endPointAddress);
                 if (subscription == null) {
@@ -87,6 +88,7 @@ public class MealService {
                 }
                 PushResponse response = subscription.pushData(data);
                 results.put(endPointAddress, response);
+                logger.info("External service get packet: " + response.isResult());
             }catch (Exception e){
                 logger.info("Can't send packet to URL: " + endPointAddress, e);
                 results.put(endPointAddress, null);

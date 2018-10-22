@@ -23,7 +23,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 @Component
-@Scope("prototype")
+@Scope("singleton")
 public class ScudManager {
     private final Integer LIMIT_RECORDS = getLimitRecords();
     private final String DEFAULT_VALUE = "1";
@@ -78,6 +78,7 @@ public class ScudManager {
     private void sendEnterEventsToExternal(Session session, Integer limitRecords) {
         Boolean sendToExternal = false;
         List<EventDataItem> list = null;
+        logger.info("Start sending EnterEvents to external system.");
         try {
             list = findEnterEvents(session, limitRecords);
             if(list == null || list.isEmpty()){
