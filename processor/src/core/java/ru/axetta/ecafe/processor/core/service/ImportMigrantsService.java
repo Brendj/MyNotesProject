@@ -193,11 +193,11 @@ public class ImportMigrantsService {
                 session.flush();
             }
 
-            transaction.commit();
-            transaction = null;
-
             Query query = session.createSQLQuery("truncate table cf_esz_migrants_requests");
             query.executeUpdate();
+
+            transaction.commit();
+            transaction = null;
 
             logger.info(String.format("End fill migrants table. Time taken %s ms", System.currentTimeMillis() - begin));
         } finally {
