@@ -222,6 +222,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final int MAX_RECS_getEventsList = 1000;
 
     private static final String COMMENT_MPGU_CREATE = "{Создано на mos.ru %s пользователем с номером телефона %s)}";
+    private static final String COMMENT_BACK_CREATE = "{Создано в ИСПП при регистрации заявления на питание}";
 
     private static final List<SectionType> typesForSummary = new ArrayList<SectionType>(Arrays.asList(SectionType.ACC_INC_REGISTRY,
             SectionType.ACCOUNT_OPERATIONS_REGISTRY, SectionType.ACCOUNTS_REGISTRY, SectionType.ORGANIZATIONS_STRUCTURE, SectionType.CLIENT_REGISTRY));
@@ -9052,6 +9053,114 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        CheckApplicationForFoodResult result = new CheckApplicationForFoodResult();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByGuid(persistenceSession, clientGuid);
+            if (null == client) {
+                throw new ClientNotFoundException(String.format("Unable to find client with guid={%s}", clientGuid));
+            }
+
+            ApplicationForFood applicationForFood = DAOUtils
+                    .getLastApplicationForFoodByClientGuid(persistenceSession, clientGuid);
+
+            if (null == applicationForFood) {
+                result.setApplicationExists(Boolean.FALSE);
+            } else {
+                if (applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DELIVERY_ERROR, null)) ||
+                    applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS)) ||
+                    applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_APPROVAL)) ||
+                    applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) {
+                    result.setApplicationExists(Boolean.FALSE);
+                } else {
+                    result.setApplicationExists(Boolean.TRUE);
+                }
+            }
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (ClientNotFoundException e) {
+            logger.error(String.format("Error in checkApplicationForFood while check for client with guid={%s}", clientGuid), e);
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (Exception e) {
+            logger.error(String.format("Error in checkApplicationForFood while check for client with guid={%s}", clientGuid), e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Result registerApplicationForFood(@WebParam(name = "clientGuid") String clientGuid, @WebParam(name = "categoryDiscount") Long categoryDiscount,
+            @WebParam(name = "otherDiscount") Boolean otherDiscount, @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "guardianName") String guardianName, @WebParam(name = "guardianSurname") String guardianSurname,
+            @WebParam(name = "guardianSecondName") String guardianSecondName) {
+
+        String mobilePhone = Client.checkAndConvertMobile(guardianMobile);
+        if (StringUtils.isEmpty(clientGuid) || (null == categoryDiscount && !otherDiscount) || StringUtils.isEmpty(mobilePhone)
+                || StringUtils.isEmpty(guardianName) || StringUtils.isEmpty(guardianSurname)) {
+            return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
+        }
+        if (StringUtils.isEmpty(mobilePhone)) {
+            return new Result(RC_INVALID_DATA, "Неверный формат мобильного телефона");
+        }
+        if (null == guardianSecondName)
+            guardianSecondName = "";
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Result result = new Result();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByGuid(persistenceSession, clientGuid);
+            if (null == client) {
+                throw new ClientNotFoundException(String.format("Unable to find client with guid={%s}", clientGuid));
+            }
+
+            DAOUtils.createApplicationForFood(persistenceSession, client, otherDiscount ? null : categoryDiscount,
+                    mobilePhone, guardianName, guardianSecondName, guardianSurname);
+            DAOUtils.updateApplicationForFood(persistenceSession, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+
+            //if (!otherDiscount) {
+            //    DAOUtils.updateApplicationForFood(persistenceSession, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));
+            //}
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (ClientNotFoundException e) {
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (Exception e) {
+            logger.error(String.format("Error in registerApplicationForFood: clientGuid={%s}, categoryDiscount=%d, " +
+                    "otherDiscount=\"%s\", guardianMobile=\"%s\"', guardianName=\"%s\", guardianSurname=\"%s\", "
+                    + "guardianSecondName=\"%s\"",
+                    clientGuid, categoryDiscount, otherDiscount.toString(), guardianMobile, guardianName, guardianSurname,
+                    guardianSecondName), e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return result;
     }

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CheckApplicationForFoodResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
@@ -566,4 +567,12 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "removeRequestForCashOut")
     Result removeRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "idOfRequest") Long idOfRequest);
+    @WebMethod(operationName = "checkApplicationForFood")
+    CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid);
+
+    @WebMethod(operationName = "registerApplicationForFood")
+    Result registerApplicationForFood(@WebParam(name = "clientGuid") String clientGuid, @WebParam(name = "categoryDiscount") Long categoryDiscount,
+            @WebParam(name = "otherDiscount") Boolean otherDiscount, @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "guardianName") String guardianName, @WebParam(name = "guardianSurname") String guardianSurname,
+            @WebParam(name = "guardianSecondName") String guardianSecondName);
 }

@@ -3141,6 +3141,19 @@ public class DAOUtils {
         }
     }
 
+    public static ClientDtisznDiscountInfo getDTISZNDiscountInfoByClientAndCode(Session session, Client client, Integer code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        return (ClientDtisznDiscountInfo) criteria.uniqueResult();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getDTISZNDiscountsInfoByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client", client));
+        return criteria.list();
+    }
+
     public static List<MenusCalendarDate> getMenusCalendarDateItems(Session session, Long idOfMenusCalendar) {
         Criteria criteria = session.createCriteria(MenusCalendarDate.class);
         criteria.add(Restrictions.eq("menusCalendar.idOfMenusCalendar", idOfMenusCalendar));
@@ -3638,5 +3651,91 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.asc("menuDetailName"));
         criteria.setProjection(Projections.projectionList().add(Projections.property("menuDetailName")));
         return criteria.list();
+    }
+
+    public static ApplicationForFood getLastApplicationForFoodByClientGuid(Session session, String clientGuid) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.createAlias("client", "c");
+        criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
+        criteria.setMaxResults(1);
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static ApplicationForFood createApplicationForFood(Session session, Client client, Long dtisznCode, String mobile,
+            String guardianName, String guardianSecondName, String guardianSurname) {
+        Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
+        ApplicationForFood applicationForFood = new ApplicationForFood(client, dtisznCode,
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null),
+                mobile, guardianName, guardianSecondName, guardianSurname, applicationForFoodVersion);
+        session.save(applicationForFood);
+
+        addApplicationForFoodHistory(session, applicationForFood,
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null));
+
+        return applicationForFood;
+    }
+
+    public static ApplicationForFood updateApplicationForFood(Session session, Client client, ApplicationForFoodStatus status) {
+        ApplicationForFood applicationForFood = findActiveApplicationForFoodByClient(session, client);
+        if (null == applicationForFood)
+            return null;
+
+        Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
+        applicationForFood.setStatus(status);
+        applicationForFood.setVersion(applicationForFoodVersion);
+        session.update(applicationForFood);
+
+        addApplicationForFoodHistory(session, applicationForFood, status);
+        return applicationForFood;
+    }
+
+    public static void addApplicationForFoodHistory(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status) {
+        Long applicationForFoodHistoryVersion = nextVersionByApplicationForFoodHistory(session);
+        ApplicationForFoodHistory applicationForFoodHistory = new ApplicationForFoodHistory(applicationForFood,
+                status,null, applicationForFoodHistoryVersion);
+        session.save(applicationForFoodHistory);
+    }
+
+    public static ApplicationForFood findActiveApplicationForFoodByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.ne("status",
+                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS)));
+        criteria.add(Restrictions.ne("status",
+                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_APPROVAL)));
+        criteria.add(Restrictions.ne("status",
+                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT)));
+        criteria.setMaxResults(1);
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static long nextVersionByApplicationForFood(Session session){
+        long version = 0L;
+        Query query = session
+                .createSQLQuery("select apf.version from cf_applications_for_food as apf order by apf.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o != null){
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static long nextVersionByApplicationForFoodHistory(Session session){
+        long version = 0L;
+        Query query = session
+                .createSQLQuery("select apfh.version from cf_applications_for_food_history as apfh order by apfh.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o != null){
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static ApplicationForFood findApplicationForFoodByClientIdAndRegDate(Session session, Long idOfClient, Date regDate) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("createdDate", regDate));
+        return (ApplicationForFood) criteria.uniqueResult();
     }
 }
