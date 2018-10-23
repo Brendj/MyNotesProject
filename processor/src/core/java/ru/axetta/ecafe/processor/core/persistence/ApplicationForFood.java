@@ -20,11 +20,12 @@ public class ApplicationForFood {
     private String applicantSurname;
     private Date lastUpdate;
     private Boolean archived;
+    private Long idOfOrgOnCreate;
     private Long version;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
 
     public ApplicationForFood(Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName,
-            String applicantSecondName, String applicantSurname, Long version) {
+            String applicantSecondName, String applicantSurname, Long idOfOrgOnCreate, Long version) {
         this.client = client;
         this.dtisznCode = dtisznCode;
         this.createdDate = new Date();
@@ -36,6 +37,7 @@ public class ApplicationForFood {
         this.lastUpdate = new Date();
         this.version = version;
         this.archived = false;
+        this.idOfOrgOnCreate = idOfOrgOnCreate;
     }
 
     public ApplicationForFood() {
@@ -144,5 +146,13 @@ public class ApplicationForFood {
 
     public void setApplicationForFoodHistories(Set<ApplicationForFoodHistory> applicationForFoodHistories) {
         this.applicationForFoodHistories = applicationForFoodHistories;
+    }
+
+    public Long getIdOfOrgOnCreate() {
+        return idOfOrgOnCreate;
+    }
+
+    public void setIdOfOrgOnCreate(Long idOfOrgOnCreate) {
+        this.idOfOrgOnCreate = idOfOrgOnCreate;
     }
 }

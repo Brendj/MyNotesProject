@@ -3657,6 +3657,7 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.createAlias("client", "c");
         criteria.add(Restrictions.eq("c.clientGUID", clientGuid));
+        criteria.add(Restrictions.eq("archived", Boolean.FALSE));
         criteria.addOrder(org.hibernate.criterion.Order.desc("lastUpdate"));
         criteria.setMaxResults(1);
         return (ApplicationForFood) criteria.uniqueResult();
@@ -3667,7 +3668,7 @@ public class DAOUtils {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
         ApplicationForFood applicationForFood = new ApplicationForFood(client, dtisznCode,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null),
-                mobile, guardianName, guardianSecondName, guardianSurname, applicationForFoodVersion);
+                mobile, guardianName, guardianSecondName, guardianSurname, null, applicationForFoodVersion);
         session.save(applicationForFood);
 
         addApplicationForFoodHistory(session, applicationForFood,
@@ -3737,5 +3738,13 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("createdDate", regDate));
         return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static List<ApplicationForFood> getApplicationsForFoodForOrgSinceVersion(Session session, Long idOfOrg,
+            long version) throws Exception {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client.org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
     }
 }

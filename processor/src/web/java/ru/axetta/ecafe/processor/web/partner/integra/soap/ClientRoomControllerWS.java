@@ -9083,6 +9083,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) {
                     result.setApplicationExists(Boolean.FALSE);
                 } else {
+                    result.setApplicantName(applicationForFood.getApplicantName());
+                    result.setApplicantSurname(applicationForFood.getApplicantSurname());
+                    result.setApplicantSecondName(applicationForFood.getApplicantSecondName());
+                    result.setRegDate(toXmlDateTime(applicationForFood.getCreatedDate()));
                     result.setApplicationExists(Boolean.TRUE);
                 }
             }
