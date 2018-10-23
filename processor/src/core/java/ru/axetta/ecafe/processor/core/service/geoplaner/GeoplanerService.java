@@ -26,7 +26,7 @@ public class GeoplanerService {
     private final String URL_FOR_ENTER_EVENTS = getGeoplanerURLEnterEvents();
     private final String URL_FOR_PURCHASES = getGeoplanerURLPurchases();
     private final String URL_FOR_PAYMENTS = getGeoplanerURLPayments();
-    private final String TEST_ENDPOINT_ADDRESS = "https://testrestcontroller.herokuapp.com/test"; // Тестовый сервер на heroku
+    //private final String TEST_ENDPOINT_ADDRESS = "https://testrestcontroller.herokuapp.com/test"; // Тестовый сервер на heroku
 
     private boolean debug = isDebug();
 
@@ -35,6 +35,10 @@ public class GeoplanerService {
 
     public Integer sendPost(Object event, int code) throws Exception{
         String endPointAddress = getAddress(code);
+        if(endPointAddress == null){
+            logger.error("The address is null when trying to send an event packet: " + event.getClass());
+            return null;
+        }
         HttpClient httpClient = new HttpClient();
         PostMethod method = new PostMethod(endPointAddress);
         method.addRequestHeader("Content-Type", "application/json");
@@ -70,17 +74,17 @@ public class GeoplanerService {
 
     private String getGeoplanerURLPurchases() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.geoplaner.sendevents.purchasesendpointaddress", TEST_ENDPOINT_ADDRESS);
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.purchasesendpointaddress");
     }
 
     private String getGeoplanerURLEnterEvents() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.geoplaner.sendevents.entereventsendpointaddress", TEST_ENDPOINT_ADDRESS);
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.entereventsendpointaddress");
     }
 
     private String getGeoplanerURLPayments() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
-        return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentendpointaddress", TEST_ENDPOINT_ADDRESS);
+        return properties.getProperty("ecafe.processor.geoplaner.sendevents.paymentendpointaddress");
     }
 
     private boolean isDebug() {

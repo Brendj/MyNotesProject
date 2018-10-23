@@ -55,7 +55,10 @@ public class GeoplanerManager {
                 return;
             }
             Integer statusCode = service.sendPost(info, ENTER_EVENTS);
-            if(!statusCode.equals(200)){
+            if(statusCode == null){
+                logger.error("Result code is null");
+            }
+            else if(!statusCode.equals(200)){
                 logger.error("The Geoplaner returned code " + statusCode
                         + " when sent EnterEvent IdOfOrg " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
                         + " ID enterEvent " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent());
@@ -92,7 +95,10 @@ public class GeoplanerManager {
                 return;
             }
             Integer statusCode = service.sendPost(info, PURCHASES);
-            if(!statusCode.equals(200)){
+            if(statusCode == null){
+                logger.error("Result code is null");
+            }
+            else if(!statusCode.equals(200)){
                 logger.error("The Geoplaner returned code " + statusCode + " when sent Purchases ID " + purchases.getIdOfOrder());
             } else {
                 logger.info("Sends PurchasesInfo of Order ID= " + purchases.getIdOfOrder() + " to Geoplaner ");
@@ -125,7 +131,10 @@ public class GeoplanerManager {
                 return;
             }
             Integer statusCode = service.sendPost(info, PAYMENTS);
-            if(!statusCode.equals(200)){
+            if(statusCode == null){
+                logger.error("Result code is null");
+            }
+            else if(!statusCode.equals(200)){
                 logger.error("The Geoplaner returned code " + statusCode + " when sent clientPayment ID " + clientPayment.getIdOfPayment());
             } else {
                 logger.info("Sends clientPayment of Order ID= " + clientPayment.getIdOfPayment() + " to Geoplaner ");
