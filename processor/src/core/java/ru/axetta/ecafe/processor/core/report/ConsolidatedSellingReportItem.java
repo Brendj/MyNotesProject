@@ -17,6 +17,7 @@ public class ConsolidatedSellingReportItem {
     private Long payFood;
     private Long buffetFood;
     private Long totalFood;
+    private Long preorderFood;
 
     public ConsolidatedSellingReportItem(Long idOfOrg, String orgName, String district, String address, int number) {
         this.idOfOrg = idOfOrg;
@@ -27,6 +28,7 @@ public class ConsolidatedSellingReportItem {
         this.payFood = 0L;
         this.buffetFood = 0L;
         this.totalFood = 0L;
+        this.preorderFood = 0L;
         this.number = number;
     }
 
@@ -40,6 +42,10 @@ public class ConsolidatedSellingReportItem {
 
     public void addBufferFood(Long value) {
         this.buffetFood += value;
+    }
+
+    public void addPreorderFood(Long value) {
+        this.preorderFood += value;
     }
 
     public Integer getNumber() {
@@ -107,7 +113,18 @@ public class ConsolidatedSellingReportItem {
     }
 
     public Long getTotalFood() {
-        return complexFood + payFood + buffetFood;
+        return complexFood + payFood + buffetFood + preorderFood;
     }
 
+    public void setTotalFood(Long totalFood) {
+        this.totalFood = totalFood;
+    }
+
+    public Long getPreorderFood() {
+        return preorderFood;
+    }
+
+    public void setPreorderFood(Long preorderFood) {
+        this.preorderFood = preorderFood;
+    }
 }

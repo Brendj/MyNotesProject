@@ -93,9 +93,10 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         orderTypes.add(OrderTypeEnumType.PAY_PLAN.ordinal());
         orderTypes.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
         Query query = session.createSQLQuery("select org.idoforg, org.shortnameinfoservice, org.district, org.address, "
-                + "od.rprice, od.qty, od.menuorigin, od.menutype "
+                + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
+                + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
                 + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + org_condition
                 + "order by org.idoforg");
@@ -115,22 +116,26 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
             Integer qty = (Integer) row[5];
             Integer menuOrigin = (Integer) row[6];
             Integer menuType = (Integer) row[7];
+            Boolean isPreorder = (Boolean) row[8];
             ConsolidatedSellingReportItem item = getReportItemByIdOfOrg(result_list, idOfOrg);
             if (item == null) {
                 item = new ConsolidatedSellingReportItem(idOfOrg, shortNameInfoService, district, address, number);
                 number++;
-                addValues(item, rprice, qty, menuOrigin, menuType);
+                addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
                 result_list.add(item);
             } else {
-                addValues(item, rprice, qty, menuOrigin, menuType);
+                addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
             }
         }
 
         return new JRBeanCollectionDataSource(result_list);
     }
 
-    private void addValues(ConsolidatedSellingReportItem item, Long rprice, Integer qty, Integer menuOrigin, Integer menuType) {
-        if ((menuType >= 50) && (menuType <= 99) && (rprice > 0)) {
+    private void addValues(ConsolidatedSellingReportItem item, Long rprice, Integer qty, Integer menuOrigin,
+            Integer menuType, Boolean isPreorder) {
+        if (isPreorder) {
+            item.addPreorderFood(rprice * qty);
+        } else if ((menuType >= 50) && (menuType <= 99) && (rprice > 0)) {
             item.addComplexFood(rprice * qty);
         } else if (menuOrigin.equals(OrderDetail.PRODUCT_COMMERCIAL) && menuType.equals(0)) {
             item.addPayFood(rprice * qty);
