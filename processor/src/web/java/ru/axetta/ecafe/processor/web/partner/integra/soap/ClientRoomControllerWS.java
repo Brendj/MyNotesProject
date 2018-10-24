@@ -9059,9 +9059,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid) {
+        CheckApplicationForFoodResult result = new CheckApplicationForFoodResult();
+        if (StringUtils.isEmpty(clientGuid)) {
+            result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
+            result.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
+            return result;
+        }
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        CheckApplicationForFoodResult result = new CheckApplicationForFoodResult();
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
