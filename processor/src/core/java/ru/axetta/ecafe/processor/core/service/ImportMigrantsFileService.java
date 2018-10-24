@@ -76,7 +76,7 @@ public class ImportMigrantsFileService {
                 throw new Exception(String.format("Файл выгрузки ESZ с мигрантами %s не найден", filename));
             }
             fileInputStream = new FileInputStream(filename);
-            inputStreamReader = new InputStreamReader(fileInputStream, "windows-1251");
+            inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
             bufferedReader = new BufferedReader(inputStreamReader);
 
             fillTable(bufferedReader);
