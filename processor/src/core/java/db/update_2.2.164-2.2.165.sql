@@ -42,6 +42,7 @@ CREATE TABLE cf_applications_for_food
     applicantSurname character varying(128) NOT NULL,
     lastupdate bigint NOT NULL,
     archived integer,
+    idoforgoncreate bigint,
     version bigint NOT NULL,
     CONSTRAINT cf_applications_for_food_pk PRIMARY KEY (idofapplicationforfood)
 )

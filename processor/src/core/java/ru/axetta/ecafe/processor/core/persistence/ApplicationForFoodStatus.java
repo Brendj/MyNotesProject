@@ -61,6 +61,14 @@ public class ApplicationForFoodStatus {
             return false;
         }
         ApplicationForFoodStatus status = (ApplicationForFoodStatus) object;
+
+        if (null == this.declineReason) {
+            if (null == status.getDeclineReason()) {
+                return this.applicationForFoodState.equals(status.getApplicationForFoodState());
+            }
+            return false;
+        }
+
         return this.applicationForFoodState.equals(status.getApplicationForFoodState()) &&
                 this.declineReason.equals(status.getDeclineReason());
     }
