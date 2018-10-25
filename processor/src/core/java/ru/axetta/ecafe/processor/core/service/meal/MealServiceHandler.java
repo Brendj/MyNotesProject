@@ -55,7 +55,7 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
     private String parseAddress(String endPointAddress) {
         return endPointAddress
                 .replaceAll("http://|https://", "")
-                .replaceAll("\\.|/", "_");
+                .replaceAll("[./:]", "_");
     }
 
     private String getLogPath() {

@@ -54,7 +54,7 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
     private String parseAddress(String endPointAddress) {
         return endPointAddress
                 .replaceAll("http://|https://", "")
-                .replaceAll("\\.|/", "_");
+                .replaceAll("[./:]", "_");
     }
 
     public Set<QName> getHeaders() {
