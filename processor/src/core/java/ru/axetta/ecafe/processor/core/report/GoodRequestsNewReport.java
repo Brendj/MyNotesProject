@@ -61,6 +61,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_HIDE_PREORDERS = "hidePreorders";
     final public static String P_PREORDERS_ONLY = "preordersOnly";
     final public static String P_IS_EMAIL_NOTIFY = "isEmailNotify";
+    final public static String P_NEED_FULL_GOOD_NAMES = "needFullGoodNames";
 
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
@@ -149,6 +150,9 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             String isEmailNotifyString = reportProperties.getProperty(P_IS_EMAIL_NOTIFY, "false");
             final boolean isEmailNotify = Boolean.parseBoolean(isEmailNotifyString);
 
+            String needFullGoodNamesString = reportProperties.getProperty(P_NEED_FULL_GOOD_NAMES, "true");
+            final boolean needFullGoodNames = Boolean.parseBoolean(needFullGoodNamesString);
+
             String idOfOrgString = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             if (isEmailNotify) {
                 Long idOfOrg = Long.parseLong(idOfOrgString);
@@ -175,7 +179,8 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
 
             return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
-                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly));
+                    hideMissedColumns, hideGeneratePeriod, hideLastValue, notification, hidePreorders, preordersOnly,
+                    needFullGoodNames));
         }
     }
 

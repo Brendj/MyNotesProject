@@ -45,6 +45,9 @@ public class GoodRequestsNewReportService {
     final private boolean hideTotalRow;
     final private Session session;
 
+    final private String MENU_DETAIL_TYPE_DINNER = "dinner";
+    final private String MENU_DETAIL_TYPE_BREAKFAST = "breakfast";
+
     public GoodRequestsNewReportService(Session session, String OVERALL, String OVERALL_TITLE, boolean hideTotalRow) {
         this.OVERALL = OVERALL;
         this.OVERALL_TITLE = OVERALL_TITLE;
@@ -55,7 +58,7 @@ public class GoodRequestsNewReportService {
     public List<Item> buildReportItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
             int hideDailySampleValue, Date generateBeginTime, Date generateEndTime, List<Long> idOfOrgList,
             List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
-            boolean notification, boolean hidePreorders, boolean preordersOnly) {
+            boolean notification, boolean hidePreorders, boolean preordersOnly, boolean needFullGoodNames) {
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = getDefinedOrgs(idOfOrgList, idOfMenuSourceOrgList);
 
         List<Item> itemList = new LinkedList<Item>();
@@ -110,7 +113,9 @@ public class GoodRequestsNewReportService {
                     "SELECT distinct ci.idoforg, "
                             + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
                             + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex, "
-                            + "   CASE WHEN (pc.amount = 0) THEN gmd.goodscode ELSE gc.goodscode END AS goodscode "
+                            + "   CASE WHEN (pc.amount = 0) THEN gmd.goodscode ELSE gc.goodscode END AS goodscode, "
+                            + "   CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%завтрак%') THEN 'breakfast' ELSE "
+                            + "         CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%обед%') THEN 'dinner' ELSE '' END END AS type "
                             + "FROM cf_preorder_complex pc "
                             + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -143,11 +148,19 @@ public class GoodRequestsNewReportService {
                 final Long globalId = ((BigInteger) values[1]).longValue();
                 Boolean isComplex = (Boolean) values[2];
                 final String goodsCode = (null != values[3]) ? values[3].toString() : "";
+                final String menuDetailType = (null != values[4]) ? values[4].toString() : "";
 
                 if (isComplex) {
                     planType = FeedingPlanType.COMPLEX;
                 } else {
-                    planType = FeedingPlanType.DISH;
+                    if (MENU_DETAIL_TYPE_BREAKFAST.equals(menuDetailType)) {
+                        planType = FeedingPlanType.BREAKFAST;
+                    } else if (MENU_DETAIL_TYPE_DINNER.equals(menuDetailType)) {
+                        planType = FeedingPlanType.DINNER;
+                    } else {
+                        logger.info(String.format("GoodRequestsNewReportService: unexpected menu detail type was finded in org with id = %d", idOfOrg));
+                        continue;
+                    }
                 }
 
                 ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
@@ -174,7 +187,8 @@ public class GoodRequestsNewReportService {
         for (Object obj : goodRequestPositionList) {
             processPosition(hideDailySampleValue, generateBeginTime, generateEndTime, hideMissedColumns,
                     hideGeneratePeriod, hideLastValue, orgMap, itemList, beginDate, endDate, dates,
-                    complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj, notification);
+                    complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj, notification,
+                    needFullGoodNames);
         }
 
         if (orgFilter == 0 && !idOfMenuSourceOrgList.isEmpty()) {
@@ -252,7 +266,7 @@ public class GoodRequestsNewReportService {
 
         return buildReportItems(startTime, endTime, nameFilter, orgFilter, hideDailySampleValue, generateBeginTime,
                 generateEndTime, idOfOrgList, idOfMenuSourceOrgList, hideMissedColumns, hideGeneratePeriod,
-                hideLastValue, notification, false, false);
+                hideLastValue, notification, false, false, true);
     }
 
     private HashMap<Long, BasicReportJob.OrgShortItem> getDefinedOrgs(List<Long> idOfOrgList,
@@ -294,7 +308,7 @@ public class GoodRequestsNewReportService {
             boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
             HashMap<Long, BasicReportJob.OrgShortItem> orgMap, List<Item> itemList, Date beginDate, Date endDate,
             TreeSet<Date> dates, Map<Long, ComplexInfoItem> complexOrgDictionary, List goodRequestPositionList,
-            Map<Long, GoodInfo> requestGoodsInfo, Object obj, boolean notification) {
+            Map<Long, GoodInfo> requestGoodsInfo, Object obj, boolean notification, boolean needFullGoodNames) {
         Date doneDate;
         GoodRequestPosition position = (GoodRequestPosition) obj;
         BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
@@ -345,8 +359,12 @@ public class GoodRequestsNewReportService {
         } else {
             feedingPlanType = FeedingPlanType.PAY_PLAN;
         }
-        String name = good.getFullName();
-        if (StringUtils.isEmpty(name)) {
+        String name = "";
+        if (needFullGoodNames) {
+            name = good.getFullName();
+        }
+
+        if (!needFullGoodNames || StringUtils.isEmpty(name)) {
             name = good.getNameOfGood();
         }
         String goodsCode = good.getGoodsCode();
@@ -441,7 +459,9 @@ public class GoodRequestsNewReportService {
         /*1*/ PAY_PLAN("Платное питание"),
         /*2*/ SUBSCRIPTION_FEEDING("Абонементное питание"),
         /*3*/ COMPLEX("Вариативное платное питание. Комплексы"),
-        /*4*/ DISH("Вариативное платное питание. Отдельные блюда");
+        /*4*/ DISH("Вариативное платное питание. Отдельные блюда"),
+        /*5*/ BREAKFAST("Завтрак (перечень блюд на выбор)"),
+        /*6*/ DINNER("Обед (перечень блюд на выбор)");
 
         private String name;
 

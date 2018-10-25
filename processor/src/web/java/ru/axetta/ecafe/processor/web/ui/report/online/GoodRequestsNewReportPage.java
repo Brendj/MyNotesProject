@@ -473,7 +473,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(hideLastValue));
         properties.setProperty(GoodRequestsNewReport.P_NAME_FILTER, nameFiler);
         properties.setProperty(GoodRequestsNewReport.P_ORG_REQUEST_FILTER, Integer.toString(orgRequest.getOrgRequestFilterEnum().ordinal()));
-        //TODO
+        properties.setProperty(GoodRequestsNewReport.P_NEED_FULL_GOOD_NAMES, Boolean.toString(false));
 
         boolean hidePreorders = false, preordersOnly = false;
         switch (preorderType) {
