@@ -113,7 +113,7 @@ public class MealManager {
                 HashMap<String, PushResponse> responses = mealService.sendEvent(mItem);
                 PushResponse response = responses.get(MEAL_ENDPOINT_ADDRESS);
                 if(response == null){
-                    throw new Exception("Meal Response is null");
+                    throw new Exception("Main receiver ( " + MEAL_ENDPOINT_ADDRESS + " ) didn't get the packages");
                 }
                 if(response.isResult()) {
                     sendOrders.add(item);
@@ -150,7 +150,7 @@ public class MealManager {
                 HashMap<String, PushResponse> responses = mealService.sendEvent(mItem);
                 PushResponse response = responses.get(MEAL_ENDPOINT_ADDRESS);
                 if(response == null){
-                    throw new Exception("Meal Response is null");
+                    throw new Exception("Main receiver ( " + MEAL_ENDPOINT_ADDRESS + " ) didn't get the packages");
                 }
                 if(response.isResult()) {
                     sendTransactions.add(item);

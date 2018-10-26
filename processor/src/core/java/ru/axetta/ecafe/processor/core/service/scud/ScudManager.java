@@ -88,7 +88,7 @@ public class ScudManager {
             HashMap<String, PushResponse> responses = service.sendEvent(list);
             PushResponse response = responses.get(SCUD_ENDPOINT_ADDRESS);
             if(response == null){
-                throw new Exception("Response from SCUD is null");
+                throw new Exception("Main receiver ( " + SCUD_ENDPOINT_ADDRESS + " ) didn't get the packages");
             }
             sendToExternal = true;
             Integer responseCode = response.isResult()? 1 : 0;
