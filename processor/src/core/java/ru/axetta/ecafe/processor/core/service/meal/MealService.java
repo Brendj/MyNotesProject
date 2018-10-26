@@ -41,7 +41,7 @@ public class MealService {
     private List<String> getMealEndPointAddresses() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         String endPointAddresses  = properties
-                .getProperty("ecafe.processor.mealmanager.endpointaddress", "http://10.146.136.36/service/webservice/meal/");
+                .getProperty("ecafe.processor.mealmanager.endpointaddress", "http://10.146.136.36/service/webservice/meal");
         return Arrays.asList(endPointAddresses.split("\\s*;\\s*"));
     }
 

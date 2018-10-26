@@ -45,7 +45,7 @@ public class MealManager {
     private static String getMainEndPointAddress() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties
-                .getProperty("ecafe.processor.mealmanager.mainendpointaddress", "http://10.146.136.36/service/webservice/meal/");
+                .getProperty("ecafe.processor.mealmanager.mainendpointaddress", "http://10.146.136.36/service/webservice/meal");
     }
 
     private static final Logger logger = LoggerFactory.getLogger(MealManager.class);
