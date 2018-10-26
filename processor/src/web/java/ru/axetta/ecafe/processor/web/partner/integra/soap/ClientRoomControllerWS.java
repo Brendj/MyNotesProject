@@ -8805,21 +8805,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result setMultiCardModeForClient(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value){
+    public Result setMultiCardModeForClient(@WebParam(name = "contractId") String contractId, @WebParam(name = "value") String value){
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         Result response = new Result();
         try {
+            if(StringUtils.isEmpty(contractId) || StringUtils.isEmpty(value)){
+                throw new RequiredFieldsAreNotFilledException(RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC);
+            }
+            if(!contractId.matches("\\d")){
+                throw new InvalidDataException("Лицевой счет должен содержать только числовые символы");
+            }
+            Long contractIdLongVal = Long.parseLong(contractId);
+
+            if(!value.toLowerCase().matches("true|false")){
+                throw new InvalidDataException("Значение для установки флага MultiCardMode должно быть задано как true или false");
+            }
+            Boolean multiCardModeFlag = Boolean.parseBoolean(value);
+
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractIdLongVal);
             if(client == null){
                 throw new ClientNotFoundException("Не удалось найти Клиента с л/с: " + contractId);
             }
 
             if(client.getOrg() != null && client.getOrg().multiCardModeIsEnabled()){
-                client.setMultiCardMode(value);
+                client.setMultiCardMode(multiCardModeFlag);
             } else {
                 throw new IllegalArgumentException(
                         "ОО клиента не поддерживает функцию использования клиентами нескольких индификаторов");
@@ -8839,10 +8852,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     "Попытка установить режим \"Использования нескольких индификаторов\" для клиента л/с" + contractId + " , при отключеной опции для ОО клиента", e);
             response.resultCode = RC_INTERNAL_ERROR;
             response.description = e.getMessage();
-        }catch (ClientNotFoundException e){
+        }catch (ClientNotFoundException e) {
             logger.error("", e);
             response.resultCode = RC_CLIENT_NOT_FOUND;
             response.description = RC_CLIENT_NOT_FOUND_DESC;
+        }catch (RequiredFieldsAreNotFilledException e) {
+            logger.error("", e);
+            response.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
+            response.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
+        }catch(InvalidDataException e){
+            logger.error("", e);
+            response.resultCode = RC_INVALID_DATA;
+            response.description = e.getMessage();
         } catch (Exception e) {
             logger.error("Ошибка при попытке установить для Клиента (contractId=" + contractId + ") значение для поля multiCardMode ", e);
             response.resultCode = RC_INTERNAL_ERROR;
