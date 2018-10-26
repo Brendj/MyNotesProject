@@ -8813,7 +8813,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if(StringUtils.isEmpty(contractId) || StringUtils.isEmpty(value)){
                 throw new RequiredFieldsAreNotFilledException(RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC);
             }
-            if(!contractId.matches("\\d")){
+            if(!contractId.matches("\\d+")){
                 throw new InvalidDataException("Лицевой счет должен содержать только числовые символы");
             }
             Long contractIdLongVal = Long.parseLong(contractId);
