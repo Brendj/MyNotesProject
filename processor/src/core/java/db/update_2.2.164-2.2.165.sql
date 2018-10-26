@@ -89,3 +89,5 @@ CREATE TABLE cf_client_dtiszn_discount_info
 WITH (
     OIDS = FALSE
 );
+
+--! ФИНАЛИЗИРОВАН 26.10.2018, НЕ МЕНЯТЬ
