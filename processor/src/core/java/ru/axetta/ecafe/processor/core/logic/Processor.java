@@ -74,6 +74,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRe
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
@@ -1006,6 +1010,8 @@ public class Processor implements SyncProcessor {
         fullProcessingClientBalanceHoldRequest(request, syncHistory, responseSections);
 
         fullProcessingClientBalanceHoldData(request, syncHistory, responseSections);
+
+        fullProcessingRequestFeeding(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -6327,5 +6333,62 @@ public class Processor implements SyncProcessor {
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+    }
+
+    private void fullProcessingRequestFeeding(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            RequestFeeding requestFeeding = request.getRequestFeeding();
+            if (null != requestFeeding) {
+                RequestFeedingData requestFeedingData = processRequestFeedingData(requestFeeding);
+                addToResponseSections(requestFeedingData, responseSections);
+
+                ResRequestFeeding resRequestFeeding = processRequestFeeding(requestFeeding);
+                addToResponseSections(resRequestFeeding, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingRequestFeeding: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private ResRequestFeeding processRequestFeeding(RequestFeeding requestFeeding)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResRequestFeeding resRequestFeeding = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new RequestFeedingProcessor(persistenceSession, requestFeeding);
+            resRequestFeeding = (ResRequestFeeding) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resRequestFeeding;
+    }
+
+    private RequestFeedingData processRequestFeedingData(RequestFeeding requestFeeding)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        RequestFeedingData requestFeedingData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            RequestFeedingProcessor processor = new RequestFeedingProcessor(persistenceSession, requestFeeding);
+            requestFeedingData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error in process processRequestFeedingData: ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return requestFeedingData;
     }
 }

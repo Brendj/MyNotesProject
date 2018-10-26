@@ -41,6 +41,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersF
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
@@ -2674,6 +2676,7 @@ public class SyncRequest {
             builders.add(new MenusCalendarSupplierBuilder());
             builders.add(new ClientBalanceHoldBuilder(idOfOrg));
             builders.add(new ClientBalanceHoldData.Builder(idOfOrg));
+            builders.add(new RequestFeedingBuilder(idOfOrg));
             return builders;
         }
 
@@ -2941,6 +2944,10 @@ public class SyncRequest {
 
     public ClientBalanceHoldData getClientBalanceHoldData() {
         return this.<ClientBalanceHoldData>findSection(ClientBalanceHoldData.class);
+    }
+
+    public RequestFeeding getRequestFeeding() {
+        return this.<RequestFeeding>findSection(RequestFeeding.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

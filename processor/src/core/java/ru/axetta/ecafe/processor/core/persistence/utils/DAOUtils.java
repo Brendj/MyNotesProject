@@ -3743,7 +3743,9 @@ public class DAOUtils {
     public static List<ApplicationForFood> getApplicationsForFoodForOrgSinceVersion(Session session, Long idOfOrg,
             long version) throws Exception {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
-        criteria.add(Restrictions.eq("client.org.idOfOrg", idOfOrg));
+        criteria.createAlias("client", "c");
+        criteria.createAlias("c.org", "o");
+        criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
