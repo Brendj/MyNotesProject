@@ -73,6 +73,7 @@ public class RequestFeedingItem {
         this.idOfOrgOnCreate = applicationForFood.getIdOfOrgOnCreate();
         this.dtisznCode = applicationForFood.getDtisznCode();
         this.isArchive = applicationForFood.getArchived();
+        this.version = applicationForFood.getVersion();
     }
 
     public static RequestFeedingItem build(Node itemNode, Long idOfOrg) throws Exception {
