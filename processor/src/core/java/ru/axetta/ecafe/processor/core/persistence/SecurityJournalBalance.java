@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -255,6 +256,10 @@ public class SecurityJournalBalance {
         }
     }
 
+    private static boolean writeBalancesInfoEnabled() {
+        return RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.security-admin.balances.disable", "0").equals("0");
+    }
+
     public static void saveSecurityJournalBalanceFromPayment(SecurityJournalBalance journal, boolean success,
             String message, ClientPayment clientPayment) {
         journal.setIsSuccess(success);
@@ -263,7 +268,7 @@ public class SecurityJournalBalance {
         if (clientPayment != null) {
             journal.setAccountTransaction(clientPayment.getTransaction());
         }
-        DAOService.getInstance().saveSecurityJournalBalance(journal);
+        if (writeBalancesInfoEnabled()) DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
     public static void saveSecurityJournalBalanceWithTransaction(SecurityJournalBalance journal, boolean success,
@@ -272,7 +277,7 @@ public class SecurityJournalBalance {
         journal.setMessage(message);
         journal.setAccountTransaction(accountTransaction);
         journal.setEventDate(accountTransaction.getTransactionTime());
-        DAOService.getInstance().saveSecurityJournalBalance(journal);
+        if (writeBalancesInfoEnabled()) DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
     public static void saveSecurityJournalBalance(SecurityJournalBalance journal, boolean success, String message) {
@@ -284,7 +289,7 @@ public class SecurityJournalBalance {
                 journal.setAccountTransaction(order.getTransaction());
             }
         }
-        DAOService.getInstance().saveSecurityJournalBalance(journal);
+        if (writeBalancesInfoEnabled()) DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
     public Long getIdOfJournalBalance() {
