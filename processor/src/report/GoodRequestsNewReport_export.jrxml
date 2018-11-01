@@ -246,7 +246,7 @@
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#99CCFF" mode="Opaque" style="table">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="6daf10b9-73c0-4509-848d-a377ffc8d55b" style="Crosstab Data Text" x="0" y="0" width="164" height="20"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
 									<font size="8"/>
