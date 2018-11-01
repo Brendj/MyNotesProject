@@ -45,8 +45,10 @@ public class GoodRequestsNewReportService {
     final private boolean hideTotalRow;
     final private Session session;
 
-    final private String MENU_DETAIL_TYPE_DINNER = "dinner";
-    final private String MENU_DETAIL_TYPE_BREAKFAST = "breakfast";
+    final private String MENU_DETAIL_TYPE_DINNER = "dinner";        // обед
+    final private String MENU_DETAIL_TYPE_BREAKFAST = "breakfast";  // завтрак
+    final private String MENU_DETAIL_TYPE_AFTERNOON = "afternoon";  // полдник
+    final private String MENU_DETAIL_TYPE_SUPPER = "supper";        // ужин
 
     public GoodRequestsNewReportService(Session session, String OVERALL, String OVERALL_TITLE, boolean hideTotalRow) {
         this.OVERALL = OVERALL;
@@ -114,8 +116,10 @@ public class GoodRequestsNewReportService {
                             + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
                             + "   CASE WHEN (pc.amount = 0) THEN false ELSE true END AS iscomplex, "
                             + "   CASE WHEN (pc.amount = 0) THEN gmd.goodscode ELSE gc.goodscode END AS goodscode, "
-                            + "   CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%завтрак%') THEN 'breakfast' ELSE "
-                            + "         CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%обед%') THEN 'dinner' ELSE '' END END AS type "
+                            + "   CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%завтрак%') THEN 'breakfast' "
+                            + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%обед%') THEN 'dinner' "
+                            + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%полдник%') THEN 'afternoon' "
+                            + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%ужин%') THEN 'supper' ELSE '' END AS type "
                             + "FROM cf_preorder_complex pc "
                             + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -157,6 +161,10 @@ public class GoodRequestsNewReportService {
                         planType = FeedingPlanType.BREAKFAST;
                     } else if (MENU_DETAIL_TYPE_DINNER.equals(menuDetailType)) {
                         planType = FeedingPlanType.DINNER;
+                    } else if (MENU_DETAIL_TYPE_AFTERNOON.equals(menuDetailType)) {
+                        planType = FeedingPlanType.AFTERNOON;
+                    } else if (MENU_DETAIL_TYPE_SUPPER.equals(menuDetailType)) {
+                        planType = FeedingPlanType.SUPPER;
                     } else {
                         logger.info(String.format("GoodRequestsNewReportService: unexpected menu detail type was finded in org with id = %d", idOfOrg));
                         continue;
@@ -461,7 +469,9 @@ public class GoodRequestsNewReportService {
         /*3*/ COMPLEX("Вариативное платное питание. Комплексы"),
         /*4*/ DISH("Вариативное платное питание. Отдельные блюда"),
         /*5*/ BREAKFAST("Завтрак (перечень блюд на выбор)"),
-        /*6*/ DINNER("Обед (перечень блюд на выбор)");
+        /*6*/ DINNER("Обед (перечень блюд на выбор)"),
+        /*7*/ AFTERNOON("Полдник (перечень блюд на выбор)"),
+        /*8*/ SUPPER("Ужин (перечень блюд на выбор)");
 
         private String name;
 
