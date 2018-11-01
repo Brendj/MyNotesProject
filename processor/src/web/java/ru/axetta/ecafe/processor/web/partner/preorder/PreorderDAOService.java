@@ -1307,16 +1307,6 @@ public class PreorderDAOService {
         }
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            if (two_days <= forbiddenDays) {
-                c.add(Calendar.DATE, 1);
-                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
-                if (CalendarUtils.isWorkDateWithoutParserForPreorder(isSixWorkWeek, currentDate)
-                        && !isSpecialConfigDate(client, currentDate)) {
-                    two_days++;
-                }
-                continue;
-            }
-
             Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
             if(specialDates != null){
                 for (SpecialDate specialDate : specialDates) {
@@ -1328,6 +1318,15 @@ public class PreorderDAOService {
                     }
                 }
             }
+            if (two_days <= forbiddenDays) {
+                c.add(Calendar.DATE, 1);
+                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
+                if (!isWeekend) {
+                    two_days++;
+                }
+                continue;
+            }
+
             int day = CalendarUtils.getDayOfWeek(currentDate);
             if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
                 //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
