@@ -3749,4 +3749,18 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
+
+    public static Card getLastCreatedActiveCardByClient(Session session, Client client) {
+        try {
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("client", client))
+                    .add(Restrictions.eq("state", CardState.ISSUED.getValue()))
+                    .addOrder(org.hibernate.criterion.Order.desc("createTime"))
+                    .setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (Exception e){
+            logger.error("Can't get last active card by client with contractID: " + client.getContractId(), e);
+            return  null;
+        }
+    }
 }

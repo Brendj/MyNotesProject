@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.items.ClientGroupsByRegExAndOrgItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
@@ -14,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1820,4 +1822,172 @@ public class ClientManager {
         return (ClientGroup) criteria.uniqueResult();
     }
 
+    public static void resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(Org org, Session session) throws Exception{
+        Date beginDate = CalendarUtils.addMonth(new Date(), -1); // Время выборки - месяц
+        List<Long> listOfIdsFriendlyOrgs = new LinkedList<Long>(); // Получение списка ID дружественных и целевого ОО
+        for (Org fo : org.getFriendlyOrg()) {
+            listOfIdsFriendlyOrgs.add(fo.getIdOfOrg());
+        }
+        BigInteger undefinedResult = new BigInteger("-1"); // Для сортировки в SQL-запросе требовалось значение, отличное от NULL
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+        try {
+            Query getMultiCardOwnersIdQuery = session.createSQLQuery("select c.idofclient "
+                    + " from cf_clients as c "
+                    + " join cf_cards as crd on crd.idofclient = c.idofclient "
+                    + " where c.idoforg in (:orgIds)"
+                    + " and c.multicardmode = 1 "
+                    + " and crd.state = 0 "
+                    + " group by c.idofclient "
+                    + " having count(crd.*) > 1 "
+            );
+            getMultiCardOwnersIdQuery.setParameterList("orgIds", listOfIdsFriendlyOrgs);
+            List<BigInteger> multiCardOwnersIds = getMultiCardOwnersIdQuery.list(); // Получение списка ID клиентов с включеным режимом, имеющие на руках больше 1 активной карты
+            if(multiCardOwnersIds == null || multiCardOwnersIds.isEmpty()){
+                return;
+            }
+
+            Query getLastActiveCardQuery = session.createSQLQuery(
+                                            " select distinct on(crd.idofclient) crd.idofclient, crd.idofcard, "
+                                            + "                     case "
+                                            + "                        when qee.eventdate is null and qo.eventdate is null then -1 " // Если за месяц не было событий, то -1
+                                            + "                        when qee.eventdate is null or qo.eventdate >= qee.eventdate then qo.eventdate  "
+                                            + "                        when qo.eventdate is null or qo.eventdate < qee.eventdate then qee.eventdate  "
+                                            + "                        else -1  "
+                                            + "                     end eventdate "
+                                            + " from cf_cards crd "
+                                            + " left join (select idofcard, max(createddate) as eventdate "
+                                            + "           from cf_orders  "
+                                            + "           where idofclient in (:idOfClients) "
+                                            + "           and createddate >= :beginDate "
+                                            + "           and idofcard is not null "
+                                            + "           group by idofcard  "
+                                            + "           order by eventdate "
+                                            + "           limit 1 "
+                                            + "           ) qo on crd.idofcard = qo.idofcard "
+                                            + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
+                                            + "           from cf_enterevents ee "
+                                            + "           join cf_cards crd on crd.cardno = ee.idofcard and crd.idoforg = ee.idoforg "
+                                            + "           where crd.idofclient in (:idOfClients) "
+                                            + "           and ee.evtdatetime >= :beginDate "
+                                            + "           group by crd.idofcard  "
+                                            + "           order by eventdate desc "
+                                            + "           limit 1 "
+                                            + "           ) qee on crd.idofcard = qee.idofcard "
+                                            + " where crd.state = 0 "
+                                            + " and crd.idofclient in (:idOfClients) "
+                                            + " order by crd.idofclient desc, eventdate desc "
+            );
+            getLastActiveCardQuery.setParameterList("idOfClients", multiCardOwnersIds);
+            getLastActiveCardQuery.setParameter("beginDate", beginDate.getTime());
+            List<Object[]> lastActiveCards = getLastActiveCardQuery.list();
+
+            CardManager cardManager = RuntimeContext.getInstance().getCardManager();
+            for(Object[] row : lastActiveCards){
+                if(row[0] == null) { // row[0] - ID клиента
+                    continue;
+                }
+                Client client = (Client) session.get(Client.class, ((BigInteger) row[0]).longValue());
+                List<Card> clientsCards = new LinkedList<Card>(client.getCards());
+                if(row[1] == null || (row[2] == null || row[2].equals(undefinedResult))){ // row[1] - ID карты, row[2] - время последнего события
+                    Card lastCreatedCard = DAOUtils.getLastCreatedActiveCardByClient(session, client);
+                    if(lastCreatedCard == null){
+                        continue;
+                    }
+                    clientsCards.remove(lastCreatedCard);
+                } else {
+                    Card lastActiveCard = (Card) session.get(Card.class, ((BigInteger) row[1]).longValue());
+                    clientsCards.remove(lastActiveCard);
+                }
+                for(Card card : clientsCards){
+                    if(card.getState().equals(CardState.ISSUED.getValue())){
+                        cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                                CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
+                                "Другое", card.getIssueTime(), card.getExternalId());
+                    }
+                }
+            }
+
+
+        } catch (Exception e) {
+            logger.error("Failed to reset flags MultiCardMode at clients: ", e);
+        }
+        finally {
+            Query resetFlagMultiCardModeAndUpVersionQuery = session.createSQLQuery(
+                            " update cf_clients "
+                            + " set multicardmode = 0, clientregistryversion = :nextClientRegistryVersion"
+                            + " where idoforg in (:orgIds) "
+                            + " and multicardmode = 1 "
+            );
+            resetFlagMultiCardModeAndUpVersionQuery.setParameterList("orgIds", listOfIdsFriendlyOrgs);
+            resetFlagMultiCardModeAndUpVersionQuery.setParameter("nextClientRegistryVersion", clientRegistryVersion);
+            resetFlagMultiCardModeAndUpVersionQuery.executeUpdate();
+        }
+    }
+
+    public static void blockExtraCardOfClient(Client client, Session persistenceSession) {
+        try{
+            BigInteger undefinedResult = new BigInteger("-1"); // Для сортировки в SQL-запросе требовалось значение, отличное от NULL
+            Date beginDate = CalendarUtils.addMonth(new Date(), -1);
+            Query getDateAndIdLastActiveCardQuery = persistenceSession.createSQLQuery(
+                                            " select crd.idofcard, "
+                                            + "       case "
+                                            + "        when qo.idofcard is null and qee.idofcard is null then -1 " // Если за месяц не было событий, то -1
+                                            + "        when qee.eventdate is null or qo.eventdate >= qee.eventdate then qo.eventdate "
+                                            + "        when qo.eventdate is null or qo.eventdate < qee.eventdate then qee.eventdate "
+                                            + "        else -1 "
+                                            + "       end maxeventdate "
+                                            + " from cf_cards crd "
+                                            + " left join (select idofcard, max(createddate) as eventdate "
+                                            + "     from cf_orders "
+                                            + "     where idofclient = :idOfClient "
+                                            + "     and createddate >= :beginDate "
+                                            + "     and idofcard is not null "
+                                            + "     group by idofcard "
+                                            + " ) qo on crd.idofcard = qo.idofcard "
+                                            + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
+                                            + "     from cf_enterevents ee "
+                                            + "     join cf_cards crd on crd.cardno = ee.idofcard and crd.idoforg = ee.idoforg "
+                                            + "     where crd.idofclient = :idOfClient "
+                                            + "     and ee.evtdatetime >= :beginDate "
+                                            + "     group by crd.idofcard "
+                                            + " ) qee on crd.idofcard = qee.idofcard "
+                                            + " where crd.state = 0 "
+                                            + " and crd.idofclient = :idOfClient "
+                                            + " and (select count(*) "
+                                            + "     from cf_cards "
+                                            + "     where idofclient = :idOfClient "
+                                            + "     and crd.state = 0 ) > 1 "
+                                            + " order by maxeventdate desc "
+                                            + " limit 1"
+            );
+            getDateAndIdLastActiveCardQuery.setParameter("idOfClient", client.getIdOfClient());
+            getDateAndIdLastActiveCardQuery.setParameter("beginDate", beginDate.getTime());
+            Object[] result = (Object[]) getDateAndIdLastActiveCardQuery.uniqueResult();
+            if(result == null){
+                return;
+            }
+            Long idOfLastActiveCard = ((BigInteger)result[0]).longValue();
+            List<Card> clientsCards = new LinkedList<Card>(client.getCards());
+            CardManager cardManager = RuntimeContext.getInstance().getCardManager();
+            if(result[1].equals(undefinedResult)){ // Если за месяц не было активности, то как основную считать последнюю выданную
+                Card lastCreatedCard = DAOUtils.getLastCreatedActiveCardByClient(persistenceSession, client);
+                clientsCards.remove(lastCreatedCard);
+            } else {
+                Card lastActiveCard = (Card) persistenceSession.get(Card.class, idOfLastActiveCard);
+                if(lastActiveCard == null){
+                    throw new Exception("From DB come ID: " + idOfLastActiveCard + " but such a card does not exist");
+                }
+                clientsCards.remove(lastActiveCard);
+            }
+            for(Card card : clientsCards){
+                if(card.getState().equals(CardState.ISSUED.getValue())){
+                    cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                            CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
+                            "Другое", card.getIssueTime(), card.getExternalId());
+                }
+            }
+        }catch (Exception e){
+            logger.error("Failed to block extra cards for client contractID: " + client.getContractId(), e);
+        }
+    }
 }

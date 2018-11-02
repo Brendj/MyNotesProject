@@ -377,6 +377,9 @@ public class OrgEditPage extends BasicWorkspacePage
         for(Org fo: org.getFriendlyOrg()){
             fo.setMultiCardModeEnabled(multiCardModeEnabled);
         }
+        if(!multiCardModeEnabled){
+            ClientManager.resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(org, session);
+        }
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
 

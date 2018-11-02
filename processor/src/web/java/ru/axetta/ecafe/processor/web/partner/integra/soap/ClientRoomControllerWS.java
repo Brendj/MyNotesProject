@@ -4856,25 +4856,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
+            if(StringUtils.isEmpty(guardMobile)){
+                throw new InvalidDataException("Не заполнен номер телефона опекуна");
+            }
+
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
             Client client = DAOUtils.findClientByContractId(session, contractId);
+            if(client == null){
+                throw new ClientNotFoundException("Не удалось найти клиента по л/с " + contractId);
+            }
 
             List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, client.getIdOfClient());
             boolean guardianWithMobileFound = false;
             for (ClientGuardianItem item : guardians) {
                 Client guardian = (Client)session.get(Client.class, item.getIdOfClient());
-                if (guardian != null && guardian.getMobile().equals(guardMobile)) {
+                if (guardian != null && stringEquals(guardian.getMobile(), guardMobile)) {
                     guardianWithMobileFound = true;
                     Criteria criteria = session.createCriteria(ClientGuardian.class);
                     criteria.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
                     criteria.add(Restrictions.eq("idOfGuardian", item.getIdOfClient()));
-                    ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
-                    cg.setDisabled(value);
-                    cg.setVersion(getClientGuardiansResultVersion(session));
-                    cg.setLastUpdate(new Date());
-                    session.persist(cg);
+                    List<ClientGuardian> listOfClientGuardian = criteria.list();
+                    if(listOfClientGuardian == null || listOfClientGuardian.isEmpty()){
+                        continue;
+                    }
+                    for(ClientGuardian cg : listOfClientGuardian) {
+                        cg.setDisabled(value);
+                        cg.setVersion(getClientGuardiansResultVersion(session));
+                        cg.setLastUpdate(new Date());
+                        session.persist(cg);
+                    }
                 }
             }
             if (value) {
@@ -4902,6 +4914,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         }
+        catch (InvalidDataException e){
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
+            result.description = e.getMessage();
+        }
+        catch (ClientNotFoundException e){
+            logger.error("Failed to process client room controller request", e);
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        }
         catch (Exception e) {
             logger.error("Failed to process client room controller request", e);
             result.resultCode = RC_INTERNAL_ERROR;
@@ -4910,8 +4932,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(session, logger);
         }
-
         return result;
+    }
+
+    private boolean stringEquals(String mobile, String guardMobile) {
+        return mobile == null || mobile.isEmpty() ? guardMobile == null || guardMobile.isEmpty() : mobile.equals(guardMobile);
     }
 
     private Long getClientGuardiansResultVersion(Session session) {
@@ -8833,6 +8858,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if(client.getOrg() != null && client.getOrg().multiCardModeIsEnabled()){
                 client.setMultiCardMode(multiCardModeFlag);
+                if(!multiCardModeFlag){
+                    ClientManager.blockExtraCardOfClient(client, persistenceSession);
+                }
             } else {
                 throw new IllegalArgumentException(
                         "ОО клиента не поддерживает функцию использования клиентами нескольких индификаторов");
