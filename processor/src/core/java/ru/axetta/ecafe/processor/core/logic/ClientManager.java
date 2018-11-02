@@ -1861,7 +1861,7 @@ public class ClientManager {
                                             + "           and createddate >= :beginDate "
                                             + "           and idofcard is not null "
                                             + "           group by idofcard  "
-                                            + "           order by eventdate "
+                                            + "           order by eventdate desc "
                                             + "           limit 1 "
                                             + "           ) qo on crd.idofcard = qo.idofcard "
                                             + " left join (select crd.idofcard as idofcard, max(ee.evtdatetime) as eventdate "
