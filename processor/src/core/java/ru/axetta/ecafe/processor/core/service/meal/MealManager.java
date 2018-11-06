@@ -113,7 +113,7 @@ public class MealManager {
                 HashMap<String, PushResponse> responses = mealService.sendEvent(mItem);
                 PushResponse response = responses.get(MEAL_ENDPOINT_ADDRESS);
                 if(response == null){
-                    throw new Exception("Main receiver ( " + MEAL_ENDPOINT_ADDRESS + " ) didn't get the packages");
+                    throw new Exception("No response packet from the main receiver ( " + MEAL_ENDPOINT_ADDRESS + " )");
                 }
                 if(response.isResult()) {
                     sendOrders.add(item);
