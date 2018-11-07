@@ -10,6 +10,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
@@ -46,6 +49,11 @@ public class ScudService {
             ScudWebService service = new ScudWebService();
             controller = service.getPushScudPort();
             Client proxy = ClientProxy.getClient(controller);
+            proxy.getInInterceptors().add(new AbstractPhaseInterceptor<Message>(Phase.RECEIVE) {
+                public void handleMessage(org.apache.cxf.message.Message message) {
+                    message.put(org.apache.cxf.message.Message.CONTENT_TYPE, "text/xml");
+                }
+            });
             BindingProvider bp = (BindingProvider) controller;
             bp.getRequestContext().put("schema-validation-enabled", "false");
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endPointAddress);
