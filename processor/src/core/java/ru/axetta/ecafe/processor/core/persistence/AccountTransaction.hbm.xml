@@ -11,7 +11,7 @@
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
                 <param name="column">IdOfTransaction</param>
-                <param name="max_lo">8</param>
+                <param name="max_lo">32</param>
             </generator>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
