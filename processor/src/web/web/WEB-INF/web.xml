@@ -108,6 +108,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>CommonTaskServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.CommonTaskServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ImageServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.ImageServlet</servlet-class>
     </servlet>
@@ -200,6 +205,11 @@
     <servlet-mapping>
         <servlet-name>SyncServlet</servlet-name>
         <url-pattern>/sync</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CommonTaskServlet</servlet-name>
+        <url-pattern>/commontask</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

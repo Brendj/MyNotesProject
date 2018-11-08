@@ -7525,6 +7525,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
             List<ComplexInfo> availableComplexes = sfService.findComplexesWithSubFeeding(clientOrg, vp);
+            cycleDiagram.setMonday(getCycleDiagramDayValue(cycleDiagram.getMonday(), "monday", contractId));
+            cycleDiagram.setTuesday(getCycleDiagramDayValue(cycleDiagram.getTuesday(), "tuesday", contractId));
+            cycleDiagram.setWednesday(getCycleDiagramDayValue(cycleDiagram.getWednesday(), "wednesday", contractId));
+            cycleDiagram.setThursday(getCycleDiagramDayValue(cycleDiagram.getThursday(), "thursday", contractId));
+            cycleDiagram.setFriday(getCycleDiagramDayValue(cycleDiagram.getFriday(), "friday", contractId));
+            cycleDiagram.setSaturday(getCycleDiagramDayValue(cycleDiagram.getSaturday(), "saturday", contractId));
             if (list.isEmpty()) {
                 // создаем новую
                 CycleDiagram diagram = new CycleDiagram();
@@ -7605,6 +7611,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private String getCycleDiagramDayValue(String sourceValue, String dayOfWeek, Long contractId) {
+        if (sourceValue == null) {
+            RuntimeContext.getAppContext().getBean(CommonTaskService.class).writeToCommonLog(
+                    RuntimeContext.getInstance().getNodeName(), "error", String.format("Null cycle diagram for %s, contractId = %s", dayOfWeek, contractId));
+            return "";
+        }
+        return sourceValue;
     }
 
     private boolean allDaysWithData(boolean sixWorkWeek, CycleDiagramExt cycleDiagram) {
