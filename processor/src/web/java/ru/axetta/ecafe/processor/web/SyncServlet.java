@@ -149,7 +149,6 @@ public class SyncServlet extends HttpServlet {
                 String message = String.format("Failed to perform this sync from idOfOrg=%s. Too many active requests. Current count syncs: %s, full syncs: %s, accInc syncs: %s",
                         idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount);
                 logger.error(message);
-                removeSyncInProgress(idOfOrg);
                 sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
                 return;
             }
@@ -184,7 +183,6 @@ public class SyncServlet extends HttpServlet {
             } catch (Exception e) {
                 String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -193,14 +191,12 @@ public class SyncServlet extends HttpServlet {
                     String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
                     logger.error(message);
                     sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                    removeSyncInProgress(idOfOrg);
                     return;
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
                 String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -218,7 +214,6 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to parse XML request. IdOfOrg=%s", idOfOrg), e);
                 String msg = String.format("Failed to parse XML request: %s", e.getMessage());
                 sendError(response, syncTime, msg, HttpServletResponse.SC_BAD_REQUEST);
-                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -232,7 +227,6 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to process request. IdOfOrg=%s", idOfOrg), e);
                 String message = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, message, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -246,7 +240,6 @@ public class SyncServlet extends HttpServlet {
                 logger.error(String.format("Failed to serialize response. IdOfOrg=%s", idOfOrg), e);
                 String format = String.format("Failed to serialize response: %s", e.getMessage());
                 sendError(response, syncTime, format, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                removeSyncInProgress(idOfOrg);
                 return;
             }
 
@@ -260,21 +253,19 @@ public class SyncServlet extends HttpServlet {
                 writeResponse(response, requestData.isCompressed, responseDocument);
             } catch (Exception e) {
                 logger.error(String.format("Failed to write response. IdOfOrg=%s", idOfOrg), e);
-                removeSyncInProgress(idOfOrg);
                 throw new ServletException(e);
             }
 
             final String message = String.format("End of synchronization with %s: id: %s, time taken: %s ms",
                     request.getRemoteAddr(), idOfOrg, System.currentTimeMillis() - begin_sync);
             logger.info(message);
-            removeSyncInProgress(idOfOrg);
         } catch (RuntimeContext.NotInitializedException e) {
-            removeSyncInProgress(idOfOrg);
             SyncCollector.setErrMessage(syncTime, e.getMessage());
             SyncCollector.registerSyncEnd(syncTime);
             throw new UnavailableException(e.getMessage());
         } finally {
             SyncCollector.registerSyncEnd(syncTime);
+            removeSyncInProgress(idOfOrg);
         }
     }
 
