@@ -13,11 +13,8 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,7 +25,7 @@ import java.util.List;
 @Component("ImportMigrantsService")
 @Scope("singleton")
 public class ImportMigrantsService {
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportMigrantsFileService.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportMigrantsService.class);
 
     public void run() throws Exception {
         if (!isOn())
@@ -60,7 +57,14 @@ public class ImportMigrantsService {
 
             Date date = new Date();
 
+            Integer counter = 0;
+            Integer size = eszMigrantsRequestList.size();
+
+            Long cycleTime = System.currentTimeMillis();
             for (ESZMigrantsRequest request : eszMigrantsRequestList) {
+                if (transaction == null || !transaction.isActive())
+                    transaction = session.beginTransaction();
+
                 Migrant migrant = MigrantsUtils.getMigrantRequestByGuidAndGroupId(session, request.getClientGuid(),
                         request.getIdOfServiceClass());
 
@@ -74,6 +78,22 @@ public class ImportMigrantsService {
                     }
                 }
 
+                List<Org> orgVisitList = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
+
+                if (orgVisitList.size() > 1) {
+                    logger.warn(String.format("More then one organization was found with unom=%d and inn=%s for client with guid={%s}",
+                            request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
+                    cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
+                    continue;
+                }
+
+                if (orgVisitList.isEmpty()) {
+                    logger.warn(String.format("No organization was found with unom=%d and inn=%s for client with guid={%s}",
+                            request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
+                    cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
+                    continue;
+                }
+
                 Client client = null;
 
                 if (null != request.getClientGuid() && !request.getClientGuid().isEmpty())
@@ -85,20 +105,6 @@ public class ImportMigrantsService {
                             (request.getFirstname() == null) ? "" : request.getFirstname(),
                             (request.getSecondname() == null) ? "" : request.getSecondname());
                     client = (Client) session.load(Client.class, idOfClient);
-                }
-
-                List<Org> orgVisitList = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
-
-                if (orgVisitList.size() > 1) {
-                    logger.warn(String.format("More then one organization was found with unom=%d and inn=%s for client with guid={%s}",
-                            request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
-                    continue;
-                }
-
-                if (orgVisitList.isEmpty()) {
-                    logger.warn(String.format("No organization was found with unom=%d and inn=%s for client with guid={%s}",
-                            request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
-                    continue;
                 }
 
                 Integer resolution;
@@ -190,14 +196,11 @@ public class ImportMigrantsService {
                                 resolution, date));
                     }
                 }
-                session.flush();
+                transaction.commit();
+                transaction = null;
+
+                cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
             }
-
-            Query query = session.createSQLQuery("truncate table cf_esz_migrants_requests");
-            query.executeUpdate();
-
-            transaction.commit();
-            transaction = null;
 
             logger.info(String.format("End fill migrants table. Time taken %s ms", System.currentTimeMillis() - begin));
         } finally {
@@ -221,5 +224,16 @@ public class ImportMigrantsService {
         return new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
                 resolution, date, null, null, null,
                 VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ESZ);
+    }
+
+    private Long loggingInfoAndFlushSession(Integer counter, Integer size, Long cycleTime, Session session) {
+        if (counter%100 == 0) {
+            session.flush();
+            session.clear();
+            logger.info(String.format("Filling migrants table: %d/%d done. Time taken %s ms", counter, size,
+                    System.currentTimeMillis() - cycleTime));
+            cycleTime = System.currentTimeMillis();
+        }
+        return cycleTime;
     }
 }

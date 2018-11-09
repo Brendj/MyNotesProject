@@ -93,6 +93,12 @@ public class ImportMigrantsFileService {
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
+
+            logger.info("Clear esz migrants table");
+            Query truncateQuery = session.createSQLQuery("truncate table cf_esz_migrants_requests");
+            truncateQuery.executeUpdate();
+            logger.info("End of clearing esz migrants table");
+
             transaction = session.beginTransaction();
             StringBuilder sqlQueryBuilder = new StringBuilder(INITIAL_SQL);
 
