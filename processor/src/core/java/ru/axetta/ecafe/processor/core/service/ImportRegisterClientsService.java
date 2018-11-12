@@ -1395,6 +1395,11 @@ public class ImportRegisterClientsService {
                         dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                         dbClient.setOrg(newOrg);
                     }
+                    if(!newOrg.multiCardModeIsEnabled() && dbClient.activeMultiCardMode()){
+                        dbClient.setMultiCardMode(false);
+                        ClientManager.blockExtraCardOfClient(dbClient, session);
+                    }
+
                     addClientMigrationEntry(session, beforeMigrateOrg, dbClient.getOrg(), dbClient, change);
                     change.setIdOfOrg(dbClient.getOrg().getIdOfOrg());
                 case MODIFY_OPERATION:

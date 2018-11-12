@@ -1112,6 +1112,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if(!multiCardMode){
                 ClientManager.blockExtraCardOfClient(client, persistenceSession);
             }
+        } else if(client.activeMultiCardMode()){
+            client.setMultiCardMode(false);
+            ClientManager.blockExtraCardOfClient(client, persistenceSession);
         }
 
         resetNewFlags();
