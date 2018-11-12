@@ -67,6 +67,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
+import javax.net.ssl.SSLContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -737,6 +738,14 @@ public class RuntimeContext implements ApplicationContextAware {
             usePriceSms = getPropertiesValue("ecafe.processor.sms.usePrice", "true").equals("true");
 
             runCheckSums();
+
+            try {
+                SSLContext ctx = SSLContext.getInstance("TLSv1.2");
+                ctx.init(null, null, null);
+                SSLContext.setDefault(ctx);
+            } catch (Exception e) {
+                logger.error("Error in setting tls 1.2 (ignore on java 6): ", e);
+            }
 
         } catch (Exception e) {
             destroy(executorService, scheduler);
