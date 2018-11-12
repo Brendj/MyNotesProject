@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsDat
 import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCategoriesDiscountsAndRules;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -25,6 +26,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersF
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
@@ -1185,6 +1189,9 @@ public class SyncResponse {
     private MenusCalendarData menusCalendarData;
     private ClientBalanceHoldFeeding clientBalanceHoldFeeding;
     private ResClientBalanceHoldData resClientBalanceHoldData;
+    private ResRequestFeeding resRequestFeeding;
+    private RequestFeedingData requestFeedingData;
+    private ClientDiscountDTSZN clientDiscountDTSZN;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1531,6 +1538,18 @@ public class SyncResponse {
 
         if (resClientBalanceHoldData != null) {
             envelopeElement.appendChild(resClientBalanceHoldData.toElement(document));
+        }
+
+        if (resRequestFeeding != null) {
+            envelopeElement.appendChild(resRequestFeeding.toElement(document));
+        }
+
+        if (requestFeedingData != null) {
+            envelopeElement.appendChild(requestFeedingData.toElement(document));
+        }
+
+        if (clientDiscountDTSZN != null) {
+            envelopeElement.appendChild(clientDiscountDTSZN.toElement(document));
         }
     }
 

@@ -48,7 +48,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     if (null == applicationForFood) {
                         applicationForFood = new ApplicationForFood(client, item.getDtisznCode(), status, item.getApplicantPhone(),
                                 item.getApplicantName(), item.getApplicantSecondName(), item.getApplicantSurname(),
-                                item.getIdOfOrgOnCreate(), nextVersion);
+                                item.getServNumber(), item.getCreatorType(), item.getIdOfDocOrder(), item.getDocOrderDate(), nextVersion);
                         session.save(applicationForFood);
                     } else {
                         applicationForFood.setClient(client);

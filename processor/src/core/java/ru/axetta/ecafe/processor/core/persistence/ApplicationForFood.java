@@ -20,12 +20,16 @@ public class ApplicationForFood {
     private String applicantSurname;
     private Date lastUpdate;
     private Boolean archived;
-    private Long idOfOrgOnCreate;
+    private String serviceNumber;
+    private ApplicationForFoodCreatorType creatorType;
+    private String idOfDocOrder;
+    private Date docOrderDate;
     private Long version;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
 
     public ApplicationForFood(Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName,
-            String applicantSecondName, String applicantSurname, Long idOfOrgOnCreate, Long version) {
+            String applicantSecondName, String applicantSurname, String serviceNumber, ApplicationForFoodCreatorType creatorType,
+            String idOfDocOrder, Date docOrderDate, Long version) {
         this.client = client;
         this.dtisznCode = dtisznCode;
         this.createdDate = new Date();
@@ -37,7 +41,10 @@ public class ApplicationForFood {
         this.lastUpdate = new Date();
         this.version = version;
         this.archived = false;
-        this.idOfOrgOnCreate = idOfOrgOnCreate;
+        this.serviceNumber = serviceNumber;
+        this.creatorType = creatorType;
+        this.idOfDocOrder = idOfDocOrder;
+        this.docOrderDate = docOrderDate;
     }
 
     public ApplicationForFood() {
@@ -148,11 +155,35 @@ public class ApplicationForFood {
         this.applicationForFoodHistories = applicationForFoodHistories;
     }
 
-    public Long getIdOfOrgOnCreate() {
-        return idOfOrgOnCreate;
+    public String getServiceNumber() {
+        return serviceNumber;
     }
 
-    public void setIdOfOrgOnCreate(Long idOfOrgOnCreate) {
-        this.idOfOrgOnCreate = idOfOrgOnCreate;
+    public void setServiceNumber(String serviceNumber) {
+        this.serviceNumber = serviceNumber;
+    }
+
+    public ApplicationForFoodCreatorType getCreatorType() {
+        return creatorType;
+    }
+
+    public void setCreatorType(ApplicationForFoodCreatorType creatorType) {
+        this.creatorType = creatorType;
+    }
+
+    public String getIdOfDocOrder() {
+        return idOfDocOrder;
+    }
+
+    public void setIdOfDocOrder(String idOfDocOrder) {
+        this.idOfDocOrder = idOfDocOrder;
+    }
+
+    public Date getDocOrderDate() {
+        return docOrderDate;
+    }
+
+    public void setDocOrderDate(Date docOrderDate) {
+        this.docOrderDate = docOrderDate;
     }
 }

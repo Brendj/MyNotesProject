@@ -574,5 +574,5 @@ public interface ClientRoomController {
     Result registerApplicationForFood(@WebParam(name = "clientGuid") String clientGuid, @WebParam(name = "categoryDiscount") Long categoryDiscount,
             @WebParam(name = "otherDiscount") Boolean otherDiscount, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "guardianName") String guardianName, @WebParam(name = "guardianSurname") String guardianSurname,
-            @WebParam(name = "guardianSecondName") String guardianSecondName);
+            @WebParam(name = "guardianSecondName") String guardianSecondName, @WebParam(name = "serviceNumber") String serviceNumber);
 }

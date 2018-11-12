@@ -9184,7 +9184,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result registerApplicationForFood(@WebParam(name = "clientGuid") String clientGuid, @WebParam(name = "categoryDiscount") Long categoryDiscount,
             @WebParam(name = "otherDiscount") Boolean otherDiscount, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "guardianName") String guardianName, @WebParam(name = "guardianSurname") String guardianSurname,
-            @WebParam(name = "guardianSecondName") String guardianSecondName) {
+            @WebParam(name = "guardianSecondName") String guardianSecondName, @WebParam(name = "serviceNumber") String serviceNumber) {
 
         String mobilePhone = Client.checkAndConvertMobile(guardianMobile);
         if (StringUtils.isEmpty(clientGuid) || (null == categoryDiscount && !otherDiscount) || StringUtils.isEmpty(mobilePhone)
@@ -9210,7 +9210,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             DAOUtils.createApplicationForFood(persistenceSession, client, otherDiscount ? null : categoryDiscount,
-                    mobilePhone, guardianName, guardianSecondName, guardianSurname);
+                    mobilePhone, guardianName, guardianSecondName, guardianSurname, serviceNumber, ApplicationForFoodCreatorType.PORTAL);
             DAOUtils.updateApplicationForFood(persistenceSession, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
 
             //if (!otherDiscount) {

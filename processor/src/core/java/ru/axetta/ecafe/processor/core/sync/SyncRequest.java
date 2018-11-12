@@ -23,6 +23,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers.ClientG
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientPhotosBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
+import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
@@ -2677,6 +2679,7 @@ public class SyncRequest {
             builders.add(new ClientBalanceHoldBuilder(idOfOrg));
             builders.add(new ClientBalanceHoldData.Builder(idOfOrg));
             builders.add(new RequestFeedingBuilder(idOfOrg));
+            builders.add(new ClientDiscountDTSZNBuilder(idOfOrg));
             return builders;
         }
 
@@ -2948,6 +2951,10 @@ public class SyncRequest {
 
     public RequestFeeding getRequestFeeding() {
         return this.<RequestFeeding>findSection(RequestFeeding.class);
+    }
+
+    public ClientDiscountsDTSZNRequest getClientDiscountDSZNRequest() {
+        return this.<ClientDiscountsDTSZNRequest>findSection(ClientDiscountsDTSZNRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

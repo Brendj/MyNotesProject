@@ -15,6 +15,7 @@ import java.util.Date;
 
 public class ResRequestFeedingItem {
     private Long applicationForFeedingNumber;
+    private String serviceNumber;
     private Long version;
     private Date regDate;
     private Long idOfClient;
@@ -32,6 +33,7 @@ public class ResRequestFeedingItem {
         this.regDate = applicationForFood.getCreatedDate();
         this.idOfClient = applicationForFood.getClient().getIdOfClient();
         this.applicantPhone = applicationForFood.getMobile();
+        this.serviceNumber = applicationForFood.getServiceNumber();
         this.code = resultCode;
     }
 
@@ -45,12 +47,18 @@ public class ResRequestFeedingItem {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             XMLUtils.setAttributeIfNotNull(element, "RegDate", simpleDateFormat.format(regDate));
         }
-        if (null != idOfClient)
+        if (null != idOfClient) {
             XMLUtils.setAttributeIfNotNull(element, "ClientId", idOfClient);
-        if (null != applicantPhone)
+        }
+        if (null != applicantPhone) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantPhone", applicantPhone);
-        if (null != code)
+        }
+        if (null != serviceNumber) {
+            XMLUtils.setAttributeIfNotNull(element, "ServNumber", serviceNumber);
+        }
+        if (null != code) {
             XMLUtils.setAttributeIfNotNull(element, "Code", code);
+        }
         if (code != null && code != 0) {
             XMLUtils.setAttributeIfNotNull(element, "Error", error);
         }
@@ -111,5 +119,13 @@ public class ResRequestFeedingItem {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public String getServiceNumber() {
+        return serviceNumber;
+    }
+
+    public void setServiceNumber(String serviceNumber) {
+        this.serviceNumber = serviceNumber;
     }
 }

@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 public enum ClientDTISZNDiscountStatus {
-    NONE(0,"Не указано"),
+    NOT_CONFIRMED(0,"Не подтверждена"),
     CONFIRMED(1,"Подтверждена"),
-    NOT_CONFIRMED(2,"Не подтверждена");
+    NONE(2,"Не указано");
 
     private final int value;
     private final String description;

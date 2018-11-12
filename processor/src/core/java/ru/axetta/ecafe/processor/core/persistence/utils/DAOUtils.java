@@ -3141,7 +3141,7 @@ public class DAOUtils {
         }
     }
 
-    public static ClientDtisznDiscountInfo getDTISZNDiscountInfoByClientAndCode(Session session, Client client, Integer code) {
+    public static ClientDtisznDiscountInfo getDTISZNDiscountInfoByClientAndCode(Session session, Client client, Long code) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("dtisznCode", code));
@@ -3664,11 +3664,13 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood createApplicationForFood(Session session, Client client, Long dtisznCode, String mobile,
-            String guardianName, String guardianSecondName, String guardianSurname) {
+            String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
+            ApplicationForFoodCreatorType creatorType) {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
         ApplicationForFood applicationForFood = new ApplicationForFood(client, dtisznCode,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null),
-                mobile, guardianName, guardianSecondName, guardianSurname, null, applicationForFoodVersion);
+                mobile, guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType, null,
+                null, applicationForFoodVersion);
         session.save(applicationForFood);
 
         addApplicationForFoodHistory(session, applicationForFood,
@@ -3762,5 +3764,22 @@ public class DAOUtils {
             logger.error("Can't get last active card by client with contractID: " + client.getContractId(), e);
             return  null;
         }
+    }
+
+    public static List<ClientDtisznDiscountInfo> getDTISZNDiscountsInfoByClientIdSinceVersion(Session session, Long idOfClient,
+            Long version) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("version", version));
+        return criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoByOrgIdSinceVersion(Session session, Long idOfOrg,
+            Long version) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.createAlias("client", "c");
+        criteria.add(Restrictions.eq("c.org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("version", version));
+        return criteria.list();
     }
 }

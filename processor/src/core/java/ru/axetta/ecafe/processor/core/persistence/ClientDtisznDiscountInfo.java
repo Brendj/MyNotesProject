@@ -9,12 +9,14 @@ import java.util.Date;
 public class ClientDtisznDiscountInfo {
     private Long idOfClientDTISZNDiscountInfo;
     private Client client;
-    private Integer dtisznCode;
+    private Long dtisznCode;
     private String dtisznDescription;
     private ClientDTISZNDiscountStatus status;
     private Date dateStart;
     private Date dateEnd;
     private Date createdDate;
+    private Long version;
+    private Boolean archived;
 
     public ClientDtisznDiscountInfo() {
 
@@ -36,11 +38,11 @@ public class ClientDtisznDiscountInfo {
         this.client = client;
     }
 
-    public Integer getDtisznCode() {
+    public Long getDtisznCode() {
         return dtisznCode;
     }
 
-    public void setDtisznCode(Integer dtisznCode) {
+    public void setDtisznCode(Long dtisznCode) {
         this.dtisznCode = dtisznCode;
     }
 
@@ -82,5 +84,21 @@ public class ClientDtisznDiscountInfo {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public Boolean getArchived() {
+        return archived;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
     }
 }

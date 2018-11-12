@@ -20,6 +20,7 @@ public class RequestFeedingItem {
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
     private Long applicationForFeedingNumber;
+    private String servNumber;
     private Integer status;
     private Integer declineReason;
     private Date applicationCreatedDate;
@@ -28,18 +29,22 @@ public class RequestFeedingItem {
     private String applicantName;
     private String applicantSecondName;
     private String applicantPhone;
-    private Long idOfOrgOnCreate;
+    private ApplicationForFoodCreatorType creatorType;
     private Long dtisznCode;
+    private String idOfDocOrder;
+    private Date docOrderDate;
     private Boolean isArchive;
+    private Boolean hasSocialDiscount;
     private String errorMessage;
     private Integer resCode;
     private Long version;
 
-    public RequestFeedingItem(Long applicationForFeedingNumber, Integer status, Integer declineReason,
+    public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status, Integer declineReason,
             Date applicationCreatedDate, Long idOfClient, String applicantSurname, String applicantName,
-            String applicantSecondName, String applicantPhone, Long idOfOrgOnCreate, Long dtisznCode,
-            Boolean isArchive, String errorMessage) {
+            String applicantSecondName, String applicantPhone, ApplicationForFoodCreatorType creatorType, Long dtisznCode,
+            String idOfDocOrder, Date docOrderDate, Boolean isArchive, String errorMessage) {
         this.applicationForFeedingNumber = applicationForFeedingNumber;
+        this.servNumber = servNumber;
         this.status = status;
         this.declineReason = declineReason;
         this.applicationCreatedDate = applicationCreatedDate;
@@ -48,8 +53,10 @@ public class RequestFeedingItem {
         this.applicantName = applicantName;
         this.applicantSecondName = applicantSecondName;
         this.applicantPhone = applicantPhone;
-        this.idOfOrgOnCreate = idOfOrgOnCreate;
+        this.creatorType = creatorType;
         this.dtisznCode = dtisznCode;
+        this.idOfDocOrder = idOfDocOrder;
+        this.docOrderDate = docOrderDate;
         this.isArchive = isArchive;
         if (errorMessage.isEmpty()) {
             this.setResCode(ERROR_CODE_ALL_OK);
@@ -70,10 +77,14 @@ public class RequestFeedingItem {
         this.applicantName = applicationForFood.getApplicantName();
         this.applicantSecondName = applicationForFood.getApplicantSecondName();
         this.applicantPhone = applicationForFood.getMobile();
-        this.idOfOrgOnCreate = applicationForFood.getIdOfOrgOnCreate();
         this.dtisznCode = applicationForFood.getDtisznCode();
         this.isArchive = applicationForFood.getArchived();
         this.version = applicationForFood.getVersion();
+        this.servNumber = applicationForFood.getServiceNumber();
+        this.creatorType = applicationForFood.getCreatorType();
+        this.idOfDocOrder = applicationForFood.getIdOfDocOrder();
+        this.docOrderDate = applicationForFood.getDocOrderDate();
+        this.hasSocialDiscount = (null != applicationForFood.getDtisznCode());
     }
 
     public static RequestFeedingItem build(Node itemNode, Long idOfOrg) throws Exception {
@@ -86,9 +97,12 @@ public class RequestFeedingItem {
         String applicantName;
         String applicantSecondName;
         String applicantPhone;
-        Long idOfOrgOnCreate;
         Long dtisznDiscount;
         Boolean archived;
+        String serviceNumber;
+        ApplicationForFoodCreatorType creatorType;
+        String idOfDocOrder;
+        Date docOrderDate;
 
         StringBuilder errorMessage = new StringBuilder();
 
@@ -152,8 +166,6 @@ public class RequestFeedingItem {
             errorMessage.append("Attribute ApplicantPhone is incorrect ");
         }
 
-        idOfOrgOnCreate = XMLUtils.getLongAttributeValue(itemNode, "OrgIdCreator");
-
         dtisznDiscount = XMLUtils.getLongAttributeValue(itemNode, "DiscountDtszn");
         if (null == dtisznDiscount) {
             errorMessage.append("Attribute DiscountDtszn not found ");
@@ -161,13 +173,25 @@ public class RequestFeedingItem {
 
         archived = XMLUtils.getBooleanAttributeValue(itemNode, "D");
 
-        return new RequestFeedingItem(applicationForFeedingNumber, state, declineReason, regDate, idOfClient,
-                applicantSurname, applicantName, applicantSecondName, applicantPhone, idOfOrgOnCreate, dtisznDiscount,
-                archived, errorMessage.toString());
+        serviceNumber = XMLUtils.getStringAttributeValue(itemNode, "ServNumber", 128);
+
+        creatorType = ApplicationForFoodCreatorType.fromCode(XMLUtils.getIntegerAttributeValue(itemNode, "CreatorType"));
+        if (null == creatorType) {
+            errorMessage.append("Attribute CreatorType not found ");
+        }
+
+        idOfDocOrder = XMLUtils.getStringAttributeValue(itemNode, "DocOrderId", 128);
+
+        docOrderDate = XMLUtils.getDateTimeAttributeValue(itemNode, "DocOrderDate");
+
+        return new RequestFeedingItem(applicationForFeedingNumber, serviceNumber, state, declineReason, regDate, idOfClient,
+                applicantSurname, applicantName, applicantSecondName, applicantPhone, creatorType, dtisznDiscount,
+                idOfDocOrder, docOrderDate, archived, errorMessage.toString());
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         if (null != applicationForFeedingNumber)
             XMLUtils.setAttributeIfNotNull(element, "Number", applicationForFeedingNumber);
         if (null != version)
@@ -177,7 +201,6 @@ public class RequestFeedingItem {
         if (null != declineReason)
             XMLUtils.setAttributeIfNotNull(element, "DeclineReason", declineReason);
         if (null != applicationCreatedDate) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
             XMLUtils.setAttributeIfNotNull(element, "RegDate", simpleDateFormat.format(applicationCreatedDate));
         }
         if (null != idOfClient)
@@ -190,13 +213,26 @@ public class RequestFeedingItem {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantSecName", applicantSecondName);
         if (null != applicantPhone)
             XMLUtils.setAttributeIfNotNull(element, "ApplicantPhone", applicantPhone);
-        if (null != idOfOrgOnCreate)
-            XMLUtils.setAttributeIfNotNull(element, "OrgIdCreator", idOfOrgOnCreate);
         if (null != dtisznCode) {
             XMLUtils.setAttributeIfNotNull(element, "DiscountDtszn", dtisznCode);
         }
         if (null != isArchive) {
             XMLUtils.setAttributeIfNotNull(element, "D", isArchive.toString());
+        }
+        if (null != servNumber) {
+            XMLUtils.setAttributeIfNotNull(element, "ServNumber", servNumber);
+        }
+        if (null != creatorType) {
+            XMLUtils.setAttributeIfNotNull(element, "CreatorType", creatorType.getCode());
+        }
+        if (null != idOfDocOrder) {
+            XMLUtils.setAttributeIfNotNull(element, "DocOrderId", idOfDocOrder);
+        }
+        if (null != docOrderDate) {
+            XMLUtils.setAttributeIfNotNull(element, "DocOrderDate", simpleDateFormat.format(docOrderDate));
+        }
+        if (null != hasSocialDiscount) {
+            XMLUtils.setAttributeIfNotNull(element, "InSocOrgans", hasSocialDiscount);
         }
         return element;
     }
@@ -273,14 +309,6 @@ public class RequestFeedingItem {
         this.applicantPhone = applicantPhone;
     }
 
-    public Long getIdOfOrgOnCreate() {
-        return idOfOrgOnCreate;
-    }
-
-    public void setIdOfOrgOnCreate(Long idOfOrgOnCreate) {
-        this.idOfOrgOnCreate = idOfOrgOnCreate;
-    }
-
     public Long getDtisznCode() {
         return dtisznCode;
     }
@@ -319,5 +347,45 @@ public class RequestFeedingItem {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public String getServNumber() {
+        return servNumber;
+    }
+
+    public void setServNumber(String servNumber) {
+        this.servNumber = servNumber;
+    }
+
+    public ApplicationForFoodCreatorType getCreatorType() {
+        return creatorType;
+    }
+
+    public void setCreatorType(ApplicationForFoodCreatorType creatorType) {
+        this.creatorType = creatorType;
+    }
+
+    public String getIdOfDocOrder() {
+        return idOfDocOrder;
+    }
+
+    public void setIdOfDocOrder(String idOfDocOrder) {
+        this.idOfDocOrder = idOfDocOrder;
+    }
+
+    public Date getDocOrderDate() {
+        return docOrderDate;
+    }
+
+    public void setDocOrderDate(Date docOrderDate) {
+        this.docOrderDate = docOrderDate;
+    }
+
+    public Boolean getHasSocialDiscount() {
+        return hasSocialDiscount;
+    }
+
+    public void setHasSocialDiscount(Boolean hasSocialDiscount) {
+        this.hasSocialDiscount = hasSocialDiscount;
     }
 }

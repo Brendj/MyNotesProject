@@ -12,7 +12,7 @@
             <generator class="identity"/>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient" not-null="true"/>
-        <property name="dtisznCode" column="DTISZNCode" type="integer" not-null="true"/>
+        <property name="dtisznCode" column="DTISZNCode" type="long" not-null="true"/>
         <property name="dtisznDescription" column="DTISZNDescription" type="string" length="512"/>
         <property name="status" column="Status" not-null="true">
             <type name="org.hibernate.type.EnumType">
@@ -22,5 +22,7 @@
         <property name="dateStart" column="DateStart" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="dateEnd" column="DateEnd" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="version" column="Version" type="long"/>
+        <property name="archived" column="archived" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
     </class>
 </hibernate-mapping>
