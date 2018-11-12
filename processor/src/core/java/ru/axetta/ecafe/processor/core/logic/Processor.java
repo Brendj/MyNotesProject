@@ -46,6 +46,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ComplexSche
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ComplexScheduleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ResComplexSchedules;
+import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
+import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
@@ -1012,6 +1015,8 @@ public class Processor implements SyncProcessor {
         fullProcessingClientBalanceHoldData(request, syncHistory, responseSections);
 
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
+
+        fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -6390,5 +6395,38 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return requestFeedingData;
+    }
+
+    private void fullProcessingClientDiscountDSZN(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            ClientDiscountsDTSZNRequest dsznRequest = request.getClientDiscountDSZNRequest();
+            if (null != dsznRequest) {
+                ClientDiscountDTSZN clientDiscountDTSZN = processClientDiscountsDTSZN(dsznRequest);
+                addToResponseSections(clientDiscountDTSZN, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingClientDiscountDSZN: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private ClientDiscountDTSZN processClientDiscountsDTSZN(ClientDiscountsDTSZNRequest dsznRequest)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ClientDiscountDTSZN clientDiscountDTSZN = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ClientDiscountDTSZNProcessor(persistenceSession, dsznRequest);
+            clientDiscountDTSZN = (ClientDiscountDTSZN) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return clientDiscountDTSZN;
     }
 }
