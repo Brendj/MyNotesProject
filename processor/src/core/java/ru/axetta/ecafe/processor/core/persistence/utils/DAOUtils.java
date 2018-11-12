@@ -3770,7 +3770,7 @@ public class DAOUtils {
             Long version) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
-        criteria.add(Restrictions.eq("version", version));
+        criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
 
@@ -3779,7 +3779,7 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.createAlias("client", "c");
         criteria.add(Restrictions.eq("c.org.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("version", version));
+        criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
 }

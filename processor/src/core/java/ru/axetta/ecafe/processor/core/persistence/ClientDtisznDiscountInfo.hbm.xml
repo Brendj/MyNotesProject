@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo" table="Cf_Client_DTISZN_Discount_Info"
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo" table="cf_client_dtiszn_discount_info"
            optimistic-lock="version">
         <id name="idOfClientDTISZNDiscountInfo" column="IdOfClientDTISZNDiscountInfo" type="long">
             <generator class="identity"/>
