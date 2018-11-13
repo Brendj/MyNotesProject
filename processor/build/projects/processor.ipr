@@ -547,7 +547,7 @@
   </component>
   <component name="DataSourceManagerImpl" format="xml" hash="3771474690">
     <data-source source="LOCAL" name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
-      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://172.18.16.14:5432/amoscow</jdbc-url>
@@ -558,7 +558,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="Kazan Stand VM" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
-      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://192.168.15.158:5432/akazan</jdbc-url>
@@ -569,7 +569,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="Local MoscowDB" uuid="cedfba61-0f44-4ced-9708-18045311d229">
-      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
@@ -582,7 +582,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="Local Stand Data Source" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
-      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_moscow_db_1</jdbc-url>
@@ -593,7 +593,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="SPB Data Base Source" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
-      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/aspb</jdbc-url>
@@ -604,7 +604,7 @@
       </libraries>
     </data-source>
     <data-source source="LOCAL" name="Moscow Last" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
-      <driver-ref>9219996b-47df-49a0-9535-f18a8cd53da1</driver-ref>
+      <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://172.18.16.24:5432/moscow_15_09_24</jdbc-url>
@@ -1757,6 +1757,19 @@
         <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-xjc.jar!/1.0" />
       </SOURCES>
     </library>
+    <library name="com.ibm.mq.commonservices">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/ibm/com.ibm.mq.commonservices.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/ibm/com.ibm.mq.headers.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/ibm/com.ibm.mq.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/ibm/com.ibm.mq.jmqi.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/ibm/com.ibm.mqjms.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/../lib/ibm/com.ibm.mq.jmqi.jar!/" />
+      </SOURCES>
+    </library>
     <library name="commons">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-beanutils-1.8.0.jar!/" />
@@ -1951,8 +1964,16 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" type="repository">
-      <properties maven-id="org.aopalliance:com.springsource.org.aopalliance:1.0.0" />
+    <library name="mockito-all-1.9.5">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/mockito-all-1.9.5.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/../lib/mockito-all-1.9.5.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="org.aopalliance:com.springsource.org.aopalliance:1.0.0">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/com.springsource.org.aopalliance-1.0.0.jar!/" />
       </CLASSES>
@@ -2014,6 +2035,13 @@
       <JAVADOC />
       <SOURCES />
       <jarDirectory url="file://$PROJECT_DIR$/../lib/xades" recursive="false" />
+    </library>
+    <library name="xercesImpl-2.9.1-jbossas-1">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/apache/xercesImpl-2.9.1-jbossas-1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
   </component>
 </project>
