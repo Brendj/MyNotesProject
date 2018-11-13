@@ -137,6 +137,7 @@ public class PreorderRequestsReportService extends RecoverableService {
             return;
 
         List<PreorderItemForDelete> preorderItemForDeleteList = new ArrayList<PreorderItemForDelete>();
+        Map<Long, List<String>> guidListForOrg = new HashMap<Long, List<String>>();
 
         Session session = null;
         Transaction transaction = null;
@@ -146,7 +147,7 @@ public class PreorderRequestsReportService extends RecoverableService {
 
             List<PreorderItem> preorderItemList = loadPreorders(session); //все актуальные предзаказы на завтра и дальше
             Map<Long, Integer> forbiddenDaysMap = new HashMap<Long, Integer>();
-            Map<Long, DatesForPreorder> datesMap = new HashMap<Long, DatesForPreorder>();
+            Map<Long, Map<Long, DatesForPreorder>> datesMap = new HashMap<Long, Map<Long, DatesForPreorder>>();
 
             for (PreorderItem item : preorderItemList) {
                 boolean itemWasDeleted = false;
@@ -180,14 +181,21 @@ public class PreorderRequestsReportService extends RecoverableService {
                     if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
                         forbiddenDaysCount -= 1;
 
-                    DatesForPreorder dates = datesMap.get(item.getIdOfOrg());
+                    DatesForPreorder dates = null;
+                    Map<Long, DatesForPreorder> orgMap = datesMap.get(item.getIdOfOrg());
+                    if (null != orgMap) {
+                        dates = orgMap.get(item.getIdOfClientGroup());
+                    }
                     if (dates == null) {
-                        if (!getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate))
+                        if (!getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate, item.getIdOfClientGroup()))
                             continue;
                         dates = new DatesForPreorder();
                         dates.startDate = startDate;
                         dates.endDate = endDate;
-                        datesMap.put(item.getIdOfOrg(), dates);
+                        if (null == orgMap) {
+                            datesMap.put(item.getIdOfOrg(), new HashMap<Long, DatesForPreorder>());
+                        }
+                        datesMap.get(item.getIdOfOrg()).put(item.getIdOfClientGroup(), dates);
                     }
                     startDate = dates.startDate;
                     endDate = dates.endDate;
@@ -208,10 +216,24 @@ public class PreorderRequestsReportService extends RecoverableService {
                             preorderItemForDeleteList.add(new PreorderItemForDelete(item.getIdOfClient(), item.getPreorderDate()));
                             continue;
                         }
-                        if (null == item.getDeleted() || !item.getDeleted())
-                            createRequestFromPreorder(session, item, fireTime);
+                        if (null == item.getDeleted() || !item.getDeleted()) {
+                            String guid = createRequestFromPreorder(session, item, fireTime);
+                            if (null != guid) {
+                                if (!guidListForOrg.containsKey(item.getIdOfOrg())) {
+                                    guidListForOrg.put(item.getIdOfOrg(), new ArrayList<String>());
+                                }
+                                guidListForOrg.get(item.getIdOfOrg()).add(guid);
+                            }
+                        }
+
                     } else {
-                        updateRequestFromPreorder(session, item, fireTime);
+                        String guid = updateRequestFromPreorder(session, item, fireTime);
+                        if (null != guid) {
+                            if (!guidListForOrg.containsKey(item.getIdOfOrg())) {
+                                guidListForOrg.put(item.getIdOfOrg(), new ArrayList<String>());
+                            }
+                            guidListForOrg.get(item.getIdOfOrg()).add(guid);
+                        }
                     }
                 } catch (Exception e) {
                     logger.warn("PreorderRequestsReportService: could not create GoodRequest");
@@ -229,75 +251,15 @@ public class PreorderRequestsReportService extends RecoverableService {
         calendarEnd.add(Calendar.MINUTE, 1);
         final Date endGenerateTime = calendarEnd.getTime();
 
-        Date now = CalendarUtils.startOfDay(new Date());
-        Date monthFinished = CalendarUtils.endOfDay(CalendarUtils.addMonth(startDate, 1));
-
-        List<Long> goodRequestOrgOwnerList = new ArrayList<Long>();
-
-        try {
-            session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            List<GoodRequest> goodRequestList = DAOUtils.getPreorderGoodRequestsByDate(session, now, monthFinished);
-
-            for (GoodRequest request : goodRequestList)
-                if (!goodRequestOrgOwnerList.contains(request.getOrgOwner()))
-                    goodRequestOrgOwnerList.add(request.getOrgOwner());
-
-            transaction.commit();
-            transaction = null;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-
-        for (Long orgOwner : goodRequestOrgOwnerList) {
-            Integer forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(orgOwner);
-            if (null == forbiddenDaysCount)
-                forbiddenDaysCount = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
-            if (forbiddenDaysCount != 0)
-                forbiddenDaysCount -= 1;
-
-            List<String> guids = getGoodRequestPositionGuids(orgOwner, forbiddenDaysCount);
-            if (!guids.isEmpty())
+        for (Long orgOwner : guidListForOrg.keySet()) {
+            List<String> guids = guidListForOrg.get(orgOwner);
+            if (null != guids && !guids.isEmpty())
                 notifyOrg(orgOwner, fireTime, endGenerateTime, lastCreateOrUpdateDate, guids);
         }
     }
 
-    private List<String> getGoodRequestPositionGuids(Long orgOwner, Integer forbiddenDaysCount) {
-        Session session = null;
-        Transaction transaction = null;
-        List<String> resultList = new ArrayList<String>();
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            Date startDate = new Date();
-            Date endDate = new Date();
-
-            if (!getPreorderDates(session, orgOwner, forbiddenDaysCount, startDate, endDate))
-                return new ArrayList<String>();
-
-            Criteria criteria = session.createCriteria(GoodRequestPosition.class);
-            criteria.createAlias("goodRequest", "gr");
-            criteria.add(Restrictions.between("gr.doneDate", startDate, endDate));
-            criteria.add(Restrictions.eq("notified", Boolean.FALSE));
-            criteria.add(Restrictions.eq("orgOwner", orgOwner));
-            criteria.setProjection(Projections.projectionList().add(Projections.property("guid")));
-            resultList = criteria.list();
-
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-        return resultList;
-    }
-
-    private Boolean getPreorderDates(Session session, Long orgOwner, Integer forbiddenDaysCount, Date startDate, Date endDate) {
+    private Boolean getPreorderDates(Session session, Long orgOwner, Integer forbiddenDaysCount, Date startDate,
+            Date endDate, Long idOfClientGroup) {
         Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
         Date _startDate = CalendarUtils.truncateToDayOfMonth(new Date());
         Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
@@ -307,6 +269,14 @@ public class PreorderRequestsReportService extends RecoverableService {
         specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
         specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
         specialDaysCriteria.add(Restrictions.between("date", _startDate, specialDaysMonth));
+        if (null != idOfClientGroup) {
+            specialDaysCriteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+            specialDaysCriteria.setProjection(Projections.projectionList()
+                    .add(Projections.property("date"))
+                    .add(Projections.property("idOfClientGroup")));
+        } else {
+            specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.max("date")));
+        }
 
         List<SpecialDate> specialDates = specialDaysCriteria.list();
 
@@ -455,7 +425,8 @@ public class PreorderRequestsReportService extends RecoverableService {
               + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
               + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
               + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
-              + "   c.balance, c.idofclient, (coalesce(pc.deletedstate=1, false) OR coalesce(pmd.deletedstate=1, false)) AS isdeleted "
+              + "   c.balance, c.idofclient, (coalesce(pc.deletedstate=1, false) OR coalesce(pmd.deletedstate=1, false)) AS isdeleted,"
+              + "   c.idofclientgroup "
               + "FROM cf_preorder_complex pc "
               + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
               + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -464,12 +435,10 @@ public class PreorderRequestsReportService extends RecoverableService {
               + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
               + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
               + "WHERE pc.preorderdate > :date "
-              + "   and ((pc.amount <> 0 OR pmd.amount <> 0) OR (coalesce(pc.deletedstate = 1, false) OR coalesce(pmd.deletedstate = 1, false)))"; //AND pc.deletedstate=0
-              //+ "WHERE pc.lastupdate BETWEEN :startTime AND :endTime AND pc.deletedstate=0";
+              + "   and ((pc.amount <> 0 OR pmd.amount <> 0) OR (coalesce(pc.deletedstate = 1, false) OR coalesce(pmd.deletedstate = 1, false)))";
+
         Query query = session.createSQLQuery(sqlQuery);
         query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
-        //query.setParameter("startTime", startDate.getTime());
-        //query.setParameter("endTime", endDate.getTime());
         List data = query.list();
         for (Object entry : data) {
             Object o[] = (Object[]) entry;
@@ -490,17 +459,18 @@ public class PreorderRequestsReportService extends RecoverableService {
             Long idOfClient = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
             Boolean isDeleted = (Boolean) o[14];
             Boolean isComplex = !complexAmount.equals(0);
+            Long idOfClientGroup = (null != o[15]) ? ((BigInteger) o[15]).longValue() : null;
 
             preorderItemList
                     .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                             createdDate, idOfGoodsRequest, preorderDate,
                             complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance, idOfClient,
-                            isDeleted, isComplex));
+                            isDeleted, isComplex, idOfClientGroup));
         }
         return preorderItemList;
     }
 
-    private void createRequestFromPreorder(Session session, PreorderItem preorderItem, Date fireTime) {
+    private String createRequestFromPreorder(Session session, PreorderItem preorderItem, Date fireTime) {
         //  Формируем номер по маске {idOfOrg}-{yyMMdd}-ЗВК-{countToDay}
         Date now = new Date(System.currentTimeMillis());
         String number = "";
@@ -513,7 +483,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         Staff staff = DAOUtils.getAdminStaffFromOrg(session, preorderItem.getIdOfOrg());
 
         if (null == good || null == staff)
-            return;
+            return null;
 
         //  Создание GoodRequest
         GoodRequest goodRequest = new GoodRequest();
@@ -558,13 +528,15 @@ public class PreorderRequestsReportService extends RecoverableService {
             session.update(detail);
         }
         session.flush();
+
+        return pos.getGuid();
     }
 
-    private void updateRequestFromPreorder(Session session, PreorderItem item, Date fireTime) {
+    private String updateRequestFromPreorder(Session session, PreorderItem item, Date fireTime) {
         GoodRequestPosition pos = (GoodRequestPosition) session.load(GoodRequestPosition.class, item.getIdOfGoodsRequestPosition());
         if (null == pos) {
             logger.error("PreorderRequestsReportService: could not find GoodRequestPosition with id=" + item.getIdOfGoodsRequestPosition().toString());
-            return;
+            return null;
         }
         Boolean isUpdated = false;
 
@@ -594,7 +566,9 @@ public class PreorderRequestsReportService extends RecoverableService {
 
         if (isUpdated) {
             session.flush();
+            return pos.getGuid();
         }
+        return null;
     }
 
     public <T extends ConsumerRequestDistributedObject> T save(Session session, T object, String className) {
@@ -944,10 +918,11 @@ public class PreorderRequestsReportService extends RecoverableService {
         private Long idOfClient;
         private Boolean isDeleted;
         private Boolean isComplex;
+        private Long idOfClientGroup;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
                 Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance,
-                Long idOfClient, Boolean isDeleted, Boolean isComplex) {
+                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -961,6 +936,7 @@ public class PreorderRequestsReportService extends RecoverableService {
             this.idOfClient = idOfClient;
             this.isDeleted = isDeleted;
             this.isComplex = isComplex;
+            this.idOfClientGroup = idOfClientGroup;
         }
 
         public PreorderItem() {
@@ -1069,6 +1045,14 @@ public class PreorderRequestsReportService extends RecoverableService {
 
         public void setComplex(Boolean complex) {
             isComplex = complex;
+        }
+
+        public Long getIdOfClientGroup() {
+            return idOfClientGroup;
+        }
+
+        public void setIdOfClientGroup(Long idOfClientGroup) {
+            this.idOfClientGroup = idOfClientGroup;
         }
     }
 
