@@ -3,6 +3,7 @@
         <dependencies>
             <module name="org.apache.commons.logging"/>
             <module name="org.apache.commons.collections"/>
+            <module name="org.apache.xerces"/>
             <module name="org.hibernate"/>
             <module name="org.slf4j"/>
             <module name="org.apache.cxf"/>
@@ -17,6 +18,7 @@
                 </imports>
             </module>
             <module name="com.ibm.icu"/>
+            <module name="com.ibm.mq"/>
             <module name="org.apache.ws.security"/>
             <module name="org.springframework.spring">
                 <imports>
