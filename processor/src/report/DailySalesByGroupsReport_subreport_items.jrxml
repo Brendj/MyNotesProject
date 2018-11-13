@@ -23,7 +23,7 @@
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement/>
+				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{originName}]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -35,7 +35,7 @@
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
 			</textField>
 			<textField>
@@ -47,7 +47,7 @@
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sum}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 			<textField>

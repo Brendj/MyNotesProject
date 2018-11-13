@@ -21,6 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -191,15 +193,18 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         public class SubReportMealRow implements Comparable<SubReportMealRow> {
 
             private String name;
-            private long count, price, sum;
+            private Integer count;
+            private Long price;
+            private Long sum;
             private Long countCash;
             private Long countCard;
             private Long sumCash;
             private Long sumCard;
             private Long countCashAndCard;
             private Long sumCashAndCard;
+            private HashMap<String, SubReportMealRow> dishesList;
 
-            public SubReportMealRow(String name, long count, long price, long sum,
+            public SubReportMealRow(String name, Integer count, Long price, Long sum,
                     Long countCash, Long countCard, Long sumCash, Long sumCard, Long countCashAndCard, Long sumCashAndCard) {
                 this.name = name;
                 this.count = count;
@@ -211,22 +216,35 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 this.setSumCard(sumCard);
                 this.setCountCashAndCard(countCashAndCard);
                 this.setSumCashAndCard(sumCashAndCard);
+                this.dishesList = new HashMap<String, SubReportMealRow>();
             }
 
             public String getName() {
                 return name;
             }
 
-            public long getCount() {
+            public Integer getCount() {
                 return count;
             }
 
-            public long getPrice() {
+            public Long getPrice() {
                 return price;
             }
 
-            public long getSum() {
+            public Long getSum() {
                 return sum;
+            }
+
+            public void setCount(Integer count) {
+                this.count = count;
+            }
+
+            public void setPrice(Long price) {
+                this.price = price;
+            }
+
+            public void setSum(Long sum) {
+                this.sum = sum;
             }
 
             @Override
@@ -281,6 +299,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             public void setSumCashAndCard(Long sumCashAndCard) {
                 this.sumCashAndCard = sumCashAndCard;
             }
+
+            public HashMap<String, SubReportMealRow> getDishesList() {
+                return dishesList;
+            }
+
+            public void setDishesList(HashMap<String, SubReportMealRow> dishesList) {
+                this.dishesList = dishesList;
+            }
         }
 
         public class TotalMealRow {
@@ -300,7 +326,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 return count;
             }
 
-            public void setCount(long count) {
+            public void setCount(Integer count) {
                 this.count = count;
             }
 
@@ -543,7 +569,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     menuGroup = vals[0].toString();
                 }
                 menuName = (String) vals[1];
-                long count = Long.parseLong(vals[2].toString());
+                Integer count = Integer.parseInt(vals[2].toString());
                 long rPrice = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
                 long sum = vals[4] == null ? 0 : Long.parseLong(vals[4].toString());
 
@@ -608,6 +634,8 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             long totalUnPaidCount = 0, totalUnPaidSum = 0;
             long totalUnPaidTempClientsCount = 0, totalUnPaidTempClientsSum = 0;
             long totalPayCount = 0, totalPaySum = 0;
+            Long totalPreorderCount = 0L;
+            Long totalPreorderSum = 0L;
 
             totalCount = 0;
             totalSum = 0;
@@ -618,6 +646,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             totalCountMixed = 0;
             totalSumMixed = 0;
 
+            List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
             if (includeComplex) {
                 Query complexQuery_1 = session.createSQLQuery(
                         "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum, " +
@@ -625,9 +654,14 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                                 + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
                                 + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
                                 + "ELSE 'other' END AS flag "
-                                + String.format("FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE %s AND (o.IdOfOrder=od.IdOfOrder) AND", orgAdditionalCondition)
-                                + " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND "
-                                + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 "
+                                + "FROM CF_ORDERS o "
+                                + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder "
+                                + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder"
+                                + " WHERE "
+                                + orgAdditionalCondition
+                                + " AND (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND "
+                                + " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND o.state=0 AND od.state=0 AND "
+                                + " pl.idofpreorderlinkod IS NULL "
                                 + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, flag");
 
                 complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
@@ -646,7 +680,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     vals = (Object[]) o;
                     //int menuOrigin = Integer.parseInt(vals[0].toString());
                     String menuNamePay = vals[4].toString(); // od.MenuType
-                    long count = Long.parseLong(vals[1].toString());
+                    Integer count = Integer.parseInt(vals[1].toString());
                     long rPrice = vals[2] == null ? 0 : Long.parseLong(vals[2].toString());
                     long sum = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
                     long discount = vals[5] == null ? 0 : Long.parseLong(vals[5].toString());
@@ -688,16 +722,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 subReportDataRowsPay.add(new SubReportDataRow(menuGroupPay, totalCount, totalSum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
                         totalCountMixed, totalSumMixed));
 
-                long totalPayAndBuffetCount = totalBuffetCount + totalPayCount;
-                long totalPayAndBuffetSum = totalBuffetSum + totalPaySum;
-
-                totalDataRows
-                        .add(new TotalDataRow("Платное комплексное питание + Буфет ВСЕГО: ", totalPayAndBuffetCount,
-                                totalPayAndBuffetSum, subReportDataRowsPay));
-
                 //// бесплатное питание по своей ОО
-
-                List<SubReportDataRow> subReportDataRowsUnPaid = new LinkedList<SubReportDataRow>();
 
                 Query freeComplexQuery1 = session.createSQLQuery(
                         "SELECT od.MenuType, SUM(od.Qty) AS qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount "
@@ -728,7 +753,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     vals = (Object[]) o;
                     //int menuOrigin = Integer.parseInt(vals[0].toString());
                     String menuNameUnPaid = vals[4].toString(); // od.MenuType
-                    long count = Long.parseLong(vals[1].toString());
+                    Integer count = Integer.parseInt(vals[1].toString());
                     long rPrice = vals[2] == null ? 0 : Long.parseLong(vals[2].toString());
                     long sum = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
                     long socdiscount = vals[5] == null ? 0 : Long.parseLong(vals[5].toString());
@@ -783,7 +808,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 for (Object o : mealsList) {
                     vals = (Object[]) o;
                     String menuNameUnPaidTempClients = vals[4].toString(); // od.MenuType
-                    long count = Long.parseLong(vals[1].toString());
+                    Integer count = Integer.parseInt(vals[1].toString());
                     long rPrice = vals[2] == null ? 0 : Long.parseLong(vals[2].toString());
                     long sum = vals[3] == null ? 0 : Long.parseLong(vals[3].toString());
                     long socdiscount = vals[5] == null ? 0 : Long.parseLong(vals[5].toString());
@@ -801,27 +826,198 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
                 subReportDataRowsUnPaid.add(new SubReportDataRow(menuGroupUnPaidTempClients, totalCount, totalSum, totalCountCash, totalCountCard, totalSumCash, totalSumCard,
                         totalCountMixed, totalSumMixed));
-
-                long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount + totalUnPaidTempClientsCount;
-                long totalByAllSum = totalBuffetSum + totalPaySum + totalUnPaidSum + totalUnPaidTempClientsSum;
-
-                totalDataRows.add(new TotalDataRow("ОБЩЕЕ: ", totalByAllCount, totalByAllSum, subReportDataRowsUnPaid));
             }
+
+            // предзаказы
+            Query preordersQuery = session.createSQLQuery(
+                    "SELECT od.MenuType, od.Qty, od.RPrice, od.Qty*od.RPrice AS sum, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, "
+                     + "    CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
+                     + "        WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
+                     + "        WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
+                     + "        ELSE 'other' END AS flag "
+                     + "    , pmd.menudetailname AS preorderMenuDetailName, pmd.menudetailprice, pmd.amount, "
+                     + "    pc.modeofadd, pc.armcomplexid, pmd.itemcode "
+                     + "FROM cf_orders o "
+                     + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder AND od.idoforg = o.idoforg "
+                     + "INNER JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
+                     + "INNER JOIN cf_preorder_complex pc ON pl.preorderguid = pc.guid "
+                     + "LEFT JOIN "
+                     + "    (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.amount, pmd.itemcode "
+                     + "        FROM cf_preorder_menudetail pmd "
+                     + "        WHERE pmd.amount > 0 "
+                     + "    ) pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex "
+                     + "WHERE "
+                     + orgAdditionalCondition
+                     + "    AND od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax AND od.rPrice > 0 AND "
+                     + "    o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime AND o.state=0 AND od.state=0 "
+                     + "ORDER BY 1, 11, 10");
+
+            preordersQuery.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+            preordersQuery.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+            preordersQuery.setParameter("startTime", startTime.getTime());
+            preordersQuery.setParameter("endTime", endTime.getTime());
+
+            mealsList = preordersQuery.list();
+
+            String menuGroupPay = "Платное питание - предзаказ";
+
+            MealRow mealRowPay = new MealRow(menuGroupPay, new ArrayList<SubReportMealRow>());
+            mealRowHashMap.put(menuGroupPay, mealRowPay);
+
+            HashMap<Integer, SubReportMealRow> complexMap = new HashMap<Integer, SubReportMealRow>();
+
+            totalCountCash = 0L;
+            totalCountCard = 0L;
+            totalSumCash = 0L;
+            totalSumCard = 0L;
+            totalCountMixed = 0L;
+            totalSumMixed = 0L;
+
+            for (Object o : mealsList) {
+                vals = (Object[]) o;
+                Integer qty = (Integer) vals[1];
+                Long rPrice = ((BigInteger) vals[2]).longValue();
+                Long sum = ((BigInteger) vals[3]).longValue();
+                String menuNamePay = vals[4].toString();
+                Long discount = ((BigInteger) vals[5]).longValue();
+                Long socialDiscount = ((BigInteger) vals[6]).longValue();
+                Long grantSum = ((BigInteger) vals[7]).longValue();
+                String payType = (String) vals[8];
+                String menuDetailName = (String) vals[9];
+                Long menuDetailPrice = null == vals[10] ? null : ((BigInteger) vals[10]).longValue();
+                Integer amount = (Integer) vals[11];
+                Integer modeOfAdd = (Integer) vals[12];
+                Integer armComplexId = (Integer) vals[13];
+                String itemCode = (String) vals[14];
+                menuDetailName = String.format("%s (%s)", menuDetailName, itemCode);
+                Long tradeDiscount = (long) (
+                        ((double) (discount - socialDiscount) / (double) (discount + socialDiscount + rPrice + grantSum))
+                                * 100);
+                if (tradeDiscount > 0) {
+                    menuNamePay = String.format("%s (скидка %d%%)", menuNamePay, tradeDiscount);
+                }
+
+                Integer countCash = 0;
+                Integer countCard = 0;
+                Long sumCash = 0L;
+                Long sumCard = 0L;
+                Integer countMixed = 0;
+                Long sumMixed = 0L;
+
+                if (payType.equals("cash")) {
+                    if (null != modeOfAdd && modeOfAdd.equals(2)) {
+                        countCash = qty;
+                        sumCash = sum;
+                    } else if (null != modeOfAdd && modeOfAdd.equals(4)) {
+                        countCash = amount;
+                        sumCash = menuDetailPrice * amount;
+                    }
+                } else if (payType.equals("card")) {
+                    if (null != modeOfAdd && modeOfAdd.equals(2)) {
+                        countCard = qty;
+                        sumCard = sum;
+                    } else if (null != modeOfAdd && modeOfAdd.equals(4)) {
+                        countCard = amount;
+                        sumCard = menuDetailPrice * amount;
+                    }
+                } else if (payType.equals("mixed")) {
+                    if (null != modeOfAdd && modeOfAdd.equals(2)) {
+                        countMixed = qty;
+                        sumMixed = sum;
+                    } else if (null != modeOfAdd && modeOfAdd.equals(4)) {
+                        countMixed = amount;
+                        sumMixed = menuDetailPrice * amount;
+                    }
+                }
+
+                totalCount += qty;
+                totalSum += sum;
+                totalCountCash += countCash;
+                totalCountCard += countCard;
+                totalSumCash += sumCash;
+                totalSumCard += sumCard;
+                totalCountMixed += countMixed;
+                totalSumMixed += sumMixed;
+
+                if (null != modeOfAdd && modeOfAdd.equals(2)) {
+                    subReportMealRow = complexMap.get(armComplexId);
+                    if (null == subReportMealRow) {
+                        subReportMealRow = new SubReportMealRow(menuNamePay, qty, rPrice, sum, totalCountCash,
+                                totalCountCard, totalSumCash, totalSumCard, totalCountMixed, totalSumMixed);
+                        complexMap.put(armComplexId, subReportMealRow);
+                        totalPreorderSum += sum;
+                    } else {
+                        subReportMealRow.setCount(subReportMealRow.getCount() + qty);
+                        subReportMealRow.setSum(subReportMealRow.getSum() + qty * rPrice);
+                        totalPreorderSum += qty * rPrice;
+                    }
+                    totalPreorderCount += qty;
+                } else if (null != modeOfAdd && modeOfAdd.equals(4)) {
+                    subReportMealRow = complexMap.get(armComplexId);
+                    if (null == subReportMealRow) {
+                        subReportMealRow = new SubReportMealRow(menuNamePay, null, null, null, totalCountCash,
+                                totalCountCard, totalSumCash, totalSumCard, totalCountMixed, totalSumMixed);
+                        complexMap.put(armComplexId, subReportMealRow);
+                    }
+                    HashMap<String, SubReportMealRow> dishMap = subReportMealRow.getDishesList();
+                    if (null == dishMap.get(itemCode)) {
+                        dishMap.put(itemCode, new SubReportMealRow(menuDetailName, amount, menuDetailPrice, amount * menuDetailPrice, totalCountCash,
+                                totalCountCard, totalSumCash, totalSumCard, totalCountMixed, totalSumMixed));
+                    } else {
+                        SubReportMealRow mealRow = dishMap.get(itemCode);
+                        mealRow.setCount(mealRow.getCount() + amount);
+                        mealRow.setSum(mealRow.getSum() + amount * menuDetailPrice);
+                    }
+                    totalPreorderSum += amount * menuDetailPrice;
+                    totalPreorderCount += amount;
+                }
+            }
+
+            mealRowHashMap.get(menuGroupPay).getSubReportMealRowList().addAll(complexMap.values());
+
+            mealRowHashMap.get(menuGroupPay).setMealCountGroupTotal(totalPreorderCount);
+            mealRowHashMap.get(menuGroupPay).setMealSumGroupTotal(totalPreorderSum);
+
+            subReportDataRowsPay.add(new SubReportDataRow(menuGroupPay, totalPreorderCount, totalPreorderSum, totalCountCash,
+                    totalCountCard, totalSumCash, totalSumCard, totalCountMixed, totalSumMixed));
+
+            totalDataRows.add(new TotalDataRow("Платное комплексное питание + Предзаказ ВСЕГО: ",
+                    totalPreorderCount + totalPayCount, totalPreorderSum + totalPaySum,
+                    subReportDataRowsPay));
+            totalDataRows.add(new TotalDataRow("Платное комплексное питание + Предзаказ + Буфет ВСЕГО: ",
+                    totalPreorderCount + totalPayCount + totalBuffetCount, totalPreorderSum + totalPaySum + totalBuffetSum,
+                    Collections.<SubReportDataRow>emptyList()));
+
+            long totalByAllCount = totalBuffetCount + totalPayCount + totalUnPaidCount + totalUnPaidTempClientsCount + totalPreorderCount;
+            long totalByAllSum = totalBuffetSum + totalPaySum + totalUnPaidSum + totalUnPaidTempClientsSum + totalPreorderSum;
+
+            totalDataRows.add(new TotalDataRow("ОБЩЕЕ: ", totalByAllCount, totalByAllSum, subReportDataRowsUnPaid));
 
             //Сбор итоговых данных "Платное комплексное питание"
             List mealsPayTotals;
 
             Query payComplexQueryTotal = session.createSQLQuery(
-                    "SELECT SUM(od.Qty) AS qtySum, SUM(od.Qty * od.RPrice), "
-                            + "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) THEN 'cash' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) THEN 'card' "
-                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
-                            + "ELSE 'other' END AS flag FROM CF_ORDERS o, CF_ORDERDETAILS od "
+                    "SELECT CASE WHEN pc.modeofadd = 2 THEN SUM(od.Qty) "
+                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount) ELSE 0 END AS amount, "
+                            + "CASE WHEN pc.modeofadd = 2 THEN SUM(od.Qty * od.RPrice) "
+                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount * pmd.menudetailprice) ELSE 0 END AS price, "
+                            + "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NULL THEN 'cash' "
+                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NULL THEN 'card' "
+                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NULL THEN 'mixed' "
+                            + "WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pcash' "
+                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pcard' "
+                            + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pmixed' "
+                            + "ELSE 'other' END AS flag FROM CF_ORDERS o "
+                            + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder AND o.idoforg = od.idoforg "
+                            + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
+                            + "LEFT JOIN cf_preorder_complex pc ON pc.guid = pl.preorderguid "
+                            + "LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex AND pc.amount = 0"
                             + String.format("WHERE %s AND (o.IdOfOrder = od.IdOfOrder) ", orgAdditionalCondition)
                             + "AND (od.MenuType >= :typeComplexMin AND od.MenuType <= :typeComplexMax) "
                             + "AND (od.rPrice > 0) AND (o.CreatedDate >= :startTime AND o.CreatedDate <= :endTime) "
                             + "AND o.state = 0 AND od.state = 0 "
-                            + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum, o.sumbycard, o.sumbycash");
+                            + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, "
+                            + "o.grantsum, o.sumbycard, o.sumbycash, pl.idofpreorderlinkod, pc.modeofadd");
             payComplexQueryTotal.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             payComplexQueryTotal.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
             payComplexQueryTotal.setParameter("startTime", startTime.getTime());
@@ -838,6 +1034,15 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             mealCountSumByCashAndSumByCardTotal = 0;
             mealSumSumByCardAndSumByCashTotal = 0;
 
+            Long preorderMealCountSumByCashTotal = 0L;
+            Long preorderMealSumSumByCashTotal = 0L;
+
+            Long preorderMealCountSumByCardTotal = 0L;
+            Long preorderMealSumSumByCardTotal = 0L;
+
+            Long preorderMealCountSumByCashAndSumByCardTotal = 0L;
+            Long preorderMealSumSumByCardAndSumByCashTotal = 0L;
+
             for (Object mealsTot : mealsPayTotals) {
                 vals = (Object[]) mealsTot;
 
@@ -850,6 +1055,15 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 } else if (vals[2].toString().equals("mixed")) {
                     mealCountSumByCashAndSumByCardTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
                     mealSumSumByCardAndSumByCashTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
+                } else if (vals[2].toString().equals("pcash")) {
+                    preorderMealCountSumByCashTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
+                    preorderMealSumSumByCashTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
+                } else if (vals[2].toString().equals("pcard")) {
+                    preorderMealCountSumByCardTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
+                    preorderMealSumSumByCardTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
+                } else if (vals[2].toString().equals("pmixed")) {
+                    preorderMealCountSumByCashAndSumByCardTotal += vals[0] == null ? 0 : Long.parseLong(vals[0].toString());
+                    preorderMealSumSumByCardAndSumByCashTotal += vals[1] == null ? 0 : Long.parseLong(vals[1].toString());
                 }
             }
 
@@ -875,6 +1089,17 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     .setMealCountSumByCashAndSumByCardTotal(null);
             mealRowHashMap.get("Бесплатное комплексное питание")
                     .setMealSumSumByCardAndSumByCashTotal(null);
+
+            mealRowHashMap.get("Платное питание - предзаказ").setMealCountSumByCardTotal(preorderMealCountSumByCardTotal);
+            mealRowHashMap.get("Платное питание - предзаказ").setMealSumSumByCardTotal(preorderMealSumSumByCardTotal);
+
+            mealRowHashMap.get("Платное питание - предзаказ").setMealCountSumByCashTotal(preorderMealCountSumByCashTotal);
+            mealRowHashMap.get("Платное питание - предзаказ").setMealSumSumByCashTotal(preorderMealSumSumByCashTotal);
+
+            mealRowHashMap.get("Платное питание - предзаказ")
+                    .setMealCountSumByCashAndSumByCardTotal(preorderMealCountSumByCashAndSumByCardTotal);
+            mealRowHashMap.get("Платное питание - предзаказ")
+                    .setMealSumSumByCardAndSumByCashTotal(preorderMealSumSumByCardAndSumByCashTotal);
 
             //Сбор данных "Централизованное", "Собственное", "Закупленное", "Централизованное с доготовкой"
             List mealBuffetList;

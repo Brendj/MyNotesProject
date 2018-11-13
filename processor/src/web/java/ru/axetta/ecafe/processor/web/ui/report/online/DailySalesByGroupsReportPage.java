@@ -54,6 +54,7 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
     private String menuGroups = "";
     private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
     private boolean includeFriendlyOrgs = false;
+    private boolean preordersOnly = false;
 
     public DailySalesByGroupsReportPage() throws RuntimeContext.NotInitializedException {
         super();
@@ -110,6 +111,13 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         this.includeFriendlyOrgs = includeFriendlyOrgs;
     }
 
+    public boolean isPreordersOnly() {
+        return preordersOnly;
+    }
+
+    public void setPreordersOnly(boolean preordersOnly) {
+        this.preordersOnly = preordersOnly;
+    }
 
     public void showCSVList(ActionEvent actionEvent){
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -118,19 +126,24 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             List<BasicReportJob.OrgShortItem> orgShortItemList;
-            if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
-                List<Long> orgIdsList;
-                if(includeFriendlyOrgs) {
-                    orgIdsList = getFriendlyOrgsIds(persistenceSession);
-                }else {
-                    orgIdsList = idOfOrgList;
-                }
-                orgShortItemList = getOrgShortItemList(orgIdsList);
-            } else {
+            if (idOfOrgList == null || idOfOrgList.isEmpty()) {
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация!", null));
                 return;
             }
+            List<Long> orgIdsList;
+            if(includeFriendlyOrgs) {
+                orgIdsList = getFriendlyOrgsIds(persistenceSession);
+            }else {
+                orgIdsList = checkOrgIdListForPreorder(persistenceSession, idOfOrgList);
+            }
+            if (orgIdsList == null || orgIdsList.isEmpty()) {
+                facesContext.addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация, удовлетворяющая фильтру", null));
+                return;
+            }
+            orgShortItemList = getOrgShortItemList(orgIdsList);
+
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
             DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
@@ -175,19 +188,23 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
         Session persistenceSession = (Session) em.getDelegate();
         List<BasicReportJob.OrgShortItem> orgShortItemList;
 
-        if (idOfOrgList != null && !idOfOrgList.isEmpty()) {
-            List<Long> orgIdsList;
-            if(includeFriendlyOrgs) {
-                orgIdsList = getFriendlyOrgsIds(persistenceSession);
-            }else {
-                orgIdsList = idOfOrgList;
-            }
-            orgShortItemList = getOrgShortItemList(orgIdsList);
-        } else {
+        if (idOfOrgList == null || idOfOrgList.isEmpty()) {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация!", null));
             return;
         }
+        List<Long> orgIdsList;
+        if(includeFriendlyOrgs) {
+            orgIdsList = getFriendlyOrgsIds(persistenceSession);
+        }else {
+            orgIdsList = checkOrgIdListForPreorder(persistenceSession, idOfOrgList);
+        }
+        if (orgIdsList == null || orgIdsList.isEmpty()) {
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Не выбрана ни одна организация, удовлетворяющая фильтру", null));
+            return;
+        }
+        orgShortItemList = getOrgShortItemList(orgIdsList);
 
         try {
             buildReport(persistenceSession, orgShortItemList);
@@ -251,7 +268,8 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
     private List<Long> getFriendlyOrgsIds(Session session) {
         List<Long> tempIds = new ArrayList<Long>();
         for(Long orgId : idOfOrgList) {
-            tempIds.addAll(DAOUtils.findFriendlyOrgIds(session, orgId));
+            List<Long> friendlyOrgIdList = DAOUtils.findFriendlyOrgIds(session, orgId);
+            tempIds.addAll(checkOrgIdListForPreorder(session, friendlyOrgIdList));
         }
         Set<Long> distinctIds = new HashSet<Long>(tempIds); //remove doubles
         return new ArrayList<Long>(distinctIds);
@@ -266,5 +284,19 @@ public class DailySalesByGroupsReportPage extends OnlineReportPage {
                     org.getOfficialName()));
         }
         return list;
+    }
+
+    private List<Long> checkOrgIdListForPreorder(Session session, List<Long> idOfOrgList) {
+        if (preordersOnly) {
+            List<Long> resulList = new ArrayList<Long>();
+            for (Long idOfOrg : idOfOrgList) {
+                Org org = (Org) session.load(Org.class, idOfOrg);
+                if (org.getPreordersEnabled())
+                    resulList.add(idOfOrg);
+            }
+            return resulList;
+        } else {
+            return idOfOrgList;
+        }
     }
 }

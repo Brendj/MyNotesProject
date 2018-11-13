@@ -60,6 +60,10 @@
         <h:selectBooleanCheckbox value="#{dailySalesByGroupsReportPage.includeFriendlyOrgs}"
                                      styleClass="output-text" />
 
+        <h:outputText escape="true" value="Показывать только организации с функционалом \"Предзаказ\"" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{dailySalesByGroupsReportPage.preordersOnly}"
+                                 styleClass="output-text" />
+
         <a4j:commandButton value="Генерировать отчет" action="#{dailySalesByGroupsReportPage.buildReport}"
                            reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
