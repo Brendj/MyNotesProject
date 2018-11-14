@@ -1522,6 +1522,16 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
+    public boolean actionIsOnByNode(String parameterName) {
+        String instance = getNodeName();
+        String reqInstance = getConfigProperties().getProperty(parameterName);
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
+                reqInstance.trim())) {
+            return false;
+        }
+        return true;
+    }
+
     public boolean getOptionValueBool(int optionId) {
         return getOptionValueString(optionId).equals("1");
     }

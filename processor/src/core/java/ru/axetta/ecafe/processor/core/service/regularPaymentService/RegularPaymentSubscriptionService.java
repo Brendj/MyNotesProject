@@ -114,10 +114,12 @@ public class RegularPaymentSubscriptionService {
         return true;
     }
 
+    private boolean isOn() {
+        return RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.regularpayments.node");
+    }
+
     public void checkClientBalances(Long idOfOrg ) {
-        if (!RuntimeContext.getInstance().isMainNode()) {
-            return;
-        }
+        if (!isOn()) return;
         SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
                 SecurityJournalProcess.EventType.REGULAR_PAYMENTS, new Date());
         process.saveWithSuccess(true);
