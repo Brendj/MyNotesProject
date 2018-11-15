@@ -110,13 +110,13 @@ public class RequestFeedingItem {
         applicationForFeedingNumber = XMLUtils.getLongAttributeValue(itemNode, "Number");
 
         state = XMLUtils.getIntegerAttributeValue(itemNode, "State");
-        if (!ApplicationForFoodState.TRY_TO_REGISTER.getCode().equals(state) ||
-                !ApplicationForFoodState.REGISTERED.getCode().equals(state) ||
-                !ApplicationForFoodState.PAUSED.getCode().equals(state) ||
-                !ApplicationForFoodState.RESUME.getCode().equals(state) ||
-                !ApplicationForFoodState.OK.getCode().equals(state) ||
-                !ApplicationForFoodState.DENIED.getCode().equals(state) ||
-                !ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode().equals(state) |
+        if (!ApplicationForFoodState.TRY_TO_REGISTER.getCode().equals(state) &&
+                !ApplicationForFoodState.REGISTERED.getCode().equals(state) &&
+                !ApplicationForFoodState.PAUSED.getCode().equals(state) &&
+                !ApplicationForFoodState.RESUME.getCode().equals(state) &&
+                !ApplicationForFoodState.OK.getCode().equals(state) &&
+                !ApplicationForFoodState.DENIED.getCode().equals(state) &&
+                !ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode().equals(state) &&
                 !ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode().equals(state)) {
             errorMessage.append("Attribute State is incorrect ");
         }
