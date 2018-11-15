@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,13 +34,13 @@ public class ApplicationForFood {
             String idOfDocOrder, Date docOrderDate, Long version) {
         this.client = client;
         this.dtisznCode = dtisznCode;
-        this.createdDate = new Date();
+        this.createdDate = CalendarUtils.truncateToSecond(new Date()).getTime();
         this.status = status;
         this.mobile = mobile;
         this.applicantName = applicantName;
         this.applicantSecondName = applicantSecondName;
         this.applicantSurname = applicantSurname;
-        this.lastUpdate = new Date();
+        this.lastUpdate = this.createdDate;
         this.version = version;
         this.archived = false;
         this.serviceNumber = serviceNumber;

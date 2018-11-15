@@ -698,4 +698,10 @@ public class CalendarUtils {
         return new Long(diff / (1000*60*60)).intValue();
     }
 
+    public static Calendar truncateToSecond(Date date) {
+        GregorianCalendar calendar = new GregorianCalendar(RuntimeContext.getInstance().getLocalTimeZone(null));
+        calendar.setTime(date);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
+    }
 }
