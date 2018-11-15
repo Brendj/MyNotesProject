@@ -62,6 +62,7 @@ public class RequestFeedingItem {
             this.setResCode(ERROR_CODE_ALL_OK);
         } else {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
+            this.errorMessage = errorMessage;
         }
     }
 
@@ -123,11 +124,9 @@ public class RequestFeedingItem {
         declineReason = XMLUtils.getIntegerAttributeValue(itemNode, "DeclineReason");
         if (null == declineReason && ApplicationForFoodState.DENIED.getCode().equals(state) ||
                 ApplicationForFoodState.DENIED.getCode().equals(state) &&
-                        ApplicationForFoodDeclineReason.NO_DOCS.getCode().equals(declineReason) ||
-                ApplicationForFoodState.DENIED.getCode().equals(state) &&
-                        ApplicationForFoodDeclineReason.NO_APPROVAL.getCode().equals(declineReason) ||
-                ApplicationForFoodState.DENIED.getCode().equals(state) &&
-                        ApplicationForFoodDeclineReason.INFORMATION_CONFLICT.getCode().equals(declineReason)) {
+                        !ApplicationForFoodDeclineReason.NO_DOCS.getCode().equals(declineReason) &&
+                        !ApplicationForFoodDeclineReason.NO_APPROVAL.getCode().equals(declineReason) &&
+                        !ApplicationForFoodDeclineReason.INFORMATION_CONFLICT.getCode().equals(declineReason)) {
             errorMessage.append("Attribute DeclineReason is incorrect ");
         }
 
@@ -167,9 +166,6 @@ public class RequestFeedingItem {
         }
 
         dtisznDiscount = XMLUtils.getLongAttributeValue(itemNode, "DiscountDtszn");
-        if (null == dtisznDiscount) {
-            errorMessage.append("Attribute DiscountDtszn not found ");
-        }
 
         archived = XMLUtils.getBooleanAttributeValue(itemNode, "D");
 
