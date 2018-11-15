@@ -37,6 +37,7 @@ public class ETPMVService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVService.class);
     private final int COORDINATE_MESSAGE = 0;
     private final String ISPP_ID = "-063101-";
+    private final int PAUSE_IN_MILLIS = 1000;
 
     @Async
     public void processIncoming(String message) {
@@ -131,8 +132,8 @@ public class ETPMVService {
         String message = createStatusMessage(serviceNumber, status, reason);
         boolean success = false;
         try {
-            if (System.currentTimeMillis() - begin_time < 1000) {
-                Thread.sleep(System.currentTimeMillis() - begin_time); //пауза между получением заявления и ответом, или между двумя статусами подряд не менее секунды
+            if (System.currentTimeMillis() - begin_time < PAUSE_IN_MILLIS) {
+                Thread.sleep(PAUSE_IN_MILLIS - (System.currentTimeMillis() - begin_time)); //пауза между получением заявления и ответом, или между двумя статусами не менее секунды
             }
             RuntimeContext.getAppContext().getBean(ETPMVClient.class).sendStatus(message);
             success = true;

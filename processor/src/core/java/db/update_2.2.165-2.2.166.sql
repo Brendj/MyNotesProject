@@ -35,12 +35,13 @@ OIDS = FALSE
 --таблица отправленных статусов заявлений
 create table cf_etp_outgoing_message
 (
+    idOfEtpOutgoingMessage bigserial,
     etpMessageId character varying(30) NOT NULL,
     etpMessagePayload text NOT NULL,
     createdDate bigint NOT NULL,
     lastUpdate bigint,
     isSent integer NOT NULL DEFAULT 0,
-    CONSTRAINT cf_etp_outgoing_message_pk PRIMARY KEY (etpMessageId)
+    CONSTRAINT cf_etp_outgoing_message_pk PRIMARY KEY (idOfEtpOutgoingMessage)
 )
 WITH (
 OIDS = FALSE

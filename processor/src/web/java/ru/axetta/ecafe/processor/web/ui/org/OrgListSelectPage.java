@@ -56,7 +56,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         MainPage.getSessionInstance().resetOrgFilterPageName();
     }
 
-    public synchronized void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
+    public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
         List<Long> idOfContragentList, MainPage mainPage) throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();
@@ -87,7 +87,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
     }
 
-    public synchronized void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
+    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
             throws Exception {
         if (isUpdate) {
             updateSelectedOrgs();

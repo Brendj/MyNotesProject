@@ -10,6 +10,7 @@ import java.util.Date;
  * Created by nuc on 02.11.2018.
  */
 public class EtpOutgoingMessage {
+    private Long idOfEtpOutgoingMessage;
     private String etpMessageId;
     private String etpMessagePayload;
     private Date createdDate;
@@ -58,5 +59,13 @@ public class EtpOutgoingMessage {
 
     public void setIsSent(Boolean sent) {
         isSent = sent;
+    }
+
+    public Long getIdOfEtpOutgoingMessage() {
+        return idOfEtpOutgoingMessage;
+    }
+
+    public void setIdOfEtpOutgoingMessage(Long idOfEtpOutgoingMessage) {
+        this.idOfEtpOutgoingMessage = idOfEtpOutgoingMessage;
     }
 }
