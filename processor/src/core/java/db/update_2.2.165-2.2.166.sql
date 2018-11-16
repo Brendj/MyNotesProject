@@ -6,11 +6,14 @@
 
 -- таблица заявлений на льготное питание
 ALTER TABLE cf_applications_for_food
-    add column servicenumber character varying(128),
+    add column servicenumber character varying(128) NOT NULL,
     add column creatortype integer NOT NULL DEFAULT 0,
     add column idofdocorder character varying(128),
     add column docorderdate bigint,
-    drop column idoforgoncreate;
+    drop column idoforgoncreate,
+    add CONSTRAINT cf_applications_for_food_servicenumber_uq UNIQUE(servicenumber);
+
+CREATE INDEX cf_applications_for_food_servicenumber_idx on cf_applications_for_food(servicenumber);
 
 ALTER TABLE cf_client_dtiszn_discount_info
     ALTER column dtiszncode TYPE bigint;

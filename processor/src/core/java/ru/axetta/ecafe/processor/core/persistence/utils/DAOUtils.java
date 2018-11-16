@@ -3693,11 +3693,55 @@ public class DAOUtils {
         return applicationForFood;
     }
 
+    public static ApplicationForFood  updateApplicationForFoodByServiceNumber(Session persistenceSession, String serviceNumber,
+            ApplicationForFoodStatus status) {
+        ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession, serviceNumber);
+        if(applicationForFood == null){
+            logger.warn("Can't find ApplicationForFood by serviceNumber = " + serviceNumber);
+            return null;
+        }
+        Long applicationForFoodVersion = nextVersionByApplicationForFood(persistenceSession);
+        applicationForFood.setStatus(status);
+        applicationForFood.setVersion(applicationForFoodVersion);
+        persistenceSession.update(applicationForFood);
+
+        addApplicationForFoodHistoryIfNotExist(persistenceSession, applicationForFood, status);
+        return applicationForFood;
+    }
+
     public static void addApplicationForFoodHistory(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status) {
         Long applicationForFoodHistoryVersion = nextVersionByApplicationForFoodHistory(session);
         ApplicationForFoodHistory applicationForFoodHistory = new ApplicationForFoodHistory(applicationForFood,
                 status,null, applicationForFoodHistoryVersion);
         session.save(applicationForFoodHistory);
+    }
+
+
+    public static void addApplicationForFoodHistoryIfNotExist(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status) {
+        ApplicationForFoodHistory applicationForFoodHistory = null;
+        try {
+            applicationForFoodHistory = findApplicationForFoodHistoryByStatusAndapplicationForFood(session, applicationForFood, status);
+            if(applicationForFoodHistory != null){
+                logger.warn(String.format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s, "
+                        , applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
+                        applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber()));
+                return;
+            }
+            Long applicationForFoodHistoryVersion = nextVersionByApplicationForFoodHistory(session);
+            applicationForFoodHistory = new ApplicationForFoodHistory(applicationForFood,
+                    status, null, applicationForFoodHistoryVersion);
+            session.save(applicationForFoodHistory);
+        } catch (Exception e){
+            logger.error("", e);
+        }
+    }
+
+    private static ApplicationForFoodHistory findApplicationForFoodHistoryByStatusAndapplicationForFood(Session session, ApplicationForFood applicationForFood,
+            ApplicationForFoodStatus status) {
+        Criteria criteria = session.createCriteria(ApplicationForFoodHistory.class);
+        criteria.add(Restrictions.eq("status", status))
+                .add(Restrictions.eq("applicationForFood", applicationForFood));
+        return (ApplicationForFoodHistory) criteria.uniqueResult();
     }
 
     public static ApplicationForFood findActiveApplicationForFoodByClient(Session session, Client client) {
@@ -3739,6 +3783,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("createdDate", regDate));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static ApplicationForFood findApplicationForFoodByServiceNumber(Session persistenceSession, String serviceNumber) {
+        Criteria criteria = persistenceSession.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.like("serviceNumber", serviceNumber));
         return (ApplicationForFood) criteria.uniqueResult();
     }
 

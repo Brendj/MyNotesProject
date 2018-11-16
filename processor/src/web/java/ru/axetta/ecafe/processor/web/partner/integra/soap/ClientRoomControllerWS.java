@@ -9237,4 +9237,43 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return result;
     }
+
+    @Override
+    public Result updateStatusOfApplicationForFood(@WebParam(name = "state") Integer stateCode, @WebParam(name = "declineReason") Integer declineReasonCode,
+            @WebParam(name = "serviceNumber") String serviceNumber){
+        ApplicationForFoodDeclineReason declineReason = ApplicationForFoodDeclineReason.fromInteger(declineReasonCode);
+        ApplicationForFoodState state = ApplicationForFoodState.fromCode(stateCode);
+        if(state == null){
+            return new Result(RC_INVALID_DATA, "Не известный код состояния заявления");
+        }
+        if(StringUtils.isEmpty(serviceNumber)){
+            return new Result(RC_INVALID_DATA, "Не заполнен номер заявления");
+        }
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Result result = new Result();
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(state, declineReason);
+        try{
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            ApplicationForFood updatedApplicationForFood = DAOUtils.updateApplicationForFoodByServiceNumber(persistenceSession, serviceNumber, status);
+            if(updatedApplicationForFood == null){
+                throw new Exception("Result of update ApplicationForFood serviceNumber = " + serviceNumber + " is null");
+            }
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        }catch (Exception e){
+            logger.error(String.format("Can't update ApplicationForFood serviceNumber = %s", serviceNumber), e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
 }

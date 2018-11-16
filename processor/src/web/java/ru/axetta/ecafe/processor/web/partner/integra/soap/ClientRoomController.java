@@ -575,4 +575,8 @@ public interface ClientRoomController {
             @WebParam(name = "otherDiscount") Boolean otherDiscount, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "guardianName") String guardianName, @WebParam(name = "guardianSurname") String guardianSurname,
             @WebParam(name = "guardianSecondName") String guardianSecondName, @WebParam(name = "serviceNumber") String serviceNumber);
+
+    @WebMethod(operationName = "updateStatusOfApplicationForFood")
+    Result updateStatusOfApplicationForFood(@WebParam(name = "state") Integer state, @WebParam(name = "declineReason") Integer declineReason,
+            @WebParam(name = "serviceNumber") String serviceNumber);
 }

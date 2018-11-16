@@ -22,7 +22,7 @@
         <property name="applicantSurname" column="ApplicantSurname" type="string" length="128" not-null="true"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="archived" column="Archived" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
-        <property name="serviceNumber" column="ServiceNumber" type="string" length="128"/>
+        <property name="serviceNumber" column="ServiceNumber" type="string" length="128" unique="true" not-null="true"/>
         <property name="creatorType" column="CreatorType" not-null="true">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodCreatorType</param>
