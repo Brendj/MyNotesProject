@@ -9,7 +9,8 @@ public enum PreorderState {
     /*1*/ DELETED("Удалено поставщиком"),
     /*2*/ CHANGED_PRICE("Изменение цены у поставщика"),
     /*3*/ NOT_ENOUGH_BALANCE("Недостаточно средств на балансе л/с"),
-    /*4*/ CHANGE_ORG("Перевод в другую ОО");
+    /*4*/ CHANGE_ORG("Перевод в другую ОО"),
+    /*5*/ CHANGED_CALENDAR("Удален по причине изменения календаря учебных дней");
 
     private final String description;
 

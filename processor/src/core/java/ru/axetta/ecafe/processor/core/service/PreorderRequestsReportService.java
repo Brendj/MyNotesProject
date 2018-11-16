@@ -114,6 +114,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         }
     }
 
+    private void deletePreorderForChangedCalendar(Session session, PreorderItem item) {
+        Long version = DAOUtils.nextVersionByPreorderComplex(session);
+        if (item.getIdOfPreorderComplex() != null) {
+            PreorderComplex.delete(session, item.getIdOfPreorderComplex(), version, PreorderState.CHANGED_CALENDAR);
+        }
+    }
+
     public void runTask() throws Exception {
         //генерация предзаказов по регулярному правилу
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
@@ -148,6 +155,7 @@ public class PreorderRequestsReportService extends RecoverableService {
             List<PreorderItem> preorderItemList = loadPreorders(session); //все актуальные предзаказы на завтра и дальше
             Map<Long, Integer> forbiddenDaysMap = new HashMap<Long, Integer>();
             Map<Long, Map<Long, DatesForPreorder>> datesMap = new HashMap<Long, Map<Long, DatesForPreorder>>();
+            Map<Long, Map<Long, List<Date>>> weekends = new HashMap<Long, Map<Long, List<Date>>>();
 
             for (PreorderItem item : preorderItemList) {
                 boolean itemWasDeleted = false;
@@ -165,6 +173,11 @@ public class PreorderRequestsReportService extends RecoverableService {
                 if (null == item.getIdOfGood()) {
                     logger.warn(String.format("PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
                             item.getIdOfOrg(), item.getCreatedDate().toString()) );
+                    continue;
+                }
+
+                if (checkPreorderDateForWeekend(session, item, weekends) && null == item.getIdOfGoodsRequestPosition()) {
+                    deletePreorderForChangedCalendar(session, item);
                     continue;
                 }
 
@@ -260,17 +273,18 @@ public class PreorderRequestsReportService extends RecoverableService {
 
     private Boolean getPreorderDates(Session session, Long orgOwner, Integer forbiddenDaysCount, Date startDate,
             Date endDate, Long idOfClientGroup) {
-        Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
+        //Long idOfSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, orgOwner);
         Date _startDate = CalendarUtils.truncateToDayOfMonth(new Date());
         Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
 
         Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
-        specialDaysCriteria.add(Restrictions.eq("idOfOrg", idOfSourceOrg));
+        specialDaysCriteria.add(Restrictions.eq("idOfOrg", orgOwner));
         specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
         specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
         specialDaysCriteria.add(Restrictions.between("date", _startDate, specialDaysMonth));
         if (null != idOfClientGroup) {
-            specialDaysCriteria.add(Restrictions.eq("idOfClientGroup", idOfClientGroup));
+            specialDaysCriteria.add(Restrictions.or(Restrictions.eq("idOfClientGroup", idOfClientGroup),
+                    Restrictions.isNull("idOfClientGroup")));
             specialDaysCriteria.setProjection(Projections.projectionList()
                     .add(Projections.property("date"))
                     .add(Projections.property("idOfClientGroup")));
@@ -278,18 +292,21 @@ public class PreorderRequestsReportService extends RecoverableService {
             specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.max("date")));
         }
 
-        List<SpecialDate> specialDates = specialDaysCriteria.list();
+        List specialDates = specialDaysCriteria.list();
 
-        Integer forbiddenCout = forbiddenDaysCount;
+        Integer forbiddenCount = forbiddenDaysCount;
 
         do {
+            _startDate = CalendarUtils.addOneDay(_startDate);
+
             Date endDateStart = CalendarUtils.startOfDay(_startDate);
             Date endDateEnd = CalendarUtils.endOfDay(_startDate);
             Boolean isWeekend = false;
 
             //check special dates
-            for (SpecialDate date : specialDates) {
-                if (CalendarUtils.betweenDate(date.getDate(), endDateStart, endDateEnd)) {
+            for (Object specialDate : specialDates) {
+                Object[] vals = (Object[]) specialDate;
+                if (CalendarUtils.betweenDate((Date) vals[0], endDateStart, endDateEnd)) {
                     isWeekend = true;
                     break;
                 }
@@ -300,11 +317,10 @@ public class PreorderRequestsReportService extends RecoverableService {
                 isWeekend = true;
             }
 
-            _startDate = CalendarUtils.addOneDay(_startDate);
             if (!isWeekend) {
-                forbiddenCout--;
+                forbiddenCount--;
             }
-        } while (forbiddenCout >= 0);
+        } while (forbiddenCount >= 0);
 
         Date _endDate;
         int dayOfWeek = CalendarUtils.getDayOfWeek(_startDate);
@@ -319,8 +335,9 @@ public class PreorderRequestsReportService extends RecoverableService {
 
         Date fireTimeStart = CalendarUtils.startOfDay(new Date());
         Date fireTimeEnd = CalendarUtils.endOfDay(new Date());
-        for (SpecialDate date : specialDates) {
-            if (CalendarUtils.betweenOrEqualDate(date.getDate(), fireTimeStart, fireTimeEnd)) {
+        for (Object date : specialDates) {
+            Object[] vals = (Object[]) date;
+            if (CalendarUtils.betweenOrEqualDate((Date) vals[0], fireTimeStart, fireTimeEnd)) {
                 return false;
             }
         }
@@ -855,6 +872,55 @@ public class PreorderRequestsReportService extends RecoverableService {
                 }
             }
         }
+    }
+
+    private Boolean checkPreorderDateForWeekend(Session session, PreorderItem item, Map<Long, Map<Long, List<Date>>> weekends) {
+        Map<Long, List<Date>> groupWeekends = weekends.get(item.getIdOfOrg());
+        if (null == groupWeekends || null == groupWeekends.get(item.getIdOfClientGroup())) {
+            Date _startDate = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
+
+            Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
+            specialDaysCriteria.add(Restrictions.eq("idOfOrg", item.getIdOfOrg()));
+            specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
+            specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
+            specialDaysCriteria.add(Restrictions.between("date", _startDate, specialDaysMonth));
+            if (null != item.getIdOfClientGroup()) {
+                specialDaysCriteria.add(Restrictions.or(Restrictions.eq("idOfClientGroup", item.getIdOfClientGroup()),
+                        Restrictions.isNull("idOfClientGroup")));
+                specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.property("date"))
+                        .add(Projections.property("idOfClientGroup")));
+            } else {
+                specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.max("date")));
+            }
+
+            List list = specialDaysCriteria.list();
+
+            weekends.put(item.getIdOfOrg(), new HashMap<Long, List<Date>>());
+            groupWeekends = weekends.get(item.getIdOfOrg());
+
+            if (null == groupWeekends.get(item.getIdOfClientGroup())) {
+                groupWeekends.put(item.getIdOfClientGroup(), new ArrayList<Date>());
+            }
+
+            for (Object object : list) {
+                Object[] vals = (Object[]) object;
+                groupWeekends.get(item.getIdOfClientGroup()).add((Date) vals[0]);
+            }
+        }
+
+        if (null != groupWeekends) {
+            if (null != groupWeekends.get(item.getIdOfClientGroup())) {
+                for (Date date : groupWeekends.get(item.getIdOfClientGroup())) {
+                    Date startDate = CalendarUtils.startOfDay(date);
+                    Date endDate = CalendarUtils.endOfDay(date);
+                    if (CalendarUtils.betweenOrEqualDate(item.getPreorderDate(), startDate, endDate)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void scheduleSync() {
