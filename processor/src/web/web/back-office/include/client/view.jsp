@@ -178,6 +178,48 @@
     <rich:calendar value="#{mainPage.clientViewPage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" readonly="true" />
 
+    <h:outputText escape="true" value="Кружоки/Секции" styleClass="output-text" rendered="#{mainPage.clientViewPage.visitsSections}"/>
+    <rich:dataTable id="clientSectionsViewTable" value="#{mainPage.clientViewPage.clientSectionsItems}" var="clientSection"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                    footerClass="data-table-footer-center" rendered="#{mainPage.clientViewPage.visitsSections}">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Ид ОО посещения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.orgRegistry.idOfOrg}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Название ОО посещения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.orgRegistry.shortName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Адрес ОО посещения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.orgRegistry.shortAddress}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Название кружка" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.section}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата начала занятий" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.visitStartDate}" styleClass="output-text" converter="timeConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата окончания занятий" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.visitEndDate}" styleClass="output-text" converter="timeConverter"/>
+        </rich:column>
+    </rich:dataTable>
+
     <h:outputText escape="true" value="Опекуны" styleClass="output-text"/>
     <rich:dataTable id="clientGuardianViewTable" value="#{mainPage.clientViewPage.clientGuardianItems}" var="clientGuardian"
                     columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"

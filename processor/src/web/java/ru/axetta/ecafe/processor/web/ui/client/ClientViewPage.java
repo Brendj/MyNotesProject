@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -86,6 +87,14 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public void setMultiCardMode(Boolean multiCardMode) {
         this.multiCardMode = multiCardMode;
+    }
+
+    public Boolean getVisitsSections() {
+        return visitsSections;
+    }
+
+    public void setVisitsSections(Boolean visitsSections) {
+        this.visitsSections = visitsSections;
     }
 
     public static class PersonData {
@@ -192,6 +201,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String cardRequest;
     private String balanceHold;
     private Boolean multiCardMode;
+    private Boolean visitsSections;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -575,6 +585,9 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.clientWardItems = loadWardsByClient(session, idOfClient);
 
+        this.clientSectionsItems = MigrantsUtils.getActiveMigrantsByIdOfClient(session, idOfClient);
+        visitsSections = !clientSectionsItems.isEmpty();
+
         try {
             ClientPhoto clientPhoto = ImageUtils.findClientPhoto(session, client.getIdOfClient());
             this.photoURL = ImageUtils.getPhotoURL(client, clientPhoto, ImageUtils.ImageSize.MEDIUM.getValue(), false);
@@ -630,6 +643,12 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public List<ClientGuardianItem> getClientWardItems() {
         return clientWardItems;
+    }
+
+    private List<Migrant> clientSectionsItems;
+
+    public List<Migrant> getClientSectionsItems(){
+        return clientSectionsItems;
     }
 
     public Date getLastConfirmMobile() {
