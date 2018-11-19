@@ -38,6 +38,7 @@ public class ETPMVService {
     private final int COORDINATE_MESSAGE = 0;
     private final String ISPP_ID = "-063101-";
     private final int PAUSE_IN_MILLIS = 1000;
+    //private final int DAYS_TO_EXPIRE = 5;
 
     @Async
     public void processIncoming(String message) {
@@ -128,7 +129,7 @@ public class ETPMVService {
         return false;
     }
 
-    private void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
+    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
         String message = createStatusMessage(serviceNumber, status, reason);
         boolean success = false;
         try {
@@ -186,6 +187,37 @@ public class ETPMVService {
         }
         return null;
     }
+
+    /*public void resendStatuses() {
+        List<EtpOutgoingMessage> messages = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getNotSendedMessages();
+        for (EtpOutgoingMessage message : messages) {
+            boolean success = false;
+            try {
+                RuntimeContext.getAppContext().getBean(ETPMVClient.class).sendStatus(message.getEtpMessagePayload());
+                success = true;
+            } catch (Exception e) {
+                logger.error("Error in sendErrorStatus: ", e);
+            }
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).updateOutgoingStatus(message, success);
+        }
+    }
+
+    public void processExpired() {
+        Date dateTo = CalendarUtils.addDays(new Date(), DAYS_TO_EXPIRE); //todo как рассчитать 5 РАБОЧИХ дней без привязки к ОО?
+        List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getExpiredApplicationsForFood(dateTo);
+        long begin_time = System.currentTimeMillis();
+        for (ApplicationForFood applicationForFood : list) {
+            try {
+                RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).expireApplicationForFood(applicationForFood);
+                sendStatus(begin_time, applicationForFood.getServiceNumber(), ApplicationForFoodState.RESUME, null);
+                begin_time = System.currentTimeMillis();
+                sendStatus(begin_time, applicationForFood.getServiceNumber(), ApplicationForFoodState.DENIED,
+                        ApplicationForFoodDeclineReason.NO_DOCS);
+            } catch (Exception e) {
+                logger.error(String.format("Error in expire application for food, serviceNumber = %s. Error stack: ", applicationForFood.getServiceNumber()), e);
+            }
+        }
+    }*/
 
     private JAXBContext getJAXBContext(int type) throws Exception {
         switch (type) {

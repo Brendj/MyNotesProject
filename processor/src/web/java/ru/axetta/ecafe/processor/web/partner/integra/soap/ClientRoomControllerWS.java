@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
@@ -9261,7 +9262,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if(updatedApplicationForFood == null){
                 throw new Exception("Result of update ApplicationForFood serviceNumber = " + serviceNumber + " is null");
             }
-
+            RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatus(System.currentTimeMillis()-1000, serviceNumber,
+                    status.getApplicationForFoodState(), status.getDeclineReason());
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
             persistenceTransaction.commit();
