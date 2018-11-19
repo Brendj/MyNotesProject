@@ -468,6 +468,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
             getLogger().error("Error create RegularPreorders: ", e);
             printError("Во время создания регулярных предзаказов произошла ошибка с текстом " + e.getMessage());
         }
+
+    }
+    public void runApplicationForFoodProcessingService() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(ApplicationForFoodProcessingService.class).runTask();
+            printMessage("Обработка заявлений завершена");
+        } catch (Exception e) {
+            getLogger().error("Error processing applications for food: ", e);
+            printError("Во время обработки заявлений на льготное питание произошла ошибка с текстом " + e.getMessage());
+        }
     }
 
     public String getOrgsForSpbCardsUidUpdate() {

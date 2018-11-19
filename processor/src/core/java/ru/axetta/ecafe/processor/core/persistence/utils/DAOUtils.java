@@ -3693,6 +3693,16 @@ public class DAOUtils {
         return applicationForFood;
     }
 
+    public static ApplicationForFood updateApplicationForFoodWithVersion(Session session, ApplicationForFood applicationForFood,
+            ApplicationForFoodStatus status, Long version, Long historyVersion) {
+        applicationForFood.setStatus(status);
+        applicationForFood.setVersion(version);
+        session.update(applicationForFood);
+
+        addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, historyVersion);
+        return applicationForFood;
+    }
+
     public static ApplicationForFood  updateApplicationForFoodByServiceNumber(Session persistenceSession, String serviceNumber,
             ApplicationForFoodStatus status) {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession, serviceNumber);
@@ -3711,11 +3721,15 @@ public class DAOUtils {
 
     public static void addApplicationForFoodHistory(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status) {
         Long applicationForFoodHistoryVersion = nextVersionByApplicationForFoodHistory(session);
-        ApplicationForFoodHistory applicationForFoodHistory = new ApplicationForFoodHistory(applicationForFood,
-                status,null, applicationForFoodHistoryVersion);
-        session.save(applicationForFoodHistory);
+        addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, applicationForFoodHistoryVersion);
     }
 
+    public static void addApplicationForFoodHistoryWithVersion(Session session, ApplicationForFood applicationForFood,
+            ApplicationForFoodStatus status, Long version) {
+        ApplicationForFoodHistory applicationForFoodHistory = new ApplicationForFoodHistory(applicationForFood,
+                status,null, version);
+        session.save(applicationForFoodHistory);
+    }
 
     public static void addApplicationForFoodHistoryIfNotExist(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status) {
         ApplicationForFoodHistory applicationForFoodHistory = null;
@@ -3753,6 +3767,7 @@ public class DAOUtils {
                 new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_APPROVAL)));
         criteria.add(Restrictions.ne("status",
                 new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT)));
+        criteria.add(Restrictions.or(Restrictions.isNull("archived"), Restrictions.eq("archived", false)));
         criteria.setMaxResults(1);
         return (ApplicationForFood) criteria.uniqueResult();
     }
@@ -3830,6 +3845,15 @@ public class DAOUtils {
         criteria.createAlias("client", "c");
         criteria.add(Restrictions.eq("c.org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodListByStatus(Session session, ApplicationForFoodStatus status, Boolean isOthers) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("status", status));
+        criteria.add(Restrictions.eq("archived", false));
+        if (isOthers)
+            criteria.add(Restrictions.isNull("dtisznCode"));
         return criteria.list();
     }
 }
