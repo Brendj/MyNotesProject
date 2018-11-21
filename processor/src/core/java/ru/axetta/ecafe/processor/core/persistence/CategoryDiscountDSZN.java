@@ -17,16 +17,19 @@ public class CategoryDiscountDSZN {
     private CategoryDiscount categoryDiscount;
     private Long version;
     private Boolean deleted;
+    private Long ETPCode;
 
     public CategoryDiscountDSZN() {
     }
 
-    public CategoryDiscountDSZN(Integer code, String description, CategoryDiscount categoryDiscount, Long version) {
+    public CategoryDiscountDSZN(Integer code, String description, CategoryDiscount categoryDiscount, Long ETPCode,
+            Long version) {
         this.code = code;
         this.description = description;
         this.categoryDiscount = categoryDiscount;
         this.version = version;
         this.deleted = false;
+        this.ETPCode = ETPCode;
     }
 
     public int getIdOfCategoryDiscountDSZN() {
@@ -77,6 +80,14 @@ public class CategoryDiscountDSZN {
         this.deleted = deleted;
     }
 
+    public Long getETPCode() {
+        return ETPCode;
+    }
+
+    public void setETPCode(Long ETPCode) {
+        this.ETPCode = ETPCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -106,6 +117,7 @@ public class CategoryDiscountDSZN {
                 ", categoryDiscount=" + categoryDiscount +
                 ", version=" + version +
                 ", deleted=" + deleted +
+                ", etpCode=" + ETPCode +
                 '}';
     }
 }

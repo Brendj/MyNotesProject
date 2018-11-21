@@ -3856,4 +3856,16 @@ public class DAOUtils {
             criteria.add(Restrictions.isNull("dtisznCode"));
         return criteria.list();
     }
+
+    public static CategoryDiscountDSZN findCategoryDiscountDSZNByETPCode(EntityManager entityManager, Long ETPCode) {
+        javax.persistence.Query q = entityManager.createQuery("from CategoryDiscountDSZN where ETPCode=:ETPCode");
+        q.setParameter("ETPCode", ETPCode);
+        CategoryDiscountDSZN result;
+        try {
+            result = (CategoryDiscountDSZN) q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+        return result;
+    }
 }

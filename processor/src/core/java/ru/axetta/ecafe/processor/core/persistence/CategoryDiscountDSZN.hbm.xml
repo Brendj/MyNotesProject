@@ -16,5 +16,6 @@
         <property name="version" column="version" type="long" not-null="true"/>
         <property name="deleted" column="deleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+        <property name="ETPCode" column="etpcode" type="long"/>
     </class>
 </hibernate-mapping>

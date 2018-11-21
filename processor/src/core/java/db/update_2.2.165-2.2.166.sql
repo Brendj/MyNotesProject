@@ -63,3 +63,8 @@ create table cf_etp_bk_message
 WITH (
 OIDS = FALSE
 );
+
+-- код льготы ЕТП
+ALTER TABLE cf_categorydiscounts_dszn
+    add column etpcode bigint;
+    

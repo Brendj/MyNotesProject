@@ -19,6 +19,8 @@
     <h:inputText value="#{categoryDiscountDSZNCreatePage.code}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание льготы ДСЗН" styleClass="output-text" />
     <h:inputTextarea value="#{categoryDiscountDSZNCreatePage.description}" styleClass="input-text" rows="5" cols="64" />
+    <h:outputText escape="true" value="Код льготы ETP" styleClass="output-text" />
+    <h:inputText value="#{categoryDiscountDSZNCreatePage.ETPCode}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Льгота ИСПП" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{categoryDiscountDSZNCreatePage.categoryName}" readonly="true" styleClass="input-text"

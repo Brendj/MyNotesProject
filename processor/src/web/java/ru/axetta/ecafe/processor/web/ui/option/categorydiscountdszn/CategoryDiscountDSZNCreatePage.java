@@ -35,6 +35,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
     private String description = "";
     private CategoryDiscount categoryDiscount;
     private String categoryName;
+    private Long ETPCode;
 
     @Override
     public void onShow() throws Exception {
@@ -81,7 +82,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
                 categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
                 categoryDiscountDSZN.setVersion(nextVersion);
             } else {
-                categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, nextVersion);
+                categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, ETPCode, nextVersion);
             }
             entityManager.persist(categoryDiscountDSZN);
             code = null;
@@ -125,5 +126,13 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public Long getETPCode() {
+        return ETPCode;
+    }
+
+    public void setETPCode(Long ETPCode) {
+        this.ETPCode = ETPCode;
     }
 }

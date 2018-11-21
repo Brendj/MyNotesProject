@@ -36,6 +36,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     private String description;
     private CategoryDiscount categoryDiscount;
     private String categoryName;
+    private Long ETPCode;
 
     @Override
     public void completeCategorySelection(Session session, Long idOfCategory) throws Exception {
@@ -65,6 +66,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         categoryDiscountDSZN.setDescription(description);
         categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
         categoryDiscountDSZN.setVersion(nextVersion);
+        categoryDiscountDSZN.setETPCode(ETPCode);
         entityManager.persist(categoryDiscountDSZN);
         printMessage("Данные обновлены.");
         return null;
@@ -86,6 +88,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         } else {
             categoryName = "";
         }
+        this.ETPCode = categoryDiscountDSZN.getETPCode();
     }
 
     public EntityManager getEntityManager() {
@@ -138,5 +141,13 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
 
     public String getEntityName() {
         return "Льгота ДСЗН " + code;
+    }
+
+    public Long getETPCode() {
+        return ETPCode;
+    }
+
+    public void setETPCode(Long ETPCode) {
+        this.ETPCode = ETPCode;
     }
 }
