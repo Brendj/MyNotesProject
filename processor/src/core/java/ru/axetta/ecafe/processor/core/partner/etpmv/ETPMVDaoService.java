@@ -18,6 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -74,9 +75,11 @@ public class ETPMVDaoService {
         entityManager.persist(etpBKMessage);
     }
 
+    @Transactional(readOnly = true)
     public ApplicationForFood findApplicationForFood(String guid) {
-        Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.clientGUID = :guid order by a.createdDate desc limit 1");
+        Query query = entityManager.createQuery("select a from ApplicationForFood a where a.client.clientGUID = :guid order by a.createdDate desc");
         query.setParameter("guid", guid);
+        query.setMaxResults(1);
         try {
             return (ApplicationForFood) query.getSingleResult();
         } catch (NoResultException e) {
@@ -92,5 +95,21 @@ public class ETPMVDaoService {
         DAOUtils.createApplicationForFood(session, client, dtisznCode, mobile,
                 guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
         DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean benefitExists(String benefit) {
+        Query query = entityManager.createNativeQuery("select cast (count(*) as bigint) from cf_categorydiscounts_dszn where etpcode = :benefit");
+        query.setParameter("benefit", Long.parseLong(benefit));
+        Object result = query.getSingleResult();
+        return (((BigInteger)result).longValue() > 0);
+    }
+
+    @Transactional(readOnly = true)
+    public Long getDSZNBenefit(String benefit) {
+        Query query = entityManager.createQuery("select b.code from CategoryDiscountDSZN b where b.ETPCode = :benefit");
+        query.setParameter("benefit", Long.parseLong(benefit));
+        query.setMaxResults(1);
+        return new Long((Integer)query.getSingleResult());
     }
 }

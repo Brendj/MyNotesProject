@@ -38,6 +38,9 @@ public class ETPMVService {
     private final int COORDINATE_MESSAGE = 0;
     private final String ISPP_ID = "-063101-";
     private final int PAUSE_IN_MILLIS = 1000;
+    public final String BENEFIT_INOE = "0";
+    public final String BENEFIT_REGULAR = "1";
+    //public final Set<String> BENEFITS_ETP = new HashSet<String>(Arrays.asList("0", "1", "2", "3", "4", "5"));
     //private final int DAYS_TO_EXPIRE = 5;
 
     @Async
@@ -69,6 +72,7 @@ public class ETPMVService {
         CoordinateData coordinateData = coordinateMessage.getCoordinateDataMessage();
         RequestService requestService = coordinateData.getService();
         String serviceNumber = requestService.getServiceNumber();
+        logger.info("Incoming ETP message with ServiceNumber = " + serviceNumber);
         if (!serviceNumber.contains(ISPP_ID)) throw new Exception("Wrong ISPP_ID in Service Number");
 
         daoService.saveEtpPacket(serviceNumber, message);
@@ -81,19 +85,24 @@ public class ETPMVService {
         String yavl_lgot = getServicePropertiesValue(serviceProperties, "yavl_lgot");
         String benefit = getServicePropertiesValue(serviceProperties, "benefit");
 
-        ArrayOfBaseDeclarant contacts = requestServiceForSign.getContacts();
-        String firstName = null, lastName = null, middleName = null, mobile = null;
-        for (BaseDeclarant baseDeclarant : contacts.getBaseDeclarant()) {
-            if (!baseDeclarant.getType().equals(ContactType.CHILD)) {
-                firstName = ((RequestContact)baseDeclarant).getFirstName();
-                lastName = ((RequestContact)baseDeclarant).getLastName();
-                middleName = ((RequestContact)baseDeclarant).getMiddleName();
-                mobile = Client.checkAndConvertMobile(((RequestContact)baseDeclarant).getMobilePhone());
-                break;
-            }
+        if (wrongBenefits(yavl_lgot, benefit)) {
+            logger.error("Wrong benefits in packet");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+            return;
         }
-        if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(yavl_lgot) || StringUtils.isEmpty(benefit)
-            || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(middleName) || StringUtils.isEmpty(mobile)) {
+
+        ArrayOfBaseDeclarant contacts = requestServiceForSign.getContacts();
+        BaseDeclarant baseDeclarant = getBaseDeclarant(contacts);
+        if (baseDeclarant == null) {
+            logger.error("Error in processCoordinateMessage: wrong contacts data");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+            return;
+        }
+        String firstName = ((RequestContact)baseDeclarant).getFirstName();
+        String lastName = ((RequestContact)baseDeclarant).getLastName();
+        String middleName = ((RequestContact)baseDeclarant).getMiddleName();
+        String mobile = Client.checkAndConvertMobile(((RequestContact)baseDeclarant).getMobilePhone());
+        if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
                 logger.error("Error in processCoordinateMessage: not enough data");
                 sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
                 return;
@@ -113,11 +122,32 @@ public class ETPMVService {
                 return;
             }
         }
-        daoService.createApplicationForGood(client, Long.parseLong(benefit), mobile, firstName, middleName, lastName, serviceNumber, ApplicationForFoodCreatorType.PORTAL);
+        Long _benefit = yavl_lgot.equals(BENEFIT_INOE) ? null : RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefit(benefit);
+        daoService.createApplicationForGood(client, _benefit, mobile, firstName, middleName, lastName, serviceNumber, ApplicationForFoodCreatorType.PORTAL);
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.TRY_TO_REGISTER, null);
         begin_time = System.currentTimeMillis();
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.REGISTERED, null);
         daoService.updateEtpPacketWithSuccess(serviceNumber);
+    }
+
+    private BaseDeclarant getBaseDeclarant(ArrayOfBaseDeclarant contacts) {
+        BaseDeclarant bd = null;
+        for (BaseDeclarant baseDeclarant : contacts.getBaseDeclarant()) {
+            if (!baseDeclarant.getType().equals(ContactType.CHILD)) {
+                if (bd != null) {
+                    return null;
+                }
+                bd = baseDeclarant;
+            }
+        }
+        return bd;
+    }
+
+    private boolean wrongBenefits(String yavl_lgot, String benefit) {
+        if (StringUtils.isEmpty(yavl_lgot)) return true;
+        if (!(yavl_lgot.equals(BENEFIT_INOE) || yavl_lgot.equals(BENEFIT_REGULAR))) return true;
+        if (yavl_lgot.equals(BENEFIT_REGULAR) && (StringUtils.isEmpty(benefit) || !RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).benefitExists(benefit))) return true;
+        return false;
     }
 
     private boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
@@ -130,6 +160,7 @@ public class ETPMVService {
     }
 
     public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
+        logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber);
         String message = createStatusMessage(serviceNumber, status, reason);
         boolean success = false;
         try {
@@ -139,7 +170,7 @@ public class ETPMVService {
             RuntimeContext.getAppContext().getBean(ETPMVClient.class).sendStatus(message);
             success = true;
         } catch (Exception e) {
-            logger.error("Error in sendErrorStatus: ", e);
+            logger.error("Error in sendStatus: ", e);
         }
         RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success);
     }
