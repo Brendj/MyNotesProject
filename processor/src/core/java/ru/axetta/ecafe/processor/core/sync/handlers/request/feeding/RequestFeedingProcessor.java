@@ -88,8 +88,9 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
         RequestFeedingData result = new RequestFeedingData();
         List<RequestFeedingItem> items = new ArrayList<RequestFeedingItem>();
         RequestFeedingItem resItem;
+        List<Long> friendlyOrgIds = DAOUtils.findFriendlyOrgIds(session, requestFeeding.getIdOfOrgOwner());
         List<ApplicationForFood> list =
-                DAOUtils.getApplicationsForFoodForOrgSinceVersion(session, requestFeeding.getIdOfOrgOwner(), requestFeeding.getMaxVersion());
+                DAOUtils.getApplicationsForFoodForOrgsSinceVersion(session, friendlyOrgIds, requestFeeding.getMaxVersion());
         for (ApplicationForFood applicationForFood : list) {
             if (null != applicationForFood) {
                 resItem = new RequestFeedingItem(applicationForFood);

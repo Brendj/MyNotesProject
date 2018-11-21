@@ -3807,12 +3807,12 @@ public class DAOUtils {
         return (ApplicationForFood) criteria.uniqueResult();
     }
 
-    public static List<ApplicationForFood> getApplicationsForFoodForOrgSinceVersion(Session session, Long idOfOrg,
+    public static List<ApplicationForFood> getApplicationsForFoodForOrgsSinceVersion(Session session, List<Long> idOfOrgs,
             long version) throws Exception {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.createAlias("client", "c");
         criteria.createAlias("c.org", "o");
-        criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.in("o.idOfOrg", idOfOrgs));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
