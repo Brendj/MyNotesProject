@@ -3868,4 +3868,13 @@ public class DAOUtils {
         }
         return result;
     }
+
+    public static List<CategoryDiscountDSZN> getCategoryDiscountDSZNList(Session session, Boolean withEtp) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        if (withEtp) {
+            criteria.add(Restrictions.isNotNull("ETPCode"));
+        }
+        criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscountDSZN"));
+        return criteria.list();
+    }
 }

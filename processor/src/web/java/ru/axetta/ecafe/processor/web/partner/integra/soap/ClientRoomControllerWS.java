@@ -9278,4 +9278,38 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return result;
     }
+
+    @Override
+    public ETPDiscountsResult getETPDiscounts() {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ETPDiscountsResult result = new ETPDiscountsResult();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            ETPDiscountList discountList = new ETPDiscountList();
+            List<ETPDiscountItem> itemList = new ArrayList<ETPDiscountItem>();
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils.getCategoryDiscountDSZNList(persistenceSession, true);
+            for (CategoryDiscountDSZN discount : categoryDiscountDSZNList) {
+
+                itemList.add(new ETPDiscountItem(discount));
+            }
+            discountList.setItemList(itemList);
+            result.setDiscountList(discountList);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error in getETPDiscounts", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
 }
