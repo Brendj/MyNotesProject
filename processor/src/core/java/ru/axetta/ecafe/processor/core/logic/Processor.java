@@ -3406,12 +3406,6 @@ public class Processor implements SyncProcessor {
                         // Client is specified if card is specified
                         client = card.getClient();
                     }
-                    /*else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
-                        // Specified client isn't the owner of the specified card
-                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 230, String.format(
-                                "Client isn't the owner of the specified card, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                                idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                    }*/
                 }
                 if (null != client && card != null) {
                     if (Card.ACTIVE_STATE != card.getState()) {
@@ -3438,34 +3432,7 @@ public class Processor implements SyncProcessor {
                                 errorClientIds.add(idOfClient);
                             }
                         }
-                        //
-                        //return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
-                        //        "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
-                        //        idOfOrg, payment.getIdOfOrder(), idOfClient));
                     }
-                }
-                // Card check
-                if (null != card) {
-                    //if (Card.ACTIVE_STATE != card.getState()) {
-                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 320, String.format(
-                    //            "Card is locked, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s", idOfOrg,
-                    //            payment.getIdOfOrder(), idOfClient, cardNo));
-                    //}
-                    //if (null == card.getIssueTime()) {
-                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 330, String.format(
-                    //            "Card wasn't issued, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                    //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                    //}
-                    //if (payment.getTime().before(card.getIssueTime())) {
-                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 340, String.format(
-                    //            "Card wasn't issued at payment time, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                    //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                    //}
-                    //if (!payment.getTime().before(card.getValidTime())) {
-                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 350, String.format(
-                    //            "Card wasn't valid at payment time, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                    //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                    //}
                 }
                 // Verify spicified sums to be valid non negative numbers
                 if (payment.getSumByCard() < 0 || payment.getSumByCash() < 0 || payment.getSocDiscount() < 0
@@ -3474,12 +3441,12 @@ public class Processor implements SyncProcessor {
                             String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                     payment.getIdOfOrder()));
                 }
-                if (0 != payment.getSumByCard() && card == null) {
+                /*if (0 != payment.getSumByCard() && card == null) {
                     // Check if card is specified
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 240, String.format(
                             "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
                             idOfOrg, payment.getIdOfOrder(), idOfClient));
-                }
+                }*/
 
                 SecurityJournalBalance journalBalance = SecurityJournalBalance
                         .getSecurityJournalBalanceDataFromOrder(payment, client, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER,
