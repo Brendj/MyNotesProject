@@ -77,7 +77,7 @@
         <url-pattern>/back-office/index.faces</url-pattern>
     </filter-mapping>
 
-    <filter>
+    <!--<filter>
         <filter-name>PreorderServiceFilter</filter-name>
         <filter-class>ru.axetta.ecafe.processor.web.partner.preorder.PreorderServiceFilter</filter-class>
     </filter>
@@ -85,7 +85,7 @@
     <filter-mapping>
         <filter-name>PreorderServiceFilter</filter-name>
         <url-pattern>/preorder/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping>-->
 
     <listener>
         <display-name>JavaServer Faces configure listener</display-name>
@@ -176,7 +176,7 @@
         <servlet-class>ru.axetta.ecafe.processor.web.partner.newispp.LastModifiedOrgsServlet</servlet-class>
     </servlet>
 
-    <servlet>
+    <!--<servlet>
         <servlet-name>PreorderServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
@@ -195,7 +195,7 @@
     <servlet-mapping>
         <servlet-name>PreorderServlet</servlet-name>
         <url-pattern>/preorder/*</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>-->
 
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
