@@ -9153,10 +9153,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) {
                     result.setApplicationExists(Boolean.FALSE);
                 } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyyTHH:mm:ss");
                     result.setApplicantName(applicationForFood.getApplicantName());
                     result.setApplicantSurname(applicationForFood.getApplicantSurname());
                     result.setApplicantSecondName(applicationForFood.getApplicantSecondName());
-                    result.setRegDate(toXmlDateTime(applicationForFood.getCreatedDate()));
+                    result.setRegDate(dateFormat.format(applicationForFood.getCreatedDate()));
                     result.setApplicationExists(Boolean.TRUE);
                 }
             }

@@ -25,7 +25,7 @@ public class CheckApplicationForFoodResult extends Result {
     private String applicantSecondName;
 
     @XmlElement(name = "regDate")
-    protected XMLGregorianCalendar regDate;
+    protected String regDate;
 
     public CheckApplicationForFoodResult() {
 
@@ -63,11 +63,11 @@ public class CheckApplicationForFoodResult extends Result {
         this.applicantSecondName = applicantSecondName;
     }
 
-    public XMLGregorianCalendar getRegDate() {
+    public String getRegDate() {
         return regDate;
     }
 
-    public void setRegDate(XMLGregorianCalendar regDate) {
+    public void setRegDate(String regDate) {
         this.regDate = regDate;
     }
 }
