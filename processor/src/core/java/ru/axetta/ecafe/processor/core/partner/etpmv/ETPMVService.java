@@ -159,6 +159,11 @@ public class ETPMVService {
         return false;
     }
 
+    @Async
+    public void sendStatusAsync(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
+        sendStatus(begin_time, serviceNumber, status, reason);
+    }
+
     public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
         logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber);
         String message = createStatusMessage(serviceNumber, status, reason);
