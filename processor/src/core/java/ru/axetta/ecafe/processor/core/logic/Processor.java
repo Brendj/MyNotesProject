@@ -4381,20 +4381,23 @@ public class Processor implements SyncProcessor {
     private SyncResponse.ClientRegistry processSyncClientRegistry(Long idOfOrg,
             SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds) throws Exception {
         SyncResponse.ClientRegistry clientRegistry = new SyncResponse.ClientRegistry();
+        List<Client> clients;
+        Org organization;
+        List<Org> orgList;
+        List<Long> activeClientsId;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org organization = getOrgReference(persistenceSession, idOfOrg);
-            List<Org> orgList = new ArrayList<Org>(organization.getFriendlyOrg());
+            organization = getOrgReference(persistenceSession, idOfOrg);
+            orgList = new ArrayList<Org>(organization.getFriendlyOrg());
             orgList.add(organization);
-            List<Client> clients = findNewerClients(persistenceSession, orgList,
+            clients = findNewerClients(persistenceSession, orgList,
                     clientRegistryRequest.getCurrentVersion());
-            
-            // Добавляем временных посетителей (мигрантов)
 
+            // Добавляем временных посетителей (мигрантов)
             List<Client> migrants = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
             clients.addAll(migrants);
 
@@ -4405,7 +4408,7 @@ public class Processor implements SyncProcessor {
                     clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
                 }
             }
-            List<Long> activeClientsId = findActiveClientsId(persistenceSession, orgList);
+            activeClientsId = findActiveClientsId(persistenceSession, orgList);
             // Получаем чужих клиентов.
             Map<String, Set<Client>> alienClients = ClientManager
                     .findAllocatedClients(persistenceSession, organization);
@@ -4420,10 +4423,19 @@ public class Processor implements SyncProcessor {
             }
 
             // Добавляем временных посетителей (мигрантов)
-            for(Client migrant : migrants){
+            for (Client migrant : migrants) {
                 activeClientsId.add(migrant.getIdOfClient());
             }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
 
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
             // "при отличии количества активных клиентов в базе админки от клиентов, которые должны быть у данной организации
             // с учетом дружественных и правил - выдаем список идентификаторов всех клиентов в отдельном теге"
             if (clientRegistryRequest.getCurrentCount() != null && activeClientsId.size() != clientRegistryRequest
@@ -4467,7 +4479,7 @@ public class Processor implements SyncProcessor {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
             List<Client> clients = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
