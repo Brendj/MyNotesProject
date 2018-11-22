@@ -176,7 +176,7 @@
         <servlet-class>ru.axetta.ecafe.processor.web.partner.newispp.LastModifiedOrgsServlet</servlet-class>
     </servlet>
 
-    <!--<servlet>
+    <servlet>
         <servlet-name>PreorderServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
@@ -192,7 +192,7 @@
             <param-value>ru.axetta.ecafe.processor.web.partner.preorder.PreorderRequestInterceptor</param-value>
         </init-param>
     </servlet>
-    <servlet-mapping>
+    <!--<servlet-mapping>
         <servlet-name>PreorderServlet</servlet-name>
         <url-pattern>/preorder/*</url-pattern>
     </servlet-mapping>-->
