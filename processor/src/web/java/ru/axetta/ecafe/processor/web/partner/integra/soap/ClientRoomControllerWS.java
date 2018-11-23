@@ -9153,7 +9153,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     applicationForFood.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT))) {
                     result.setApplicationExists(Boolean.FALSE);
                 } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyyTHH:mm:ss");
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy'T'HH:mm:ss");
                     result.setApplicantName(applicationForFood.getApplicantName());
                     result.setApplicantSurname(applicationForFood.getApplicantSurname());
                     result.setApplicantSecondName(applicationForFood.getApplicantSecondName());
