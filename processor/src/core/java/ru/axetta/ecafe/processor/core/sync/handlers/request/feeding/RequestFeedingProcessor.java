@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
@@ -34,6 +36,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             ResRequestFeedingItem resItem;
             boolean errorFound;
             Long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            Long nextHistoryVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
             for (RequestFeedingItem item : requestFeeding.getItems()) {
                 errorFound = !item.getResCode().equals(RequestFeedingItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
@@ -41,26 +45,41 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             item.getIdOfClient(), item.getApplicationCreatedDate());
                     Client client = (Client) session.load(Client.class, item.getIdOfClient());
                     if (null == client) {
-                        throw new Exception(String.format("Client with id=%d not found", item.getIdOfClient()));
+                        logger.error(String.format("Client with id=%d not found", item.getIdOfClient()));
+                        continue;
                     }
                     ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(item.getStatus()),
                             ApplicationForFoodDeclineReason.fromInteger(item.getDeclineReason()));
                     if (null == applicationForFood) {
-                        applicationForFood = new ApplicationForFood(client, item.getDtisznCode(), status, item.getApplicantPhone(),
-                                item.getApplicantName(), item.getApplicantSecondName(), item.getApplicantSurname(),
-                                item.getServNumber(), item.getCreatorType(), item.getIdOfDocOrder(), item.getDocOrderDate(), nextVersion);
-                        session.save(applicationForFood);
+                        try {
+                            applicationForFood = DAOUtils
+                                    .createApplicationForFood(session, client, item.getDtisznCode(), item.getApplicantPhone(), item.getApplicantName(),
+                                            item.getApplicantSecondName(), item.getApplicantSurname(), item.getServNumber(), ApplicationForFoodCreatorType.PORTAL);
+                            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), item.getServNumber(),
+                                    applicationForFood.getStatus().getApplicationForFoodState(),
+                                    applicationForFood.getStatus().getDeclineReason());
+                            applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumber(session, item.getServNumber(),
+                                    new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+                            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), item.getServNumber(),
+                                    applicationForFood.getStatus().getApplicationForFoodState(),
+                                    applicationForFood.getStatus().getDeclineReason());
+                        } catch (Exception e) {
+                            logger.error(String.format("Unable to create application for food {idOfClient=%d, DTSZNCode=%d, "
+                                    + "applicantPhone=%s, applicantName=%s, applicantSecondName=%s, applicantSurname=%s, serviceNumber=%s}",
+                                    item.getIdOfClient(), item.getDtisznCode(), item.getApplicantPhone(), item.getApplicantName(),
+                                    item.getApplicantSecondName(), item.getApplicantSurname(), item.getServNumber()), e);
+                            continue;
+                        }
+
                     } else {
-                        applicationForFood.setClient(client);
-                        applicationForFood.setDtisznCode(item.getDtisznCode());
-                        applicationForFood.setStatus(status);
-                        applicationForFood.setMobile(item.getApplicantPhone());
-                        applicationForFood.setApplicantName(item.getApplicantName());
-                        applicationForFood.setApplicantSecondName(item.getApplicantSecondName());
-                        applicationForFood.setApplicantSurname(item.getApplicantSurname());
-                        applicationForFood.setLastUpdate(new Date());
-                        applicationForFood.setVersion(nextVersion);
-                        session.update(applicationForFood);
+                        ApplicationForFoodStatus oldStatus = applicationForFood.getStatus();
+                        applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(),
+                                client, item.getDtisznCode(), status, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(),
+                                item.getApplicantSurname(), nextVersion, nextHistoryVersion);
+                        if (!oldStatus.equals(status)) {
+                            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(),
+                                    item.getServNumber(), status.getApplicationForFoodState(), status.getDeclineReason());
+                        }
                     }
 
                     resItem = new ResRequestFeedingItem(applicationForFood, item.getResCode());

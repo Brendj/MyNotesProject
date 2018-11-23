@@ -3667,14 +3667,22 @@ public class DAOUtils {
             String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
             ApplicationForFoodCreatorType creatorType) {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
+        Long historyVersion = nextVersionByApplicationForFoodHistory(session);
+        return createApplicationForFoodWithVersion(session, client, dtisznCode, mobile, guardianName, guardianSecondName,
+                guardianSurname, serviceNumber, creatorType, applicationForFoodVersion, historyVersion);
+    }
+
+    public static ApplicationForFood createApplicationForFoodWithVersion(Session session, Client client, Long dtisznCode, String mobile,
+            String guardianName, String guardianSecondName, String guardianSurname, String serviceNumber,
+            ApplicationForFoodCreatorType creatorType, Long version, Long historyVersion) {
         ApplicationForFood applicationForFood = new ApplicationForFood(client, dtisznCode,
                 new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null),
                 mobile, guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType, null,
-                null, applicationForFoodVersion);
+                null, version);
         session.save(applicationForFood);
 
-        addApplicationForFoodHistory(session, applicationForFood,
-                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null));
+        addApplicationForFoodHistoryWithVersion(session, applicationForFood,
+                new ApplicationForFoodStatus(ApplicationForFoodState.TRY_TO_REGISTER, null), historyVersion);
 
         return applicationForFood;
     }
@@ -3687,6 +3695,7 @@ public class DAOUtils {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(session);
         applicationForFood.setStatus(status);
         applicationForFood.setVersion(applicationForFoodVersion);
+        applicationForFood.setLastUpdate(new Date());
         session.update(applicationForFood);
 
         addApplicationForFoodHistory(session, applicationForFood, status);
@@ -3697,6 +3706,7 @@ public class DAOUtils {
             ApplicationForFoodStatus status, Long version, Long historyVersion) {
         applicationForFood.setStatus(status);
         applicationForFood.setVersion(version);
+        applicationForFood.setLastUpdate(new Date());
         session.update(applicationForFood);
 
         addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, historyVersion);
@@ -3713,6 +3723,7 @@ public class DAOUtils {
         Long applicationForFoodVersion = nextVersionByApplicationForFood(persistenceSession);
         applicationForFood.setStatus(status);
         applicationForFood.setVersion(applicationForFoodVersion);
+        applicationForFood.setLastUpdate(new Date());
         persistenceSession.update(applicationForFood);
 
         addApplicationForFoodHistoryIfNotExist(persistenceSession, applicationForFood, status);
@@ -3876,5 +3887,28 @@ public class DAOUtils {
         }
         criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscountDSZN"));
         return criteria.list();
+    }
+
+    public static ApplicationForFood  updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession, String serviceNumber,
+            Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName, String applicantSecondName,
+            String applicantSurname, Long version, Long historyVersion) {
+        ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession, serviceNumber);
+        if(applicationForFood == null){
+            logger.warn("Can't find ApplicationForFood by serviceNumber = " + serviceNumber);
+            return null;
+        }
+        applicationForFood.setClient(client);
+        applicationForFood.setDtisznCode(dtisznCode);
+        applicationForFood.setStatus(status);
+        applicationForFood.setMobile(mobile);
+        applicationForFood.setApplicantName(applicantName);
+        applicationForFood.setApplicantSecondName(applicantSecondName);
+        applicationForFood.setApplicantSurname(applicantSurname);
+        applicationForFood.setVersion(version);
+        applicationForFood.setLastUpdate(new Date());
+        persistenceSession.update(applicationForFood);
+
+        addApplicationForFoodHistoryWithVersion(persistenceSession, applicationForFood, status, historyVersion);
+        return applicationForFood;
     }
 }

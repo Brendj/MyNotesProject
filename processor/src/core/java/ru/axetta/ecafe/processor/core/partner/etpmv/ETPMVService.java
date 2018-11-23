@@ -274,4 +274,7 @@ public class ETPMVService {
         throw new Exception("Unknown message type");
     }
 
+    public int getPauseValue() {
+        return PAUSE_IN_MILLIS;
+    }
 }
