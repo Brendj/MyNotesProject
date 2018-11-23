@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by nuc on 01.11.2018.
@@ -224,7 +225,10 @@ public class ETPMVService {
         return null;
     }
 
-    /*public void resendStatuses() {
+    public void resendStatuses() {
+        if (!RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.etp.consumer.node")) {
+            return;
+        }
         List<EtpOutgoingMessage> messages = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getNotSendedMessages();
         for (EtpOutgoingMessage message : messages) {
             boolean success = false;
@@ -238,7 +242,7 @@ public class ETPMVService {
         }
     }
 
-    public void processExpired() {
+    /*public void processExpired() {
         Date dateTo = CalendarUtils.addDays(new Date(), DAYS_TO_EXPIRE); //todo как рассчитать 5 РАБОЧИХ дней без привязки к ОО?
         List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getExpiredApplicationsForFood(dateTo);
         long begin_time = System.currentTimeMillis();

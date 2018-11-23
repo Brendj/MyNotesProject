@@ -20,6 +20,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by nuc on 02.11.2018.
@@ -67,6 +68,12 @@ public class ETPMVDaoService {
     }
 
     @Transactional
+    public void updateOutgoingStatus(EtpOutgoingMessage message, Boolean isSent) {
+        message.setIsSent(isSent);
+        entityManager.merge(message);
+    }
+
+    @Transactional
     public void saveBKStatus(String message, Boolean isSent) {
         EtpBKMessage etpBKMessage = new EtpBKMessage();
         etpBKMessage.setMessage(message);
@@ -111,5 +118,11 @@ public class ETPMVDaoService {
         query.setParameter("benefit", Long.parseLong(benefit));
         query.setMaxResults(1);
         return new Long((Integer)query.getSingleResult());
+    }
+
+    @Transactional(readOnly = true)
+    public List<EtpOutgoingMessage> getNotSendedMessages() {
+        Query query = entityManager.createQuery("select m from EtpOutgoingMessage m where m.isSent = false order by m.createdDate");
+        return query.getResultList();
     }
 }
