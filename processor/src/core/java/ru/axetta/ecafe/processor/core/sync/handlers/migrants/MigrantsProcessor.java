@@ -176,8 +176,18 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqItem.setNameOrgReg(migrant.getOrgRegistry().getShortName());
             inMigReqItem.setRequestNumber(migrant.getRequestNumber());
             inMigReqItem.setIdOfMigrClient(migrant.getClientMigrate().getIdOfClient());
-            inMigReqItem.setNameOfMigrClient(migrant.getClientMigrate().getPerson().getFullName());
-            inMigReqItem.setGroupOfMigrClient(migrant.getClientMigrate().getClientGroup().getGroupName());
+            Person person = migrant.getClientMigrate().getPerson();
+            if (null != person) {
+                inMigReqItem.setNameOfMigrClient(migrant.getClientMigrate().getPerson().getFullName());
+            } else {
+                inMigReqItem.setNameOfMigrClient("");
+            }
+            ClientGroup clientGroup = migrant.getClientMigrate().getClientGroup();
+            if (null != clientGroup) {
+                inMigReqItem.setGroupOfMigrClient(migrant.getClientMigrate().getClientGroup().getGroupName());
+            } else {
+                inMigReqItem.setGroupOfMigrClient("");
+            }
             inMigReqItem.setVisitStartDate(migrant.getVisitStartDate());
             inMigReqItem.setVisitEndDate(migrant.getVisitEndDate());
             inMigReqItem.setInitiator(migrant.getInitiator());
