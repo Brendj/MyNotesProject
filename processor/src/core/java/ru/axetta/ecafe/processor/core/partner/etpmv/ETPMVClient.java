@@ -28,7 +28,7 @@ import java.util.Properties;
 @Component
 @Scope("singleton")
 @DependsOn("runtimeContext")
-public class ETPMVClient implements MessageListener {
+public class ETPMVClient implements MessageListener, ExceptionListener {
 
     private static final String HOST = "etp3.sm-soft.ru"; // Host name or IP address
     private static final int PORT = 2424; // Listener port for your queue manager
@@ -56,7 +56,7 @@ public class ETPMVClient implements MessageListener {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVClient.class);
 
     @PostConstruct
-    private void init() {
+    private synchronized void init() {
 
         if (!RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.isOn", "false").equals("true")) return;
 
@@ -65,8 +65,11 @@ public class ETPMVClient implements MessageListener {
         try {
             jmsFactoryFactory = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
             jmsConnectionFactory = jmsFactoryFactory.createConnectionFactory();
-            jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_HOST_NAME, properties.getProperty("ecafe.processor.etp.host", "etp3.sm-soft.ru"));
-            jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_PORT, Integer.parseInt(properties.getProperty("ecafe.processor.etp.port", "2424")));
+            //jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_HOST_NAME, properties.getProperty("ecafe.processor.etp.host", "etp3.sm-soft.ru"));
+            //jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_PORT, Integer.parseInt(properties.getProperty("ecafe.processor.etp.port", "2424")));
+            jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_CONNECTION_NAME_LIST, properties.getProperty("ecafe.processor.etp.hosts", "etp3.sm-soft.ru(2424),etp4.sm-soft.ru(2424)"));
+            jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_CLIENT_RECONNECT_OPTIONS, WMQConstants.WMQ_CLIENT_RECONNECT);
+            jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_CLIENT_RECONNECT_TIMEOUT, Integer.parseInt(properties.getProperty("ecafe.processor.etp.reconnect_timeout", "600")));
             jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_CHANNEL, properties.getProperty("ecafe.processor.etp.channel", "CLNT.SAMPLE.SVRCONN"));
             jmsConnectionFactory.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
             jmsConnectionFactory.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, properties.getProperty("ecafe.processor.etp.qmgr", "GU01QM"));
@@ -88,6 +91,7 @@ public class ETPMVClient implements MessageListener {
                 queueConsumer = jmsConsumerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in", "SAMPLE.APPLICATION_INC"));
                 consumer = jmsConsumerSession.createConsumer(queueConsumer);
                 consumer.setMessageListener(this);
+                jmsConnection.setExceptionListener(this);
 
                 bkQueueConsumer = jmsProducerSession.createQueue(properties.getProperty("ecafe.processor.etp.queue.in.bk", "SAMPLE.APPLICATION_INC.BK"));
                 consumerBK = jmsProducerSession.createProducer(bkQueueConsumer);
@@ -122,6 +126,17 @@ public class ETPMVClient implements MessageListener {
         } catch (JMSException e) {
             logger.error("Error in parse ETP message: " + message.toString() + " Stack trace: ", e);
         }
+    }
+
+    @Override
+    public void onException(JMSException ex) {
+        logger.error("Exception in ETPMVClient. Try to reconnect");
+        init();
+    }
+
+    public void watchdogRun() {
+        if (!RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.isOn", "false").equals("true")) return;
+        if (jmsConnection == null) init();
     }
 
     public void sendStatus(String message) throws Exception {
