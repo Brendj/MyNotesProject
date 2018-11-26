@@ -67,4 +67,5 @@ OIDS = FALSE
 -- код льготы ЕТП
 ALTER TABLE cf_categorydiscounts_dszn
     add column etpcode bigint;
-    
+
+--! ФИНАЛИЗИРОВАН 26.11.2018, НЕ МЕНЯТЬ
