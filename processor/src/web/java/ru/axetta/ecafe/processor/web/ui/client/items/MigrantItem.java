@@ -35,6 +35,10 @@ public class MigrantItem implements Comparable {
     private String group;
     private boolean annulled;
 
+    private String shortName;
+    private Long idOfOrg;
+    private String shortAddress;
+
     public MigrantItem(Session session, Migrant migrant) {
         this.compositeIdOfMigrant = migrant.getCompositeIdOfMigrant();
         this.requestNumber = migrant.getRequestNumber();
@@ -63,6 +67,13 @@ public class MigrantItem implements Comparable {
         this.visitEndDate = migrant.getVisitEndDate();
         this.section = migrant.getSection();
         this.annulled = false;
+
+        if(migrant.getOrgRegistry() != null){
+            Org orgRegistry = migrant.getOrgRegistry();
+            this.shortAddress = orgRegistry.getShortAddress();
+            this.idOfOrg = orgRegistry.getIdOfOrg();
+            this.shortName = orgRegistry.getShortName();
+        }
     }
 
     private String getOrgname(Org org) {
@@ -224,5 +235,29 @@ public class MigrantItem implements Comparable {
 
     public void setLastUpdateDateTime(Date lastUpdateDateTime) {
         this.lastUpdateDateTime = lastUpdateDateTime;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 }

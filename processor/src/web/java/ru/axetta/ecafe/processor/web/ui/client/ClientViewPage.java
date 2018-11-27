@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -585,7 +586,8 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.clientWardItems = loadWardsByClient(session, idOfClient);
 
-        this.clientSectionsItems = MigrantsUtils.getActiveMigrantsByIdOfClient(session, idOfClient);
+        List<Migrant> migrants = MigrantsUtils.getActiveMigrantsByIdOfClient(session, idOfClient);
+        clientSectionsItems = buildClientSectionsItem(session, migrants);
         visitsSections = !clientSectionsItems.isEmpty();
 
         try {
@@ -602,6 +604,17 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
 
+    }
+
+    private List<MigrantItem> buildClientSectionsItem(Session session, List<Migrant> migrants) {
+        List<MigrantItem> result = new LinkedList<MigrantItem>();
+        if(migrants != null){
+            for(Migrant migrant : migrants){
+                MigrantItem item = new MigrantItem(session, migrant);
+                result.add(item);
+            }
+        }
+        return result;
     }
 
     public static String getCategoriesDiscountsDSZNDesc(Session session, Client client) {
@@ -645,9 +658,9 @@ public class ClientViewPage extends BasicWorkspacePage {
         return clientWardItems;
     }
 
-    private List<Migrant> clientSectionsItems;
+    private List<MigrantItem> clientSectionsItems;
 
-    public List<Migrant> getClientSectionsItems(){
+    public List<MigrantItem> getClientSectionsItems(){
         return clientSectionsItems;
     }
 

@@ -186,19 +186,19 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Ид ОО посещения" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.orgRegistry.idOfOrg}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientSection.idOfOrg}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Название ОО посещения" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.orgRegistry.shortName}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientSection.shortName}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Адрес ОО посещения" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.orgRegistry.shortAddress}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientSection.shortAddress}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
