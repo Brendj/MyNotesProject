@@ -25,6 +25,7 @@ public class ClientGuardianItem {
     private Boolean disabled;
     private Integer relation;
     private String guidRequest;
+    private Boolean informedSpecialMenu; //ConsentToPreOrder
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -36,6 +37,7 @@ public class ClientGuardianItem {
         if (clientGuardian.getCardRequest() != null) {
             this.guidRequest = clientGuardian.getCardRequest().getGuid();
         }
+        this.informedSpecialMenu = clientGuardian.getInformedSpecialMenu();
         this.result = null;
     }
 
@@ -74,6 +76,7 @@ public class ClientGuardianItem {
         XMLUtils.setAttributeIfNotNull(element, "D", deleteState);
         XMLUtils.setAttributeIfNotNull(element, "Relation", relation);
         XMLUtils.setAttributeIfNotNull(element, "GuidRequest", guidRequest);
+        XMLUtils.setAttributeIfNotNull(element, "ConsentToPreOrder", informedSpecialMenu ? "1" : "0"); //По протоколу поле ConsentToPreOrder == informedSpecialMenu
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
@@ -113,5 +116,13 @@ public class ClientGuardianItem {
 
     public void setRelation(Integer relation) {
         this.relation = relation;
+    }
+
+    public Boolean getInformedSpecialMenu() {
+        return informedSpecialMenu;
+    }
+
+    public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
+        this.informedSpecialMenu = informedSpecialMenu;
     }
 }
