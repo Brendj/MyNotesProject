@@ -17,5 +17,6 @@
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="isSent" column="isSent"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="errorMessage" column="errorMessage" type="string"/>
     </class>
 </hibernate-mapping>

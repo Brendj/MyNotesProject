@@ -53,13 +53,14 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void saveOutgoingStatus(String messageId, String messageText, Boolean isSent) {
+    public void saveOutgoingStatus(String messageId, String messageText, Boolean isSent, String errorMessage) {
         try {
             EtpOutgoingMessage etpOutgoingMessage = new EtpOutgoingMessage();
             etpOutgoingMessage.setEtpMessageId(messageId);
             etpOutgoingMessage.setCreatedDate(new Date());
             etpOutgoingMessage.setEtpMessagePayload(messageText);
             etpOutgoingMessage.setIsSent(isSent);
+            etpOutgoingMessage.setErrorMessage(errorMessage);
             etpOutgoingMessage.setLastUpdate(new Date());
             entityManager.merge(etpOutgoingMessage);
         } catch (Exception e) {

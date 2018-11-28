@@ -9,7 +9,6 @@ import generated.etp.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.RNIPSecuritySOAPHandler;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.dom.ElementNSImpl;
@@ -22,12 +21,17 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by nuc on 01.11.2018.
@@ -41,6 +45,7 @@ public class ETPMVService {
     private final int PAUSE_IN_MILLIS = 1000;
     public final String BENEFIT_INOE = "0";
     public final String BENEFIT_REGULAR = "1";
+    private final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     //public final Set<String> BENEFITS_ETP = new HashSet<String>(Arrays.asList("0", "1", "2", "3", "4", "5"));
     //private final int DAYS_TO_EXPIRE = 5;
 
@@ -87,8 +92,8 @@ public class ETPMVService {
         String benefit = getServicePropertiesValue(serviceProperties, "benefit");
 
         if (wrongBenefits(yavl_lgot, benefit)) {
-            logger.error("Wrong benefits in packet");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+            logger.error("Error in processCoordinateMessage: wrong benefits in packet");
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong benefits in packet");
             return;
         }
 
@@ -96,7 +101,7 @@ public class ETPMVService {
         BaseDeclarant baseDeclarant = getBaseDeclarant(contacts);
         if (baseDeclarant == null) {
             logger.error("Error in processCoordinateMessage: wrong contacts data");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "wrong contacts data");
             return;
         }
         String firstName = ((RequestContact)baseDeclarant).getFirstName();
@@ -105,13 +110,13 @@ public class ETPMVService {
         String mobile = Client.checkAndConvertMobile(((RequestContact)baseDeclarant).getMobilePhone());
         if (StringUtils.isEmpty(guid) || StringUtils.isEmpty(firstName) || StringUtils.isEmpty(lastName) || StringUtils.isEmpty(mobile)) {
                 logger.error("Error in processCoordinateMessage: not enough data");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "not enough data");
                 return;
         }
         Client client = DAOService.getInstance().getClientByGuid(guid);
         if (client == null) {
             logger.error("Error in processCoordinateMessage: client not found");
-            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "client not found");
             return;
         }
         ApplicationForFood applicationForFood = daoService.findApplicationForFood(guid);
@@ -119,7 +124,7 @@ public class ETPMVService {
         if (applicationForFood != null) {
             if (!testForApplicationForFoodStatus(applicationForFood)) {
                 logger.error("Error in processCoordinateMessage: ApplicationForFood found but status is incorrect");
-                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null);
+                sendStatus(begin_time, serviceNumber, ApplicationForFoodState.DELIVERY_ERROR, null, "ApplicationForFood found but status is incorrect");
                 return;
             }
         }
@@ -170,6 +175,10 @@ public class ETPMVService {
     }
 
     public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason) throws Exception {
+        sendStatus(begin_time, serviceNumber, status, reason, null);
+    }
+
+    public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason, String errorMessage) throws Exception {
         logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber);
         String message = createStatusMessage(serviceNumber, status, reason);
         boolean success = false;
@@ -182,7 +191,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success);
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage);
     }
 
     private void sendToBK(String message) {
@@ -203,7 +212,10 @@ public class ETPMVService {
         StatusType statusType = objectFactory.createStatusType();
         statusType.setStatusCode(status.getCode());
         statusType.setStatusTitle(status.getDescription());
-        statusType.setStatusDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(new Date()));
+        DateFormat format = new SimpleDateFormat(DATE_FORMAT);
+        XMLGregorianCalendar calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(format.format(new Date()));
+        calendar.setTimezone(getTimeZoneOffsetInMinutes());
+        statusType.setStatusDate(calendar);
         coordinateStatusData.setStatus(statusType);
         coordinateStatusData.setServiceNumber(serviceNumber);
         coordinateStatusMessage.setCoordinateStatusDataMessage(coordinateStatusData);
@@ -221,6 +233,10 @@ public class ETPMVService {
         return sw.toString();
     }
 
+    private int getTimeZoneOffsetInMinutes() {
+        return TimeZone.getTimeZone("Europe/Moscow").getRawOffset()/60000; //значение часового сдвига в мс выражаем в минутах
+    }
+
     private String getServicePropertiesValue(ElementNSImpl serviceProperties, String elementName) {
         for (int i = 0; i < serviceProperties.getLength(); i++) {
             String nodeName = serviceProperties.getChildNodes().item(i).getNodeName();
@@ -230,7 +246,8 @@ public class ETPMVService {
     }
 
     public void resendStatuses() {
-        if (!RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.etp.consumer.node")) {
+        if (!RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.etp.consumer.node") ||
+                !RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.isOn", "false").equals("true")) {
             return;
         }
         List<EtpOutgoingMessage> messages = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getNotSendedMessages();
