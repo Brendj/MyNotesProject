@@ -102,6 +102,9 @@ public class ETPMVDaoService {
         DAOUtils.createApplicationForFood(session, client, dtisznCode, mobile,
                 guardianName, guardianSecondName, guardianSurname, serviceNumber, creatorType);
         DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+        if (dtisznCode == null) {
+            DAOUtils.updateApplicationForFood(session, client, new ApplicationForFoodStatus(ApplicationForFoodState.PAUSED, null));
+        }
     }
 
     @Transactional(readOnly = true)

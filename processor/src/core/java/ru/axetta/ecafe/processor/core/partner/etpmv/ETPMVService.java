@@ -128,6 +128,10 @@ public class ETPMVService {
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.TRY_TO_REGISTER, null);
         begin_time = System.currentTimeMillis();
         sendStatus(begin_time, serviceNumber, ApplicationForFoodState.REGISTERED, null);
+        if (yavl_lgot.equals(BENEFIT_INOE)) {
+            begin_time = System.currentTimeMillis();
+            sendStatus(begin_time, serviceNumber, ApplicationForFoodState.PAUSED, null);
+        }
         daoService.updateEtpPacketWithSuccess(serviceNumber);
     }
 
