@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -92,7 +93,7 @@ public class ApplicationForFoodProcessingService {
             ApplicationForFoodStatus deniedStatus = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
                     ApplicationForFoodDeclineReason.NO_DOCS);
 
-            Integer counter = 0;
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
             for (ApplicationForFood application : applicationForFoodList) {
                 Org clientOrg = application.getClient().getOrg();
@@ -118,25 +119,25 @@ public class ApplicationForFoodProcessingService {
                         historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
                     }
 
-                    DAOUtils.updateApplicationForFoodWithVersion(session, application, resumeStatus, applicationVersion,
+                    application = DAOUtils.updateApplicationForFoodWithVersion(session, application, resumeStatus, applicationVersion,
                             historyVersion);
-                    DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
+                    service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                            application.getStatus().getApplicationForFoodState(),
+                            application.getStatus().getDeclineReason());
+                    application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
                             historyVersion);
-
-                }
-                if (counter++%100 == 0) {
-                    session.flush();
-                    session.clear();
-                    logger.info(String.format("Update applications: %d/%d done.", counter, applicationForFoodList.size()));
+                    service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                            application.getStatus().getApplicationForFoodState(),
+                            application.getStatus().getDeclineReason());
                 }
             }
 
             transaction.commit();
             transaction = null;
+            logger.info("End of processing applications for food for 1060 status");
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
-            logger.info("End of processing applications for food for 1060 status");
         }
     }
 
@@ -164,6 +165,8 @@ public class ApplicationForFoodProcessingService {
 
             //check special dates
             for (Date specialDate : specialDates) {
+                if (null == specialDate)
+                    continue;
                 if (CalendarUtils.betweenDate(specialDate, endDateStart, endDateEnd)) {
                     isWeekend = true;
                     break;
