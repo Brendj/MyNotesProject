@@ -128,6 +128,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public void runTaskNextTimePerDay() throws Exception {
+        logger.info("Start preorder request report gen");
         updateDate();
 
         orgItems = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems();
@@ -150,87 +151,116 @@ public class PreorderRequestsReportService extends RecoverableService {
         Transaction transaction = null;
         try {
             session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
 
             List<PreorderItem> preorderItemList = loadPreorders(session); //все актуальные предзаказы на завтра и дальше
             Map<Long, Integer> forbiddenDaysMap = new HashMap<Long, Integer>();
             Map<Long, Map<Long, DatesForPreorder>> datesMap = new HashMap<Long, Map<Long, DatesForPreorder>>();
             Map<Long, Map<Long, List<Date>>> weekends = new HashMap<Long, Map<Long, List<Date>>>();
-
+            int size = preorderItemList.size();
+            int counter = 0;
             for (PreorderItem item : preorderItemList) {
-                boolean itemWasDeleted = false;
-                for (PreorderItemForDelete itemForDelete : preorderItemForDeleteList) {
-                    if (itemForDelete.idOfClient.equals(item.idOfClient) &&
-                            itemForDelete.preorderDate.equals(item.preorderDate)) {
-                        deletePreorderForNotEnoughMoney(session, item);
-                        itemWasDeleted = true;
-                        break;
-                    }
-                }
-                if (itemWasDeleted)
-                    continue;
-
-                if (null == item.getIdOfGood()) {
-                    logger.warn(String.format("PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
-                            item.getIdOfOrg(), item.getCreatedDate().toString()) );
-                    continue;
-                }
-
-                if (checkPreorderDateForWeekend(session, item, weekends) && null == item.getIdOfGoodsRequestPosition()) {
-                    deletePreorderForChangedCalendar(session, item);
-                    continue;
-                }
-
+                counter++;
+                logger.info(String.format("Generating %s request from %s", counter, size));
                 try {
-                    Date startDate = new Date();
-                    Date endDate = new Date();
-                    Integer forbiddenDaysCount = forbiddenDaysMap.get(item.getIdOfOrg());
-                    if (forbiddenDaysCount == null) {
-                        forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(item.getIdOfOrg());
-                        if (forbiddenDaysCount == null)
-                            forbiddenDaysCount = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
-                        forbiddenDaysMap.put(item.getIdOfOrg(), forbiddenDaysCount);
-                    }
-                    if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
-                        forbiddenDaysCount -= 1;
-
-                    DatesForPreorder dates = null;
-                    Map<Long, DatesForPreorder> orgMap = datesMap.get(item.getIdOfOrg());
-                    if (null != orgMap) {
-                        dates = orgMap.get(item.getIdOfClientGroup());
-                    }
-                    if (dates == null) {
-                        if (!getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate, item.getIdOfClientGroup()))
-                            continue;
-                        dates = new DatesForPreorder();
-                        dates.startDate = startDate;
-                        dates.endDate = endDate;
-                        if (null == orgMap) {
-                            datesMap.put(item.getIdOfOrg(), new HashMap<Long, DatesForPreorder>());
+                    transaction = session.beginTransaction();
+                    boolean itemWasDeleted = false;
+                    for (PreorderItemForDelete itemForDelete : preorderItemForDeleteList) {
+                        if (itemForDelete.idOfClient.equals(item.idOfClient) && itemForDelete.preorderDate.equals(item.preorderDate)) {
+                            deletePreorderForNotEnoughMoney(session, item);
+                            itemWasDeleted = true;
+                            break;
                         }
-                        datesMap.get(item.getIdOfOrg()).put(item.getIdOfClientGroup(), dates);
                     }
-                    startDate = dates.startDate;
-                    endDate = dates.endDate;
-
-                    if (!CalendarUtils.betweenDate(item.getPreorderDate(), startDate, endDate)) {
+                    if (itemWasDeleted) {
+                        transaction.commit();
+                        transaction = null;
                         continue;
                     }
 
-                    if (null == item.getIdOfGoodsRequestPosition()) {
-                        Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient, CalendarUtils.startOfDay(fireTime), endDate,
-                            item.getIdOfPreorderComplex(), item.getIdOfPreorderMenuDetail());
+                    if (null == item.getIdOfGood()) {
+                        logger.warn(String.format(
+                                "PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
+                                item.getIdOfOrg(), item.getCreatedDate().toString()));
+                        transaction.commit();
+                        transaction = null;
+                        continue;
+                    }
 
-                        if ((item.clientBalance - item.complexPrice - preordersPrice) < 0L) {
-                            logger.warn(String.format("PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
-                                            + "idOfPreorderComplex=%d, idOfPreorderMenuDetail=%d)",
-                                    item.idOfClient, item.idOfPreorderComplex, item.idOfPreorderMenuDetail));
-                            deletePreorderForNotEnoughMoney(session, item);
-                            preorderItemForDeleteList.add(new PreorderItemForDelete(item.getIdOfClient(), item.getPreorderDate()));
+                    if (checkPreorderDateForWeekend(session, item, weekends) && null == item.getIdOfGoodsRequestPosition()) {
+                        deletePreorderForChangedCalendar(session, item);
+                        transaction.commit();
+                        transaction = null;
+                        continue;
+                    }
+
+                    try {
+                        Date startDate = new Date();
+                        Date endDate = new Date();
+                        Integer forbiddenDaysCount = forbiddenDaysMap.get(item.getIdOfOrg());
+                        if (forbiddenDaysCount == null) {
+                            forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(item.getIdOfOrg());
+                            if (forbiddenDaysCount == null)
+                                forbiddenDaysCount = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
+                            forbiddenDaysMap.put(item.getIdOfOrg(), forbiddenDaysCount);
+                        }
+                        if (null != forbiddenDaysCount && forbiddenDaysCount != 0)
+                            forbiddenDaysCount -= 1;
+
+                        DatesForPreorder dates = null;
+                        Map<Long, DatesForPreorder> orgMap = datesMap.get(item.getIdOfOrg());
+                        if (null != orgMap) {
+                            dates = orgMap.get(item.getIdOfClientGroup());
+                        }
+                        if (dates == null) {
+                            if (!getPreorderDates(session, item.getIdOfOrg(), forbiddenDaysCount, startDate, endDate, item.getIdOfClientGroup())) {
+                                transaction.commit();
+                                transaction = null;
+                                continue;
+                            }
+                            dates = new DatesForPreorder();
+                            dates.startDate = startDate;
+                            dates.endDate = endDate;
+                            if (null == orgMap) {
+                                datesMap.put(item.getIdOfOrg(), new HashMap<Long, DatesForPreorder>());
+                            }
+                            datesMap.get(item.getIdOfOrg()).put(item.getIdOfClientGroup(), dates);
+                        }
+                        startDate = dates.startDate;
+                        endDate = dates.endDate;
+
+                        if (!CalendarUtils.betweenDate(item.getPreorderDate(), startDate, endDate)) {
+                            transaction.commit();
+                            transaction = null;
                             continue;
                         }
-                        if (null == item.getDeleted() || !item.getDeleted()) {
-                            String guid = createRequestFromPreorder(session, item, fireTime);
+
+                        if (null == item.getIdOfGoodsRequestPosition()) {
+                            Long preordersPrice = DAOUtils.getAllPreordersPriceByClient(session, item.idOfClient,
+                                    CalendarUtils.startOfDay(fireTime), endDate, item.getIdOfPreorderComplex(), item.getIdOfPreorderMenuDetail());
+
+                            if ((item.clientBalance - item.complexPrice - preordersPrice) < 0L) {
+                                logger.warn(String.format(
+                                        "PreorderRequestsReportService: not enough money balance to create request (idOfClient=%d, "
+                                                + "idOfPreorderComplex=%d, idOfPreorderMenuDetail=%d)", item.idOfClient,
+                                        item.idOfPreorderComplex, item.idOfPreorderMenuDetail));
+                                deletePreorderForNotEnoughMoney(session, item);
+                                preorderItemForDeleteList.add(new PreorderItemForDelete(item.getIdOfClient(), item.getPreorderDate()));
+                                transaction.commit();
+                                transaction = null;
+                                continue;
+                            }
+                            if (null == item.getDeleted() || !item.getDeleted()) {
+                                String guid = createRequestFromPreorder(session, item, fireTime);
+                                if (null != guid) {
+                                    if (!guidListForOrg.containsKey(item.getIdOfOrg())) {
+                                        guidListForOrg.put(item.getIdOfOrg(), new ArrayList<String>());
+                                    }
+                                    guidListForOrg.get(item.getIdOfOrg()).add(guid);
+                                }
+                            }
+
+                        } else {
+                            String guid = updateRequestFromPreorder(session, item, fireTime);
                             if (null != guid) {
                                 if (!guidListForOrg.containsKey(item.getIdOfOrg())) {
                                     guidListForOrg.put(item.getIdOfOrg(), new ArrayList<String>());
@@ -238,27 +268,22 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 guidListForOrg.get(item.getIdOfOrg()).add(guid);
                             }
                         }
-
-                    } else {
-                        String guid = updateRequestFromPreorder(session, item, fireTime);
-                        if (null != guid) {
-                            if (!guidListForOrg.containsKey(item.getIdOfOrg())) {
-                                guidListForOrg.put(item.getIdOfOrg(), new ArrayList<String>());
-                            }
-                            guidListForOrg.get(item.getIdOfOrg()).add(guid);
-                        }
+                    } catch (Exception e) {
+                        logger.warn("PreorderRequestsReportService: could not create GoodRequest");
                     }
-                } catch (Exception e) {
-                    logger.warn("PreorderRequestsReportService: could not create GoodRequest");
+                    transaction.commit();
+                    transaction = null;
+                } finally {
+                        HibernateUtils.rollback(transaction, logger);
                 }
             }
-            transaction.commit();
-            transaction = null;
+
+
         } finally {
-            HibernateUtils.rollback(transaction, logger);
+
             HibernateUtils.close(session, logger);
         }
-
+        logger.info("End preorder request report gen");
         Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
         final Date lastCreateOrUpdateDate = calendarEnd.getTime();
         calendarEnd.add(Calendar.MINUTE, 1);
