@@ -225,6 +225,13 @@ public class ETPMVService {
             dictionaryItem.setName(reason.getDescription());
             coordinateStatusData.setReason(dictionaryItem);
         }
+        if (!status.getCode().equals(ApplicationForFoodState.DENIED.getCode())) {
+            coordinateStatusData.setNote(status.getNote());
+        } else {
+            if (null != reason) {
+                coordinateStatusData.setNote(reason.getDescription());
+            }
+        }
 
         JAXBContext jaxbContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
