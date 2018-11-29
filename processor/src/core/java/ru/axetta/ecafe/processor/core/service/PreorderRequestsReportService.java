@@ -29,10 +29,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.quartz.*;
@@ -150,9 +147,9 @@ public class PreorderRequestsReportService extends RecoverableService {
         Session session = null;
         Transaction transaction = null;
         try {
+            List<PreorderItem> preorderItemList = loadPreorders(); //все актуальные предзаказы на завтра и дальше
             session = runtimeContext.createPersistenceSession();
-
-            List<PreorderItem> preorderItemList = loadPreorders(session); //все актуальные предзаказы на завтра и дальше
+            session.setFlushMode(FlushMode.COMMIT);
             Map<Long, Integer> forbiddenDaysMap = new HashMap<Long, Integer>();
             Map<Long, Map<Long, DatesForPreorder>> datesMap = new HashMap<Long, Map<Long, DatesForPreorder>>();
             Map<Long, Map<Long, List<Date>>> weekends = new HashMap<Long, Map<Long, List<Date>>>();
@@ -274,13 +271,10 @@ public class PreorderRequestsReportService extends RecoverableService {
                     transaction.commit();
                     transaction = null;
                 } finally {
-                        HibernateUtils.rollback(transaction, logger);
+                    HibernateUtils.rollback(transaction, logger);
                 }
             }
-
-
         } finally {
-
             HibernateUtils.close(session, logger);
         }
         logger.info("End preorder request report gen");
@@ -459,55 +453,60 @@ public class PreorderRequestsReportService extends RecoverableService {
         return properties;
     }
 
-    private List<PreorderItem> loadPreorders(Session session) {
+    private List<PreorderItem> loadPreorders() {
+        Session session = null;
+        Transaction transaction = null;
         List<PreorderItem> preorderItemList = new ArrayList<PreorderItem>();
-        String sqlQuery =
-                "SELECT ci.idoforg, pc.createddate, pc.idofpreordercomplex, pmd.idofpreordermenudetail, "
-              + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
-              + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"
-              + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
-              + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
-              + "   c.balance, c.idofclient, (coalesce(pc.deletedstate=1, false) OR coalesce(pmd.deletedstate=1, false)) AS isdeleted,"
-              + "   c.idofclientgroup "
-              + "FROM cf_preorder_complex pc "
-              + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
-              + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
-              + "   AND ci.idofcomplex = pc.armcomplexid "
-              + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 "
-              + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
-              + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-              + "WHERE pc.preorderdate > :date "
-              + "   and ((pc.amount <> 0 OR pmd.amount <> 0) OR (coalesce(pc.deletedstate = 1, false) OR coalesce(pmd.deletedstate = 1, false)))";
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
 
-        Query query = session.createSQLQuery(sqlQuery);
-        query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
-        List data = query.list();
-        for (Object entry : data) {
-            Object o[] = (Object[]) entry;
-            Long idOfOrg = (null != o[0]) ? ((BigInteger) o[0]).longValue() : null;
-            Date createdDate = (null != o[1]) ? new Date(((BigInteger) o[1]).longValue()) : null;
-            Long idOfPreorderComplex = (null != o[2]) ? ((BigInteger) o[2]).longValue() : null;
-            Long idOfPreorderMenuDetail = (null != o[3]) ? ((BigInteger) o[3]).longValue() : null;
-            Long idOfGood = (null != o[4]) ? ((BigInteger) o[4]).longValue() : null;
-            Integer amount = (Integer) o[5];
-            Long idOfGoodsRequest = (null != o[6]) ? ((BigInteger) o[6]).longValue() : null;
-            Date preorderDate = (null != o[7]) ? new Date(((BigInteger) o[7]).longValue()) : null;
+            String sqlQuery =
+                    "SELECT ci.idoforg, pc.createddate, pc.idofpreordercomplex, pmd.idofpreordermenudetail, " + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount," + "   CASE WHEN (pc.amount = 0) THEN pmd.idOfGoodsRequestPosition ELSE pc.idOfGoodsRequestPosition END AS idOfGoodsRequestPosition,"
+                            + "   pc.preorderdate, pc.complexprice, pc.amount AS complexamount, pmd.menudetailprice, pmd.amount AS menudetailamount,"
+                            + "   c.balance, c.idofclient, (coalesce(pc.deletedstate=1, FALSE) OR coalesce(pmd.deletedstate=1, FALSE)) AS isdeleted,"
+                            + "   c.idofclientgroup " + "FROM cf_preorder_complex pc " + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                            + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
+                            + "   AND ci.idofcomplex = pc.armcomplexid " + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 "
+                            + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate " + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
+                            + "WHERE pc.preorderdate > :date " + "   AND ((pc.amount <> 0 OR pmd.amount <> 0) OR (coalesce(pc.deletedstate = 1, FALSE) OR coalesce(pmd.deletedstate = 1, FALSE)))";
 
-            Long complexPrice = (null != o[8]) ? ((BigInteger) o[8]).longValue() : 0L;
-            Integer complexAmount = (null != o[9]) ? (Integer) o[9] : 0;
-            Long menuDetailPrice = (null != o[10]) ? ((BigInteger) o[10]).longValue() : 0L;
-            Integer menuDetailAmount = (null != o[11]) ? (Integer) o[11] : 0;
-            Long clientBalance = (null != o[12]) ? ((BigInteger) o[12]).longValue() : 0L;
-            Long idOfClient = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
-            Boolean isDeleted = (Boolean) o[14];
-            Boolean isComplex = !complexAmount.equals(0);
-            Long idOfClientGroup = (null != o[15]) ? ((BigInteger) o[15]).longValue() : null;
+            Query query = session.createSQLQuery(sqlQuery);
+            query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
+            List data = query.list();
+            for (Object entry : data) {
+                Object o[] = (Object[]) entry;
+                Long idOfOrg = (null != o[0]) ? ((BigInteger) o[0]).longValue() : null;
+                Date createdDate = (null != o[1]) ? new Date(((BigInteger) o[1]).longValue()) : null;
+                Long idOfPreorderComplex = (null != o[2]) ? ((BigInteger) o[2]).longValue() : null;
+                Long idOfPreorderMenuDetail = (null != o[3]) ? ((BigInteger) o[3]).longValue() : null;
+                Long idOfGood = (null != o[4]) ? ((BigInteger) o[4]).longValue() : null;
+                Integer amount = (Integer) o[5];
+                Long idOfGoodsRequest = (null != o[6]) ? ((BigInteger) o[6]).longValue() : null;
+                Date preorderDate = (null != o[7]) ? new Date(((BigInteger) o[7]).longValue()) : null;
 
-            preorderItemList
-                    .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
-                            createdDate, idOfGoodsRequest, preorderDate,
-                            complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance, idOfClient,
-                            isDeleted, isComplex, idOfClientGroup));
+                Long complexPrice = (null != o[8]) ? ((BigInteger) o[8]).longValue() : 0L;
+                Integer complexAmount = (null != o[9]) ? (Integer) o[9] : 0;
+                Long menuDetailPrice = (null != o[10]) ? ((BigInteger) o[10]).longValue() : 0L;
+                Integer menuDetailAmount = (null != o[11]) ? (Integer) o[11] : 0;
+                Long clientBalance = (null != o[12]) ? ((BigInteger) o[12]).longValue() : 0L;
+                Long idOfClient = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
+                Boolean isDeleted = (Boolean) o[14];
+                Boolean isComplex = !complexAmount.equals(0);
+                Long idOfClientGroup = (null != o[15]) ? ((BigInteger) o[15]).longValue() : null;
+
+                preorderItemList
+                        .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
+                                createdDate, idOfGoodsRequest, preorderDate,
+                                complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance,
+                                idOfClient, isDeleted, isComplex, idOfClientGroup));
+            }
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
         return preorderItemList;
     }
@@ -569,7 +568,6 @@ public class PreorderRequestsReportService extends RecoverableService {
             detail.setIdOfGoodsRequestPosition(pos.getGlobalId());
             session.update(detail);
         }
-        session.flush();
 
         return pos.getGuid();
     }
@@ -607,7 +605,6 @@ public class PreorderRequestsReportService extends RecoverableService {
         }
 
         if (isUpdated) {
-            session.flush();
             return pos.getGuid();
         }
         return null;
