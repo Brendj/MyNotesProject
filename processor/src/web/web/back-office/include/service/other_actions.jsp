@@ -118,8 +118,10 @@
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-        <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
-                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <a4j:commandButton value="Запустить свергу льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>

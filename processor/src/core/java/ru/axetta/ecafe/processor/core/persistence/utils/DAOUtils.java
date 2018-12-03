@@ -3911,4 +3911,21 @@ public class DAOUtils {
         addApplicationForFoodHistoryWithVersion(persistenceSession, applicationForFood, status, historyVersion);
         return applicationForFood;
     }
+
+    public static long nextVersionByClientDTISZNDiscountInfo(Session session) {
+        long version = 0L;
+        Query query = session
+                .createSQLQuery("select version from cf_client_dtiszn_discount_info order by version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o != null){
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static  CategoryDiscountDSZN getCategoryDiscountDSZNByDSZNCode(Session session, Long dsznCode) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("code", dsznCode));
+        return (CategoryDiscountDSZN) criteria.uniqueResult();
+    }
 }

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
@@ -470,6 +471,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
 
     }
+
     public void runApplicationForFoodProcessingService() throws Exception {
         try {
             RuntimeContext.getAppContext().getBean(ApplicationForFoodProcessingService.class).runTask();
@@ -477,6 +479,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         } catch (Exception e) {
             getLogger().error("Error processing applications for food: ", e);
             printError("Во время обработки заявлений на льготное питание произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void runDTSZNDiscountsReviseService() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).runTask();
+            printMessage("Сверка завершена");
+        } catch (Exception e) {
+            getLogger().error("Error discounts revise service: ", e);
+            printError("Во время сверки произошла ошибка с текстом " + e.getMessage());
         }
     }
 

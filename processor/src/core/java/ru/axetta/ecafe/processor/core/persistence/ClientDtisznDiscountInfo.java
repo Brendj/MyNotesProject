@@ -17,6 +17,21 @@ public class ClientDtisznDiscountInfo {
     private Date createdDate;
     private Long version;
     private Boolean archived;
+    private Date lastUpdate;
+
+    public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
+            Date dateStart, Date dateEnd, Date createdDate, Long version) {
+        this.client = client;
+        this.dtisznCode = dtisznCode;
+        this.dtisznDescription = dtisznDescription;
+        this.status = status;
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
+        this.createdDate = createdDate;
+        this.version = version;
+        this.archived = false;
+        this.lastUpdate = new Date();
+    }
 
     public ClientDtisznDiscountInfo() {
 
@@ -100,5 +115,13 @@ public class ClientDtisznDiscountInfo {
 
     public void setArchived(Boolean archived) {
         this.archived = archived;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }
