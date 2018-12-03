@@ -21,11 +21,12 @@ import java.util.logging.Logger;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "IsppWebServiceService", targetNamespace = "urn:contingent.mos.ru:ws:ispp", wsdlLocation = "file:/D:/Temp/aiscontingent/ispp_1.wsdl")
+@WebServiceClient(name = "IsppWebServiceService", targetNamespace = "urn:contingent.mos.ru:ws:ispp", wsdlLocation = "META-INF/contingent/ispp.wsdl")
 public class IsppWebServiceService
     extends Service
 {
 
+    private final static String WSDL_LOCATION = "META-INF/contingent/ispp.wsdl";
     private final static URL ISPPWEBSERVICESERVICE_WSDL_LOCATION;
     private final static Logger logger = Logger.getLogger(generated.contingent.IsppWebServiceService.class.getName());
 
@@ -34,7 +35,7 @@ public class IsppWebServiceService
         try {
             URL baseUrl;
             baseUrl = generated.contingent.IsppWebServiceService.class.getResource(".");
-            url = new URL(baseUrl, "file:/D:/Temp/aiscontingent/ispp_1.wsdl");
+            url = new URL(baseUrl, IsppWebServiceService.class.getClassLoader().getResource(WSDL_LOCATION).getPath());
         } catch (MalformedURLException e) {
             logger.warning("Failed to create URL for the wsdl Location: 'file:/D:/Temp/aiscontingent/ispp_1.wsdl', retrying as a local file");
             logger.warning(e.getMessage());
