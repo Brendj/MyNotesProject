@@ -81,7 +81,7 @@ public class DiscountChangeHistory {
                 clientCategories.append(",");
             }
             session.close();
-            return clientCategories.substring(0, clientCategories.length() - 1);
+            return clientCategories.length() == 0 ? null : clientCategories.substring(0, clientCategories.length() - 1);
 
         }
     }
