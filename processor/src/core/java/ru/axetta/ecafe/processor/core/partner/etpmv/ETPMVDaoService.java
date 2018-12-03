@@ -19,6 +19,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -128,5 +129,36 @@ public class ETPMVDaoService {
     public List<EtpOutgoingMessage> getNotSendedMessages() {
         Query query = entityManager.createQuery("select m from EtpOutgoingMessage m where m.isSent = false order by m.createdDate");
         return query.getResultList();
+    }
+
+    @Transactional
+    public List<ApplicationForFood> getDataForAISContingent() {
+        Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c where a.sendToAISContingent = false "
+                + " and ((a.dtisznCode <> null and a.status = :statusDtiszn) or (a.dtisznCode = null and a.status = :statusInoe))");
+        query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
+        query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        return query.getResultList();
+    }
+
+    @Transactional
+    public void confirmFromAISContingent(List<String> guids) {
+        List<String> list = new ArrayList<String>();
+        int counter = 0;
+        Query query = entityManager.createQuery("update ApplicationForFood app set app.sendToAISContingent = true "
+                + "where app.client.idOfClient in (select c.idOfClient from Client c where c.clientGUID in (:guids)) and app.sendToAISContingent = false");
+        for (String guid : guids) {
+            counter++;
+            list.add(guid);
+            if (counter > 20) {
+                counter = 0;
+                query.setParameter("guids", list);
+                query.executeUpdate();
+                list.clear();
+            }
+        }
+        if (list.size() > 0) {
+            query.setParameter("guids", list);
+            query.executeUpdate();
+        }
     }
 }

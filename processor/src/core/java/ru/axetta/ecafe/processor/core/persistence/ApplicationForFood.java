@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 public class ApplicationForFood {
@@ -27,6 +26,7 @@ public class ApplicationForFood {
     private String idOfDocOrder;
     private Date docOrderDate;
     private Long version;
+    private Boolean sendToAISContingent;
     private Set<ApplicationForFoodHistory> applicationForFoodHistories;
 
     public ApplicationForFood(Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName,
@@ -47,6 +47,7 @@ public class ApplicationForFood {
         this.creatorType = creatorType;
         this.idOfDocOrder = idOfDocOrder;
         this.docOrderDate = docOrderDate;
+        this.sendToAISContingent = false;
     }
 
     public ApplicationForFood() {
@@ -187,5 +188,13 @@ public class ApplicationForFood {
 
     public void setDocOrderDate(Date docOrderDate) {
         this.docOrderDate = docOrderDate;
+    }
+
+    public Boolean getSendToAISContingent() {
+        return sendToAISContingent;
+    }
+
+    public void setSendToAISContingent(Boolean sendToAISContingent) {
+        this.sendToAISContingent = sendToAISContingent;
     }
 }

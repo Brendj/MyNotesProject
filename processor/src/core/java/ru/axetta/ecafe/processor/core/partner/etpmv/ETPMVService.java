@@ -4,12 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
+import generated.contingent.*;
 import generated.etp.*;
+import generated.etp.ObjectFactory;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.dom.ElementNSImpl;
 import org.slf4j.Logger;
@@ -23,12 +26,17 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -48,6 +56,9 @@ public class ETPMVService {
     private final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     //public final Set<String> BENEFITS_ETP = new HashSet<String>(Arrays.asList("0", "1", "2", "3", "4", "5"));
     //private final int DAYS_TO_EXPIRE = 5;
+    private IsppWebServiceService service;
+    private IsppWebService port;
+    private BindingProvider bindingProvider;
 
     @Async
     public void processIncoming(String message) {
@@ -270,6 +281,76 @@ public class ETPMVService {
         }
     }
 
+    public void sendToAISContingent() throws Exception {
+        if (!RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.etp.aiscontingent.node")) {
+            return;
+        }
+        logger.info("Start sending data to AIS Contingent");
+        List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDataForAISContingent();
+        if (list.size() == 0) {
+            logger.info("Finish sending data to AIS Contingent. No records sent");
+        //    return;
+        }
+        initAISContingentService();
+        generated.contingent.ObjectFactory objectFactory = new generated.contingent.ObjectFactory();
+        SetBenefits setBenefits = objectFactory.createSetBenefits();
+        IsppHeaders isppHeaders = objectFactory.createIsppHeaders();
+        isppHeaders.setUsername(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.username", "ispp"));
+        isppHeaders.setPassword(encryptPassword(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.password", "D43!asT7")));
+        SetBenefitsRequest setBenefitsRequest = objectFactory.createSetBenefitsRequest();
+        SetBenefitsRequest.Children children = objectFactory.createSetBenefitsRequestChildren();
+        for (ApplicationForFood applicationForFood : list) {
+            Child child = objectFactory.createChild();
+            child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
+            child.setGuid(applicationForFood.getClient().getClientGUID());
+            children.getChild().add(child);
+        }
+        setBenefitsRequest.setChildren(children);
+        setBenefits.setRequest(setBenefitsRequest);
+        logger.info("Sending request to AIS Contingent");
+        SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
+        logger.info("Got response from AIS Contingent. Processing...");
+        if (response != null && response.getResult() != null && response.getResult().getSuccess() != null) {
+            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(response.getResult().getSuccess().getGuid());
+        }
+        if (response != null && response.getResult() != null && response.getResult().getNotFound() != null && response.getResult().getNotFound().getGuid().size() > 0) {
+            StringBuilder notFoundGuids = new StringBuilder();
+            for (String str : response.getResult().getNotFound().getGuid()) {
+                notFoundGuids.append(str);
+            }
+            logger.error("Not found guids from AIS Contingent: " + notFoundGuids.toString());
+        }
+        logger.info(String.format("Finish sending data to AIS Contingent. Sent %s records", list.size()));
+    }
+
+    private String encryptPassword(String source) throws Exception {
+        final MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+        messageDigest.reset();
+        messageDigest.update(source.getBytes(Charset.forName("UTF8")));
+        final byte[] resultByte = messageDigest.digest();
+        return new String(Hex.encodeHex(resultByte));
+    }
+
+    private void initAISContingentService() throws Exception {
+        if (port == null) {
+            service = new IsppWebServiceService();
+            port = service.getIsppWebServicePort();
+            bindingProvider = (BindingProvider) port;
+            URL endpoint = new URL(getAISContingentUrl());
+            bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint.toString());
+
+            final AISContingentMessageLogger loggingHandler = new RuntimeContext().getAppContext().getBean(AISContingentMessageLogger.class);
+            final List<Handler> handlerChain = new ArrayList<Handler>();
+            handlerChain.add(loggingHandler);
+            bindingProvider.getBinding().setHandlerChain(handlerChain);
+        }
+    }
+
+    private String getAISContingentUrl() throws Exception {
+        String url = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.url", "");
+        if (StringUtils.isEmpty(url)) throw new Exception("AIS Contingent endpoint address is not specified");
+        return url;
+    }
     /*public void processExpired() {
         Date dateTo = CalendarUtils.addDays(new Date(), DAYS_TO_EXPIRE); //todo как рассчитать 5 РАБОЧИХ дней без привязки к ОО?
         List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getExpiredApplicationsForFood(dateTo);

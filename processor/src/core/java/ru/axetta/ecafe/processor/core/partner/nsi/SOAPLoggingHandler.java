@@ -59,7 +59,7 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
      * output the message. The writeTo() method can throw
      * SOAPException or IOException
      */
-    private void logToSystemOut(SOAPMessageContext smc) {
+    protected void logToSystemOut(SOAPMessageContext smc) {
         Boolean outboundProperty = (Boolean)
                 smc.get (MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
