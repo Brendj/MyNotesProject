@@ -11,3 +11,6 @@ alter table cf_etp_outgoing_message add column errormessage character varying(10
 CREATE INDEX cf_goods_requests_orgowner_createddate_idx ON cf_goods_requests USING btree (orgowner, createddate);alter table cf_applications_for_food add column sendtoaiscontingent integer NOT NULL DEFAULT 0;
 
 alter table cf_applications_for_food add column sendtoaiscontingent integer NOT NULL DEFAULT 0;
+
+--исправляем некорректное значение пола у клиентов, созданных через мос.ру
+update cf_clients set gender = 0 where gender = 2;

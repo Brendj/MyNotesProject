@@ -8030,6 +8030,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new Result(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
             }
             if (guardian == null) {
+                if (gender != null && gender.equals(2)) gender = 0; else gender = 1;
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
                         surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries);
             } else {
