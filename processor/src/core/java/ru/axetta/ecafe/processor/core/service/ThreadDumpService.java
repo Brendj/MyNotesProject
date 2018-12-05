@@ -49,18 +49,7 @@ public class ThreadDumpService {
     }
 
     private boolean isOn() {
-        String nodes = RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.thread.dump.nodes", "");
-        if (nodes.equals("ALL")) {
-            return true;
-        } else if (nodes.equals("")) {
-            return false;
-        }
-        String[] strs = nodes.split(",");
-        List<String> nodesList = new ArrayList<String>(Arrays.asList(strs));
-        if (nodesList.contains(RuntimeContext.getInstance().getNodeName()))
-            return true;
-        else
-            return false;
+        return RuntimeContext.getInstance().groupActionIsOnByNode("ecafe.processor.thread.dump.nodes");
     }
 
     public ThreadDumpInfo dumpStack() {

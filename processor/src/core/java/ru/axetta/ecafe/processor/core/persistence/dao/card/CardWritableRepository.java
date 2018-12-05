@@ -408,4 +408,21 @@ public class CardWritableRepository extends WritableJpaDao {
                 .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
+
+    public List<Card> findAllByClientList(List<Client> clients) {
+        StringBuilder sb = new StringBuilder();
+        for (Client cl : clients) {
+            sb.append(cl.getIdOfClient()).append(",");
+        }
+        Query q = entityManager.createNativeQuery("create temp table clients_for_cards (idOfClient bigint) on commit drop");
+        q.executeUpdate();
+        String str = sb.toString();
+        q = entityManager.createNativeQuery(String.format("insert into clients_for_cards(idOfClient) values(unnest(cast(string_to_array('%s', ',') as bigint[])))", str.substring(0, str.length()-1)));
+        q.executeUpdate();
+        q = entityManager.createNativeQuery("select c.IdOfCard, c.Version, c.IdOfClient, c.IdOfVisitor, c.idoforg, c.CardNo, c.CardType, c.CreatedDate, c.LastUpdate, c.State, c.LockReason, "
+                + "c.ValidDate, c.IssueDate, c.LifeState, c.CardPrintedNo, c.ExternalId, c.CardSignCertNum, c.IsLongUid, c.transitionstate "
+                + "from cf_cards c inner join clients_for_cards cfc on c.idOfClient = cfc.idOfClient", Card.class);
+        return q.getResultList();
+    }
+
 }

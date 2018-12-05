@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.dao.card.CardReadOnlyRepository;
+import ru.axetta.ecafe.processor.core.persistence.dao.card.CardWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncReadOnlyRepository;
@@ -43,8 +45,15 @@ import java.util.List;
 public class AccountsRegistryHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AccountsRegistryHandler.class);
+    private static Boolean newWayAccountsRegistry = null;
 
-    @Transactional
+    private boolean isNewWayAccountsRegistry() {
+        if (newWayAccountsRegistry == null) {
+            newWayAccountsRegistry = RuntimeContext.getInstance().groupActionIsOnByNode("ecafe.processor.sync.newaccountsregistry.nodes");
+        }
+        return newWayAccountsRegistry;
+    }
+
     public AccountsRegistry handlerFull(SyncRequest request,long idOfOrg) {
         if (!SyncRequest.versionIsAfter(request.getClientVersion(), "2.7")){
             return null;
@@ -62,10 +71,11 @@ public class AccountsRegistryHandler {
         // Добавляем карты перемещенных клиентов
         clientList.addAll(clientDao.findAllAllocatedClients(idOfOrg));
 
-        //for (Client client : clientList) {
-        //    accountsRegistry.getAccountItems().add(new AccountItem(client));
-        //}
-        addCards(accountsRegistry, clientList);
+        if (isNewWayAccountsRegistry()) {
+            addCardsNewWay(accountsRegistry, clientList);
+        } else {
+            addCards(accountsRegistry, clientList);
+        }
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
 
@@ -92,8 +102,22 @@ public class AccountsRegistryHandler {
         }
     }
 
+    private void addCardsNewWay(AccountsRegistry accountsRegistry, List<Client> clientList) {
+        List<Client> temp = new ArrayList<Client>();
+        for (Client client : clientList) {
+            temp.add(client);
+        }
+        accountsRegistry.getAccountItems().addAll(getAccountItems(temp));
+    }
+
     private List<AccountItem> getAccountItems(List<Client> clients) {
-        List<Card> cards = CardReadOnlyRepository.getInstance().findAllByClientList(clients);
+        List<Card> cards;
+        if (isNewWayAccountsRegistry()) {
+            cards = CardWritableRepository.getInstance().findAllByClientList(clients);
+        } else {
+            cards = CardReadOnlyRepository.getInstance().findAllByClientList(clients);
+        }
+
         List<AccountItem> result = new ArrayList<AccountItem>();
         for (Client client : clients) {
             result.add(new AccountItem(client, cards));

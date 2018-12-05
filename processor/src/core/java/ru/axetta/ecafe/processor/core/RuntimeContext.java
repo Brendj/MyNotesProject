@@ -1533,6 +1533,21 @@ public class RuntimeContext implements ApplicationContextAware {
         return true;
     }
 
+    public boolean groupActionIsOnByNode(String parameter) {
+        String nodes = RuntimeContext.getInstance().getPropertiesValue(parameter, "");
+        if (nodes.equals("ALL")) {
+            return true;
+        } else if (nodes.equals("")) {
+            return false;
+        }
+        String[] strs = nodes.split(",");
+        List<String> nodesList = new ArrayList<String>(Arrays.asList(strs));
+        if (nodesList.contains(RuntimeContext.getInstance().getNodeName()))
+            return true;
+        else
+            return false;
+    }
+
     public boolean getOptionValueBool(int optionId) {
         return getOptionValueString(optionId).equals("1");
     }

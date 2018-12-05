@@ -48,6 +48,7 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
         return query.getResultList();
     }
 
+    @Transactional(readOnly = true)
     public List<Client> findAllActiveByOrg(List<Long> idOfOrg) {
         Query query = entityManager
                 .createQuery("from Client c where c.org.idOfOrg in (:idOfOrg) and c.idOfClientGroup < :idOfClientGroup ")
@@ -70,7 +71,7 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
         return query.getResultList();
     }
 
-
+    @Transactional(readOnly = true)
     public List<Client> findAllAllocatedClients(Long idOfOrg) {
         Session ses = entityManager.unwrap(Session.class);
         Org org = (Org) ses.load(Org.class, idOfOrg);
