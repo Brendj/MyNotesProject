@@ -300,6 +300,9 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 });
             }
 
+            if (enterEventItems.isEmpty()) {
+                enterEventItems.add(new EnterEventItem("", "", "", "", "", ""));
+            }
             return new JRBeanCollectionDataSource(enterEventItems);
         }
 
