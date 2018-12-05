@@ -162,7 +162,7 @@ public class ETPMVDaoService {
         List<ApplicationForFood> apps = query.getResultList();
         ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
         for (ApplicationForFood applicationForFood : apps) {
-            result.add(DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, nextVersion, historyVersion));
+            result.add(DAOUtils.updateApplicationForFoodWithSendToAISContingent(session, applicationForFood, status, nextVersion, historyVersion));
         }
         return result;
     }

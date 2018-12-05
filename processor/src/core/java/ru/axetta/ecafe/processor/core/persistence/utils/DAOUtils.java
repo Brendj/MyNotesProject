@@ -3702,6 +3702,12 @@ public class DAOUtils {
         return applicationForFood;
     }
 
+    public static ApplicationForFood updateApplicationForFoodWithSendToAISContingent(Session session, ApplicationForFood applicationForFood,
+            ApplicationForFoodStatus status, Long version, Long historyVersion) {
+        applicationForFood.setSendToAISContingent(true);
+        return updateApplicationForFoodWithVersion(session, applicationForFood, status, version, historyVersion);
+    }
+
     public static ApplicationForFood updateApplicationForFoodWithVersion(Session session, ApplicationForFood applicationForFood,
             ApplicationForFoodStatus status, Long version, Long historyVersion) {
         applicationForFood.setStatus(status);
