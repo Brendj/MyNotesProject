@@ -147,7 +147,8 @@ public class DTSZNDiscountsReviseService {
                         session.save(discountInfo);
                     } else {
                         if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
-                            // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН. Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
+                            // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
+                            // Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
                             boolean wasModified = false;
                             if (!discountInfo.getDateStart().equals(item.getDsznDateBeginAsDate())) {
                                 discountInfo.setDateStart(item.getDsznDateBeginAsDate());
@@ -177,10 +178,24 @@ public class DTSZNDiscountsReviseService {
                             //2 stage
                             CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getBenefit().getDsznCode());
                             if (null != categoryDiscountDSZN) {
-                                ClientManager.ClientFieldConfigForUpdate config = new ClientManager.ClientFieldConfigForUpdate();
-                                config.setValue(ClientManager.FieldId.BENEFIT_DSZN, item.getBenefit().getDsznCode().toString());
-                                config.setValue(ClientManager.FieldId.CONTRACT_ID, client.getContractId().toString());
-                                ClientManager.modifyClient(config);
+                                Set<CategoryDiscount> categoryDiscountSet = client.getCategories();
+                                Boolean discountExist = false;
+
+                                for (CategoryDiscount discount : categoryDiscountSet) {
+                                    if (discount.getIdOfCategoryDiscount() == categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()) {
+                                        discountExist = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!discountExist) {
+                                    ClientManager.ClientFieldConfigForUpdate config = new ClientManager.ClientFieldConfigForUpdate();
+                                    config.setValue(ClientManager.FieldId.BENEFIT,
+                                            String.format("%s,%d", client.getCategoriesDiscounts(),
+                                                    categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()));
+                                    config.setValue(ClientManager.FieldId.CONTRACT_ID, client.getContractId().toString());
+                                    ClientManager.modifyClient(config);
+                                }
                             }
                         }
                     }
@@ -197,7 +212,7 @@ public class DTSZNDiscountsReviseService {
             }
 
             logger.info(String.format("Revise 2.0: %d/%d pages was processed", currentPage, pagesCount));
-        } while (++currentPage < pagesCount);
+        } while (currentPage++ < pagesCount);
     }
 
     private URL getServiceUrl() throws Exception {
@@ -249,8 +264,10 @@ public class DTSZNDiscountsReviseService {
 
     private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
-        paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group", OPERATOR_EQUAL, "ОУ", false));
-        paramList.add(new NSIRequestParam("benefit-form/entity-id", OPERATOR_IN, StringUtils.join(entityIdList, ","), false));
+        paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
+                OPERATOR_EQUAL, "ОУ", false));
+        paramList.add(new NSIRequestParam("benefit-form/entity-id", OPERATOR_IN,
+                StringUtils.join(entityIdList, ","), false));
         paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false ));
         paramList.add(new NSIRequestParam("dszn-date-begin", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_IS_NULL, true));
@@ -263,7 +280,8 @@ public class DTSZNDiscountsReviseService {
     private NSIBenefitDictionaryResponse loadBenefitsDictionary(Long page, Long pageSize) {
         HttpClient httpClient = new HttpClient();
 
-        httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(), new Protocol("https", new EasySSLProtocolSocketFactory(), serviceURL.getPort()));
+        httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
+                new Protocol("https", new EasySSLProtocolSocketFactory(), serviceURL.getPort()));
         PostMethod method = new PostMethod(serviceURL.getPath());
         try {
 
@@ -273,8 +291,8 @@ public class DTSZNDiscountsReviseService {
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
-            logger.info(String.format("loadBenefitsDictionary(page=%d, pageSize=%d loaded with status %d by %d msec", page, pageSize,
-                    status, new Date().getTime() - date.getTime()));
+            logger.info(String.format("loadBenefitsDictionary(page=%d, pageSize=%d loaded with status %d by %d msec",
+                    page, pageSize, status, new Date().getTime() - date.getTime()));
             if (HttpStatus.OK.value() != status) {
                 throw new Exception("Unable to get data from NSI");
             }
@@ -291,7 +309,8 @@ public class DTSZNDiscountsReviseService {
     private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList) {
         HttpClient httpClient = new HttpClient();
 
-        httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(), new Protocol("https", new EasySSLProtocolSocketFactory(), serviceURL.getPort()));
+        httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
+                new Protocol("https", new EasySSLProtocolSocketFactory(), serviceURL.getPort()));
         PostMethod method = new PostMethod(serviceURL.getPath());
         try {
 
