@@ -109,7 +109,8 @@ public class ApplicationForFoodProcessingService {
                     dayTriggerHash.put(clientOrg.getIdOfOrg(), new HashMap<Date, Date>());
                 }
 
-                dayTriggerHash.get(clientOrg.getIdOfOrg()).put(statusCreatedDate, getTriggerDateForOrg(session, clientOrg, statusCreatedDate, daysCount));
+                dayTriggerHash.get(clientOrg.getIdOfOrg()).put(statusCreatedDate,
+                        getTriggerDateForOrg(session, clientOrg, statusCreatedDate, daysCount, application.getClient().getIdOfClientGroup()));
                 Date triggerDate = dayTriggerHash.get(clientOrg.getIdOfOrg()).get(statusCreatedDate);
                 if (triggerDate.getTime() <= fireDate.getTime()) {
                     if (null == applicationVersion) {
@@ -141,7 +142,7 @@ public class ApplicationForFoodProcessingService {
         }
     }
 
-    private Date getTriggerDateForOrg(Session session, Org org, Date statusCreatedDate, Integer daysCount) {
+    private Date getTriggerDateForOrg(Session session, Org org, Date statusCreatedDate, Integer daysCount, Long idOfClientGroup) {
         Integer _daysCounter = daysCount;
 
         Date _startDate = CalendarUtils.truncateToDayOfMonth(statusCreatedDate);
@@ -152,7 +153,11 @@ public class ApplicationForFoodProcessingService {
         specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
         specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
         specialDaysCriteria.add(Restrictions.between("date", _startDate, specialDaysMonth));
-        specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.max("date")));
+        specialDaysCriteria.add(Restrictions.or(Restrictions.eq("idOfClientGroup", idOfClientGroup),
+                Restrictions.isNull("idOfClientGroup")));
+        specialDaysCriteria.setProjection(Projections.projectionList()
+                .add(Projections.property("date"))
+                .add(Projections.property("idOfClientGroup")));
 
         List<Date> specialDates = specialDaysCriteria.list();
 
