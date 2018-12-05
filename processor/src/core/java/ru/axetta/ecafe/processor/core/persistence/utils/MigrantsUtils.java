@@ -30,7 +30,7 @@ import java.util.*;
 
 public class MigrantsUtils {
     private static final Logger logger = LoggerFactory.getLogger(MigrantsUtils.class);
-    public static final String[] resolutionNames = {"Создана",                                 //0
+    public static final String[] resolutionNames = {"Создана",                                         //0
                                                      "Подтверждена",                                   //1
                                                      "Отклонена и сдана в архив",                      //2
                                                      "Аннулирована и сдана в архив",                   //3
@@ -437,5 +437,15 @@ public class MigrantsUtils {
         }
 
         return migrantList;
+    }
+
+    public static List<Migrant> getMigrationForListOfOrgVisit(Session session, List<Long> idOfOrgs, Date startTime, Date endTime)throws Exception {
+        Date date = new Date();
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.createCriteria("orgVisit", "org", JoinType.INNER_JOIN);
+        criteria.add(Restrictions.in("org.idOfOrg", idOfOrgs));
+        criteria.add(Restrictions.le("visitStartDate", endTime));
+        criteria.add(Restrictions.ge("visitEndDate", startTime));
+        return criteria.list();
     }
 }

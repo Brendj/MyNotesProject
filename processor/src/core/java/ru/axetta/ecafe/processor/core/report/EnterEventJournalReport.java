@@ -9,11 +9,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Visitor;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -87,7 +86,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-
+            Boolean outputMigrants = Boolean.parseBoolean(reportProperties.getProperty("outputMigrants"));
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
@@ -98,6 +97,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
             parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
+            parameterMap.put("outputMigrants", outputMigrants);
 
             JasperPrint jasperPrint = JasperFillManager
                     .fillReport(templateFilename, parameterMap, createDataSource(session, startTime, endTime, idOfOrg));
@@ -108,6 +108,12 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg)
                 throws Exception {
             Integer eventFilter;
+            Boolean outputMigrants = Boolean.parseBoolean(reportProperties.getProperty("outputMigrants", "false"));
+            Boolean sortedBySections = Boolean.parseBoolean(reportProperties.getProperty("sortedBySections", "false"));
+            Map<Client, String> clientSections = new HashMap<Client, String>();
+            List<Long> idOfOrgList = new LinkedList<Long>();
+            List<Migrant> expectedMigrants = null;
+
             try {
                 eventFilter = Integer.parseInt(reportProperties.getProperty("eventFilter"));
             } catch (Exception e) {
@@ -136,8 +142,6 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
             if (allFriendlyOrgs) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
-                List<Long> idOfOrgList = new ArrayList<Long>();
-
                 for (Org orgItem : org.getFriendlyOrg()) {
                     idOfOrgList.add(orgItem.getIdOfOrg());
                 }
@@ -152,19 +156,37 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             List<EnterEvent> enterEventList = criteria.list();
 
             String passdirection, personFullName;
+
+            if(idOfOrgList.isEmpty()){
+                Org org = (Org) session.load(Org.class, idOfOrg);
+                for (Org orgItem : org.getFriendlyOrg()) {
+                    idOfOrgList.add(orgItem.getIdOfOrg());
+                }
+            }
+
+            if(outputMigrants){
+                if(allFriendlyOrgs) {
+                    expectedMigrants = MigrantsUtils
+                            .getMigrationForListOfOrgVisit(session, idOfOrgList, startTime, endTime);
+                } else {
+                    expectedMigrants = MigrantsUtils
+                            .getMigrationForListOfOrgVisit(session, Arrays.asList(idOfOrg), startTime, endTime);
+                }
+            }
+
             for (EnterEvent enterEvent : enterEventList) {
                 if (!matchItem(enterEvent, eventFilter)) {
                     continue;
                 }
                 if (enterEvent.getClient() != null) {
                     personFullName = enterEvent.getClient().getPerson().getFullName();
-                } else if(enterEvent.getVisitorFullName() != null) {
+                } else if (enterEvent.getVisitorFullName() != null) {
                     personFullName = enterEvent.getVisitorFullName();
-                } else if(enterEvent.getIdOfVisitor() != null) {
-                    Criteria visitorCriteria =  session.createCriteria(Visitor.class);
+                } else if (enterEvent.getIdOfVisitor() != null) {
+                    Criteria visitorCriteria = session.createCriteria(Visitor.class);
                     visitorCriteria.add(Restrictions.eq("idOfVisitor", enterEvent.getIdOfVisitor()));
                     Visitor visitor = (Visitor) visitorCriteria.uniqueResult();
-                    if(visitor != null) {
+                    if (visitor != null) {
                         if (visitor.getPerson() != null) {
                             personFullName = visitor.getPerson().getFullName();
                         } else {
@@ -236,7 +258,46 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                         CalendarUtils.formatTimeClassicToString(enterEvent.getEvtDateTime().getTime()), personFullName,
                         groupName, passdirection, enterEvent.getOrg().getShortNameInfoService());
 
+
+                if (outputMigrants && !CollectionUtils.isEmpty(expectedMigrants) && enterEvent.getClient() != null) { // Если надо вывести кружки и в ОО вообще они есть...
+                    Client client = (Client) session.load(Client.class, enterEvent.getClient().getIdOfClient()); // То достаем клиента...
+                    if (client != null && !clientSections.containsKey(client)) { // Проверям находили ли мы на него, иначе уходим
+                        if (!idOfOrgList.contains(client.getOrg().getIdOfOrg())) { // Проверяем подает ли он признаки мигранта, иначе добавляем в мапу с NULL в названии кружка
+                            boolean findMigrant = false;
+                            for (Migrant migrant : expectedMigrants) { // Через линейный поиск ищем клиента среди мигрантов...
+                                if (migrant.getClientMigrate().equals(client)) {
+                                    findMigrant = true;
+                                    clientSections.put(client, migrant.getSection()); //...и добавляем в мапу чтоб больше с ним не возиться
+                                    break;
+                                }
+                            }
+                            if (!findMigrant) {
+                                clientSections.put(client, null);
+                            }
+                        } else {
+                            clientSections.put(client, null);
+                        }
+                    }
+                    enterEventItem.setSectionName(clientSections.get(client)); // Добавляем название кружка в item
+                }
                 enterEventItems.add(enterEventItem);
+            }
+
+            if(sortedBySections){
+                Collections.sort(enterEventItems, new Comparator<EnterEventItem>() {
+                    @Override
+                    public int compare(EnterEventItem o1, EnterEventItem o2) {
+                        if(o1.getSectionName() == null && o2.getSectionName() == null) {
+                            return 0;
+                        } else if(o1.getSectionName() == null){
+                            return -1;
+                        } else if (o2.getSectionName() == null){
+                            return 1;
+                        } else {
+                            return o1.getSectionName().compareTo(o2.getSectionName());
+                        }
+                    }
+                });
             }
 
             return new JRBeanCollectionDataSource(enterEventItems);
@@ -279,6 +340,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         private String group;// Группа
         private String eventName;// Наименование события
         private String shortNameOrg; // Название учреждения
+        private String sectionName;
 
         public EnterEventItem(String eventDate, String time, String fullName, String group, String eventName,
                 String shortNameOrg) {
@@ -341,6 +403,14 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         @Override
         public int compareTo(EnterEventItem o) {
             return o.getEventDate().compareTo(this.eventDate);
+        }
+
+        public String getSectionName() {
+            return sectionName;
+        }
+
+        public void setSectionName(String sectionName) {
+            this.sectionName = sectionName;
         }
     }
 }

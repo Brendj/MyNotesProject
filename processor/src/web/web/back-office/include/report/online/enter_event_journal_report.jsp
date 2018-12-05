@@ -62,6 +62,18 @@
                                  styleClass="output-text">
         </h:selectBooleanCheckbox>
     </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="false" value="Отображать колонку \"Кружок/секция\"" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.enterEventJournalReportPage.outputMigrants}"
+                                 styleClass="output-text">
+        </h:selectBooleanCheckbox>
+    </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="false" value="Сортировать по кружку/секции" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.enterEventJournalReportPage.sortedBySections}"
+                                 styleClass="output-text">
+        </h:selectBooleanCheckbox>
+    </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Группа" styleClass="output-text" />

@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentSta
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.EnterEventJournalReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu;
@@ -32,10 +33,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by anvarov on 04.04.18.
@@ -43,7 +41,6 @@ import java.util.Properties;
 public class EnterEventJournalReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(EnterEventJournalReportPage.class);
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     private String htmlReport = null;
 
@@ -51,13 +48,14 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
     private List<DocumentState> stateList = new ArrayList<DocumentState>();
     private SelectItem[] eventFilter;
     private Integer selectedEventFilter = 0;
+    private Boolean outputMigrants = false;
+    private Boolean sortedBySections = false;
 
     public EnterEventJournalReportPage() throws RuntimeContext.NotInitializedException {
         super();
-        localCalendar.setTime(this.startDate);
-        localCalendar.add(Calendar.DATE, 7);
-        localCalendar.add(Calendar.SECOND, -1);
-        this.endDate = localCalendar.getTime();
+        this.periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+        startDate = CalendarUtils.startOfDay(new Date());
+        onReportPeriodChanged(null);
     }
 
     private Boolean allFriendlyOrgs = false;
@@ -94,6 +92,12 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                 String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
                 properties.setProperty("groupName", groupNamesString);
                 properties.setProperty("eventFilter", selectedEventFilter.toString());
+                properties.setProperty("outputMigrants", outputMigrants.toString());
+                if(outputMigrants){
+                    properties.setProperty("sortedBySections", sortedBySections.toString());
+                } else {
+                    properties.setProperty("sortedBySections", "false");
+                }
 
                 builder.setReportProperties(properties);
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -156,6 +160,12 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                         String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
                         properties.setProperty("groupName", groupNamesString);
                         properties.setProperty("eventFilter", selectedEventFilter.toString());
+                        properties.setProperty("outputMigrants", outputMigrants.toString());
+                        if(outputMigrants){
+                            properties.setProperty("sortedBySection", sortedBySections.toString());
+                        } else {
+                            properties.setProperty("sortedBySection", "false");
+                        }
 
                         builder.setReportProperties(properties);
                         report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -342,5 +352,21 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
 
     public void setSelectedEventFilter(Integer selectedEventFilter) {
         this.selectedEventFilter = selectedEventFilter;
+    }
+
+    public Boolean getOutputMigrants() {
+        return outputMigrants;
+    }
+
+    public void setOutputMigrants(Boolean outputMigrants) {
+        this.outputMigrants = outputMigrants;
+    }
+
+    public Boolean getSortedBySections() {
+        return sortedBySections;
+    }
+
+    public void setSortedBySections(Boolean sortedBySections) {
+        this.sortedBySections = sortedBySections;
     }
 }

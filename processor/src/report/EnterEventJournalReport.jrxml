@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EnterEventJournalReport" pageWidth="1030" pageHeight="100000" columnWidth="990" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="610e1876-6cc3-430a-8c8a-81cfa52c5891">
-	<property name="ireport.zoom" value="1.7715610000000017"/>
-	<property name="ireport.x" value="832"/>
+	<property name="ireport.zoom" value="1.6105100000000014"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
+	<parameter name="outputMigrants" class="java.lang.Boolean"/>
 	<field name="eventDate" class="java.lang.String"/>
 	<field name="time" class="java.lang.String"/>
 	<field name="fullName" class="java.lang.String"/>
 	<field name="group" class="java.lang.String"/>
 	<field name="eventName" class="java.lang.String"/>
 	<field name="shortNameOrg" class="java.lang.String"/>
+	<field name="sectionName" class="java.lang.String"/>
 	<title>
 		<band height="50" splitType="Stretch">
 			<textField>
-				<reportElement uuid="afa6e3d7-9c57-4459-8c82-4e7ef4ce4451" x="0" y="0" width="990" height="50"/>
+				<reportElement x="0" y="0" width="885" height="50" uuid="afa6e3d7-9c57-4459-8c82-4e7ef4ce4451">
+					<printWhenExpression><![CDATA[!$P{outputMigrants}]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Журнал посещений  с " + $P{beginDate} + " по " + $P{endDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="990" height="50" uuid="e7ac79a1-f5c6-4ede-9474-28f9bb930dce">
+					<printWhenExpression><![CDATA[$P{outputMigrants}]]></printWhenExpression>
+				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
@@ -25,7 +38,7 @@
 	<pageHeader>
 		<band height="20">
 			<staticText>
-				<reportElement uuid="1b8655a7-197e-4e5f-b0c4-77a7a70a77be" x="0" y="0" width="70" height="20"/>
+				<reportElement x="0" y="0" width="70" height="20" uuid="1b8655a7-197e-4e5f-b0c4-77a7a70a77be"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -39,7 +52,7 @@
 				<text><![CDATA[Дата]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b477d8ff-1345-4ac6-a4b1-92fffffeb666" x="70" y="0" width="70" height="20"/>
+				<reportElement x="70" y="0" width="70" height="20" uuid="b477d8ff-1345-4ac6-a4b1-92fffffeb666"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -53,7 +66,7 @@
 				<text><![CDATA[Время]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ffc3e62d-026f-40ca-8e1f-214f3aeae4f4" x="440" y="0" width="300" height="20"/>
+				<reportElement x="440" y="0" width="300" height="20" uuid="ffc3e62d-026f-40ca-8e1f-214f3aeae4f4"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -67,7 +80,7 @@
 				<text><![CDATA[Событие]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="7dbaf461-d157-463e-b1d8-53c19e2adb26" x="740" y="0" width="250" height="20"/>
+				<reportElement x="740" y="0" width="145" height="20" uuid="7dbaf461-d157-463e-b1d8-53c19e2adb26"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -81,7 +94,7 @@
 				<text><![CDATA[Корпус посещения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="581ba608-4385-4449-88ee-f63bf8c13231" x="340" y="0" width="100" height="20"/>
+				<reportElement x="340" y="0" width="100" height="20" uuid="581ba608-4385-4449-88ee-f63bf8c13231"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -95,7 +108,7 @@
 				<text><![CDATA[Группа]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="21d5ee28-11b6-4f31-b31e-9966964cd495" x="140" y="0" width="200" height="20"/>
+				<reportElement x="140" y="0" width="200" height="20" uuid="21d5ee28-11b6-4f31-b31e-9966964cd495"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -108,12 +121,28 @@
 				</textElement>
 				<text><![CDATA[ФИО]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="885" y="0" width="105" height="20" uuid="84b4c864-f89c-424d-8f5b-d27063f01ea0">
+					<printWhenExpression><![CDATA[$P{outputMigrants}]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Кружок/секция]]></text>
+			</staticText>
 		</band>
 	</pageHeader>
 	<detail>
 		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement uuid="6b71749e-6695-4df9-aa02-f739782a6e46" x="0" y="0" width="70" height="20"/>
+				<reportElement x="0" y="0" width="70" height="20" uuid="6b71749e-6695-4df9-aa02-f739782a6e46"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -125,7 +154,7 @@
 				<textFieldExpression><![CDATA[$F{eventDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="12148367-1473-419d-8a27-1ca2bf29d004" x="70" y="0" width="70" height="20"/>
+				<reportElement x="70" y="0" width="70" height="20" uuid="12148367-1473-419d-8a27-1ca2bf29d004"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -137,7 +166,7 @@
 				<textFieldExpression><![CDATA[$F{time}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="218d902f-d8d8-4311-af99-ce6e074631cc" x="140" y="0" width="200" height="20"/>
+				<reportElement x="140" y="0" width="200" height="20" uuid="218d902f-d8d8-4311-af99-ce6e074631cc"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -149,7 +178,7 @@
 				<textFieldExpression><![CDATA[$F{fullName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="3286650c-00d5-444b-8aed-31485c7f0846" x="340" y="0" width="100" height="20"/>
+				<reportElement x="340" y="0" width="100" height="20" uuid="3286650c-00d5-444b-8aed-31485c7f0846"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -161,7 +190,7 @@
 				<textFieldExpression><![CDATA[$F{group}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a73479d2-72c5-4aac-a092-54969c30ac46" x="440" y="0" width="300" height="20"/>
+				<reportElement x="440" y="0" width="300" height="20" uuid="a73479d2-72c5-4aac-a092-54969c30ac46"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -173,7 +202,7 @@
 				<textFieldExpression><![CDATA[$F{eventName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="9edf3af5-83f7-4668-9675-3ff8b6c4ca1b" x="740" y="0" width="250" height="20"/>
+				<reportElement x="740" y="0" width="145" height="20" uuid="9edf3af5-83f7-4668-9675-3ff8b6c4ca1b"/>
 				<box>
 					<pen lineWidth="0.25"/>
 					<topPen lineWidth="0.25"/>
@@ -183,6 +212,20 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{shortNameOrg}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="885" y="0" width="105" height="20" uuid="a569ff72-7fe8-48b2-ac50-24f9c7e709ae">
+					<printWhenExpression><![CDATA[$P{outputMigrants}]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{sectionName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

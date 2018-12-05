@@ -51,7 +51,7 @@ public class EMPSmsServiceImpl extends ISmsService {
     EMPProcessor empProcessor;
     //  system
     public static final String ENCODING = "UTF-8";
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPProcessor.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPSmsServiceImpl.class);
     //  services instances
     protected SubscriptionPortType subscriptionService;
 
