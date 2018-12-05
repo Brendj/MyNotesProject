@@ -27,10 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -71,10 +68,11 @@ public class AccountsRegistryHandler {
         // Добавляем карты перемещенных клиентов
         clientList.addAll(clientDao.findAllAllocatedClients(idOfOrg));
 
+        Set<Client> clientSet = new HashSet<Client>(clientList);
         if (isNewWayAccountsRegistry()) {
-            addCardsNewWay(accountsRegistry, clientList);
+            addCardsNewWay(accountsRegistry, clientSet);
         } else {
-            addCards(accountsRegistry, clientList);
+            addCards(accountsRegistry, clientSet);
         }
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
@@ -86,7 +84,7 @@ public class AccountsRegistryHandler {
         return accountsRegistry;
     }
 
-    private void addCards(AccountsRegistry accountsRegistry, List<Client> clientList) {
+    private void addCards(AccountsRegistry accountsRegistry, Set<Client> clientList) {
         List<Client> temp = new ArrayList<Client>();
         int counter = 0;
         for (Client client : clientList) {
@@ -102,7 +100,7 @@ public class AccountsRegistryHandler {
         }
     }
 
-    private void addCardsNewWay(AccountsRegistry accountsRegistry, List<Client> clientList) {
+    private void addCardsNewWay(AccountsRegistry accountsRegistry, Set<Client> clientList) {
         List<Client> temp = new ArrayList<Client>();
         for (Client client : clientList) {
             temp.add(client);
