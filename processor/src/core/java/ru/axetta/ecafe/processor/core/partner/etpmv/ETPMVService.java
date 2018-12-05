@@ -285,6 +285,10 @@ public class ETPMVService {
         if (!RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.etp.aiscontingent.node")) {
             return;
         }
+        sendToAISContingentTask();
+    }
+
+    public void sendToAISContingentTask() throws Exception {
         logger.info("Start sending data to AIS Contingent");
         List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDataForAISContingent();
         if (list.size() == 0) {
@@ -311,7 +315,14 @@ public class ETPMVService {
         SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
         logger.info("Got response from AIS Contingent. Processing...");
         if (response != null && response.getResult() != null && response.getResult().getSuccess() != null) {
-            RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(response.getResult().getSuccess().getGuid());
+            Long nextVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodNextVersion();
+            Long historyVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodHistoryNextVersion();
+            for (String guid : response.getResult().getSuccess().getGuid()) {
+                List<ApplicationForFood> apps = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).confirmFromAISContingent(guid, nextVersion, historyVersion);
+                for (ApplicationForFood applicationForFood : apps) {
+                    sendStatus(System.currentTimeMillis() - PAUSE_IN_MILLIS, applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(), null);
+                }
+            }
         }
         if (response != null && response.getResult() != null && response.getResult().getNotFound() != null && response.getResult().getNotFound().getGuid().size() > 0) {
             StringBuilder notFoundGuids = new StringBuilder();

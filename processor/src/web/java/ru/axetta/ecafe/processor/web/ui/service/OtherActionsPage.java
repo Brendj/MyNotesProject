@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -489,6 +490,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         } catch (Exception e) {
             getLogger().error("Error discounts revise service: ", e);
             printError("Во время сверки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void sendToAISContingent() {
+        try {
+            RuntimeContext.getAppContext().getBean(ETPMVService.class).sendToAISContingentTask();
+            printMessage("Операция выполнена");
+        } catch (Exception e) {
+            getLogger().error("Error in sendToAISContingent: ", e);
+            printError("Во время выполнения операции произошла ошибка с текстом " + e.getMessage());
         }
     }
 

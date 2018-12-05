@@ -141,24 +141,30 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void confirmFromAISContingent(List<String> guids) {
-        List<String> list = new ArrayList<String>();
-        int counter = 0;
-        Query query = entityManager.createQuery("update ApplicationForFood app set app.sendToAISContingent = true "
-                + "where app.client.idOfClient in (select c.idOfClient from Client c where c.clientGUID in (:guids)) and app.sendToAISContingent = false");
-        for (String guid : guids) {
-            counter++;
-            list.add(guid);
-            if (counter > 20) {
-                counter = 0;
-                query.setParameter("guids", list);
-                query.executeUpdate();
-                list.clear();
-            }
-        }
-        if (list.size() > 0) {
-            query.setParameter("guids", list);
-            query.executeUpdate();
-        }
+    public Long getApplicationForFoodNextVersion() {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.nextVersionByApplicationForFood(session);
     }
+
+    @Transactional
+    public Long getApplicationForFoodHistoryNextVersion() {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.nextVersionByApplicationForFoodHistory(session);
+    }
+
+    @Transactional
+    public List<ApplicationForFood> confirmFromAISContingent(String guid, Long nextVersion, Long historyVersion) {
+        List<ApplicationForFood> result = new ArrayList<ApplicationForFood>();
+        Session session = entityManager.unwrap(Session.class);
+        Query query = entityManager.createQuery("select app from ApplicationForFood app "
+                + "where app.client.idOfClient in (select c.idOfClient from Client c where c.clientGUID = :guid) and app.sendToAISContingent = false");
+        query.setParameter("guid", guid);
+        List<ApplicationForFood> apps = query.getResultList();
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null);
+        for (ApplicationForFood applicationForFood : apps) {
+            result.add(DAOUtils.updateApplicationForFoodWithVersion(session, applicationForFood, status, nextVersion, historyVersion));
+        }
+        return result;
+    }
+
 }
