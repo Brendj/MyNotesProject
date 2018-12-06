@@ -36,7 +36,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     private String description;
     private CategoryDiscount categoryDiscount;
     private String categoryName;
-    private Long ETPCode;
+    private String ETPCode;
 
     @Override
     public void completeCategorySelection(Session session, Long idOfCategory) throws Exception {
@@ -61,12 +61,23 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
             printError("Добавьте описание льготы ДСЗН");
             return null;
         }
+        Long etpCodeLong;
+        if (ETPCode.isEmpty()) {
+            etpCodeLong = null;
+        } else {
+            try {
+                etpCodeLong = Long.parseLong(ETPCode);
+            } catch (Exception e) {
+                printError("Неверный код ЕТП");
+                return null;
+            }
+        }
         Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
         CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNById(entityManager, idOfCategoryDiscountDSZN);
         categoryDiscountDSZN.setDescription(description);
         categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
         categoryDiscountDSZN.setVersion(nextVersion);
-        categoryDiscountDSZN.setETPCode(ETPCode);
+        categoryDiscountDSZN.setETPCode(etpCodeLong);
         entityManager.persist(categoryDiscountDSZN);
         printMessage("Данные обновлены.");
         return null;
@@ -88,7 +99,11 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         } else {
             categoryName = "";
         }
-        this.ETPCode = categoryDiscountDSZN.getETPCode();
+        if (null != categoryDiscountDSZN.getETPCode()) {
+            this.ETPCode = categoryDiscountDSZN.getETPCode().toString();
+        } else {
+            this.ETPCode = null;
+        }
     }
 
     public EntityManager getEntityManager() {
@@ -143,11 +158,11 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         return "Льгота ДСЗН " + code;
     }
 
-    public Long getETPCode() {
+    public String getETPCode() {
         return ETPCode;
     }
 
-    public void setETPCode(Long ETPCode) {
+    public void setETPCode(String ETPCode) {
         this.ETPCode = ETPCode;
     }
 }
