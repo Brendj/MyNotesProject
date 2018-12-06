@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EnterEventJournalReport" pageWidth="1030" pageHeight="100000" columnWidth="990" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="610e1876-6cc3-430a-8c8a-81cfa52c5891">
 	<property name="ireport.zoom" value="1.6105100000000014"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="650"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="beginDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
@@ -213,8 +213,9 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{shortNameOrg}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="885" y="0" width="105" height="20" uuid="a569ff72-7fe8-48b2-ac50-24f9c7e709ae">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 					<printWhenExpression><![CDATA[$P{outputMigrants}]]></printWhenExpression>
 				</reportElement>
 				<box>
