@@ -60,7 +60,6 @@ public class ApplicationForFoodProcessingService {
         Transaction transaction = null;
         try {
             logger.info("Start processing applications for food for 1060 status");
-            Date fireTime = new Date();
 
             session = context.createPersistenceSession();
             transaction = session.beginTransaction();
@@ -159,7 +158,7 @@ public class ApplicationForFoodProcessingService {
                 .add(Projections.property("date"))
                 .add(Projections.property("idOfClientGroup")));
 
-        List<Date> specialDates = specialDaysCriteria.list();
+        List specialDates = specialDaysCriteria.list();
 
         do {
             _startDate = CalendarUtils.addOneDay(_startDate);
@@ -169,10 +168,11 @@ public class ApplicationForFoodProcessingService {
             Boolean isWeekend = false;
 
             //check special dates
-            for (Date specialDate : specialDates) {
+            for (Object specialDate : specialDates) {
+                Object[] vals = (Object[]) specialDate;
                 if (null == specialDate)
                     continue;
-                if (CalendarUtils.betweenDate(specialDate, endDateStart, endDateEnd)) {
+                if (CalendarUtils.betweenDate((Date) vals[0], endDateStart, endDateEnd)) {
                     isWeekend = true;
                     break;
                 }
