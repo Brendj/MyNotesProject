@@ -110,6 +110,7 @@ public class ImportMigrantsFileService {
             logger.info("Start fill esz migrants table");
             long begin = System.currentTimeMillis();
             while ((line = bufferedReader.readLine()) != null) {
+                line = line.replace("\uFEFF", "");
                 if (counter == 0 && !session.getTransaction().isActive())
                     transaction = session.beginTransaction();
 
