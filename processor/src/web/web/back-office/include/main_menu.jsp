@@ -1395,6 +1395,11 @@
                             binding="#{consolidatedSellingReportPage.mainMenuComponent}" label="Сводный отчет по реализации"
                             action="#{consolidatedSellingReportPage.show}" reRender="workspaceForm"/>
 
+        <rich:panelMenuItem id="contragentPreordersReportMenuItem"
+                            binding="#{mainPage.contragentPreordersReportPage.mainMenuComponent}" label="Отчет по предварительным заказам"
+                            action="#{mainPage.contragentPreordersReportPage.show}" reRender="workspaceForm"/>
+
+
     </rich:panelMenuGroup>
 
     <%--@elvariable id="cardGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardGroupPage"--%>

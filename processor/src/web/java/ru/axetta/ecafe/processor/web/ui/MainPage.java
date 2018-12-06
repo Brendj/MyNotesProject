@@ -430,6 +430,7 @@ public class MainPage implements Serializable {
 
     private final ContragentCompletionReportPage contragentCompletionReportPage = new ContragentCompletionReportPage();
     private final ContragentPaymentReportPage contragentPaymentReportPage = new ContragentPaymentReportPage();
+    private final ContragentPreordersReportPage contragentPreordersReportPage = new ContragentPreordersReportPage();
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage();
@@ -6563,6 +6564,10 @@ public class MainPage implements Serializable {
         return contragentPaymentReportPage;
     }
 
+    public ContragentPreordersReportPage getContragentPreordersReportPage() {
+        return contragentPreordersReportPage;
+    }
+
     public ClientPaymentsPage getClientPaymentsReportPage() {
         return clientPaymentsReportPage;
     }
@@ -7110,6 +7115,19 @@ public class MainPage implements Serializable {
         updateSelectedMainMenu();
         return null;
     }
+
+    /*public Object showContragentPreordersReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = contragentPreordersReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set contragent preorders report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета по предзаказам поставщиков питания: " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }*/
 
     public Object showClientPaymentsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
