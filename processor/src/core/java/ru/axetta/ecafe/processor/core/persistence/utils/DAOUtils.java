@@ -3929,9 +3929,40 @@ public class DAOUtils {
         return version;
     }
 
-    public static  CategoryDiscountDSZN getCategoryDiscountDSZNByDSZNCode(Session session, Long dsznCode) {
+    public static CategoryDiscountDSZN getCategoryDiscountDSZNByDSZNCode(Session session, Long dsznCode) {
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         criteria.add(Restrictions.eq("code", dsznCode));
         return (CategoryDiscountDSZN) criteria.uniqueResult();
+    }
+
+    public static ECafeSettings getECafeSettingByIdOfOrgAndSettingId(Session session, Long idOfOrg, SettingsIds id) {
+        Criteria criteria = session.createCriteria(ECafeSettings.class);
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.eq("settingsId", id));
+        criteria.add(Restrictions.eq("deletedState", false));
+        List list = criteria.list();
+        if (list.isEmpty()) {
+            return null;
+        }
+        return (ECafeSettings) list.get(0);
+    }
+
+    public static GroupNamesToOrgs getGroupNamesToOrgsByOrgAndGroupName(Session session, Org org, String groupName) {
+
+        Long idOfMainOrg = null;
+        for (Org o : org.getFriendlyOrg()) {
+            if (o.isMainBuilding()) {
+                idOfMainOrg = o.getIdOfOrg();
+                break;
+            }
+        }
+
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
+        if (null != idOfMainOrg) {
+            criteria.add(Restrictions.eq("idOfMainOrg", idOfMainOrg));
+        }
+        criteria.add(Restrictions.eq("groupName", groupName));
+        return (GroupNamesToOrgs) criteria.uniqueResult();
     }
 }
