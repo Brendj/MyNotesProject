@@ -9,24 +9,19 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
-
-import static org.hibernate.criterion.Restrictions.*;
 
 /**
  * Created by anvarov on 04.04.18.
@@ -110,9 +105,16 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             Integer eventFilter;
             Boolean outputMigrants = Boolean.parseBoolean(reportProperties.getProperty("outputMigrants", "false"));
             Boolean sortedBySections = Boolean.parseBoolean(reportProperties.getProperty("sortedBySections", "false"));
-            Map<Client, String> clientSections = new HashMap<Client, String>();
             List<Long> idOfOrgList = new LinkedList<Long>();
-            List<Migrant> expectedMigrants = null;
+            List<EnterEventItem> enterEventItems = new LinkedList<EnterEventItem>();
+
+            String joinMigrants = outputMigrants ? " left join cf_migrants m on m.IdOfClientMigrate = c.idofclient and m.IdOfOrgVisit = ee.idoforg " : "";
+            String selectPartSectionName = outputMigrants ? ", case when ee.evtdatetime between m.VisitStartDate and m.VisitEndDate "
+                                                          + " then m.section else cast('' as text) end " : ", cast('' as text) as section "; // No Dialect mapping for JDBC type: 1111 exception
+            String partOfOrderByMigrantSection = sortedBySections && outputMigrants ? " m.section, " : "";
+            String eventsCondition = "";
+            String clientGroupCondition = "";
+            String orgCondition = "";
 
             try {
                 eventFilter = Integer.parseInt(reportProperties.getProperty("eventFilter"));
@@ -120,24 +122,13 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 eventFilter = 0;
             }
 
-            //группа фильтр
+            eventsCondition = getEventsCondition(eventFilter);
+
             String groupNameFilter = reportProperties.getProperty("groupName");
-
-            ArrayList<String> groupList = new ArrayList<String>();
-
-            if (groupNameFilter != null && !groupNameFilter.equals("")) {
-                String[] groups = StringUtils.split(groupNameFilter, ",");
-                for (String str: groups) {
-                    groupList.add(str);
-                }
-            }
-
-            List<EnterEventItem> enterEventItems = new ArrayList<EnterEventItem>();
-            Criteria criteria = session.createCriteria(EnterEvent.class);
-
-            if (!groupList.isEmpty()) {
-                criteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-                criteria.add(Restrictions.in("cg.groupName", groupList));
+            List<String> groupList = Collections.emptyList();
+            if(! StringUtils.isEmpty(groupNameFilter)){
+                groupList = Arrays.asList(StringUtils.split(groupNameFilter, ","));
+                clientGroupCondition = " and gr.groupname in (:groupList) ";
             }
 
             if (allFriendlyOrgs) {
@@ -146,184 +137,101 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                     idOfOrgList.add(orgItem.getIdOfOrg());
                 }
 
-                criteria.createAlias("org", "o").add(in("o.idOfOrg", idOfOrgList));
+                orgCondition = " and ee.idoforg in (:listOfOrgId) ";
             } else {
-                criteria.createAlias("org", "o").add(eq("o.idOfOrg", idOfOrg));
+                orgCondition = " and ee.idoforg = :idOfOrg ";
             }
 
-            criteria.add((between("evtDateTime", startTime, endTime)));
-            criteria.addOrder(Order.asc("evtDateTime"));
-            List<EnterEvent> enterEventList = criteria.list();
+            Query query = session.createSQLQuery(
+                           " select ee.evtdatetime, p.surname, p.firstname, p.secondname, gr.groupname, ee.passdirection, o.shortname " + selectPartSectionName
+                            + " from cf_enterevents ee "
+                            + " join cf_orgs o on ee.idoforg = o.idoforg "
+                            + " left join cf_cards crd on ee.idofcard = crd.cardno "
+                            + " left join cf_clients c on c.idofclient = ee.idofclient or c.idofclient = crd.idofclient "
+                            + " left join cf_visitors v on v.idOfVisitor = ee.idofvisitor "
+                            + " left join cf_persons p on p.idofperson = c.idofperson or p.idofperson = v.idofperson "
+                            + joinMigrants
+                            + " left join cf_clientgroups gr on gr.idoforg = c.idoforg and gr.idofclientgroup = c.idofclientgroup "
+                            + " where ee.evtdatetime between :startTime and :endTime "
+                            + orgCondition
+                            + eventsCondition
+                            + clientGroupCondition
+                            + " order by " + partOfOrderByMigrantSection + " ee.evtdatetime "
+            );
+            query.setParameter("startTime", startTime.getTime())
+                 .setParameter("endTime", endTime.getTime());
 
-            String passdirection, personFullName;
-
-            if(idOfOrgList.isEmpty()){
-                Org org = (Org) session.load(Org.class, idOfOrg);
-                for (Org orgItem : org.getFriendlyOrg()) {
-                    idOfOrgList.add(orgItem.getIdOfOrg());
-                }
+            if(!clientGroupCondition.isEmpty()){
+                query.setParameterList("groupList", groupList);
             }
 
-            if(outputMigrants){
-                if(allFriendlyOrgs) {
-                    expectedMigrants = MigrantsUtils
-                            .getMigrationForListOfOrgVisit(session, idOfOrgList, startTime, endTime);
-                } else {
-                    expectedMigrants = MigrantsUtils
-                            .getMigrationForListOfOrgVisit(session, Arrays.asList(idOfOrg), startTime, endTime);
-                }
+            if(allFriendlyOrgs){
+                query.setParameterList("listOfOrgId", idOfOrgList);
+            } else {
+                query.setParameter("idOfOrg", idOfOrg);
             }
 
-            for (EnterEvent enterEvent : enterEventList) {
-                if (!matchItem(enterEvent, eventFilter)) {
-                    continue;
-                }
-                if (enterEvent.getClient() != null) {
-                    personFullName = enterEvent.getClient().getPerson().getFullName();
-                } else if (enterEvent.getVisitorFullName() != null) {
-                    personFullName = enterEvent.getVisitorFullName();
-                } else if (enterEvent.getIdOfVisitor() != null) {
-                    Criteria visitorCriteria = session.createCriteria(Visitor.class);
-                    visitorCriteria.add(Restrictions.eq("idOfVisitor", enterEvent.getIdOfVisitor()));
-                    Visitor visitor = (Visitor) visitorCriteria.uniqueResult();
-                    if (visitor != null) {
-                        if (visitor.getPerson() != null) {
-                            personFullName = visitor.getPerson().getFullName();
-                        } else {
-                            personFullName = "";
-                        }
-                    } else {
-                        personFullName = "";
-                    }
-                } else {
-                    personFullName = "";
-                }
+            List<Object[]> data = query.list();
+            for(Object[] row : data){
+                Date evtDateTime = new Date(((BigInteger) row[0]).longValue());
+                String eventDate = CalendarUtils.dateShortToStringFullYear(evtDateTime);
+                String time = CalendarUtils.formatTimeClassicToString(evtDateTime.getTime());
+                String fullName = StringUtils.defaultString((String) row[1])  + " " +StringUtils.defaultString((String) row[2]) + " " + StringUtils.defaultString((String) row[3]);
+                String group = StringUtils.defaultString((String) row[4]);
+                String eventName = getEventsName((Integer) row[5]);
+                String shortNameOrg = StringUtils.defaultString((String) row[6]);
+                String sectionName = StringUtils.defaultString((String) row[7]);
 
-                switch (enterEvent.getPassDirection()) {
-                    case EnterEvent.ENTRY:
-                        passdirection = "вход";
-                        break;
-                    case EnterEvent.EXIT:
-                        passdirection = "выход";
-                        break;
-                    case EnterEvent.PASSAGE_IS_FORBIDDEN:
-                        passdirection = "проход запрещен";
-                        break;
-                    case EnterEvent.TURNSTILE_IS_BROKEN:
-                        passdirection = "взлом турникета";
-                        break;
-                    case EnterEvent.EVENT_WITHOUT_PASSAGE:
-                        passdirection = "событие без прохода";
-                        break;
-                    case EnterEvent.PASSAGE_RUFUSAL:
-                        passdirection = "отказ от прохода";
-                        break;
-                    case EnterEvent.RE_ENTRY:
-                        passdirection = "повторный вход";
-                        break;
-                    case EnterEvent.RE_EXIT:
-                        passdirection = "повторный выход";
-                        break;
-                    case EnterEvent.DETECTED_INSIDE:
-                        passdirection = "обнаружен на подносе карты внутри здания";
-                        break;
-                    case EnterEvent.CHECKED_BY_TEACHER_EXT:
-                        passdirection = "отмечен в классном журнале через внешнюю систему";
-                        break;
-                    case EnterEvent.CHECKED_BY_TEACHER_INT:
-                        passdirection = "отмечен учителем внутри здания";
-                        break;
-                    case EnterEvent.QUERY_FOR_ENTER:
-                        passdirection = "запрос на вход";
-                        break;
-                    case EnterEvent.QUERY_FOR_EXIT:
-                        passdirection = "запрос на выход";
-                        break;
-                    default:
-                        passdirection = "неизвестный тип";
-                }
-
-                String groupName = "";
-
-                ClientGroup clientGroup = getClientGroupByID(enterEvent.getIdOfClientGroup(), enterEvent.getOrg().getIdOfOrg(), session);
-
-                if (clientGroup != null) {
-                    if (clientGroup.getGroupName() != null) {
-                        groupName = clientGroup.getGroupName();
-                    }
-                }
-
-                EnterEventItem enterEventItem = new EnterEventItem(
-                        CalendarUtils.dateShortToStringFullYear(enterEvent.getEvtDateTime()),
-                        CalendarUtils.formatTimeClassicToString(enterEvent.getEvtDateTime().getTime()), personFullName,
-                        groupName, passdirection, enterEvent.getOrg().getShortNameInfoService());
-
-
-                if (outputMigrants && !CollectionUtils.isEmpty(expectedMigrants) && enterEvent.getClient() != null) { // Если надо вывести кружки и в ОО вообще они есть...
-                    Client client = (Client) session.load(Client.class, enterEvent.getClient().getIdOfClient()); // То достаем клиента...
-                    if (client != null && !clientSections.containsKey(client)) { // Проверям находили ли мы на него, иначе уходим
-                        if (!idOfOrgList.contains(client.getOrg().getIdOfOrg())) { // Проверяем подает ли он признаки мигранта, иначе добавляем в мапу с NULL в названии кружка
-                            boolean findMigrant = false;
-                            for (Migrant migrant : expectedMigrants) { // Через линейный поиск ищем клиента среди мигрантов...
-                                if (migrant.getClientMigrate().equals(client)) {
-                                    findMigrant = true;
-                                    clientSections.put(client, migrant.getSection()); //...и добавляем в мапу чтоб больше с ним не возиться
-                                    break;
-                                }
-                            }
-                            if (!findMigrant) {
-                                clientSections.put(client, null);
-                            }
-                        } else {
-                            clientSections.put(client, null);
-                        }
-                    }
-                    enterEventItem.setSectionName(clientSections.get(client)); // Добавляем название кружка в item
-                }
-                enterEventItems.add(enterEventItem);
-            }
-
-            if(sortedBySections){
-                Collections.sort(enterEventItems, new Comparator<EnterEventItem>() {
-                    @Override
-                    public int compare(EnterEventItem o1, EnterEventItem o2) {
-                        if(o1.getSectionName() == null && o2.getSectionName() == null) {
-                            return 0;
-                        } else if(o1.getSectionName() == null){
-                            return -1;
-                        } else if (o2.getSectionName() == null){
-                            return 1;
-                        } else {
-                            return o1.getSectionName().compareTo(o2.getSectionName());
-                        }
-                    }
-                });
-            }
-
-            if (enterEventItems.isEmpty()) {
-                enterEventItems.add(new EnterEventItem("", "", "", "", "", ""));
+                EnterEventItem item = new EnterEventItem(eventDate, time, fullName, group, eventName, shortNameOrg, sectionName);
+                enterEventItems.add(item);
             }
             return new JRBeanCollectionDataSource(enterEventItems);
         }
 
-        private boolean matchItem(EnterEvent enterEvent, Integer eventFilter) {
-            if (eventFilter.equals(0)) return true;      //все
-            if (eventFilter.equals(1)) {                //входы-выходы
-                return (enterEvent.getPassDirection() == EnterEvent.ENTRY || enterEvent.getPassDirection() == EnterEvent.EXIT
-                || enterEvent.getPassDirection() == EnterEvent.RE_ENTRY || enterEvent.getPassDirection() == EnterEvent.RE_EXIT);
-            }
-            if (eventFilter.equals(2)) {                //с клиентом
-                return enterEvent.getClient() != null;
-            } else {
-                return enterEvent.getClient() == null;
+        private String getEventsName(Integer passdirection) {
+            switch (passdirection) {
+                case EnterEvent.ENTRY:
+                    return "вход";
+                case EnterEvent.EXIT:
+                    return "выход";
+                case EnterEvent.PASSAGE_IS_FORBIDDEN:
+                    return "проход запрещен";
+                case EnterEvent.TURNSTILE_IS_BROKEN:
+                    return "взлом турникета";
+                case EnterEvent.EVENT_WITHOUT_PASSAGE:
+                    return "событие без прохода";
+                case EnterEvent.PASSAGE_RUFUSAL:
+                    return "отказ от прохода";
+                case EnterEvent.RE_ENTRY:
+                    return "повторный вход";
+                case EnterEvent.RE_EXIT:
+                    return "повторный выход";
+                case EnterEvent.DETECTED_INSIDE:
+                    return "обнаружен на подносе карты внутри здания";
+                case EnterEvent.CHECKED_BY_TEACHER_EXT:
+                    return "отмечен в классном журнале через внешнюю систему";
+                case EnterEvent.CHECKED_BY_TEACHER_INT:
+                    return "отмечен учителем внутри здания";
+                case EnterEvent.QUERY_FOR_ENTER:
+                    return "запрос на вход";
+                case EnterEvent.QUERY_FOR_EXIT:
+                    return "запрос на выход";
+                default:
+                    return "неизвестный тип";
             }
         }
 
-        public ClientGroup getClientGroupByID(Long idOfClientGroup, Long idOfOrg, Session session) throws Exception {
-            Criteria criteria = session.createCriteria(ClientGroup.class);
-            criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-            criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", idOfClientGroup));
-            return (ClientGroup) criteria.uniqueResult();
+        private String getEventsCondition(Integer eventFilter) {
+            switch (eventFilter) {
+                case 1:
+                    return " and ee.passdirection in ( " + EnterEvent.ENTRY + ", " + EnterEvent.EXIT + ", " + EnterEvent.RE_ENTRY + ", " + EnterEvent.RE_EXIT + " ) ";
+                case 2:
+                    return " and not (c.idofclient is null and crd.cardno is null) ";
+                case 3:
+                    return " and c.idofclient is null and crd.cardno is null ";
+                default:
+                    return "";
+            }
         }
 
         public void setIdOfOrg(Long idOfOrg) {
@@ -346,13 +254,14 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
         private String sectionName;
 
         public EnterEventItem(String eventDate, String time, String fullName, String group, String eventName,
-                String shortNameOrg) {
+                String shortNameOrg, String sectionName) {
             this.eventDate = eventDate;
             this.time = time;
             this.fullName = fullName;
             this.group = group;
             this.eventName = eventName;
             this.shortNameOrg = shortNameOrg;
+            this.sectionName = sectionName;
         }
 
         public String getEventDate() {

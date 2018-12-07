@@ -33,7 +33,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by anvarov on 04.04.18.
@@ -84,32 +87,28 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-
-                Properties properties = new Properties();
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                properties.setProperty("eventFilter", selectedEventFilter.toString());
-                properties.setProperty("outputMigrants", outputMigrants.toString());
-                if(outputMigrants){
-                    properties.setProperty("sortedBySections", sortedBySections.toString());
-                } else {
-                    properties.setProperty("sortedBySections", "false");
-                }
-
-                builder.setReportProperties(properties);
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Properties properties = new Properties();
+            String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+            properties.setProperty("groupName", groupNamesString);
+            properties.setProperty("eventFilter", selectedEventFilter.toString());
+            properties.setProperty("outputMigrants", outputMigrants.toString());
+            if (outputMigrants) {
+                properties.setProperty("sortedBySections", sortedBySections.toString());
+            } else {
+                properties.setProperty("sortedBySections", "false");
             }
+            builder.setReportProperties(properties);
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
 
         if (report != null) {
