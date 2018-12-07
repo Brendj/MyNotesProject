@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
-import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -30,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -189,7 +187,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                 }
 
                 GoodRequestsNewReportService.ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
-                GoodRequestsNewReportService.GoodInfo info = new GoodRequestsNewReportService.GoodInfo(globalId, "", planType, goodsCode);
+                GoodRequestsNewReportService.GoodInfo info = new GoodRequestsNewReportService.GoodInfo(globalId, "", planType, goodsCode, null);
                 if (infoItem == null) {
                     infoItem = new GoodRequestsNewReportService.ComplexInfoItem(idOfOrg);
                 }
@@ -214,10 +212,10 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             if (itemList.isEmpty()) {
                 for (BasicReportJob.OrgShortItem item : orgMap.values()) {
                     itemList.add(new GoodRequestsNewReportService.Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
-                            hideLastValue, null, 0L, ""));
+                            hideLastValue, null, 0L, "", null, null));
                 }
                 itemList.add(new GoodRequestsNewReportService.Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                        hideDailySampleValue, hideLastValue, null, 0L, 0L, "", ""));
+                        hideDailySampleValue, hideLastValue, null, 0L, 0L, "", "", null, null));
             }
             return itemList;
         }
@@ -315,13 +313,14 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
             }
             String goodsCode = good.getGoodsCode();
             if (!requestGoodsInfo.containsKey(good.getGlobalId())) {
-                requestGoodsInfo.put(good.getGlobalId(), new GoodRequestsNewReportService.GoodInfo(good.getGlobalId(), name, planType, goodsCode));
+                requestGoodsInfo.put(good.getGlobalId(), new GoodRequestsNewReportService.GoodInfo(good.getGlobalId(), name, planType, goodsCode, null));
             }
             // чтобы хотя бы раз выполнилмся, для уведомлений
             if (!hideMissedColumns && goodRequestPositionList.indexOf(obj) == 0) {
                 while (beginDate.getTime() <= endDate.getTime()) {
                     itemList.add(new GoodRequestsNewReportService.Item(org, name, beginDate, 0L, 0L, 0L, 0L,
-                            0L, 0L, hideDailySampleValue, hideLastValue, planType, 0L, 0L, goodsCode));
+                            0L, 0L, hideDailySampleValue, hideLastValue, planType, 0L, 0L, goodsCode,
+                            null, null));
                     dates.add(beginDate);
                     beginDate = CalendarUtils.addOneDay(beginDate);
                 }
@@ -376,9 +375,10 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                 Date doneDate, String name, int hideDailySampleValue, int hideLastValue, GoodRequestsNewReportService.FeedingPlanType goodType,
                 Long notificationMark, Long needToMark, String goodsCode) {
             itemList.add(
-                    new GoodRequestsNewReportService.Item(org, name, doneDate, hideDailySampleValue, hideLastValue, goodType, notificationMark, goodsCode));
+                    new GoodRequestsNewReportService.Item(org, name, doneDate, hideDailySampleValue, hideLastValue, goodType,
+                            notificationMark, goodsCode, null, null));
             itemList.add(new GoodRequestsNewReportService.Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
-                    goodType, notificationMark, needToMark, 0L, "", goodsCode));
+                    goodType, notificationMark, needToMark, 0L, "", goodsCode, null, null));
         }
 
         private static void addItemsFromList(List<GoodRequestsNewReportService.Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
@@ -386,7 +386,7 @@ public class PreorderRequestsReport extends BasicReportForContragentJob {
                 Long newTempClients, int hideDailySampleValue, int hideLastValue, GoodRequestsNewReportService.FeedingPlanType goodType, Long notificationMark,
                 Long needToMark, String goodsCode) {
             itemList.add(new GoodRequestsNewReportService.Item(org, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
-                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, goodType, notificationMark, needToMark, goodsCode));
+                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, goodType, notificationMark, needToMark, goodsCode, null, null));
         }
     }
 

@@ -99,8 +99,9 @@ public class GoodRequestsNewReportService {
                 final Long globalId = complexInfo.getGood().getGlobalId();
                 final Long idOfOrg = complexInfo.getOrg().getIdOfOrg();
                 final String goodsCode = complexInfo.getGood().getGoodsCode();
+                final Long price = complexInfo.getCurrentPrice();
                 ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
-                GoodInfo info = new GoodInfo(globalId, "", feedingPlanType, goodsCode);
+                GoodInfo info = new GoodInfo(globalId, "", feedingPlanType, goodsCode, price);
                 if (infoItem == null) {
                     infoItem = new ComplexInfoItem(idOfOrg);
                 }
@@ -119,7 +120,11 @@ public class GoodRequestsNewReportService {
                             + "   CASE WHEN (pc.amount = 0 AND pc.complexname ILIKE '%завтрак%') THEN 'breakfast' "
                             + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%обед%') THEN 'dinner' "
                             + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%полдник%') THEN 'afternoon' "
-                            + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%ужин%') THEN 'supper' ELSE '' END AS type "
+                            + "        WHEN (pc.amount = 0 AND pc.complexname ILIKE '%ужин%') THEN 'supper' ELSE '' END AS type,"
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.idofgoodsrequestposition ELSE pc.idofgoodsrequestposition "
+                            + "         END AS idofgoodsrequestposition ,"
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.menudetailprice ELSE pc.complexprice "
+                            + "         END AS price "
                             + "FROM cf_preorder_complex pc "
                             + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate "
@@ -153,6 +158,8 @@ public class GoodRequestsNewReportService {
                 Boolean isComplex = (Boolean) values[2];
                 final String goodsCode = (null != values[3]) ? values[3].toString() : "";
                 final String menuDetailType = (null != values[4]) ? values[4].toString() : "";
+                final Long idOfGoodsRequestPosition = (null !=  values[5]) ? ((BigInteger) values[5]).longValue() : null;
+                final Long price = (null != values[6]) ? ((BigInteger) values[6]).longValue() : null;
 
                 if (isComplex) {
                     planType = FeedingPlanType.COMPLEX;
@@ -172,11 +179,14 @@ public class GoodRequestsNewReportService {
                 }
 
                 ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
-                GoodInfo info = new GoodInfo(globalId, "", planType, goodsCode);
+                GoodInfo info = new GoodInfo(globalId, "", planType, goodsCode, price);
                 if (infoItem == null) {
                     infoItem = new ComplexInfoItem(idOfOrg);
                 }
-                infoItem.goodInfos.put(globalId, info);
+                if (!infoItem.goodInfos.containsKey(globalId)) {
+                    infoItem.goodInfos.put(globalId, info);
+                }
+                infoItem.preorderInfo.put(idOfGoodsRequestPosition, info);
                 complexOrgDictionary.put(idOfOrg, infoItem);
                 allGoodsInfo.put(globalId, info);
             }
@@ -224,12 +234,14 @@ public class GoodRequestsNewReportService {
                         }
                         if (!requestGoodsInfo.containsKey(idOfGood)) {
                             FeedingPlanType feedingPlanType = null;
+                            Long price = null;
                             if (allGoodsInfo.containsKey(idOfGood)) {
                                 feedingPlanType = allGoodsInfo.get(idOfGood).feedingPlanType;
+                                price = allGoodsInfo.get(idOfGood).price;
                             } else {
                                 continue;
                             }
-                            fullNameProviderMap.put(idOfOrg, new GoodInfo(idOfGood, nameOfGood, feedingPlanType, goodsCode));
+                            fullNameProviderMap.put(idOfOrg, new GoodInfo(idOfGood, nameOfGood, feedingPlanType, goodsCode, price));
                         }
                     }
                     if (fullNameProviderMap.getCollection(item.getSourceMenuOrg()) != null) {
@@ -238,14 +250,16 @@ public class GoodRequestsNewReportService {
                             if (hideMissedColumns) {
                                 for (Date date : dates) {
                                     addItemsFromList(itemList, item, date, goodInfo.name, hideDailySampleValue,
-                                            hideLastValue, goodInfo.feedingPlanType, 0L, goodInfo.goodsCode);
+                                            hideLastValue, goodInfo.feedingPlanType, 0L,
+                                            goodInfo.goodsCode, goodInfo.price, goodInfo.feedingPlanType.getTotalString());
                                 }
                             } else {
                                 beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
                                 endDate = CalendarUtils.endOfDay(endTime);
                                 while (beginDate.getTime() <= endDate.getTime()) {
                                     addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
-                                            hideLastValue, goodInfo.feedingPlanType, 0L, goodInfo.goodsCode);
+                                            hideLastValue, goodInfo.feedingPlanType, 0L,
+                                            goodInfo.goodsCode, goodInfo.price, goodInfo.feedingPlanType.getTotalString());
                                     beginDate = CalendarUtils.addOneDay(beginDate);
                                 }
                             }
@@ -258,10 +272,10 @@ public class GoodRequestsNewReportService {
         if (itemList.isEmpty() && !hideTotalRow) {
             for (BasicReportJob.OrgShortItem item : orgMap.values()) {
                 itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
-                        hideLastValue, null, 0L, ""));
+                        hideLastValue, null, 0L, "", null, ""));
             }
             itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                    hideDailySampleValue, hideLastValue, null, 0L, null, "", ""));
+                    hideDailySampleValue, hideLastValue, null, 0L, null, "", "", null, null));
         }
 
         return itemList;
@@ -357,15 +371,24 @@ public class GoodRequestsNewReportService {
 
         final Good good = position.getGood();
         FeedingPlanType feedingPlanType = null;
+        Long price = null;
         if (complexOrgDictionary.containsKey(position.getOrgOwner())) {
-            if (complexOrgDictionary.get(position.getOrgOwner()).goodInfos.containsKey(good.getGlobalId())) {
-                feedingPlanType = complexOrgDictionary.get(position.getOrgOwner()).goodInfos
-                        .get(good.getGlobalId()).feedingPlanType;
+            ComplexInfoItem complexInfoItem = complexOrgDictionary.get(position.getOrgOwner());
+            if (complexInfoItem.preorderInfo.containsKey(position.getGlobalId())) {
+                GoodInfo info = complexInfoItem.preorderInfo.get(position.getGlobalId());
+                feedingPlanType = info.feedingPlanType;
+                price = info.price;
+            } else if (complexInfoItem.goodInfos.containsKey(good.getGlobalId())) {
+                GoodInfo info = complexInfoItem.goodInfos.get(good.getGlobalId());
+                feedingPlanType = info.feedingPlanType;
+                price = info.price;
             } else {
                 feedingPlanType = FeedingPlanType.PAY_PLAN;
+                price = 0L;
             }
         } else {
             feedingPlanType = FeedingPlanType.PAY_PLAN;
+            price = 0L;
         }
         String name = "";
         if (needFullGoodNames) {
@@ -377,20 +400,20 @@ public class GoodRequestsNewReportService {
         }
         String goodsCode = good.getGoodsCode();
         if (!requestGoodsInfo.containsKey(good.getGlobalId())) {
-            requestGoodsInfo.put(good.getGlobalId(), new GoodInfo(good.getGlobalId(), name, feedingPlanType, goodsCode));
+            requestGoodsInfo.put(good.getGlobalId(), new GoodInfo(good.getGlobalId(), name, feedingPlanType, goodsCode, price));
         }
         // чтобы хотя бы раз выполнилмся, для уведомлений
         if (!hideMissedColumns && hideTotalRow && goodRequestPositionList.indexOf(obj) == 0) {
             while (beginDate.getTime() <= endDate.getTime()) {
                 itemList.add(new Item(org, name, beginDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
-                        feedingPlanType, 0L, ""));
+                        feedingPlanType, 0L, "", price, null));
                 dates.add(beginDate);
                 beginDate = CalendarUtils.addOneDay(beginDate);
             }
         }
 
         addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, tempClientsCount, newTotalCount, newDailySample, newTempClients,
-                hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode);
+                hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode, price, feedingPlanType.getTotalString());
         dates.add(doneDate);
         if (notification) {
             position.setNotified(true);
@@ -442,45 +465,53 @@ public class GoodRequestsNewReportService {
     }
 
     private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
-            int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode) {
+            int hideDailySampleValue, int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark,
+            String goodsCode, Long price, String totalPlanStr) {
         itemList.add(
-                new Item(org, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode));
+                new Item(org, name, doneDate, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode, price, totalPlanStr));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark, null, "", goodsCode));
+                    feedingPlanType, notificationMark, null, "", goodsCode, price, totalPlanStr));
         }
     }
 
     private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
             Long totalCount, Long dailySampleCount, Long tempClientsCount, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
-            int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode) {
+            int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode, Long price, String totalPlanStr) {
         itemList.add(new Item(org, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount, newDailySample, newTempClients,
-                hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode));
+                hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode, price, totalPlanStr));
         if (!hideTotalRow) {
             itemList.add(new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount, tempClientsCount, newTotalCount,
-                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, 0L, null, "", goodsCode));
+                    newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, 0L,
+                    null, "", goodsCode, price, totalPlanStr));
         }
     }
 
     public enum FeedingPlanType {
-        /*0*/ REDUCED_PRICE_PLAN("Льготное питание"),
-        /*1*/ PAY_PLAN("Платное питание"),
-        /*2*/ SUBSCRIPTION_FEEDING("Абонементное питание"),
-        /*3*/ COMPLEX("Вариативное платное питание. Комплексы"),
-        /*4*/ DISH("Вариативное платное питание. Отдельные блюда"),
-        /*5*/ BREAKFAST("Завтрак (перечень блюд на выбор)"),
-        /*6*/ DINNER("Обед (перечень блюд на выбор)"),
-        /*7*/ AFTERNOON("Полдник (перечень блюд на выбор)"),
-        /*8*/ SUPPER("Ужин (перечень блюд на выбор)");
+        /*0*/ REDUCED_PRICE_PLAN("Льготное питание", "льготному питанию"),
+        /*1*/ PAY_PLAN("Платное питание", "платному питанию"),
+        /*2*/ SUBSCRIPTION_FEEDING("Абонементное питание", "абонементному питанию"),
+        /*3*/ COMPLEX("Вариативное платное питание. Комплексы", "вариативному платному питанию"),
+        /*4*/ DISH("Вариативное платное питание. Отдельные блюда", "вариативному платному питанию"),
+        /*5*/ BREAKFAST("Завтрак (перечень блюд на выбор)", "вариативному платному питанию"),
+        /*6*/ DINNER("Обед (перечень блюд на выбор)", "вариативному платному питанию"),
+        /*7*/ AFTERNOON("Полдник (перечень блюд на выбор)", "вариативному платному питанию"),
+        /*8*/ SUPPER("Ужин (перечень блюд на выбор)", "вариативному платному питанию");
 
         private String name;
+        private String totalString;
 
-        FeedingPlanType(String name) {
+        FeedingPlanType(String name, String totalString) {
             this.name = name;
+            this.totalString = totalString;
         }
 
         public String getName() {
             return name;
+        }
+
+        public String getTotalString() {
+            return totalString;
         }
     }
 
@@ -488,6 +519,7 @@ public class GoodRequestsNewReportService {
 
         final long idOfOrg;
         final Map<Long, GoodInfo> goodInfos = new HashMap<Long, GoodInfo>();
+        final Map<Long, GoodInfo> preorderInfo = new HashMap<Long, GoodInfo>();
 
         public ComplexInfoItem(long idOfOrg) {
             this.idOfOrg = idOfOrg;
@@ -501,12 +533,14 @@ public class GoodRequestsNewReportService {
         final String name;
         final FeedingPlanType feedingPlanType;
         final String goodsCode;
+        final Long price;
 
-        public GoodInfo(long idOfGood, String name, FeedingPlanType feedingPlanType, String goodsCode) {
+        public GoodInfo(long idOfGood, String name, FeedingPlanType feedingPlanType, String goodsCode, Long price) {
             this.idOfGood = idOfGood;
             this.name = name;
             this.feedingPlanType = feedingPlanType;
             this.goodsCode = goodsCode;
+            this.price = price;
         }
 
         @Override
@@ -558,26 +592,29 @@ public class GoodRequestsNewReportService {
         private Long idOfOrg;
         private String address;
         private String goodsCode;
+        private String totalPlanStr;
+        private Long price;
 
         protected Item(Item item, Date doneDate) {
             this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L, 0L, 0L,
                     item.getHideDailySample(), item.getHideLastValue(), item.getFeedingPlanType(),
-                    item.getNotificationMark(), item.getIdOfOrg(), item.getAddress(), item.getGoodsCode());
+                    item.getNotificationMark(), item.getIdOfOrg(), item.getAddress(), item.getGoodsCode(), item.getPrice(),
+                    item.getTotalPlanStr());
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
                 Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long idOfOrg, String address,
-                String goodsCode) {
+                String goodsCode, Long price, String totalPlanStr) {
             this(orgNum, officialName, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount,
                     newDailySample, newTempClients, hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark,
-                    0L, idOfOrg, address, goodsCode);
+                    0L, idOfOrg, address, goodsCode, price, totalPlanStr);
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
                 Long tempClients, Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark, Long idOfOrg,
-                String address, String goodsCode) {
+                String address, String goodsCode, Long price, String totalPlanStr) {
             this.orgNum = orgNum;
             this.officialName = officialName;
             this.goodName = goodName;
@@ -604,43 +641,46 @@ public class GoodRequestsNewReportService {
             this.idOfOrg = idOfOrg;
             this.address = address;
             this.goodsCode = goodsCode;
+            this.totalPlanStr = totalPlanStr;
+            this.price = price;
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark, Long idOfOrg,
-                String address, String goodsCode) {
+                String address, String goodsCode, Long price, String totalPlanStr) {
             this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue,
-                    hideLastValue, feedingPlanType, notificationMark, needToMark, idOfOrg, address, goodsCode);
+                    hideLastValue, feedingPlanType, notificationMark, needToMark, idOfOrg, address, goodsCode, price, totalPlanStr);
         }
 
         public Item(String orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue,
                 int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, Long idOfOrg, String address,
-                String goodsCode) {
+                String goodsCode, Long price, String totalPlanStr) {
             this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue,
-                    hideLastValue, feedingPlanType, notificationMark, idOfOrg, address, goodsCode);
+                    hideLastValue, feedingPlanType, notificationMark, idOfOrg, address, goodsCode, price, totalPlanStr);
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample, Long tempClients,
                 Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark, String goodsCode) {
+                FeedingPlanType feedingPlanType, Long notificationMark, Long needToMark, String goodsCode, Long price, String totalPlanStr) {
             this(Org.extractOrgNumberFromName(item.getOfficialName()), item.getShortName(), goodName, doneDate,
                     totalCount, dailySample, tempClients, newTotalCount, newDailySample, newTempClients, hideDailySampleValue, hideLastValue,
-                    feedingPlanType, notificationMark, needToMark, item.getIdOfOrg(), item.getAddress(), goodsCode);
+                    feedingPlanType, notificationMark, needToMark, item.getIdOfOrg(), item.getAddress(), goodsCode, price, totalPlanStr);
 
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample, Long tempClients,
                 Long newTotalCount, Long newDailySample, Long newTempClients, int hideDailySampleValue, int hideLastValue,
-                FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode) {
+                FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode, Long price, String totalPlanStr) {
             this(item, goodName, doneDate, totalCount, dailySample, tempClients, newTotalCount, newDailySample, newTempClients,
-                    hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, 0L, goodsCode);
+                    hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, 0L, goodsCode, price, totalPlanStr);
 
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, int hideDailySampleValue,
-                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode) {
-            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue, feedingPlanType,
-                    notificationMark, goodsCode);
+                int hideLastValue, FeedingPlanType feedingPlanType, Long notificationMark, String goodsCode, Long price,
+                String totalPlanStr) {
+            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, 0L, 0L,
+                    hideDailySampleValue, hideLastValue, feedingPlanType, notificationMark, goodsCode, price, totalPlanStr);
         }
 
         @Override
@@ -838,6 +878,22 @@ public class GoodRequestsNewReportService {
 
         public void setGoodsCode(String goodsCode) {
             this.goodsCode = goodsCode;
+        }
+
+        public String getTotalPlanStr() {
+            return totalPlanStr;
+        }
+
+        public void setTotalPlanStr(String totalPlanStr) {
+            this.totalPlanStr = totalPlanStr;
+        }
+
+        public Long getPrice() {
+            return price;
+        }
+
+        public void setPrice(Long price) {
+            this.price = price;
         }
     }
 }
