@@ -457,8 +457,8 @@ public class ImportRegisterOrgsService {
                         oi.getInterdistrictCouncilFrom(),
                         oi.getInterdistrictCouncilChief(),
                         oi.getInterdistrictCouncilChiefFrom(),
-                        orgRegistryChange, solveBoolean(oi.getMainBuilding()), oi.getShortNameSupplierFrom()
-
+                        orgRegistryChange, solveBoolean(oi.getMainBuilding()), oi.getShortNameSupplierFrom(),
+                        oi.getOrgState()
                 );
     }
 
@@ -484,6 +484,7 @@ public class ImportRegisterOrgsService {
         Поля _From - данные из ИС ПП, поля без _From - данные из АИС Реестр.
          */
         protected Long idOfOrg;
+        protected Integer orgState;
         protected Long createDate;
         protected Integer operationType;
 
@@ -841,6 +842,14 @@ public class ImportRegisterOrgsService {
 
         public void setInnFrom(String innFrom) {
             this.innFrom = innFrom;
+        }
+
+        public Integer getOrgState() {
+            return orgState;
+        }
+
+        public void setOrgState(Integer orgState) {
+            this.orgState = orgState;
         }
     }
 }

@@ -14,6 +14,7 @@ public class OrgRegistryChangeItem {
     protected Long idOfOrg;
     protected Long createDate;
     protected Integer operationType;
+    protected Integer state;
 
     protected OrganizationType organizationType;
     protected OrganizationType organizationTypeFrom;
@@ -79,8 +80,9 @@ public class OrgRegistryChangeItem {
 
             String guid, String guidFrom, Long additionalId, String interdistrictCouncil,
             String interdistrictCouncilFrom, String interdistrictCouncilChief, String interdistrictCouncilChiefFrom,
-            OrgRegistryChange orgRegistryChange, boolean mainBuilding, String shortNameSupplierFrom) {
+            OrgRegistryChange orgRegistryChange, boolean mainBuilding, String shortNameSupplierFrom, Integer state) {
         this.idOfOrg = idOfOrg;
+        this.state = state;
 
         this.organizationType = organizationType;
         this.organizationTypeFrom = organizationTypeFrom;
@@ -401,5 +403,13 @@ public class OrgRegistryChangeItem {
 
     public void setInnFrom(String innFrom) {
         this.innFrom = innFrom;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }

@@ -278,9 +278,9 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
-                            <h:outputText value="Межрайонный совет ОО" />
+                            <h:outputText value="Статус" />
                         </f:facet>
-                        <h:outputText value="#{org.interdistrictCouncil}" escape="false" />
+                        <h:outputText value="#{org.stringState}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">

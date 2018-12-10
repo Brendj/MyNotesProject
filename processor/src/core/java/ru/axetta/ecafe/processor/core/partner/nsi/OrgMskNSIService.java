@@ -277,6 +277,7 @@ public class OrgMskNSIService extends MskNSIService {
 
     private void fillInfOWithOrg(ImportRegisterOrgsService.OrgInfo info, Org existingOrg) {
         info.setIdOfOrg(existingOrg.getIdOfOrg());
+        info.setOrgState(existingOrg.getState());
         info.setOrganizationTypeFrom(existingOrg.getType());
 
         info.setShortNameFrom(existingOrg.getShortNameInfoService());
@@ -445,6 +446,7 @@ public class OrgMskNSIService extends MskNSIService {
 
             ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
             info.setIdOfOrg(o.getIdOfOrg());
+            info.setOrgState(o.getState());
             info.setOrganizationType(o.getType());
             info.setShortNameFrom(o.getShortName());
             info.setOfficialNameFrom(o.getOfficialName());

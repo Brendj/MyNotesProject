@@ -11,6 +11,7 @@
             <generator class="identity"/>
         </id>
         <property name="idOfOrg" column="idoforg" type="long"/>
+        <property name="state" column="state" type="integer"/>
         <property name="createDate" column="createdate" type="long"/>
         <property name="operationType" column="operationtype" type="int"/>
 

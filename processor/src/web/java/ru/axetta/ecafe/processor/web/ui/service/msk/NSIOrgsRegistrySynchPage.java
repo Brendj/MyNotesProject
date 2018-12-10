@@ -581,6 +581,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public class WebItem {
         protected Long idOfOrgRegistryChange;
         protected Long idOfOrg;
+        private Integer state;
         protected Long createDate;
         protected Integer operationType;
 
@@ -627,6 +628,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         public WebItem(OrgRegistryChange registryChange) {
             this.idOfOrgRegistryChange = registryChange.getIdOfOrgRegistryChange();
             this.idOfOrg = registryChange.getIdOfOrg();
+            this.state = 0; //stub
             this.createDate = registryChange.getCreateDate();
             this.operationType = registryChange.getOperationType();
             this.applied = registryChange.getApplied();
@@ -676,6 +678,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         public WebItem(OrgRegistryChangeItem registryChangeItem) {
             this.idOfOrgRegistryChange = registryChangeItem.getIdOfOrgRegistryChangeItem();
             this.idOfOrg = registryChangeItem.getIdOfOrg();
+            this.state = registryChangeItem.getState();
             this.createDate = registryChangeItem.getCreateDate();
             this.operationType = registryChangeItem.getOperationType();
             this.applied = registryChangeItem.getApplied();
@@ -1086,6 +1089,25 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public void setInnFrom(String innFrom) {
             this.innFrom = innFrom;
+        }
+
+        public Integer getState() {
+            return state;
+        }
+
+        public String getStringState() {
+            if (state == null) return "";
+            if (state.equals(Org.ACTIVE_STATE)) return "Обслуживается";
+            else {
+                if (state.equals(Org.INACTIVE_STATE))
+                    return "Не обслуживается";
+                else
+                    return "";
+            }
+        }
+
+        public void setState(Integer state) {
+            this.state = state;
         }
     }
 }
