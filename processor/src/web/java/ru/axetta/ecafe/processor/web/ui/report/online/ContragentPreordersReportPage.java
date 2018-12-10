@@ -121,7 +121,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
             ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
             builder.setContragent(this.contragent);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("hideOrgsWithEmptyData", hideOrgsWithEmptyData.toString());
+            builder.getReportProperties().setProperty("hideEmptyData", hideOrgsWithEmptyData.toString());
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -169,7 +169,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
             ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
             builder.setContragent(this.contragent);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("hideOrgsWithEmptyData", hideOrgsWithEmptyData.toString());
+            builder.getReportProperties().setProperty("hideEmptyData", hideOrgsWithEmptyData.toString());
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);

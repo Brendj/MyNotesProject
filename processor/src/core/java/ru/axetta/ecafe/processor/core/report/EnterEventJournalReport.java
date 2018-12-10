@@ -132,7 +132,8 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
             Query query = session.createSQLQuery(
                            " select ee.evtdatetime, p.surname, p.firstname, p.secondname,"
-                            + " case when gr.idoforg not in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) then 'Обучающиеся других ОО' else gr.groupname end as groupname, "
+                            + " case when gr.idoforg not in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) then 'Обучающиеся других ОО'"
+                            + " else gr.groupname end as groupname, "
                             + " ee.passdirection, o.shortname " + selectPartSectionName
                             + " from cf_enterevents ee "
                             + " join cf_orgs o on ee.idoforg = o.idoforg "

@@ -35,7 +35,6 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
 
     public static class Builder extends BasicReportForContragentJob.Builder {
         private String templateFilename;
-        private Boolean exportToHTML;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -45,7 +44,6 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             templateFilename = RuntimeContext.getInstance()
                     .getAutoReportGenerator().getReportsTemplateFilePath()
                     + ContragentPreordersReport.class.getSimpleName() + ".jasper";
-            exportToHTML = true;
         }
 
         @Override
@@ -65,10 +63,10 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            Boolean hideOrgsWithEmptyData = Boolean.valueOf(getReportProperties().getProperty("hideOrgsWithEmptyData"));
+            Boolean hideEmptyData = Boolean.valueOf(getReportProperties().getProperty("hideEmptyData"));
 
             JRDataSource dataSource = createDataSource(session, contragent, startTime, endTime,
-                    idOfOrgList, hideOrgsWithEmptyData);
+                    idOfOrgList, hideEmptyData);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -79,11 +77,11 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
-                List<Long> idOfOrgList, Boolean hideOrgsWithEmptyData) throws Exception{
+                List<Long> idOfOrgList, Boolean hideEmptyData) throws Exception{
             List<ContragentPreordersReportItem> result = new LinkedList<ContragentPreordersReportItem>();
             String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
             String idOfContragentCondition = contragent == null ? "" : " and ctg.idofcontragent = :idOfContragent ";
-
+            String ordersCondition = hideEmptyData ? " and pl.idoforder is not null " : "";
 
             Query query = session.createSQLQuery(" select ctg.idofcontragent, ctg.contragentname, o.idoforg, \n"
                     + " o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate,\n"
@@ -99,6 +97,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg\n"
                     + " where pc.deletedstate = 0 and pc.amount > 0 "
                     + idOfContragentCondition
+                    + ordersCondition
                     + " and pc.preorderdate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + " union\n"
@@ -117,6 +116,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg\n"
                     + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 "
                     + idOfContragentCondition
+                    + ordersCondition
                     + " and pmd.preorderdate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + " order by 1, 6 desc, 2, 3, 4 ");
