@@ -105,16 +105,15 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             Integer eventFilter;
             Boolean outputMigrants = Boolean.parseBoolean(reportProperties.getProperty("outputMigrants", "false"));
             Boolean sortedBySections = Boolean.parseBoolean(reportProperties.getProperty("sortedBySections", "false"));
-            List<Long> idOfOrgList = new LinkedList<Long>();
             List<EnterEventItem> enterEventItems = new LinkedList<EnterEventItem>();
 
-            String joinMigrants = outputMigrants ? " left join cf_migrants m on m.IdOfClientMigrate = c.idofclient and m.IdOfOrgVisit = ee.idoforg " : "";
+            String joinMigrants = outputMigrants ? " left join cf_migrants m on m.IdOfClientMigrate = c.idofclient and m.IdOfOrgVisit = ee.idOfOrg " : "";
             String selectPartSectionName = outputMigrants ? ", case when ee.evtdatetime between m.VisitStartDate and m.VisitEndDate "
                                                           + " then m.section else cast('' as text) end " : ", cast('' as text) as section "; // No Dialect mapping for JDBC type: 1111 exception
             String partOfOrderByMigrantSection = sortedBySections && outputMigrants ? " m.section, " : "";
             String eventsCondition = "";
             String clientGroupCondition = "";
-            String orgCondition = "";
+            String orgCondition = allFriendlyOrgs ? " and ee.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg)" : " and ee.idoforg = :idOfOrg ";
 
             try {
                 eventFilter = Integer.parseInt(reportProperties.getProperty("eventFilter"));
@@ -131,19 +130,10 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 clientGroupCondition = " and gr.groupname in (:groupList) ";
             }
 
-            if (allFriendlyOrgs) {
-                Org org = (Org) session.load(Org.class, idOfOrg);
-                for (Org orgItem : org.getFriendlyOrg()) {
-                    idOfOrgList.add(orgItem.getIdOfOrg());
-                }
-
-                orgCondition = " and ee.idoforg in (:listOfOrgId) ";
-            } else {
-                orgCondition = " and ee.idoforg = :idOfOrg ";
-            }
-
             Query query = session.createSQLQuery(
-                           " select ee.evtdatetime, p.surname, p.firstname, p.secondname, gr.groupname, ee.passdirection, o.shortname " + selectPartSectionName
+                           " select ee.evtdatetime, p.surname, p.firstname, p.secondname,"
+                            + " case when gr.idoforg not in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) then 'Обучающиеся других ОО' else gr.groupname end as groupname, "
+                            + " ee.passdirection, o.shortname " + selectPartSectionName
                             + " from cf_enterevents ee "
                             + " join cf_orgs o on ee.idoforg = o.idoforg "
                             + " left join cf_cards crd on ee.idofcard = crd.cardno "
@@ -159,16 +149,11 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                             + " order by " + partOfOrderByMigrantSection + " ee.evtdatetime "
             );
             query.setParameter("startTime", startTime.getTime())
-                 .setParameter("endTime", endTime.getTime());
+                 .setParameter("endTime", endTime.getTime())
+                 .setParameter("idOfOrg", idOfOrg);
 
             if(!clientGroupCondition.isEmpty()){
                 query.setParameterList("groupList", groupList);
-            }
-
-            if(allFriendlyOrgs){
-                query.setParameterList("listOfOrgId", idOfOrgList);
-            } else {
-                query.setParameter("idOfOrg", idOfOrg);
             }
 
             List<Object[]> data = query.list();
