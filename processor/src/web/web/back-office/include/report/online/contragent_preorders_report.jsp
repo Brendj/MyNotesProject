@@ -64,9 +64,8 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.contragentPreordersReportPage.orgFilter}}" />
         </h:panelGroup>
 
-        <h:outputText styleClass="output-text" escape="true" value="Скрывать ОО с пустыми данными" />
-        <h:selectBooleanCheckbox value="#{mainPage.contragentPreordersReportPage.hideOrgsWithEmptyData}" styleClass="output-text"
-                                 disabled="true">
+        <h:outputText styleClass="output-text" escape="true" value="Показывать только с данными" />
+        <h:selectBooleanCheckbox value="#{mainPage.contragentPreordersReportPage.hideOrgsWithEmptyData}" styleClass="output-text">
         </h:selectBooleanCheckbox>
     </h:panelGrid>
     <h:panelGrid columns="2">
