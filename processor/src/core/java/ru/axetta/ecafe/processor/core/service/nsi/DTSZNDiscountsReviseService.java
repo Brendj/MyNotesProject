@@ -6,8 +6,10 @@ package ru.axetta.ecafe.processor.core.service.nsi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
@@ -121,6 +123,8 @@ public class DTSZNDiscountsReviseService {
         Session session = null;
         Transaction transaction = null;
 
+        ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+
         do {
             try {
                 NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList);
@@ -213,6 +217,8 @@ public class DTSZNDiscountsReviseService {
                             }
                         }
                     }
+
+                    updateApplicationForFood(session, service, discountInfo);
                 }
                 transaction.commit();
                 transaction = null;
@@ -412,5 +418,52 @@ public class DTSZNDiscountsReviseService {
             }
         } while (++currentPage < pagesCount);
         return entityIds;
+    }
+
+    public void updateApplicationForFood(Session session, ETPMVService service, ClientDtisznDiscountInfo discountInfo) {
+        ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, discountInfo.getClient());
+        if (null == application)
+            return;
+
+        Date fireTime = new Date();
+
+        try {
+            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+            //7705
+            application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
+                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
+                    applicationVersion, historyVersion);
+            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                    application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+
+            if (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                    .betweenOrEqualDate(discountInfo.getDateStart(), discountInfo.getDateEnd(), fireTime)) {
+                //1052
+                application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
+                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
+                        applicationVersion, historyVersion);
+                service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                        application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+
+                //1075
+                application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
+                        new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
+                        historyVersion);
+                service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                        application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+            } else {
+                //1080.3
+                application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
+                        new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
+                        applicationVersion, historyVersion);
+                service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                        application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Error in updateApplicationForFood: " +
+                    "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo=%d",
+                    discountInfo.getClient().getIdOfClient(), discountInfo.getIdOfClientDTISZNDiscountInfo()));
+        }
     }
 }
