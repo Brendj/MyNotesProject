@@ -547,4 +547,8 @@ public class DAOReadonlyService {
             return null;
         }
     }
+
+    public Long getIdOfPacket(Long idOfOrg) {
+        return entityManager.find(OrgSync.class, idOfOrg).getIdOfPacket();
+    }
 }

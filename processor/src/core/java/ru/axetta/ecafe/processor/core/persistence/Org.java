@@ -127,7 +127,7 @@ public class Org implements Serializable {
     private String introductionQueue;
     private Long additionalIdBuilding;
     private String statusDetailing;
-    private OrgSync orgSync;
+    //private OrgSync orgSync;
     private OrgContractId orgContractId;
     private Boolean payByCashier;
     private Boolean oneActiveCard;
@@ -191,9 +191,7 @@ public class Org implements Serializable {
         this.introductionQueue = introductionQueue;
         this.additionalIdBuilding = additionalIdBuilding;
         this.statusDetailing = statusDetailing;
-        this.orgSync = new OrgSync();
-        this.orgSync.setIdOfPacket(0L);
-        this.orgSync.setOrg(this);
+
         this.orgContractId = new OrgContractId();
         this.orgContractId.setLastClientContractId(1L);
         this.orgContractId.setOrg(this);
@@ -927,13 +925,13 @@ public class Org implements Serializable {
         this.statusDetailing = statusDetailing;
     }
 
-    public OrgSync getOrgSync() {
+    /*public OrgSync getOrgSync() {
         return orgSync;
     }
 
     public void setOrgSync(OrgSync orgSync) {
         this.orgSync = orgSync;
-    }
+    }*/
 
     public Boolean getPayByCashier() {
         return payByCashier;

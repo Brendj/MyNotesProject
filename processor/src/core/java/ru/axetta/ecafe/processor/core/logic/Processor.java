@@ -5711,11 +5711,13 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Org organization = getOrgReference(persistenceSession, idOfOrg);
-            Long result = organization.getOrgSync().getIdOfPacket();
-            organization.getOrgSync().setIdOfPacket(++result);
+            OrgSync orgSync = (OrgSync)persistenceSession.load(OrgSync.class, idOfOrg);
+            Long result = orgSync.getIdOfPacket();
+            orgSync.setIdOfPacket(++result);
             //organization.setIdOfPacket(result + 1);
             organization.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
             persistenceSession.update(organization);
+            persistenceSession.update(orgSync);
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -6025,7 +6027,7 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    public SyncHistory createSyncHistoryIntegro(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
+    public SyncHistory createSyncHistoryIntegro(Long idOfOrg, Date startTime, String clientVersion,
             String remoteAddress) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -6034,7 +6036,8 @@ public class Processor implements SyncProcessor {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = getOrgReference(persistenceSession, idOfOrg);
-            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
+            OrgSync orgSync = (OrgSync)persistenceSession.load(OrgSync.class, idOfOrg);
+            SyncHistory syncHistory = new SyncHistory(organization, startTime, orgSync.getIdOfPacket(), clientVersion,
                     remoteAddress);
             persistenceSession.save(syncHistory);
             //Long idOfSync = syncHistory.getIdOfSync();

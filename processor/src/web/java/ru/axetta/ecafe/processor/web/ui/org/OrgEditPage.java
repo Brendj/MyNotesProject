@@ -212,7 +212,9 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setState(state);
         org.setCardLimit(cardLimit);
         org.setPublicKey(publicKey);
-        org.getOrgSync().setIdOfPacket(idOfPacket);
+        OrgSync orgSync = (OrgSync)session.load(OrgSync.class, idOfOrg);
+        orgSync.setIdOfPacket(idOfPacket);
+        session.update(orgSync);
         if (changeSsoPassword) {
             org.setSsoPassword(plainSsoPassword);
         }
@@ -423,7 +425,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.state = org.getState();
         this.cardLimit = org.getCardLimit();
         this.publicKey = org.getPublicKey();
-        this.idOfPacket = org.getOrgSync().getIdOfPacket();
+        this.idOfPacket = DAOReadonlyService.getInstance().getIdOfPacket(idOfOrg);
         this.smsSender = org.getSmsSender();
         this.priceOfSms = org.getPriceOfSms();
         this.subscriptionPrice = org.getSubscriptionPrice();

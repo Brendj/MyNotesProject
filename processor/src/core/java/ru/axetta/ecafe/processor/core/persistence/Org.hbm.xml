@@ -227,7 +227,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientMigration"/>
         </set>
 
-        <one-to-one name="orgSync" class="ru.axetta.ecafe.processor.core.persistence.OrgSync" cascade="all"/>
+        <!--<one-to-one name="orgSync" class="ru.axetta.ecafe.processor.core.persistence.OrgSync" cascade="all"/>-->
         <one-to-one name="orgContractId" class="ru.axetta.ecafe.processor.core.persistence.OrgContractId" cascade="all"/>
         <property name="payByCashier" column="PayByCashier"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>

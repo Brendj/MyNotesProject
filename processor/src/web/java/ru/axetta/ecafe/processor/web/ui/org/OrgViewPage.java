@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -173,7 +174,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.state = org.getState();
         this.cardLimit = org.getCardLimit();
         this.publicKey = org.getPublicKey();
-        this.idOfPacket = org.getOrgSync().getIdOfPacket();
+        this.idOfPacket = DAOReadonlyService.getInstance().getIdOfPacket(idOfOrg);
         this.smsSender = org.getSmsSender();
         this.priceOfSms = org.getPriceOfSms();
         this.subscriptionPrice = org.getSubscriptionPrice();

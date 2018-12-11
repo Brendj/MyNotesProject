@@ -4,15 +4,12 @@
 
 package ru.axetta.ecafe.processor.dashboard;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -32,7 +29,6 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -190,12 +186,12 @@ public class DashboardServiceBean {
         def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
-            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.orgSync.lastSuccessfulBalanceSync, org.isWorkInSummerTime FROM Org org WHERE 1 = 1";
+            String queryText = "SELECT os.org.idOfOrg, os.org.officialName, os.org.district, os.org.location, os.org.tag, lastSuccessfulBalanceSync, os.org.isWorkInSummerTime FROM OrgSync os WHERE 1 = 1";
             if (idOfOrg != null) {
-                queryText += " AND org.idOfOrg = :idOfOrg";
+                queryText += " AND idOfOrg = :idOfOrg";
             }
             if (orgStatus < 2) {
-                queryText += " AND org.state = :orgStatus";
+                queryText += " AND os.org.state = :orgStatus";
             }
             Query query = entityManager.createQuery(queryText);
             Session session = entityManager.unwrap(Session.class);
@@ -632,18 +628,18 @@ public class DashboardServiceBean {
         def.setTimeout(600 * 1000);
         try {
             String queryText =
-                    "SELECT DISTINCT " + "org.idOfOrg, org.officialName, " + "org.orgSync.lastSuccessfulBalanceSync, "
-                            + "org.orgSync.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
+                    "SELECT DISTINCT " + "os.org.idOfOrg, os.org.officialName, " + "os.lastSuccessfulBalanceSync, "
+                            + "os.lastUnSuccessfulBalanceSync, " + "min(sh.syncStartTime) AS firstSyncTime, "
                             + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
-                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
-                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
-                            + "(SELECT count(distinct eev.client.idOfClient) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
-                            + "(SELECT count(distinct eev.client.idOfClient) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
-                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount > 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
-                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount = 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
-                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount > 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
-                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount = 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
-                            + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh ";
+                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = os.org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
+                            + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = os.org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
+                            + "(SELECT count(distinct eev.client.idOfClient) FROM EnterEvent eev WHERE eev.org.idOfOrg = os.org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
+                            + "(SELECT count(distinct eev.client.idOfClient) FROM EnterEvent eev WHERE eev.org.idOfOrg = os.org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = os.org.idOfOrg AND ord.socDiscount > 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = os.org.idOfOrg AND ord.socDiscount = 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = os.org.idOfOrg AND ord.socDiscount > 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = os.org.idOfOrg AND ord.socDiscount = 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
+                            + "FROM OrgSync os LEFT OUTER JOIN os.org.syncHistoriesInternal sh ";
             if (idOfOrg != null) {
                 queryText += " WHERE org.idOfOrg=:idOfOrg";
             }

@@ -295,6 +295,10 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 org.getFriendlyOrg().add(org);*/
                 org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
                 session.save(org);
+                OrgSync orgSync = new OrgSync();
+                orgSync.setIdOfPacket(0L);
+                orgSync.setOrg(org);
+                session.persist(orgSync);
 
                 org.setRefectoryType(null);
                 if(org.getFriendlyOrg() == null) {

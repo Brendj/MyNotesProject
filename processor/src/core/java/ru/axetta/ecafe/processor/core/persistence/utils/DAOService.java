@@ -652,10 +652,10 @@ public class DAOService {
     public List<Org> getOrderedSynchOrgsList(boolean excludeDisabled) {
         String disabledClause = "";
         if (excludeDisabled) {
-            disabledClause = " where state <> 0 ";
+            disabledClause = " where os.state <> 0 ";
         }
         TypedQuery<Org> query = entityManager
-                .createQuery("from Org " + disabledClause + " order by orgSync.lastSuccessfulBalanceSync", Org.class);
+                .createQuery("select os.org from OrgSync os " + disabledClause + " order by lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 

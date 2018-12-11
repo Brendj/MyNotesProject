@@ -633,6 +633,10 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setPreordersEnabled(preordersEnabled);
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
         session.save(org);
+        OrgSync orgSync = new OrgSync();
+        orgSync.setIdOfPacket(0L);
+        orgSync.setOrg(org);
+        session.persist(orgSync);
 
         if (menuExchangeSourceOrg!=null) DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, org.getIdOfOrg());
 

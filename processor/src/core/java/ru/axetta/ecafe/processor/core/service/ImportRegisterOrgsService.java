@@ -181,6 +181,11 @@ public class ImportRegisterOrgsService {
                     friendlyOrgs.add(org); //все созданные организации загоняем в список, чтобы ниже связать их как дружественные
 
                     session.persist(org);
+                    OrgSync orgSync = new OrgSync();
+                    orgSync.setIdOfPacket(0L);
+                    orgSync.setOrg(org);
+                    session.persist(orgSync);
+
 
                     if (!org.getType().equals(OrganizationType.SUPPLIER)) {
                         createPredefinedClientGroupsForOrg(session, org.getIdOfOrg());

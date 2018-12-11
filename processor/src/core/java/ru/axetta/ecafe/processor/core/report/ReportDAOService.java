@@ -418,7 +418,7 @@ public class ReportDAOService {
 
 
     public void updateLastSuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update Org set orgSync.lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager.createQuery("update OrgSync set lastSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
@@ -426,7 +426,7 @@ public class ReportDAOService {
 
 
     public void updateLastUnsuccessfulBalanceSync(long idOfOrg) {
-        Query q = entityManager.createQuery("update Org set orgSync.lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
+        Query q = entityManager.createQuery("update OrgSync set lastUnSuccessfulBalanceSync=:date where idOfOrg=:idOfOrg");
         q.setParameter("date", new Date());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
@@ -434,7 +434,7 @@ public class ReportDAOService {
 
 
     public List<Org> getOrderedSynchOrgsList() {
-        TypedQuery<Org> query = entityManager.createQuery("from Org order by orgSync.lastSuccessfulBalanceSync", Org.class);
+        TypedQuery<Org> query = entityManager.createQuery("select os.org from OrgSync os order by lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 
