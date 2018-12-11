@@ -272,10 +272,11 @@ public class GoodRequestsNewReportService {
         if (itemList.isEmpty() && !hideTotalRow) {
             for (BasicReportJob.OrgShortItem item : orgMap.values()) {
                 itemList.add(new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
-                        hideLastValue, null, 0L, "", null, ""));
+                        hideLastValue, null, 0L, "", 0L, ""));
             }
             itemList.add(new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime),
-                    hideDailySampleValue, hideLastValue, null, 0L, null, "", "", null, null));
+                    hideDailySampleValue, hideLastValue, null, 0L, null, "",
+                    "", 0L, ""));
         }
 
         return itemList;

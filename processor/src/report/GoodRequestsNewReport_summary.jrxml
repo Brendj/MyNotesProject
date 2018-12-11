@@ -245,12 +245,19 @@
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#CCCCCC" mode="Opaque">
 							<textField>
-								<reportElement uuid="0d39e18e-ad49-45d4-9804-76b11c1f18a7" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="214" y="0" width="400" height="40"/>
+								<reportElement uuid="0d39e18e-ad49-45d4-9804-76b11c1f18a7" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="214" y="0" width="400" height="40">
+									<printWhenExpression><![CDATA[$V{totalPlanStr} != null]]></printWhenExpression>
+								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalPlanSum}).movePointLeft(2)]]></textFieldExpression>
+								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalPlanSum}).movePointLeft(2)
++ ($V{hideDailySampleSum}==0L ? "" :
+    ($V{totalPlanDailySum}==0L ? "" : " / " + java.math.BigDecimal.valueOf($V{totalPlanDailySum}).movePointLeft(2))
+    + ($V{totalPlanTempSum}==0L ? "" : " / " + java.math.BigDecimal.valueOf($V{totalPlanTempSum}).movePointLeft(2)))]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="4c1312fd-afe2-437e-b2b8-236e0affbd96" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="214" height="40"/>
+								<reportElement uuid="4c1312fd-afe2-437e-b2b8-236e0affbd96" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="214" height="40">
+									<printWhenExpression><![CDATA[!$V{totalPlanStr}.isEmpty()]]></printWhenExpression>
+								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA["Итого по " + $V{totalPlanStr} + " (руб.)"]]></textFieldExpression>
 							</textField>
@@ -315,7 +322,9 @@
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="697b775f-9b9e-428a-844a-e780d60c68fc" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$V{totalPlanCount}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{totalPlanCount} + ($V{hideDailySampleSum}==0L ? "" :
+    ($V{dailySampleMeasure} == 0L ? "" : " / " + $V{dailySampleMeasure})
+    + ($V{tempClientsMeasure} == 0L ? "" : " / " + $V{tempClientsMeasure}))]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="e063563f-6ddf-417c-bac5-b4ec840162d3" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="40"/>
@@ -325,7 +334,10 @@
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="499a56c7-5738-430b-b060-fb552df71846" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="100" height="40"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{goodSum}).movePointLeft(2)]]></textFieldExpression>
+								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{goodPrice} * $V{totalPlanCount}).movePointLeft(2)
++ ($V{hideDailySampleSum}==0L ? "" :
+    ($V{dailySampleMeasure} == 0L ? "" : " / " + java.math.BigDecimal.valueOf($V{goodPrice} * $V{dailySampleMeasure}).movePointLeft(2))
+    + ($V{tempClientsMeasure} == 0L ? "" : " / " + java.math.BigDecimal.valueOf($V{goodPrice} * $V{tempClientsMeasure}).movePointLeft(2)))]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -400,7 +412,13 @@
 					<measureExpression><![CDATA[$F{price}]]></measureExpression>
 				</measure>
 				<measure name="totalPlanSum" class="java.lang.Long" calculation="Sum">
-					<measureExpression><![CDATA[$F{price}]]></measureExpression>
+					<measureExpression><![CDATA[$F{price} * $F{totalCount}]]></measureExpression>
+				</measure>
+				<measure name="totalPlanDailySum" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{price} * $F{dailySample}]]></measureExpression>
+				</measure>
+				<measure name="totalPlanTempSum" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{price} * $F{tempClients}]]></measureExpression>
 				</measure>
 				<crosstabCell width="91" height="40">
 					<cellContents style="table">
