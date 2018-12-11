@@ -8,12 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -26,16 +26,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.net.MalformedURLException;
+import java.net.ConnectException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -96,27 +94,29 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
-    public void run() {
+    public void run() throws Exception {
         if (!isOn()) {
             return;
         }
         runTask();
     }
 
-    public void runTask() {
+    public void runTask() throws Exception {
         if (null == serviceURL) {
-            logger.error("Unable to run DTSZNDiscountsReviseService - no service url was found");
-            return;
+            throw new Exception("Unable to run DTSZNDiscountsReviseService - no service url was found");
         }
 
         Long pageSize = getPageSize();
         List<String> entityIdList = loadEntityIdList(pageSize);
 
+        if (null != entityIdList && entityIdList.isEmpty()) {
+            throw new Exception("No benefits was found - revise will be terminating");
+        }
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Long currentPage = 1L;
         Long pagesCount = 0L;
-        Long clientDTISZNDsicountVersion = 0L;
+        Long clientDTISZNDiscountVersion = 0L;
 
         Session session = null;
         Transaction transaction = null;
@@ -128,7 +128,7 @@ public class DTSZNDiscountsReviseService {
                 session = runtimeContext.createPersistenceSession();
                 transaction = session.beginTransaction();
 
-                clientDTISZNDsicountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
                 for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
 
@@ -137,13 +137,14 @@ public class DTSZNDiscountsReviseService {
                         logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                         continue;
                     }
-                    ClientDtisznDiscountInfo discountInfo =
-                            DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
+                    ClientDtisznDiscountInfo discountInfo = DAOUtils
+                            .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
 
                     if (null == discountInfo) {
-                        discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(), item.getBenefit().getBenefitForm(),
+                        discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
+                                item.getBenefit().getBenefitForm(),
                                 item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDsicountVersion);
+                                item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDiscountVersion);
                         session.save(discountInfo);
                     } else {
                         if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
@@ -159,7 +160,7 @@ public class DTSZNDiscountsReviseService {
                                 wasModified = true;
                             }
                             if (wasModified) {
-                                discountInfo.setVersion(clientDTISZNDsicountVersion);
+                                discountInfo.setVersion(clientDTISZNDiscountVersion);
                                 session.merge(discountInfo);
                             }
                         } else {
@@ -168,34 +169,47 @@ public class DTSZNDiscountsReviseService {
                             discountInfo.setArchived(true);
                             session.merge(discountInfo);
 
-                            discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(), item.getBenefit().getBenefitForm(),
+                            discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
+                                    item.getBenefit().getBenefitForm(),
                                     item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                    item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDsicountVersion);
+                                    item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
+                                    clientDTISZNDiscountVersion);
                             session.save(discountInfo);
+                        }
+                    }
 
+                    CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                            .getCategoryDiscountDSZNByDSZNCode(session, item.getBenefit().getDsznCode());
+                    if (null != categoryDiscountDSZN) {
+                        String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
+                        List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
+                        for (String discount : discounts) {
+                            try {
+                                categoryDiscountsList.add(Long.parseLong(discount));
+                            } catch (NumberFormatException e) {
+                                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d",
+                                        discount, client.getIdOfClient()));
+                            }
+                        }
 
-                            //TODO check
-                            //2 stage
-                            CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getBenefit().getDsznCode());
-                            if (null != categoryDiscountDSZN) {
-                                Set<CategoryDiscount> categoryDiscountSet = client.getCategories();
-                                Boolean discountExist = false;
+                        if (!categoryDiscountsList.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
+                            String oldDiscounts = client.getCategoriesDiscounts();
+                            String newDiscounts = oldDiscounts + (StringUtils.isEmpty(oldDiscounts) ? "":",")
+                                    + categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount();
 
-                                for (CategoryDiscount discount : categoryDiscountSet) {
-                                    if (discount.getIdOfCategoryDiscount() == categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()) {
-                                        discountExist = true;
-                                        break;
-                                    }
-                                }
+                            Integer oldDiscountMode = client.getDiscountMode();
+                            Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
-                                if (!discountExist) {
-                                    ClientManager.ClientFieldConfigForUpdate config = new ClientManager.ClientFieldConfigForUpdate();
-                                    config.setValue(ClientManager.FieldId.BENEFIT,
-                                            String.format("%s,%d", client.getCategoriesDiscounts(),
-                                                    categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()));
-                                    config.setValue(ClientManager.FieldId.CONTRACT_ID, client.getContractId().toString());
-                                    ClientManager.modifyClient(config);
-                                }
+                            client.setCategoriesDiscounts(newDiscounts);
+                            client.setDiscountMode(newDiscountMode);
+
+                            if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
+                                        newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
+                                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                                session.save(discountChangeHistory);
+                                client.setLastDiscountsUpdate(new Date());
+                                client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
                             }
                         }
                     }
@@ -204,6 +218,8 @@ public class DTSZNDiscountsReviseService {
                 transaction = null;
 
                 pagesCount = response.getPagesCount();
+            } catch (HttpException e) {
+                logger.error("HTTP exeption: ", e);
             } catch (Exception e) {
                 logger.error("Unable to get person benefits from NSI", e);
             } finally {
@@ -277,7 +293,7 @@ public class DTSZNDiscountsReviseService {
         return new NSIRequest(paramList, page, "PersonBenefit", pageSize);
     }
 
-    private NSIBenefitDictionaryResponse loadBenefitsDictionary(Long page, Long pageSize) {
+    private NSIBenefitDictionaryResponse loadBenefitsDictionary(Long page, Long pageSize) throws ConnectException {
         HttpClient httpClient = new HttpClient();
 
         httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
@@ -291,13 +307,15 @@ public class DTSZNDiscountsReviseService {
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
-            logger.info(String.format("loadBenefitsDictionary(page=%d, pageSize=%d loaded with status %d by %d msec",
-                    page, pageSize, status, new Date().getTime() - date.getTime()));
+            logger.info(
+                    String.format("loadBenefitsDictionary(page=%d, pageSize=%d loaded with status %d by %d msec", page,
+                            pageSize, status, new Date().getTime() - date.getTime()));
             if (HttpStatus.OK.value() != status) {
                 throw new Exception("Unable to get data from NSI");
             }
             return readDataFromResponse(method, NSIBenefitDictionaryResponse.class);
-
+        } catch (ConnectException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Error in loadBenefitsDictionary", e);
         } finally {
@@ -306,7 +324,7 @@ public class DTSZNDiscountsReviseService {
         return null;
     }
 
-    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList) {
+    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList) throws ConnectException {
         HttpClient httpClient = new HttpClient();
 
         httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
@@ -320,13 +338,15 @@ public class DTSZNDiscountsReviseService {
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
-            logger.info(String.format("loadPersonBenefits(page=%d, pageSize=%d loaded with status %d by %d msec", page, pageSize,
-                    status, new Date().getTime() - date.getTime()));
+            logger.info(String.format("loadPersonBenefits(page=%d, pageSize=%d loaded with status %d by %d msec", page,
+                    pageSize, status, new Date().getTime() - date.getTime()));
             if (HttpStatus.OK.value() != status) {
                 throw new Exception("Unable to get data from NSI");
             }
             return readDataFromResponse(method, NSIPersonBenefitResponse.class);
 
+        } catch (ConnectException e) {
+            throw e;
         } catch (Exception e) {
             logger.error("Error in loadPersonBenefits", e);
         }
@@ -363,7 +383,7 @@ public class DTSZNDiscountsReviseService {
         return objectMapper.readValue(method.getResponseBodyAsString(), clazz);
     }
 
-    private List<String> loadEntityIdList(Long pageSize) {
+    private List<String> loadEntityIdList(Long pageSize) throws ConnectException {
         Long currentPage = 1L;
         Long pagesCount;
 
@@ -384,6 +404,8 @@ public class DTSZNDiscountsReviseService {
                 }
 
                 pagesCount = response.getPagesCount();
+            } catch (ConnectException e) {
+                throw e;
             } catch (Exception e) {
                 logger.error("Unable to get benefits from NSI");
                 break;

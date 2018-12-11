@@ -3938,7 +3938,7 @@ public class DAOUtils {
 
     public static CategoryDiscountDSZN getCategoryDiscountDSZNByDSZNCode(Session session, Long dsznCode) {
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
-        criteria.add(Restrictions.eq("code", dsznCode));
+        criteria.add(Restrictions.eq("code", dsznCode.intValue()));
         return (CategoryDiscountDSZN) criteria.uniqueResult();
     }
 
