@@ -22,7 +22,7 @@ public class ContragentPreordersReportItem {
     private String reversed;
     private Date createdDate;
     private Long orderSum;
-    private Long idOfOrder;
+    private String idOfOrder;
     private String isPaid;
 
     public ContragentPreordersReportItem(Long idOfContragent, String contragentName, Long idOfOrg, String orgShortName,
@@ -44,7 +44,7 @@ public class ContragentPreordersReportItem {
         this.reversed = reversed;
         this.createdDate = createdDate;
         this.orderSum = orderSum;
-        this.idOfOrder = idOfOrder;
+        this.idOfOrder = idOfOrder == null ? "" : idOfOrder.toString();
         this.isPaid = isPaid;
     }
 
@@ -168,11 +168,11 @@ public class ContragentPreordersReportItem {
         this.orderSum = orderSum;
     }
 
-    public Long getIdOfOrder() {
+    public String getIdOfOrder() {
         return idOfOrder;
     }
 
-    public void setIdOfOrder(Long idOfOrder) {
+    public void setIdOfOrder(String idOfOrder) {
         this.idOfOrder = idOfOrder;
     }
 

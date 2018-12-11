@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cherry_Landscape" pageWidth="1044" pageHeight="10000" orientation="Landscape" columnWidth="1004" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPreorderReport" pageWidth="1044" pageHeight="10000" columnWidth="1004" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<property name="ireport.zoom" value="1.8627639691774651"/>
-	<property name="ireport.x" value="89"/>
+	<property name="ireport.x" value="279"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
@@ -79,7 +79,7 @@
 	<field name="orderSum" class="java.lang.Long">
 		<fieldDescription><![CDATA[orderSum]]></fieldDescription>
 	</field>
-	<field name="idOfOrder" class="java.lang.Long">
+	<field name="idOfOrder" class="java.lang.String">
 		<fieldDescription><![CDATA[idOfOrder]]></fieldDescription>
 	</field>
 	<field name="isPaid" class="java.lang.String">
@@ -90,14 +90,6 @@
 		<variableExpression><![CDATA[Boolean.TRUE]]></variableExpression>
 		<initialValueExpression><![CDATA[1L]]></initialValueExpression>
 	</variable>
-	<variable name="backgroundColor" class="java.lang.Long" resetType="Group" resetGroup="Group1" calculation="Count">
-		<variableExpression><![CDATA[$V{backgroundColor}]]></variableExpression>
-		<initialValueExpression><![CDATA[1L]]></initialValueExpression>
-	</variable>
-	<variable name="groupPreorderDate" class="java.util.Date" resetType="Group" resetGroup="Group1" calculation="Highest">
-		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{preorderDate})]]></variableExpression>
-		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{preorderDate})]]></initialValueExpression>
-	</variable>
 	<variable name="startDate" class="java.lang.String" calculation="First">
 		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
 		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
@@ -106,18 +98,6 @@
 		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></variableExpression>
 		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></initialValueExpression>
 	</variable>
-	<group name="Group1">
-		<groupExpression><![CDATA[$V{rowsCount}]]></groupExpression>
-		<groupHeader>
-			<band>
-				<property name="local_mesure_unitheight" value="pixel"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			</band>
-		</groupHeader>
-	</group>
-	<background>
-		<band splitType="Stretch"/>
-	</background>
 	<title>
 		<band height="194" splitType="Stretch">
 			<property name="local_mesure_unitheight" value="pixel"/>
@@ -276,7 +256,7 @@
 				<text><![CDATA[8]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="426" y="156" width="54" height="38" uuid="93d1e8da-00ec-4a6b-9999-0f9d2780fcfd">
+				<reportElement x="416" y="156" width="64" height="38" uuid="93d1e8da-00ec-4a6b-9999-0f9d2780fcfd">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -291,7 +271,7 @@
 				<text><![CDATA[7]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="371" y="156" width="55" height="38" uuid="5d692b77-b44d-4c48-bd3a-197b0743dc1f">
+				<reportElement x="371" y="156" width="45" height="38" uuid="5d692b77-b44d-4c48-bd3a-197b0743dc1f">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<box>
@@ -381,7 +361,7 @@
 				<text><![CDATA[1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="371" y="60" width="55" height="20" forecolor="#000000" uuid="b28093ad-d455-4445-b4ca-fce1ea5757ba">
+				<reportElement style="Column header" x="371" y="60" width="45" height="20" forecolor="#000000" uuid="b28093ad-d455-4445-b4ca-fce1ea5757ba">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -403,7 +383,7 @@
 				<text><![CDATA[Данные физ. лица]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="426" y="60" width="577" height="20" forecolor="#000000" uuid="0475b4a5-89cc-4095-ae5d-b0763b9cd6ed">
+				<reportElement style="Column header" x="416" y="60" width="587" height="20" forecolor="#000000" uuid="0475b4a5-89cc-4095-ae5d-b0763b9cd6ed">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -558,7 +538,7 @@
 				<text><![CDATA[Кол-во]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="371" y="80" width="55" height="76" forecolor="#000000" uuid="4bb1b1fe-c99c-44f8-be24-b9c98d519696">
+				<reportElement style="Column header" x="371" y="80" width="45" height="76" forecolor="#000000" uuid="4bb1b1fe-c99c-44f8-be24-b9c98d519696">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -682,7 +662,7 @@
 				<text><![CDATA[ID]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="426" y="80" width="54" height="76" forecolor="#000000" uuid="4f8d93e3-79f9-41af-857d-f72fabfd9177">
+				<reportElement style="Column header" x="416" y="80" width="64" height="76" forecolor="#000000" uuid="4f8d93e3-79f9-41af-857d-f72fabfd9177">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
@@ -783,7 +763,7 @@
 	<detail>
 		<band height="17" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="40" height="17" backcolor="#FF6666" uuid="f7488a9c-2db3-4652-8b02-a49a5ed08a6d">
+				<reportElement style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="17" backcolor="#FF6666" uuid="f7488a9c-2db3-4652-8b02-a49a5ed08a6d">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -798,9 +778,8 @@
 				<textFieldExpression><![CDATA[$F{idOfContragent}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="40" y="0" width="142" height="17" uuid="523707c8-4029-4eeb-96c0-a7c6c649747c">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="40" y="0" width="142" height="17" uuid="523707c8-4029-4eeb-96c0-a7c6c649747c">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -814,9 +793,8 @@
 				<textFieldExpression><![CDATA[$F{contragentName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="318" y="0" width="53" height="17" uuid="ded70f8d-7f19-463a-83f9-789ad48b0253">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="318" y="0" width="53" height="17" uuid="ded70f8d-7f19-463a-83f9-789ad48b0253">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -830,7 +808,7 @@
 				<textFieldExpression><![CDATA[$F{orgShortAddress}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="371" y="0" width="55" height="17" uuid="5c6eeb19-55d4-4bb3-a24c-ab4d93d01468">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="371" y="0" width="45" height="17" uuid="5c6eeb19-55d4-4bb3-a24c-ab4d93d01468">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -845,7 +823,7 @@
 				<textFieldExpression><![CDATA[$F{clientContractId}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="877" y="0" width="72" height="17" uuid="c5227000-3fcc-4abe-ba8b-6b0b2199fbba">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="877" y="0" width="72" height="17" uuid="c5227000-3fcc-4abe-ba8b-6b0b2199fbba">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -854,13 +832,13 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
+				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{cancelDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="222" y="0" width="96" height="17" uuid="eb89ca96-8eac-48aa-b958-e63354285b59">
+				<reportElement style="table" stretchType="RelativeToTallestObject" mode="Opaque" x="222" y="0" width="96" height="17" uuid="eb89ca96-8eac-48aa-b958-e63354285b59">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -875,8 +853,7 @@
 				<textFieldExpression><![CDATA[$F{orgShortName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="534" y="0" width="30" height="17" uuid="611e88f2-554d-47f3-8b1f-98fcf9dc6768">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="534" y="0" width="30" height="17" uuid="611e88f2-554d-47f3-8b1f-98fcf9dc6768">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -891,7 +868,7 @@
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="696" y="0" width="64" height="17" uuid="c2f25bfe-fe74-4d86-93c7-fcfc9514c721">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="696" y="0" width="64" height="17" uuid="c2f25bfe-fe74-4d86-93c7-fcfc9514c721">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -906,8 +883,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{createdDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="564" y="0" width="78" height="17" uuid="e4ed9390-9e74-45ba-a3d4-dcf8000d8479">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="564" y="0" width="78" height="17" uuid="e4ed9390-9e74-45ba-a3d4-dcf8000d8479">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -922,8 +898,8 @@
 				<textFieldExpression><![CDATA[$F{dish}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="642" y="0" width="54" height="17" uuid="4cb483aa-f3d3-4f09-b8bd-82eed39400f9">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="642" y="0" width="54" height="17" uuid="4cb483aa-f3d3-4f09-b8bd-82eed39400f9">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -937,7 +913,7 @@
 				<textFieldExpression><![CDATA[String.format(Locale.US, "%.2f", new BigDecimal($F{complexPrice} / 100.0))]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="182" y="0" width="40" height="17" backcolor="#FFFFFF" uuid="a68f98ee-eacc-495f-9373-dea5a7bfa5f0">
+				<reportElement style="table" stretchType="RelativeToTallestObject" mode="Transparent" x="182" y="0" width="40" height="17" backcolor="#FFFFFF" uuid="a68f98ee-eacc-495f-9373-dea5a7bfa5f0">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -952,8 +928,8 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="426" y="0" width="54" height="17" uuid="fd6ae10f-17b7-411f-b3bf-0dce24e2bb4d">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="416" y="0" width="64" height="17" uuid="fd6ae10f-17b7-411f-b3bf-0dce24e2bb4d">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -961,14 +937,14 @@
 					<bottomPen lineWidth="0.5"/>
 					<rightPen lineWidth="0.5"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Top">
+				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{cancelDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="760" y="0" width="64" height="17" uuid="5ac64209-dfaf-488f-b3c7-c59353b1af83">
-					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="760" y="0" width="64" height="17" uuid="5ac64209-dfaf-488f-b3c7-c59353b1af83">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
@@ -982,7 +958,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrder}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="949" y="0" width="54" height="17" uuid="83d9f02c-9139-4cd7-89bf-2f3b6e67c59a"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="949" y="0" width="54" height="17" uuid="83d9f02c-9139-4cd7-89bf-2f3b6e67c59a"/>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -990,12 +966,12 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Top">
-					<font fontName="SansSerif" size="8"/>
+					<font fontName="SansSerif" size="8" isItalic="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{isPaid}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="480" y="0" width="54" height="17" uuid="04465fb2-ee56-4766-9ceb-afec57a87369">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="480" y="0" width="54" height="17" uuid="04465fb2-ee56-4766-9ceb-afec57a87369">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -1010,7 +986,7 @@
 				<textFieldExpression><![CDATA[$F{complexName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" positionType="Float" stretchType="RelativeToBandHeight" x="824" y="0" width="53" height="17" uuid="5a88d489-5931-4778-a0c2-9e2aaefb30a6"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="824" y="0" width="53" height="17" uuid="5a88d489-5931-4778-a0c2-9e2aaefb30a6"/>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>

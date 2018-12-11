@@ -23,8 +23,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
@@ -133,22 +131,22 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             List<Object[]> dataFromDB = query.list();
             if(dataFromDB != null){
                 for(Object[] row : dataFromDB) {
-                    Long idOfContragent = getLongFromBigIntegerorNull(row[0]);
+                    Long idOfContragent = getLongFromBigIntegerOrNull(row[0]);
                     String contragentName = (String) row[1];
-                    Long idOfOrg = getLongFromBigIntegerorNull(row[2]);
+                    Long idOfOrg = getLongFromBigIntegerOrNull(row[2]);
                     String orgShortName = (String) row[3];
                     String orgShortAddress = (String) row[4];
-                    Long clientContractId = getLongFromBigIntegerorNull(row[5]);
+                    Long clientContractId = getLongFromBigIntegerOrNull(row[5]);
                     Date preorderDate = getDateFromBigIntegerOrNull(row[6]);
                     String complexName = (String) row[7];
                     Integer amount = (Integer) row[8];
                     String dish = (String) row[9];
-                    Long complexPrice = getLongFromBigIntegerorNull(row[10]);
+                    Long complexPrice = getLongFromBigIntegerOrNull(row[10]);
                     Date cancelDate = getDateFromBigIntegerOrNull(row[11]);
                     String reversed = (String) row[12];
                     Date createdDate = getDateFromBigIntegerOrNull(row[13]);
-                    Long orderSum = getLongFromBigIntegerorNull(row[14]);
-                    Long idOfOrder = getLongFromBigIntegerorNull(row[15]);
+                    Long orderSum = getLongFromBigIntegerOrNull(row[14]);
+                    Long idOfOrder = getLongFromBigIntegerOrNull(row[15]);
                     String isPaid = (String) row[16];
                     ContragentPreordersReportItem item = new ContragentPreordersReportItem(
                             idOfContragent, contragentName, idOfOrg, orgShortName, orgShortAddress, clientContractId,
@@ -162,7 +160,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             return new JRBeanCollectionDataSource(result);
         }
 
-        private Long getLongFromBigIntegerorNull(Object o){
+        private Long getLongFromBigIntegerOrNull(Object o){
             return o != null ? ((BigInteger)o).longValue() : null;
         }
 
