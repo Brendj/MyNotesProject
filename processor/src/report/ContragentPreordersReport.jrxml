@@ -940,7 +940,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{preorderDate})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($F{preorderDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="760" y="0" width="64" height="17" uuid="5ac64209-dfaf-488f-b3c7-c59353b1af83">
