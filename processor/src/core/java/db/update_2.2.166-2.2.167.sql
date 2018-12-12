@@ -18,3 +18,5 @@ update cf_clients set gender = 0 where gender = 2;
 create index cf_visitreqresolutionhist_IdOfRequest_IdOfOrgRegistry_idx on cf_visitreqresolutionhist USING  BTREE (IdOfRequest, IdOfOrgRegistry);
 
 alter table cf_orgregistrychange_item add column state integer;
+
+--! ФИНАЛИЗИРОВАН 12.12.2018, НЕ МЕНЯТЬ
