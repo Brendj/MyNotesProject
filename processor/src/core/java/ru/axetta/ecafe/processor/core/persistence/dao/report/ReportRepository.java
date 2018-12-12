@@ -531,38 +531,44 @@ public class ReportRepository extends BaseJpaDao {
         EnterEventJournalReport.Builder builder = new EnterEventJournalReport.Builder(templateFilename);
         try {
             Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+            if(org == null){
+                throw new EntityNotFoundException("Not found org by ID: " + reportParameters.getIdOfOrg());
+            }
+
             BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
                     org.getShortName(), org.getOfficialName(), org.getAddress());
             builder.setOrg(orgShortItem);
             builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            builder.setIdOfOrg(reportParameters.getIdOfOrg());
+
             Properties properties = new Properties();
             if (reportParameters.getGroupName() != null) {
                 properties.setProperty("groupName", reportParameters.getGroupName());
             }
-
+            if(reportParameters.getOutputMigrants() != null){
+                properties.setProperty("outputMigrants", reportParameters.getOutputMigrants());
+            }
+            if(reportParameters.getSortedBySections() != null){
+                properties.setProperty("sortedBySections", reportParameters.getSortedBySections());
+            }
             builder.setReportProperties(properties);
 
             boolean isAllFriendlyOrgs;
-
             if (reportParameters.getIsAllFriendlyOrgs() == null) {
                 isAllFriendlyOrgs = true;
             } else {
                 isAllFriendlyOrgs = Boolean.parseBoolean(reportParameters.getIsAllFriendlyOrgs());
             }
-
-            if (isAllFriendlyOrgs) {
-                builder.setAllFriendlyOrgs(true);
-                builder.setIdOfOrg(reportParameters.getIdOfOrg());
-            } else {
-                builder.setAllFriendlyOrgs(false);
-                builder.setIdOfOrg(reportParameters.getIdOfOrg());
-            }
+            builder.setAllFriendlyOrgs(isAllFriendlyOrgs);
 
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;
         } catch (EntityNotFoundException e) {
             logger.error("Not found organization to generate report");
+            return null;
+        } catch (Exception e){
+            logger.error("Failure to build a report", e);
             return null;
         }
     }
@@ -711,10 +717,10 @@ public class ReportRepository extends BaseJpaDao {
                 if (parameter.getParameterName().equals("startDate")) {
                     startDate = safeDateFormat.parse(parameter.getParameterValue());
                 }
-                if (parameter.getParameterName().equals("endDate")) {
+                else if (parameter.getParameterName().equals("endDate")) {
                     endDate = safeDateFormat.parse(parameter.getParameterValue());
                 }
-                if (parameter.getParameterName().equals("idOfOrg")) {
+                else if (parameter.getParameterName().equals("idOfOrg")) {
                     idOfOrg = Long.parseLong(parameter.getParameterValue());
                 }
             }
@@ -799,6 +805,8 @@ public class ReportRepository extends BaseJpaDao {
         private Integer category;
         private String groupName;
         private String isAllFriendlyOrgs;
+        private String outputMigrants;   // receive from ARM 1 or 0
+        private String sortedBySections; // receive from ARM 1 or 0
 
         public ReportParameters(List<ReportParameter> parameters) {
             this.parameters = parameters;
@@ -860,6 +868,8 @@ public class ReportRepository extends BaseJpaDao {
             category = null;
             groupName = null;
             isAllFriendlyOrgs = null;
+            outputMigrants = null;
+            sortedBySections = null;
 
             DateFormat safeDateFormat = dateFormat.get();
             for (ReportParameter parameter : parameters) {
@@ -867,36 +877,42 @@ public class ReportRepository extends BaseJpaDao {
                     startDate = safeDateFormat.parse(parameter.getParameterValue());
                     startDate = CalendarUtils.truncateToDayOfMonth(startDate);
                 }
-                if (parameter.getParameterName().equals("endDate")) {
+                else if (parameter.getParameterName().equals("endDate")) {
                     endDate = safeDateFormat.parse(parameter.getParameterValue());
                     endDate = CalendarUtils.endOfDay(endDate);
                 }
-                if (parameter.getParameterName().equals("idOfOrg")) {
+                else if (parameter.getParameterName().equals("idOfOrg")) {
                     idOfOrg = Long.parseLong(parameter.getParameterValue());
                 }
-                if (parameter.getParameterName().equals("idOfContragent")) {
+                else if (parameter.getParameterName().equals("idOfContragent")) {
                     idOfContragent = Long.parseLong(parameter.getParameterValue());
                 }
-                if (parameter.getParameterName().equals("idOfContract")) {
+                else if (parameter.getParameterName().equals("idOfContract")) {
                     idOfContract = Long.parseLong(parameter.getParameterValue());
                 }
-                if (parameter.getParameterName().equals("region")) {
+                else if (parameter.getParameterName().equals("region")) {
                     region = parameter.getParameterValue();
                 }
-                if (parameter.getParameterName().equals("email")) {
+                else if (parameter.getParameterName().equals("email")) {
                     email = parameter.getParameterValue();
                 }
-                if (parameter.getParameterName().equals("enterEventType")) {
+                else if (parameter.getParameterName().equals("enterEventType")) {
                     enterEventType = parameter.getParameterValue();
                 }
-                if (parameter.getParameterName().equals("categories")) {
+                else if (parameter.getParameterName().equals("categories")) {
                     category = Integer.valueOf(parameter.getParameterValue());
                 }
-                if (parameter.getParameterName().equals("clientGroupName")) {
+                else if (parameter.getParameterName().equals("clientGroupName")) {
                     groupName = parameter.getParameterValue();
                 }
-                if (parameter.getParameterName().equals("isAllFriendlyOrgs")) {
+                else if (parameter.getParameterName().equals("isAllFriendlyOrgs")) {
                     isAllFriendlyOrgs = parameter.getParameterValue();
+                }
+                else if(parameter.getParameterName().equals("outputMigrants")){
+                    outputMigrants = Boolean.toString(parameter.getParameterValue().equals("1"));
+                }
+                else if(parameter.getParameterName().equals("sortedBySections")){
+                    sortedBySections = Boolean.toString(parameter.getParameterValue().equals("1"));
                 }
             }
             return this;
@@ -907,5 +923,20 @@ public class ReportRepository extends BaseJpaDao {
                     && endDate != null;
         }
 
+        public String getOutputMigrants() {
+            return outputMigrants;
+        }
+
+        public void setOutputMigrants(String outputMigrants) {
+            this.outputMigrants = outputMigrants;
+        }
+
+        public String getSortedBySections() {
+            return sortedBySections;
+        }
+
+        public void setSortedBySections(String sortedBySections) {
+            this.sortedBySections = sortedBySections;
+        }
     }
 }
