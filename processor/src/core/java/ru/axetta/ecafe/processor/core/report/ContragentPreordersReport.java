@@ -93,7 +93,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " left join cf_orders ord on ord.idoforg = pl.idoforg and ord.idoforder = pl.idoforder\n"
                     + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction\n"
                     + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg\n"
-                    + " where pc.deletedstate = 0 and pc.amount > 0 "
+                    + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1 "
                     + idOfContragentCondition
                     + ordersCondition
                     + " and pc.preorderdate BETWEEN :startDate and :endDate "
@@ -105,14 +105,14 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " ord.orderdate, pl.qty*pl.price as ordersum, pl.idoforder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as \"Оплачено\"\n"
                     + " from cf_preorder_menudetail pmd\n"
                     + " join cf_clients c on pmd.idofclient = c.idofclient\n"
-                    + " join cf_orgs o on c.idoforg = o.idoforg \n"
+                    + " join cf_orgs o on c.idoforg = o.idoforg  "
                     + " join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent\n"
                     + " join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex\n"
                     + " left join cf_preorder_linkod pl on pl.preorderguid = pc.guid\n"
                     + " left join cf_orders ord on ord.idoforg = pl.idoforg and ord.idoforder = pl.idoforder\n"
                     + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction\n"
                     + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg\n"
-                    + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 "
+                    + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and o.PreordersEnabled = 1 "
                     + idOfContragentCondition
                     + ordersCondition
                     + " and pmd.preorderdate BETWEEN :startDate and :endDate "

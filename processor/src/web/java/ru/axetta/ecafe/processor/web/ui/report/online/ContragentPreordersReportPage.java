@@ -76,6 +76,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
         orgFilter = "";
         if (orgMap == null || orgMap.isEmpty()) {
             orgFilter = "Не выбрано";
+            idOfOrgList.clear();
         } else {
             StringBuilder orgsNameBuilder = new StringBuilder();
             idOfOrgList = new LinkedList<Long>();
