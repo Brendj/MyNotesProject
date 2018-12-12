@@ -500,15 +500,15 @@ public class ImportRegisterClientsService {
                         cl == null || cl.getGender() == null ? null : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
             }
 
-            if(org.getChangesDSZN()) {
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN,
-                        pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
-                        updateClient);
-                if(!updateClient) {
-                    updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscounts(),
-                                    categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscounts());
-                }
-            }
+            //if(org.getChangesDSZN()) {
+            //    updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN,
+            //            pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
+            //            updateClient);
+            //    if(!updateClient) {
+            //        updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscounts(),
+            //                        categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscounts());
+            //    }
+            //}
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
@@ -789,17 +789,17 @@ public class ImportRegisterClientsService {
             }
         }
 
-        ch.setCheckBenefits(checkBenefits);
-        if(checkBenefits) {
-            ch.setBenefitDSZN(clientBenefitDSZN);
-            ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
-                    currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
-            if(currentClient != null) {
-                ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-                ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-                        StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
-            }
-        }
+        //ch.setCheckBenefits(checkBenefits);
+        //if(checkBenefits) {
+        //    ch.setBenefitDSZN(clientBenefitDSZN);
+        //    ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
+        //            currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
+        //    if(currentClient != null) {
+        //        ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
+        //        ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
+        //                StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
+        //    }
+        //}
 
         if (operation == CREATE_OPERATION) {
             if (!StringUtils.isEmpty(guardiansCount)) {
@@ -951,11 +951,11 @@ public class ImportRegisterClientsService {
         if (currentClient.getBirthDate() != null) {
             ch.setBirthDate(currentClient.getBirthDate().getTime());
         }
-        ch.setCheckBenefits(checkBenefits);
-        if(checkBenefits) {
-            ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
-            ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
-        }
+        //ch.setCheckBenefits(checkBenefits);
+        //if(checkBenefits) {
+        //    ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
+        //    ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
+        //}
         ch.setAgeTypeGroup(currentClient.getAgeTypeGroup());
         sess.save(ch);
     }

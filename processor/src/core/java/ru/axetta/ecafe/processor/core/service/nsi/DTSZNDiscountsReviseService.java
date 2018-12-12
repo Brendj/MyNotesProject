@@ -119,6 +119,7 @@ public class DTSZNDiscountsReviseService {
         Long currentPage = 1L;
         Long pagesCount = 0L;
         Long clientDTISZNDiscountVersion = 0L;
+        Date fireTime = new Date();
 
         Session session = null;
         Transaction transaction = null;
@@ -141,6 +142,12 @@ public class DTSZNDiscountsReviseService {
                         logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                         continue;
                     }
+
+                    if (!client.getOrg().getChangesDSZN()) {
+                        logger.info(String.format("Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped", item.getPerson().getId()));
+                        continue;
+                    }
+
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
 
@@ -180,6 +187,11 @@ public class DTSZNDiscountsReviseService {
                                     clientDTISZNDiscountVersion);
                             session.save(discountInfo);
                         }
+                    }
+
+                    if (!discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !CalendarUtils
+                            .betweenOrEqualDate(discountInfo.getDateStart(), discountInfo.getDateEnd(), fireTime)) {
+                        continue;
                     }
 
                     CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
@@ -422,7 +434,8 @@ public class DTSZNDiscountsReviseService {
 
     public void updateApplicationForFood(Session session, ETPMVService service, ClientDtisznDiscountInfo discountInfo) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, discountInfo.getClient());
-        if (null == application)
+        if (null == application ||
+                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)))
             return;
 
         Date fireTime = new Date();
