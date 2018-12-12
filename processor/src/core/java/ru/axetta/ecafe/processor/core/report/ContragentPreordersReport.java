@@ -61,10 +61,10 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            Boolean hideEmptyData = Boolean.valueOf(getReportProperties().getProperty("hideEmptyData"));
+            Boolean showOnlyUnpaidItems = Boolean.valueOf(getReportProperties().getProperty("showOnlyUnpaidItems"));
 
             JRDataSource dataSource = createDataSource(session, contragent, startTime, endTime,
-                    idOfOrgList, hideEmptyData);
+                    idOfOrgList, showOnlyUnpaidItems);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -75,11 +75,11 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
-                List<Long> idOfOrgList, Boolean hideEmptyData) throws Exception{
+                List<Long> idOfOrgList, Boolean showOnlyUnpaidItems) throws Exception{
             List<ContragentPreordersReportItem> result = new LinkedList<ContragentPreordersReportItem>();
             String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
             String idOfContragentCondition = contragent == null ? "" : " and ctg.idofcontragent = :idOfContragent ";
-            String ordersCondition = hideEmptyData ? " and pl.idoforder is not null " : "";
+            String ordersCondition = showOnlyUnpaidItems ? " and (pl.idoforder is null or co.idoforder is not null ) " : "";
 
             Query query = session.createSQLQuery(" select ctg.idofcontragent, ctg.contragentname, o.idoforg, \n"
                     + " o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate,\n"

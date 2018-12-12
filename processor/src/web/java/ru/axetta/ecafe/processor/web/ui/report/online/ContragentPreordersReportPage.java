@@ -41,7 +41,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
     private final Logger logger = LoggerFactory.getLogger(ContragentPreordersReportPage.class);
     private Contragent contragent;
     private String htmlReport;
-    private Boolean hideOrgsWithEmptyData = false;
+    private Boolean showOnlyUnpaidItems = false;
     private final String CLASS_TYPE_TSP = Integer.toString(Contragent.TSP);
     private String orgFilter = "Не выбрано";
 
@@ -100,12 +100,12 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
         MainPage.getSessionInstance().showOrgListSelectPage();
     }
 
-    public Boolean getHideOrgsWithEmptyData() {
-        return hideOrgsWithEmptyData;
+    public Boolean getShowOnlyUnpaidItems() {
+        return showOnlyUnpaidItems;
     }
 
-    public void setHideOrgsWithEmptyData(Boolean hideOrgsWithEmptyData) {
-        this.hideOrgsWithEmptyData = hideOrgsWithEmptyData;
+    public void setShowOnlyUnpaidItems(Boolean showOnlyUnpaidItems) {
+        this.showOnlyUnpaidItems = showOnlyUnpaidItems;
     }
 
     public Object buildReport() {
@@ -121,7 +121,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
             ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
             builder.setContragent(this.contragent);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("hideEmptyData", hideOrgsWithEmptyData.toString());
+            builder.getReportProperties().setProperty("showOnlyUnpaidItems", showOnlyUnpaidItems.toString());
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
@@ -169,7 +169,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
             ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
             builder.setContragent(this.contragent);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("hideEmptyData", hideOrgsWithEmptyData.toString());
+            builder.getReportProperties().setProperty("showOnlyUnpaidItems", showOnlyUnpaidItems.toString());
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
