@@ -107,9 +107,9 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             Boolean sortedBySections = Boolean.parseBoolean(reportProperties.getProperty("sortedBySections", "false"));
             List<EnterEventItem> enterEventItems = new LinkedList<EnterEventItem>();
 
-            String joinMigrants = outputMigrants ? " left join cf_migrants m on m.IdOfClientMigrate = c.idofclient and m.IdOfOrgVisit = ee.idOfOrg " : "";
-            String selectPartSectionName = outputMigrants ? ", case when ee.evtdatetime between m.VisitStartDate and m.VisitEndDate "
-                                                          + " then m.section else cast('' as text) end " : ", cast('' as text) as section "; // No Dialect mapping for JDBC type: 1111 exception
+            String joinMigrants = outputMigrants ? " left join cf_migrants m on m.IdOfClientMigrate = c.idofclient"
+                    + " and m.IdOfOrgVisit = ee.idOfOrg and ee.evtdatetime between m.VisitStartDate and m.VisitEndDate" : "";
+            String selectPartSectionName = outputMigrants ? ", m.section " : ", cast('' as text) as section "; // No Dialect mapping for JDBC type: 1111 exception
             String partOfOrderByMigrantSection = sortedBySections && outputMigrants ? " m.section, " : "";
             String eventsCondition = "";
             String clientGroupCondition = "";

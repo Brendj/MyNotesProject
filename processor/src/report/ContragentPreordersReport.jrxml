@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ContragentPreorderReport" pageWidth="1044" pageHeight="10000" columnWidth="1004" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f98f54d5-e234-47d1-a08f-01ded547b4d1">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="data-2365"/>
 	<property name="ireport.zoom" value="1.8627639691774651"/>
-	<property name="ireport.x" value="279"/>
+	<property name="ireport.x" value="596"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
@@ -823,7 +823,7 @@
 				<textFieldExpression><![CDATA[$F{clientContractId}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="877" y="0" width="72" height="17" uuid="c5227000-3fcc-4abe-ba8b-6b0b2199fbba">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="877" y="0" width="72" height="17" isPrintWhenDetailOverflows="true" uuid="c5227000-3fcc-4abe-ba8b-6b0b2199fbba">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -868,7 +868,7 @@
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="696" y="0" width="64" height="17" uuid="c2f25bfe-fe74-4d86-93c7-fcfc9514c721">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="696" y="0" width="64" height="17" isPrintWhenDetailOverflows="true" uuid="c2f25bfe-fe74-4d86-93c7-fcfc9514c721">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -928,7 +928,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="416" y="0" width="64" height="17" uuid="fd6ae10f-17b7-411f-b3bf-0dce24e2bb4d">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="416" y="0" width="64" height="17" isPrintWhenDetailOverflows="true" uuid="fd6ae10f-17b7-411f-b3bf-0dce24e2bb4d">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="3" bottomPadding="1" rightPadding="3">
@@ -940,7 +940,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="SansSerif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{cancelDate})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{preorderDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="table" stretchType="RelativeToTallestObject" x="760" y="0" width="64" height="17" uuid="5ac64209-dfaf-488f-b3c7-c59353b1af83">
