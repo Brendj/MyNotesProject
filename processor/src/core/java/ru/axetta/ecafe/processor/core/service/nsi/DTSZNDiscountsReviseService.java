@@ -118,8 +118,8 @@ public class DTSZNDiscountsReviseService {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Long currentPage = 1L;
         Long pagesCount = 0L;
-        Long clientDTISZNDiscountVersion = 0L;
-        Date fireTime = new Date();
+        Long clientDTISZNDiscountVersion;
+        List<Long> clientIdList = new ArrayList<Long>();
 
         Session session = null;
         Transaction transaction = null;
@@ -157,6 +157,9 @@ public class DTSZNDiscountsReviseService {
                                 item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                                 item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDiscountVersion);
                         session.save(discountInfo);
+                        if (!clientIdList.contains(client.getIdOfClient())) {
+                            clientIdList.add(discountInfo.getIdOfClientDTISZNDiscountInfo());
+                        }
                     } else {
                         if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
                             // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
@@ -173,6 +176,9 @@ public class DTSZNDiscountsReviseService {
                             if (wasModified) {
                                 discountInfo.setVersion(clientDTISZNDiscountVersion);
                                 session.merge(discountInfo);
+                                if (!clientIdList.contains(client.getIdOfClient())) {
+                                    clientIdList.add(discountInfo.getIdOfClientDTISZNDiscountInfo());
+                                }
                             }
                         } else {
                             // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
@@ -186,51 +192,12 @@ public class DTSZNDiscountsReviseService {
                                     item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
                                     clientDTISZNDiscountVersion);
                             session.save(discountInfo);
-                        }
-                    }
-
-                    if (!discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !CalendarUtils
-                            .betweenOrEqualDate(discountInfo.getDateStart(), discountInfo.getDateEnd(), fireTime)) {
-                        continue;
-                    }
-
-                    CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
-                            .getCategoryDiscountDSZNByDSZNCode(session, item.getBenefit().getDsznCode());
-                    if (null != categoryDiscountDSZN) {
-                        String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
-                        List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
-                        for (String discount : discounts) {
-                            try {
-                                categoryDiscountsList.add(Long.parseLong(discount));
-                            } catch (NumberFormatException e) {
-                                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d",
-                                        discount, client.getIdOfClient()));
-                            }
-                        }
-
-                        if (!categoryDiscountsList.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
-                            String oldDiscounts = client.getCategoriesDiscounts();
-                            String newDiscounts = oldDiscounts + (StringUtils.isEmpty(oldDiscounts) ? "":",")
-                                    + categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount();
-
-                            Integer oldDiscountMode = client.getDiscountMode();
-                            Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-
-                            client.setCategoriesDiscounts(newDiscounts);
-                            client.setDiscountMode(newDiscountMode);
-
-                            if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-                                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                                        newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-                                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                                session.save(discountChangeHistory);
-                                client.setLastDiscountsUpdate(new Date());
-                                client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+                            if (!clientIdList.contains(client.getIdOfClient())) {
+                                clientIdList.add(discountInfo.getIdOfClientDTISZNDiscountInfo());
                             }
                         }
                     }
 
-                    updateApplicationForFood(session, service, discountInfo);
                 }
                 transaction.commit();
                 transaction = null;
@@ -247,6 +214,27 @@ public class DTSZNDiscountsReviseService {
 
             logger.info(String.format("Revise 2.0: %d/%d pages was processed", currentPage, pagesCount));
         } while (currentPage++ < pagesCount);
+
+        try {
+            session = runtimeContext.createPersistenceSession();
+
+            Integer counter = 1;
+            for (Long idOfClient : clientIdList) {
+                transaction = session.beginTransaction();
+                Client client = (Client) session.load(Client.class, idOfClient);
+                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+                processDiscounts(session, client, clientInfoList, service);
+                transaction.commit();
+                transaction = null;
+                logger.info(String.format("Updating discounts for clients: %d/%d done", counter++, clientIdList.size()));
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in update discounts", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     private URL getServiceUrl() throws Exception {
@@ -371,13 +359,6 @@ public class DTSZNDiscountsReviseService {
         return null;
     }
 
-    private void authenticateHeaders(HttpHeaders headers) {
-        String auth = username + ":" + password;
-        byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
-        String authHeader = "Basic " + new String(encodedAuth);
-        headers.set("Authorization", authHeader);
-    }
-
     private void authenticateHeaders(EntityEnclosingMethod method) {
         String auth = username + ":" + password;
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
@@ -432,8 +413,8 @@ public class DTSZNDiscountsReviseService {
         return entityIds;
     }
 
-    public void updateApplicationForFood(Session session, ETPMVService service, ClientDtisznDiscountInfo discountInfo) {
-        ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, discountInfo.getClient());
+    public void updateApplicationForFood(Session session, ETPMVService service, Client client, List<ClientDtisznDiscountInfo> infoList/*, ClientDtisznDiscountInfo discountInfo*/) {
+        ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
         if (null == application ||
                 !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)))
             return;
@@ -450,8 +431,14 @@ public class DTSZNDiscountsReviseService {
             service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
                     application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
-            if (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                    .betweenOrEqualDate(discountInfo.getDateStart(), discountInfo.getDateEnd(), fireTime)) {
+            Boolean isOk = false;
+
+            for (ClientDtisznDiscountInfo info : infoList) {
+                isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                        .betweenOrEqualDate(info.getDateStart(), info.getDateEnd(), fireTime);
+            }
+
+            if (isOk) {
                 //1052
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
@@ -475,8 +462,61 @@ public class DTSZNDiscountsReviseService {
             }
         } catch (Exception e) {
             logger.error(String.format("Error in updateApplicationForFood: " +
-                    "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo=%d",
-                    discountInfo.getClient().getIdOfClient(), discountInfo.getIdOfClientDTISZNDiscountInfo()));
+                    "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
+                    client.getIdOfClient(), StringUtils.join(infoList, ",")));
         }
+    }
+
+    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList, ETPMVService service) throws Exception {
+
+        Date fireTime = new Date();
+
+        String oldDiscounts = client.getCategoriesDiscounts();
+        String newDiscounts = oldDiscounts;
+
+        String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
+        List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
+        for (String discount : discounts) {
+            try {
+                categoryDiscountsList.add(Long.parseLong(discount));
+            } catch (NumberFormatException e) {
+                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d",
+                        discount, client.getIdOfClient()));
+            }
+        }
+
+        for (ClientDtisznDiscountInfo info : infoList) {
+            if (!info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !CalendarUtils
+                    .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())) {
+                continue;
+            }
+
+            CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                    .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
+
+            if (null != categoryDiscountDSZN) {
+                if (!categoryDiscountsList.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
+                    newDiscounts += oldDiscounts + (oldDiscounts.isEmpty() ? "":",")
+                            + categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount();
+                }
+            }
+        }
+        Integer oldDiscountMode = client.getDiscountMode();
+        Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+
+        if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+            client.setCategoriesDiscounts(newDiscounts);
+            client.setDiscountMode(newDiscountMode);
+
+            DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
+                    newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
+            discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
+            session.save(discountChangeHistory);
+            client.setLastDiscountsUpdate(new Date());
+            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            client.setClientRegistryVersion(clientRegistryVersion);
+        }
+        updateApplicationForFood(session, service, client, infoList);
     }
 }
