@@ -4946,27 +4946,34 @@ public class Processor implements SyncProcessor {
 
         if (deletedPreorders.size() > 0 || changedPreorders.size() > 0 || deletedPreorderMenuDetails.size() > 0 || changedPreorderMenuDetails.size() > 0) {
             version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
-            //Integer days = getDaysToAdd(organization.getIdOfOrg(), now, CalendarUtils.addDays(now, PreorderComplex.getDaysOfRegularPreorders()));
-            Integer days = DAOUtils.getPreorderFeedingForbiddenDays(organization.getIdOfOrg());
+/*            Integer days = DAOUtils.getPreorderFeedingForbiddenDays(organization.getIdOfOrg());
             if (days != null) days++;
             else {
                 days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
             }
-            dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(now, days)); //дата, начиная с которой нужно удалять измененные предзаказы
+            dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(now, days)); //дата, начиная с которой нужно удалять измененные предзаказы*/
         }
         for (PreorderComplex preorderComplex : deletedPreorders) {
+            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                    .getStartDateForGeneratePreorders(preorderComplex.getClient());
             preorderComplex.deleteBySupplier(version, preorderComplex.getPreorderDate().after(dateFrom));
             persistenceSession.update(preorderComplex);
         }
         for (PreorderComplex preorderComplex : changedPreorders) {
+            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                    .getStartDateForGeneratePreorders(preorderComplex.getClient());
             preorderComplex.changeBySupplier(version, preorderComplex.getPreorderDate().after(dateFrom));
             persistenceSession.update(preorderComplex);
         }
         for (PreorderMenuDetail preorderMenuDetail : deletedPreorderMenuDetails) {
+            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                    .getStartDateForGeneratePreorders(preorderMenuDetail.getClient());
             preorderMenuDetail.deleteBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
             persistenceSession.update(preorderMenuDetail);
         }
         for (PreorderMenuDetail preorderMenuDetail : changedPreorderMenuDetails) {
+            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                    .getStartDateForGeneratePreorders(preorderMenuDetail.getClient());
             preorderMenuDetail.changeBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
             persistenceSession.update(preorderMenuDetail);
         }
