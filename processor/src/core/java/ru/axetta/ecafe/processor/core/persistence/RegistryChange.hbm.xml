@@ -38,7 +38,7 @@
         <property name="birthDate" column="BirthDate" type="long"/>
         <property name="genderFrom" column="GenderFrom" type="int"/>
         <property name="birthDateFrom" column="BirthDateFrom" type="long"/>
-        <property name="checkBenefits" column="CheckBenefits" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="checkBenefits" column="CheckBenefits" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="benefitDSZN" column="BenefitDSZN" type="string" length="128"/>
         <property name="newDiscounts" column="NewDiscounts" type="string" length="128"/>
         <property name="benefitDSZNFrom" column="BenefitDSZNFrom" type="string" length="128"/>

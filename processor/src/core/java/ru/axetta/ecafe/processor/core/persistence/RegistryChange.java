@@ -294,6 +294,10 @@ public class RegistryChange {
         return checkBenefits;
     }
 
+    public Boolean getCheckBenefitsSafe() {
+        return (null == checkBenefits) ? false : checkBenefits;
+    }
+
     public void setCheckBenefits(Boolean checkBenefits) {
         this.checkBenefits = checkBenefits;
     }

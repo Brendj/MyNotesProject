@@ -789,7 +789,7 @@ public class ImportRegisterClientsService {
             }
         }
 
-        //ch.setCheckBenefits(checkBenefits);
+        ch.setCheckBenefits(checkBenefits);
         //if(checkBenefits) {
         //    ch.setBenefitDSZN(clientBenefitDSZN);
         //    ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
@@ -951,7 +951,8 @@ public class ImportRegisterClientsService {
         if (currentClient.getBirthDate() != null) {
             ch.setBirthDate(currentClient.getBirthDate().getTime());
         }
-        //ch.setCheckBenefits(checkBenefits);
+
+        ch.setCheckBenefits(checkBenefits);
         //if(checkBenefits) {
         //    ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
         //    ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
@@ -1339,8 +1340,8 @@ public class ImportRegisterClientsService {
                     }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
-                    if(change.getCheckBenefits()) {
+                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
+                    if(change.getCheckBenefitsSafe()) {
                         createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
                         createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     }
@@ -1418,8 +1419,8 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
-                    if(change.getCheckBenefits()) {
+                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
+                    if(change.getCheckBenefitsSafe()) {
                         modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
                         modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     }

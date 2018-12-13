@@ -204,8 +204,8 @@ public class ImportRegisterSpbClientsService {
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
-                    if(change.getCheckBenefits()) {
+                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
+                    if(change.getCheckBenefitsSafe()) {
                         createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
                         createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     }
@@ -281,8 +281,8 @@ public class ImportRegisterSpbClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefits());
-                    if(change.getCheckBenefits()) {
+                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
+                    if(change.getCheckBenefitsSafe()) {
                         modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
                         modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
                     }
