@@ -253,7 +253,7 @@
 									<printWhenExpression><![CDATA[!$V{totalPlanStr}.isEmpty()]]></printWhenExpression>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="10"/>
+									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA["Итого по " + $V{totalPlanStr} + " (руб.)"]]></textFieldExpression>
 							</textField>
@@ -262,7 +262,7 @@
 									<printWhenExpression><![CDATA[$V{totalPlanStr} != null]]></printWhenExpression>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="10"/>
+									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{totalPlanSum}).movePointLeft(2)
 + ($V{hideDailySampleSum}==0L ? "" :
@@ -283,7 +283,7 @@
 									<property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
 								</reportElement>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="10"/>
+									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{goodName}]]></textFieldExpression>
 							</textField>
@@ -291,9 +291,10 @@
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
 						<cellContents backcolor="#99CCFF" mode="Opaque" style="table">
-							<textField>
+							<textField isStretchWithOverflow="true">
 								<reportElement uuid="6daf10b9-73c0-4509-848d-a377ffc8d55b" style="Crosstab Data Text" x="0" y="0" width="164" height="20"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font size="8"/>
 									<paragraph leftIndent="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{feedingPlanTypeStr}]]></textFieldExpression>
@@ -326,17 +327,23 @@
 						<cellContents>
 							<textField>
 								<reportElement uuid="983c7a3f-0efa-4ce2-8c3b-3aa6409f276c" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
 								<textFieldExpression><![CDATA[$V{goodsCode}]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="e063563f-6ddf-417c-bac5-b4ec840162d3" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="20"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
 								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{goodPrice}).movePointLeft(2)]]></textFieldExpression>
 							</textField>
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="697b775f-9b9e-428a-844a-e780d60c68fc" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="20"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
 								<textFieldExpression><![CDATA[$V{totalPlanCount} + ($V{hideDailySampleSum}==0L ? "" :
     ($V{dailySampleMeasure} == 0L ? "" : " / " + $V{dailySampleMeasure})
     + ($V{tempClientsMeasure} == 0L ? "" : " / " + $V{tempClientsMeasure}))
@@ -344,7 +351,9 @@
 							</textField>
 							<textField isStretchWithOverflow="true">
 								<reportElement uuid="499a56c7-5738-430b-b060-fb552df71846" style="table" positionType="Float" stretchType="RelativeToBandHeight" x="300" y="0" width="100" height="20"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
 								<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{goodPrice} * $V{totalPlanCount}).movePointLeft(2)
 + ($V{hideDailySampleSum}==0L ? "" :
     ($V{dailySampleMeasure} == 0L ? "" : " / " + java.math.BigDecimal.valueOf($V{goodPrice} * $V{dailySampleMeasure}).movePointLeft(2))
@@ -479,7 +488,7 @@ $V{tempClientsMeasure}))]]></textFieldExpression>
 								<printWhenExpression><![CDATA[$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10"/>
+								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+ ($V{hideDailySampleSum}==0L || ($V{dailySampleMeasure}==0L && $V{tempClientsMeasure}==0L)     ? "" : " / "+ $V{dailySampleMeasure} + ($V{tempClientsMeasure}==0L ? "" : " / " + $V{tempClientsMeasure}))]]></textFieldExpression>
 						</textField>
