@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import org.hibernate.Session;
 import org.richfaces.component.html.HtmlPanelMenuGroup;
 import org.richfaces.component.html.HtmlPanelMenuItem;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +45,10 @@ public class BasicWorkspacePage extends BasicPage {
 
     public String getPageTitle() {
         return buildMenuComponentPath(mainMenuComponent);
+    }
+
+    public void fill(Session session) throws Exception {
+
     }
 
     private static String buildMenuComponentPath(UIComponent menuComponent) {

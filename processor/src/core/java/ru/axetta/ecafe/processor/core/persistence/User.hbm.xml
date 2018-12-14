@@ -41,6 +41,8 @@
         <property name="attemptNumber" column="AttemptNumber" type="integer"/>
         <property name="department" column="department" type="string" length="64" not-null="false" />
         <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="idofperson" fetch="select" lazy="false"/>
+        <property name="idOfGroup" column="IdOfGroup" type="long" />
+        <property name="isGroup" column="isGroup" type="boolean" not-null="true"/>
 
         <set name="contragents" table="CF_UserContragents">
             <key column="IdOfUser"/>

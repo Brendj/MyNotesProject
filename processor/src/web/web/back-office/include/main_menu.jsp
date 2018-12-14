@@ -1587,6 +1587,28 @@
     <rich:panelMenuItem id="createUserMenuItem" binding="#{mainPage.userCreatePage.mainMenuComponent}" label="Создание"
                         action="#{mainPage.showUserCreatePage}" reRender="workspaceForm" />
 
+    <rich:panelMenuGroup id="userGroupGroupMenu" label="Роли пользователей" binding="#{mainPage.userGroupGroupPage.mainMenuComponent}"
+                         rendered="#{mainPage.eligibleToViewUsers}" expanded="false">
+        <a4j:support event="onclick" action="#{mainPage.showUserGroupPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="showUserGroupListMenuItem" binding="#{mainPage.userGroupListPage.mainMenuComponent}" label="Список"
+                            action="#{mainPage.showUserGroupListPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedUserGroupGroupMenu" label="#{mainPage.selectedUserGroupGroupPage.userName}"
+                             binding="#{mainPage.selectedUserGroupGroupPage.mainMenuComponent}" rendered="false">
+            <a4j:support event="onclick" action="#{mainPage.showSelectedUserGroupGroupPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="viewUserGroupMenuItem" binding="#{mainPage.userGroupViewPage.mainMenuComponent}" label="Просмотр"
+                                action="#{mainPage.showUserGroupViewPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="editUserGroupMenuItem" binding="#{mainPage.userGroupEditPage.mainMenuComponent}"
+                                label="Редактирование" action="#{mainPage.showUserGroupEditPage}" reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="createUserGroupMenuItem" binding="#{mainPage.userGroupCreatePage.mainMenuComponent}" label="Создание"
+                            action="#{mainPage.showUserGroupCreatePage}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
+
     <rich:panelMenuGroup id="thinClientUsersGroupMenu" label="Тонкий клиент" binding="#{mainPage.thinClientUserGroupPage.mainMenuComponent}"
                          rendered="#{!mainPage.eligibleToViewUsers}">
         <a4j:support event="onclick" action="#{mainPage.showThinClientUsersGroupPage}" reRender="workspaceForm" />

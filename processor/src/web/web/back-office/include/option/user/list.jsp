@@ -28,7 +28,7 @@
             <h:panelGrid columns="2" styleClass="borderless-grid">
                 <a4j:commandButton value="Применить" action="#{mainPage.showUserListPage}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
-                <a4j:commandButton value="Очистить" action="#{mainPage.clearUserListPageFilter}"
+                <a4j:commandButton value="Очистить" action="#{mainPage.userListPage.clearUserListPageFilter}"
                                    reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
             </h:panelGrid>
         </rich:simpleTogglePanel>

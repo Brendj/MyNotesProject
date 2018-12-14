@@ -40,38 +40,38 @@ import java.util.*;
 public class UserEditPage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList,
         OrgMainBuildingListSelectPage.CompleteHandler {
 
-    private Long idOfUser;
-    private String userName;
-    private boolean changePassword = false;
-    private String plainPassword;
-    private String plainPasswordConfirmation;
-    private String phone;
-    private String email;
+    protected Long idOfUser;
+    protected String userName;
+    protected boolean changePassword = false;
+    protected String plainPassword;
+    protected String plainPasswordConfirmation;
+    protected String phone;
+    protected String email;
     //private ContragentItem contragentItem;
-    private List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
-    private Integer idOfRole;
-    private String roleName;
-    private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
-    private FunctionSelector functionSelector = new FunctionSelector();
-    private String contragentFilter = "Не выбрано";
-    private String contragentIds;
-    private String orgIds;
-    private String orgIdsCanceled;
-    private Long organizationId;
-    private Boolean blocked;
-    private SelectItem[] regions;
-    private String region;
-    private String orgFilter = "Не выбрано";
-    private String orgFilterCanceled = "Не выбрано";
-    private Boolean needChangePassword;
-    private Date blockedUntilDate;
-    private String organizationsFilter = "Не выбрано";
-    private String firstName;
-    private String surname;
-    private String secondName;
-    private String department;
+    protected List<ContragentItem> contragentItems = new ArrayList<ContragentItem>();
+    protected Integer idOfRole;
+    protected String roleName;
+    protected final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
+    protected FunctionSelector functionSelector = new FunctionSelector();
+    protected String contragentFilter = "Не выбрано";
+    protected String contragentIds;
+    protected String orgIds;
+    protected String orgIdsCanceled;
+    protected Long organizationId;
+    protected Boolean blocked;
+    protected SelectItem[] regions;
+    protected String region;
+    protected String orgFilter = "Не выбрано";
+    protected String orgFilterCanceled = "Не выбрано";
+    protected Boolean needChangePassword;
+    protected Date blockedUntilDate;
+    protected String organizationsFilter = "Не выбрано";
+    protected String firstName;
+    protected String surname;
+    protected String secondName;
+    protected String department;
 
-    private UserNotificationType selectOrgType;
+    protected UserNotificationType selectOrgType;
 
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
@@ -179,9 +179,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             }
             user.setBlocked(blocked);
             user.setBlockedUntilDate(blockedUntilDate);
-            User.DefaultRole role = User.DefaultRole.parse(idOfRole);
-            user.setIdOfRole(role.getIdentification());
-            if (User.DefaultRole.SUPPLIER.equals(role)) {
+            User.DefaultRole role = null;
+            if (idOfRole < UserRoleEnumTypeMenu.OFFSET) {
+                role = User.DefaultRole.parse(idOfRole);
+            }
+            user.setIdOfRole(idOfRole);
+            if (role != null && User.DefaultRole.SUPPLIER.equals(role)) {
                 //user.setFunctions(functionSelector.getSupplierFunctions(session));
                 user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(role.toString());
@@ -190,7 +193,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
-            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+            if (role != null && role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
                 //user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(role.toString());
@@ -205,15 +208,15 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.getContragents().add(contragent);
             }
 
-            if(role.equals(User.DefaultRole.MONITORING)){
+            if(role != null && role.equals(User.DefaultRole.MONITORING)){
                 user.setFunctions(functionSelector.getMonitoringFunctions(session));
                 user.setRoleName(role.toString());
             }
-            if(role.equals(User.DefaultRole.ADMIN)){
+            if(role != null && role.equals(User.DefaultRole.ADMIN)){
                 user.setFunctions(functionSelector.getAdminFunctions(session));
                 user.setRoleName(role.toString());
             }
-            if(role.equals(User.DefaultRole.ADMIN_SECURITY)){
+            if(role != null && role.equals(User.DefaultRole.ADMIN_SECURITY)){
                 user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
                 user.setRoleName(role.toString());
             }
@@ -225,10 +228,17 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setFunctions(functionSelector.getSelected(session));
                 user.setRoleName(this.roleName);
             }
-            if (role.equals(User.DefaultRole.CARD_OPERATOR)) {
+            if (role != null && role.equals(User.DefaultRole.CARD_OPERATOR)) {
                 user.setFunctions(functionSelector.getCardOperatorFunctions(session));
                 user.setRoleName(role.toString());
                 user.setDepartment(department);
+            }
+            if (role == null) {
+                User userRole = (User)session.get(User.class, idOfRole - UserRoleEnumTypeMenu.OFFSET);
+                Set<Function> set = new HashSet<Function>(userRole.getFunctions());
+                user.setFunctions(set);
+                user.setRoleName(userRole.getUserName());
+                user.setIdOfGroup(userRole.getIdOfUser());
             }
             if (region != null && region.length() > 0) {
                 user.setRegion(region);
@@ -317,20 +327,23 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             return true;
         }
 
-        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
-        if(role.equals(User.DefaultRole.MONITORING) && !user.getFunctions().equals(functionSelector.getMonitoringFunctions(session))) {
+        User.DefaultRole role = null;
+        if (idOfRole < UserRoleEnumTypeMenu.OFFSET ) {
+            role = User.DefaultRole.parse(idOfRole);
+        }
+        if(role != null && role.equals(User.DefaultRole.MONITORING) && !user.getFunctions().equals(functionSelector.getMonitoringFunctions(session))) {
             return true;
         }
-        if(role.equals(User.DefaultRole.ADMIN) && !user.getFunctions().equals(functionSelector.getAdminFunctions(session))) {
+        if(role != null && role.equals(User.DefaultRole.ADMIN) && !user.getFunctions().equals(functionSelector.getAdminFunctions(session))) {
             return true;
         }
-        if(role.equals(User.DefaultRole.ADMIN_SECURITY) && !user.getFunctions().equals(functionSelector.getSecurityAdminFunctions(session))) {
+        if(role != null && role.equals(User.DefaultRole.ADMIN_SECURITY) && !user.getFunctions().equals(functionSelector.getSecurityAdminFunctions(session))) {
             return true;
         }
-        if (User.DefaultRole.DEFAULT.equals(role) && !user.getFunctions().equals(functionSelector.getSelected(session))) {
+        if (role != null && User.DefaultRole.DEFAULT.equals(role) && !user.getFunctions().equals(functionSelector.getSelected(session))) {
             return true;
         }
-        if (role.equals(User.DefaultRole.CARD_OPERATOR) && !user.getFunctions().equals(functionSelector.getCardOperatorFunctions(session))) {
+        if (role != null && role.equals(User.DefaultRole.CARD_OPERATOR) && !user.getFunctions().equals(functionSelector.getCardOperatorFunctions(session))) {
             return true;
         }
 
@@ -441,31 +454,37 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
 
     public Boolean getIsDefault(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DEFAULT);
     }
 
     public Boolean getIsSecurityAdmin(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.ADMIN_SECURITY);
     }
 
     public Boolean getIsSupplier() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.SUPPLIER);
     }
 
     public Boolean getIsSupplierReport() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.SUPPLIER_REPORT);
     }
 
     public Boolean getIsCardOperator() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.CARD_OPERATOR);
     }
 
     public Boolean getIsDirector(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DIRECTOR);
     }
@@ -608,7 +627,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return items;
     } */
 
-    private void fill(Session session, User user) throws Exception {
+    protected void fill(Session session, User user) throws Exception {
         this.contragentItems.clear();
         this.orgItems.clear();
         this.orgItemsCanceled.clear();
@@ -666,7 +685,11 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
         setOrganizationsFilterInfo(organizationItems);
 
-        this.idOfRole = user.getIdOfRole();
+        if (user.getIdOfRole() < User.DefaultRole.values().length) {
+            this.idOfRole = user.getIdOfRole();
+        } else {
+            this.idOfRole = UserRoleEnumTypeMenu.OFFSET.intValue() + user.getIdOfGroup().intValue();
+        }
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
         this.blockedUntilDate = user.getBlockedUntilDate();
@@ -742,9 +765,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     }
 
     protected static class OrgItem {
-        private final Long idOfOrg;
-        private final String shortName;
-        private final Boolean mainBuilding;
+        protected final Long idOfOrg;
+        protected final String shortName;
+        protected final Boolean mainBuilding;
 
         OrgItem(Org org) {
             this(org.getIdOfOrg(), org.getShortName(), org.isMainBuilding());

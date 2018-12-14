@@ -116,7 +116,9 @@ public class MainPage implements Serializable {
     private Long selectedIdOfCard;
     private Long selectedIdOfRule;
     private Long selectedIdOfUser;
+    private Long selectedIdOfUserGroup;
     private Long removedIdOfUser;
+    private Long removedIdOfUserGroup;
     private Long selectedIdOfReportJob;
     private Long removedIdOfReportJob;
     private Long selectedIdOfPos;
@@ -163,11 +165,17 @@ public class MainPage implements Serializable {
 
     // User manipulation
     private final BasicWorkspacePage userGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage userGroupGroupPage = new BasicWorkspacePage();
     private final UserListPage userListPage = new UserListPage();
+    private final UserGroupListPage userGroupListPage = new UserGroupListPage();
     private final SelectedUserGroupPage selectedUserGroupPage = new SelectedUserGroupPage();
+    private final SelectedUserGroupPage selectedUserGroupGroupPage = new SelectedUserGroupPage();
     private final UserViewPage userViewPage = new UserViewPage();
+    private final UserGroupViewPage userGroupViewPage = new UserGroupViewPage();
     private final UserEditPage userEditPage = new UserEditPage();
+    private final UserGroupEditPage userGroupEditPage = new UserGroupEditPage();
     private final UserCreatePage userCreatePage = new UserCreatePage();
+    private final UserGroupCreatePage userGroupCreatePage = new UserGroupCreatePage();
 
     private final OptionsSecurityPage optionsSecurityPage = new OptionsSecurityPage();
     private final OptionsSecurityClientPage optionsSecurityClientPage = new OptionsSecurityClientPage();
@@ -675,8 +683,18 @@ public class MainPage implements Serializable {
         return userGroupPage;
     }
 
+    public BasicWorkspacePage getUserGroupGroupPage() {
+        return userGroupGroupPage;
+    }
+
     public Object showUserGroupPage() {
         currentWorkspacePage = userGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showUserGroupGroupPage() {
+        currentWorkspacePage = userGroupGroupPage;
         updateSelectedMainMenu();
         return null;
     }
@@ -742,6 +760,10 @@ public class MainPage implements Serializable {
         return userListPage;
     }
 
+    public UserGroupListPage getUserGroupListPage() {
+        return userGroupListPage;
+    }
+
     public Object showJournalBalancesReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -804,6 +826,31 @@ public class MainPage implements Serializable {
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = userListPage;
+        } catch (Exception e) {
+            logger.error("Failed to fill user list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showUserGroupListPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            userGroupListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = userGroupListPage;
         } catch (Exception e) {
             logger.error("Failed to fill user list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -891,7 +938,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object clearUserListPageFilter() {
+    public Object removeUser(Long idOfUserRemoved, Long idOfUserSelected, SelectedUserGroupPage groupPage, UserListPage listPage) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -900,38 +947,12 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            userListPage.getUserFilter().clear();
-            userListPage.fill(persistenceSession);
+            listPage.removeUser(persistenceSession, idOfUserRemoved);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to clear filter for user list page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(), null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
-        return null;
-    }
-
-    public Object removeUser() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            userListPage.removeUser(persistenceSession, removedIdOfUser);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            if (removedIdOfUser.equals(selectedIdOfUser)) {
-                selectedIdOfUser = null;
-                selectedUserGroupPage.hideMenuGroup();
+            if (idOfUserRemoved.equals(idOfUserSelected)) {
+                idOfUserSelected = null;
+                groupPage.hideMenuGroup();
             }
         } catch (Exception e) {
             logger.error("Failed to remove user", e);
@@ -943,6 +964,14 @@ public class MainPage implements Serializable {
             HibernateUtils.close(persistenceSession, logger);
         }
         return null;
+    }
+
+    public Object removeUser() {
+        return removeUser(removedIdOfUser, selectedIdOfUser, selectedUserGroupPage, userListPage);
+    }
+
+    public Object removeUserGroup() {
+        return removeUser(removedIdOfUserGroup, selectedIdOfUserGroup, selectedUserGroupGroupPage, userGroupListPage);
     }
 
     public Long getSelectedIdOfUser() {
@@ -965,7 +994,7 @@ public class MainPage implements Serializable {
         return selectedUserGroupPage;
     }
 
-    public Object showSelectedUserGroupPage() {
+    public Object showSelectedUserGroupPage(SelectedUserGroupPage page) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -974,7 +1003,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
+            page.fill(persistenceSession, selectedIdOfUser);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = selectedUserGroupPage;
@@ -990,11 +1019,19 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showSelectedUserGroupPage() {
+        return showSelectedUserGroupPage(selectedUserGroupPage);
+    }
+
+    public Object showSelectedUserGroupGroupPage() {
+        return showSelectedUserGroupPage(selectedUserGroupGroupPage);
+    }
+
     public UserViewPage getUserViewPage() {
         return userViewPage;
     }
 
-    public Object showUserViewPage() {
+    public Object showUserViewPage(SelectedUserGroupPage groupPage, UserViewPage viewPage, Long id) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -1003,12 +1040,12 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
-            userViewPage.fill(persistenceSession, selectedIdOfUser);
+            groupPage.fill(persistenceSession, id);
+            viewPage.fill(persistenceSession, id);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            selectedUserGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = userViewPage;
+            groupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = viewPage;
         } catch (Exception e) {
             logger.error("Failed to fill user view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1021,6 +1058,14 @@ public class MainPage implements Serializable {
         }
         updateSelectedMainMenu();
         return null;
+    }
+
+    public Object showUserViewPage() {
+        return showUserViewPage(selectedUserGroupPage, userViewPage, selectedIdOfUser);
+    }
+
+    public Object showUserGroupViewPage() {
+        return showUserViewPage(selectedUserGroupGroupPage, userGroupViewPage, selectedIdOfUserGroup);
     }
 
     public UserEditPage getUserEditPage() {
@@ -1039,7 +1084,7 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object showUserEditPage() {
+    public Object showUserEditPage(SelectedUserGroupPage groupPage, UserEditPage editPage, Long id) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -1048,12 +1093,12 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
-            userEditPage.fill(persistenceSession, selectedIdOfUser);
+            groupPage.fill(persistenceSession, id);
+            editPage.fill(persistenceSession, id);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            selectedUserGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = userEditPage;
+            groupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = editPage;
         } catch (Exception e) {
             logger.error("Failed to fill user edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1068,7 +1113,15 @@ public class MainPage implements Serializable {
         return null;
     }
 
-    public Object updateUser() {
+    public Object showUserEditPage() {
+        return showUserEditPage(selectedUserGroupPage, userEditPage, selectedIdOfUser);
+    }
+
+    public Object showUserGroupEditPage() {
+        return showUserEditPage(selectedUserGroupGroupPage, userGroupEditPage, selectedIdOfUserGroup);
+    }
+
+    public Object updateUser(UserEditPage editPage, SelectedUserGroupPage groupPage, Long idOfUser) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -1077,16 +1130,16 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            userEditPage.updateUser(persistenceSession, selectedIdOfUser);
-            selectedUserGroupPage.fill(persistenceSession, selectedIdOfUser);
+            editPage.updateUser(persistenceSession, idOfUser);
+            groupPage.fill(persistenceSession, idOfUser);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные пользователя обновлены успешно", null));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные обновлены успешно", null));
         } catch (Exception e) {
             logger.error("Failed to update user", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при изменении данных пользователя: " + e.getMessage(), null));
+                    "Ошибка при изменении данных: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1096,11 +1149,31 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object updateUser() {
+        return updateUser(userEditPage, selectedUserGroupPage, selectedIdOfUser);
+    }
+
+    public Object updateUserGroup() {
+        return updateUser(userGroupEditPage, selectedUserGroupGroupPage, selectedIdOfUserGroup);
+    }
+
     public UserCreatePage getUserCreatePage() {
         return userCreatePage;
     }
 
+    public UserGroupCreatePage getUserGroupCreatePage() {
+        return userGroupCreatePage;
+    }
+
     public Object showUserCreatePage() {
+        return showGivenPage(userCreatePage);
+    }
+
+    public Object showUserGroupCreatePage() {
+        return showGivenPage(userGroupCreatePage);
+    }
+
+    private Object showGivenPage(BasicWorkspacePage page) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -1109,19 +1182,17 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            userCreatePage.fill(persistenceSession);
+            page.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            currentWorkspacePage = userCreatePage;
+            currentWorkspacePage = page;
         } catch (Exception e) {
             logger.error("Failed to show user create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы создания пользователя: " + e.getMessage(), null));
+                    "Ошибка при подготовке страницы: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         updateSelectedMainMenu();
         return null;
@@ -10434,5 +10505,33 @@ public class MainPage implements Serializable {
 
     public void setUserFilterOfSelectUserListSelectPage(String userFilterOfSelectUserListSelectPage) {
         this.userFilterOfSelectUserListSelectPage = userFilterOfSelectUserListSelectPage;
+    }
+
+    public SelectedUserGroupPage getSelectedUserGroupGroupPage() {
+        return selectedUserGroupGroupPage;
+    }
+
+    public UserGroupViewPage getUserGroupViewPage() {
+        return userGroupViewPage;
+    }
+
+    public UserGroupEditPage getUserGroupEditPage() {
+        return userGroupEditPage;
+    }
+
+    public Long getSelectedIdOfUserGroup() {
+        return selectedIdOfUserGroup;
+    }
+
+    public void setSelectedIdOfUserGroup(Long selectedIdOfUserGroup) {
+        this.selectedIdOfUserGroup = selectedIdOfUserGroup;
+    }
+
+    public Long getRemovedIdOfUserGroup() {
+        return removedIdOfUserGroup;
+    }
+
+    public void setRemovedIdOfUserGroup(Long removedIdOfUserGroup) {
+        this.removedIdOfUserGroup = removedIdOfUserGroup;
     }
 }

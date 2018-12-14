@@ -22,10 +22,7 @@ import org.jboss.as.web.security.SecurityContextAssociationValve;
 
 import javax.faces.model.SelectItem;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,36 +34,36 @@ import java.util.Map;
 public class UserCreatePage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList,
         OrgMainBuildingListSelectPage.CompleteHandler {
 
-    private Long idOfUser;
-    private String userName;
-    private String plainPassword;
-    private String plainPasswordConfirmation;
-    private String phone;
-    private String email;
-    private List<ContragentItem> contragentItems = new ArrayList<ContragentItem> ();
-    private final FunctionSelector functionSelector = new FunctionSelector();
-    private Integer idOfRole;
-    private String roleName;
-    private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
+    protected Long idOfUser;
+    protected String userName;
+    protected String plainPassword;
+    protected String plainPasswordConfirmation;
+    protected String phone;
+    protected String email;
+    protected List<ContragentItem> contragentItems = new ArrayList<ContragentItem> ();
+    protected final FunctionSelector functionSelector = new FunctionSelector();
+    protected Integer idOfRole;
+    protected String roleName;
+    protected final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
     //private Contragent currentContragent;
-    private String contragentFilter = "Не выбрано";
-    private String contragentIds;
-    private SelectItem[] regions;
-    private String region;
-    private String orgFilter = "Не выбрано";
-    private String orgFilterCanceled = "Не выбрано";
-    private String organizationsFilter = "Не выбрано";
-    private UserNotificationType selectOrgType;
-    private String orgIds;
-    private Boolean needChangePassword;
+    protected String contragentFilter = "Не выбрано";
+    protected String contragentIds;
+    protected SelectItem[] regions;
+    protected String region;
+    protected String orgFilter = "Не выбрано";
+    protected String orgFilterCanceled = "Не выбрано";
+    protected String organizationsFilter = "Не выбрано";
+    protected UserNotificationType selectOrgType;
+    protected String orgIds;
+    protected Boolean needChangePassword;
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
     protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
     protected List<OrgItem> organizationItems = new ArrayList<OrgItem>(0);
-    private Long organizationId;
-    private String firstName;
-    private String surname;
-    private String secondName;
-    private String department;
+    protected Long organizationId;
+    protected String firstName;
+    protected String surname;
+    protected String secondName;
+    protected String department;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -263,7 +260,10 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             }
             User user = new User(userName, plainPassword, phone, new Date());
             user.setEmail(email);
-            User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+            User.DefaultRole role = null;
+            if (idOfRole > UserRoleEnumTypeMenu.OFFSET) {
+                role = User.DefaultRole.parse(idOfRole);
+            }
             user.setIdOfRole(idOfRole);
             user.setBlocked(false);
             user.setPasswordDate(new Date(System.currentTimeMillis()));
@@ -272,7 +272,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setPerson(person);
                 session.save(person);
             }
-            if (User.DefaultRole.DEFAULT.equals(role)) {
+            if (role != null && User.DefaultRole.DEFAULT.equals(role)) {
                 if (StringUtils.isEmpty(roleName)) {
                     this.printError("Заполните имя роли");
                     throw new Exception("Не заполнено имя роли");
@@ -280,7 +280,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                 user.setRoleName(this.roleName);
                 user.setFunctions(functionSelector.getSelected(session));
             }
-            if (role.equals(User.DefaultRole.SUPPLIER)) {
+            if (role != null && role.equals(User.DefaultRole.SUPPLIER)) {
                 user.setFunctions(functionSelector.getSupplierFunctions(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
@@ -288,7 +288,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
                     throw new RuntimeException("Contragent list is empty");
                 }
             }
-            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+            if (role != null && role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
                 user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setRoleName(role.toString());
                 if (contragentItems.isEmpty()) {
@@ -312,26 +312,33 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             } else {
                 user.setRegion(null);
             }
-            if(role.equals(User.DefaultRole.MONITORING)){
+            if(role != null && role.equals(User.DefaultRole.MONITORING)){
                 user.setFunctions(functionSelector.getMonitoringFunctions(session));
                 user.setRoleName(role.toString());
             }
-            if(role.equals(User.DefaultRole.ADMIN)){
+            if(role != null && role.equals(User.DefaultRole.ADMIN)){
                 user.setFunctions(functionSelector.getAdminFunctions(session));
                 user.setRoleName(role.toString());
             }
-            if(role.equals(User.DefaultRole.ADMIN_SECURITY)){
+            if(role != null && role.equals(User.DefaultRole.ADMIN_SECURITY)){
                 user.setFunctions(functionSelector.getSecurityAdminFunctions(session));
                 user.setRoleName(role.toString());
             }
-            if (role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
+            if (role != null && role.equals(User.DefaultRole.SUPPLIER_REPORT)) {
                 user.setFunctions(functionSelector.getSupplierReportFunctions(session));
                 user.setRoleName(role.toString());
             }
-            if (role.equals(User.DefaultRole.CARD_OPERATOR)){
+            if (role != null && role.equals(User.DefaultRole.CARD_OPERATOR)){
                 user.setFunctions(functionSelector.getCardOperatorFunctions(session));
                 user.setRoleName(role.toString());
                 user.setDepartment(department);
+            }
+            if (role == null) {
+                User userRole = (User)session.get(User.class, idOfRole - UserRoleEnumTypeMenu.OFFSET);
+                Set<Function> set = new HashSet<Function>(userRole.getFunctions());
+                user.setFunctions(set);
+                user.setRoleName(userRole.getUserName());
+                user.setIdOfGroup(userRole.getIdOfUser());
             }
             user.setNeedChangePassword(needChangePassword);
             session.save(user);
@@ -392,31 +399,37 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     }
 
     public Boolean getIsDefault(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DEFAULT);
     }
 
     public Boolean getIsSecurityAdmin(){
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.ADMIN_SECURITY);
     }
 
     public Boolean getIsSupplier() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.SUPPLIER);
     }
 
     public Boolean getIsSupplierReport() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.SUPPLIER_REPORT);
     }
 
     public Boolean getIsCardOperator() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.CARD_OPERATOR);
     }
 
     public Boolean getIsDirector() {
+        if (idOfRole > UserRoleEnumTypeMenu.OFFSET) return false;
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DIRECTOR);
     }
@@ -498,7 +511,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     }
 
     protected static class OrgItem {
-        private final Long idOfOrg;
+        protected final Long idOfOrg;
         private final String shortName;
         private final Boolean mainBuilding;
 

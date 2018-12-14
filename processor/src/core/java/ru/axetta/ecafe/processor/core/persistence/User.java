@@ -132,15 +132,31 @@ public class User {
         this.department = department;
     }
 
+    public Long getIdOfGroup() {
+        return idOfGroup;
+    }
+
+    public void setIdOfGroup(Long idOfGroup) {
+        this.idOfGroup = idOfGroup;
+    }
+
+    public Boolean getIsGroup() {
+        return isGroup;
+    }
+
+    public void setIsGroup(Boolean group) {
+        isGroup = group;
+    }
+
     public enum DefaultRole{
-        DEFAULT(0,"настраиваемая роль"),
-        ADMIN(1,"администратор"),
-        SUPPLIER(2,"поставщик питания"),
-        MONITORING(3,"мониторинг"),
-        ADMIN_SECURITY(4, "администратор ИБ"),
-        SUPPLIER_REPORT(5, "отчетность поставщика питания"),
-        CARD_OPERATOR(6, "оператор по картам"),
-        DIRECTOR(7, "директор школы");
+        DEFAULT(0,"1. Настраиваемая роль"),
+        ADMIN(1,"2. Администратор"),
+        SUPPLIER(2,"3. Поставщик питания"),
+        MONITORING(3,"4. Мониторинг"),
+        ADMIN_SECURITY(4, "5. Администратор ИБ"),
+        SUPPLIER_REPORT(5, "6. Отчетность поставщика питания"),
+        CARD_OPERATOR(6, "7. Оператор по картам"),
+        DIRECTOR(7, "8. Директор школы");
 
 
         private Integer identification;
@@ -203,6 +219,8 @@ public class User {
     private Integer attemptNumber;
     private Person person;
     private String department;
+    private Long idOfGroup;
+    private Boolean isGroup;
 
     public String getRoleName() {
         return roleName;
@@ -243,6 +261,18 @@ public class User {
         this.updateTime = updateTime;
         this.deletedState = false;
         this.person = null;
+        this.isGroup = false;
+    }
+
+    public User(String userName) throws Exception {
+        this.userName = userName;
+        this.cypheredPassword = encryptPassword("dsfkjsd4783249#($*&Q)(*#sdfs-=212%^(#@HHSO@@#Upi");
+        this.phone = "";
+        this.idOfRole = DefaultRole.DEFAULT.getIdentification();
+        this.updateTime = new Date();
+        this.deletedState = false;
+        this.person = null;
+        this.isGroup = true;
     }
 
     public Long getIdOfUser() {

@@ -551,4 +551,10 @@ public class DAOReadonlyService {
     public Long getIdOfPacket(Long idOfOrg) {
         return entityManager.find(OrgSync.class, idOfOrg).getIdOfPacket();
     }
+
+    public List<User> getUserRoles() {
+        return entityManager
+                .createQuery("select u from User u where u.isGroup = true and u.deletedState = false order by u.userName")
+                .getResultList();
+    }
 }

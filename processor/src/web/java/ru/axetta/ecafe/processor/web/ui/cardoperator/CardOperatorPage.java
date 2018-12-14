@@ -428,7 +428,7 @@ public class CardOperatorPage extends BasicWorkspacePage implements ClientSelect
         return null;
     }
 
-    private void fill(Session persistenceSession) throws Exception {
+    public void fill(Session persistenceSession) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         if (client != null) {
             Client cl = DAOReadonlyService.getInstance().findClientById(client.getIdOfClient());

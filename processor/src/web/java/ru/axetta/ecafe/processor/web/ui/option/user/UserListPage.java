@@ -11,14 +11,19 @@ import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.jboss.as.web.security.SecurityContextAssociationValve;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -31,6 +36,8 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class UserListPage extends BasicWorkspacePage {
+
+    protected static final Logger logger = LoggerFactory.getLogger(UserListPage.class);
 
     public static class Item {
 
@@ -110,15 +117,16 @@ public class UserListPage extends BasicWorkspacePage {
         }
     }
 
-    private List<Item> items = Collections.emptyList();
+    protected List<Item> items = Collections.emptyList();
 
-    private final UserFilter userFilter = new UserFilter();
+    protected final UserFilter userFilter = new UserFilter();
 
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
         Criteria criteria = session.createCriteria(User.class);
         userFilter.addFilter(criteria);
         criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.eq("isGroup", false));
         List users = criteria.list();
         for (Object object : users) {
             User user = (User) object;
@@ -150,6 +158,32 @@ public class UserListPage extends BasicWorkspacePage {
                 .createUserEditRecord(SecurityJournalAuthenticate.EventType.DELETE_USER, request.getRemoteAddr(), currentUserName,
                         currentUser, true, null, String.format("Удален пользователь %s", user.getUserName()));
         DAOService.getInstance().writeAuthJournalRecord(record);
+    }
+
+    public Object clearUserListPageFilter() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            getUserFilter().clear();
+            fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to clear filter for user list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
     }
 
     public UserFilter getUserFilter() {

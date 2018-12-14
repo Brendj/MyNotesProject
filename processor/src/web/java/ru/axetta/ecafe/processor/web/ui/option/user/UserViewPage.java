@@ -20,15 +20,15 @@ import java.util.Date;
  */
 public class UserViewPage extends BasicWorkspacePage {
 
-    private Long idOfUser;
-    private String userName;
-    private String phone;
-    private String email;
-    private String firstName;
-    private String surname;
-    private String secondName;
-    private Date updateTime;
-    private final FunctionViewer functionViewer = new FunctionViewer();
+    protected Long idOfUser;
+    protected String userName;
+    protected String phone;
+    protected String email;
+    protected String firstName;
+    protected String surname;
+    protected String secondName;
+    protected Date updateTime;
+    protected final FunctionViewer functionViewer = new FunctionViewer();
 
     public String getPageFilename() {
         return "option/user/view";
