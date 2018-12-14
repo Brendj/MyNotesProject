@@ -19,4 +19,7 @@ create index cf_visitreqresolutionhist_IdOfRequest_IdOfOrgRegistry_idx on cf_vis
 
 alter table cf_orgregistrychange_item add column state integer;
 
+ALTER TABLE cf_registrychange ALTER COLUMN checkbenefits DROP NOT NULL;
+ALTER TABLE cf_registrychange_employee ALTER COLUMN checkbenefits DROP NOT NULL;
+
 --! ФИНАЛИЗИРОВАН 12.12.2018, НЕ МЕНЯТЬ
