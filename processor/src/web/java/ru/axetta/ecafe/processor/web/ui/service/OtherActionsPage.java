@@ -503,6 +503,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void runDTSZNDiscountsReviseServicePart2() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).runTaskPart2();
+            printMessage("Сверка (этап 2) завершена");
+        } catch (Exception e) {
+            getLogger().error("Error discounts revise service: ", e);
+            printError("Во время сверки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
     public String getOrgsForSpbCardsUidUpdate() {
         return orgsForSpbCardsUidUpdate;
     }

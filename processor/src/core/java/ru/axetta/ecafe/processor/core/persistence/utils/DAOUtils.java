@@ -3972,4 +3972,9 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("groupName", groupName));
         return (GroupNamesToOrgs) criteria.uniqueResult();
     }
+
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfo(Session session) {
+        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo");
+        return query.list();
+    }
 }

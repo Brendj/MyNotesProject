@@ -22,6 +22,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -131,11 +133,15 @@ public class DTSZNDiscountsReviseService {
                 NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList);
 
                 session = runtimeContext.createPersistenceSession();
+                session.setFlushMode(FlushMode.COMMIT);
                 transaction = session.beginTransaction();
 
                 clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
                 for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
+                    if (null == transaction || !transaction.isActive()) {
+                        transaction = session.beginTransaction();
+                    }
 
                     Client client = DAOUtils.findClientByGuid(session, item.getPerson().getId());
                     if (null == client) {
@@ -158,7 +164,7 @@ public class DTSZNDiscountsReviseService {
                                 item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDiscountVersion);
                         session.save(discountInfo);
                         if (!clientIdList.contains(client.getIdOfClient())) {
-                            clientIdList.add(discountInfo.getIdOfClientDTISZNDiscountInfo());
+                            clientIdList.add(discountInfo.getClient().getIdOfClient());
                         }
                     } else {
                         if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
@@ -177,7 +183,7 @@ public class DTSZNDiscountsReviseService {
                                 discountInfo.setVersion(clientDTISZNDiscountVersion);
                                 session.merge(discountInfo);
                                 if (!clientIdList.contains(client.getIdOfClient())) {
-                                    clientIdList.add(discountInfo.getIdOfClientDTISZNDiscountInfo());
+                                    clientIdList.add(discountInfo.getClient().getIdOfClient());
                                 }
                             }
                         } else {
@@ -193,14 +199,14 @@ public class DTSZNDiscountsReviseService {
                                     clientDTISZNDiscountVersion);
                             session.save(discountInfo);
                             if (!clientIdList.contains(client.getIdOfClient())) {
-                                clientIdList.add(discountInfo.getIdOfClientDTISZNDiscountInfo());
+                                clientIdList.add(discountInfo.getClient().getIdOfClient());
                             }
                         }
                     }
 
+                    transaction.commit();
+                    transaction = null;
                 }
-                transaction.commit();
-                transaction = null;
 
                 pagesCount = response.getPagesCount();
             } catch (HttpException e) {
@@ -217,16 +223,25 @@ public class DTSZNDiscountsReviseService {
 
         try {
             session = runtimeContext.createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
 
             Integer counter = 1;
             for (Long idOfClient : clientIdList) {
-                transaction = session.beginTransaction();
+                if (null == transaction || !transaction.isActive()) {
+                    transaction = session.beginTransaction();
+                }
                 Client client = (Client) session.load(Client.class, idOfClient);
                 List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
                 processDiscounts(session, client, clientInfoList, service);
+                if (0 == counter%1000) {
+                    transaction.commit();
+                    transaction = null;
+                }
+                logger.info(String.format("Updating discounts for clients: %d/%d done", counter++, clientIdList.size()));
+            }
+            if (null != transaction && transaction.isActive()) {
                 transaction.commit();
                 transaction = null;
-                logger.info(String.format("Updating discounts for clients: %d/%d done", counter++, clientIdList.size()));
             }
 
         } catch (Exception e) {
@@ -431,7 +446,7 @@ public class DTSZNDiscountsReviseService {
             service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
                     application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
-            Boolean isOk = false;
+            Boolean isOk = true;
 
             for (ClientDtisznDiscountInfo info : infoList) {
                 isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
@@ -472,7 +487,7 @@ public class DTSZNDiscountsReviseService {
         Date fireTime = new Date();
 
         String oldDiscounts = client.getCategoriesDiscounts();
-        String newDiscounts = oldDiscounts;
+        String newDiscounts;
 
         String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
         List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
@@ -485,6 +500,7 @@ public class DTSZNDiscountsReviseService {
             }
         }
 
+        List<Long> discountCodes = new ArrayList<Long>(categoryDiscountsList);
         for (ClientDtisznDiscountInfo info : infoList) {
             if (!info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !CalendarUtils
                     .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())) {
@@ -495,12 +511,12 @@ public class DTSZNDiscountsReviseService {
                     .getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
 
             if (null != categoryDiscountDSZN) {
-                if (!categoryDiscountsList.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
-                    newDiscounts += oldDiscounts + (oldDiscounts.isEmpty() ? "":",")
-                            + categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount();
+                if (!discountCodes.contains(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount())) {
+                    discountCodes.add(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount());
                 }
             }
         }
+        newDiscounts = StringUtils.join(discountCodes, ",");
         Integer oldDiscountMode = client.getDiscountMode();
         Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
@@ -513,10 +529,59 @@ public class DTSZNDiscountsReviseService {
             discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
             session.save(discountChangeHistory);
             client.setLastDiscountsUpdate(new Date());
-            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+            try {
+                client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+            } catch (Exception e) {
+                logger.error(String.format("Unexpected discount code for clien with id=%d", client.getIdOfClient()));
+            }
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             client.setClientRegistryVersion(clientRegistryVersion);
         }
         updateApplicationForFood(session, service, client, infoList);
+    }
+
+    public void runTaskPart2() throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+
+            List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+
+            Integer clientCounter = 1;
+
+            for (Long idOfClient : clientList) {
+                if (null == transaction || !transaction.isActive()) {
+                    transaction = session.beginTransaction();
+                }
+
+                Client client = (Client) session.load(Client.class, idOfClient);
+                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+                if (!clientInfoList.isEmpty()) {
+                    processDiscounts(session, client, clientInfoList, service);
+                }
+                if (0 == clientCounter%1000) {
+                    transaction.commit();
+                    transaction = null;
+                }
+                logger.info(String.format("Updating discounts for clients: client %d/%d",
+                        clientCounter++, clientList.size()));
+            }
+
+            if (null != transaction && transaction.isActive()) {
+                transaction.commit();
+                transaction = null;
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in update discounts", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 }
