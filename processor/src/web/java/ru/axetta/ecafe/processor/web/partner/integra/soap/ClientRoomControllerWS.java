@@ -2849,6 +2849,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
             //   menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
@@ -2949,6 +2950,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
 
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
+            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
             //menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
