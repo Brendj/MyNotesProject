@@ -121,7 +121,6 @@ public class DTSZNDiscountsReviseService {
         Long currentPage = 1L;
         Long pagesCount = 0L;
         Long clientDTISZNDiscountVersion;
-        List<Long> clientIdList = new ArrayList<Long>();
 
         Session session = null;
         Transaction transaction = null;
@@ -138,6 +137,7 @@ public class DTSZNDiscountsReviseService {
 
                 clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
+                Integer counter = 1;
                 for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
                     if (null == transaction || !transaction.isActive()) {
                         transaction = session.beginTransaction();
@@ -163,9 +163,6 @@ public class DTSZNDiscountsReviseService {
                                 item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                                 item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDiscountVersion);
                         session.save(discountInfo);
-                        if (!clientIdList.contains(client.getIdOfClient())) {
-                            clientIdList.add(discountInfo.getClient().getIdOfClient());
-                        }
                     } else {
                         if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
                             // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
@@ -181,15 +178,14 @@ public class DTSZNDiscountsReviseService {
                             }
                             if (wasModified) {
                                 discountInfo.setVersion(clientDTISZNDiscountVersion);
+                                discountInfo.setLastUpdate(new Date());
                                 session.merge(discountInfo);
-                                if (!clientIdList.contains(client.getIdOfClient())) {
-                                    clientIdList.add(discountInfo.getClient().getIdOfClient());
-                                }
                             }
                         } else {
                             // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
                             // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
                             discountInfo.setArchived(true);
+                            discountInfo.setLastUpdate(new Date());
                             session.merge(discountInfo);
 
                             discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
@@ -198,12 +194,14 @@ public class DTSZNDiscountsReviseService {
                                     item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
                                     clientDTISZNDiscountVersion);
                             session.save(discountInfo);
-                            if (!clientIdList.contains(client.getIdOfClient())) {
-                                clientIdList.add(discountInfo.getClient().getIdOfClient());
-                            }
                         }
                     }
-
+                    if (0 == counter%1000) {
+                        transaction.commit();
+                        transaction = null;
+                    }
+                }
+                if (null != transaction && transaction.isActive()) {
                     transaction.commit();
                     transaction = null;
                 }
@@ -224,6 +222,10 @@ public class DTSZNDiscountsReviseService {
         try {
             session = runtimeContext.createPersistenceSession();
             session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+            // ид клиентов, у которых в пред день поменялись или добавлялись льготы
+            List<Long> clientIdList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoByLastUpdate(session,
+                    CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1)));
 
             Integer counter = 1;
             for (Long idOfClient : clientIdList) {
@@ -450,7 +452,7 @@ public class DTSZNDiscountsReviseService {
 
             for (ClientDtisznDiscountInfo info : infoList) {
                 isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                        .betweenOrEqualDate(info.getDateStart(), info.getDateEnd(), fireTime);
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd());
             }
 
             if (isOk) {

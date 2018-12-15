@@ -3977,4 +3977,10 @@ public class DAOUtils {
         Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo");
         return query.list();
     }
+
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoByLastUpdate(Session session, Date lastUpdate) {
+        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo where lastUpdate>=:lastUpdate");
+        query.setParameter("lastUpdate", lastUpdate);
+        return query.list();
+    }
 }
