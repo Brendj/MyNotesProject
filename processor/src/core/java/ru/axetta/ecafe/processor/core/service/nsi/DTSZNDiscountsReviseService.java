@@ -25,6 +25,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -46,6 +48,8 @@ public class DTSZNDiscountsReviseService {
 
     public static final String MODE = "ecafe.processor.revise.dtszn.mode.test";
     public static final String DEFAULT_MODE = "true";
+
+    public static final String CRON_EXPRESSION_PROPERTY = "ecafe.processor.revise.dtszn.cronExpression";
 
     public static final String SERVICE_URL = "ecafe.processor.revise.dtszn.url";
     public static final String DEFAULT_TEST_SERVICE_URL = "https://10.89.95.142:38080/api/public/v2";
@@ -69,7 +73,7 @@ public class DTSZNDiscountsReviseService {
 
     public static final String DSZN_CODE_FILTER = "24,41,48,52,56,66";
 
-    Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
+    private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
 
     private URL serviceURL;
     private String username;
@@ -124,8 +128,6 @@ public class DTSZNDiscountsReviseService {
 
         Session session = null;
         Transaction transaction = null;
-
-        ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
         do {
             try {
@@ -219,39 +221,7 @@ public class DTSZNDiscountsReviseService {
             logger.info(String.format("Revise 2.0: %d/%d pages was processed", currentPage, pagesCount));
         } while (currentPage++ < pagesCount);
 
-        try {
-            session = runtimeContext.createPersistenceSession();
-            session.setFlushMode(FlushMode.COMMIT);
-            transaction = session.beginTransaction();
-            // ид клиентов, у которых в пред день поменялись или добавлялись льготы
-            List<Long> clientIdList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoByLastUpdate(session,
-                    CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1)));
-
-            Integer counter = 1;
-            for (Long idOfClient : clientIdList) {
-                if (null == transaction || !transaction.isActive()) {
-                    transaction = session.beginTransaction();
-                }
-                Client client = (Client) session.load(Client.class, idOfClient);
-                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
-                processDiscounts(session, client, clientInfoList, service);
-                if (0 == counter%1000) {
-                    transaction.commit();
-                    transaction = null;
-                }
-                logger.info(String.format("Updating discounts for clients: %d/%d done", counter++, clientIdList.size()));
-            }
-            if (null != transaction && transaction.isActive()) {
-                transaction.commit();
-                transaction = null;
-            }
-
-        } catch (Exception e) {
-            logger.error("Error in update discounts", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
+        runTaskPart2();
     }
 
     private URL getServiceUrl() throws Exception {
@@ -433,27 +403,38 @@ public class DTSZNDiscountsReviseService {
     public void updateApplicationForFood(Session session, ETPMVService service, Client client, List<ClientDtisznDiscountInfo> infoList/*, ClientDtisznDiscountInfo discountInfo*/) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
         if (null == application ||
-                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)))
+                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)) ||
+                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
             return;
+        }
 
         Date fireTime = new Date();
 
         try {
-            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
-            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-            //7705
-            application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
-                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
-                    applicationVersion, historyVersion);
-            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
-                    application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
-
             Boolean isOk = true;
 
             for (ClientDtisznDiscountInfo info : infoList) {
                 isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
                         .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd());
             }
+
+            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
+            if (application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
+                if (!isOk) {
+                    application.setArchived(true);
+                    session.update(application);
+                }
+                return;
+            }
+
+            //7705
+            application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
+                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
+                    applicationVersion, historyVersion);
+            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                    application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
             if (isOk) {
                 //1052
@@ -494,11 +475,35 @@ public class DTSZNDiscountsReviseService {
         String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
         List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
         for (String discount : discounts) {
+            Long discountCode;
             try {
-                categoryDiscountsList.add(Long.parseLong(discount));
+                discountCode = Long.parseLong(discount);
             } catch (NumberFormatException e) {
                 logger.warn(String.format("Unable to parse discount code=%s for client with id=%d",
                         discount, client.getIdOfClient()));
+                continue;
+            }
+
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils.getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
+            if (categoryDiscountDSZNList.isEmpty()) {
+                continue;
+            }
+            List<Long> discountCodeList = new ArrayList<Long>();
+            for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscountDSZNList) {
+                discountCodeList.add(categoryDiscountDSZN.getCode().longValue());
+            }
+
+            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, discountCodeList);
+
+            Boolean isOk = true;
+
+            for (ClientDtisznDiscountInfo info : clientDtisznDiscountInfoList) {
+                isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd());
+            }
+
+            if (isOk) {
+                categoryDiscountsList.add(discountCode);
             }
         }
 
@@ -534,7 +539,7 @@ public class DTSZNDiscountsReviseService {
             try {
                 client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
             } catch (Exception e) {
-                logger.error(String.format("Unexpected discount code for clien with id=%d", client.getIdOfClient()));
+                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
             }
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             client.setClientRegistryVersion(clientRegistryVersion);
@@ -584,6 +589,44 @@ public class DTSZNDiscountsReviseService {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void scheduleSync() throws Exception {
+        String syncSchedule = RuntimeContext.getInstance().getConfigProperties().getProperty(CRON_EXPRESSION_PROPERTY, "");
+        if (syncSchedule.equals("")) {
+            return;
+        }
+        try {
+            logger.info("Scheduling revise 2.0 service job: " + syncSchedule);
+            JobDetail job = new JobDetail("DTSZNDiscountsReviseService", Scheduler.DEFAULT_GROUP, DTSZNDiscountsReviseServiceJob.class);
+
+            SchedulerFactory sfb = new StdSchedulerFactory();
+            Scheduler scheduler = sfb.getScheduler();
+            if (!syncSchedule.equals("")) {
+                CronTrigger trigger = new CronTrigger("DTSZNDiscountsReviseService", Scheduler.DEFAULT_GROUP);
+                trigger.setCronExpression(syncSchedule);
+                if (scheduler.getTrigger("DTSZNDiscountsReviseService", Scheduler.DEFAULT_GROUP) != null) {
+                    scheduler.deleteJob("DTSZNDiscountsReviseService", Scheduler.DEFAULT_GROUP);
+                }
+                scheduler.scheduleJob(job, trigger);
+            }
+            scheduler.start();
+        } catch(Exception e) {
+            logger.error("Failed to schedule revise 2.0 service job:", e);
+        }
+    }
+
+    public static class DTSZNDiscountsReviseServiceJob implements Job {
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            try {
+                RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).run();
+            } catch (JobExecutionException e) {
+                throw e;
+            } catch (Exception e) {
+                logger.error("Failed to run revise 2.0 service job:", e);
+            }
         }
     }
 }

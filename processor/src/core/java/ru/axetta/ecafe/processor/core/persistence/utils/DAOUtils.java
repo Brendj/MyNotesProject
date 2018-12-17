@@ -3978,9 +3978,16 @@ public class DAOUtils {
         return query.list();
     }
 
-    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoByLastUpdate(Session session, Date lastUpdate) {
-        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo where lastUpdate>=:lastUpdate");
-        query.setParameter("lastUpdate", lastUpdate);
-        return query.list();
+    public static List<CategoryDiscountDSZN> getCategoryDiscountDSZNByCategoryDiscountCode(Session session, Long idOfCategoryDiscount) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
+        return criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoByClientAndCode(Session session, Client client, List<Long> codeList) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.in("dtisznCode", codeList));
+        return criteria.list();
     }
 }
