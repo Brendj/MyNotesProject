@@ -486,6 +486,7 @@ public class DTSZNDiscountsReviseService {
 
             List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils.getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
             if (categoryDiscountDSZNList.isEmpty()) {
+                categoryDiscountsList.add(discountCode);
                 continue;
             }
             List<Long> discountCodeList = new ArrayList<Long>();
