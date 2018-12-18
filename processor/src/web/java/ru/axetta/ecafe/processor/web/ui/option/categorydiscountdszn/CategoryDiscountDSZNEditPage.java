@@ -9,11 +9,13 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategorySelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,49 +52,63 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         }
     }
 
-    @Transactional
     public Object save() {
-        if (categoryDiscount != null && (categoryDiscount.getIdOfCategoryDiscount() < 0
-                || !categoryDiscount.getCategoryType().equals(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT))) {
-            printError("Неверная категория льготы ИСПП");
-            return null;
-        }
-        Integer DSZNcode;
-        if(code.isEmpty()){
-            printError("Неверный код ДТиСЗН");
-            return null;
-        }else{
-            try {
-                DSZNcode = Integer.parseInt(code);
-            }catch (Exception e){
-                printError("Неверный код ДТиСЗН");
-                return null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            if (categoryDiscount != null && (categoryDiscount.getIdOfCategoryDiscount() < 0 || !categoryDiscount.getCategoryType().equals(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT))) {
+                throw new Exception("Неверная категория льготы ИСПП");
             }
-        }
-        if(StringUtils.isEmpty(description)) {
-            printError("Добавьте описание льготы ДТиСЗН");
-            return null;
-        }
-        Long etpCodeLong;
-        if (ETPCode.isEmpty()) {
-            etpCodeLong = null;
-        } else {
-            try {
-                etpCodeLong = Long.parseLong(ETPCode);
-            } catch (Exception e) {
-                printError("Неверный код ЕТП");
-                return null;
+            Integer DSZNcode;
+            if (code.isEmpty()) {
+                throw new Exception("Неверный код ДТиСЗН");
+            } else {
+                try {
+                    DSZNcode = Integer.parseInt(code);
+                } catch (NumberFormatException e) {
+                    throw new Exception("Неверный код ДТиСЗН");
+                }
             }
+            if (StringUtils.isEmpty(description)) {
+                throw new Exception("Добавьте описание льготы ДТиСЗН");
+            }
+            Long etpCodeLong;
+            if (ETPCode.isEmpty()) {
+                etpCodeLong = null;
+            } else {
+                try {
+                    etpCodeLong = Long.parseLong(ETPCode);
+                } catch (NumberFormatException e) {
+                    throw new Exception("Неверный код ЕТП");
+                }
+            }
+            Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
+
+            CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                    .findCategoryDiscountDSZNById(entityManager, idOfCategoryDiscountDSZN);
+
+            categoryDiscountDSZN.setDescription(description);
+            categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
+            categoryDiscountDSZN.setVersion(nextVersion);
+            categoryDiscountDSZN.setETPCode(etpCodeLong);
+            categoryDiscountDSZN.setCode(DSZNcode);
+
+            persistenceSession.update(categoryDiscountDSZN);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            printMessage("Данные обновлены.");
+        } catch (Exception e){
+            getLogger().error("Error saving changes", e);
+            printError(e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
         }
-        Long nextVersion = DAOUtils.nextVersionByCategoryDiscountDSZN(entityManager);
-        CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNById(entityManager, idOfCategoryDiscountDSZN);
-        categoryDiscountDSZN.setDescription(description);
-        categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
-        categoryDiscountDSZN.setVersion(nextVersion);
-        categoryDiscountDSZN.setETPCode(etpCodeLong);
-        categoryDiscountDSZN.setCode(DSZNcode);
-        entityManager.persist(categoryDiscountDSZN);
-        printMessage("Данные обновлены.");
         return null;
     }
 
