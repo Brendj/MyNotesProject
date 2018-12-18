@@ -403,7 +403,7 @@ public class DTSZNDiscountsReviseService {
     public void updateApplicationForFood(Session session, ETPMVService service, Client client, List<ClientDtisznDiscountInfo> infoList/*, ClientDtisznDiscountInfo discountInfo*/) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
         if (null == application ||
-                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)) ||
+                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)) &&
                 !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
             return;
         }
@@ -411,11 +411,15 @@ public class DTSZNDiscountsReviseService {
         Date fireTime = new Date();
 
         try {
-            Boolean isOk = true;
+            Boolean isOk = false;
 
             for (ClientDtisznDiscountInfo info : infoList) {
-                isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd());
+                if (application.getDtisznCode().equals(info.getDtisznCode()) &&
+                        info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) &&
+                        CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())) {
+                    isOk = true;
+                    break;
+                }
             }
 
             Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
@@ -503,7 +507,7 @@ public class DTSZNDiscountsReviseService {
                         .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd());
             }
 
-            if (isOk) {
+            if (!clientDtisznDiscountInfoList.isEmpty() && isOk) {
                 categoryDiscountsList.add(discountCode);
             }
         }
