@@ -69,6 +69,7 @@ public class CardSignDataBasicPage extends BasicWorkspacePage {
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(0, CardSign.CARDSIGN_SCRIPT_TYPE));
         items.add(new SelectItem(1, CardSign.CARDSIGN_ECDSA_TYPE));
+        items.add(new SelectItem(2, CardSign.CARDSIGN_GOST2012_TYPE));
         return items;
     }
 

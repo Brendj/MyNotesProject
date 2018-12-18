@@ -16,7 +16,8 @@ public class CardSign {
 
     public static final String CARDSIGN_SCRIPT_TYPE = "Scrypt";
     public static final String CARDSIGN_ECDSA_TYPE = "ECDSA";
-    public static final String[] CARDSIGN_TYPES = {CARDSIGN_SCRIPT_TYPE, CARDSIGN_ECDSA_TYPE};
+    public static final String CARDSIGN_GOST2012_TYPE = "Gost2012_256";
+    public static final String[] CARDSIGN_TYPES = {CARDSIGN_SCRIPT_TYPE, CARDSIGN_ECDSA_TYPE, CARDSIGN_GOST2012_TYPE};
 
     public CardSign() {
 

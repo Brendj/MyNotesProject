@@ -27,6 +27,7 @@ public class CardSignItem {
     public static String getSignTypeFromString(String sType) {
         if (sType.equals(CardSign.CARDSIGN_SCRIPT_TYPE)) return "0";
         if (sType.equals(CardSign.CARDSIGN_ECDSA_TYPE)) return "1";
+        if (sType.equals(CardSign.CARDSIGN_GOST2012_TYPE)) return "2";
         return "0";
     }
 
