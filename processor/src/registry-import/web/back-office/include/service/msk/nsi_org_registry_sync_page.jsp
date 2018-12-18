@@ -196,13 +196,13 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
-                                <h:outputText value="Льгота ДСЗН" />
+                                <h:outputText value="Льгота ДТиСЗН" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.benefitDSZN}" />
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
-                                <h:outputText value="Предыдущая Льгота ДСЗН" />
+                                <h:outputText value="Предыдущая Льгота ДТиСЗН" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.benefitDSZNFrom}" />
                         </rich:column>

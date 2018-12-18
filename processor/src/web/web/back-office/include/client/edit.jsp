@@ -176,7 +176,7 @@
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Льготы ДСЗН" styleClass="output-text" />
+    <h:outputText escape="true" value="Льготы ДТиСЗН" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
     <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientEditPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"

@@ -32,7 +32,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     }
 
     private int idOfCategoryDiscountDSZN;
-    private Integer code;
+    private String code;
     private String description;
     private CategoryDiscount categoryDiscount;
     private String categoryName;
@@ -57,8 +57,20 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
             printError("Неверная категория льготы ИСПП");
             return null;
         }
+        Integer DSZNcode;
+        if(code.isEmpty()){
+            printError("Неверный код ДТиСЗН");
+            return null;
+        }else{
+            try {
+                DSZNcode = Integer.parseInt(code);
+            }catch (Exception e){
+                printError("Неверный код ДТиСЗН");
+                return null;
+            }
+        }
         if(StringUtils.isEmpty(description)) {
-            printError("Добавьте описание льготы ДСЗН");
+            printError("Добавьте описание льготы ДТиСЗН");
             return null;
         }
         Long etpCodeLong;
@@ -78,6 +90,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
         categoryDiscountDSZN.setVersion(nextVersion);
         categoryDiscountDSZN.setETPCode(etpCodeLong);
+        categoryDiscountDSZN.setCode(DSZNcode);
         entityManager.persist(categoryDiscountDSZN);
         printMessage("Данные обновлены.");
         return null;
@@ -91,7 +104,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     @Transactional
     public void reload() {
         CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNById(entityManager, idOfCategoryDiscountDSZN);
-        this.code = categoryDiscountDSZN.getCode();
+        this.code = categoryDiscountDSZN.getCode().toString();
         this.description = categoryDiscountDSZN.getDescription();
         this.categoryDiscount = categoryDiscountDSZN.getCategoryDiscount();
         if(this.categoryDiscount != null) {
@@ -122,11 +135,11 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
         this.idOfCategoryDiscountDSZN = idOfCategoryDiscountDSZN;
     }
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
@@ -155,7 +168,7 @@ public class CategoryDiscountDSZNEditPage extends BasicWorkspacePage implements 
     }
 
     public String getEntityName() {
-        return "Льгота ДСЗН " + code;
+        return "Льгота ДТиСЗН " + code;
     }
 
     public String getETPCode() {

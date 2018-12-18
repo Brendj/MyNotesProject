@@ -16,14 +16,14 @@
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" style="text-align:right">
             <f:facet name="header">
-                <h:outputText escape="true" value="Код льготы ДСЗН" />
+                <h:outputText escape="true" value="Код льготы ДТиСЗН" />
             </f:facet>
             <h:outputText escape="true" value="#{item.code}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Описание льготы ДСЗН" />
+                    <h:outputText styleClass="output-text" escape="true" value="Описание льготы ДТиСЗН" />
                 </h:panelGroup>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{item.description}" />

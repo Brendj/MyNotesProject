@@ -39,7 +39,7 @@
         <rich:column headerClass="center-aligned-column" style="text-align:left" width="300">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Льготы ДСЗН" />
+                    <h:outputText styleClass="output-text" escape="true" value="Льготы ДТиСЗН" />
                 </h:panelGroup>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{item.categoriesDSZN}" />
@@ -85,13 +85,19 @@
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="categoryTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                               stepControls="auto" boundaryControls="hide">
+            <rich:datascroller for="categoryTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                               stepControls="auto">
+                <f:facet name="first">
+                    <h:graphicImage value="/images/16x16/first.png" />
+                </f:facet>
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
                 </f:facet>
                 <f:facet name="next">
                     <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+                <f:facet name="last">
+                    <h:graphicImage value="/images/16x16/last.png" />
                 </f:facet>
             </rich:datascroller>
         </f:facet>

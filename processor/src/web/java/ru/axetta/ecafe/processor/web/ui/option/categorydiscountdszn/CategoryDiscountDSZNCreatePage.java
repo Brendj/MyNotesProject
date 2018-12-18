@@ -62,11 +62,11 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
             return null;
         }
         if(StringUtils.isEmpty(description)) {
-            printError("Добавьте описание льготы ДСЗН");
+            printError("Добавьте описание льготы ДТиСЗН");
             return null;
         }
         if(code == null || code < 0) {
-            printError("Неверный код ДСЗН");
+            printError("Неверный код ДТиСЗН");
             return null;
         }
         try {
@@ -74,7 +74,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
             CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.findCategoryDiscountDSZNByCode(entityManager, code);
             if(categoryDiscountDSZN != null) {
                 if(!categoryDiscountDSZN.getDeleted()) {
-                    printError("Категория льготы ДСЗН с таким кодом уже существует");
+                    printError("Категория льготы ДТиСЗН с таким кодом уже существует");
                     return null;
                 }
                 categoryDiscountDSZN.setDeleted(false);

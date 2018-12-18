@@ -15,9 +15,9 @@
 <%--@elvariable id="categoryDiscountDSZNCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscountdszn.CategoryDiscountDSZNCreatePage"--%>
 <h:panelGrid id="categoryDSZNCreatePanel" binding="#{categoryDiscountDSZNCreatePage.pageComponent}"
              styleClass="borderless-grid" columns="2">
-    <h:outputText escape="true" value="Код льготы ДСЗН" styleClass="output-text required-field" />
+    <h:outputText escape="true" value="Код льготы ДТиСЗН" styleClass="output-text required-field" />
     <h:inputText value="#{categoryDiscountDSZNCreatePage.code}" maxlength="32" styleClass="input-text" />
-    <h:outputText escape="true" value="Описание льготы ДСЗН" styleClass="output-text" />
+    <h:outputText escape="true" value="Описание льготы ДТиСЗН" styleClass="output-text" />
     <h:inputTextarea value="#{categoryDiscountDSZNCreatePage.description}" styleClass="input-text" rows="5" cols="64" />
     <h:outputText escape="true" value="Код льготы ЕТП" styleClass="output-text" />
     <h:inputText value="#{categoryDiscountDSZNCreatePage.ETPCode}" maxlength="32" styleClass="input-text" />

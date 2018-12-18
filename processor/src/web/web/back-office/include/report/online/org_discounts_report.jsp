@@ -41,7 +41,7 @@
         <h:selectBooleanCheckbox value="#{mainPage.orgDiscountsReportPage.showPayComplex}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 
-        <h:outputText escape="false" value="Показать льготы ДСЗН" styleClass="output-text" />
+        <h:outputText escape="false" value="Показать льготы ДТиСЗН" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.orgDiscountsReportPage.showDSZN}" styleClass="output-text">
         </h:selectBooleanCheckbox>
 

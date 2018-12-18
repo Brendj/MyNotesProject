@@ -143,7 +143,7 @@
     <h:outputText  escape="true" value="Категории" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientViewPage.categoriesDiscounts}" escape="true" styleClass="output-text" />
 
-    <h:outputText escape="true" value="Льготы ДСЗН" styleClass="output-text" />
+    <h:outputText escape="true" value="Льготы ДТиСЗН" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientViewPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
     <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" styleClass="output-text" />
     <h:outputText value="#{mainPage.clientViewPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"

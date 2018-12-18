@@ -61,7 +61,7 @@ public class CategoryDiscountDSZNListPage extends BasicWorkspacePage implements 
             persistenceTransaction = null;
             reload();
         } catch (Exception e) {
-            logAndPrintMessage("Ошибка при удалении категории ДСЗН ", e);
+            logAndPrintMessage("Ошибка при удалении категории ДТиСЗН ", e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(persistenceSession, getLogger());
