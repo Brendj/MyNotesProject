@@ -29,7 +29,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -39,7 +39,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -454,11 +453,12 @@ public class DTSZNDiscountsReviseService {
                 return;
             }
 
+            long currentTime = System.currentTimeMillis();
             //7705
             application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                     new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
                     applicationVersion, historyVersion);
-            service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+            service.sendStatusAsync(currentTime - service.getPauseValue(), application.getServiceNumber(),
                     application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
             if (isOk) {
@@ -466,21 +466,21 @@ public class DTSZNDiscountsReviseService {
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
                         applicationVersion, historyVersion);
-                service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                service.sendStatusAsync(currentTime, application.getServiceNumber(),
                         application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
                 //1075
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
                         historyVersion);
-                service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                service.sendStatusAsync(currentTime + service.getPauseValue(), application.getServiceNumber(),
                         application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
             } else {
                 //1080.3
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
                         applicationVersion, historyVersion);
-                service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
+                service.sendStatusAsync(currentTime, application.getServiceNumber(),
                         application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
             }
         } catch (Exception e) {
