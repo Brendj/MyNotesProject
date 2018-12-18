@@ -60,6 +60,15 @@ public class PreorderMenuDetail {
         if (doDelete) this.amount = 0;
         this.state = state;
         this.preorderComplex.setLastUpdate(new Date());
+        boolean allDeleted = true;
+        for (PreorderMenuDetail pmd : this.preorderComplex.getPreorderMenuDetails()) {
+            if (!pmd.getDeletedState()) allDeleted = false;
+        }
+        if (allDeleted) {
+            this.preorderComplex.setState(state);
+            this.preorderComplex.setDeletedState(true);
+            this.preorderComplex.setAmount(0);
+        }
     }
 
     public Long getIdOfPreorderMenuDetail() {
