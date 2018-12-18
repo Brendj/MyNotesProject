@@ -119,12 +119,12 @@ public class ApplicationForFoodProcessingService {
 
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, resumeStatus, applicationVersion,
                             historyVersion);
-                    service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                    service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                             application.getStatus().getApplicationForFoodState(),
                             application.getStatus().getDeclineReason());
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
                             historyVersion);
-                    service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                    service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                             application.getStatus().getApplicationForFoodState(),
                             application.getStatus().getDeclineReason());
                 }

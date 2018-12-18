@@ -55,12 +55,12 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             applicationForFood = DAOUtils
                                     .createApplicationForFood(session, client, item.getDtisznCode(), item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(), item.getServNumber(), ApplicationForFoodCreatorType.PORTAL);
-                            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), item.getServNumber(),
+                            service.sendStatusAsync(System.currentTimeMillis(), item.getServNumber(),
                                     applicationForFood.getStatus().getApplicationForFoodState(),
                                     applicationForFood.getStatus().getDeclineReason());
                             applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumber(session, item.getServNumber(),
                                     new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
-                            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), item.getServNumber(),
+                            service.sendStatusAsync(System.currentTimeMillis(), item.getServNumber(),
                                     applicationForFood.getStatus().getApplicationForFoodState(),
                                     applicationForFood.getStatus().getDeclineReason());
                         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 client, item.getDtisznCode(), status, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(),
                                 item.getApplicantSurname(), nextVersion, nextHistoryVersion);
                         if (!oldStatus.equals(status)) {
-                            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(),
+                            service.sendStatusAsync(System.currentTimeMillis(),
                                     item.getServNumber(), status.getApplicationForFoodState(), status.getDeclineReason());
                         }
                     }

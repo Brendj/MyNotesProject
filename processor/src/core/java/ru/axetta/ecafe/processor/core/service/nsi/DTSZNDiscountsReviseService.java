@@ -64,6 +64,9 @@ public class DTSZNDiscountsReviseService {
     public static final String PAGE_SIZE = "ecafe.processor.revise.dtszn.page.size";
     public static final Long DEFAULT_PAGE_SIZE = 300L;
 
+    public static final String MAX_RECORDS_PER_TRANSACTION = "ecafe.processor.revise.dtszn.records";
+    public static final Long DEFAULT_MAX_RECORDS_PER_TRANSACTION = 1000L;
+
     public static final String OPERATOR_EQUAL = "=";
     public static final String OPERATOR_IN = "in";
     public static final String OPERATOR_LIKE = "like";
@@ -79,6 +82,7 @@ public class DTSZNDiscountsReviseService {
     private String username;
     private String password;
     private Boolean isTest;
+    private Long maxRecords;
 
     public boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -97,6 +101,7 @@ public class DTSZNDiscountsReviseService {
             serviceURL = getServiceUrl();
             username = getUserName();
             password = getPassword();
+            maxRecords = getMaxRecords();
         } catch (Exception e) {
             logger.error("DTSZNDiscountsReviseService initialization error", e);
         }
@@ -198,7 +203,7 @@ public class DTSZNDiscountsReviseService {
                             session.save(discountInfo);
                         }
                     }
-                    if (0 == counter%1000) {
+                    if (0 == counter%maxRecords) {
                         transaction.commit();
                         transaction = null;
                     }
@@ -262,6 +267,22 @@ public class DTSZNDiscountsReviseService {
     private String getPassword() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         return runtimeContext.getConfigProperties().getProperty(PASSWORD, DEFAULT_PASSWORD);
+    }
+
+    private Long getMaxRecords() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String recordsString = runtimeContext.getConfigProperties().getProperty(MAX_RECORDS_PER_TRANSACTION);
+        if (null == recordsString) {
+            return DEFAULT_MAX_RECORDS_PER_TRANSACTION;
+        }
+        Long records;
+        try {
+            records = Long.parseLong(recordsString);
+        } catch (NumberFormatException e) {
+            logger.error(String.format("Unable to parse max records value from config: %s", recordsString));
+            return DEFAULT_MAX_RECORDS_PER_TRANSACTION;
+        }
+        return records;
     }
 
     private NSIRequest buildDictBenefitRequest(Long page, Long pageSize) {
@@ -437,7 +458,7 @@ public class DTSZNDiscountsReviseService {
             application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                     new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
                     applicationVersion, historyVersion);
-            service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+            service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                     application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
             if (isOk) {
@@ -445,21 +466,21 @@ public class DTSZNDiscountsReviseService {
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
                         applicationVersion, historyVersion);
-                service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                         application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
 
                 //1075
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
                         historyVersion);
-                service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                         application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
             } else {
                 //1080.3
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
                         applicationVersion, historyVersion);
-                service.sendStatusAsync(System.currentTimeMillis() - service.getPauseValue(), application.getServiceNumber(),
+                service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                         application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
             }
         } catch (Exception e) {
@@ -575,7 +596,7 @@ public class DTSZNDiscountsReviseService {
                 if (!clientInfoList.isEmpty()) {
                     processDiscounts(session, client, clientInfoList, service);
                 }
-                if (0 == clientCounter%1000) {
+                if (0 == clientCounter%maxRecords) {
                     transaction.commit();
                     transaction = null;
                 }
