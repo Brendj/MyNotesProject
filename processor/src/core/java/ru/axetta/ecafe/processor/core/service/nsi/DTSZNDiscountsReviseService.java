@@ -66,6 +66,9 @@ public class DTSZNDiscountsReviseService {
     public static final String MAX_RECORDS_PER_TRANSACTION = "ecafe.processor.revise.dtszn.records";
     public static final Long DEFAULT_MAX_RECORDS_PER_TRANSACTION = 1000L;
 
+    public static final String DISABLE_OU_FILTER_PROPERTY = "ecafe.processor.revise.dtszn.disableOUFilter";
+    public static final Boolean DEFAULT_DISABLE_OU_FILTER = true;
+
     public static final String OPERATOR_EQUAL = "=";
     public static final String OPERATOR_IN = "in";
     public static final String OPERATOR_LIKE = "like";
@@ -76,12 +79,14 @@ public class DTSZNDiscountsReviseService {
     public static final String DSZN_CODE_FILTER = "24,41,48,52,56,66";
 
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
+    private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
 
     private URL serviceURL;
     private String username;
     private String password;
     private Boolean isTest;
     private Long maxRecords;
+    private Boolean disableOUFilter;
 
     public boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -101,6 +106,7 @@ public class DTSZNDiscountsReviseService {
             username = getUserName();
             password = getPassword();
             maxRecords = getMaxRecords();
+            disableOUFilter = getDisableOuFilter();
         } catch (Exception e) {
             logger.error("DTSZNDiscountsReviseService initialization error", e);
         }
@@ -284,6 +290,15 @@ public class DTSZNDiscountsReviseService {
         return records;
     }
 
+    private Boolean getDisableOuFilter() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String disableOUFilterString = runtimeContext.getConfigProperties().getProperty(DISABLE_OU_FILTER_PROPERTY);
+        if (null == disableOUFilterString) {
+            return DEFAULT_DISABLE_OU_FILTER;
+        }
+        return Boolean.parseBoolean(disableOUFilterString);
+    }
+
     private NSIRequest buildDictBenefitRequest(Long page, Long pageSize) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
         paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false));
@@ -293,8 +308,10 @@ public class DTSZNDiscountsReviseService {
 
     private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
-        paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
-                OPERATOR_EQUAL, "ОУ", false));
+        if (!disableOUFilter) {
+            paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
+                    OPERATOR_EQUAL, "ОУ", false));
+        }
         paramList.add(new NSIRequestParam("benefit-form/entity-id", OPERATOR_IN,
                 StringUtils.join(entityIdList, ","), false));
         paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false ));
@@ -320,13 +337,18 @@ public class DTSZNDiscountsReviseService {
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
+            long timeTaken = new Date().getTime() - date.getTime();
             logger.info(
                     String.format("loadBenefitsDictionary(page=%d, pageSize=%d loaded with status %d by %d msec", page,
-                            pageSize, status, new Date().getTime() - date.getTime()));
+                            pageSize, status, timeTaken));
+
+            String responseBody = method.getResponseBodyAsString();
+            reviseLogger.logResponse(method, responseBody, status, timeTaken);
+
             if (HttpStatus.OK.value() != status) {
                 throw new Exception("Unable to get data from NSI");
             }
-            return readDataFromResponse(method, NSIBenefitDictionaryResponse.class);
+            return readDataFromResponse(responseBody, NSIBenefitDictionaryResponse.class);
         } catch (ConnectException e) {
             throw e;
         } catch (Exception e) {
@@ -351,12 +373,17 @@ public class DTSZNDiscountsReviseService {
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
+            long timeTaken = new Date().getTime() - date.getTime();
             logger.info(String.format("loadPersonBenefits(page=%d, pageSize=%d loaded with status %d by %d msec", page,
-                    pageSize, status, new Date().getTime() - date.getTime()));
+                    pageSize, status, timeTaken));
+
+            String responseBody = method.getResponseBodyAsString();
+            reviseLogger.logResponse(method, responseBody, status, timeTaken);
+
             if (HttpStatus.OK.value() != status) {
                 throw new Exception("Unable to get data from NSI");
             }
-            return readDataFromResponse(method, NSIPersonBenefitResponse.class);
+            return readDataFromResponse(responseBody, NSIPersonBenefitResponse.class);
 
         } catch (ConnectException e) {
             throw e;
@@ -382,11 +409,12 @@ public class DTSZNDiscountsReviseService {
                 "application/json",
                 "UTF-8");
         method.setRequestEntity(requestEntity);
+        reviseLogger.logRequest(method);
     }
 
-    private <T> T readDataFromResponse(EntityEnclosingMethod method, Class<T> clazz) throws Exception {
+    private <T> T readDataFromResponse(String responseBody, Class<T> clazz) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(method.getResponseBodyAsString(), clazz);
+        return objectMapper.readValue(responseBody, clazz);
     }
 
     private List<String> loadEntityIdList(Long pageSize) throws ConnectException {
