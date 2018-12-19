@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.UUID;
 
 @Component
 @Scope("session")
@@ -56,6 +57,7 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
 
     @Transactional
     public Object onSave(){
+        String guid;
         if (categoryDiscount != null && (categoryDiscount.getIdOfCategoryDiscount() < 0
                 || !categoryDiscount.getCategoryType().equals(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT))) {
             printError("Неверная категория льготы ИСПП");
@@ -82,7 +84,8 @@ public class CategoryDiscountDSZNCreatePage extends BasicWorkspacePage implement
                 categoryDiscountDSZN.setCategoryDiscount(categoryDiscount);
                 categoryDiscountDSZN.setVersion(nextVersion);
             } else {
-                categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, ETPCode, nextVersion);
+                guid = UUID.randomUUID().toString();
+                categoryDiscountDSZN = new CategoryDiscountDSZN(code, description, categoryDiscount, ETPCode, nextVersion, guid);
             }
             entityManager.persist(categoryDiscountDSZN);
             code = null;

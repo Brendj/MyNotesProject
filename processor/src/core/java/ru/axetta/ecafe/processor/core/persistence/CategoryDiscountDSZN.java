@@ -24,13 +24,14 @@ public class CategoryDiscountDSZN {
     }
 
     public CategoryDiscountDSZN(Integer code, String description, CategoryDiscount categoryDiscount, Long ETPCode,
-            Long version) {
+            Long version, String guid) {
         this.code = code;
         this.description = description;
         this.categoryDiscount = categoryDiscount;
         this.version = version;
         this.deleted = false;
         this.ETPCode = ETPCode;
+        this.guid = guid;
     }
 
     public int getIdOfCategoryDiscountDSZN() {
