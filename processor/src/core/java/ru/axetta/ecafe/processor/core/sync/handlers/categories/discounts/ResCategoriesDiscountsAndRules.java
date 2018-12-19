@@ -454,7 +454,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             element.setAttribute("Name", this.description);
             element.setAttribute("V", Long.toString(this.version));
             element.setAttribute("D", Boolean.toString(this.deleted));
-            element.setAttribute("GUID", this.guid);
+            element.setAttribute("Guid", this.guid);
             return element;
         }
 
