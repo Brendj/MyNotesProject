@@ -407,6 +407,28 @@ public class ETPMVService {
         return PAUSE_IN_MILLIS;
     }
 
+    @Async
+    public void sendStatusesAsync(List<ETPMVScheduledStatus> statusList) throws Exception {
+        for (ETPMVScheduledStatus status : statusList) {
+            sendStatus(status);
+        }
+    }
+
+    public void sendStatus(ETPMVScheduledStatus status) throws Exception {
+        logger.info("Sending status to ETP with ServiceNumber = " + status.getServiceNumber() + ". Status = " + status.getState().getCode());
+        String message = createStatusMessage(status.getServiceNumber(), status.getState(), status.getReason());
+        boolean success = false;
+        try {
+            Thread.sleep(PAUSE_IN_MILLIS);
+            RuntimeContext.getAppContext().getBean(ETPMVClient.class).sendStatus(message);
+            logger.info("Status with ServiceNumber = " + status.getServiceNumber() + " sent to ETP. Status = " + status.getState().getCode());
+            success = true;
+        } catch (Exception e) {
+            logger.error("Error in sendStatus: ", e);
+        }
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null);
+    }
+
     public void scheduleSync() throws Exception {
         String syncSchedule = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.cron", "");
         if (syncSchedule.equals("")) {

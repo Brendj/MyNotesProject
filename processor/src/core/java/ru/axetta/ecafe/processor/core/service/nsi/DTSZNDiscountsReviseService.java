@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service.nsi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -38,6 +39,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component
@@ -481,36 +483,36 @@ public class DTSZNDiscountsReviseService {
                 return;
             }
 
-            long currentTime = System.currentTimeMillis();
+            LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
             //7705
             application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                     new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
                     applicationVersion, historyVersion);
-            service.sendStatusAsync(currentTime - service.getPauseValue(), application.getServiceNumber(),
-                    application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
-
+            statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
+                    application.getStatus().getDeclineReason()));
             if (isOk) {
                 //1052
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
                         applicationVersion, historyVersion);
-                service.sendStatusAsync(currentTime, application.getServiceNumber(),
-                        application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+                statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
+                        application.getStatus().getDeclineReason()));
 
                 //1075
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
                         historyVersion);
-                service.sendStatusAsync(currentTime + service.getPauseValue(), application.getServiceNumber(),
-                        application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+                statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
+                        application.getStatus().getDeclineReason()));
             } else {
                 //1080.3
                 application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
                         new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
                         applicationVersion, historyVersion);
-                service.sendStatusAsync(currentTime, application.getServiceNumber(),
-                        application.getStatus().getApplicationForFoodState(), application.getStatus().getDeclineReason());
+                statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
+                        application.getStatus().getDeclineReason()));
             }
+            service.sendStatusesAsync(statusList);
         } catch (Exception e) {
             logger.error(String.format("Error in updateApplicationForFood: " +
                     "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
