@@ -136,7 +136,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         for (CategoryDiscountDSZN discountDSZN : categoriesDiscountDSZN) {
             CategoryDiscountDSZNItem c = new CategoryDiscountDSZNItem(discountDSZN.getCode(),
                     discountDSZN.getCategoryDiscount() != null ? discountDSZN.getCategoryDiscount().getIdOfCategoryDiscount() : null,
-                    discountDSZN.getDescription(), discountDSZN.getVersion(), discountDSZN.getDeleted());
+                    discountDSZN.getDescription(), discountDSZN.getVersion(), discountDSZN.getDeleted(), discountDSZN.getGuid());
             addDCIDSZN(c);
         }
     }
@@ -415,14 +415,16 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
         private String description;
         private Long version;
         private Boolean deleted;
+        private String guid;
 
         public CategoryDiscountDSZNItem(Integer code, Long categoryId, String description, Long version,
-                Boolean deleted) {
+                Boolean deleted, String guid) {
             this.code = code;
             this.categoryId = categoryId;
             this.description = description;
             this.version = version;
             this.deleted = deleted;
+            this.guid = guid;
         }
 
         public Integer getCode() {
@@ -452,6 +454,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             element.setAttribute("Name", this.description);
             element.setAttribute("V", Long.toString(this.version));
             element.setAttribute("D", Boolean.toString(this.deleted));
+            element.setAttribute("GUID", this.guid);
             return element;
         }
 
@@ -463,6 +466,14 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
                     ", version=" + version +
                     ", deleted=" + deleted +
                     '}';
+        }
+
+        public String getGuid() {
+            return guid;
+        }
+
+        public void setGuid(String guid) {
+            this.guid = guid;
         }
     }
 

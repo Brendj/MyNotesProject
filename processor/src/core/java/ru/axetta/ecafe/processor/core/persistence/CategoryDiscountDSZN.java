@@ -18,6 +18,7 @@ public class CategoryDiscountDSZN {
     private Long version;
     private Boolean deleted;
     private Long ETPCode;
+    private String guid;
 
     public CategoryDiscountDSZN() {
     }
@@ -119,5 +120,13 @@ public class CategoryDiscountDSZN {
                 ", deleted=" + deleted +
                 ", etpCode=" + ETPCode +
                 '}';
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

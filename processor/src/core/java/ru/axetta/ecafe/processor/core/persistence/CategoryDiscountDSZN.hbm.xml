@@ -17,5 +17,6 @@
         <property name="deleted" column="deleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
         <property name="ETPCode" column="etpcode" type="long"/>
+        <property name="guid" column="guid" type="string" length="80" not-null="true" unique="true"/>
     </class>
 </hibernate-mapping>
