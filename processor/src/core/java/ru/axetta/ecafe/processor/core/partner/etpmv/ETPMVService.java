@@ -15,6 +15,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xerces.dom.ElementNSImpl;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -403,5 +405,40 @@ public class ETPMVService {
 
     public int getPauseValue() {
         return PAUSE_IN_MILLIS;
+    }
+
+    public void scheduleSync() throws Exception {
+        String syncSchedule = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.cron", "");
+        if (syncSchedule.equals("")) {
+            return;
+        }
+        try {
+            JobDetail job = new JobDetail("SendToAISContingent", Scheduler.DEFAULT_GROUP, AISContingentServiceJob.class);
+            SchedulerFactory sfb = new StdSchedulerFactory();
+            Scheduler scheduler = sfb.getScheduler();
+            if (!syncSchedule.equals("")) {
+                CronTrigger trigger = new CronTrigger("SendToAISContingent", Scheduler.DEFAULT_GROUP);
+                trigger.setCronExpression(syncSchedule);
+                if (scheduler.getTrigger("SendToAISContingent", Scheduler.DEFAULT_GROUP) != null) {
+                    scheduler.deleteJob("SendToAISContingent", Scheduler.DEFAULT_GROUP);
+                }
+                scheduler.scheduleJob(job, trigger);
+            }
+            scheduler.start();
+        } catch(Exception e) {
+            logger.error("Failed to schedule revise 2.0 service job:", e);
+        }
+    }
+    public static class AISContingentServiceJob implements Job {
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            try {
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendToAISContingent();
+            } catch (JobExecutionException e) {
+                throw e;
+            } catch (Exception e) {
+                logger.error("Failed to send data to AIS Contingent:", e);
+            }
+        }
     }
 }
