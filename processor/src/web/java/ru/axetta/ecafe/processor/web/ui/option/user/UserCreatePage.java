@@ -261,7 +261,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             User user = new User(userName, plainPassword, phone, new Date());
             user.setEmail(email);
             User.DefaultRole role = null;
-            if (idOfRole > UserRoleEnumTypeMenu.OFFSET) {
+            if (idOfRole < UserRoleEnumTypeMenu.OFFSET) {
                 role = User.DefaultRole.parse(idOfRole);
             }
             user.setIdOfRole(idOfRole);

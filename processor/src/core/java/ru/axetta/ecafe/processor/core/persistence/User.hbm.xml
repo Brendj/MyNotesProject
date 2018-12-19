@@ -19,7 +19,7 @@
         <property name="cypheredPassword" column="Password" type="string" length="128" not-null="true"/>
         <property name="phone" column="Phone" type="string" length="32" not-null="true"/>
 
-        <property name="email" column="Email" type="string" length="128" not-null="true"/>
+        <property name="email" column="Email" type="string" length="128"/>
 
         <property name="idOfRole" column="idOfRole" type="integer"/>
         <property name="roleName" column="RoleName" type="string" length="128"/>
