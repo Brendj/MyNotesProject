@@ -117,6 +117,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+        reload();
         printMessage(wereChanges ? "Операция выполнена" : "Нет измененных записей");
     }
 
