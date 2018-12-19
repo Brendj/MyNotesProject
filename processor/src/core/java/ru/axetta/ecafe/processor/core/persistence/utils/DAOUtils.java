@@ -3807,6 +3807,12 @@ public class DAOUtils {
         return version;
     }
 
+    public static List<ApplicationForFood> getApplicationForFoodListByOrgs(Session session, List<Long> idOfOrgs) {
+        Query query = session.createQuery("select a from ApplicationForFood a where a.client.org.idOfOrg in :idOfOrgs order by a.serviceNumber");
+        query.setParameterList("idOfOrgs", idOfOrgs);
+        return query.list();
+    }
+
     public static long nextVersionByApplicationForFoodHistory(Session session){
         long version = 0L;
         Query query = session

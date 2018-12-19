@@ -59,6 +59,7 @@ public class ETPMVService {
     private IsppWebServiceService service;
     private IsppWebService port;
     private BindingProvider bindingProvider;
+    JAXBContext jaxbContext;
 
     @Async
     public void processIncoming(String message) {
@@ -190,7 +191,7 @@ public class ETPMVService {
     }
 
     public void sendStatus(long begin_time, String serviceNumber, ApplicationForFoodState status, ApplicationForFoodDeclineReason reason, String errorMessage) throws Exception {
-        logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber);
+        logger.info("Sending status to ETP with ServiceNumber = " + serviceNumber + ". Status = " + status.getCode());
         String message = createStatusMessage(serviceNumber, status, reason);
         boolean success = false;
         try {
@@ -198,6 +199,7 @@ public class ETPMVService {
                 Thread.sleep(PAUSE_IN_MILLIS - (System.currentTimeMillis() - begin_time)); //пауза между получением заявления и ответом, или между двумя статусами не менее секунды
             }
             RuntimeContext.getAppContext().getBean(ETPMVClient.class).sendStatus(message);
+            logger.info("Status with ServiceNumber = " + serviceNumber + " sent to ETP. Status = " + status.getCode());
             success = true;
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
@@ -244,11 +246,16 @@ public class ETPMVService {
             }
         }
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
+        JAXBContext jaxbContext = getJAXBContextToSendStatus();
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter sw = new StringWriter();
         marshaller.marshal(coordinateStatusMessage, sw);
         return sw.toString();
+    }
+
+    private JAXBContext getJAXBContextToSendStatus() throws Exception {
+        if (jaxbContext == null) jaxbContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
+        return jaxbContext;
     }
 
     private int getTimeZoneOffsetInMinutes() {

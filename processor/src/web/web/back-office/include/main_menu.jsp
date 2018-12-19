@@ -963,6 +963,10 @@
 
     <rich:panelMenuItem id="serviceRNIP" binding="#{mainPage.serviceRNIPPage.mainMenuComponent}"
                         label="РНИП" action="#{mainPage.serviceRNIPPage.show}" reRender="workspaceForm" />
+
+    <%--@elvariable id="applicationForFoodReportPage" type="ru.axetta.ecafe.processor.web.ui.service.ApplicationForFoodReportPage"--%>
+    <rich:panelMenuItem id="serviceApplicationForFoodReport" binding="#{applicationForFoodReportPage.mainMenuComponent}"
+                        label="Заявления на льготное питание" action="#{applicationForFoodReportPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
