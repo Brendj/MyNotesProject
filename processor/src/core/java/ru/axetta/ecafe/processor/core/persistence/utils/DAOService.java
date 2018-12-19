@@ -63,6 +63,13 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<CategoryDiscount> getCategoryDiscountListByCategoryName(String categoryName) {
+        String strQuery = "from CategoryDiscount where lower(categoryName) like lower('%"+  categoryName +"%') order by idOfCategoryDiscount";
+        TypedQuery<CategoryDiscount> q = entityManager
+                .createQuery(strQuery, CategoryDiscount.class);
+        return q.getResultList();
+    }
+
     public List<CategoryDiscountDSZN> getCategoryDiscountDSZNList() {
         TypedQuery<CategoryDiscountDSZN> q = entityManager
                 .createQuery("from CategoryDiscountDSZN where deleted = false order by code", CategoryDiscountDSZN.class);

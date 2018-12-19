@@ -40,6 +40,8 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         return items;
     }
 
+    private String categoryNameFilter = "";
+
     public String getPageFilename() {
         return "option/categorydiscount/list";
     }
@@ -82,6 +84,36 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         for(CategoryDiscount categoryDiscount : list) {
             items.add(new CategoryDiscountItem(categoryDiscount));
         }
+    }
+
+    public String getCategoryNameFilter() {
+        return categoryNameFilter;
+    }
+
+    public void setCategoryNameFilter(String categoryNameFilter) {
+        this.categoryNameFilter = categoryNameFilter;
+    }
+
+    public Object clear() {
+        categoryNameFilter = "";
+        reload();
+        return null;
+    }
+
+    public Object search() {
+        if(categoryNameFilter.isEmpty()){
+            return null;
+        }
+        List<CategoryDiscount> list = service.getCategoryDiscountListByCategoryName(categoryNameFilter);
+        items = new LinkedList<CategoryDiscountItem>();
+        for(CategoryDiscount categoryDiscount : list) {
+            items.add(new CategoryDiscountItem(categoryDiscount));
+        }
+        return null;
+    }
+
+    public String getStatus() {
+        return categoryNameFilter.isEmpty() ? "Нет" : "Установлен";
     }
 
     public static class CategoryDiscountItem {

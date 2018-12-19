@@ -11,6 +11,20 @@
 <%-- Категории --%>
 <%--@elvariable id="categoryDiscountListPage" type="ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountListPage"--%>
 <h:panelGrid id="categoryListPanel" binding="#{categoryDiscountListPage.pageComponent}" styleClass="borderless-grid">
+    <rich:simpleTogglePanel label="Фильтр (#{categoryDiscountListPage.status})" switchType="client"
+                            eventsQueue="mainFormEventQueue" opened="false" headerClass="filter-panel-header" id="categoryListSimpleTogglePane">
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Наименование" styleClass="output-text" />
+            <h:inputText value="#{categoryDiscountListPage.categoryNameFilter}" maxlength="64"
+                         styleClass="input-text" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <a4j:commandButton value="Применить" action="#{categoryDiscountListPage.search}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
+            <a4j:commandButton value="Очистить" action="#{categoryDiscountListPage.clear}"
+                               reRender="workspaceTogglePanel" styleClass="command-button" />
+        </h:panelGrid>
+    </rich:simpleTogglePanel>
     <rich:dataTable id="categoryTable" value="#{categoryDiscountListPage.items}" var="item" rows="20"
                     columnClasses="left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
