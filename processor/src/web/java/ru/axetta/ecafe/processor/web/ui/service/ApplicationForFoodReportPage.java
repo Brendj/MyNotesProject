@@ -5,12 +5,11 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
-import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
-import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodDeclineReason;
-import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
-import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodStatus;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,10 +38,6 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public void reload() {
-        if (idOfOrgList.size() == 0) {
-            printError("Выберите одну или несколько организаций");
-            return;
-        }
         items.clear();
         Session session = null;
         Transaction transaction = null;
@@ -121,6 +117,20 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         printMessage(wereChanges ? "Операция выполнена" : "Нет измененных записей");
     }
 
+    public String getStatusString(ApplicationForFoodStatus status) {
+        return status.getApplicationForFoodState().getCode().toString()
+                + (status.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED) ? "." + status.getDeclineReason().getCode() : "");
+    }
+
+    public String getBenefitText() {
+        if (currentItem == null) return "";
+        try {
+            return RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDSZNBenefitName(currentItem.getBenefit());
+        } catch (NoResultException e) {
+            return "Льгота не найдена в справочнике по коду";
+        }
+    }
+
     public List<ApplicationForFoodReportItem> getItems() {
         return items;
     }
@@ -146,4 +156,29 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     public void setCurrentItem(ApplicationForFoodReportItem currentItem) {
         this.currentItem = currentItem;
     }
+
+    public List<ApplicationForFoodHistoryReportItem> getHistoryItems() {
+        List<ApplicationForFoodHistoryReportItem> result = new ArrayList<ApplicationForFoodHistoryReportItem>();
+        if (currentItem == null) return result;
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            List<ApplicationForFoodHistory> list = DAOUtils.getHistoryByApplicationForFood(session, currentItem.getApplicationForFood());
+
+            for (ApplicationForFoodHistory history : list) {
+                result.add(new ApplicationForFoodHistoryReportItem(history));
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in get ApplicationForFoodHistory info: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
 }

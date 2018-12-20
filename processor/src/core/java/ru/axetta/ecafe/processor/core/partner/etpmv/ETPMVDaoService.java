@@ -54,7 +54,7 @@ public class ETPMVDaoService {
     }
 
     @Transactional
-    public void saveOutgoingStatus(String messageId, String messageText, Boolean isSent, String errorMessage) {
+    public void saveOutgoingStatus(String messageId, String messageText, Boolean isSent, String errorMessage, ApplicationForFoodStatus status) {
         try {
             EtpOutgoingMessage etpOutgoingMessage = new EtpOutgoingMessage();
             etpOutgoingMessage.setEtpMessageId(messageId);
@@ -64,6 +64,16 @@ public class ETPMVDaoService {
             etpOutgoingMessage.setErrorMessage(errorMessage);
             etpOutgoingMessage.setLastUpdate(new Date());
             entityManager.merge(etpOutgoingMessage);
+            if (isSent) {
+                Query query = entityManager.createQuery("select h from ApplicationForFoodHistory h where h.applicationForFood.serviceNumber = :serviceNumber and status = :status");
+                query.setParameter("serviceNumber", messageId);
+                query.setParameter("status", status);
+                try {
+                    ApplicationForFoodHistory history = (ApplicationForFoodHistory) query.getSingleResult();
+                    history.setSendDate(new Date());
+                    entityManager.merge(history);
+                } catch (Exception ignore) { }
+            }
         } catch (Exception e) {
             logger.error("Error in saving outgoing ETP status: ", e);
         }
@@ -123,6 +133,20 @@ public class ETPMVDaoService {
         query.setParameter("benefit", Long.parseLong(benefit));
         query.setMaxResults(1);
         return new Long((Integer)query.getSingleResult());
+    }
+
+    @Transactional(readOnly = true)
+    public String getDSZNBenefitName(String benefit) {
+        Query query = entityManager.createQuery("select b.description from CategoryDiscountDSZN b where b.code = :benefit");
+        Integer ben;
+        try {
+            ben = Integer.parseInt(benefit);
+        } catch (Exception e) {
+            ben = 0;
+        }
+        query.setParameter("benefit", ben);
+        query.setMaxResults(1);
+        return (String)query.getSingleResult();
     }
 
     @Transactional(readOnly = true)

@@ -206,7 +206,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage);
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(serviceNumber, message, success, errorMessage, new ApplicationForFoodStatus(status, reason));
     }
 
     private void sendToBK(String message) {
@@ -426,7 +426,7 @@ public class ETPMVService {
         } catch (Exception e) {
             logger.error("Error in sendStatus: ", e);
         }
-        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null);
+        RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).saveOutgoingStatus(status.getServiceNumber(), message, success, null, new ApplicationForFoodStatus(status.getState(), status.getReason()));
     }
 
     public void scheduleSync() throws Exception {

@@ -3808,8 +3808,9 @@ public class DAOUtils {
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByOrgs(Session session, List<Long> idOfOrgs) {
-        Query query = session.createQuery("select a from ApplicationForFood a where a.client.org.idOfOrg in :idOfOrgs order by a.serviceNumber");
-        query.setParameterList("idOfOrgs", idOfOrgs);
+        String condition = (idOfOrgs.size() == 0 ? "" : "where a.client.org.idOfOrg in :idOfOrgs");
+        Query query = session.createQuery("select a from ApplicationForFood a " + condition + " order by a.serviceNumber");
+        if (idOfOrgs.size() > 0) query.setParameterList("idOfOrgs", idOfOrgs);
         return query.list();
     }
 
@@ -3822,6 +3823,12 @@ public class DAOUtils {
             version = Long.valueOf(o.toString()) + 1;
         }
         return version;
+    }
+
+    public static List<ApplicationForFoodHistory> getHistoryByApplicationForFood(Session session, ApplicationForFood applicationForFood) {
+        Query query = session.createQuery("select h from ApplicationForFoodHistory h where h.applicationForFood = :app order by h.createdDate");
+        query.setParameter("app", applicationForFood);
+        return query.list();
     }
 
     public static ApplicationForFood findApplicationForFoodByClientIdAndRegDate(Session session, Long idOfClient, Date regDate) {

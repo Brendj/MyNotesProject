@@ -14,8 +14,8 @@ import java.util.List;
 
 public class ApplicationForFoodReportItem {
     private String serviceNumber;
-    private Date createdDate;
-    private ApplicationForFoodStatus applicationForFoodStatus;
+    protected Date createdDate;
+    protected ApplicationForFoodStatus applicationForFoodStatus;
     private Date lastUpdate;
     private Long contractId;
     private String fio;
@@ -26,6 +26,10 @@ public class ApplicationForFoodReportItem {
     private ApplicationForFood applicationForFood;
     private boolean isChanged;
     private List<ApplicationForFoodStatus> statuses;
+
+    public ApplicationForFoodReportItem() {
+
+    }
 
     public ApplicationForFoodReportItem(ApplicationForFood applicationForFood) {
         this.serviceNumber = applicationForFood.getServiceNumber();
@@ -49,11 +53,9 @@ public class ApplicationForFoodReportItem {
     }
 
     public String getStatusTitle() {
-        String code = applicationForFoodStatus.getApplicationForFoodState().getCode().toString();
         String description = applicationForFoodStatus.getApplicationForFoodState().getDescription();
-        String declineReasonCode = applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED) ? "." + applicationForFoodStatus.getDeclineReason().getCode() : "";
         String declineReasonDescription = applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED) ? applicationForFoodStatus.getDeclineReason().getDescription() : "";
-        return code + declineReasonCode + ". " + description + ". " + declineReasonDescription;
+        return description + ". " + declineReasonDescription;
     }
 
     public Boolean getIsPaused() {
@@ -64,6 +66,10 @@ public class ApplicationForFoodReportItem {
     public Boolean getIsResumed() {
         if (!isInoe) return false;
         return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
+    }
+
+    public String getArchieved() {
+        return applicationForFood.getArchived() ? "Да" : "Нет";
     }
 
     public String getServiceNumber() {

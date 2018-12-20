@@ -12,13 +12,51 @@
 <%--@elvariable id="applicationForFoodReportPage" type="ru.axetta.ecafe.processor.web.ui.service.ApplicationForFoodReportPage"--%>
 <h:panelGrid id="applicationForFoodPanelGrid" binding="#{applicationForFoodReportPage.pageComponent}"
              styleClass="borderless-grid">
-    <rich:modalPanel id="applicationForFoodMessagePanel" autosized="true" minWidth="400">
+    <rich:modalPanel id="applicationForFoodMessagePanel" autosized="true" minWidth="500">
         <f:facet name="header">
-            <h:outputText value="История изменений записи" />
+            <h:outputText value="История статусов по заявлению #{applicationForFoodReportPage.currentItem.serviceNumber}" />
         </f:facet>
-        <%--<h:inputTextarea value="#{applicationForFoodReportPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />--%>
+        <rich:dataTable id="applicationForFoodHistoryTable" value="#{applicationForFoodReportPage.historyItems}" var="item" rows="25"
+                        footerClass="data-table-footer">
+            <f:facet name="header">
+                <rich:columnGroup>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Статус" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Расшифровка" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Дата создания" />
+                    </rich:column>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="Отправка в ЕТП" />
+                    </rich:column>
+                </rich:columnGroup>
+            </f:facet>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.applicationForFoodStateString}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.statusTitle}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.createdDate}" styleClass="output-text" converter="timeConverter" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="#{item.sendDate}" styleClass="output-text" converter="timeConverter" />
+            </rich:column>
+        </rich:dataTable>
         <rich:spacer height="20px" />
         <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('applicationForFoodMessagePanel')" style="width: 180px;" ajaxSingle="true" />
+    </rich:modalPanel>
+    <rich:modalPanel id="applicationForFoodMessageBenefitPanel" autosized="true" minWidth="400">
+        <f:facet name="header">
+            <h:outputText value="Льгота #{applicationForFoodReportPage.currentItem.benefit}" />
+        </f:facet>
+        <h:inputTextarea value="#{applicationForFoodReportPage.benefitText}" cols="80" rows="10" readonly="true" />
+        <rich:spacer height="20px" />
+        <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('applicationForFoodMessageBenefitPanel')" style="width: 180px;" ajaxSingle="true" />
     </rich:modalPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
@@ -80,6 +118,12 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Управление" />
                 </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Доп. информация" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Архивное" />
+                </rich:column>
             </rich:columnGroup>
         </f:facet>
         <rich:column headerClass="column-header">
@@ -95,7 +139,10 @@
             <h:outputText escape="true" value="#{item.lastUpdate}" styleClass="output-text" converter="dateConverter" />
         </rich:column>
         <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{item.contractId}" converter="contractIdConverter" />
+                <f:setPropertyActionListener value="#{item.applicationForFood.client.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{item.fio}" styleClass="output-text" />
@@ -107,7 +154,10 @@
             <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.benefit}" styleClass="output-text" />
+            <a4j:commandLink value="#{item.benefit}" styleClass="command-link" reRender="applicationForFoodMessageBenefitPanel" ajaxSingle="true"
+                               oncomplete="Richfaces.showModalPanel('applicationForFoodMessageBenefitPanel');">
+                <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <a4j:commandLink reRender="applicationForFoodTable" rendered="#{item.isPaused}" value="Принесли документы"
@@ -123,6 +173,15 @@
                              action="#{applicationForFoodReportPage.makeDenied()}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <a4j:commandButton value="..." reRender="applicationForFoodHistoryTable,applicationForFoodMessagePanel" ajaxSingle="true"
+                               oncomplete="Richfaces.showModalPanel('applicationForFoodMessagePanel');">
+                <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
+            </a4j:commandButton>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{item.archieved}" styleClass="output-text" />
         </rich:column>
 
         <f:facet name="footer">
