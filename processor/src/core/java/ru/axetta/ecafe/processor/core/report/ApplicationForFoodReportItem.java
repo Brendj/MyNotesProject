@@ -26,6 +26,7 @@ public class ApplicationForFoodReportItem {
     private ApplicationForFood applicationForFood;
     private boolean isChanged;
     private List<ApplicationForFoodStatus> statuses;
+    private String mobile;
 
     public ApplicationForFoodReportItem() {
 
@@ -44,6 +45,7 @@ public class ApplicationForFoodReportItem {
         this.isInoe = applicationForFood.getDtisznCode() == null;
         this.applicationForFood = applicationForFood;
         isChanged = false;
+        this.mobile = applicationForFood.getMobile();
         statuses = new ArrayList<ApplicationForFoodStatus>();
     }
 
@@ -174,5 +176,13 @@ public class ApplicationForFoodReportItem {
 
     public void setApplicationForFood(ApplicationForFood applicationForFood) {
         this.applicationForFood = applicationForFood;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

@@ -3826,6 +3826,12 @@ public class DAOUtils {
         return query.list();
     }
 
+    public static List<ApplicationForFood> getApplicationForFoodListByClient(Session session, Long idOfClient) {
+        Query query = session.createQuery("select a from ApplicationForFood a where a.client.idOfClient = :idOfClient order by a.serviceNumber");
+        query.setParameter("idOfClient", idOfClient);
+        return query.list();
+    }
+
     public static long nextVersionByApplicationForFoodHistory(Session session){
         long version = 0L;
         Query query = session

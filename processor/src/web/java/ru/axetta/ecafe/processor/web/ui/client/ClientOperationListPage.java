@@ -11,16 +11,22 @@ import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientDiscount
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientMigrationHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
+import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
 import ru.axetta.ecafe.processor.core.report.ClientSmsList;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +42,7 @@ import java.util.List;
  */
 public class ClientOperationListPage extends BasicWorkspacePage {
 
+    Logger logger = LoggerFactory.getLogger(ClientOperationListPage.class);
     private Long idOfClient;
     private Date startTime;
     private Date endTime;
@@ -50,6 +57,8 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<ClientGroupMigrationHistory> clientGroupMigrationHistories = new ArrayList<ClientGroupMigrationHistory>();
     private List<ClientMigration> clientMigrations = new ArrayList<ClientMigration>();
     private List<DiscountChangeHistory> discountChangeHistories = new ArrayList<DiscountChangeHistory>();
+    private List<ApplicationForFoodReportItem> applicationsForFood = new ArrayList<ApplicationForFoodReportItem>();
+    private ApplicationForFoodReportItem currentApplicationForFood;
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -218,6 +227,51 @@ public class ClientOperationListPage extends BasicWorkspacePage {
                 .getBean(ClientDiscountChangeHistoryService.class);
 
         discountChangeHistories = clientDiscountChangeService.findAll(client);
+
+        applicationsForFood.clear();
+        List<ApplicationForFood> applicationForFoodList = DAOUtils.getApplicationForFoodListByClient(session, this.idOfClient);
+        for (ApplicationForFood applicationForFood : applicationForFoodList) {
+            applicationsForFood.add(new ApplicationForFoodReportItem(applicationForFood));
+        }
     }
 
+    public List<ApplicationForFoodReportItem> getApplicationsForFood() {
+        return applicationsForFood;
+    }
+
+    public void setApplicationsForFood(List<ApplicationForFoodReportItem> applicationsForFood) {
+        this.applicationsForFood = applicationsForFood;
+    }
+
+    public ApplicationForFoodReportItem getCurrentApplicationForFood() {
+        return currentApplicationForFood;
+    }
+
+    public void setCurrentApplicationForFood(ApplicationForFoodReportItem currentApplicationForFood) {
+        this.currentApplicationForFood = currentApplicationForFood;
+    }
+
+    public List<ApplicationForFoodHistoryReportItem> getHistoryItems() {
+        List<ApplicationForFoodHistoryReportItem> result = new ArrayList<ApplicationForFoodHistoryReportItem>();
+        if (currentApplicationForFood == null) return result;
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            List<ApplicationForFoodHistory> list = DAOUtils.getHistoryByApplicationForFood(session, currentApplicationForFood.getApplicationForFood());
+
+            for (ApplicationForFoodHistory history : list) {
+                result.add(new ApplicationForFoodHistoryReportItem(history));
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 }
