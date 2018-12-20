@@ -68,17 +68,29 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                     + "applicantPhone=%s, applicantName=%s, applicantSecondName=%s, applicantSurname=%s, serviceNumber=%s}",
                                     item.getIdOfClient(), item.getDtisznCode(), item.getApplicantPhone(), item.getApplicantName(),
                                     item.getApplicantSecondName(), item.getApplicantSurname(), item.getServNumber()), e);
+                            resItem = new ResRequestFeedingItem();
+                            resItem.setCode(RequestFeedingItem.ERROR_CODE_INTERNAL_ERROR);
+                            resItem.setError("Error in processing entity: " + e.getMessage());
+                            items.add(resItem);
                             continue;
                         }
 
                     } else {
-                        ApplicationForFoodStatus oldStatus = applicationForFood.getStatus();
-                        applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(),
-                                client, item.getDtisznCode(), status, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(),
-                                item.getApplicantSurname(), nextVersion, nextHistoryVersion);
-                        if (!oldStatus.equals(status)) {
-                            service.sendStatusAsync(System.currentTimeMillis(),
-                                    item.getServNumber(), status.getApplicationForFoodState(), status.getDeclineReason());
+                        try {
+                            ApplicationForFoodStatus oldStatus = applicationForFood.getStatus();
+                            applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(),
+                                    client, item.getDtisznCode(), status, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(),
+                                    item.getApplicantSurname(), nextVersion, nextHistoryVersion);
+                            if (!oldStatus.equals(status)) {
+                                service.sendStatusAsync(System.currentTimeMillis(),
+                                        item.getServNumber(), status.getApplicationForFoodState(), status.getDeclineReason());
+                            }
+                        } catch (Exception e) {
+                            resItem = new ResRequestFeedingItem();
+                            resItem.setCode(RequestFeedingItem.ERROR_CODE_INTERNAL_ERROR);
+                            resItem.setError("Error in processing entity: " + e.getMessage());
+                            items.add(resItem);
+                            continue;
                         }
                     }
 
@@ -93,7 +105,6 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     resItem.setError(item.getErrorMessage());
                 }
                 items.add(resItem);
-                session.flush();
             }
         } catch (Exception e) {
             logger.error("Error saving RequestFeeding", e);

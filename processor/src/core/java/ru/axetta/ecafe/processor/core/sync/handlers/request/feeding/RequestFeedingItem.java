@@ -18,6 +18,7 @@ import java.util.Date;
 public class RequestFeedingItem {
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
+    public static final Integer ERROR_CODE_INTERNAL_ERROR=110;
 
     private Long applicationForFeedingNumber;
     private String servNumber;

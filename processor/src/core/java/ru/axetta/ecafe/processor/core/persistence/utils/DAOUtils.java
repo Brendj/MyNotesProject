@@ -3755,6 +3755,18 @@ public class DAOUtils {
         session.save(applicationForFoodHistory);
     }
 
+    public static void addApplicationForFoodHistoryWithVersionIfNotExist(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status, Long version) throws Exception {
+        ApplicationForFoodHistory applicationForFoodHistory;
+        applicationForFoodHistory = findApplicationForFoodHistoryByStatusAndapplicationForFood(session, applicationForFood, status);
+        if(applicationForFoodHistory != null){
+            String errorString = String.format("Exist applicationForFoodHistory state = %d for ApplicationForFood: clientContractID= %d , serviceNumber= %s ",
+                    applicationForFoodHistory.getStatus().getApplicationForFoodState().getCode(),
+                    applicationForFood.getClient().getContractId(), applicationForFood.getServiceNumber());
+            throw new Exception(errorString);
+        }
+        addApplicationForFoodHistoryWithVersion(session, applicationForFood, status, version);
+    }
+
     public static void addApplicationForFoodHistoryIfNotExist(Session session, ApplicationForFood applicationForFood, ApplicationForFoodStatus status) {
         ApplicationForFoodHistory applicationForFoodHistory = null;
         try {
@@ -3917,7 +3929,7 @@ public class DAOUtils {
 
     public static ApplicationForFood  updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession, String serviceNumber,
             Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName, String applicantSecondName,
-            String applicantSurname, Long version, Long historyVersion) {
+            String applicantSurname, Long version, Long historyVersion) throws Exception {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession, serviceNumber);
         if(applicationForFood == null){
             logger.warn("Can't find ApplicationForFood by serviceNumber = " + serviceNumber);
@@ -3934,7 +3946,7 @@ public class DAOUtils {
         applicationForFood.setLastUpdate(new Date());
         persistenceSession.update(applicationForFood);
 
-        addApplicationForFoodHistoryWithVersion(persistenceSession, applicationForFood, status, historyVersion);
+        addApplicationForFoodHistoryWithVersionIfNotExist(persistenceSession, applicationForFood, status, historyVersion);
         return applicationForFood;
     }
 
