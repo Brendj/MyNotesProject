@@ -14,4 +14,6 @@ UPDATE cf_categorydiscounts_dszn
 SET version = (SELECT MAX(version) FROM cf_categorydiscounts_dszn) + 1
 WHERE deleted <> 1;
 
+alter table cf_client_dtiszn_discount_info add column archived integer;
+
 --! ФИНАЛИЗИРОВАН 19.12.2018, НЕ МЕНЯТЬ
