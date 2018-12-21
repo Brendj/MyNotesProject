@@ -47,7 +47,7 @@
         <property name="ageTypeGroup" column="AgeTypeGroup" type="string" length="128"/>
         <property name="ageTypeGroupFrom" column="AgeTypeGroupFrom" type="string" length="128"/>
         <property name="parallel" column="parallel" type="string" length="255"/>
-        <property name="parallelFrom" column="AparallelFrom" type="string" length="255"/>
+        <property name="parallelFrom" column="parallelFrom" type="string" length="255"/>
         <property name="dsznDateBegin" column="dszn_date_begin" type="long"/>
         <property name="dsznDateBeginFrom" column="dszn_date_beginFrom" type="long"/>
         <property name="dsznDateEnd" column="dszn_date_end" type="long"/>
