@@ -111,6 +111,8 @@
         <property name="multiCardMode" column="multiCardMode"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
 
+        <property name="parallel" column="parallel" type="string" length="255"/>
+
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting"/>

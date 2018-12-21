@@ -382,6 +382,8 @@ public class SyncResponse {
             private final String passportNumber;
             private final String passportSeries;
             private final Boolean multiCardMode;
+            private final String parallel;
+            private final String ssoId;
 
             public Item(Client client, int clientType) {
                 this.orgOwner = client.getOrg().getIdOfOrg();
@@ -425,6 +427,8 @@ public class SyncResponse {
                 this.passportNumber = client.getPassportNumber();
                 this.passportSeries = client.getPassportSeries();
                 this.multiCardMode = client.activeMultiCardMode();
+                this.parallel = client.getParallel();
+                this.ssoId = client.getSsoid();
             }
 
             public Item(Client client, int clientType, boolean tempClient) {
@@ -619,6 +623,12 @@ public class SyncResponse {
                     element.setAttribute("PassportSeries", this.passportSeries);
                 }
                 element.setAttribute("multiCardMode", this.multiCardMode ? "1" : "0");
+                if(this.parallel != null){
+                    element.setAttribute("LParallel", this.parallel);
+                }
+                if(this.ssoId != null){
+                    element.setAttribute("SsoId", this.ssoId);
+                }
                 return element;
             }
 

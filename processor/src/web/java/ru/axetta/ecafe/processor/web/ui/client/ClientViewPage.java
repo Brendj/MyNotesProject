@@ -98,6 +98,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.visitsSections = visitsSections;
     }
 
+    public String getParallel() {
+        return parallel;
+    }
+
+    public void setParallel(String parallel) {
+        this.parallel = parallel;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -203,6 +211,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String balanceHold;
     private Boolean multiCardMode;
     private Boolean visitsSections;
+    private String parallel;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -601,6 +610,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.passportNumber = client.getPassportNumber();
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
+        this.parallel = client.getParallel();
 
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
 

@@ -141,6 +141,8 @@ public class Client {
     private String iacRegId;
     private Boolean multiCardMode;
 
+    private String parallel;
+
     protected Client() {
         // For Hibernate only
     }
@@ -1156,5 +1158,13 @@ public class Client {
         } else {
             return multiCardMode;
         }
+    }
+
+    public String getParallel() {
+        return parallel;
+    }
+
+    public void setParallel(String parallel) {
+        this.parallel = parallel;
     }
 }

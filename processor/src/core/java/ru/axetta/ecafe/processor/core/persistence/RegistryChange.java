@@ -53,6 +53,15 @@ public class RegistryChange {
 
     protected String ageTypeGroupFrom;
 
+    protected String parallel;
+    protected String parallelFrom;
+
+    protected Long dsznDateBegin;
+    protected Long dsznDateBeginFrom;
+
+    protected Long dsznDateEnd;
+    protected Long dsznDateEndFrom;
+
     public static final int FULL_COMPARISON = 1;
     public static final int CHANGES_UPDATE = 2;
 
@@ -364,5 +373,53 @@ public class RegistryChange {
 
     public void setAgeTypeGroupFrom(String ageTypeGroupFrom) {
         this.ageTypeGroupFrom = ageTypeGroupFrom;
+    }
+
+    public String getParallel() {
+        return parallel;
+    }
+
+    public void setParallel(String parallel) {
+        this.parallel = parallel;
+    }
+
+    public String getParallelFrom() {
+        return parallelFrom;
+    }
+
+    public void setParallelFrom(String parallelFrom) {
+        this.parallelFrom = parallelFrom;
+    }
+
+    public Long getDsznDateBegin() {
+        return dsznDateBegin;
+    }
+
+    public void setDsznDateBegin(Long dsznDateBegin) {
+        this.dsznDateBegin = dsznDateBegin;
+    }
+
+    public Long getDsznDateBeginFrom() {
+        return dsznDateBeginFrom;
+    }
+
+    public void setDsznDateBeginFrom(Long dsznDateBeginFrom) {
+        this.dsznDateBeginFrom = dsznDateBeginFrom;
+    }
+
+    public Long getDsznDateEnd() {
+        return dsznDateEnd;
+    }
+
+    public void setDsznDateEnd(Long dsznDateEnd) {
+        this.dsznDateEnd = dsznDateEnd;
+    }
+
+    public Long getDsznDateEndFrom() {
+        return dsznDateEndFrom;
+    }
+
+    public void setDsznDateEndFrom(Long dsznDateEndFrom) {
+        this.dsznDateEndFrom = dsznDateEndFrom;
     }
 }
