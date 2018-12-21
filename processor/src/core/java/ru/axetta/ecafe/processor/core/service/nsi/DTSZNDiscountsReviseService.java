@@ -34,13 +34,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.xml.bind.DatatypeConverter;
 import java.net.ConnectException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -137,19 +136,19 @@ public class DTSZNDiscountsReviseService {
         Long currentPage = 1L;
         Long pagesCount = 0L;
         Long clientDTISZNDiscountVersion;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        String filterDate = DatatypeConverter.printDateTime(calendar);
 
         Session session = null;
         Transaction transaction = null;
 
         do {
             try {
-                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList);
+                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate);
 
                 session = runtimeContext.createPersistenceSession();
-                session.setFlushMode(FlushMode.COMMIT);
-                transaction = session.beginTransaction();
-
-                clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                session.setFlushMode(FlushMode.MANUAL);
 
                 Integer counter = 1;
                 for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
@@ -170,6 +169,8 @@ public class DTSZNDiscountsReviseService {
 
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
+
+                    clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
                     if (null == discountInfo) {
                         discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
@@ -210,15 +211,15 @@ public class DTSZNDiscountsReviseService {
                             session.save(discountInfo);
                         }
                     }
-                    if (0 == counter%maxRecords) {
-                        transaction.commit();
-                        transaction = null;
-                    }
-                }
-                if (null != transaction && transaction.isActive()) {
                     transaction.commit();
                     transaction = null;
+                    if (0 == counter%maxRecords) {
+                        session.flush();
+                        session.clear();
+                    }
                 }
+                session.flush();
+                session.clear();
 
                 pagesCount = response.getPagesCount();
             } catch (HttpException e) {
@@ -308,7 +309,7 @@ public class DTSZNDiscountsReviseService {
         return new NSIRequest(paramList, page, "DictBenefit", pageSize);
     }
 
-    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList) {
+    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList, String date) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
         if (!disableOUFilter) {
             paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
@@ -322,6 +323,8 @@ public class DTSZNDiscountsReviseService {
         paramList.add(new NSIRequestParam("benefit-confirmed", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("updated-at", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("person/deleted-at", OPERATOR_IS_NULL, false));
+        paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_LT, date, true));
+        paramList.add(new NSIRequestParam("created-by", OPERATOR_EQUAL, "ou", false));
         return new NSIRequest(paramList, page, "PersonBenefit", pageSize);
     }
 
@@ -361,7 +364,7 @@ public class DTSZNDiscountsReviseService {
         return null;
     }
 
-    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList) throws ConnectException {
+    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList, String filterDate) throws ConnectException {
         HttpClient httpClient = new HttpClient();
 
         httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
@@ -371,7 +374,7 @@ public class DTSZNDiscountsReviseService {
 
             method.addRequestHeader("Content-Type", "application/json; charset=utf-8");
             authenticateHeaders(method);
-            prepareMethodData(method, buildPersonBenefitRequest(page, pageSize, entityIdList));
+            prepareMethodData(method, buildPersonBenefitRequest(page, pageSize, entityIdList, filterDate));
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
@@ -450,7 +453,7 @@ public class DTSZNDiscountsReviseService {
         return entityIds;
     }
 
-    public void updateApplicationForFood(Session session, ETPMVService service, Client client, List<ClientDtisznDiscountInfo> infoList/*, ClientDtisznDiscountInfo discountInfo*/) {
+    public void updateApplicationForFood(Session session, ETPMVService service, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
         if (null == application ||
                 !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)) &&
@@ -482,6 +485,8 @@ public class DTSZNDiscountsReviseService {
                 }
                 return;
             }
+
+            logger.info(String.format("Found application for status update; clientId=%d", client.getIdOfClient()));
 
             LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
             //7705
@@ -608,7 +613,7 @@ public class DTSZNDiscountsReviseService {
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            session.setFlushMode(FlushMode.COMMIT);
+            session.setFlushMode(FlushMode.MANUAL);
             transaction = session.beginTransaction();
 
             List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
@@ -626,18 +631,17 @@ public class DTSZNDiscountsReviseService {
                 if (!clientInfoList.isEmpty()) {
                     processDiscounts(session, client, clientInfoList, service);
                 }
+                transaction.commit();
+                transaction = null;
                 if (0 == clientCounter%maxRecords) {
-                    transaction.commit();
-                    transaction = null;
+                    session.flush();
+                    session.clear();
                 }
                 logger.info(String.format("Updating discounts for clients: client %d/%d",
                         clientCounter++, clientList.size()));
             }
-
-            if (null != transaction && transaction.isActive()) {
-                transaction.commit();
-                transaction = null;
-            }
+            session.flush();
+            session.clear();
 
         } catch (Exception e) {
             logger.error("Error in update discounts", e);
