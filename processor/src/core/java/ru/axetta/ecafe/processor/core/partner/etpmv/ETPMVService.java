@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.partner.etpmv;
 
+import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import generated.contingent.*;
 import generated.etp.*;
 import generated.etp.ObjectFactory;
@@ -38,10 +39,7 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created by nuc on 01.11.2018.
@@ -62,6 +60,8 @@ public class ETPMVService {
     private IsppWebService port;
     private BindingProvider bindingProvider;
     JAXBContext jaxbContext;
+    private final int AIS_CONTINGENT_CONNECT_TIMEOUT = 10000;
+    private final int AIS_CONTINGENT_REQUEST_TIMEOUT = 10*60*1000;
 
     @Async
     public void processIncoming(String message) {
@@ -358,6 +358,9 @@ public class ETPMVService {
             bindingProvider = (BindingProvider) port;
             URL endpoint = new URL(getAISContingentUrl());
             bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint.toString());
+            Map<String, Object> requestContext = bindingProvider.getRequestContext();
+            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, AIS_CONTINGENT_REQUEST_TIMEOUT);
+            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, AIS_CONTINGENT_CONNECT_TIMEOUT);
 
             final AISContingentMessageLogger loggingHandler = new RuntimeContext().getAppContext().getBean(AISContingentMessageLogger.class);
             final List<Handler> handlerChain = new ArrayList<Handler>();
