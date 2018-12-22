@@ -62,6 +62,7 @@ public class ETPMVService {
     JAXBContext jaxbContext;
     private final int AIS_CONTINGENT_CONNECT_TIMEOUT = 10000;
     private final int AIS_CONTINGENT_REQUEST_TIMEOUT = 10*60*1000;
+    private final int AIS_CONTINGENT_MAX_PACKET = 10;
 
     @Async
     public void processIncoming(String message) {
@@ -302,7 +303,7 @@ public class ETPMVService {
         List<ApplicationForFood> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getDataForAISContingent();
         if (list.size() == 0) {
             logger.info("Finish sending data to AIS Contingent. No records sent");
-        //    return;
+            return;
         }
         initAISContingentService();
         generated.contingent.ObjectFactory objectFactory = new generated.contingent.ObjectFactory();
@@ -311,18 +312,37 @@ public class ETPMVService {
         isppHeaders.setUsername(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.username", "ispp"));
         isppHeaders.setPassword(encryptPassword(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.aiscontingent.password", "D43!asT7")));
         SetBenefitsRequest setBenefitsRequest = objectFactory.createSetBenefitsRequest();
+        setBenefits.setRequest(setBenefitsRequest);
         SetBenefitsRequest.Children children = objectFactory.createSetBenefitsRequestChildren();
+        int counter = 0;
+        int sent_counter = 0;
         for (ApplicationForFood applicationForFood : list) {
             Child child = objectFactory.createChild();
             child.setBenefitCode(applicationForFood.getDtisznCode() == null ? "0" : applicationForFood.getDtisznCode().toString());
             child.setGuid(applicationForFood.getClient().getClientGUID());
             children.getChild().add(child);
+            sent_counter++;
+            if (children.getChild().size() > AIS_CONTINGENT_MAX_PACKET) {
+                counter++;
+                setBenefitsRequest.setChildren(children);
+                logger.info(String.format("Sending request %s to AIS Contingent", counter));
+                SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
+                logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
+                processResponseFromAISContingent(response);
+                children.getChild().clear();
+            }
         }
-        setBenefitsRequest.setChildren(children);
-        setBenefits.setRequest(setBenefitsRequest);
-        logger.info("Sending request to AIS Contingent");
-        SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
-        logger.info("Got response from AIS Contingent. Processing...");
+        if (children.getChild().size() > 0) {
+            setBenefitsRequest.setChildren(children);
+            logger.info(String.format("Sending request %s to AIS Contingent", counter));
+            SetBenefitsResponse1 response = port.setBenefits(setBenefits, isppHeaders);
+            logger.info(String.format("Got response %s from AIS Contingent. Processing...", counter));
+            processResponseFromAISContingent(response);
+        }
+        logger.info(String.format("Finish sending data to AIS Contingent. Sent %s records", sent_counter));
+    }
+
+    private void processResponseFromAISContingent(SetBenefitsResponse1 response) throws Exception {
         if (response != null && response.getResult() != null && response.getResult().getSuccess() != null) {
             Long nextVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodNextVersion();
             Long historyVersion = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getApplicationForFoodHistoryNextVersion();
@@ -340,7 +360,6 @@ public class ETPMVService {
             }
             logger.error("Not found guids from AIS Contingent: " + notFoundGuids.toString());
         }
-        logger.info(String.format("Finish sending data to AIS Contingent. Sent %s records", list.size()));
     }
 
     private String encryptPassword(String source) throws Exception {
