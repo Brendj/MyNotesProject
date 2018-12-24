@@ -1846,18 +1846,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             clientSummaryExt.setLastEnterEventTime(toXmlDateTime(ee.getEvtDateTime()));
         }
         /* Группа к которой относится клиент (Наименование класса ученика) */
+        Long groupId;
         if (client.getClientGroup() == null) {
             clientSummaryExt.setGrade(null);
+            clientSummaryExt.setGroupPredefined(0);
         } else {
             clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
+            groupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+            if (groupId >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() && groupId <= ClientGroup.Predefined.CLIENT_DISPLACED.getValue()) {
+                clientSummaryExt.setGroupPredefined(1);
+            } else {
+                clientSummaryExt.setGroupPredefined(0);
+            }
         }
-        Long groupId = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-        if (groupId >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() && groupId <= ClientGroup.Predefined.CLIENT_DISPLACED.getValue()) {
-            clientSummaryExt.setGroupPredefined(1);
-        } else {
-            clientSummaryExt.setGroupPredefined(0);
-        }
-
         /* Краткое наименование Учебного учреждения для сервиса информирования*/
         clientSummaryExt.setOfficialName(client.getOrg().getShortNameInfoService());
         // Новые параметры:
