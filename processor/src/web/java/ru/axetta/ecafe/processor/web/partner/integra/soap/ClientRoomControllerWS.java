@@ -1848,7 +1848,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         /* Группа к которой относится клиент (Наименование класса ученика) */
         Long groupId;
         if (client.getClientGroup() == null) {
-            clientSummaryExt.setGrade(null);
+            clientSummaryExt.setGrade("");
             clientSummaryExt.setGroupPredefined(0);
         } else {
             clientSummaryExt.setGrade(client.getClientGroup().getGroupName());
