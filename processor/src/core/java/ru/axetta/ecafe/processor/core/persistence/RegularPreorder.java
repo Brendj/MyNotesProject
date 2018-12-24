@@ -28,6 +28,7 @@ public class RegularPreorder {
     private Date createdDate;
     private Date lastUpdate;
     private Boolean deletedState;
+    private String mobile;
 
     public RegularPreorder() {
 
@@ -35,7 +36,7 @@ public class RegularPreorder {
 
     public RegularPreorder(Client client, Date startDate, Date endDate, String itemCode, Integer idOfComplex,
             Integer amount, String itemName, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday,
-            Boolean friday, Boolean saturday, Long price) {
+            Boolean friday, Boolean saturday, Long price, String guardianMobile) {
         this.client = client;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -53,6 +54,7 @@ public class RegularPreorder {
         this.createdDate = new Date();
         this.lastUpdate = new Date();
         this.deletedState = false;
+        this.mobile = guardianMobile;
     }
 
     public Long getIdOfRegularPreorder() {
@@ -197,5 +199,13 @@ public class RegularPreorder {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

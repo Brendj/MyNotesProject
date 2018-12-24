@@ -41,6 +41,7 @@
         </property>
         <property name="idOfGoodsRequestPosition" column="idofgoodsrequestposition" type="long" />
         <property name="idOfOrgOnCreate" column="idoforgoncreate" type="long" />
+        <property name="mobile" column="mobile" type="string" length="32" />
         <many-to-one name="regularPreorder" class="ru.axetta.ecafe.processor.core.persistence.RegularPreorder"
                      column="IdOfRegularPreorder" fetch="select"/>
     </class>

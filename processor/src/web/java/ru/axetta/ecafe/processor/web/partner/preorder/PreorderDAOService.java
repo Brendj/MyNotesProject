@@ -66,7 +66,7 @@ public class PreorderDAOService {
         IPreorderDAOOperations impl = new IPreorderDAOOperations() {
             @Override
             public void deleteRegularPreorder(Session session, RegularPreorder regularPreorder, PreorderState preorderState) throws Exception {
-                deleteRegularPreorderInternal(session, regularPreorder, preorderState);
+                deleteRegularPreorderInternal(session, regularPreorder, preorderState, null);
             }
 
             @Override
@@ -388,7 +388,7 @@ public class PreorderDAOService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void savePreorderComplexes(PreorderSaveListParam list) throws Exception {
+    public void savePreorderComplexes(PreorderSaveListParam list, String guardianMobile) throws Exception {
         //Собираем коллекцию в нужном виде
         Map<Integer, ComplexListParam> map = new HashMap<Integer, ComplexListParam>();
         for (ComplexListParam complex : list.getComplexes()) {
@@ -459,9 +459,9 @@ public class PreorderDAOService {
             if (regularComplex != null) {
                 if (regularComplex.getEnabled() && complex.getAmount() > 0) {
                     createRegularPreorder(client, regularComplex, complex.getAmount(),
-                            complex.getIdOfComplex(), date, true, null);
+                            complex.getIdOfComplex(), date, true, null, guardianMobile);
                 } else {
-                    deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date);
+                    deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date, guardianMobile);
                 }
                 continue;
             }
@@ -475,11 +475,11 @@ public class PreorderDAOService {
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setDeletedState(!complexSelected);
                     preorderComplex.setVersion(nextVersion);
-                    //em.merge(preorderComplex);
+                    preorderComplex.setMobile(guardianMobile);
                 } catch (NoResultException e) {
                     if (complexSelected) {
                         preorderComplex = createPreorderComplex(idOfComplex, client, date, complexAmount, null,
-                                nextVersion);
+                                nextVersion, guardianMobile);
                         if (complex.getMenuItems() == null) {
                             //создаем детализацию предзаказа по блюдам меню, т.к. ее нет в запросе
                             Set<PreorderMenuDetail> set = createPreorderMenuDetails(idOfComplex, client, date, preorderComplex);
@@ -501,9 +501,9 @@ public class PreorderDAOService {
                     if (regularMenuItem != null) {
                         if (regularMenuItem.getEnabled() && menuItem.getAmount() > 0) {
                             createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
-                                    false, menuItem.getIdOfMenuDetail());
+                                    false, menuItem.getIdOfMenuDetail(), guardianMobile);
                         } else {
-                            deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date);
+                            deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date, guardianMobile);
                         }
                         continue;
                     }
@@ -548,7 +548,7 @@ public class PreorderDAOService {
     }
 
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
-            Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu) throws Exception {
+            Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile) throws Exception {
         String menuDetailName = null;
         Long menuDetailPrice = null;
         String itemCode = null;
@@ -578,6 +578,7 @@ public class PreorderDAOService {
             regularPreorder.setSaturday(regularComplex.getSaturday());
             regularPreorder.setStartDate(regularComplex.getStartDate());
             regularPreorder.setEndDate(regularComplex.getEndDate());
+            regularPreorder.setMobile(guardianMobile);
             regularPreorder.setLastUpdate(new Date());
             em.merge(regularPreorder);
         } catch (NoResultException e) {
@@ -591,19 +592,19 @@ public class PreorderDAOService {
                 }
                 regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), null, idOfComplex,
                         amount, complexName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
-                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), complexPrice);
+                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), complexPrice, guardianMobile);
                 em.persist(regularPreorder);
             } else {
                 regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), itemCode, idOfComplex,
                         amount, menuDetailName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
-                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), menuDetailPrice);
+                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), menuDetailPrice, guardianMobile);
                 em.persist(regularPreorder);
             }
         }
         createPreordersFromRegular(regularPreorder, true);
     }
 
-    private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date) throws Exception {
+    private void deleteRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfMenu, Date date, String guardianMobile) throws Exception {
         String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.itemCode = :itemCode ";
         Query regularPreorderSelect = em.createQuery("select m from RegularPreorder m "
                 + "where m.client = :client " + condition + " and m.deletedState = false");
@@ -615,14 +616,15 @@ public class PreorderDAOService {
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
-        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK);
+        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile);
     }
 
-    private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder, PreorderState state) throws Exception {
+    private void deleteRegularPreorderInternal(Session session, RegularPreorder regularPreorder, PreorderState state, String guardianMobile) throws Exception {
         deleteGeneratedPreordersByRegular(session, regularPreorder, state);
 
         regularPreorder.setDeletedState(true);
         regularPreorder.setLastUpdate(new Date());
+        regularPreorder.setMobile(guardianMobile);
         session.update(regularPreorder);
     }
 
@@ -721,7 +723,8 @@ public class PreorderDAOService {
                     continue;
                 }
                 preorderComplex = createPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
-                        complexInfo.getMenuDate(), StringUtils.isEmpty(regularPreorder.getItemCode()) ? regularPreorder.getAmount() : 0, complexInfo, nextVersion);
+                        complexInfo.getMenuDate(), StringUtils.isEmpty(regularPreorder.getItemCode()) ? regularPreorder.getAmount() : 0, complexInfo,
+                        nextVersion, regularPreorder.getMobile());
                 preorderComplex.setRegularPreorder(regularPreorder);
                 em.persist(preorderComplex);
             }
@@ -842,7 +845,8 @@ public class PreorderDAOService {
         return (list == null || list.size() == 0) ? null : list.get(0);
     }
 
-    private PreorderComplex createPreorderComplex(Integer idOfComplex, Client client, Date date, Integer complexAmount, ComplexInfo ci, Long nextVersion) throws MenuDetailNotExistsException {
+    private PreorderComplex createPreorderComplex(Integer idOfComplex, Client client, Date date, Integer complexAmount, ComplexInfo ci,
+            Long nextVersion, String guardianMobile) throws MenuDetailNotExistsException {
         PreorderComplex preorderComplex = new PreorderComplex();
         preorderComplex.setClient(client);
         preorderComplex.setPreorderDate(date);
@@ -857,6 +861,7 @@ public class PreorderDAOService {
         preorderComplex.setLastUpdate(new Date());
         preorderComplex.setState(PreorderState.OK);
         preorderComplex.setIdOfOrgOnCreate(client.getOrg().getIdOfOrg());
+        preorderComplex.setMobile(guardianMobile);
         if (ci == null) ci = getComplexInfo(client, idOfComplex, date);
         if (ci != null) {
             preorderComplex.setComplexName(ci.getComplexName());

@@ -151,7 +151,7 @@ public class PreorderService {
         try {
             authorize(list.getContractId(), RuntimeContext.getAppContext().getBean(TokenService.class).getToken());
             logRequest(list);
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(list);
+            //RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(list);
             res.setCode(0);
             res.setMessage("OK");
         } catch (PreorderAccessDeniedException e1) {

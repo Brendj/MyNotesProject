@@ -8720,12 +8720,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders) {
+    public Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders, @WebParam(name="guardianMobile") String guardianMobile) {
         authenticateRequest(preorders.getContractId());
         Result result = new Result();
         try {
             PreorderSaveListParam preorderSaveListParam = new PreorderSaveListParam(preorders);
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(preorderSaveListParam);
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).savePreorderComplexes(preorderSaveListParam, guardianMobile);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (MenuDetailNotExistsException e) {

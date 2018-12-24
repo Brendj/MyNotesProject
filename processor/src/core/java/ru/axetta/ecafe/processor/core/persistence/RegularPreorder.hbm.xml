@@ -32,5 +32,6 @@
         <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="mobile" column="mobile" type="string" length="32"/>
     </class>
 </hibernate-mapping>

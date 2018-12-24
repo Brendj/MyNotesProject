@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CheckApplicationForFoodResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
@@ -541,7 +540,7 @@ public interface ClientRoomController {
     public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn);
 
     @WebMethod()
-    Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders);
+    Result putPreorderComplex(@WebParam(name = "preorders") PreorderParam preorders, @WebParam(name="guardianMobile") String guardianMobile);
 
     @WebMethod(operationName = "addRegistrationCard")
     AddRegistrationCardResult addRegistrationCard(@WebParam(name = "regid") String regid, @WebParam(name = "suid") String suid,
