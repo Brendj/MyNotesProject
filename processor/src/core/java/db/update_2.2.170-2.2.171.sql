@@ -11,3 +11,6 @@ alter table cf_preorder_complex
 alter table cf_regular_preorders
   add column mobile varchar(32);
 
+--индексы на таблицу с дтисзн льготами
+CREATE INDEX cf_client_dtiszn_discount_info_idofclient_dtiszncode_idx ON cf_client_dtiszn_discount_info USING btree (idofclient, dtiszncode);
+CREATE INDEX cf_client_dtiszn_discount_info_version_idx ON cf_client_dtiszn_discount_info USING btree (version);
