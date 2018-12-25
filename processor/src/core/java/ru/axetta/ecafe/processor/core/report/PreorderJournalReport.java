@@ -26,6 +26,7 @@ import java.util.*;
 public class PreorderJournalReport extends BasicReportForListOrgsJob {
     private static final Logger logger = LoggerFactory.getLogger(PreorderJournalReport.class);
     final public static String P_ID_OF_CLIENTS="idOfClients";
+    final public static String P_LINE_SEPARATOR="line_separator";
 
     public PreorderJournalReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
@@ -64,7 +65,9 @@ public class PreorderJournalReport extends BasicReportForListOrgsJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, idOfClientList, parameterMap);
+            String lineSeparator = reportProperties.getProperty(P_LINE_SEPARATOR);
+
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, idOfClientList, parameterMap, lineSeparator);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -72,7 +75,7 @@ public class PreorderJournalReport extends BasicReportForListOrgsJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList,
-                List<Long> idOfClientList, Map<String, Object> parameterMap) {
+                List<Long> idOfClientList, Map<String, Object> parameterMap, String lineSeparator) {
             List<PreorderJournalReportItem> items = new ArrayList<PreorderJournalReportItem>();
 
             String orgCondition = idOfOrgList.size() == 0 ? "" : " and pc.idOfOrgOnCreate in :orgList";
@@ -86,7 +89,7 @@ public class PreorderJournalReport extends BasicReportForListOrgsJob {
             List<PreorderComplex> list = query.list();
             int num = 1;
             for (PreorderComplex pc : list) {
-                PreorderJournalReportItem item = new PreorderJournalReportItem(num, pc);
+                PreorderJournalReportItem item = new PreorderJournalReportItem(num, pc, lineSeparator);
                 items.add(item);
                 num++;
             }

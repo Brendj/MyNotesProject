@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -27,8 +26,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -53,7 +58,7 @@ public class PreorderJournalReportPage extends OnlineReportPage {
             return null;
         }
         PreorderJournalReport.Builder builder = new PreorderJournalReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
+        builder.setReportProperties(buildProperties("<br/>"));
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -93,6 +98,70 @@ public class PreorderJournalReportPage extends OnlineReportPage {
         return null;
     }
 
+    public void exportToXLS(ActionEvent actionEvent){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String templateFilename = checkIsExistFile(".jasper");
+        if (StringUtils.isEmpty(templateFilename)) return ;
+        if (idOfOrgList.size() == 0 && getClientList().size() == 0) {
+            printError("Выберите клиента или организацию");
+            return;
+        }
+        Date generateTime = new Date();
+        PreorderJournalReport.Builder builder = new PreorderJournalReport.Builder(templateFilename);
+        builder.setReportProperties(buildProperties("\n"));
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        if(report!=null){
+            try {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                String filename = buildFileName(generateTime, report);
+                response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
+
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            }
+        }
+    }
+
+    private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = basicReportJob.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s", "PreorderJournalReport", reportDistinctText, format);
+    }
+
     @PostConstruct
     public void setDates() {
         startDate = CalendarUtils.startOfDay(new Date());
@@ -113,7 +182,7 @@ public class PreorderJournalReportPage extends OnlineReportPage {
         return "service/preorder_journal_report";
     }
 
-    private Properties buildProperties() {
+    private Properties buildProperties(String lineSeparator) {
         Properties properties = new Properties();
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, getGetStringIdOfOrgList());
         String idOfClients = "";
@@ -124,6 +193,7 @@ public class PreorderJournalReportPage extends OnlineReportPage {
             idOfClients = idOfClients.substring(0, idOfClients.length()-1);
         }
         properties.setProperty(PreorderJournalReport.P_ID_OF_CLIENTS, idOfClients);
+        properties.setProperty(PreorderJournalReport.P_LINE_SEPARATOR, lineSeparator);
         return properties;
     }
 

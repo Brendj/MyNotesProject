@@ -28,7 +28,7 @@ public class PreorderJournalReportItem {
 
     }
 
-    public PreorderJournalReportItem(Integer number, PreorderComplex preorderComplex) {
+    public PreorderJournalReportItem(Integer number, PreorderComplex preorderComplex, String lineSeparator) {
         this.number = number;
         this.preorderDate = preorderComplex.getPreorderDate();
         this.idOfOrg = preorderComplex.getIdOfOrgOnCreate();
@@ -36,9 +36,10 @@ public class PreorderJournalReportItem {
         this.groupName = preorderComplex.getClient().getClientGroup().getGroupName();
         this.complexName = preorderComplex.getComplexName();
         if (preorderComplex.getAmount().equals(0)) {
-            this.complexName += ": \n";
+            this.complexName += ": " + lineSeparator;
             for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                this.complexName += preorderMenuDetail.getMenuDetailName() + "\n";
+                if (preorderMenuDetail.getAmount() > 0)
+                    this.complexName += preorderMenuDetail.getMenuDetailName() + " - " + preorderMenuDetail.getAmount() + lineSeparator;
             }
             this.complexName = this.complexName.substring(0, this.complexName.length()-1);
         }
