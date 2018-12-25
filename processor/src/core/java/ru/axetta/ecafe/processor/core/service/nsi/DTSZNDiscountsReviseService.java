@@ -605,6 +605,7 @@ public class DTSZNDiscountsReviseService {
             }
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             client.setClientRegistryVersion(clientRegistryVersion);
+            session.update(client);
         }
         updateApplicationForFood(session, service, client, infoList);
     }
