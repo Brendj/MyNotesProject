@@ -11,6 +11,7 @@ import com.ibm.msg.client.wmq.WMQConstants;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -59,6 +62,13 @@ public class ETPMVClient implements MessageListener, ExceptionListener {
     private synchronized void init() {
 
         if (!RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.isOn", "false").equals("true")) return;
+        String nodes = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.nodes", "");
+        if (StringUtils.isEmpty(nodes)) return;
+        String[] arr = nodes.split(",");
+        List<String> nodesList = Arrays.asList(arr);
+        if (!nodesList.contains(RuntimeContext.getInstance().getNodeName())) {
+            return;
+        }
 
         logger.info("Start init ETP connection");
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
