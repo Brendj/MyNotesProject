@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.hibernate.Criteria;
@@ -75,6 +76,8 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT = "Справка по предоставлению бесплатного питания обучающимся";
     private final String REPORT_ENTER_EVENT_JOURNAL="EnterEventJournalReport";
     private final String REPORT_ENTER_EVENT_JOURNAL_SUBJECT="Журнал посещений";
+    private final String REPORT_PREORDER_JOURNAL_REPORT = "VariableFeedingJournalReport";
+    private final String REPORT_PREORDER_JOURNAL_REPORT_SUBJECT = "Журнал операций ВП";
 
 
     private static final Logger logger = LoggerFactory.getLogger(ReportRepository.class);
@@ -118,6 +121,8 @@ public class ReportRepository extends BaseJpaDao {
             return getDailyReferReportDiscount(parameters, REPORT_DISCOUNT_COMPLEXES_IN_ALL_SUPER_CATEGORIES_SUBJECT);
         } else if (reportType.equals(REPORT_ENTER_EVENT_JOURNAL)) {
             return getEnterEventJournal(parameters, REPORT_ENTER_EVENT_JOURNAL_SUBJECT);
+        } else if (reportType.equals(REPORT_PREORDER_JOURNAL_REPORT)) {
+            return getPreorderJournal(parameters, REPORT_PREORDER_JOURNAL_REPORT_SUBJECT);
         }
         return null;
     }
@@ -330,6 +335,22 @@ public class ReportRepository extends BaseJpaDao {
         return rawDataReport;
     }
 
+    private byte[] getPreorderJournal(List<ReportParameter> parameters, String subject) throws Exception {
+        Session session = entityManager.unwrap(Session.class);
+        ReportParameters reportParameters = new ReportParameters(parameters).parse();
+        if (!reportParameters.checkRequiredParameters()) {
+            return null; //не переданы или заполнены с ошибкой обязательные параметры
+        }
+        BasicJasperReport jasperReport = buildPreorderJournalReport(session, reportParameters);
+        if (jasperReport == null || isEmptyReportPrintPagesOrZero(jasperReport)) {
+            return null;
+        }
+        ByteArrayOutputStream stream = exportReportToJRXls(jasperReport);
+        byte[] rawDataReport = stream.toByteArray();
+        postReportToEmails(subject, reportParameters, rawDataReport);
+        return rawDataReport;
+    }
+
     private boolean isEmptyReportPrintPages(BasicJasperReport deliveredServicesReport) {
         return deliveredServicesReport.getPrint().getPages() != null
                 && deliveredServicesReport.getPrint().getPages().get(0).getElements().size() == 0;
@@ -348,6 +369,39 @@ public class ReportRepository extends BaseJpaDao {
             for (String em : emails) {
                 postReport(em, subject + String.format(" (%s - %s)", df.format(reportParameters.getStartDate()), df.format(reportParameters.getEndDate())), arr);
             }
+        }
+    }
+
+    private BasicJasperReport buildPreorderJournalReport(Session session, ReportParameters reportParameters)
+            throws Exception {
+        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
+        String templateFilename =
+                autoReportGenerator.getReportsTemplateFilePath() + PreorderJournalReport.class.getSimpleName() + ".jasper";
+        PreorderJournalReport.Builder builder = new PreorderJournalReport.Builder(templateFilename);
+        try {
+            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+            if(org == null){
+                throw new EntityNotFoundException("Not found org by ID: " + reportParameters.getIdOfOrg());
+            }
+
+            Properties properties = new Properties();
+            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, reportParameters.getIdOfOrg().toString());
+            if(reportParameters.getIdOfContract() != null){
+                Client client = DAOUtils.findClientByContractId(session, reportParameters.getIdOfContract());
+                properties.setProperty(PreorderJournalReport.P_ID_OF_CLIENTS, client.getIdOfClient().toString());
+            }
+            properties.setProperty(PreorderJournalReport.P_LINE_SEPARATOR, "\n");
+            builder.setReportProperties(properties);
+
+            BasicJasperReport jasperReport = builder
+                    .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
+            return jasperReport;
+        } catch (EntityNotFoundException e) {
+            logger.error("Not found organization to generate report");
+            return null;
+        } catch (Exception e){
+            logger.error("Failure to build a report", e);
+            return null;
         }
     }
 
