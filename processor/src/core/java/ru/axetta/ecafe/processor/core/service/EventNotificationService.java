@@ -73,6 +73,8 @@ public class EventNotificationService {
     public static final String SOURCE_ORG_VALUES_KEY   = "sourceOrgId";
     public static final String DIRECTION_VALUES_KEY   = "direction";
     public static final String ENTER_WITH_CHECKER_VALUES_KEY   = "enterWithChecker";
+    public static final String ORG_ADDRESS_KEY = "address";
+    public static final String ORG_SHORT_NAME_KEY = "shortnameinfoservice";
 
     public static final String PARAM_ORDER_EVENT_TIME = "orderEventTime";
     public static final String PARAM_AMOUNT_PRICE = "amountPrice";
@@ -693,6 +695,20 @@ public class EventNotificationService {
         return attachToValues(GUARDIAN_VALUES_KEY, "" + guardianId, values);
     }
 
+    public static final String[] attachOrgAddressToValues(String address, String[] values) {
+        if (StringUtils.isEmpty(address)) {
+            return values;
+        }
+        return attachToValues(ORG_ADDRESS_KEY, address, values);
+    }
+
+    public static final String[] attachOrgShortNameToValues(String shortName, String[] values) {
+        if (StringUtils.isEmpty(shortName)) {
+            return values;
+        }
+        return attachToValues(ORG_SHORT_NAME_KEY, shortName, values);
+    }
+
     public static Long getTargetIdFromValues(String[] values) {
         String id = findValueInParams(new String [] {TARGET_VALUES_KEY}, values);
         if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
@@ -761,6 +777,7 @@ public class EventNotificationService {
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY
                     || direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 empType = getEnterEventEMPType(destClient, dataClient, direction, values);
+                putOrgParams(empType, values);
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
                 if (dataClient != null) {
@@ -769,6 +786,7 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, destClient);
                 }
                 putGuardianParams(guardianClient, empType);
+                putOrgParams(empType, values);
             } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
 
                 if (dataClient != null) {
@@ -794,6 +812,7 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, destClient);
                 }
                 putGuardianParams(guardianClient, empType);
+                putOrgParams(empType, values);
             } else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
                 empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, destClient);
                 String token = findValueInParams(new String [] {"linkingToken"}, values);
@@ -927,6 +946,17 @@ public class EventNotificationService {
         }
         empType.getParameters().put(EMPLeaveWithGuardianEventType.GUARDIAN_SURNAME_PARAM, sn);
         empType.getParameters().put(EMPLeaveWithGuardianEventType.GUARDIAN_NAME_PARAM, n);
+    }
+
+    private static final void putOrgParams(EMPEventType empType, String[] values) {
+        String orgAddress = findValueInParams(new String[] {ORG_ADDRESS_KEY}, values);
+        if (!StringUtils.isEmpty(orgAddress)) {
+            empType.getParameters().put(ORG_ADDRESS_KEY, orgAddress);
+        }
+        String orgShortName = findValueInParams(new String[] {ORG_SHORT_NAME_KEY}, values);
+        if (!StringUtils.isEmpty(orgShortName)) {
+            empType.getParameters().put(ORG_SHORT_NAME_KEY, orgShortName);
+        }
     }
 
     private boolean isSMSNotificationEnabledForType(String type) {

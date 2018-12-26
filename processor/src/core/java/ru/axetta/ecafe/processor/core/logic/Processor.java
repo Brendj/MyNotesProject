@@ -5394,6 +5394,8 @@ public class Processor implements SyncProcessor {
                         values = EventNotificationService.attachTargetIdToValues(e.getIdOfEnterEvent(), values);
                         values = EventNotificationService
                                 .attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
+                        values = EventNotificationService.attachOrgAddressToValues(org.getAddress(), values);
+                        values = EventNotificationService.attachOrgShortNameToValues(org.getShortNameInfoService(), values);
                         switch (org.getType()) {
                             case PROFESSIONAL:
                             case SCHOOL: {
