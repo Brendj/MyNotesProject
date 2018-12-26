@@ -158,7 +158,7 @@ public class DTSZNDiscountsReviseService {
 
                     Client client = DAOUtils.findClientByGuid(session, item.getPerson().getId());
                     if (null == client) {
-                        logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
+                        //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                         continue;
                     }
 
@@ -189,6 +189,11 @@ public class DTSZNDiscountsReviseService {
                             }
                             if (!discountInfo.getDateEnd().equals(item.getDsznDateEndAsDate())) {
                                 discountInfo.setDateEnd(item.getDsznDateEndAsDate());
+                                wasModified = true;
+                            }
+                            if (item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED) ||
+                                    !item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
+                                discountInfo.setStatus(item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED);
                                 wasModified = true;
                             }
                             if (wasModified) {
