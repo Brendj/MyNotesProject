@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.PreorderState;
 
 import java.util.Date;
 
@@ -45,7 +46,9 @@ public class PreorderJournalReportItem {
         }
         this.amount = preorderComplex.getAmount() == 0 ? null : preorderComplex.getAmount();
         this.isDeleted = preorderComplex.getDeletedState() ? "Да" : "";
-        this.deleteReason = preorderComplex.getDeletedState() ? preorderComplex.getState().toString() : "";
+        this.deleteReason = preorderComplex.getDeletedState()
+                ? (preorderComplex.getState().equals(PreorderState.OK) ? "Удалено пользователем" : preorderComplex.getState().toString())
+                : "";
         this.isRegular = preorderComplex.getRegularPreorder() != null ? "Да" : "";
         this.createdDate = preorderComplex.getCreatedDate();
         this.lastUpdate = preorderComplex.getLastUpdate();
