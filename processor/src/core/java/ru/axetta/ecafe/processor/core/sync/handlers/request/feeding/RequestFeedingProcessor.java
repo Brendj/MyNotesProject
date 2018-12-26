@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding> {
@@ -78,6 +77,14 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                     } else {
                         try {
                             ApplicationForFoodStatus oldStatus = applicationForFood.getStatus();
+                            if (!oldStatus.equals(status) && applicationForFood.getDtisznCode()== null && status.getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
+                                //если Иное и новый статус 1075, то искусственно создаем статус 1052
+                                DAOUtils.addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood,
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null), nextHistoryVersion);
+                                service.sendStatusAsync(System.currentTimeMillis() - RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue(),
+                                        item.getServNumber(), ApplicationForFoodState.RESULT_PROCESSING, status.getDeclineReason());
+                            }
+
                             applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(),
                                     client, item.getDtisznCode(), status, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(),
                                     item.getApplicantSurname(), nextVersion, nextHistoryVersion);
