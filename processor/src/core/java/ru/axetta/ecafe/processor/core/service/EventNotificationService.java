@@ -75,6 +75,9 @@ public class EventNotificationService {
     public static final String ENTER_WITH_CHECKER_VALUES_KEY   = "enterWithChecker";
     public static final String ORG_ADDRESS_KEY = "address";
     public static final String ORG_SHORT_NAME_KEY = "shortnameinfoservice";
+    public static final String CLIENT_GENDER_KEY = "gender";
+    public static final String CLIENT_GENDER_VALUE_MALE = "male";
+    public static final String CLIENT_GENDER_VALUE_FEMALE = "famale";
 
     public static final String PARAM_ORDER_EVENT_TIME = "orderEventTime";
     public static final String PARAM_AMOUNT_PRICE = "amountPrice";
@@ -709,6 +712,21 @@ public class EventNotificationService {
         return attachToValues(ORG_SHORT_NAME_KEY, shortName, values);
     }
 
+    public static final String[] attachGenderToValues(Integer gender, String[] values) {
+        if (null == gender) {
+            return values;
+        }
+
+        String genderString;
+        switch (gender) {
+            case 0: genderString = CLIENT_GENDER_VALUE_FEMALE; break;
+            case 1: genderString = CLIENT_GENDER_VALUE_MALE; break;
+            default: return values;
+        }
+
+        return attachToValues(CLIENT_GENDER_KEY, genderString, values);
+    }
+
     public static Long getTargetIdFromValues(String[] values) {
         String id = findValueInParams(new String [] {TARGET_VALUES_KEY}, values);
         if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
@@ -778,6 +796,7 @@ public class EventNotificationService {
                     || direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 empType = getEnterEventEMPType(destClient, dataClient, direction, values);
                 putOrgParams(empType, values);
+                putGenderParams(empType, values);
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
                 if (dataClient != null) {
@@ -856,6 +875,7 @@ public class EventNotificationService {
                 empType.getParameters().put(PARAM_AMOUNT_PRICE, amountPrice);
                 empType.getParameters().put(PARAM_AMOUNT_LUNCH, amountLunch);
                 empType.getParameters().put(PARAM_AMOUNT, amount);
+                putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, dataClient, destClient);
@@ -870,12 +890,14 @@ public class EventNotificationService {
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, destClient);
                 }
+                putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, dataClient, destClient);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient);
                 }
+                putGenderParams(empType, values);
             }
 
             if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
@@ -956,6 +978,13 @@ public class EventNotificationService {
         String orgShortName = findValueInParams(new String[] {ORG_SHORT_NAME_KEY}, values);
         if (!StringUtils.isEmpty(orgShortName)) {
             empType.getParameters().put(ORG_SHORT_NAME_KEY, orgShortName);
+        }
+    }
+
+    private static final void putGenderParams(EMPEventType empType, String[] values) {
+        String gender = findValueInParams(new String[]{CLIENT_GENDER_KEY}, values);
+        if (null != gender) {
+            empType.getParameters().put(CLIENT_GENDER_KEY, gender);
         }
     }
 

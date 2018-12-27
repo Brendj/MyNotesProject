@@ -3566,6 +3566,7 @@ public class Processor implements SyncProcessor {
                                 Long.toString(client.getBalance() / 100) + ',' + Long
                                         .toString(Math.abs(client.getBalance()) % 100), values);
                     }
+                    values = EventNotificationService.attachGenderToValues(client.getGender(), values);
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                             .sendNotificationAsync(client, null, EventNotificationService.MESSAGE_PAYMENT, values,
                                     payment.getOrderDate());
@@ -5394,6 +5395,7 @@ public class Processor implements SyncProcessor {
                                 .attachSourceOrgIdToValues(idOfOrg, values); //организация из пакета синхронизации
                         values = EventNotificationService.attachOrgAddressToValues(org.getAddress(), values);
                         values = EventNotificationService.attachOrgShortNameToValues(org.getShortNameInfoService(), values);
+                        values = EventNotificationService.attachGenderToValues(clientFromEnterEvent.getGender(), values);
                         switch (org.getType()) {
                             case PROFESSIONAL:
                             case SCHOOL: {
