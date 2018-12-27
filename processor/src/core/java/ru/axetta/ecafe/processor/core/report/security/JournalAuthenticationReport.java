@@ -120,7 +120,7 @@ public class JournalAuthenticationReport extends BasicReportForAllOrgJob {/*
                 item.setUserName(balance.getLogin());
                 item.setIsSuccess(balance.getSuccess() ? "Да" : "Нет");
                 item.setComment(balance.getComment());
-                if (balance.getIdOfArmType() != null) {
+                if (SecurityJournalAuthenticate.ArmType.parse(balance.getIdOfArmType()) != null) {
                     item.setArmType(SecurityJournalAuthenticate.ArmType.parse(balance.getIdOfArmType()).toString());
                 }
                 item.setIpAddress(balance.getIpAddress());
