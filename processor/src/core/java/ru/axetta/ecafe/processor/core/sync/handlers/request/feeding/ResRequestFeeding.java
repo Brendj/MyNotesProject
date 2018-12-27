@@ -13,6 +13,7 @@ import java.util.List;
 
 public class ResRequestFeeding implements AbstractToElement {
     private List<ResRequestFeedingItem> items;
+    private List<ResRequestFeedingETPStatuses> statuses;
 
     public ResRequestFeeding() {
 
@@ -33,5 +34,13 @@ public class ResRequestFeeding implements AbstractToElement {
 
     public void setItems(List<ResRequestFeedingItem> items) {
         this.items = items;
+    }
+
+    public List<ResRequestFeedingETPStatuses> getStatuses() {
+        return statuses;
+    }
+
+    public void setStatuses(List<ResRequestFeedingETPStatuses> statuses) {
+        this.statuses = statuses;
     }
 }

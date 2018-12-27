@@ -31,6 +31,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
     public ResRequestFeeding process() {
         ResRequestFeeding result = new ResRequestFeeding();
         List<ResRequestFeedingItem> items = new ArrayList<ResRequestFeedingItem>();
+        List<ResRequestFeedingETPStatuses> etpStatuses = new ArrayList<ResRequestFeedingETPStatuses>();
         try {
             ResRequestFeedingItem resItem;
             boolean errorFound;
@@ -54,14 +55,10 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                             applicationForFood = DAOUtils
                                     .createApplicationForFood(session, client, item.getDtisznCode(), item.getApplicantPhone(), item.getApplicantName(),
                                             item.getApplicantSecondName(), item.getApplicantSurname(), item.getServNumber(), ApplicationForFoodCreatorType.PORTAL);
-                            service.sendStatusAsync(System.currentTimeMillis(), item.getServNumber(),
-                                    applicationForFood.getStatus().getApplicationForFoodState(),
-                                    applicationForFood.getStatus().getDeclineReason());
-                            applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumber(session, item.getServNumber(),
-                                    new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
-                            service.sendStatusAsync(System.currentTimeMillis(), item.getServNumber(),
-                                    applicationForFood.getStatus().getApplicationForFoodState(),
-                                    applicationForFood.getStatus().getDeclineReason());
+                            etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, applicationForFood.getStatus()));
+                            ApplicationForFoodStatus st = new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null);
+                            applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumber(session, item.getServNumber(), st);
+                            etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, st));
                         } catch (Exception e) {
                             logger.error(String.format("Unable to create application for food {idOfClient=%d, DTSZNCode=%d, "
                                     + "applicantPhone=%s, applicantName=%s, applicantSecondName=%s, applicantSurname=%s, serviceNumber=%s}",
@@ -81,16 +78,14 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 //если Иное и новый статус 1075, то искусственно создаем статус 1052
                                 DAOUtils.addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood,
                                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null), nextHistoryVersion);
-                                service.sendStatusAsync(System.currentTimeMillis() - RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue(),
-                                        item.getServNumber(), ApplicationForFoodState.RESULT_PROCESSING, status.getDeclineReason());
+                                etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, status.getDeclineReason())));
                             }
 
                             applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(),
                                     client, item.getDtisznCode(), status, item.getApplicantPhone(), item.getApplicantName(), item.getApplicantSecondName(),
                                     item.getApplicantSurname(), nextVersion, nextHistoryVersion);
                             if (!oldStatus.equals(status)) {
-                                service.sendStatusAsync(System.currentTimeMillis(),
-                                        item.getServNumber(), status.getApplicationForFoodState(), status.getDeclineReason());
+                                etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, new ApplicationForFoodStatus(status.getApplicationForFoodState(), status.getDeclineReason())));
                             }
                         } catch (Exception e) {
                             resItem = new ResRequestFeedingItem();
@@ -118,6 +113,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             return null;
         }
         result.setItems(items);
+        result.setStatuses(etpStatuses);
         return result;
     }
 

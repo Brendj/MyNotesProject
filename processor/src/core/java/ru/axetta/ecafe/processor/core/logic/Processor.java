@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
 import ru.axetta.ecafe.processor.core.file.FileUtils;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgSyncWritableRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
@@ -77,10 +78,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRe
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
@@ -6360,6 +6358,12 @@ public class Processor implements SyncProcessor {
             resRequestFeeding = (ResRequestFeeding) processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            long time = System.currentTimeMillis() - RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
+            for (ResRequestFeedingETPStatuses etpStatus : resRequestFeeding.getStatuses()) {
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(time, etpStatus.getApplicationForFood().getServiceNumber(),
+                        etpStatus.getStatus().getApplicationForFoodState(), etpStatus.getStatus().getDeclineReason());
+                time += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
+            }
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
