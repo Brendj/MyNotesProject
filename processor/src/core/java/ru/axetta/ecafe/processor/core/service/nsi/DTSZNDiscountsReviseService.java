@@ -70,6 +70,9 @@ public class DTSZNDiscountsReviseService {
     public static final String DISABLE_OU_FILTER_PROPERTY = "ecafe.processor.revise.dtszn.disableOUFilter";
     public static final Boolean DEFAULT_DISABLE_OU_FILTER = true;
 
+    public static final String DISABLE_UPDATED_AT_FILTER_PROPERTY = "ecafe.processor.revise.dtszn.disableUpdatedAtFilter";
+    public static final Boolean DEFAULT_DISABLE_UPDATED_AT_FILTER = true;
+
     public static final String OPERATOR_EQUAL = "=";
     public static final String OPERATOR_IN = "in";
     public static final String OPERATOR_LIKE = "like";
@@ -88,6 +91,7 @@ public class DTSZNDiscountsReviseService {
     private Boolean isTest;
     private Long maxRecords;
     private Boolean disableOUFilter;
+    private Boolean disableUpdatedAtFilter;
 
     public boolean isOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -108,6 +112,7 @@ public class DTSZNDiscountsReviseService {
             password = getPassword();
             maxRecords = getMaxRecords();
             disableOUFilter = getDisableOuFilter();
+            disableUpdatedAtFilter = getDisableUpdatedAtFilter();
         } catch (Exception e) {
             logger.error("DTSZNDiscountsReviseService initialization error", e);
         }
@@ -307,6 +312,15 @@ public class DTSZNDiscountsReviseService {
         return Boolean.parseBoolean(disableOUFilterString);
     }
 
+    private Boolean getDisableUpdatedAtFilter() {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String disableUpdatedAtFilterString = runtimeContext.getConfigProperties().getProperty(DISABLE_UPDATED_AT_FILTER_PROPERTY);
+        if (null == disableUpdatedAtFilterString) {
+            return DEFAULT_DISABLE_UPDATED_AT_FILTER;
+        }
+        return Boolean.parseBoolean(disableUpdatedAtFilterString);
+    }
+    
     private NSIRequest buildDictBenefitRequest(Long page, Long pageSize) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
         paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false));
@@ -326,7 +340,9 @@ public class DTSZNDiscountsReviseService {
         paramList.add(new NSIRequestParam("dszn-date-begin", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("benefit-confirmed", OPERATOR_IS_NULL, true));
-        //paramList.add(new NSIRequestParam("updated-at", OPERATOR_IS_NULL, true));
+        if (!disableUpdatedAtFilter) {
+            paramList.add(new NSIRequestParam("updated-at", OPERATOR_IS_NULL, true));
+        }
         paramList.add(new NSIRequestParam("person/deleted-at", OPERATOR_IS_NULL, false));
         paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_LT, date, true));
         paramList.add(new NSIRequestParam("created-by", OPERATOR_EQUAL, "ou", false));
