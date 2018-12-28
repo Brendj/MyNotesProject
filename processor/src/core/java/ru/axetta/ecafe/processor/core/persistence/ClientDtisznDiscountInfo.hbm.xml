@@ -25,5 +25,6 @@
         <property name="version" column="Version" type="long"/>
         <property name="archived" column="archived" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="createdDateInternal" column="CreatedDateInternal" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
 </hibernate-mapping>
