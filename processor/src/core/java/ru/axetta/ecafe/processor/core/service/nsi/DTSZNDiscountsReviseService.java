@@ -326,7 +326,7 @@ public class DTSZNDiscountsReviseService {
         paramList.add(new NSIRequestParam("dszn-date-begin", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("benefit-confirmed", OPERATOR_IS_NULL, true));
-        paramList.add(new NSIRequestParam("updated-at", OPERATOR_IS_NULL, true));
+        //paramList.add(new NSIRequestParam("updated-at", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("person/deleted-at", OPERATOR_IS_NULL, false));
         paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_LT, date, true));
         paramList.add(new NSIRequestParam("created-by", OPERATOR_EQUAL, "ou", false));
