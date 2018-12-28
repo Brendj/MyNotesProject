@@ -16,3 +16,8 @@ CREATE INDEX cf_applications_for_food_history_version_idx ON cf_applications_for
 --дата создания льготы на процессинге
 alter table cf_client_dtiszn_discount_info
   add column createddateinternal bigint;
+
+
+ALTER TABLE cf_menuexchange ALTER COLUMN menudata TYPE character varying (1048576);
+
+--! ФИНАЛИЗИРОВАН 28.12.2018, НЕ МЕНЯТЬ
