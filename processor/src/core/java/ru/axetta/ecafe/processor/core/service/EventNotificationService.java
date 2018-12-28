@@ -77,7 +77,7 @@ public class EventNotificationService {
     public static final String ORG_SHORT_NAME_KEY = "shortnameinfoservice";
     public static final String CLIENT_GENDER_KEY = "gender";
     public static final String CLIENT_GENDER_VALUE_MALE = "male";
-    public static final String CLIENT_GENDER_VALUE_FEMALE = "famale";
+    public static final String CLIENT_GENDER_VALUE_FEMALE = "female";
 
     public static final String PARAM_ORDER_EVENT_TIME = "orderEventTime";
     public static final String PARAM_AMOUNT_PRICE = "amountPrice";
@@ -890,14 +890,12 @@ public class EventNotificationService {
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, destClient);
                 }
-                putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, dataClient, destClient);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient);
                 }
-                putGenderParams(empType, values);
             }
 
             if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
@@ -905,6 +903,7 @@ public class EventNotificationService {
                 empType.getParameters().put(ExternalEventNotificationService.PLACE_CODE, eventPlaceCode);
                 String eventPlaceName = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_NAME}, values);
                 empType.getParameters().put(ExternalEventNotificationService.PLACE_NAME, eventPlaceName);
+                putGenderParams(empType, values);
             }
 
             //  Устанавливаем дату
