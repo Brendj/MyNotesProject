@@ -53,6 +53,7 @@ public class ExternalEventNotificationService {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = persistenceSession.beginTransaction();
             String[] values = generateNotificationParams(client, event);
+            EventNotificationService.attachGenderToValues(client.getGender(), values);
             final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                     EventNotificationService.class);
             List<Client> guardians = ClientManager.findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
