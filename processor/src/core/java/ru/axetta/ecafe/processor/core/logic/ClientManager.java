@@ -1988,4 +1988,34 @@ public class ClientManager {
             logger.error("Failed to block extra cards for client contractID: " + client.getContractId(), e);
         }
     }
+
+    public static void addOtherDiscountForClient(Session session, Client client, Long otherDiscountCode) throws Exception {
+        String oldDiscounts = client.getCategoriesDiscounts();
+        String newDiscounts = oldDiscounts;
+        if (!StringUtils.isEmpty(newDiscounts)) {
+            newDiscounts += ",";
+        }
+        newDiscounts += otherDiscountCode.toString();
+        client.setCategoriesDiscounts(newDiscounts);
+
+        Integer oldDiscountMode = client.getDiscountMode();
+
+        if (Client.DISCOUNT_MODE_NONE == oldDiscountMode) {
+            client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
+        }
+
+        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
+                Client.DISCOUNT_MODE_BY_CATEGORY, oldDiscountMode, newDiscounts, oldDiscounts);
+        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_US);
+        session.save(discountChangeHistory);
+        client.setLastDiscountsUpdate(new Date());
+        try {
+            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+        } catch (Exception e) {
+            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+        }
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        client.setClientRegistryVersion(clientRegistryVersion);
+        session.update(client);
+    }
 }

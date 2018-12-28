@@ -5,16 +5,19 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding> {
@@ -37,7 +40,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             boolean errorFound;
             Long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
             Long nextHistoryVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+            Long otherDiscountCode = null;
             for (RequestFeedingItem item : requestFeeding.getItems()) {
                 errorFound = !item.getResCode().equals(RequestFeedingItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
@@ -79,6 +82,10 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 DAOUtils.addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood,
                                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null), nextHistoryVersion);
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood, new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, status.getDeclineReason())));
+                                if (null == otherDiscountCode) {
+                                    otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
+                                }
+                                ClientManager.addOtherDiscountForClient(session, client, otherDiscountCode);
                             }
 
                             applicationForFood = DAOUtils.updateApplicationForFoodByServiceNumberFullWithVersion(session, item.getServNumber(),

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVDaoService;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -92,6 +93,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             transaction = session.beginTransaction();
             Long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
             Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+            Long otherDiscountCode = null;
             for (ApplicationForFoodReportItem item : items) {
                 if (item.isChanged()) {
                     wereChanges = true;
@@ -101,6 +103,12 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                         RuntimeContext.getAppContext().getBean(ETPMVService.class).sendStatusAsync(System.currentTimeMillis() + pause, item.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason());
                         pause += RuntimeContext.getAppContext().getBean(ETPMVService.class).getPauseValue();
+                        if (status.getApplicationForFoodState().equals(ApplicationForFoodState.OK)) {
+                            if (null == otherDiscountCode) {
+                                otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
+                            }
+                            ClientManager.addOtherDiscountForClient(session, item.getApplicationForFood().getClient(), otherDiscountCode);
+                        }
                     }
                 }
             }

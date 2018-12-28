@@ -4021,4 +4021,10 @@ public class DAOUtils {
         criteria.add(Restrictions.in("dtisznCode", codeList));
         return criteria.list();
     }
+
+    // код льготы иное
+    public static Long getOtherDiscountCode(Session session) {
+        Query query = session.createQuery("select dszn.categoryDiscount.idOfCategoryDiscount from CategoryDiscountDSZN dszn where code=0");
+        return (Long) query.uniqueResult();
+    }
 }
