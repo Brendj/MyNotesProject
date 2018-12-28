@@ -12,3 +12,7 @@ alter table cf_etp_incoming_message
 CREATE INDEX cf_applications_for_food_version_idx ON cf_applications_for_food USING btree (version);
 
 CREATE INDEX cf_applications_for_food_history_version_idx ON cf_applications_for_food_history USING btree (version);
+
+--дата создания льготы на процессинге
+alter table cf_client_dtiszn_discount_info
+  add column createddateinternal bigint;
