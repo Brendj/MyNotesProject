@@ -60,6 +60,7 @@ public class ETPMVService {
     private IsppWebService port;
     private BindingProvider bindingProvider;
     JAXBContext jaxbContext;
+    JAXBContext jaxbConsumerContext;
     private final int AIS_CONTINGENT_CONNECT_TIMEOUT = 10000;
     private final int AIS_CONTINGENT_REQUEST_TIMEOUT = 10*60*1000;
     private final int AIS_CONTINGENT_MAX_PACKET = 10;
@@ -413,7 +414,8 @@ public class ETPMVService {
     private JAXBContext getJAXBContext(int type) throws Exception {
         switch (type) {
             case COORDINATE_MESSAGE:
-                return JAXBContext.newInstance(CoordinateMessage.class);
+                if (jaxbConsumerContext == null) jaxbConsumerContext = JAXBContext.newInstance(CoordinateStatusMessage.class);
+                return jaxbConsumerContext;
         }
         return null;
     }

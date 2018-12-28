@@ -35,6 +35,11 @@ public class ETPMVDaoService {
 
     @Transactional
     public void saveEtpPacket(String messageId, String messageText) {
+        Query query = entityManager.createQuery("select count(m.etpMessageId) from EtpIncomingMessage m where m.etpMessageId like :messageId");
+        query.setParameter("messageId", messageId + "%");
+        Long res = (Long)query.getSingleResult();
+        if (res > 0) messageId += "__" + res;
+
         EtpIncomingMessage etpIncomingMessage = new EtpIncomingMessage();
         etpIncomingMessage.setEtpMessageId(messageId);
         etpIncomingMessage.setEtpMessagePayload(messageText);
