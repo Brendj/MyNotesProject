@@ -26,6 +26,7 @@ public class ClientGuardianItem {
     private Integer relation;
     private String guidRequest;
     private Boolean informedSpecialMenu; //ConsentToPreOrder
+    private Boolean isLegalRepresent;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -39,6 +40,7 @@ public class ClientGuardianItem {
         }
         this.informedSpecialMenu = clientGuardian.getInformedSpecialMenu();
         this.result = null;
+        this.isLegalRepresent = clientGuardian.getIsLegalRepresent();
     }
 
     public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
@@ -77,6 +79,9 @@ public class ClientGuardianItem {
         XMLUtils.setAttributeIfNotNull(element, "Relation", relation);
         XMLUtils.setAttributeIfNotNull(element, "GuidRequest", guidRequest);
         XMLUtils.setAttributeIfNotNull(element, "ConsentToPreOrder", informedSpecialMenu ? "1" : "0"); //По протоколу поле ConsentToPreOrder == informedSpecialMenu
+        if(isLegalRepresent != null) {
+            XMLUtils.setAttributeIfNotNull(element, "IsLegalRepresent", isLegalRepresent ? "1" : "0");
+        }
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
@@ -124,5 +129,13 @@ public class ClientGuardianItem {
 
     public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
         this.informedSpecialMenu = informedSpecialMenu;
+    }
+
+    public Boolean getLegalRepresent() {
+        return isLegalRepresent;
+    }
+
+    public void setLegalRepresent(Boolean legalRepresent) {
+        isLegalRepresent = legalRepresent;
     }
 }

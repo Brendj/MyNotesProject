@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
 import java.util.*;
 
 @Component
@@ -131,22 +131,22 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             List<Object[]> dataFromDB = query.list();
             if(dataFromDB != null){
                 for(Object[] row : dataFromDB) {
-                    Long idOfContragent = getLongFromBigIntegerOrNull(row[0]);
+                    Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
                     String contragentName = (String) row[1];
-                    Long idOfOrg = getLongFromBigIntegerOrNull(row[2]);
+                    Long idOfOrg =DataBaseSafeConverterUtils. getLongFromBigIntegerOrNull(row[2]);
                     String orgShortName = (String) row[3];
                     String orgShortAddress = (String) row[4];
-                    Long clientContractId = getLongFromBigIntegerOrNull(row[5]);
-                    Date preorderDate = getDateFromBigIntegerOrNull(row[6]);
+                    Long clientContractId = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[5]);
+                    Date preorderDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
                     String complexName = (String) row[7];
                     Integer amount = (Integer) row[8];
                     String dish = (String) row[9];
-                    Long complexPrice = getLongFromBigIntegerOrNull(row[10]);
-                    Date cancelDate = getDateFromBigIntegerOrNull(row[11]);
+                    Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[10]);
+                    Date cancelDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[11]);
                     String reversed = (String) row[12];
-                    Date createdDate = getDateFromBigIntegerOrNull(row[13]);
-                    Long orderSum = getLongFromBigIntegerOrNull(row[14]);
-                    Long idOfOrder = getLongFromBigIntegerOrNull(row[15]);
+                    Date createdDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[13]);
+                    Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
+                    Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
                     String isPaid = (String) row[16];
                     ContragentPreordersReportItem item = new ContragentPreordersReportItem(
                             idOfContragent, contragentName, idOfOrg, orgShortName, orgShortAddress, clientContractId,
@@ -156,16 +156,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     result.add(item);
                 }
             }
-
             return new JRBeanCollectionDataSource(result);
-        }
-
-        private Long getLongFromBigIntegerOrNull(Object o){
-            return o != null ? ((BigInteger)o).longValue() : null;
-        }
-
-        private Date getDateFromBigIntegerOrNull(Object o){
-            return o != null ? new Date(((BigInteger)o).longValue()) : null;
         }
     }
 

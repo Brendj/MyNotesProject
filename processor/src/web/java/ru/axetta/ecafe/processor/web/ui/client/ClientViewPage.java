@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -12,11 +13,13 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Ban
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
+import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -144,16 +147,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
     }
 
-    private String categoriesDiscounts;
-
-    public String getCategoriesDiscounts() {
-        return categoriesDiscounts;
-    }
-
-    public void setCategoriesDiscounts(String categoriesDiscounts) {
-        this.categoriesDiscounts = categoriesDiscounts;
-    }
-
     private Long idOfClient;
     private Long idOfOrg;
     private String orgShortName;
@@ -179,7 +172,6 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Integer freePayMaxCount;
     private Integer freePayCount;
     private Date lastFreePayTime;
-    private Integer discountMode;
     private Long balance;
     private Long subBalance0;
     private Long subBalance1;
@@ -195,8 +187,6 @@ public class ClientViewPage extends BasicWorkspacePage {
     private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
-    private String categoriesDiscountsDSZN;
-    private Date lastDiscountsUpdate;
     private Boolean disablePlanCreation;
     private Date disablePlanCreationDate;
     private Date disablePlanEndDate;
@@ -382,9 +372,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         return lastFreePayTime;
     }
 
-    public Integer getDiscountMode() {
-        return discountMode;
-    }
 
     public ClientCardListViewPage getClientCardListViewPage() {
         return clientCardListViewPage;
@@ -412,22 +399,6 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
-    }
-
-    public String getCategoriesDiscountsDSZN() {
-        return categoriesDiscountsDSZN;
-    }
-
-    public void setCategoriesDiscountsDSZN(String categoriesDiscountsDSZN) {
-        this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
-    }
-
-    public Date getLastDiscountsUpdate() {
-        return lastDiscountsUpdate;
-    }
-
-    public void setLastDiscountsUpdate(Date lastDiscountsUpdate) {
-        this.lastDiscountsUpdate = lastDiscountsUpdate;
     }
 
     public Boolean getDisablePlanCreation() {
@@ -523,7 +494,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.freePayMaxCount = client.getFreePayMaxCount();
         this.freePayCount = client.getFreePayCount();
         this.lastFreePayTime = client.getLastFreePayTime();
-        this.discountMode = client.getDiscountMode();
         this.clientCardListViewPage.fill(client);
         this.clientNotificationSettingViewPage.fill(client);
         this.balance = client.getBalance();
@@ -536,8 +506,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
         this.birthDate = client.getBirthDate();
-        this.categoriesDiscountsDSZN = getCategoriesDiscountsDSZNDesc(session, client);
-        this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
         this.disablePlanCreationDate = client.getDisablePlanCreationDate();
         this.disablePlanCreation = this.disablePlanCreationDate != null;
         this.disablePlanEndDate = client.getDisablePlanEndDate();
@@ -545,6 +513,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.balanceToNotify = client.getBalanceToNotify();
         this.lastConfirmMobile = client.getLastConfirmMobile();
         this.multiCardMode = client.activeMultiCardMode();
+        this.clientDiscountItems = buildClientDiscountItem(session, client);
 
         // опекуны
         // (Kadyrov D) 23.12.2011
@@ -564,26 +533,6 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.middleGroup = client.getMiddleGroup();
 
-        // Категории скидок
-        List<Long> categoriesDiscountsIds = new ArrayList<Long>();
-        for(String cd : client.getCategoriesDiscounts().split(",")) {
-            if(StringUtils.isNotEmpty(cd)) {
-                categoriesDiscountsIds.add(Long.valueOf(cd));
-            }
-        }
-        if(categoriesDiscountsIds.size() > 0) {
-            Criteria criteria = session.createCriteria(CategoryDiscount.class);
-            criteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
-            List<CategoryDiscount> cdList = criteria.list();
-            StringBuilder sb = new StringBuilder();
-            for(CategoryDiscount categoryDiscount : cdList) {
-                sb.append(categoryDiscount.getCategoryName());
-                sb.append(";");
-            }
-            this.categoriesDiscounts = sb.length() > 1 ? sb.substring(0, sb.length() - 1) : sb.toString();
-        } else {
-            this.categoriesDiscounts = "Нет категорий";
-        }
         Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
         bankSubscriptionCriteria.add(Restrictions.eq("client", client))
                 .add(Restrictions.isNotNull("activationDate"));
@@ -616,6 +565,50 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     }
 
+    public static List<ClientDiscountItem> buildClientDiscountItem(Session session, Client client) {
+        if(StringUtils.isEmpty(client.getCategoriesDiscounts()) && StringUtils.isEmpty(client.getCategoriesDiscountsDSZN())){
+            return Collections.emptyList();
+        }
+        List<ClientDiscountItem> result = new LinkedList<ClientDiscountItem>();
+
+        Query query = session.createSQLQuery("select cd.idofcategorydiscount, cd.categoryName,"
+                + " ci.idofclientdtiszndiscountinfo, ci.dtiszncode, ci.dtisznDescription, "
+                + " ci.status, ci.datestart, ci.dateend "
+                + " from cf_clients c  "
+                + " left join cf_categorydiscounts cd on cd.idofcategorydiscount in ( "
+                + "  select cast (unnest(string_to_array(c.categoriesdiscounts, ',')) as bigint) from cf_clients c  "
+                + "  where c.idofclient = :idOfClient "
+                + " )  "
+                + " left join cf_client_dtiszn_discount_info ci on ci.idofclient = c.idofclient "
+                + " left join CF_CategoryDiscounts_DSZN cdDSZN on ci.dtiszncode = cdDSZN.code "
+                + " and cd.idofcategorydiscount = cdDSZN.idofcategorydiscount "
+                + " where c.idofclient = :idOfClient "
+                + " and case "
+                + "      when ci is null then true "
+                + "      else ci.dtiszncode = cdDSZN.code and cd.idofcategorydiscount = cdDSZN.idofcategorydiscount "
+                + "     end "
+                + " order by 1");
+
+        query.setParameter("idOfClient", client.getIdOfClient());
+
+        List<Object[]> dataFromDB = query.list();
+        for(Object[] row : dataFromDB){
+            Long idOfCategoryDiscount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+            String categoryName = StringUtils.defaultString((String) row[1]);
+            Long idOfClientDTiSZNDiscountInfo = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[2]);
+            Long code = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[3]);
+            String descriptionDSZN = (String) row[4];
+            Integer status = (Integer) row[5];
+            Date dateStart = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
+            Date dateEnd = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[7]);
+
+            ClientDiscountItem item = new ClientDiscountItem(idOfCategoryDiscount, categoryName, idOfClientDTiSZNDiscountInfo, code,
+                    descriptionDSZN, status, dateStart, dateEnd, client.getLastDiscountsUpdate(), client.getDiscountMode());
+            result.add(item);
+        }
+        return result;
+    }
+
     private List<MigrantItem> buildClientSectionsItem(Session session, List<Migrant> migrants) {
         List<MigrantItem> result = new LinkedList<MigrantItem>();
         if(migrants != null){
@@ -623,35 +616,6 @@ public class ClientViewPage extends BasicWorkspacePage {
                 MigrantItem item = new MigrantItem(session, migrant);
                 result.add(item);
             }
-        }
-        return result;
-    }
-
-    public static String getCategoriesDiscountsDSZNDesc(Session session, Client client) {
-        String result = "";
-        String categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
-        if(categoriesDiscountsDSZN.length() > 0) {
-            List<Integer> cdDSZN = new ArrayList<Integer>();
-            for(String c : categoriesDiscountsDSZN.split(",")) {
-                cdDSZN.add(Integer.valueOf(c));
-            }
-            Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
-            criteria.add(Restrictions.in("code", cdDSZN));
-            List<CategoryDiscountDSZN> list = criteria.list();
-            Map<Integer, String> map = new TreeMap<Integer, String>();
-            for (CategoryDiscountDSZN discountDSZN : list) {
-                if(!discountDSZN.getDeleted()) {
-                    map.put(discountDSZN.getCode(), discountDSZN.getDescription());
-                }
-            }
-            StringBuilder sb = new StringBuilder();
-            for (Integer code : map.keySet()) {
-                sb.append(code);
-                sb.append(" - ");
-                sb.append(map.get(code));
-                sb.append("; ");
-            }
-            result = sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
         }
         return result;
     }
@@ -674,6 +638,12 @@ public class ClientViewPage extends BasicWorkspacePage {
         return clientSectionsItems;
     }
 
+    private List<ClientDiscountItem> clientDiscountItems;
+
+    public List<ClientDiscountItem> getClientDiscountItems() {
+        return clientDiscountItems;
+    }
+
     public Date getLastConfirmMobile() {
         return lastConfirmMobile;
     }
@@ -685,6 +655,4 @@ public class ClientViewPage extends BasicWorkspacePage {
     public boolean isLastConfirmMobileEmpty() {
         return getLastConfirmMobile() == null;
     }
-
-
 }

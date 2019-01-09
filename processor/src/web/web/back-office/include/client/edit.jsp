@@ -79,6 +79,8 @@
         <h:inputText value="#{mainPage.clientEditPage.person.idDocument}" maxlength="128" styleClass="input-text" />
     </h:panelGrid>
 
+    <h:outputText escape="true" value="Параллель" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.parallel}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Группа" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
         <h:inputText value="#{mainPage.clientEditPage.clientGroupName}" readonly="true" styleClass="input-text"
@@ -157,30 +159,6 @@
     </rich:dataTable>
     <h:outputText escape="true" value="Предельное количество покупок без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.freePayMaxCount}" styleClass="input-text" />
-
-    <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.clientEditPage.discountMode}">
-        <a4j:support event="onchange" reRender="clientCategory" action="#{mainPage.clientEditPage.changeClientCategory}"/>
-        <f:selectItems value="#{mainPage.clientEditPage.selectItemList}"/>
-    </h:selectOneMenu>
-
-    <h:outputText escape="true" value="Категории" styleClass="output-text"/>
-
-    <h:panelGroup id="clientCategory">
-        <a4j:commandButton value="..." action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" disabled="#{!mainPage.clientEditPage.discountModeIsCategory}">
-             <f:param name="fullList" value="false" />
-             <f:setPropertyActionListener value="#{mainPage.clientEditPage.idOfCategoryListString}" target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
-        </a4j:commandButton>
-        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
-    </h:panelGroup>
-
-    <h:outputText escape="true" value="Льготы ДТиСЗН" styleClass="output-text" />
-    <h:outputText value="#{mainPage.clientEditPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
-    <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" styleClass="output-text" />
-    <h:outputText value="#{mainPage.clientEditPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"
-                  styleClass="output-text" />
     <h:outputText escape="true" value="Исключен из плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.disablePlanCreation}" styleClass="output-text" />
     <h:outputText escape="true" value="Дата исключения из плана питания" styleClass="output-text" />
@@ -252,6 +230,12 @@
                 <h:outputText escape="true" value="Согласие на предзаказ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.informedSpecialMenu}" disabled="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" width="150">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Законный представитель" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
@@ -374,7 +358,43 @@
             </a4j:commandButton>
         </f:facet>
     </rich:dataTable>
-
+    <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.clientEditPage.discountMode}">
+        <a4j:support event="onchange" reRender="clientCategory" action="#{mainPage.clientEditPage.changeClientCategory}"/>
+        <f:selectItems value="#{mainPage.clientEditPage.selectItemList}"/>
+    </h:selectOneMenu>
+    <h:outputText escape="true" value="Льготы" styleClass="output-text"/>
+    <rich:dataTable id="clientdiscountsViewTable" value="#{mainPage.clientEditPage.clientDiscountItems}" var="clientDiscount"
+                    columnClasses="center-aligned-column"
+                    footerClass="data-table-footer-center"  rendered="#{not empty mainPage.clientEditPage.clientDiscountItems}">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Тип предоставляемой льготы" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientDiscount.discountMode}" styleClass="output-text" converter="clientDiscountModeConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Категории льгот" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientDiscount.printedCategoriesDiscounts}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientDiscount.lastDiscountsUpdate}" styleClass="output-text" />
+        </rich:column>
+        <f:facet name="footer">
+            <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
+                               styleClass="command-link" disabled="#{!mainPage.clientEditPage.discountModeIsCategory}">
+                <f:param name="fullList" value="false" />
+                <f:setPropertyActionListener value="#{mainPage.clientEditPage.idOfCategoryListString}"
+                                             target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
+            </a4j:commandButton>
+        </f:facet>
+    </rich:dataTable>
     <h:outputText escape="true" value="Не показывать в списке представителей внешним сервисам	" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.dontShowToExternal}" styleClass="output-text" />
 

@@ -29,6 +29,7 @@ public class ClientGuardian {
     private Date lastUpdate;
     private CardRequest cardRequest;
     private Boolean informedSpecialMenu;
+    private Boolean isLegalRepresent;
 
     protected ClientGuardian() {}
 
@@ -183,5 +184,17 @@ public class ClientGuardian {
 
     public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
         this.informedSpecialMenu = informedSpecialMenu;
+    }
+
+    public Boolean getIsLegalRepresent() {
+        return isLegalRepresent;
+    }
+
+    public void setIsLegalRepresent(Boolean legalRepresent) {
+        isLegalRepresent = legalRepresent;
+    }
+
+    public Boolean isLegalRepresent(){
+        return isLegalRepresent == null ? false : isLegalRepresent;
     }
 }

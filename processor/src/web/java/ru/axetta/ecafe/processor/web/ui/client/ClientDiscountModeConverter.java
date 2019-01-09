@@ -24,6 +24,9 @@ public class ClientDiscountModeConverter implements Converter {
     }
 
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object object) {
+        if(object == null){
+            return Client.DISCOUNT_MODE_NAMES[Client.DISCOUNT_MODE_NONE];
+        }
         int value = (Integer) object;
         if (value >= 0 && value < Client.DISCOUNT_MODE_NAMES.length) {
             return Client.DISCOUNT_MODE_NAMES[value];

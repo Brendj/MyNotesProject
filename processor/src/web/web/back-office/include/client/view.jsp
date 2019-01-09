@@ -54,12 +54,12 @@
         <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
         <h:inputText value="#{mainPage.clientViewPage.person.idDocument}" readonly="true" styleClass="input-text" />
     </h:panelGrid>
+    <h:outputText escape="true" value="Параллель" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.parallel}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Группа" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientGroupName}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Подгруппа" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.middleGroup}" readonly="true" styleClass="input-text" />
-    <h:outputText escape="true" value="Параллель" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientViewPage.parallel}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Тип возрастной группы" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.ageTypeGroup}" maxlength="128" styleClass="input-text"
                  readonly="true" />
@@ -138,18 +138,6 @@
     <h:outputText escape="true" value="Время последней покупки без предъявления карты" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.lastFreePayTime}" converter="timeConverter" readonly="true"
                  styleClass="input-text" />
-    <h:outputText escape="true" value="Тип предоставляемой льготы" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientViewPage.discountMode}" converter="clientDiscountModeConverter" readonly="true"
-                 styleClass="input-text" />
-
-    <h:outputText  escape="true" value="Категории" styleClass="output-text" />
-    <h:outputText value="#{mainPage.clientViewPage.categoriesDiscounts}" escape="true" styleClass="output-text" />
-
-    <h:outputText escape="true" value="Льготы ДТиСЗН" styleClass="output-text" />
-    <h:outputText value="#{mainPage.clientViewPage.categoriesDiscountsDSZN}" escape="true" styleClass="output-text" />
-    <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" styleClass="output-text" />
-    <h:outputText value="#{mainPage.clientViewPage.lastDiscountsUpdate}" escape="true" converter="timeConverter"
-                 styleClass="output-text" />
     <h:outputText escape="true" value="Исключен из плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.disablePlanCreation}" disabled="true" readonly="true"
                              styleClass="output-text" />
@@ -266,6 +254,12 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Законный представитель" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Степень родства" />
             </f:facet>
             <h:outputText escape="true" value="#{clientGuardian.relationStr}" styleClass="output-text" />
@@ -346,6 +340,53 @@
                 </rich:column>
             </rich:dataTable>
         </rich:column>
+    </rich:dataTable>
+    <h:outputText escape="true" value="Льготы" styleClass="output-text" />
+    <rich:dataTable id="clientdiscountsViewTable" value="#{mainPage.clientViewPage.clientDiscountItems}" var="clientDiscount"
+                    columnClasses="center-aligned-column"
+                    footerClass="data-table-footer">
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Тип предоставляемой льготы" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.discountMode}" styleClass="output-text" converter="clientDiscountModeConverter"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Категории льгот" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.printedCategoriesDiscounts}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дата последнего изменения льготы ИСПП" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.lastDiscountsUpdate}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Категории ДТиСЗН" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.printedCategoriesDiscountsDSZN}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дана начала" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.dateStart}" styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дата окончания" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.dateEnd}" styleClass="output-text"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Статус" />
+                </f:facet>
+                <h:outputText escape="true" value="#{clientDiscount.status}" styleClass="output-text"/>
+            </rich:column>
     </rich:dataTable>
 
     <h:outputText escape="true" value="Не показывать в списке представителей внешним сервисам" styleClass="output-text" />

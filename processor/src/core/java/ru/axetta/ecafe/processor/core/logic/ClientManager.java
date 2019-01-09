@@ -1498,7 +1498,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        clientGuardian.getInformedSpecialMenu()));
+                        clientGuardian.getInformedSpecialMenu(), clientGuardian.getIsLegalRepresent()));
             }
         }
         return guardianItems;
@@ -1517,7 +1517,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        clientWard.getInformedSpecialMenu()));
+                        clientWard.getInformedSpecialMenu(), clientWard.getIsLegalRepresent()));
             }
         }
         return wardItems;
@@ -1678,13 +1678,15 @@ public class ClientManager {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
-                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(), item.getCreatedWhereGuardian());
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
+                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
-            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems, ClientCreatedFromType createdWhere) {
+            ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
+            ClientCreatedFromType createdWhere, Boolean isLegalRepresentative) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1696,6 +1698,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
+            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -1705,12 +1708,15 @@ public class ClientManager {
                 guardian.setClientRegistryVersion(clientRegistryVersion);
                 guardian.setCreatedFromDesc(DAOReadonlyService.getInstance().getUserFromSession().getUserName());
                 session.update(guardian);
-            } catch (Exception e) { }
+            } catch (Exception e) {
+                logger.error("Exception when try add Guardian By Client", e);
+            }
         } else {
             clientGuardian.setVersion(version);
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
+            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -1769,7 +1775,8 @@ public class ClientManager {
         Long newGuardiansVersions = generateNewClientGuardianVersion(session);
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
-                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(), item.getCreatedWhereGuardian());
+                    ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
+                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
         }
     }
 

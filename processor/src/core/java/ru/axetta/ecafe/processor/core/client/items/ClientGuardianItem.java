@@ -27,6 +27,7 @@ public class ClientGuardianItem {
     private ClientCreatedFromType createdWhereGuardian;
     private String createdWhereGuardianDesc;
     private Boolean informedSpecialMenu;
+    private Boolean isLegalRepresentative;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -36,11 +37,13 @@ public class ClientGuardianItem {
         this.disabled = false;
         isNew = true;
         informedSpecialMenu = false;
+        isLegalRepresentative = false;
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
             List notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
-            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc, Boolean informedSpecialMenu) {
+            ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
+            Boolean informedSpecialMenu, Boolean isLegalRepresentative) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
@@ -53,6 +56,7 @@ public class ClientGuardianItem {
         this.createdWhereGuardian = createdWhereGuardian;
         this.createdWhereGuardianDesc = createdWhereGuardianDesc;
         this.informedSpecialMenu = informedSpecialMenu;
+        this.isLegalRepresentative = isLegalRepresentative;
     }
 
     public String getCreatedWhereClientGuardianStr() {
@@ -165,5 +169,13 @@ public class ClientGuardianItem {
 
     public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
         this.informedSpecialMenu = informedSpecialMenu;
+    }
+
+    public Boolean getLegalRepresentative() {
+        return isLegalRepresentative;
+    }
+
+    public void setLegalRepresentative(Boolean legalRepresentative) {
+        isLegalRepresentative = legalRepresentative;
     }
 }

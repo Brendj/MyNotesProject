@@ -260,7 +260,7 @@ public class ClientDao extends WritableJpaDao {
         //Создаем опекунскую связь
         Long version = generateNewClientGuardianVersion(session);
         ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(), version, false, null, null,
-                ClientCreatedFromType.DEFAULT);
+                ClientCreatedFromType.DEFAULT, null);
 
         //Очищаем данные клиента (ребенка)
         Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
