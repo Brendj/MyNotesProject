@@ -93,17 +93,20 @@ public class ClientGuardianItem {
         Long idOfGuardian = XMLUtils.getLongAttributeValue(itemNode, "IdOfGuardian");
         Long idOfChildren = XMLUtils.getLongAttributeValue(itemNode, "IdOfChildren");
         Boolean disabled = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "Disabled"));
+        Boolean isLegalRepresent = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "IsLegalRepresent"));
         Integer delete = XMLUtils.getIntegerValueZeroSafe(itemNode, "D");
         Integer relation = XMLUtils.getIntegerAttributeValue(itemNode, "Relation");
-        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete, relation);
+        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete, relation, isLegalRepresent);
     }
 
-    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate, Integer relation) {
+    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate,
+            Integer relation, Boolean isLegalRepresent) {
         this.idOfGuardian = idOfGuardian;
         this.idOfChildren = idOfChildren;
         this.disabled = disabled;
         this.deleteState = deleteSate;
         this.relation = relation;
+        this.isLegalRepresent = isLegalRepresent;
     }
 
 

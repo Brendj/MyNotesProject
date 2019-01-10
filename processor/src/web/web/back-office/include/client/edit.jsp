@@ -366,7 +366,7 @@
     <h:outputText escape="true" value="Льготы" styleClass="output-text"/>
     <rich:dataTable id="clientdiscountsViewTable" value="#{mainPage.clientEditPage.clientDiscountItems}" var="clientDiscount"
                     columnClasses="center-aligned-column"
-                    footerClass="data-table-footer-center"  rendered="#{not empty mainPage.clientEditPage.clientDiscountItems}">
+                    footerClass="data-table-footer-center">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Тип предоставляемой льготы" />
@@ -388,7 +388,7 @@
         <f:facet name="footer">
             <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                               styleClass="command-link" disabled="#{!mainPage.clientEditPage.discountModeIsCategory}">
+                               styleClass="command-link">
                 <f:param name="fullList" value="false" />
                 <f:setPropertyActionListener value="#{mainPage.clientEditPage.idOfCategoryListString}"
                                              target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
