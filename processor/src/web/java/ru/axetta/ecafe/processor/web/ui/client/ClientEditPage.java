@@ -899,6 +899,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (mobile == null) {
             throw new Exception("Неверный формат мобильного телефона");
         }
+        if(discountMode.equals(Client.DISCOUNT_MODE_NONE) && !idOfCategoryList.isEmpty()){
+            idOfCategoryList = Collections.emptyList();
+            clientDiscountItems = Collections.emptyList();
+        }
+        validateExistingGuardians();
 
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
@@ -1120,6 +1125,23 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (client.getSsoid() != null && !client.getSsoid().equals("")) {
             EMPProcessor processor = RuntimeContext.getAppContext().getBean(EMPProcessor.class);
             processor.updateNotificationParams(client);
+        }
+    }
+
+    private void validateExistingGuardians() throws Exception {
+        if(clientGuardianItems.isEmpty()) {
+            return;
+        }
+        StringBuilder notValidGuardianSB = new StringBuilder();
+        for(ClientGuardianItem item : clientGuardianItems){
+            if(item.getRelation().equals(-1)){
+                notValidGuardianSB.append(item.getPersonName());
+                notValidGuardianSB.append(" ");
+            }
+        }
+        if(notValidGuardianSB.length() != 0){
+            throw new Exception("У следующих опекунов не указан степень родства: "
+                    + notValidGuardianSB.toString());
         }
     }
 
