@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CardApplicationReport" pageWidth="930" pageHeight="300" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="930" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.1000000000000034"/>
+	<property name="ireport.x" value="4"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="003 Sample data xls"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5"/>
+			<leftPen lineWidth="0.5"/>
+			<bottomPen lineWidth="0.5"/>
+			<rightPen lineWidth="0.5"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text"/>
+	<style name="style1">
+		<box>
+			<rightPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="style2">
+		<box>
+			<leftPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="style3">
+		<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+			<pen lineWidth="1.0"/>
+			<topPen lineWidth="1.0"/>
+			<leftPen lineWidth="1.0"/>
+			<bottomPen lineWidth="1.0"/>
+			<rightPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<parameter name="startDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
+	<parameter name="overall" class="java.lang.Long" isForPrompting="false">
+		<defaultValueExpression><![CDATA[Long.MAX_VALUE - 10]]></defaultValueExpression>
+	</parameter>
+	<parameter name="overall_all" class="java.lang.Long">
+		<defaultValueExpression><![CDATA[Long.MAX_VALUE - 8]]></defaultValueExpression>
+	</parameter>
+	<parameter name="generateEndDate" class="java.lang.String"/>
+	<parameter name="shortName" class="java.lang.String"/>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\work\\jboss-jsf2\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="clientName" class="java.lang.String"/>
+	<field name="applicationDate" class="java.util.Date"/>
+	<field name="clientName" class="java.lang.String"/>
+	<field name="guardianName" class="java.lang.String"/>
+	<field name="passport" class="java.lang.String"/>
+	<field name="requestCardType" class="java.lang.String"/>
+	<field name="currentCardType" class="java.lang.String"/>
+	<field name="currentCardState" class="java.lang.String"/>
+	<field name="issueDate" class="java.util.Date"/>
+	<field name="cardsCount" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="134" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="0" width="930" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Отчет "Доступ к сопровождению в дошкольную группу"]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="20" width="930" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["с " + $P{startDate} + " по " + $P{endDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="40" width="930" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Организация: " + $P{shortName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false">
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" stretchType="RelativeToTallestObject" x="0" y="60" width="930" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Клиент: " + $P{clientName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="0" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Дата и время заявления]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="100" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ФИО учащегося]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="200" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ФИО представителя]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="300" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Паспорт представителя]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="400" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Тип запрашиваемой карты]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="500" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Тип текущей карты]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="600" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Статус текущей карты]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="700" y="79" width="100" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Дата выдачи карты]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="800" y="79" width="130" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество карт "Москвенок" выданных на семью]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="30">
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{applicationDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{clientName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="200" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{guardianName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="300" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{passport}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="400" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{requestCardType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="500" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{currentCardType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="600" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{currentCardState}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="700" y="0" width="100" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{issueDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="800" y="0" width="130" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{cardsCount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<noData>
+		<band/>
+	</noData>
+</jasperReport>

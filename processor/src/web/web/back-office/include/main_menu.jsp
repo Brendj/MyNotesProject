@@ -972,6 +972,9 @@
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
 
+    <%--@elvariable id="cardApplicationReportPage" type="ru.axetta.ecafe.processor.web.ui.service.CardApplicationReportPage"--%>
+    <rich:panelMenuItem id="cardApplicationReport" binding="#{cardApplicationReportPage.mainMenuComponent}"
+                        label="Отчет по заявлениям на карту" action="#{cardApplicationReportPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
