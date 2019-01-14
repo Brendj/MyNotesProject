@@ -9,7 +9,7 @@
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%--@elvariable id="cardApplicationReportPage" type="ru.axetta.ecafe.processor.web.ui.service.CardApplicationReportPage"--%>
+<%--@elvariable id="cardApplicationReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardApplicationReportPage"--%>
 <h:panelGrid id="cardApplicationPanelGrid" binding="#{cardApplicationReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">

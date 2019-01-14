@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.service;
+package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
@@ -48,7 +48,7 @@ public class CardApplicationReportPage extends OnlineReportPage {
 
     @Override
     public String getPageFilename() {
-        return "service/card_applications";
+        return "report/online/card_applications";
     }
 
     @PostConstruct

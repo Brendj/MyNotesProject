@@ -69,7 +69,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="134" splitType="Stretch">
+		<band height="135" splitType="Stretch">
 			<staticText>
 				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="0" y="0" width="930" height="20"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
@@ -99,63 +99,63 @@
 				<textFieldExpression><![CDATA["Клиент: " + $P{clientName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="0" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="0" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Дата и время заявления]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="100" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="100" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ФИО учащегося]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="200" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="200" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ФИО представителя]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="300" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="300" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Паспорт представителя]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="400" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="400" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Тип запрашиваемой карты]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="500" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="500" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Тип текущей карты]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="600" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="600" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Статус текущей карты]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="700" y="79" width="100" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="700" y="80" width="100" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Дата выдачи карты]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="800" y="79" width="130" height="55"/>
+				<reportElement uuid="2b6041da-fc70-4027-99dc-4609ebe6f5c7" style="table" x="800" y="80" width="130" height="55"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>

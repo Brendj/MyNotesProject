@@ -4027,4 +4027,10 @@ public class DAOUtils {
         Query query = session.createQuery("select dszn.categoryDiscount.idOfCategoryDiscount from CategoryDiscountDSZN dszn where code=0");
         return (Long) query.uniqueResult();
     }
+
+    public static Person getPersonByClientId(Session session, Long idOfClient) {
+        Query query = session.createQuery("select p from Client c join c.person p where c.idOfClient = :idOfClient");
+        query.setParameter("idOfClient", idOfClient);
+        return (Person) query.uniqueResult();
+    }
 }

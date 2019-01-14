@@ -971,10 +971,6 @@
     <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
-
-    <%--@elvariable id="cardApplicationReportPage" type="ru.axetta.ecafe.processor.web.ui.service.CardApplicationReportPage"--%>
-    <rich:panelMenuItem id="cardApplicationReport" binding="#{cardApplicationReportPage.mainMenuComponent}"
-                        label="Отчет по заявлениям на карту" action="#{cardApplicationReportPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
@@ -1429,6 +1425,9 @@
                             binding="#{mainPage.issuedCardsReportPage.mainMenuComponent}"
                             label="Отчет о выданных и перевыпущенных картах" action="#{mainPage.issuedCardsReportPage.show}"
                             reRender="workspaceForm" />
+        <%--@elvariable id="cardApplicationReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CardApplicationReportPage"--%>
+        <rich:panelMenuItem id="cardApplicationReport" binding="#{cardApplicationReportPage.mainMenuComponent}"
+                            label="Отчет по заявлениям на карту" action="#{cardApplicationReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <%--@elvariable id="passReportsGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PassReportsGroupPage"--%>

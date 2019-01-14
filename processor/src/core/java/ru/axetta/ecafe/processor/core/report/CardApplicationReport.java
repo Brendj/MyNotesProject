@@ -10,9 +10,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -77,9 +76,16 @@ public class CardApplicationReport extends BasicReportForOrgJob {
             String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_OF_CLIENTS));
             List<String> stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
             List<Long> idOfClientList = new ArrayList<Long>();
+            List<String> clientFIOList = new LinkedList<String>();
             for (String idOfClient : stringClientsList) {
-                idOfClientList.add(Long.parseLong(idOfClient));
+                Long idOfClientLong = Long.parseLong(idOfClient);
+                idOfClientList.add(idOfClientLong);
+                Person person = DAOUtils.getPersonByClientId(session, idOfClientLong);
+                if (null != person) {
+                    clientFIOList.add(person.getFullName());
+                }
             }
+            parameterMap.put("clientName", StringUtils.join(clientFIOList, ", "));
 
             Boolean enableDateFilter = Boolean.parseBoolean(reportProperties.getProperty(P_ENABLE_DATE_FILTER));
 
@@ -92,6 +98,9 @@ public class CardApplicationReport extends BasicReportForOrgJob {
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Long idOfOrg,
                 List<Long> idOfClientList, Map<String, Object> parameterMap) throws Exception {
+            Date maxDate = null;
+            Date minDate = null;
+
             List<ReportItem> reportItemList = new LinkedList<ReportItem>();
             String conditions = "";
             if (idOfClientList.size() > 0) {
@@ -147,8 +156,24 @@ public class CardApplicationReport extends BasicReportForOrgJob {
 
                 reportItemList.add(new ReportItem(applicationDate, clientName, guardianName, passport, requestCardType,
                         currentCardType, currentCardState, issueDate, cardsCount));
+
+                if (null == startTime && null == endTime) {
+                    if (null == maxDate || maxDate.getTime() < applicationDate.getTime()) {
+                        maxDate = applicationDate;
+                    }
+
+                    if (null == minDate || minDate.getTime() > applicationDate.getTime()) {
+                        minDate = applicationDate;
+                    }
+                }
             }
 
+            if (null != minDate) {
+                parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(minDate));
+            }
+            if (null != maxDate) {
+                parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(maxDate));
+            }
             return new JRBeanCollectionDataSource(reportItemList);
         }
 
