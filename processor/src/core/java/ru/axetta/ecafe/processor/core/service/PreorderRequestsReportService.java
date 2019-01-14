@@ -17,7 +17,10 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentSta
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -296,20 +299,43 @@ public class PreorderRequestsReportService extends RecoverableService {
         Date _startDate = CalendarUtils.truncateToDayOfMonth(new Date());
         Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
 
+        Boolean isSixWorkWeek = false; //SubscriberFeedingSettingSettingValue.SIX_WORK_WEEK
+        ECafeSettings eCafeSettings = DAOUtils.getECafeSettingByIdOfOrgAndSettingId(session, orgOwner, SettingsIds.SubscriberFeeding);
+        if (null == eCafeSettings) {
+            logger.warn(String.format("Unable to find ECafeSettings for idOfOrg=%d and SettingsId=%d", orgOwner,
+                    SettingsIds.SubscriberFeeding.getId()));
+        } else {
+            try {
+                isSixWorkWeek = ((SubscriberFeedingSettingSettingValue) eCafeSettings.getSplitSettingValue()).isSixWorkWeek();
+            } catch (Exception e) {
+                logger.warn(String.format("Unable to parse setting values for idOfOrg=%d, SettingsId=%d, SettingValue=%s", orgOwner,
+                        SettingsIds.SubscriberFeeding.getId(), eCafeSettings.getSettingValue()));
+            }
+        }
+
+        if (!isSixWorkWeek) {
+            Org org = (Org) session.load(Org.class, orgOwner);
+            ClientGroup clientGroup = (ClientGroup) session.load(ClientGroup.class, new CompositeIdOfClientGroup(orgOwner, idOfClientGroup));
+            GroupNamesToOrgs groupNamesToOrgs = DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(session, org, clientGroup.getGroupName());
+            if (null != groupNamesToOrgs) {
+                isSixWorkWeek = groupNamesToOrgs.getIsSixDaysWorkWeek();
+            }
+        }
+
         Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
         specialDaysCriteria.add(Restrictions.eq("idOfOrg", orgOwner));
-        specialDaysCriteria.add(Restrictions.eq("isWeekend", Boolean.TRUE));
         specialDaysCriteria.add(Restrictions.eq("deleted", Boolean.FALSE));
         specialDaysCriteria.add(Restrictions.between("date", _startDate, specialDaysMonth));
-        if (null != idOfClientGroup) {
+//        if (null != idOfClientGroup) {
             specialDaysCriteria.add(Restrictions.or(Restrictions.eq("idOfClientGroup", idOfClientGroup),
                     Restrictions.isNull("idOfClientGroup")));
             specialDaysCriteria.setProjection(Projections.projectionList()
                     .add(Projections.property("date"))
-                    .add(Projections.property("idOfClientGroup")));
-        } else {
-            specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.max("date")));
-        }
+                    .add(Projections.property("idOfClientGroup"))
+                    .add(Projections.property("isWeekend")));
+        //} else {
+        //    specialDaysCriteria.setProjection(Projections.projectionList().add(Projections.max("date")));
+        //}
 
         List specialDates = specialDaysCriteria.list();
 
@@ -320,20 +346,23 @@ public class PreorderRequestsReportService extends RecoverableService {
 
             Date endDateStart = CalendarUtils.startOfDay(_startDate);
             Date endDateEnd = CalendarUtils.endOfDay(_startDate);
-            Boolean isWeekend = false;
+            Boolean isWeekend = null;
 
             //check special dates
             for (Object specialDate : specialDates) {
+                if (null == specialDate) {
+                    continue;
+                }
                 Object[] vals = (Object[]) specialDate;
                 if (CalendarUtils.betweenDate((Date) vals[0], endDateStart, endDateEnd)) {
-                    isWeekend = true;
+                    isWeekend = (Boolean) vals[2];
                     break;
                 }
             }
 
-            //check weekend
-            if (!CalendarUtils.isWorkDateWithoutParser(false, _startDate)) {
-                isWeekend = true;
+            if (null == isWeekend) {
+                //check weekend
+                isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, _startDate);
             }
 
             if (!isWeekend) {
