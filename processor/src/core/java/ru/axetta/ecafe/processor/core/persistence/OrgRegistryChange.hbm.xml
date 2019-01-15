@@ -50,9 +50,6 @@
         <property name="guid" column="guid" type="string" length="255" not-null="true"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>
         <property name="additionalId" column="additionalid" type="long"/>
-        <property name="mainBuilding" column="mainBuilding" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
-        <!--<many-to-one name="orgs" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange"-->
-                     <!--column="mainRegistry" />-->
 
         <set name="orgs" lazy="false" cascade="all" order-by="operationType, address">
             <key column="mainRegistry"/>

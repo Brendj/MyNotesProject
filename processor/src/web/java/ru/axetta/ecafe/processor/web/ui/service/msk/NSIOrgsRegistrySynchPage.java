@@ -44,15 +44,12 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     protected Long selectedRevision = -1L;
     protected List<Long> revisions;
     protected List<WebItem> items;
-    protected Long selectedOperationType = 0L;
     protected Boolean hideApplied = true;
     private WebItem orgForEdit;
     protected Integer selectedRegion = 0;
-    protected Integer selectedFounder = 0;
-    protected Integer selectedIndustry = 0;
 
     private final List<OrgModifyChangeItem> orgModifyChangeItems = new ArrayList<OrgModifyChangeItem>();
-    private Boolean isNeedAddElements;
+    private Boolean isNeedAddElements = true;
 
     public NSIOrgsRegistrySynchPage() {
         super();
@@ -65,7 +62,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_ADDRESS, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
-        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INTERDISTRICT, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_DIRECTOR, "", ""));
     }
 
     public String getPageFilename() {
@@ -90,10 +87,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public String getResultTitle() {
         return "";
-    }
-
-    public long getCreationsCount() {
-        return getCountOfOperation(OrgRegistryChange.CREATE_OPERATION);
     }
 
     public long getDeletionsCount() {
@@ -155,14 +148,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         return getOptionFilter(Option.OPTION_REGIONS_FROM_NSI, selectedRegion, ",");
     }
 
-    public String getFounderFilter() {
-        return getOptionFilter(Option.OPTION_FOUNDER_FROM_NSI, selectedFounder, "\n");
-    }
-
-    public String getIndustryFilter() {
-        return getOptionFilter(Option.OPTION_INDUSTRY_FROM_NSI, selectedIndustry, "\n");
-    }
-
     private String getOptionFilter(int option, int selected, String delim) {
         String str = RuntimeContext.getInstance().getOptionValueString(option);
         if (selected == 0) {
@@ -185,21 +170,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         this.selectedRevision = selectedRevision;
     }
 
-    public List<SelectItem> getOperationTypes() {
-        List<SelectItem> items = new ArrayList<SelectItem>();
-        items.add(0, new SelectItem(0, "Все"));
-        items.add(1, new SelectItem(OrgRegistryChange.CREATE_OPERATION, "Создание"));
-        items.add(2, new SelectItem(OrgRegistryChange.MODIFY_OPERATION, "Изменение"));
-//        items.add(3, new SelectItem(OrgRegistryChange.DELETE_OPERATION, "Отключение"));
-        return items;
-    }
-
     public List<SelectItem> getRegions() {
         return getSelectItemsList(Option.OPTION_REGIONS_FROM_NSI, ",");
-    }
-
-    public List<SelectItem> getIndustries() {
-        return getSelectItemsList(Option.OPTION_INDUSTRY_FROM_NSI, "\n");
     }
 
     public List<SelectItem> getSelectItemsList(int option, String delim) {
@@ -218,10 +190,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             printError("Не удается распарсить строку с перечислением настроек");
         }
         return items;
-    }
-
-    public List<SelectItem> getFounders() {
-        return getSelectItemsList(Option.OPTION_FOUNDER_FROM_NSI, "\n");
     }
 
     public List<SelectItem> getRevisions() {
@@ -304,11 +272,11 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public void doUpdate() {
         try {
             List<OrgRegistryChange> dbItems = DAOService.getInstance().getOrgRegistryChanges(nameFilter, getRegionFilter(),
-                    selectedRevision, selectedOperationType, hideApplied);
+                    selectedRevision, 2, hideApplied);
             if(isNeedAddElements && nameFilter != null && nameFilter.length() > 0){
                 dbItems = DAOService.getInstance()
                         .getOrgRegistryChangesThroughOrgRegistryChangeItems(nameFilter, selectedRevision, getRegionFilter(),
-                                selectedOperationType, hideApplied, dbItems);
+                                2, hideApplied, dbItems);
             }
             putDbItems(dbItems);
         } catch (Exception e) {
@@ -320,8 +288,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public void doRefresh() {
         StringBuffer logBuffer = new StringBuffer();
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry(nameFilter, getRegionFilter(),
-                    getFounderFilter(), getIndustryFilter(), logBuffer);
+            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry(nameFilter, getRegionFilter(), logBuffer);
             loadRevisions();
             if(revisions != null || revisions.size() > 0) {
                 selectedRevision = revisions.get(0);
@@ -347,7 +314,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                     List<Long> buildingsList = new LinkedList<Long>();
 
                     for (WebItem webItem : i.getOrgs()) {
-                        if (webItem.isSelected() && webItem.getOperation() != OrgRegistryChange.SIMILAR){
+                        if (webItem.isSelected() && webItem.getOperation() != OrgRegistryChange.SIMILAR && webItem.getOperation() != OrgRegistryChange.CREATE_OPERATION){
                             buildingsList.add(webItem.getIdOfOrgRegistryChange());
                         }
                     }
@@ -472,17 +439,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             }
         }
 
-        //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
-        //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
-        //items.get(0).getOrgs().add(new WebItem(dbItem.get(0)));
-    }
-
-    public Long getSelectedOperationType() {
-        return selectedOperationType;
-    }
-
-    public void setSelectedOperationType(Long selectedOperationType) {
-        this.selectedOperationType = selectedOperationType;
     }
 
     public Boolean getHideApplied() {
@@ -538,9 +494,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getShortNameFrom());
                 item.setNewValue(orgForEdit.getShortNameReestr());
             }
-            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_INTERDISTRICT)) {
-                item.setOldValue(orgForEdit.getInterdistrictCouncilFrom());
-                item.setNewValue(orgForEdit.getInterdistrictCouncilReestr());
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_DIRECTOR)) {
+                item.setOldValue(orgForEdit.getDirectorFrom());
+                item.setNewValue(orgForEdit.getDirectorReestr());
             }
         }
         return orgModifyChangeItems;
@@ -552,22 +508,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public void setSelectedRegion(Integer selectedRegion) {
         this.selectedRegion = selectedRegion;
-    }
-
-    public Integer getSelectedFounder() {
-        return selectedFounder;
-    }
-
-    public void setSelectedFounder(Integer selectedFounder) {
-        this.selectedFounder = selectedFounder;
-    }
-
-    public Integer getSelectedIndustry() {
-        return selectedIndustry;
-    }
-
-    public void setSelectedIndustry(Integer selectedIndustry) {
-        this.selectedIndustry = selectedIndustry;
     }
 
     public void setIsNeedAddElements(Boolean isNeedAddElements) {
@@ -612,14 +552,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String guid;
         protected String guidFrom;
         protected Long additionalId;
-
-        protected String interdistrictCouncil;
-        protected String interdistrictCouncilFrom;
-        protected String interdistrictCouncilChief;
-        protected String interdistrictCouncilChiefFrom;
-
-        protected boolean isMain;
-        protected boolean isMainFrom;
+        protected String introductionQueue;
+        protected String introductionQueueFrom;
+        protected String director;
+        protected String directorFrom;
 
         private boolean selected = false;
 
@@ -653,13 +589,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.inn = registryChange.getInn();
             this.innFrom = registryChange.getInnFrom();
             this.additionalId = registryChange.getAdditionalId();
-            this.isMain = registryChange.getMainBuilding();
-            //this.isMainFrom = registryChange.getMainBuildingFrom();
-
-            this.interdistrictCouncil = registryChange.getInterdistrictCouncil();
-            this.interdistrictCouncilFrom = registryChange.getInterdistrictCouncilFrom();
-            this.interdistrictCouncilChief = registryChange.getInterdistrictCouncilChief();
-            this.interdistrictCouncilChiefFrom = registryChange.getInterdistrictCouncilChiefFrom();
 
             this.selected = registryChange.getApplied() ? true: false;
             boolean doAdd;
@@ -704,18 +633,12 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.guid = registryChangeItem.getGuid();
             this.guidFrom = registryChangeItem.getGuidFrom();
             this.additionalId = registryChangeItem.getAdditionalId();
-            this.isMain = registryChangeItem.getMainBuilding();
-            if (this.idOfOrg != null) {
-                Org org = DAOService.getInstance().getOrg(this.idOfOrg);
-                this.isMainFrom = org.isMainBuilding();
-            }
+            this.introductionQueue = registryChangeItem.getIntroductionQueue();
+            this.introductionQueueFrom = registryChangeItem.getIntroductionQueueFrom();
+            this.director = registryChangeItem.getDirector();
+            this.directorFrom = registryChangeItem.getDirectorFrom();
 
-            this.interdistrictCouncil = registryChangeItem.getInterdistrictCouncil();
-            this.interdistrictCouncilFrom = registryChangeItem.getInterdistrictCouncilFrom();
-            this.interdistrictCouncilChief = registryChangeItem.getInterdistrictCouncilChief();
-            this.interdistrictCouncilChiefFrom = registryChangeItem.getInterdistrictCouncilChiefFrom();
-
-            this.selected = true;
+            this.selected = registryChangeItem.getOperationType().equals(OrgRegistryChange.CREATE_OPERATION) ? false : true;
         }
 
         private String getImagedString(String image, String value) {
@@ -866,6 +789,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return operationType == OrgRegistryChange.SIMILAR;
         }
 
+        public boolean getIsAdding() {
+            return operationType == OrgRegistryChange.CREATE_OPERATION;
+        }
+
         public boolean getIsModify() {
             return operationType == OrgRegistryChange.MODIFY_OPERATION;
         }
@@ -892,22 +819,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getAddressReestr() {
             return address;
-        }
-
-        public String getIsMainBuilding() {
-            if (operationType == OrgRegistryChange.CREATE_OPERATION) {
-                return getIsMainString(isMain);
-            } else {
-                return getResultString(getIsMainString(isMain), getIsMainString(isMainFrom));
-            }
-        }
-
-        private String getIsMainString(boolean isMain) {
-            if (isMain) {
-                return "Да";
-            } else {
-                return "Нет";
-            }
         }
 
         public String getAddressAISReestr() {
@@ -988,26 +899,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public void setApplied(boolean applied) {
             this.applied = applied;
-        }
-
-        public String getInterdistrictCouncil() {
-            return getResultString(interdistrictCouncil, interdistrictCouncilFrom);
-        }
-
-        public String getInterdistrictCouncilReestr() {
-            return interdistrictCouncil;
-        }
-
-        public String getInterdistrictCouncilFrom() {
-            return interdistrictCouncilFrom;
-        }
-
-        public String getInterdistrictCouncilChief() {
-            return getResultString(interdistrictCouncilChief, interdistrictCouncilChiefFrom);
-        }
-
-        public String getInterdistrictCouncilChiefFrom() {
-            return interdistrictCouncilChiefFrom;
         }
 
         public String getOperationType() {
@@ -1108,6 +999,42 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public void setState(Integer state) {
             this.state = state;
+        }
+
+        public String getIntroductionQueue() {
+            return getResultString(introductionQueue, introductionQueueFrom);
+        }
+
+        public void setIntroductionQueue(String introductionQueue) {
+            this.introductionQueue = introductionQueue;
+        }
+
+        public String getDirector() {
+            return getResultString(director, directorFrom);
+        }
+
+        public String getDirectorReestr() {
+            return director;
+        }
+
+        public void setDirector(String director) {
+            this.director = director;
+        }
+
+        public String getDirectorFrom() {
+            return directorFrom;
+        }
+
+        public void setDirectorFrom(String directorFrom) {
+            this.directorFrom = directorFrom;
+        }
+
+        public String getIntroductionQueueFrom() {
+            return introductionQueueFrom;
+        }
+
+        public void setIntroductionQueueFrom(String introductionQueueFrom) {
+            this.introductionQueueFrom = introductionQueueFrom;
         }
     }
 }

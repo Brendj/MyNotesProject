@@ -10,6 +10,7 @@ import generated.nsiws2.com.rstyle.nsi.beans.Item;
 import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.symmetric.OrgSymmetricDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
@@ -21,10 +22,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +33,8 @@ import java.util.List;
  * User: shamil
  */
 
-@Component
+@Primary
+@Component("OrgMskNSIService")
 @Scope("singleton")
 public class OrgMskNSIService extends MskNSIService {
     private static final Logger logger = LoggerFactory.getLogger(OrgMskNSIService.class);
@@ -170,13 +172,6 @@ public class OrgMskNSIService extends MskNSIService {
                         }
                         info.setRegisteryPrimaryId(registryPrimaryId);
                     }
-                    if (attr.getName().equals("interdistrict_council")) {
-                        info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
-                    }
-
-                    if (attr.getName().equals("interdistrict_council_chief")) {
-                        info.setInterdistrictCouncil(attr.getValue().get(0).getValue());
-                    }
                     if (attr.getName().equals("ФИО директора")) {
                         info.setDirectorFullName(attr.getValue().get(0).getValue());
                     }
@@ -202,8 +197,6 @@ public class OrgMskNSIService extends MskNSIService {
                     item.setRegion(info.getRegion());
                     item.setGuid(info.getGuid());
                     item.setInn(info.getInn());
-                    item.setInterdistrictCouncil(info.getInterdistrictCouncil());
-                    item.setInterdistrictCouncilChief(info.getInterdistrictCouncilChief());
 
                     Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
                             item.getInn(), item.getUnom(), item.getUnad());
@@ -275,7 +268,7 @@ public class OrgMskNSIService extends MskNSIService {
         }
     }
 
-    private void fillInfOWithOrg(ImportRegisterOrgsService.OrgInfo info, Org existingOrg) {
+    protected void fillInfOWithOrg(ImportRegisterOrgsService.OrgInfo info, Org existingOrg) {
         info.setIdOfOrg(existingOrg.getIdOfOrg());
         info.setOrgState(existingOrg.getState());
         info.setOrganizationTypeFrom(existingOrg.getType());
@@ -295,11 +288,10 @@ public class OrgMskNSIService extends MskNSIService {
         info.setGuidFrom(existingOrg.getGuid());
         info.setMainBuilding(existingOrg.isMainBuilding());
         info.setInnFrom(existingOrg.getINN());
+        info.setIntroductionQueueFrom(existingOrg.getIntroductionQueue());
+        info.setDirectorFrom(existingOrg.getOfficialPerson().getFullName());
 
         info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
-
-        info.setInterdistrictCouncilFrom(existingOrg.getInterdistrictCouncil());
-        info.setInterdistrictCouncilChiefFrom(existingOrg.getInterdistrictCouncilChief());
     }
 
     private Org findOrgByUniqueAddressId(List<Org> existingOrgList, Long additionalId) {
@@ -311,7 +303,7 @@ public class OrgMskNSIService extends MskNSIService {
         return null;
     }
 
-    private List<ImportRegisterOrgsService.OrgInfo> addInfosWithoutBTIData(String address) {
+    protected List<ImportRegisterOrgsService.OrgInfo> addInfosWithoutBTIData(String address) {
         List<ImportRegisterOrgsService.OrgInfo> result = new LinkedList<ImportRegisterOrgsService.OrgInfo>();
         ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
         info.setAddress(address);
@@ -371,21 +363,10 @@ public class OrgMskNSIService extends MskNSIService {
         return result;
     }
 
-    private boolean checkUpdated(ImportRegisterOrgsService.OrgInfo info, Org existingOrg) {
-        if(info.getInterdistrictCouncil() != null && info.getInterdistrictCouncil().equals(existingOrg.getInterdistrictCouncil())){
-            return true;
-        }
-        if(info.getInterdistrictCouncilChief() != null && info.getInterdistrictCouncilChief().equals(existingOrg.getInterdistrictCouncilChief())){
-            return true;
-        }
-
-        return false;
-    }
-
-
     //Получения списка изменений из реестров с учетом имени, и ограничения на кол-во оргзаписей в ответе
-    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, String region, String founder, String industry) throws Exception {
-        List<ImportRegisterOrgsService.OrgInfo> orgs = new ArrayList<ImportRegisterOrgsService.OrgInfo>();
+    public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, String region) throws Exception {
+        return RuntimeContext.getAppContext().getBean(OrgSymmetricDAOService.class).getOrgs(orgName, region);
+        /*List<ImportRegisterOrgsService.OrgInfo> orgs = new ArrayList<ImportRegisterOrgsService.OrgInfo>();
         int importIteration = 1;
         while (true) {
             List<ImportRegisterOrgsService.OrgInfo> iterationOrgs = null;
@@ -398,10 +379,7 @@ public class OrgMskNSIService extends MskNSIService {
             importIteration++;
             //break; /////////////////////////////Здесь можно ставить break для тестовых целей;
         }
-        /*if (StringUtils.isEmpty(orgName)) {
-            addDeletedOrgs(orgs);
-        }*/
-        return orgs;
+        return orgs;*/
     }
 
     private boolean testTwoStrings(String byOrg, String byReestrOrgInfo) {

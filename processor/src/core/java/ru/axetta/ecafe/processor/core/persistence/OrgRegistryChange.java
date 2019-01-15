@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -53,14 +51,6 @@ public class OrgRegistryChange {
     protected String guidFrom;
     protected Long additionalId;
 
-    private Boolean mainBuilding;
-
-    protected String interdistrictCouncil;
-    protected String interdistrictCouncilFrom;
-    protected String interdistrictCouncilChief;
-    protected String interdistrictCouncilChiefFrom;
-
-
     private Set<OrgRegistryChangeItem> orgs;
 
     protected Boolean applied = false;
@@ -88,11 +78,7 @@ public class OrgRegistryChange {
                              String inn, String innFrom,
 
                              String guid, String guidFrom,
-                             Long additionalId,
-             String interdistrictCouncil,
-             String interdistrictCouncilFrom,
-             String interdistrictCouncilChief,
-             String interdistrictCouncilChiefFrom
+                             Long additionalId
             ) {
         this.idOfOrg = idOfOrg;
 
@@ -127,10 +113,6 @@ public class OrgRegistryChange {
         this.guidFrom = guidFrom;
         this.additionalId = additionalId;
 
-        this.interdistrictCouncil = interdistrictCouncil;
-        this.interdistrictCouncilFrom = interdistrictCouncilFrom;
-        this.interdistrictCouncilChief = interdistrictCouncilChief;
-        this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
     }
 
     public Long getAdditionalId() {
@@ -325,54 +307,12 @@ public class OrgRegistryChange {
         this.idOfOrgRegistryChange = idOfOrgRegistryChange;
     }
 
-    public String getInterdistrictCouncil() {
-        return interdistrictCouncil;
-    }
-
-    public void setInterdistrictCouncil(String interdistrictCouncil) {
-        this.interdistrictCouncil = interdistrictCouncil;
-    }
-
-    public String getInterdistrictCouncilFrom() {
-        return interdistrictCouncilFrom;
-    }
-
-    public void setInterdistrictCouncilFrom(String interdistrictCouncilFrom) {
-        this.interdistrictCouncilFrom = interdistrictCouncilFrom;
-    }
-
-    public String getInterdistrictCouncilChief() {
-        return interdistrictCouncilChief;
-    }
-
-    public void setInterdistrictCouncilChief(String interdistrictCouncilChief) {
-        this.interdistrictCouncilChief = interdistrictCouncilChief;
-    }
-
-    public String getInterdistrictCouncilChiefFrom() {
-        return interdistrictCouncilChiefFrom;
-    }
-
-    public void setInterdistrictCouncilChiefFrom(String interdistrictCouncilChiefFrom) {
-        this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
-    }
-
     public Set<OrgRegistryChangeItem> getOrgs() {
         return orgs;
     }
 
     public void setOrgs(Set<OrgRegistryChangeItem> orgs) {
         this.orgs = orgs;
-    }
-
-
-    public Boolean getMainBuilding() {
-        if (mainBuilding == null) return false;
-        return mainBuilding;
-    }
-
-    public void setMainBuilding(Boolean mainBuilding) {
-        this.mainBuilding = mainBuilding;
     }
 
     public Long getUniqueAddressId() {

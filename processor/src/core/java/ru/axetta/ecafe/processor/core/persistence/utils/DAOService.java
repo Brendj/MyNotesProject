@@ -894,16 +894,17 @@ public class DAOService {
 
     public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad) {
         //Новый алгоритм поиска организации в нашей БД по данным от реестров. Сраниваем в 3 этапа по разным наборам полей
+        entityManager.setFlushMode(FlushModeType.COMMIT);
         javax.persistence.Query q;
         if (uniqueAddressId != null) {
-            q = entityManager.createQuery("from Org where guid=:guid and uniqueaddressid=:uniqueAddressId");
+            q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.guid=:guid and o.uniqueAddressId=:uniqueAddressId");
             q.setParameter("guid", guid);
             q.setParameter("uniqueAddressId", uniqueAddressId);
             List<Org> orgs = q.getResultList();   //1 этап
             if (orgs != null && orgs.size() > 0) {
                 return orgs.get(0);
             } else {
-                q = entityManager.createQuery("from Org where inn=:inn and uniqueaddressid=:uniqueAddressId");
+                q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.INN=:inn and o.uniqueAddressId=:uniqueAddressId");
                 q.setParameter("inn", inn);
                 q.setParameter("uniqueAddressId", uniqueAddressId);
                 List<Org> orgs2 = q.getResultList();  //2 этап
@@ -912,7 +913,7 @@ public class DAOService {
                 }
             }
         }
-        q = entityManager.createQuery("from Org where btiUnom=:unom and btiUnad=:unad");
+        q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.btiUnom=:unom and o.btiUnad=:unad");
         q.setParameter("unom", unom);
         q.setParameter("unad", unad);
         List<Org> orgs3 = q.getResultList();   //3 этап
@@ -2132,7 +2133,7 @@ public class DAOService {
                     " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
         }
         if (!StringUtils.isEmpty(regionFilter)) {
-            nameStatement += String.format(" and region = '%s'", regionFilter);
+            nameStatement += String.format(" and region like '%s%s%s'", regionFilter, "%", "%");
         }
         if (operationType > 0) {
             nameStatement += " and OperationType = " + operationType + " ";
@@ -2181,8 +2182,7 @@ public class DAOService {
             }
             if(orgRegistryChangeList.indexOf(orgRegistryChange) == -1){
                 if((orgRegistryChange.getRegion().equals(regionFilter) || isEmptyRegionFilter)
-                        && (orgRegistryChange.getOperationType() == operationType  || isAllOperations)
-                        && orgRegistryChange.getApplied().equals(!hideApplied)){
+                        && (orgRegistryChange.getOperationType() == operationType  || isAllOperations)){
                     orgRegistryChangeList.add(orgRegistryChange);
                 }
             }

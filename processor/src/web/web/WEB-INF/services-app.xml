@@ -16,6 +16,7 @@
     <jee:jndi-lookup id="processorPU" jndi-name="java:/processorPUFactory"/>
     <jee:jndi-lookup id="reportsPU" jndi-name="java:/reportsPUFactory"/>
     <jee:jndi-lookup id="externalServicesPU" jndi-name="java:/externalServicesPUFactory"/>
+    <jee:jndi-lookup id="symmetricPU" jndi-name="java:/symmetricPUFactory"/>
 
     <!--    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
           <property name="persistenceUnitName" value="processor"/>
@@ -32,6 +33,9 @@
     </bean>
     <bean id="txManagerExternalServices" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="externalServicesPU"/>
+    </bean>
+    <bean id="txManagerSymmetric" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="symmetricPU"/>
     </bean>
 
 

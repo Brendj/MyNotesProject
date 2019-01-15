@@ -50,26 +50,12 @@
 
         <h:outputText escape="true" value="Фильтр наименования ОО" styleClass="output-text" />
         <h:inputText value="#{NSIOrgsRegistrySynchPage.nameFilter}" style="width:350px;" styleClass="input-text" />
-        <h:outputText escape="true" value="Подпоиск по корпусам" styleClass="output-text"/>
+        <h:outputText escape="true" value="Поиск по названиям в ИСПП" styleClass="output-text"/>
         <h:selectBooleanCheckbox value="#{NSIOrgsRegistrySynchPage.isNeedAddElements}" style="width:350px;margin-left:-168px"/>
-        <h:outputText escape="true" value="Тип операции" styleClass="output-text" />
-        <h:selectOneMenu id="operationType" value="#{NSIOrgsRegistrySynchPage.selectedOperationType}" style="width:350px;" >
-            <f:selectItems value="#{NSIOrgsRegistrySynchPage.operationTypes}"/>
-        </h:selectOneMenu>
 
         <h:outputText escape="true" value="Округ" styleClass="output-text" />
         <h:selectOneMenu id="regionNSIOrgs" value="#{NSIOrgsRegistrySynchPage.selectedRegion}" style="width:350px;" >
             <f:selectItems value="#{NSIOrgsRegistrySynchPage.regions}"/>
-        </h:selectOneMenu>
-
-        <h:outputText escape="true" value="Учредитель" styleClass="output-text" />
-        <h:selectOneMenu id="founderNSIList" value="#{NSIOrgsRegistrySynchPage.selectedFounder}" style="width:350px;" >
-            <f:selectItems value="#{NSIOrgsRegistrySynchPage.founders}"/>
-        </h:selectOneMenu>
-
-        <h:outputText escape="true" value="Отраслевое подчинение" styleClass="output-text" />
-        <h:selectOneMenu id="industryNSIList" value="#{NSIOrgsRegistrySynchPage.selectedIndustry}" style="width:350px;" >
-            <f:selectItems value="#{NSIOrgsRegistrySynchPage.industries}"/>
         </h:selectOneMenu>
 
     </h:panelGrid>
@@ -107,15 +93,11 @@
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
                 </h:panelGrid>
                 <h:panelGrid id="revisionInfo" columns="2">
-                    <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных зданий" styleClass="output-text"/></h:panelGroup>
-                    <h:outputText value="#{NSIOrgsRegistrySynchPage.creationsCount}" styleClass="output-text" style="font-weight: bold;"/>
-                    <%--<h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество не обслуживаемых зданий" styleClass="output-text"/></h:panelGroup>
-                    <h:outputText value="#{NSIOrgsRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>--%>
-                    <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных зданий" styleClass="output-text"/></h:panelGroup>
+                    <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество принятых разногласий" styleClass="output-text"/></h:panelGroup>
                     <h:outputText value="#{NSIOrgsRegistrySynchPage.modificationsCount}" styleClass="output-text" style="font-weight: bold;"/>
                     <rich:spacer width="10px" />
                     <rich:spacer width="10px" />
-                    <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество найденных разногласий всего" styleClass="output-text"/></h:panelGroup>
+                    <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество найденных разногласий" styleClass="output-text"/></h:panelGroup>
                     <h:outputText value="#{NSIOrgsRegistrySynchPage.totalCount}" styleClass="output-text" style="font-weight: bold;"/>
                 </h:panelGrid>
             </h:panelGrid>
@@ -173,7 +155,7 @@
         </rich:modalPanel>
 
         <rich:dataTable value="#{NSIOrgsRegistrySynchPage.items}" var="e" footerClass="data-table-footer"
-                        width="100%" rows="20" columns="4" id="tableSverka" rowKeyVar="row" >
+                        width="100%" rows="20" columns="3" id="tableSverka" rowKeyVar="row" >
 
             <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="2" colspan="1">
                 <f:facet name="header">
@@ -187,15 +169,6 @@
                 <h:outputText value="#{e.idOfOrg}" escape="false" rendered="#{NSIOrgsRegistrySynchPage.isDeleteOperation(e.operation)}" /><br/>
                 <h:outputText value="Номер ОО"/> - <h:outputText value="#{e.orgNumber}" escape="false"/><br/>
                 <h:outputText value="Наименование"/> - <h:outputText value="#{e.shortName} (#{e.officialName})" escape="false"/><br/>
-                <h:outputText value="Межрайонный совет ОО"/> - <h:outputText value="#{e.interdistrictCouncil}" escape="false"/><br/>
-                <h:outputText value="Председатель межрайонного совета ОО"/> - <h:outputText value="#{e.interdistrictCouncilChief}" escape="false"/><br/>
-            </rich:column>
-
-            <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="2" colspan="1">
-                <f:facet name="header">
-                    <h:outputText value="Тип операции"/>
-                </f:facet>
-                <h:outputText value="#{e.operationType}"/>
             </rich:column>
 
             <rich:column styleClass="#{NSIOrgsRegistrySynchPage.getLineStyleClass(e)}" rowspan="2" colspan="1">
@@ -211,9 +184,10 @@
                 <rich:dataTable rendered="#{e.orgsSize > 0}" var="org" value="#{e.orgs}" >
                     <rich:column>
                         <h:selectBooleanCheckbox value="#{org.selected}" styleClass="checkboxes"
-                                      rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
+                                      rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar && !org.isAdding}"/>
                         <h:outputText value="#{org.appliedItem}" escape="false"
-                                      rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar}"/>
+                                      rendered="#{NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && !org.isSimilar && !org.isAdding}"/>
+                        <h:outputText value="#{org.itemType}" escape="false" rendered="#{org.isAdding}"/>
                         <rich:spacer height="10" />
                         <a4j:commandButton value="..." style="width: 25px; height:25px; text-align: right" title="Редактировать запись сверки"
                                            reRender="editSverkaPanel" styleClass="command-button" status="updateStatus" ajaxSingle="true"
@@ -221,12 +195,6 @@
                                            rendered="#{!NSIOrgsRegistrySynchPage.isRenderApplied(org, false) && org.isModify}">
                         <f:setPropertyActionListener value="#{org}" target="#{NSIOrgsRegistrySynchPage.orgForEdit}" />
                         </a4j:commandButton>
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Операция" />
-                        </f:facet>
-                        <h:outputText value="#{org.itemType}" escape="false"/>
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -278,21 +246,27 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="Очередь внедрения" />
+                        </f:facet>
+                        <h:outputText value="#{org.introductionQueue}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="Статус" />
                         </f:facet>
                         <h:outputText value="#{org.stringState}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
-                            <h:outputText value="Ид. орг." />
+                            <h:outputText value="Руководитель ОО" />
                         </f:facet>
-                        <h:outputText value="#{org.idOfOrg}" escape="false" />
+                        <h:outputText value="#{org.director}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
-                            <h:outputText value="Главный" />
+                            <h:outputText value="Ид. орг." />
                         </f:facet>
-                        <h:outputText value="#{org.isMainBuilding}" escape="false" />
+                        <h:outputText value="#{org.idOfOrg}" escape="false" />
                     </rich:column>
                 </rich:dataTable>
             </rich:column>

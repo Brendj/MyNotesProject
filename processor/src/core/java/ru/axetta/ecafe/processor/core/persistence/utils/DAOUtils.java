@@ -344,6 +344,12 @@ public class DAOUtils {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
     }
 
+    public static Org findOrgWithOfficialPerson(Session persistenceSession, long idOfOrg) throws Exception {
+        Query query = persistenceSession.createQuery("select o from Org o left join fetch o.officialPerson where o.idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        return (Org)query.uniqueResult();
+    }
+
     /*public static Org findOrgWithPessimisticLock(Session persistenceSession, long idOfOrg) throws Exception {
         Query query = persistenceSession.createQuery(
                 "from Org o where o.idOfOrg=:idOfOrg");

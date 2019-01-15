@@ -7,3 +7,23 @@
 -- Флаг "Законный представитель"
 alter table cf_client_guardian
   add column isLegalRepresent integer;
+
+-- удаляем неиспользуемые в сверке ОО поля
+alter table cf_orgregistrychange_item
+  drop column interdistrictcouncil,
+  drop column interdistrictcouncilfrom,
+  drop column interdistrictcouncilchief,
+  drop column interdistrictcouncilchieffrom,
+  drop column mainbuilding,
+  add column introductionqueue character varying(64),
+  add column introductionqueuefrom character varying(64),
+  add column director character varying(255),
+  add column directorfrom character varying(255);
+
+alter table cf_orgregistrychange
+  drop column interdistrictcouncil,
+  drop column interdistrictcouncilfrom,
+  drop column interdistrictcouncilchief,
+  drop column interdistrictcouncilchieffrom,
+  drop column mainbuilding;
+

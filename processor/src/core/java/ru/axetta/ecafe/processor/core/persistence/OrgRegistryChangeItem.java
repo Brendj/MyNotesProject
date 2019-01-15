@@ -43,14 +43,12 @@ public class OrgRegistryChangeItem {
     protected String guid;
     protected String guidFrom;
     protected Long additionalId;
+    protected String introductionQueue;
+    protected String introductionQueueFrom;
+    protected String director;
+    protected String directorFrom;
 
     private OrgRegistryChange orgRegistryChange;
-    private Boolean mainBuilding;
-
-    protected String interdistrictCouncil;
-    protected String interdistrictCouncilFrom;
-    protected String interdistrictCouncilChief;
-    protected String interdistrictCouncilChiefFrom;
 
     protected Boolean applied = false;
     private Long mainRegistry;
@@ -78,9 +76,9 @@ public class OrgRegistryChangeItem {
             Long unom, Long unomFrom, Long unad, Long unadFrom, Long uniqueAddressId, Long uniqueAddressIdFrom,
             String inn, String innFrom,
 
-            String guid, String guidFrom, Long additionalId, String interdistrictCouncil,
-            String interdistrictCouncilFrom, String interdistrictCouncilChief, String interdistrictCouncilChiefFrom,
-            OrgRegistryChange orgRegistryChange, boolean mainBuilding, String shortNameSupplierFrom, Integer state) {
+            String guid, String guidFrom, Long additionalId,
+            OrgRegistryChange orgRegistryChange, String shortNameSupplierFrom, Integer state, String introductionQueue,
+            String introductionQueueFrom, String director, String directorFrom) {
         this.idOfOrg = idOfOrg;
         this.state = state;
 
@@ -115,13 +113,12 @@ public class OrgRegistryChangeItem {
         this.guidFrom = guidFrom;
         this.additionalId = additionalId;
 
-        this.interdistrictCouncil = interdistrictCouncil;
-        this.interdistrictCouncilFrom = interdistrictCouncilFrom;
-        this.interdistrictCouncilChief = interdistrictCouncilChief;
-        this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
         this.orgRegistryChange = orgRegistryChange;
-        this.mainBuilding = mainBuilding;
         this.shortNameSupplierFrom = shortNameSupplierFrom;
+        this.introductionQueue = introductionQueue;
+        this.introductionQueueFrom = introductionQueueFrom;
+        this.director = director;
+        this.directorFrom = directorFrom;
     }
 
     public Long getAdditionalId() {
@@ -324,53 +321,12 @@ public class OrgRegistryChangeItem {
         this.idOfOrgRegistryChangeItem = idOfOrgRegistryChangeItem;
     }
 
-    public String getInterdistrictCouncil() {
-        return interdistrictCouncil;
-    }
-
-    public void setInterdistrictCouncil(String interdistrictCouncil) {
-        this.interdistrictCouncil = interdistrictCouncil;
-    }
-
-    public String getInterdistrictCouncilFrom() {
-        return interdistrictCouncilFrom;
-    }
-
-    public void setInterdistrictCouncilFrom(String interdistrictCouncilFrom) {
-        this.interdistrictCouncilFrom = interdistrictCouncilFrom;
-    }
-
-    public String getInterdistrictCouncilChief() {
-        return interdistrictCouncilChief;
-    }
-
-    public void setInterdistrictCouncilChief(String interdistrictCouncilChief) {
-        this.interdistrictCouncilChief = interdistrictCouncilChief;
-    }
-
-    public String getInterdistrictCouncilChiefFrom() {
-        return interdistrictCouncilChiefFrom;
-    }
-
-    public void setInterdistrictCouncilChiefFrom(String interdistrictCouncilChiefFrom) {
-        this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
-    }
-
     public OrgRegistryChange getOrgRegistryChange() {
         return orgRegistryChange;
     }
 
     public void setOrgRegistryChange(OrgRegistryChange orgRegistryChange) {
         this.orgRegistryChange = orgRegistryChange;
-    }
-
-    public Boolean getMainBuilding() {
-        if (mainBuilding == null) return false;
-        return mainBuilding;
-    }
-
-    public void setMainBuilding(Boolean mainBuilding) {
-        this.mainBuilding = mainBuilding;
     }
 
     public Long getUniqueAddressId() {
@@ -411,5 +367,37 @@ public class OrgRegistryChangeItem {
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public String getIntroductionQueue() {
+        return introductionQueue;
+    }
+
+    public void setIntroductionQueue(String introductionQueue) {
+        this.introductionQueue = introductionQueue;
+    }
+
+    public String getIntroductionQueueFrom() {
+        return introductionQueueFrom;
+    }
+
+    public void setIntroductionQueueFrom(String introductionQueueFrom) {
+        this.introductionQueueFrom = introductionQueueFrom;
+    }
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+    public String getDirectorFrom() {
+        return directorFrom;
+    }
+
+    public void setDirectorFrom(String directorFrom) {
+        this.directorFrom = directorFrom;
     }
 }

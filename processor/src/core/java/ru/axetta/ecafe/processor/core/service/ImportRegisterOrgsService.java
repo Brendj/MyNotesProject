@@ -53,7 +53,7 @@ public class ImportRegisterOrgsService {
     public static final String VALUE_UNOM = "УНОМ";
     public static final String VALUE_UNAD = "УНАД";
     public static final String VALUE_INN = "ИНН";
-    public static final String VALUE_INTERDISTRICT = "Межрайонный совет ОО";
+    public static final String VALUE_DIRECTOR = "Руководитель ОО";
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterOrgsService.class);
 
@@ -68,7 +68,7 @@ public class ImportRegisterOrgsService {
         logger.info("Start import orgs from registry");
         StringBuffer logBuffer = new StringBuffer();
         try {
-            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry("", "", "", "", logBuffer);
+            RuntimeContext.getAppContext().getBean(ImportRegisterOrgsService.class).syncOrgsWithRegistry("", "", logBuffer);
         } catch (Exception e) {
             logger.error("Failed to refresh orgs from registry", e);
         }
@@ -105,7 +105,7 @@ public class ImportRegisterOrgsService {
             case OrgRegistryChange.MODIFY_OPERATION:
                 try {
                     modifyOrg(orgRegistryChange, session, buildingsList, fieldFlags);
-                    createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
+                    //createOrg(orgRegistryChange, defaultSupplier, session, buildingsList);
                     break;
                 } catch (Exception e) {
                     logger.error("Failed to modify org", orgRegistryChange);
@@ -204,8 +204,6 @@ public class ImportRegisterOrgsService {
             }
         }else{
             return;
-            //Org org = createOrg(orgRegistryChange, officialPerson, createDate, defaultSupplier, null, null);
-            //session.persist(org);
         }
 
     }
@@ -271,7 +269,7 @@ public class ImportRegisterOrgsService {
                 continue;
             }
             if (orgRegistryChangeItem != null) {
-                Org org = DAOUtils.findOrg(session, orgRegistryChangeItem.getIdOfOrg());
+                Org org = DAOUtils.findOrgWithOfficialPerson(session, orgRegistryChangeItem.getIdOfOrg());
                 if (org != null) {
                     //По новому алгоритму обновляем следующий набор полей оорганизации:
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNOM)))
@@ -294,15 +292,27 @@ public class ImportRegisterOrgsService {
                         org.setOfficialName(orgRegistryChange.getOfficialName());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_NAME)))
                         org.setShortNameInfoService(orgRegistryChange.getShortName());//Краткое наименование для инфосервиса
-                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INTERDISTRICT))) {
-                        org.setInterdistrictCouncil(orgRegistryChangeItem.getInterdistrictCouncil());
-                        org.setInterdistrictCouncilChief(orgRegistryChangeItem.getInterdistrictCouncilChief());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_DIRECTOR))) {
+                        org.setOfficialPerson(getPersonFromFullName(orgRegistryChangeItem.getDirector()));
+                        session.persist(org.getOfficialPerson());
                     }
 
                     orgRegistryChangeItem.setApplied(true);
                 }
                 session.persist(org);
             }
+        }
+    }
+
+    private Person getPersonFromFullName(String fullName) {
+        try {
+            String[] str = fullName.split(" ");
+            String surname = str[0];
+            String firstName = str[1];
+            String secondName = str.length > 2 ? str[2] : "";
+            return new Person(firstName, surname, secondName);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -323,7 +333,7 @@ public class ImportRegisterOrgsService {
     }
 
     @Transactional
-    public StringBuffer syncOrgsWithRegistry(String orgName, String region, String founder, String industry, StringBuffer logBuffer) throws Exception {
+    public StringBuffer syncOrgsWithRegistry(String orgName, String region, StringBuffer logBuffer) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Синхронизация с Реестрами от " + date + " по всем ОУ]: ";
         log(synchDate + "Производится синхронизация по всем организациям", logBuffer);
@@ -335,7 +345,7 @@ public class ImportRegisterOrgsService {
 
         //  Итеративно загружаем организации, используя ограничения
         try {
-            List<OrgInfo> orgs = nsiService.getOrgs(orgName, region, founder, industry);
+            List<OrgInfo> orgs = nsiService.getOrgs(orgName, region);
             log(synchDate + "Получено " + orgs.size() + " записей", logBuffer);
             saveOrgs(synchDate, date, System.currentTimeMillis(), orgs, logBuffer);
         } catch (Exception e) {
@@ -362,10 +372,10 @@ public class ImportRegisterOrgsService {
             addChange = false;
             for (OrgInfo orgInfo : oi.getOrgInfos()) {
                 //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
-                if (safeCompare(orgInfo.interdistrictCouncil, orgInfo.interdistrictCouncilFrom) && safeCompare(orgInfo.interdistrictCouncilChief, orgInfo.interdistrictCouncilChiefFrom) &&
-                        safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
+                if (safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
                         safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
-                        safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom)) {
+                        safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom) &&
+                        safeCompare(orgInfo.director, orgInfo.directorFrom)) {
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
                         orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
@@ -428,11 +438,7 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getInn()), oi.getInnFrom(),
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
-                        oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
-                        oi.getInterdistrictCouncil(),
-                        oi.getInterdistrictCouncilFrom(),
-                        oi.getInterdistrictCouncilChief(),
-                        oi.getInterdistrictCouncilChiefFrom()
+                        oi.getAdditionalId() == null ? -1L : oi.getAdditionalId()
                 );
     }
 
@@ -458,12 +464,9 @@ public class ImportRegisterOrgsService {
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
-                        oi.getInterdistrictCouncil(),
-                        oi.getInterdistrictCouncilFrom(),
-                        oi.getInterdistrictCouncilChief(),
-                        oi.getInterdistrictCouncilChiefFrom(),
-                        orgRegistryChange, solveBoolean(oi.getMainBuilding()), oi.getShortNameSupplierFrom(),
-                        oi.getOrgState()
+                        orgRegistryChange, oi.getShortNameSupplierFrom(),
+                        oi.getOrgState(), oi.getIntroductionQueue(), oi.getIntroductionQueueFrom(),
+                        oi.getDirector(), oi.getDirectorFrom()
                 );
     }
 
@@ -524,13 +527,13 @@ public class ImportRegisterOrgsService {
         protected Long additionalId;
         protected Long registeryPrimaryId;
 
-        protected String interdistrictCouncil;
-        protected String interdistrictCouncilFrom;
-        protected String interdistrictCouncilChief;
-        protected String interdistrictCouncilChiefFrom;
         private String directorFullName;
         private String OGRN;
         private String state;
+        private String introductionQueue;
+        private String introductionQueueFrom;
+        private String director;
+        private String directorFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -744,39 +747,6 @@ public class ImportRegisterOrgsService {
             this.registeryPrimaryId = registeryPrimaryId;
         }
 
-        public String getInterdistrictCouncil() {
-            return interdistrictCouncil;
-        }
-
-        public void setInterdistrictCouncil(String interdistrictCouncil) {
-            this.interdistrictCouncil = interdistrictCouncil;
-        }
-
-        public String getInterdistrictCouncilFrom() {
-            return interdistrictCouncilFrom;
-        }
-
-        public void setInterdistrictCouncilFrom(String interdistrictCouncilFrom) {
-            this.interdistrictCouncilFrom = interdistrictCouncilFrom;
-        }
-
-        public String getInterdistrictCouncilChief() {
-            return interdistrictCouncilChief;
-        }
-
-        public void setInterdistrictCouncilChief(String interdistrictCouncilChief) {
-            this.interdistrictCouncilChief = interdistrictCouncilChief;
-        }
-
-        public String getInterdistrictCouncilChiefFrom() {
-            return interdistrictCouncilChiefFrom;
-        }
-
-        public void setInterdistrictCouncilChiefFrom(String interdistrictCouncilChiefFrom) {
-            this.interdistrictCouncilChiefFrom = interdistrictCouncilChiefFrom;
-        }
-
-
         public void setDirectorFullName(String directorFullName) {
             this.directorFullName = directorFullName;
         }
@@ -855,6 +825,38 @@ public class ImportRegisterOrgsService {
 
         public void setOrgState(Integer orgState) {
             this.orgState = orgState;
+        }
+
+        public String getIntroductionQueue() {
+            return introductionQueue;
+        }
+
+        public void setIntroductionQueue(String introductionQueue) {
+            this.introductionQueue = introductionQueue;
+        }
+
+        public String getIntroductionQueueFrom() {
+            return introductionQueueFrom;
+        }
+
+        public void setIntroductionQueueFrom(String introductionQueueFrom) {
+            this.introductionQueueFrom = introductionQueueFrom;
+        }
+
+        public String getDirector() {
+            return director;
+        }
+
+        public void setDirector(String director) {
+            this.director = director;
+        }
+
+        public String getDirectorFrom() {
+            return directorFrom;
+        }
+
+        public void setDirectorFrom(String directorFrom) {
+            this.directorFrom = directorFrom;
         }
     }
 }
