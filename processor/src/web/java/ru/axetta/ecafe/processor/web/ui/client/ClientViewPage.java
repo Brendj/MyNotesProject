@@ -611,7 +611,7 @@ public class ClientViewPage extends BasicWorkspacePage {
                         + " where c.idofclient = :idOfClient\n"
                         + ")  \n"
                         + "left join cf_client_dtiszn_discount_info ci on ci.idofclient = c.idofclient \n"
-                        + "join CF_CategoryDiscounts_DSZN cdDSZN on ci.dtiszncode = cdDSZN.code and cd.idofcategorydiscount = cdDSZN.idofcategorydiscount\n"
+                        + "left join CF_CategoryDiscounts_DSZN cdDSZN on ci.dtiszncode = cdDSZN.code and cd.idofcategorydiscount = cdDSZN.idofcategorydiscount\n"
                         + "where c.idofclient = :idOfClient \n"
                         + "union\t  \n"
                         + "select \n"
