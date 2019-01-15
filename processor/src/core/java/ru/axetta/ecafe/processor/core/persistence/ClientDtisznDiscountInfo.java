@@ -19,6 +19,7 @@ public class ClientDtisznDiscountInfo {
     private Boolean archived;
     private Date lastUpdate;
     private Date createdDateInternal;
+    private Date lastReceivedDate;
 
     public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
             Date dateStart, Date dateEnd, Date createdDate, Long version) {
@@ -33,6 +34,7 @@ public class ClientDtisznDiscountInfo {
         this.archived = false;
         this.lastUpdate = new Date();
         this.createdDateInternal = new Date();
+        this.lastReceivedDate = new Date();
     }
 
     public ClientDtisznDiscountInfo() {
@@ -133,5 +135,13 @@ public class ClientDtisznDiscountInfo {
 
     public void setCreatedDateInternal(Date createdDateInternal) {
         this.createdDateInternal = createdDateInternal;
+    }
+
+    public Date getLastReceivedDate() {
+        return lastReceivedDate;
+    }
+
+    public void setLastReceivedDate(Date lastReceivedDate) {
+        this.lastReceivedDate = lastReceivedDate;
     }
 }

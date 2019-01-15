@@ -27,3 +27,7 @@ alter table cf_orgregistrychange
   drop column interdistrictcouncilchieffrom,
   drop column mainbuilding;
 
+-- время последнего получения льготы от нси
+alter table cf_client_dtiszn_discount_info
+  add column lastreceiveddate bigint;
+  

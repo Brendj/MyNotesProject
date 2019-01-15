@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.FlushMode;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.quartz.*;
@@ -144,6 +145,7 @@ public class DTSZNDiscountsReviseService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(CalendarUtils.truncateToDayOfMonth(new Date()));
         String filterDate = DatatypeConverter.printDateTime(calendar);
+        Date fireTime = new Date();
 
         Session session = null;
         Transaction transaction = null;
@@ -196,14 +198,30 @@ public class DTSZNDiscountsReviseService {
                                 discountInfo.setDateEnd(item.getDsznDateEndAsDate());
                                 wasModified = true;
                             }
-                            if (item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED) ||
-                                    !item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
-                                discountInfo.setStatus(item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED);
+                            if (item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)) {
+                                discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+                                discountInfo.setArchived(false);
                                 wasModified = true;
                             }
+                            if (!item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
+                                discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
+                                discountInfo.setArchived(true);
+                                wasModified = true;
+                            }
+                            if (item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()) {
+                                discountInfo.setArchived(true);
+                                wasModified = true;
+                            }
+                            if (item.getBenefitConfirmed() && discountInfo.getArchived()) {
+                                discountInfo.setArchived(false);
+                                wasModified = true;
+                            }
+                            discountInfo.setLastReceivedDate(new Date());
                             if (wasModified) {
                                 discountInfo.setVersion(clientDTISZNDiscountVersion);
                                 discountInfo.setLastUpdate(new Date());
+                                session.merge(discountInfo);
+                            } else {
                                 session.merge(discountInfo);
                             }
                         } else {
@@ -233,7 +251,7 @@ public class DTSZNDiscountsReviseService {
 
                 pagesCount = response.getPagesCount();
             } catch (HttpException e) {
-                logger.error("HTTP exeption: ", e);
+                logger.error("HTTP exception: ", e);
             } catch (Exception e) {
                 logger.error("Unable to get person benefits from NSI", e);
             } finally {
@@ -243,6 +261,8 @@ public class DTSZNDiscountsReviseService {
 
             logger.info(String.format("Revise 2.0: %d/%d pages was processed", currentPage, pagesCount));
         } while (currentPage++ < pagesCount);
+
+        updateArchivedFlagForDiscounts();
 
         runTaskPart2();
     }
@@ -669,6 +689,35 @@ public class DTSZNDiscountsReviseService {
 
         } catch (Exception e) {
             logger.error("Error in update discounts", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void updateArchivedFlagForDiscounts() throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Date fireTime = new Date();
+
+            Query query = session.createSQLQuery(
+                    "update cf_client_dtiszn_discount_info set archived = true where lastreceiveddate not between :start and :end;");
+            query.setParameter("start", CalendarUtils.startOfDay(fireTime));
+            query.setParameter("end", CalendarUtils.endOfDay(fireTime));
+            int rows = query.executeUpdate();
+            if (0 != rows) {
+                logger.info(String.format("%d discounts marked as archived", rows));
+            }
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in update archived flag", e);
             throw e;
         } finally {
             HibernateUtils.rollback(transaction, logger);

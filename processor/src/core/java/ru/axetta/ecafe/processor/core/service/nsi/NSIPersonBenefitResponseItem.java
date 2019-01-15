@@ -21,16 +21,22 @@ public class NSIPersonBenefitResponseItem extends NSIResponseItem {
     private String dsznDateEnd;
     @JsonProperty("benefit-confirmed")
     private Boolean benefitConfirmed;
+    @JsonProperty("deleted")
+    private Boolean deleted;
+    @JsonProperty("date-end")
+    private String dateEnd;
 
     public NSIPersonBenefitResponseItem(Long version, String id, String entityId, String createdAt, String updatedAt,
             NSIResponseItem person, NSIBenefitDictionaryResponseItem benefit, String dsznDateBegin, String dsznDateEnd,
-            Boolean benefitConfirmed) {
+            Boolean benefitConfirmed, Boolean deleted, String dateEnd) {
         super(version, id, entityId, createdAt, updatedAt);
         this.person = person;
         this.benefit = benefit;
         this.dsznDateBegin = dsznDateBegin;
         this.dsznDateEnd = dsznDateEnd;
         this.benefitConfirmed = benefitConfirmed;
+        this.deleted = deleted;
+        this.dateEnd = dateEnd;
     }
 
     public NSIPersonBenefitResponseItem() {
@@ -83,5 +89,25 @@ public class NSIPersonBenefitResponseItem extends NSIResponseItem {
 
     public Date getDsznDateEndAsDate() {
         return javax.xml.bind.DatatypeConverter.parseDateTime(dsznDateEnd).getTime();
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public String getDateEnd() {
+        return dateEnd;
+    }
+
+    public Date getDateEndAsDate() {
+        return javax.xml.bind.DatatypeConverter.parseDateTime(dateEnd).getTime();
+    }
+
+    public void setDateEnd(String dateEnd) {
+        this.dateEnd = dateEnd;
     }
 }

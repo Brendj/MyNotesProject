@@ -3902,9 +3902,10 @@ public class DAOUtils {
 
     public static List<ClientDtisznDiscountInfo> getDTISZNDiscountInfoByOrgIdSinceVersion(Session session, Long idOfOrg,
             Long version) {
+        List<Long> friendlyOrgIds = findFriendlyOrgIds(session, idOfOrg);
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.createAlias("client", "c");
-        criteria.add(Restrictions.eq("c.org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.in("c.org.idOfOrg", friendlyOrgIds));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
