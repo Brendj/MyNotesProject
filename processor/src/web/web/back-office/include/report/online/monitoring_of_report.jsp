@@ -37,6 +37,10 @@
         <h:outputText styleClass="output-text" escape="true" value="Дата" />
         <rich:calendar value="#{mainPage.monitoringOfReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <h:outputText escape="true" value="Период" styleClass="output-text" />
+        <h:selectOneMenu id="operationType" value="#{mainPage.monitoringOfReportPage.selectedPeriod}" >
+            <f:selectItems value="#{mainPage.monitoringOfReportPage.periods}"/>
+        </h:selectOneMenu>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="3">

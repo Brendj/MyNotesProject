@@ -44,4 +44,28 @@ public enum OrganizationType {
     public static OrganizationType fromInteger(Integer value){
         return map.get(value);
     }
+
+    public String getShortType(){
+        if(SCHOOL.code.equals(this.code)){
+            return "СОШ";
+        } else if(KINDERGARTEN.code.equals(this.code)){
+            return "ДОУ";
+        } else if(PROFESSIONAL.code.equals(this.code)){
+            return "СПО";
+        } else {
+            return toString();
+        }
+    }
+
+    public static String getShortTypeByCode(Integer code){
+        if(SCHOOL.code.equals(code)){
+            return "СОШ";
+        } else if(KINDERGARTEN.code.equals(code)){
+            return "ДОУ";
+        } else if(PROFESSIONAL.code.equals(code)){
+            return "СПО";
+        } else {
+            return fromInteger(code).toString();
+        }
+    }
 }

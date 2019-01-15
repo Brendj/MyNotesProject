@@ -18,6 +18,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -38,11 +39,9 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
         */
     public static final String REPORT_NAME = "Мониторинг";
-    public static final String[] TEMPLATE_FILE_NAMES = {
-            "MonitoringOfReportMonday.jasper", "MonitoringOfReportTuesday.jasper", "MonitoringOfReportWednesday.jasper",
-            "MonitoringOfReportThursday.jasper", "MonitoringOfReportFriday.jasper", "MonitoringOfReportSaturday.jasper", "MonitoringOfSubReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
-    public static final int[] PARAM_HINTS = new int[]{3};
+    public static final Integer FOR_ONE_DAY = 0;
+    public static final Integer FOR_MONTH = 1;
 
     public static final String REPORT_NAME_FOR_MENU = "Мониторинг";
 
@@ -52,6 +51,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
         private String templateFilename;
         private String subReportDir;
+        private Integer selectedPeriod = FOR_ONE_DAY;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -67,60 +67,19 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
             subReportDir = reportsTemplateFilePath;
 
-            int dayOfWeek = CalendarUtils.getDayOfWeek(startTime);
-
-            Date dateMonday = new Date();
-            Date dateTuesday = new Date();
-            Date dateWednesday = new Date();
-            Date dateThursday = new Date();
-            Date dateFriday = new Date();
-            Date dateSaturday = new Date();
-
-            if (dayOfWeek == 2) {
-                templateFilename = reportsTemplateFilePath + "MonitoringOfReportMonday" + ".jasper";
-                dateMonday = startTime;
-            } else if (dayOfWeek == 3) {
-                templateFilename = reportsTemplateFilePath + "MonitoringOfReportTuesday" + ".jasper";
-                dateMonday = CalendarUtils.addDays(startTime, -1);
-                dateTuesday = startTime;
-            } else if (dayOfWeek == 4) {
-                templateFilename = reportsTemplateFilePath + "MonitoringOfReportWednesday" + ".jasper";
-                dateMonday = CalendarUtils.addDays(startTime, -2);
-                dateTuesday = CalendarUtils.addDays(startTime, -1);
-                dateWednesday = startTime;
-            } else if (dayOfWeek == 5) {
-                templateFilename = reportsTemplateFilePath + "MonitoringOfReportThursday" + ".jasper";
-                dateMonday = CalendarUtils.addDays(startTime, -3);
-                dateTuesday = CalendarUtils.addDays(startTime, -2);
-                dateWednesday = CalendarUtils.addDays(startTime, -1);
-                dateThursday = startTime;
-            } else if (dayOfWeek == 6) {
-                templateFilename = reportsTemplateFilePath + "MonitoringOfReportFriday" + ".jasper";
-                dateMonday = CalendarUtils.addDays(startTime, -4);
-                dateTuesday = CalendarUtils.addDays(startTime, -3);
-                dateWednesday = CalendarUtils.addDays(startTime, -2);
-                dateThursday = CalendarUtils.addDays(startTime, -1);
-                dateFriday = startTime;
-            } else if (dayOfWeek == 7) {
-                templateFilename = reportsTemplateFilePath + "MonitoringOfReportSaturday" + ".jasper";
-                dateMonday = CalendarUtils.addDays(startTime, -5);
-                dateTuesday = CalendarUtils.addDays(startTime, -4);
-                dateWednesday = CalendarUtils.addDays(startTime, -3);
-                dateThursday = CalendarUtils.addDays(startTime, -2);
-                dateFriday = CalendarUtils.addDays(startTime, -1);
-                dateSaturday = startTime;
-            }
-
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("dateMonday", CalendarUtils.dateShortToStringFullYear(dateMonday));
-            parameterMap.put("dateTuesday", CalendarUtils.dateShortToStringFullYear(dateTuesday));
-            parameterMap.put("dateWednesday", CalendarUtils.dateShortToStringFullYear(dateWednesday));
-            parameterMap.put("dateThursday", CalendarUtils.dateShortToStringFullYear(dateThursday));
-            parameterMap.put("dateFriday", CalendarUtils.dateShortToStringFullYear(dateFriday));
-            parameterMap.put("dateSaturday", CalendarUtils.dateShortToStringFullYear(dateSaturday));
             parameterMap.put("reportName", REPORT_NAME);
             parameterMap.put("SUBREPORT_DIR", subReportDir);
+
+            if(selectedPeriod.equals(FOR_ONE_DAY)) {
+                parameterMap.put("reportDate", CalendarUtils.dateShortToStringFullYear(startTime));
+            } else if(selectedPeriod.equals(FOR_MONTH)){
+                String month = new SimpleDateFormat("MMMM", new Locale("ru")).format(startTime);
+                parameterMap.put("currentMonth", month);
+                parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
+                parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
+            }
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
@@ -129,7 +88,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            JRDataSource dataSource = createDataSource(startTime, idOfOrgList);
+            JRDataSource dataSource = createDataSource(startTime, endTime, idOfOrgList);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
@@ -140,16 +99,24 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);//вызов из построения по расписанию
             int day = CalendarUtils.getDayOfWeek(date);
-            if (day == 1) return null; //на Вск не генерируем
+            if (day == 1 && selectedPeriod.equals(FOR_ONE_DAY)) {
+                return null; //на Вск не генерируем
+            }
             return buildInternal(date, endTime, calendar);
         }
 
-        private JRDataSource createDataSource(Date startTime, List<Long> idOfOrgList)
+        private JRDataSource createDataSource(Date startTime, Date endTime, List<Long> idOfOrgList)
                 throws Exception {
-
             MonitoringOfReportService service = new MonitoringOfReportService();
+            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, idOfOrgList));
+        }
 
-            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, idOfOrgList));
+        public Integer getSelectedPeriod() {
+            return selectedPeriod;
+        }
+
+        public void setSelectedPeriod(Integer selectedPeriod) {
+            this.selectedPeriod = selectedPeriod;
         }
     }
 

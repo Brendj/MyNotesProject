@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -30,9 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 
 /**
@@ -44,11 +43,10 @@ public class MonitoringOfReportPage extends OnlineReportPage {
     private final String reportName = MonitoringOfReport.REPORT_NAME;
     private final String reportNameForMenu = MonitoringOfReport.REPORT_NAME_FOR_MENU;
 
-    protected Date startDate;
-
+    private Date startDate;
     private Calendar localCalendar;
-
     private String htmlReport = null;
+    private Integer selectedPeriod = MonitoringOfReport.FOR_ONE_DAY;
 
     public MonitoringOfReportPage() {
         super();
@@ -70,14 +68,23 @@ public class MonitoringOfReportPage extends OnlineReportPage {
 
     public Object buildReportHTML() {
         htmlReport = null;
-        if (validateFormData())  return null;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile(".jasper");
+        if (validateFormData()){
+            return null;
+        }
+        String templateFilename = checkIsExistFile(selectedPeriod);
+        if(selectedPeriod.equals(MonitoringOfReport.FOR_ONE_DAY)){
+            startDate = CalendarUtils.startOfDay(startDate);
+            endDate = CalendarUtils.endOfDay(startDate);
+        } else if(selectedPeriod.equals(MonitoringOfReport.FOR_MONTH)){
+            startDate = CalendarUtils.getFirstDayOfMonth(startDate);
+            endDate = CalendarUtils.getLastDayOfMonth(startDate);
+        }
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
         MonitoringOfReport.Builder builder = new MonitoringOfReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
+        builder.setSelectedPeriod(selectedPeriod);
         BasicReportJob report = null;
         try {
             report = builder.buildInternal(startDate, endDate, localCalendar);
@@ -111,12 +118,12 @@ public class MonitoringOfReportPage extends OnlineReportPage {
     public void exportToXLS(ActionEvent actionEvent) {
 
         if (validateFormData()) return;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile(".jasper");
+        String templateFilename = checkIsExistFile(selectedPeriod);
         if (StringUtils.isEmpty(templateFilename)) return ;
         Date generateTime = new Date();
         MonitoringOfReport.Builder builder = new MonitoringOfReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
+        builder.setSelectedPeriod(selectedPeriod);
         BasicReportJob report = null;
         try {
             report =  builder.buildInternal(startDate, endDate, localCalendar);
@@ -163,25 +170,24 @@ public class MonitoringOfReportPage extends OnlineReportPage {
         return false;
     }
 
-    private String checkIsExistFile(String suffix) {
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+    public List<SelectItem> getPeriods() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(0, new SelectItem(MonitoringOfReport.FOR_ONE_DAY, "За день"));
+        items.add(1, new SelectItem(MonitoringOfReport.FOR_MONTH, "За месяц"));
+        return items;
+    }
 
-        int dayOfWeek = CalendarUtils.getDayOfWeek(startDate);
+    private String checkIsExistFile(Integer period) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
 
         String templateShortFileName = null;
 
-        if (dayOfWeek == 2) {
-             templateShortFileName = "MonitoringOfReportMonday" + suffix;
-        } else if (dayOfWeek == 3) {
-             templateShortFileName = "MonitoringOfReportTuesday" + suffix;
-        } else if (dayOfWeek == 4) {
-             templateShortFileName = "MonitoringOfReportWednesday" + suffix;
-        } else if (dayOfWeek == 5) {
-             templateShortFileName = "MonitoringOfReportThursday" + suffix;
-        } else if (dayOfWeek == 6) {
-             templateShortFileName = "MonitoringOfReportFriday" + suffix;
-        } else if (dayOfWeek == 7) {
-            templateShortFileName = "MonitoringOfReportSaturday" + suffix;
+        if (period.equals(MonitoringOfReport.FOR_ONE_DAY)) {
+             templateShortFileName = "MonitoringOfReportForOneDay.jasper";
+        } else if (period.equals(MonitoringOfReport.FOR_MONTH)) {
+             templateShortFileName = "MonitoringOfReportForMonth.jasper";
+        } else  {
+            return null;
         }
 
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
@@ -238,5 +244,13 @@ public class MonitoringOfReportPage extends OnlineReportPage {
     @Override
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
+    }
+
+    public Integer getSelectedPeriod() {
+        return selectedPeriod;
+    }
+
+    public void setSelectedPeriod(Integer selectedPeriod) {
+        this.selectedPeriod = selectedPeriod;
     }
 }
