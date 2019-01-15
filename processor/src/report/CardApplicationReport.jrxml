@@ -190,17 +190,17 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{requestCardType}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="500" y="0" width="100" height="30"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{currentCardType}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="600" y="0" width="100" height="30"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{currentCardState}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement uuid="d039b6b0-17ff-4b19-bdae-4a347235b28d" style="table" stretchType="RelativeToBandHeight" x="700" y="0" width="100" height="30"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{issueDate}]]></textFieldExpression>

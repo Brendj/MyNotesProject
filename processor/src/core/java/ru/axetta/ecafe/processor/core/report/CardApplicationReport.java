@@ -151,7 +151,7 @@ public class CardApplicationReport extends BasicReportForOrgJob {
                 String currentCardType = currentCardTypeNum == null ? "" : Card.TYPE_NAMES[currentCardTypeNum];
                 Integer currentCardStateNum = (Integer) row[6];
                 String currentCardState = currentCardStateNum == null ? "" : Card.STATE_NAMES[currentCardStateNum];
-                Date issueDate = new Date(((BigInteger) row[7]).longValue());
+                Date issueDate = (null != row[7]) ? new Date(((BigInteger) row[7]).longValue()) : null;
                 Integer cardsCount = ((BigInteger) row[8]).intValue();
 
                 reportItemList.add(new ReportItem(applicationDate, clientName, guardianName, passport, requestCardType,
