@@ -41,7 +41,7 @@ public class ClientDiscountItem {
         this.descriptionDSZN = StringUtils.defaultString(descriptionDSZN, "-");
         this.dateStart = dateStart == null ? "-" : DSZN_DISCOUNTS_DATA_FORMAT.format(dateStart);
         this.dateEnd = dateEnd == null ? "-" : DSZN_DISCOUNTS_DATA_FORMAT.format(dateEnd);
-        this.lastDiscountsUpdate = lastDiscountsUpdate == null ? "-" : CLIENT_DISCOUNTS_DATA_FORMAT.format(lastDiscountsUpdate);
+        this.lastDiscountsUpdate = lastDiscountsUpdate == null || idOfCategoryDiscount == null ? "-" : CLIENT_DISCOUNTS_DATA_FORMAT.format(lastDiscountsUpdate);
         this.status = status == null ? "-" :
                       status == ClientDTISZNDiscountStatus.NOT_CONFIRMED.getValue() ? ClientDTISZNDiscountStatus.NOT_CONFIRMED.getDescription() :
                       status == ClientDTISZNDiscountStatus.CONFIRMED.getValue() ? ClientDTISZNDiscountStatus.CONFIRMED.getDescription() :
