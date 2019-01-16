@@ -705,10 +705,15 @@ public class DTSZNDiscountsReviseService {
 
             Date fireTime = new Date();
 
+            Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+
             Query query = session.createSQLQuery(
-                    "update cf_client_dtiszn_discount_info set archived = true where lastreceiveddate not between :start and :end;");
-            query.setParameter("start", CalendarUtils.startOfDay(fireTime));
-            query.setParameter("end", CalendarUtils.endOfDay(fireTime));
+                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, "
+                    +" lastupdate = :lastUpdate where lastreceiveddate not between :start and :end");
+            query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
+            query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());
+            query.setParameter("version", nextVersion);
+            query.setParameter("lastUpdate", fireTime.getTime());
             int rows = query.executeUpdate();
             if (0 != rows) {
                 logger.info(String.format("%d discounts marked as archived", rows));
