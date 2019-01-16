@@ -143,8 +143,8 @@ public class SummaryCalculationService {
         }
     }
 
-    public void run(Date startDate, Date endDate, Long notyfyType) {
-        if (!isOn()) {
+    public void run(Date startDate, Date endDate, Long notyfyType, boolean clickedOnButton) {
+        if (!isOn() && !clickedOnButton) {
             return;
         }
         try {
@@ -212,7 +212,7 @@ public class SummaryCalculationService {
         Date today = new Date(System.currentTimeMillis());
         Date endDate = CalendarUtils.endOfDay(today);
         Date startDate = CalendarUtils.truncateToDayOfMonth(today);
-        run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+        run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(), false);
     }
 
     public void runWeekly() {
@@ -220,7 +220,7 @@ public class SummaryCalculationService {
         Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
         Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
         Date endDate = CalendarUtils.endOfDay(dates[1]);
-        run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue());
+        run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(), false);
     }
 
     public static boolean isOn() {

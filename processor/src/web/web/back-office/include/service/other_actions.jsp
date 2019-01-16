@@ -126,6 +126,11 @@
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить свергу льгот ДТСЗН с реестрами 2.0(этап 2)" action="#{otherActionsPage.runDTSZNDiscountsReviseServicePart2()}" id="runDTSZNDiscountsReviseServicePart2"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <rich:separator align="center" height = "8" width = "75%" />
+    <a4j:commandButton value="Итого за день" action="#{otherActionsPage.runEventNotificationServiceForDaily}" id="runEventNotificationServiceForDaily"
+                           styleClass="command-button" />
+    <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
+                                                                             styleClass="command-button" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>

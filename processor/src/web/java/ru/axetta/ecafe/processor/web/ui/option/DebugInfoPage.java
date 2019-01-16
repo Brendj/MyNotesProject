@@ -223,7 +223,8 @@ public class DebugInfoPage extends BasicWorkspacePage {
     private void testNewEMPFuncs() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
-        service.run(new Date(1455062400000L), new Date(1455148799000L), ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue());
+        service.run(new Date(1455062400000L), new Date(1455148799000L),
+                ClientNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(), false);
     }
 
     public void runTestAISReestr() throws Exception {

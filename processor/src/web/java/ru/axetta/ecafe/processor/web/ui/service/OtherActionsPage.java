@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
@@ -539,5 +540,24 @@ public class OtherActionsPage extends BasicWorkspacePage {
             getLogger().error("Error update card uids: ", e);
             printError("Вов время преобразования номеров карт произошла ошибка с текстом " + e.getMessage());
         }
+    }
+
+    public void runEventNotificationServiceForDaily(){
+        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        Date today = new Date(System.currentTimeMillis());
+        Date endDate = CalendarUtils.endOfDay(today);
+        Date startDate = CalendarUtils.truncateToDayOfMonth(today);
+        service.run(startDate, endDate,
+                ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(), true);
+    }
+
+    public void runEventNotificationServiceForWeekly(){
+        SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
+        Date today = new Date(System.currentTimeMillis());
+        Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
+        Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
+        Date endDate = CalendarUtils.endOfDay(dates[1]);
+        service.run(startDate, endDate,
+                ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(), true);
     }
 }
