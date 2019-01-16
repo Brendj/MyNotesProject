@@ -4826,6 +4826,9 @@ public class Processor implements SyncProcessor {
                 break;
             }
         }
+        if (reqComplexInfoMatch != null && (reqComplexInfoMatch.getComplexInfoDetails() == null || reqComplexInfoMatch.getComplexInfoDetails().size() == 0)) {
+            reqComplexInfoMatch = null;
+        }
         return reqComplexInfoMatch;
     }
 
