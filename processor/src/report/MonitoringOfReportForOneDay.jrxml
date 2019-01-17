@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3490" pageHeight="30000" columnWidth="3450" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="0.751314800901579"/>
-	<property name="ireport.x" value="1444"/>
+	<property name="ireport.x" value="1596"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="reportDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -30,7 +30,7 @@
 					<font size="24" isBold="true"/>
 					<paragraph leftIndent="50"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Мониторинг с " + $P{reportDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Мониторинг от " + $P{reportDate}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

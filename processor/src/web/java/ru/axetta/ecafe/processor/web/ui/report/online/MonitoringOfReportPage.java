@@ -167,6 +167,11 @@ public class MonitoringOfReportPage extends OnlineReportPage {
             printError("Выберите список организаций");
             return true;
         }
+        Date currentDate = new Date();
+        if(startDate.after(currentDate)){
+            printError("Выбрана неверная дата для формирования отчета");
+            return true;
+        }
         return false;
     }
 

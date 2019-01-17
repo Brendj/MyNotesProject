@@ -4071,7 +4071,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if ((cl != null) && (!cl.isDontShowToExternal())) {
                     ClientRepresentative clientRepresentative = objectFactory.creteClientRepresentative();
                     clientRepresentative.setId(cl.getContractId());
-                    clientRepresentative.setName(cl.getPerson().getSurnameAndFirstLetters());
+                    clientRepresentative.setName(cl.getPerson().getFullName());
                     clientRepresentative.setEmail(cl.getEmail());
                     clientRepresentative.setMobile(cl.getMobile());
                     clientRepresentative.setNotifyviaemail(cl.isNotifyViaEmail());

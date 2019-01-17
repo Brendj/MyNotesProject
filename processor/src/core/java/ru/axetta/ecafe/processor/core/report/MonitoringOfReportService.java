@@ -545,7 +545,13 @@ public class MonitoringOfReportService {
         Collections.sort(reportItemList, new Comparator<ReportItem>() {
             @Override
             public int compare(ReportItem o1, ReportItem o2) {
-                return o1.getShortName().compareToIgnoreCase(o2.getShortName());
+                int cmp = o1.getShortName().compareToIgnoreCase(o2.getShortName());
+                if(cmp == 0){
+                    Long idOfOrgO1 = Long.parseLong(o1.getIdOfOrg());
+                    Long idOfOrgO2 = Long.parseLong(o2.getIdOfOrg());
+                    return idOfOrgO1.compareTo(idOfOrgO2);
+                }
+                return cmp;
             }
         });
 
