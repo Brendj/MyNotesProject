@@ -506,7 +506,9 @@ public class MonitoringOfReportService {
             transaction = session.beginTransaction();
             for (Long idOfOrg : idOfOrgList) {
                 Org org = (Org) session.load(Org.class, idOfOrg);
-                if (!org.getState().equals(Org.ACTIVE_STATE)) continue;;
+                if (!org.getState().equals(Org.ACTIVE_STATE) || org.getType().getCode().equals(OrganizationType.SUPPLIER.getCode())){
+                    continue;
+                }
                 ReportItem reportItem = new ReportItem();
                 Org mainOrg = OrgService.getInstance().getMainBulding(org);
                 reportItem.setOrgNum(mainOrg.getOrgNumberFromNameInfoService());
