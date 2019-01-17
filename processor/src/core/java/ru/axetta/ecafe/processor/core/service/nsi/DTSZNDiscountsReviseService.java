@@ -603,7 +603,8 @@ public class DTSZNDiscountsReviseService {
 
             for (ClientDtisznDiscountInfo info : clientDtisznDiscountInfoList) {
                 isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd());
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
+                        && !info.getArchived();
             }
 
             if (!clientDtisznDiscountInfoList.isEmpty() && isOk) {
@@ -614,7 +615,7 @@ public class DTSZNDiscountsReviseService {
         List<Long> discountCodes = new ArrayList<Long>(categoryDiscountsList);
         for (ClientDtisznDiscountInfo info : infoList) {
             if (!info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !CalendarUtils
-                    .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())) {
+                    .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) || info.getArchived()) {
                 continue;
             }
 
