@@ -4893,7 +4893,7 @@ public class Processor implements SyncProcessor {
             boolean found = false;
             SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = null;
             for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : item.getReqComplexInfos()) {
-                if (preorderComplex.getArmComplexId().equals(reqComplexInfo.getComplexId())) {
+                if (preorderComplex.getArmComplexId().equals(reqComplexInfo.getComplexId()) && reqComplexInfo.getComplexInfoDetails() != null && reqComplexInfo.getComplexInfoDetails().size() > 0) {
                     found = true;
                     reqComplexInfoMatch = reqComplexInfo;
                     break;
