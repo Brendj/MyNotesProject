@@ -62,7 +62,7 @@ public class ExternalEventNotificationService {
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue())) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }

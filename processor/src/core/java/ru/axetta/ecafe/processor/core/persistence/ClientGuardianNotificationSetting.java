@@ -29,7 +29,8 @@ public class ClientGuardianNotificationSetting {
         SMS_NOTIFY_ORDERS_FREE(1230000000L, "Оповещать о покупках льготного питания", EventNotificationService.MESSAGE_PAYMENT_FREE),
         SMS_NOTIFY_SUMMARY_DAY(1300000000L, "Оповещать по итогам дня", EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY),
         SMS_NOTIFY_SUMMARY_WEEK(1400000000L, "Оповещать по итогам недели", EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK),
-        SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса", EventNotificationService.NOTIFICATION_LOW_BALANCE);
+        SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса", EventNotificationService.NOTIFICATION_LOW_BALANCE),
+        SMS_NOTIFY_MUSEUM(1600000000L, "Оповещение о получении и аннулировании билета в музей", true);
 
 
         private Long value;
