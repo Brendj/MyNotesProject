@@ -2626,7 +2626,7 @@ public class SyncRequest {
                 request = builder.searchSectionNodeAndBuild(envelopeNode);
             } catch (Exception ex) {
                 request = null;
-                logger.error("Failed to build section request, " + builder.toString());
+                logger.error("Failed to build section request, " + builder.toString(), ex);
             }
             return request;
         }

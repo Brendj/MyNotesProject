@@ -30,4 +30,5 @@ alter table cf_orgregistrychange
 -- время последнего получения льготы от нси
 alter table cf_client_dtiszn_discount_info
   add column lastreceiveddate bigint;
-  
+
+--! ФИНАЛИЗИРОВАН 17.01.2019, НЕ МЕНЯТЬ
