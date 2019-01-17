@@ -352,6 +352,7 @@ public class PreorderDAOService {
         }
 
         List res = query.getResultList();
+        Set<Long> set = new HashSet<Long>();
         for (Object o : res) {
             Object[] row = (Object[]) o;
             Long id = ((BigInteger)row[0]).longValue();
@@ -372,7 +373,10 @@ public class PreorderDAOService {
             menuItemExt.setState(state == null ? 0 : state);
             menuItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
             menuItemExt.setAvailableForRegular(isAvailableForRegular);
-            menuItemExtList.add(menuItemExt);
+            if (!set.contains(menuItemExt.getIdOfMenuDetail())) {
+                menuItemExtList.add(menuItemExt);
+                set.add(menuItemExt.getIdOfMenuDetail());
+            }
         }
         return menuItemExtList;
     }
