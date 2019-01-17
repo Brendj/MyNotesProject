@@ -168,7 +168,10 @@ public class ApplicationForFoodProcessingService {
             ClientGroup clientGroup = (ClientGroup) session.load(ClientGroup.class, new CompositeIdOfClientGroup(org.getIdOfOrg(), idOfClientGroup));
             GroupNamesToOrgs groupNamesToOrgs = DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(session, org, clientGroup.getGroupName());
             if (null != groupNamesToOrgs) {
-                isSixWorkWeek = groupNamesToOrgs.getIsSixDaysWorkWeek();
+                Boolean isSixDaysWorkWeek = groupNamesToOrgs.getIsSixDaysWorkWeek();
+                if (null != isSixDaysWorkWeek) {
+                    isSixWorkWeek = isSixDaysWorkWeek;
+                }
             }
         }
 
