@@ -126,10 +126,10 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
 
     @SuppressWarnings("unchecked")
     private void addCategoryDiscountsDSZN(Session session, Long versionDSZN, Long idOfOrg) {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        if(!org.getChangesDSZN()) { // Флаг работы со льготами ДСЗН
-            return;
-        }
+        //Org org = (Org) session.load(Org.class, idOfOrg);
+        //if(!org.getChangesDSZN()) { // Флаг работы со льготами ДСЗН
+        //    return;
+        //}
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         criteria.add(Restrictions.gt("version", versionDSZN));
         List<CategoryDiscountDSZN> categoriesDiscountDSZN = (List<CategoryDiscountDSZN>) criteria.list();
