@@ -13,13 +13,12 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Ban
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
-import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
@@ -566,114 +565,82 @@ public class ClientViewPage extends BasicWorkspacePage {
     }
 
     public static List<ClientDiscountItem> buildClientDiscountItem(Session session, Client client) {
-        if(StringUtils.isEmpty(client.getCategoriesDiscounts()) && StringUtils.isEmpty(client.getCategoriesDiscountsDSZN())){
-            return Collections.emptyList();
-        }
         List<ClientDiscountItem> result = new LinkedList<ClientDiscountItem>();
 
-        Query query = session.createSQLQuery(
-                "select\n"
-                        + "case \n"
-                        + "    when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cdDSZN.idofcategorydiscount is null then cd.idofcategorydiscount\n"
-                        + "\telse null\n"
-                        + "end as idofcategorydiscount,\n"
-                        + "case \n"
-                        + "    when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cdDSZN.idofcategorydiscount is null then cd.categoryName\n"
-                        + "\telse null \n"
-                        + "end as categoryName,\n"
-                        + "case \n"
-                        + "    when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then ci.idofclientdtiszndiscountinfo \n"
-                        + "    else null \n"
-                        + "end as idofclientdtiszndiscountinfo,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then ci.dtiszncode \n"
-                        + "     else null \n"
-                        + "end as dtiszncode, \n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then ci.dtisznDescription \n"
-                        + "     else null \n"
-                        + "end as dtisznDescription,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then ci.status \n"
-                        + "     else null \n"
-                        + "end as status,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then ci.datestart \n"
-                        + "     else null \n"
-                        + "end as datestart,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then ci.dateend \n"
-                        + "     else null \n"
-                        + "end as dateend\n"
-                        + "from cf_clients c  \n"
-                        + "join cf_categorydiscounts cd on cd.idofcategorydiscount in ( \n"
-                        + " select cast (unnest(string_to_array(c.categoriesdiscounts, ',')) as bigint) from cf_clients c  \n"
-                        + " where c.idofclient = :idOfClient\n"
-                        + ")  \n"
-                        + "left join cf_client_dtiszn_discount_info ci on ci.idofclient = c.idofclient \n"
-                        + "left join CF_CategoryDiscounts_DSZN cdDSZN on ci.dtiszncode = cdDSZN.code and cd.idofcategorydiscount = cdDSZN.idofcategorydiscount\n"
-                        + "where c.idofclient = :idOfClient \n"
-                        + "union\t  \n"
-                        + "select \n"
-                        + "case\n"
-                        + "\twhen cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then cd.idofcategorydiscount\n"
-                        + "\telse null\n"
-                        + "end as idofcategorydiscount, \n"
-                        + "case\n"
-                        + "\twhen cd.idofcategorydiscount = cdDSZN.idofcategorydiscount then cd.categoryName\n"
-                        + "\telse null \n"
-                        + "end as categoryName,\n"
-                        + "case \n"
-                        + "    when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cd.idofcategorydiscount is null then ci.idofclientdtiszndiscountinfo \n"
-                        + "    else null \n"
-                        + "end as idofclientdtiszndiscountinfo,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cd.idofcategorydiscount is null then ci.dtiszncode \n"
-                        + "     else null \n"
-                        + "end as dtiszncode, \n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cd.idofcategorydiscount is null then ci.dtisznDescription \n"
-                        + "     else null \n"
-                        + "end as dtisznDescription,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cd.idofcategorydiscount is null then ci.status \n"
-                        + "     else null \n"
-                        + "end as status,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cd.idofcategorydiscount is null then ci.datestart \n"
-                        + "     else null \n"
-                        + "end as datestart,\n"
-                        + "case \n"
-                        + "     when cd.idofcategorydiscount = cdDSZN.idofcategorydiscount or cd.idofcategorydiscount is null then ci.dateend \n"
-                        + "     else null \n"
-                        + "end as dateend\n"
-                        + "from cf_clients c  \n"
-                        + "join cf_client_dtiszn_discount_info ci on ci.idofclient = c.idofclient \n"
-                        + "join CF_CategoryDiscounts_DSZN cdDSZN on ci.dtiszncode = cdDSZN.code\n"
-                        + "left join cf_categorydiscounts cd on cd.idofcategorydiscount in ( \n"
-                        + " select cast (unnest(string_to_array(c.categoriesdiscounts, ',')) as bigint) from cf_clients c  \n"
-                        + " where c.idofclient = :idOfClient\n"
-                        + ")  and cd.idofcategorydiscount = cdDSZN.idofcategorydiscount\n"
-                        + "where c.idofclient = :idOfClient\n"
-                        + "order by 1"
-        );
+        List<Long> categoriesDiscountsIds = new LinkedList<Long>();
+        for(String cd : client.getCategoriesDiscounts().split(",")) {
+            if(StringUtils.isNotEmpty(cd)) {
+                categoriesDiscountsIds.add(Long.valueOf(cd));
+            }
+        }
 
-        query.setParameter("idOfClient", client.getIdOfClient());
+        Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
+        clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+        List<CategoryDiscount> clientDiscountsList = clientDiscountsCriteria.list();
 
-        List<Object[]> dataFromDB = query.list();
-        for(Object[] row : dataFromDB){
-            Long idOfCategoryDiscount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
-            String categoryName = StringUtils.defaultString((String) row[1]);
-            Long idOfClientDTiSZNDiscountInfo = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[2]);
-            Long code = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[3]);
-            String descriptionDSZN = (String) row[4];
-            Integer status = (Integer) row[5];
-            Date dateStart = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
-            Date dateEnd = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[7]);
+        Criteria clientDiscountsDTiSZNCriteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        clientDiscountsDTiSZNCriteria.add(Restrictions.eq("client", client));
+        List<ClientDtisznDiscountInfo> clientDiscountsDTiSZNList = clientDiscountsDTiSZNCriteria.list();
 
-            ClientDiscountItem item = new ClientDiscountItem(idOfCategoryDiscount, categoryName, idOfClientDTiSZNDiscountInfo, code,
-                    descriptionDSZN, status, dateStart, dateEnd, client.getLastDiscountsUpdate(), client.getDiscountMode());
-            result.add(item);
+        if(CollectionUtils.isEmpty(clientDiscountsList) && CollectionUtils.isEmpty(clientDiscountsDTiSZNList)){
+            return Collections.emptyList();
+        } else if(CollectionUtils.isEmpty(clientDiscountsList)){
+            for(ClientDtisznDiscountInfo discountInfo : clientDiscountsDTiSZNList){
+                ClientDiscountItem item = new ClientDiscountItem(null, null, discountInfo.getIdOfClientDTISZNDiscountInfo(),
+                        discountInfo.getDtisznCode(), discountInfo.getDtisznDescription(), discountInfo.getStatus().getValue(), discountInfo.getDateStart(),
+                        discountInfo.getDateEnd(), client.getLastDiscountsUpdate(), client.getDiscountMode());
+                result.add(item);
+            }
+        } else if(CollectionUtils.isEmpty(clientDiscountsDTiSZNList)){
+            for(CategoryDiscount categoryDiscount : clientDiscountsList){
+                ClientDiscountItem item = new ClientDiscountItem(categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
+                        null, null, null, null, null, null, client.getLastDiscountsUpdate(),
+                        client.getDiscountMode());
+                result.add(item);
+            }
+        } else {
+            for (CategoryDiscount categoryDiscount : clientDiscountsList) {
+                boolean findSuitable = false;
+                for (ClientDtisznDiscountInfo discountInfo : clientDiscountsDTiSZNList) {
+                    if(findSuitable){
+                        break;
+                    }
+                    for (CategoryDiscountDSZN discountDSZN : categoryDiscount.getCategoriesDiscountDSZN()) {
+                        if (discountDSZN.getCode().equals(discountInfo.getDtisznCode().intValue())) {
+                            ClientDiscountItem item = new ClientDiscountItem(categoryDiscount.getIdOfCategoryDiscount(),
+                                    categoryDiscount.getCategoryName(), discountInfo.getIdOfClientDTISZNDiscountInfo(),
+                                    discountInfo.getDtisznCode(), discountInfo.getDtisznDescription(),
+                                    discountInfo.getStatus().getValue(), discountInfo.getDateStart(), discountInfo.getDateEnd(), client.getLastDiscountsUpdate(),
+                                    client.getDiscountMode());
+                            result.add(item);
+                            findSuitable = true;
+                            break;
+                        }
+                    }
+                }
+                if(!findSuitable){
+                    ClientDiscountItem item = new ClientDiscountItem(categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
+                            null, null, null, null, null, null, client.getLastDiscountsUpdate(),
+                            client.getDiscountMode());
+                    result.add(item);
+                }
+            }
+            for(ClientDtisznDiscountInfo discountInfo : clientDiscountsDTiSZNList){
+                boolean findSuitableItem = false;
+                for(ClientDiscountItem item : result){
+                    Long currentIdOfClientDTiSZNDiscountInfo = item.getIdOfClientDTiSZNDiscountInfo();
+                     if(currentIdOfClientDTiSZNDiscountInfo != null && currentIdOfClientDTiSZNDiscountInfo.equals(discountInfo.getIdOfClientDTISZNDiscountInfo())){
+                        findSuitableItem = true;
+                        break;
+                    }
+                }
+                if(!findSuitableItem){
+                    ClientDiscountItem item = new ClientDiscountItem(null, null, discountInfo.getIdOfClientDTISZNDiscountInfo(),
+                            discountInfo.getDtisznCode(), discountInfo.getDtisznDescription(), discountInfo.getStatus().getValue(), discountInfo.getDateStart(),
+                            discountInfo.getDateEnd(), client.getLastDiscountsUpdate(), client.getDiscountMode());
+                    result.add(item);
+                }
+            }
         }
         return result;
     }

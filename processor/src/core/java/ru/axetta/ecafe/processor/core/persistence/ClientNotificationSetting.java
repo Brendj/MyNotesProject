@@ -26,7 +26,8 @@ public class ClientNotificationSetting {
         SMS_NOTIFY_ORDERS_FREE(1230000000L, "Оповещать о покупках льготного питания", EventNotificationService.MESSAGE_PAYMENT_FREE),
         SMS_NOTIFY_SUMMARY_DAY(1300000000L, "Оповещать по итогам дня", EventNotificationService.NOTIFICATION_SUMMARY_BY_DAY),
         SMS_NOTIFY_SUMMARY_WEEK(1400000000L, "Оповещать по итогам недели", EventNotificationService.NOTIFICATION_SUMMARY_BY_WEEK),
-        SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса", EventNotificationService.NOTIFICATION_LOW_BALANCE);
+        SMS_NOTIFY_LOW_BALANCE(1500000000L, "Оповещать о снижении баланса", EventNotificationService.NOTIFICATION_LOW_BALANCE),
+        SMS_NOTIFY_MUSEUM(1600000000L, "Оповещение о получении и аннулировании билета в музей", false); // Содержит NOTIFICATION_NOENTER_MUSEUM и NOTIFICATION_ENTER_MUSEUM, см метод parseByBinding()
 
 
         private Long value;
@@ -83,6 +84,10 @@ public class ClientNotificationSetting {
         }
 
         public static Predefined parseByBinding(String binding) {
+            if(binding.equals(EventNotificationService.NOTIFICATION_ENTER_MUSEUM)
+                    || binding.equals(EventNotificationService.NOTIFICATION_NOENTER_MUSEUM)){
+                return SMS_NOTIFY_MUSEUM;
+            }
             Predefined currentPredefined = null;
             for (Predefined predefined : Predefined.values()) {
                 if (predefined.binding != null && predefined.binding.equals(binding)) {
