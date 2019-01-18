@@ -318,7 +318,10 @@ public class PreorderRequestsReportService extends RecoverableService {
             ClientGroup clientGroup = (ClientGroup) session.load(ClientGroup.class, new CompositeIdOfClientGroup(orgOwner, idOfClientGroup));
             GroupNamesToOrgs groupNamesToOrgs = DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(session, org, clientGroup.getGroupName());
             if (null != groupNamesToOrgs) {
-                isSixWorkWeek = groupNamesToOrgs.getIsSixDaysWorkWeek();
+                Boolean isSixDaysWorkWeek = groupNamesToOrgs.getIsSixDaysWorkWeek();
+                if (null != isSixDaysWorkWeek) {
+                    isSixWorkWeek = isSixDaysWorkWeek;
+                }
             }
         }
 

@@ -512,7 +512,8 @@ public class DTSZNDiscountsReviseService {
             for (ClientDtisznDiscountInfo info : infoList) {
                 if (application.getDtisznCode().equals(info.getDtisznCode()) &&
                         info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) &&
-                        CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())) {
+                        CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) &&
+                        !info.getArchived()) {
                     isOk = true;
                     break;
                 }
@@ -710,7 +711,7 @@ public class DTSZNDiscountsReviseService {
 
             Query query = session.createSQLQuery(
                     "update cf_client_dtiszn_discount_info set archived = 1, version = :version, "
-                    +" lastupdate = :lastUpdate where lastreceiveddate not between :start and :end");
+                    +" lastupdate = :lastUpdate where lastreceiveddate not between :start and :end or lastreceiveddate is null");
             query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
             query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());
             query.setParameter("version", nextVersion);
