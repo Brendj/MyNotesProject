@@ -574,9 +574,12 @@ public class ClientViewPage extends BasicWorkspacePage {
             }
         }
 
-        Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
-        clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
-        List<CategoryDiscount> clientDiscountsList = clientDiscountsCriteria.list();
+        List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
+        if(!categoriesDiscountsIds.isEmpty()) {
+            Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
+            clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+            clientDiscountsList = clientDiscountsCriteria.list();
+        }
 
         Criteria clientDiscountsDTiSZNCriteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         clientDiscountsDTiSZNCriteria.add(Restrictions.eq("client", client));
