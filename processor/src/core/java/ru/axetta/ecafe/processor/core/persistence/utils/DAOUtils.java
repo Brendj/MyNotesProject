@@ -4040,4 +4040,14 @@ public class DAOUtils {
         query.setParameter("idOfClient", idOfClient);
         return (Person) query.uniqueResult();
     }
+
+    public static Client findClientByMobileIgnoreLeavingDeletedDisplaced(Session session, String mobile) {
+        Criteria mobileCriteria = session.createCriteria(Client.class);
+        mobileCriteria.add(Restrictions.eq("mobile", mobile));
+        mobileCriteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
+        mobileCriteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        mobileCriteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue()));
+        List<Client> resultList = (List<Client>) mobileCriteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
 }

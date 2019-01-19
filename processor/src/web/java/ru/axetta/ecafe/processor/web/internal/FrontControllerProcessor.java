@@ -429,4 +429,13 @@ public class FrontControllerProcessor {
             return e.getMessage();
         }
     }
+
+    public static String getGuardianParamDescValueByName(String paramName, GuardianDesc.GuardianDescItemParamList params) {
+        for(GuardianDesc.GuardianDescItemParam param : params.getParam()) {
+            if (param.paramName.equalsIgnoreCase(paramName)) {
+                return param.paramValue;
+            }
+        }
+        return null;
+    }
 }

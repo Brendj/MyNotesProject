@@ -24,6 +24,10 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_CARD_WRONG_STATE = 220;
     public static final int ERROR_CARD_UID_GIVEN_AWAY = 230;
     public static final int ERROR_AUTHENTICATOIN_FAILED = 400;
+    public static final int ERROR_INCORRECT_FORMAT_OF_MOBILE = 410;
+    public static final int ERROR_CLIENT_NOT_FOUND = 420;
+    public static final int ERROR_REQUIRED_FIELDS_NOT_FILLED = 430;
+    public static final int ERROR_ORGANIZATION_NOT_FOUND = 440;
     public static final String OK_MESSAGE = "Ok.";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
@@ -36,6 +40,10 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE = "Карта уже зарегистрирована в вашей организации";
     public static final String ERROR_CARD_WRONG_STATE_MESSAGE = "Невозможно вернуть/разблокировать карту с текущим статусом";
     public static final String ERROR_CARD_UID_GIVEN_AWAY_MESSAGE = "УИД карты передан в пользование другой ОО";
+    public static final String ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE = "Некорректный формат мобилного телефона";
+    public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE = "Клиент не найден";
+    public static final String ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE = "Не заполнены обязательные поля";
+    public static final String ERROR_ORGANIZATION_NOT_FOUND_MESSAGE = "Организация не найдена";
     public int code;
     public String message;
 

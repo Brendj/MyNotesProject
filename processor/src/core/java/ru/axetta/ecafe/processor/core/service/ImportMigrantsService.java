@@ -209,12 +209,12 @@ public class ImportMigrantsService {
         }
     }
 
-    private static String formRequestNumber(Long idOfOrg, Long idOfOrgVisit, Long idOfFirstRequest, Date startDate){
+    public static String formRequestNumber(Long idOfOrg, Long idOfOrgVisit, Long idOfFirstRequest, Date startDate){
         return String.format("В-%s-%s/%s-%s", idOfOrg, idOfOrgVisit, (idOfFirstRequest * -1L),
                 CalendarUtils.dateShortToString(startDate));
     }
 
-    private VisitReqResolutionHist createResolutionHistory(Session session, Client client, Long idOfRequest,
+    public static VisitReqResolutionHist createResolutionHistory(Session session, Client client, Long idOfRequest,
             Integer resolution, Date date) {
         Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, client.getOrg().getIdOfOrg());
         CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,

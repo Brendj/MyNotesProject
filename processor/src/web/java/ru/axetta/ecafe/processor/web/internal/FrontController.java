@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
@@ -29,6 +30,7 @@ import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -48,6 +50,8 @@ import javax.xml.ws.handler.MessageContext;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
@@ -1738,5 +1742,229 @@ public class FrontController extends HttpServlet {
             responseItem.message = ResponseItem.ERROR_INTERNAL_MESSAGE;
         }
         return responseItem;
+    }
+
+    @WebMethod(operationName = "findGuardianByMobilePhone")
+    public GuardianInfoResult findGuardianByMobilePhone(@WebParam(name = "orgId")Long orgId,
+            @WebParam(name = "mobilePhone") String mobilePhone)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        GuardianInfoResult result = new GuardianInfoResult();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+            if (null == mobilePhone) {
+                result.code = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE;
+                result.message = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE;
+                return result;
+            }
+
+            Client client = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone);
+            if (null == client) {
+                result.code = ResponseItem.ERROR_CLIENT_NOT_FOUND;
+                result.message = ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE;
+                return result;
+            }
+
+            Person person = client.getPerson();
+            if (null != person) {
+                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_SURNAME, person.getSurname()));
+                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_FIRST_NAME, person.getFirstName()));
+                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_SECOND_NAME, person.getSecondName()));
+            }
+
+            ClientGroup clientGroup = client.getClientGroup();
+            if (null != clientGroup) {
+                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_GROUP, clientGroup.getGroupName()));
+            }
+            result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_ORG_NAME, client.getOrg().getShortNameInfoService()));
+
+            result.code = ResponseItem.OK;
+            result.message = ResponseItem.OK_MESSAGE;
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in findGuardianByMobilePhone", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @WebMethod(operationName = "registerGuardian")
+    public ResponseItem registerGuardian(@WebParam(name = "orgId")Long orgId, @WebParam(name = "clientId")Long clientId,
+            @WebParam(name = "guardianDesc") GuardianDesc.GuardianDescItemParamList guardianDescList,  @WebParam(name = "mobilePhone") String mobilePhone)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+
+        ResponseItem result = new ResponseItem();
+
+        String firstName = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
+        if (StringUtils.isEmpty(firstName)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+        String secondName = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
+        if (StringUtils.isEmpty(secondName)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+        String surname = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
+        if (StringUtils.isEmpty(surname)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+        String group = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_GROUP, guardianDescList);
+        if (StringUtils.isEmpty(group)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+        String relationDegree = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
+        if (StringUtils.isEmpty(relationDegree)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+        String legalityStr = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
+        if (StringUtils.isEmpty(legalityStr)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+
+        Boolean legality = Boolean.parseBoolean(legalityStr);
+
+        String gender = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
+        if (StringUtils.isEmpty(gender)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+
+        String guardianBirthDayStr = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
+        if (StringUtils.isEmpty(guardianBirthDayStr)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        Date guardianBirthDay = null;
+
+        try {
+            guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
+        } catch (ParseException e) {
+            logger.error("Error in registerGuardian", e);
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+        }
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession.load(Org.class, orgId);
+            if (null == org) {
+                result.code = ResponseItem.ERROR_ORGANIZATION_NOT_FOUND;
+                result.message = ResponseItem.ERROR_ORGANIZATION_NOT_FOUND_MESSAGE;
+                return result;
+            }
+
+            ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
+            fc.setValue(ClientManager.FieldId.SURNAME, surname);
+            fc.setValue(ClientManager.FieldId.NAME, firstName);
+            fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+            fc.setValue(ClientManager.FieldId.GROUP, group);
+            fc.setValue(ClientManager.FieldId.GENDER, gender);
+            fc.setValue(ClientManager.FieldId.BIRTH_DATE, guardianBirthDay);
+            fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
+
+            Long idOfClient = ClientManager.registerClient(orgId, fc, false, true);
+
+            Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
+
+            ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree,
+                    false, clientId, ClientCreatedFromType.ARM);
+
+            clientGuardian.setIsLegalRepresent(legality);
+            persistenceSession.merge(clientGuardian);
+
+            result.code = ResponseItem.OK;
+            result.message = ResponseItem.OK_MESSAGE;
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in registerGuardian", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @WebMethod(operationName = "registerGuardianMigrantRequest")
+    public ResponseItem registerGuardianMigrantRequest(@WebParam(name = "orgId")Long orgId, @WebParam(name = "mobilePhone") String mobilePhone)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+
+        ResponseItem result = new ResponseItem();
+
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Org org = (Org) persistenceSession.load(Org.class, orgId);
+            if (null == org) {
+                result.code = ResponseItem.ERROR_ORGANIZATION_NOT_FOUND;
+                result.message = ResponseItem.ERROR_ORGANIZATION_NOT_FOUND_MESSAGE;
+                return result;
+            }
+
+            Date fireTime = new Date();
+
+            Client guardian = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, Client.checkAndConvertMobile(mobilePhone));
+
+            Long idOfProcessorMigrantRequest = MigrantsUtils
+                    .nextIdOfProcessorMigrantRequest(persistenceSession, orgId);
+            CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
+                    guardian.getOrg().getIdOfOrg());
+            String requestNumber = ImportMigrantsService.formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId,
+                    idOfProcessorMigrantRequest, fireTime);
+
+            // TODO
+            Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
+                    requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 5), Migrant.NOT_SYNCHRONIZED);
+            migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
+            //migrantNew.setSection(request.getGroupName());
+            //migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
+            persistenceSession.save(migrantNew);
+
+            persistenceSession.save(ImportMigrantsService.createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                    VisitReqResolutionHist.RES_CREATED, fireTime));
+            persistenceSession.flush();
+            persistenceSession.save(ImportMigrantsService.createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                    VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+
+            result.code = ResponseItem.OK;
+            result.message = ResponseItem.OK_MESSAGE;
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in registerGuardianMigrantRequest", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 }
