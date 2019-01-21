@@ -430,10 +430,10 @@ public class FrontControllerProcessor {
         }
     }
 
-    public static String getGuardianParamDescValueByName(String paramName, GuardianDesc.GuardianDescItemParamList params) {
-        for(GuardianDesc.GuardianDescItemParam param : params.getParam()) {
-            if (param.paramName.equalsIgnoreCase(paramName)) {
-                return param.paramValue;
+    public static <T extends ClientField> String getFindClientFieldValueByName(String paramName, T clientFieldList) {
+        for(ClientField.ClientFieldItemParam field : clientFieldList.getParam()) {
+            if (field.paramName.equalsIgnoreCase(paramName)) {
+                return field.paramValue;
             }
         }
         return null;

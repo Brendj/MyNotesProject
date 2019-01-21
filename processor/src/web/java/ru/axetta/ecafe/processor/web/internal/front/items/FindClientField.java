@@ -4,7 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.internal.front.items;
 
-public class GuardianDesc extends ClientField {
+
+public class FindClientField extends ClientField {
     public static final String FIELD_FIRST_NAME = "firstName";
     public static final String FIELD_SECOND_NAME = "secondName";
     public static final String FIELD_SURNAME = "surname";
@@ -15,6 +16,4 @@ public class GuardianDesc extends ClientField {
     public static final String FIELD_GENDER = "gender";
     public static final String FIELD_GUARDIAN_BIRTHDAY = "guardianBirthday";
     public static final String FIELD_MOBILE = "mobile";
-    public static final String FIELD_CLIENT_ID = "clientId";
 }
-

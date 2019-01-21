@@ -28,6 +28,7 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_CLIENT_NOT_FOUND = 420;
     public static final int ERROR_REQUIRED_FIELDS_NOT_FILLED = 430;
     public static final int ERROR_ORGANIZATION_NOT_FOUND = 440;
+    public static final int ERROR_CLIENT_ALREADY_EXIST = 450;
     public static final String OK_MESSAGE = "Ok.";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
@@ -44,6 +45,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE = "Клиент не найден";
     public static final String ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE = "Не заполнены обязательные поля";
     public static final String ERROR_ORGANIZATION_NOT_FOUND_MESSAGE = "Организация не найдена";
+    public static final String ERROR_CLIENT_ALREADY_EXIST_MESSAGE = "Клиент уже существует";
     public int code;
     public String message;
 

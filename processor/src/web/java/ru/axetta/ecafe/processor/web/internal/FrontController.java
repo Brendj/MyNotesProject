@@ -1744,17 +1744,25 @@ public class FrontController extends HttpServlet {
         return responseItem;
     }
 
-    @WebMethod(operationName = "findGuardianByMobilePhone")
-    public GuardianInfoResult findGuardianByMobilePhone(@WebParam(name = "orgId")Long orgId,
-            @WebParam(name = "mobilePhone") String mobilePhone)
+    @WebMethod(operationName = "findClient")
+    public FindClientResult findClient(@WebParam(name = "orgId")Long orgId,
+            @WebParam(name = "findClientFieldList") FindClientField findClientField)
             throws FrontControllerException {
         checkRequestValidity(orgId);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        GuardianInfoResult result = new GuardianInfoResult();
+        FindClientResult result = new FindClientResult();
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
+            String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, findClientField);
+
+            if (StringUtils.isEmpty(mobilePhone)) {
+                result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+                result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+                return result;
+            }
 
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
             if (null == mobilePhone) {
@@ -1772,16 +1780,16 @@ public class FrontController extends HttpServlet {
 
             Person person = client.getPerson();
             if (null != person) {
-                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_SURNAME, person.getSurname()));
-                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_FIRST_NAME, person.getFirstName()));
-                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_SECOND_NAME, person.getSecondName()));
+                result.setSurname(person.getSurname());
+                result.setFirstname(person.getFirstName());
+                result.setSecondname(person.getSecondName());
             }
 
             ClientGroup clientGroup = client.getClientGroup();
             if (null != clientGroup) {
-                result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_GROUP, clientGroup.getGroupName()));
+                result.setGroup(clientGroup.getGroupName());
             }
-            result.getGuardianDescList().getParam().add(new GuardianDesc.GuardianDescItemParam(GuardianDesc.FIELD_ORG_NAME, client.getOrg().getShortNameInfoService()));
+            result.setOrgName(client.getOrg().getShortNameInfoService());
 
             result.code = ResponseItem.OK;
             result.message = ResponseItem.OK_MESSAGE;
@@ -1790,7 +1798,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = null;
             return result;
         } catch (Exception e) {
-            logger.error("Error in findGuardianByMobilePhone", e);
+            logger.error("Error in findClient", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1799,59 +1807,65 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerGuardian")
-    public ResponseItem registerGuardian(@WebParam(name = "orgId")Long orgId, @WebParam(name = "clientId")Long clientId,
-            @WebParam(name = "guardianDesc") GuardianDesc.GuardianDescItemParamList guardianDescList,  @WebParam(name = "mobilePhone") String mobilePhone)
+    public RegisterGuardianResult registerGuardian(@WebParam(name = "orgId")Long orgId, @WebParam(name = "guardianDescList") GuardianDesc guardianDescList)
             throws FrontControllerException {
         checkRequestValidity(orgId);
 
-        ResponseItem result = new ResponseItem();
+        RegisterGuardianResult result = new RegisterGuardianResult();
 
-        String firstName = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
+        String firstName = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
         if (StringUtils.isEmpty(firstName)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
         }
-        String secondName = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
+        String secondName = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
         if (StringUtils.isEmpty(secondName)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
-        String surname = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
+        String surname = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
         if (StringUtils.isEmpty(surname)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
-        String group = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_GROUP, guardianDescList);
+        String group = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GROUP, guardianDescList);
         if (StringUtils.isEmpty(group)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
-        String relationDegree = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
+        String relationDegree = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
         if (StringUtils.isEmpty(relationDegree)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
-        String legalityStr = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
+        String legalityStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
         if (StringUtils.isEmpty(legalityStr)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
 
         Boolean legality = Boolean.parseBoolean(legalityStr);
 
-        String gender = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
+        String gender = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
         if (StringUtils.isEmpty(gender)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
 
-        String guardianBirthDayStr = FrontControllerProcessor.getGuardianParamDescValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
+        String guardianBirthDayStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
         if (StringUtils.isEmpty(guardianBirthDayStr)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        Date guardianBirthDay = null;
+        Date guardianBirthDay;
 
         try {
             guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
@@ -1859,6 +1873,39 @@ public class FrontController extends HttpServlet {
             logger.error("Error in registerGuardian", e);
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, guardianDescList);
+
+        if (StringUtils.isEmpty(mobilePhone)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+        if (null == mobilePhone) {
+            result.code = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE;
+            result.message = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE;
+            return result;
+        }
+
+        String clientIdStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_ID, guardianDescList);
+        if (StringUtils.isEmpty(clientIdStr)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        Long clientId;
+        try {
+            clientId = Long.parseLong(clientIdStr);
+        } catch (NumberFormatException e) {
+            logger.error("Error in registerGuardian", e);
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
         }
 
         Session persistenceSession = null;
@@ -1866,6 +1913,25 @@ public class FrontController extends HttpServlet {
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone);
+            if (null != client) {
+                result.code = ResponseItem.ERROR_CLIENT_ALREADY_EXIST;
+                result.message = ResponseItem.ERROR_CLIENT_ALREADY_EXIST_MESSAGE;
+                Person person = client.getPerson();
+                if (null != person) {
+                    result.setSurname(person.getSurname());
+                    result.setFirstname(person.getFirstName());
+                    result.setSecondname(person.getSecondName());
+                }
+
+                ClientGroup clientGroup = client.getClientGroup();
+                if (null != clientGroup) {
+                    result.setGroup(clientGroup.getGroupName());
+                }
+                result.setOrgName(client.getOrg().getShortNameInfoService());
+                return result;
+            }
 
             Org org = (Org) persistenceSession.load(Org.class, orgId);
             if (null == org) {
@@ -1909,11 +1975,58 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "registerGuardianMigrantRequest")
-    public ResponseItem registerGuardianMigrantRequest(@WebParam(name = "orgId")Long orgId, @WebParam(name = "mobilePhone") String mobilePhone)
+    public ResponseItem registerGuardianMigrantRequest(@WebParam(name = "orgId")Long orgId, @WebParam(name = "guardianDescList") GuardianDesc guardianDescList)
             throws FrontControllerException {
         checkRequestValidity(orgId);
 
         ResponseItem result = new ResponseItem();
+
+        String clientIdStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_ID, guardianDescList);
+        if (StringUtils.isEmpty(clientIdStr)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        Long clientId;
+        try {
+            clientId = Long.parseLong(clientIdStr);
+        } catch (NumberFormatException e) {
+            logger.error("Error in registerGuardian", e);
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, guardianDescList);
+
+        if (StringUtils.isEmpty(mobilePhone)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
+        if (null == mobilePhone) {
+            result.code = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE;
+            result.message = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE;
+            return result;
+        }
+
+        String relationDegree = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
+        if (StringUtils.isEmpty(relationDegree)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+        String legalityStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
+        if (StringUtils.isEmpty(legalityStr)) {
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            return result;
+        }
+
+        Boolean legality = Boolean.parseBoolean(legalityStr);
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1931,6 +2044,12 @@ public class FrontController extends HttpServlet {
             Date fireTime = new Date();
 
             Client guardian = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, Client.checkAndConvertMobile(mobilePhone));
+
+            ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree,
+                    false, clientId, ClientCreatedFromType.ARM);
+
+            clientGuardian.setIsLegalRepresent(legality);
+            persistenceSession.merge(clientGuardian);
 
             Long idOfProcessorMigrantRequest = MigrantsUtils
                     .nextIdOfProcessorMigrantRequest(persistenceSession, orgId);
