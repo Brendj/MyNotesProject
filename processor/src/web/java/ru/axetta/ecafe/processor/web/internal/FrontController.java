@@ -1778,19 +1778,24 @@ public class FrontController extends HttpServlet {
                 return result;
             }
 
+            ClientResponse.ClientResultList clientResultList = new ClientResponse.ClientResultList();
+            ClientResponse.ClientResult clientResult = new ClientResponse.ClientResult();
+            clientResultList.getClientResultList().add(clientResult);
+
             Person person = client.getPerson();
             if (null != person) {
-                result.setSurname(person.getSurname());
-                result.setFirstname(person.getFirstName());
-                result.setSecondname(person.getSecondName());
+                clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_SURNAME, person.getSurname()));
+                clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_FIRST_NAME, person.getFirstName()));
+                clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_SECOND_NAME, person.getSecondName()));
             }
 
             ClientGroup clientGroup = client.getClientGroup();
             if (null != clientGroup) {
-                result.setGroup(clientGroup.getGroupName());
+                clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_GROUP, clientGroup.getGroupName()));
             }
-            result.setOrgName(client.getOrg().getShortNameInfoService());
+            clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_ORG_NAME, client.getOrg().getShortNameInfoService()));
 
+            result.getClientResultList().add(clientResultList);
             result.code = ResponseItem.OK;
             result.message = ResponseItem.OK_MESSAGE;
 
@@ -1918,18 +1923,24 @@ public class FrontController extends HttpServlet {
             if (null != client) {
                 result.code = ResponseItem.ERROR_CLIENT_ALREADY_EXIST;
                 result.message = ResponseItem.ERROR_CLIENT_ALREADY_EXIST_MESSAGE;
+
+                ClientResponse.ClientResultList clientResultList = new ClientResponse.ClientResultList();
+                ClientResponse.ClientResult clientResult = new ClientResponse.ClientResult();
+                clientResultList.getClientResultList().add(clientResult);
+
                 Person person = client.getPerson();
                 if (null != person) {
-                    result.setSurname(person.getSurname());
-                    result.setFirstname(person.getFirstName());
-                    result.setSecondname(person.getSecondName());
+                    clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_SURNAME, person.getSurname()));
+                    clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_FIRST_NAME, person.getFirstName()));
+                    clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_SECOND_NAME, person.getSecondName()));
                 }
 
                 ClientGroup clientGroup = client.getClientGroup();
                 if (null != clientGroup) {
-                    result.setGroup(clientGroup.getGroupName());
+                    clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_GROUP, clientGroup.getGroupName()));
                 }
-                result.setOrgName(client.getOrg().getShortNameInfoService());
+                clientResult.getParam().add(new ClientResponse.ClientResultItemParam(FindClientResult.FIELD_ORG_NAME, client.getOrg().getShortNameInfoService()));
+                result.getClientResultList().add(clientResultList);
                 return result;
             }
 

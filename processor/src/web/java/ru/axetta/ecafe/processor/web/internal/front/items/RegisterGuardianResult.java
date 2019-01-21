@@ -10,6 +10,6 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RegisterGuardianResult")
-public class RegisterGuardianResult extends ClientResult {
+public class RegisterGuardianResult extends ClientResponse {
 
 }
