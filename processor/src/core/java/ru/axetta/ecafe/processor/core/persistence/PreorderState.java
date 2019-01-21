@@ -4,22 +4,42 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-public enum PreorderState {
-    /*0*/ OK("ОК"),
-    /*1*/ DELETED("Удалено поставщиком"),
-    /*2*/ CHANGED_PRICE("Изменение цены у поставщика"),
-    /*3*/ NOT_ENOUGH_BALANCE("Недостаточно средств на балансе л/с"),
-    /*4*/ CHANGE_ORG("Перевод в другую ОО"),
-    /*5*/ CHANGED_CALENDAR("Удален по причине изменения календаря учебных дней");
+import java.util.HashMap;
+import java.util.Map;
 
+public enum PreorderState {
+    /*0*/ OK(0, "ОК"),
+    /*1*/ DELETED(1, "Удалено поставщиком"),
+    /*2*/ CHANGED_PRICE(2, "Изменение цены у поставщика"),
+    /*3*/ NOT_ENOUGH_BALANCE(3, "Недостаточно средств на балансе л/с"),
+    /*4*/ CHANGE_ORG(4, "Перевод в другую ОО"),
+    /*5*/ CHANGED_CALENDAR(5, "Удален по причине изменения календаря учебных дней");
+
+    private final Integer code;
     private final String description;
 
-    private PreorderState(String description) {
+    static Map<Integer,PreorderState> map = new HashMap<Integer,PreorderState>();
+    static {
+        for (PreorderState status : PreorderState.values()) {
+            map.put(status.getCode(), status);
+        }
+    }
+
+    private PreorderState(int code, String description) {
+        this.code = code;
         this.description = description;
+    }
+
+    public Integer getCode() {
+        return code;
     }
 
     @Override
     public String toString() {
         return description;
+    }
+
+    public static PreorderState fromInteger(Integer value){
+        return map.get(value);
     }
 }

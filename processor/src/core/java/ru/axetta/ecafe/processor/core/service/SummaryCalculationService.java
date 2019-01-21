@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -89,6 +90,12 @@ public class SummaryCalculationService {
     public static String VALUE_AMOUNT_FRIDAY = "ComplexFriday";
     public static String VALUE_AMOUNT_SATURDAY = "ComplexSaturday";
     public static String VALUE_AMOUNT_SUNDAY = "ComplexSunday";
+
+    public static String VALUE_DELETED_PREORDER_DATE_GUARDIAN = "DeletedPreorderDateGuardian";
+    public static String VALUE_DELETED_PREORDER_DATE_OTHER = "DeletedPreorderDateOther";
+    public static String VALUE_PREORDER_DATE = "PreorderDate";
+    public static String VALUE_PREORDER_SUMM = "PreorderSumm";
+    public static String VALUE_PREORDER_LACKS_SUMM = "PreorderLacksSumm";
 
     final static String JOB_NAME_DAILY="NotificationSummaryDaily";
     final static String JOB_NAME_WEEKLY="NotificationSummaryWeekly";
@@ -518,6 +525,88 @@ public class SummaryCalculationService {
 
         attachBalanceValues(clients, notifyType);
 
+        //подсчет данных по предзаказам
+        if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
+            String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname from cf_preorder_complex pc "
+                    + " join cf_clients c on c.idofclient = pc.idofclient join cf_persons p on p.idofperson = c.idofperson "
+                    + " where pc.preorderdate > :date and pc.deletedstate = 1 "
+                    //+ " and pc.createddate = (select max(createddate) from cf_preorder_complex pc2 where pc2.idofclient = pc.idofclient and pc2.preorderdate = pc.preorderdate and pc2.deletedstate = 1) "
+                    + " and not exists(select pc1.idofpreordercomplex from cf_preorder_complex pc1 "
+                    + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
+                    + " union "
+                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname from cf_preorder_menudetail pmd "
+                    + " join cf_clients c on c.idofclient = pmd.idofclient join cf_persons p on p.idofperson = c.idofperson "
+                    + " where pmd.preorderdate > :date and pmd.deletedstate = 1 "
+                    + " and not exists(select pmd1.idofpreordermenudetail from cf_preorder_menudetail pmd1 "
+                    + "where pmd1.idofclient = pmd.idofclient and pmd1.deletedstate = 0 and pmd1.preorderdate = pmd.preorderdate and pmd1.amount > 0) "
+                    + "order by 3,1";
+            Query pQuery = entityManager.createNativeQuery(preorders_query);
+            pQuery.setParameter("date", System.currentTimeMillis());
+            List plist = pQuery.getResultList();
+            for (Object obj : plist) {
+                Object[] row = (Object[]) obj;
+                Date date = new Date(((BigInteger)row[0]).longValue());
+                Integer state = (Integer)row[1];
+                long id = ((BigInteger)row[2]).longValue();
+                String surname = (String) row[3];
+                String firstname = (String) row[4];
+                clientEE = findClientEEByClientId(clients, id);
+                if (clientEE == null) {
+                    clientEE = new ClientEE();
+                    clientEE.setIdOfClient(id);
+                    clientEE.setSurname(surname);
+                    clientEE.setFirstname(firstname);
+                    clientEE.setValues(result.clone());
+                    clients.add(clientEE);
+                }
+                if (state.equals(PreorderState.OK.getCode())) {
+                    clientEE.getPreorders().getDeletedPreorderDateGuardian().add(date);
+                } else {
+                    clientEE.getPreorders().getDeletedPreorderDateOther().add(date);
+                }
+            }
+            attachPreorderDailyValues(clients);
+        }
+
+        if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
+            String preorders_query = "select pc.preorderdate, cast(pc.amount * pc.complexprice as bigint), c.idofclient, c.balance, p.surname, p.firstname "
+                    + "from cf_preorder_complex pc join cf_clients c on pc.idofclient = c.idofclient "
+                    + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "where pc.deletedstate = 0 and pc.amount > 0 and pc.preorderdate between :startDate and :endDate "
+                    + "union "
+                    + "select pmd.preorderdate, cast(sum(pmd.amount * pmd.menudetailprice) as bigint), pmd.idofclient, c.balance, p.surname, p.firstname "
+                    + "from cf_preorder_menudetail pmd join cf_clients c on pmd.idofclient = c.idofclient "
+                    + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "where pmd.deletedstate = 0 and pmd.amount > 0 and pmd.preorderdate between :startDate and :endDate "
+                    + "group by pmd.idofclient, p.surname, p.firstname, c.balance, pmd.preorderdate order by 1, 3";
+            Query pQuery = entityManager.createNativeQuery(preorders_query);
+            pQuery.setParameter("startDate", System.currentTimeMillis());
+            pQuery.setParameter("endDate", CalendarUtils.addDays(new Date(), 7).getTime());
+            List pList = pQuery.getResultList();
+            for (Object obj : pList) {
+                Object[] row = (Object[])obj;
+                Date date = new Date(((BigInteger)row[0]).longValue());
+                Long sum = ((BigInteger)row[1]).longValue();
+                long id = ((BigInteger)row[2]).longValue();
+                long balance = ((BigInteger)row[3]).longValue();
+                String surname = (String) row[4];
+                String firstname = (String) row[5];
+                clientEE = findClientEEByClientId(clients, id);
+                if (clientEE == null) {
+                    clientEE = new ClientEE();
+                    clientEE.setIdOfClient(id);
+                    clientEE.setSurname(surname);
+                    clientEE.setFirstname(firstname);
+                    clientEE.setValues(result.clone());
+                    clients.add(clientEE);
+                }
+                clientEE.getPreorderWeekly().getPreorderDate().add(date);
+                clientEE.getPreorderWeekly().setPreorderSumm(clientEE.getPreorderWeekly().getPreorderSumm() + sum);
+                clientEE.getPreorderWeekly().setBalance(balance);
+            }
+            attachPreorderWeeklyValues(clients);
+        }
+
         for(ClientEE cEE : clients) {
             String q = "select cg.disabled, cg.idofguardian, p.firstname, p.surname from cf_client_guardian_notificationsettings n " +
                     "inner join cf_client_guardian cg on n.idofclientguardian = cg.idofclientguardian " +
@@ -546,6 +635,34 @@ public class SummaryCalculationService {
         }
 
         return clients;
+    }
+
+    private void attachPreorderDailyValues(List<ClientEE> clients) {
+        for (ClientEE clientEE : clients) {
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_DELETED_PREORDER_DATE_GUARDIAN,
+                    clientEE.getPreorders().getDeletedPreorderDateGuardian().size() == 0 ? "" : getPreorderDates(clientEE.getPreorders().getDeletedPreorderDateGuardian())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_DELETED_PREORDER_DATE_OTHER,
+                    clientEE.getPreorders().getDeletedPreorderDateOther().size() == 0 ? "" : getPreorderDates(clientEE.getPreorders().getDeletedPreorderDateOther())));
+        }
+    }
+
+    private String getPreorderDates(Set<Date> dates) {
+        String result = "";
+        for (Date date: dates) {
+            result += CalendarUtils.dateToString(date) + ",";
+        }
+        return result.substring(0, result.length()-1);
+    }
+
+    private void attachPreorderWeeklyValues(List<ClientEE> clients) {
+        for (ClientEE clientEE : clients) {
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_PREORDER_DATE,
+                    clientEE.getPreorderWeekly().getPreorderDate().size() == 0 ? "" : getPreorderDates(clientEE.getPreorderWeekly().getPreorderDate())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_PREORDER_SUMM, CurrencyStringUtils.copecksToRubles(clientEE.getPreorderWeekly().getPreorderSumm())));
+            clientEE.setValues(attachValue(clientEE.getValues(), VALUE_PREORDER_LACKS_SUMM,
+                    clientEE.getPreorderWeekly().getBalance() - clientEE.getPreorderWeekly().getPreorderSumm() > 0 ? "0" :
+                            CurrencyStringUtils.copecksToRubles(clientEE.getPreorderWeekly().getPreorderSumm() - clientEE.getPreorderWeekly().getBalance())));
+        }
     }
 
     private ClientEE findClientEEByClientId(List<ClientEE> list, Long id) {
@@ -867,6 +984,8 @@ public class SummaryCalculationService {
         private String[] values;
         private Boolean notInform;
         private List<String> guardians;
+        private NotifyPreorderDaily preorders;
+        private NotifyPreorderWeekly preorderWeekly;
 
         private ClientEE() {
             this.eeList = new ArrayList<EE>();
@@ -874,6 +993,8 @@ public class SummaryCalculationService {
             this.notInform = false;
             this.guardians = new ArrayList<String>();
             this.setValues(new String[0]);
+            this.preorders = new NotifyPreorderDaily();
+            this.preorderWeekly = new NotifyPreorderWeekly();
         }
 
         public Long getIdOfClient() {
@@ -966,6 +1087,22 @@ public class SummaryCalculationService {
 
         public void setGuardians(List<String> guardians) {
             this.guardians = guardians;
+        }
+
+        public NotifyPreorderDaily getPreorders() {
+            return preorders;
+        }
+
+        public void setPreorders(NotifyPreorderDaily preorders) {
+            this.preorders = preorders;
+        }
+
+        public NotifyPreorderWeekly getPreorderWeekly() {
+            return preorderWeekly;
+        }
+
+        public void setPreorderWeekly(NotifyPreorderWeekly preorderWeekly) {
+            this.preorderWeekly = preorderWeekly;
         }
     }
 
@@ -1170,6 +1307,79 @@ public class SummaryCalculationService {
 
         public void setOrder7(Long order7) {
             this.order7 = order7;
+        }
+    }
+
+    public static class NotifyPreorderDaily {
+        //private long idOfClient;
+        private Set<Date> deletedPreorderDateGuardian;
+        private Set<Date> deletedPreorderDateOther;
+
+        public NotifyPreorderDaily() {
+            this.deletedPreorderDateGuardian = new TreeSet<Date>();
+            this.deletedPreorderDateOther = new TreeSet<Date>();
+        }
+
+        public Set<Date> getDeletedPreorderDateGuardian() {
+            return deletedPreorderDateGuardian;
+        }
+
+        public void setDeletedPreorderDateGuardian(Set<Date> deletedPreorderDateGuardian) {
+            this.deletedPreorderDateGuardian = deletedPreorderDateGuardian;
+        }
+
+        public Set<Date> getDeletedPreorderDateOther() {
+            return deletedPreorderDateOther;
+        }
+
+        public void setDeletedPreorderDateOther(Set<Date> deletedPreorderDateOther) {
+            this.deletedPreorderDateOther = deletedPreorderDateOther;
+        }
+    }
+
+    public static class NotifyPreorderWeekly {
+        private Set<Date> preorderDate;
+        private Long preorderSumm;
+        private Long preorderLacksSumm;
+        private Long balance;
+
+        public NotifyPreorderWeekly() {
+            this.setPreorderDate(new TreeSet<Date>());
+            this.preorderSumm = 0L;
+            this.preorderLacksSumm = 0L;
+            this.balance = 0L;
+        }
+
+        public Set<Date> getPreorderDate() {
+            return preorderDate;
+        }
+
+        public void setPreorderDate(Set<Date> preorderDate) {
+            this.preorderDate = preorderDate;
+        }
+
+        public Long getPreorderSumm() {
+            return preorderSumm;
+        }
+
+        public void setPreorderSumm(Long preorderSumm) {
+            this.preorderSumm = preorderSumm;
+        }
+
+        public Long getPreorderLacksSumm() {
+            return preorderLacksSumm;
+        }
+
+        public void setPreorderLacksSumm(Long preorderLacksSumm) {
+            this.preorderLacksSumm = preorderLacksSumm;
+        }
+
+        public Long getBalance() {
+            return balance;
+        }
+
+        public void setBalance(Long balance) {
+            this.balance = balance;
         }
     }
 }
