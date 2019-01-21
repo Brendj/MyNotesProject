@@ -120,11 +120,11 @@
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-    <a4j:commandButton value="Запустить свергу льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"
+    <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Отравка статусов заявление ЛП в АИС Контингент" action="#{otherActionsPage.sendToAISContingent()}" id="sendToAISContingent"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-    <a4j:commandButton value="Запустить свергу льгот ДТСЗН с реестрами 2.0(этап 2)" action="#{otherActionsPage.runDTSZNDiscountsReviseServicePart2()}" id="runDTSZNDiscountsReviseServicePart2"
+    <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0(этап 2)" action="#{otherActionsPage.runDTSZNDiscountsReviseServicePart2()}" id="runDTSZNDiscountsReviseServicePart2"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <rich:separator align="center" height = "8" width = "75%" />
     <a4j:commandButton value="Итого за день" action="#{otherActionsPage.runEventNotificationServiceForDaily}" id="runEventNotificationServiceForDaily"
