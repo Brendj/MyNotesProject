@@ -4,13 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.internal.front.items;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import java.util.LinkedList;
+import java.util.List;
 
-@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "FindClientResult")
-public class FindClientResult extends ClientResponse {
+public class FindClientResult {
     public static final String FIELD_FIRST_NAME = "firstName";
     public static final String FIELD_SECOND_NAME = "secondName";
     public static final String FIELD_SURNAME = "surname";
@@ -21,4 +20,46 @@ public class FindClientResult extends ClientResponse {
     public static final String FIELD_GENDER = "gender";
     public static final String FIELD_GUARDIAN_BIRTHDAY = "guardianBirthday";
     public static final String FIELD_MOBILE = "mobile";
+
+    protected FindClientItemParamList findClientDescParams;
+
+    public FindClientResult() {
+        findClientDescParams = new FindClientItemParamList();
+    }
+
+    public FindClientItemParamList getFindClientDescParams() {
+        return findClientDescParams;
+    }
+
+    public void setFindClientDescParams(FindClientItemParamList findClientDescParams) {
+        this.findClientDescParams = findClientDescParams;
+    }
+
+    public static class FindClientItemParam {
+        public String paramName;
+        public String paramValue;
+
+        public FindClientItemParam() {}
+
+        public FindClientItemParam(String paramName, String paramValue) {
+            this.paramName = paramName;
+            this.paramValue = paramValue;
+        }
+    }
+
+    public static class FindClientItemParamList {
+        protected List<FindClientItemParam> param;
+
+        public FindClientItemParamList() {
+            param = new LinkedList<FindClientItemParam>();
+        }
+
+        public List<FindClientItemParam> getParam() {
+            return param;
+        }
+
+        public void setParam(List<FindClientItemParam> param) {
+            this.param = param;
+        }
+    }
 }
