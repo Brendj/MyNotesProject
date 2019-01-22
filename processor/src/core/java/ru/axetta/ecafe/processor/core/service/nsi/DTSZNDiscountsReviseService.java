@@ -159,91 +159,99 @@ public class DTSZNDiscountsReviseService {
 
                 Integer counter = 1;
                 for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
-                    if (null == transaction || !transaction.isActive()) {
-                        transaction = session.beginTransaction();
-                    }
+                    try {
+                        if (null == transaction || !transaction.isActive()) {
+                            transaction = session.beginTransaction();
+                        }
 
-                    Client client = DAOUtils.findClientByGuid(session, item.getPerson().getId());
-                    if (null == client) {
-                        //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
-                        continue;
-                    }
+                        Client client = DAOUtils.findClientByGuid(session, item.getPerson().getId());
+                        if (null == client) {
+                            //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
+                            continue;
+                        }
 
-                    if (!client.getOrg().getChangesDSZN()) {
-                        logger.info(String.format("Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped", item.getPerson().getId()));
-                        continue;
-                    }
+                        if (!client.getOrg().getChangesDSZN()) {
+                            logger.info(String.format(
+                                    "Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped",
+                                    item.getPerson().getId()));
+                            continue;
+                        }
 
-                    ClientDtisznDiscountInfo discountInfo = DAOUtils
-                            .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
+                        ClientDtisznDiscountInfo discountInfo = DAOUtils
+                                .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
 
-                    clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                        clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
-                    if (null == discountInfo) {
-                        discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
-                                item.getBenefit().getBenefitForm(),
-                                item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), clientDTISZNDiscountVersion);
-                        session.save(discountInfo);
-                    } else {
-                        if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
-                            // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
-                            // Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
-                            boolean wasModified = false;
-                            if (!discountInfo.getDateStart().equals(item.getDsznDateBeginAsDate())) {
-                                discountInfo.setDateStart(item.getDsznDateBeginAsDate());
-                                wasModified = true;
-                            }
-                            if (!discountInfo.getDateEnd().equals(item.getDsznDateEndAsDate())) {
-                                discountInfo.setDateEnd(item.getDsznDateEndAsDate());
-                                wasModified = true;
-                            }
-                            if (item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)) {
-                                discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
-                                discountInfo.setArchived(false);
-                                wasModified = true;
-                            }
-                            if (!item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
-                                discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
-                                discountInfo.setArchived(true);
-                                wasModified = true;
-                            }
-                            if (item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()) {
-                                discountInfo.setArchived(true);
-                                wasModified = true;
-                            }
-                            if (item.getBenefitConfirmed() && discountInfo.getArchived()) {
-                                discountInfo.setArchived(false);
-                                wasModified = true;
-                            }
-                            discountInfo.setLastReceivedDate(new Date());
-                            if (wasModified) {
-                                discountInfo.setVersion(clientDTISZNDiscountVersion);
-                                discountInfo.setLastUpdate(new Date());
-                                session.merge(discountInfo);
-                            } else {
-                                session.merge(discountInfo);
-                            }
-                        } else {
-                            // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
-                            // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
-                            discountInfo.setArchived(true);
-                            discountInfo.setLastUpdate(new Date());
-                            session.merge(discountInfo);
-
+                        if (null == discountInfo) {
                             discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
                                     item.getBenefit().getBenefitForm(),
                                     item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                                     item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
                                     clientDTISZNDiscountVersion);
                             session.save(discountInfo);
+                        } else {
+                            if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
+                                // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
+                                // Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
+                                boolean wasModified = false;
+                                if (!discountInfo.getDateStart().equals(item.getDsznDateBeginAsDate())) {
+                                    discountInfo.setDateStart(item.getDsznDateBeginAsDate());
+                                    wasModified = true;
+                                }
+                                if (!discountInfo.getDateEnd().equals(item.getDsznDateEndAsDate())) {
+                                    discountInfo.setDateEnd(item.getDsznDateEndAsDate());
+                                    wasModified = true;
+                                }
+                                if (item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)) {
+                                    discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+                                    discountInfo.setArchived(false);
+                                    wasModified = true;
+                                }
+                                if (!item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
+                                    discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
+                                    discountInfo.setArchived(true);
+                                    wasModified = true;
+                                }
+                                if (item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()) {
+                                    discountInfo.setArchived(true);
+                                    wasModified = true;
+                                }
+                                if (item.getBenefitConfirmed() && discountInfo.getArchived()) {
+                                    discountInfo.setArchived(false);
+                                    wasModified = true;
+                                }
+                                discountInfo.setLastReceivedDate(new Date());
+                                if (wasModified) {
+                                    discountInfo.setVersion(clientDTISZNDiscountVersion);
+                                    discountInfo.setLastUpdate(new Date());
+                                    session.merge(discountInfo);
+                                } else {
+                                    session.merge(discountInfo);
+                                }
+                            } else {
+                                // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
+                                // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
+                                discountInfo.setArchived(true);
+                                discountInfo.setLastUpdate(new Date());
+                                session.merge(discountInfo);
+
+                                discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
+                                        item.getBenefit().getBenefitForm(),
+                                        item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
+                                        item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
+                                        clientDTISZNDiscountVersion);
+                                session.save(discountInfo);
+                            }
                         }
-                    }
-                    transaction.commit();
-                    transaction = null;
-                    if (0 == counter%maxRecords) {
-                        session.flush();
-                        session.clear();
+                        transaction.commit();
+                        transaction = null;
+                        if (0 == counter++ % maxRecords) {
+                            session.flush();
+                            session.clear();
+                        }
+                    } catch (Exception e) {
+                        logger.error(String.format("Unable to update ClientDtisznDiscountInfo for person with guid = {%s}",
+                                item.getPerson().getEntityId()), e);
                     }
                 }
                 session.flush();
