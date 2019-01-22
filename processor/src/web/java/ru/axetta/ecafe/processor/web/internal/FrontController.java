@@ -1748,7 +1748,7 @@ public class FrontController extends HttpServlet {
     public List<FindClientResult> findClient(@WebParam(name = "orgId")Long orgId,
             @WebParam(name = "findClientFieldList") FindClientField findClientField)
             throws FrontControllerException {
-        //checkRequestValidity(orgId);
+        checkRequestValidity(orgId);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1807,7 +1807,7 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "registerGuardian")
     public List<RegisterGuardianResult> registerGuardian(@WebParam(name = "orgId")Long orgId, @WebParam(name = "guardianDescList") GuardianDesc guardianDescList)
             throws FrontControllerException {
-        //checkRequestValidity(orgId);
+        checkRequestValidity(orgId);
 
         String firstName = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
         if (StringUtils.isEmpty(firstName)) {
@@ -1891,6 +1891,17 @@ public class FrontController extends HttpServlet {
                 List<RegisterGuardianResult> registerGuardianResultList = new LinkedList<RegisterGuardianResult>();
                 RegisterGuardianResult registerGuardianResult = new RegisterGuardianResult();
 
+                Org org = client.getOrg();
+                if (null != org) {
+                    registerGuardianResult.getRegisterGuardianDescParams().getParam()
+                            .add(new RegisterGuardianResult.RegisterGuardianItemParam(RegisterGuardianResult.FIELD_ORG_ID, org.getIdOfOrg().toString()));
+                }
+
+                registerGuardianResult.getRegisterGuardianDescParams().getParam().add(
+                        new RegisterGuardianResult.RegisterGuardianItemParam(RegisterGuardianResult.FIELD_CLIENT_ID, client.getIdOfClient().toString()));
+                registerGuardianResult.getRegisterGuardianDescParams().getParam().add(
+                        new RegisterGuardianResult.RegisterGuardianItemParam(RegisterGuardianResult.FIELD_CLIENT_GUID, client.getClientGUID()));
+
                 Person person = client.getPerson();
                 if (null != person) {
                     registerGuardianResult.getRegisterGuardianDescParams().getParam().add(
@@ -1972,18 +1983,10 @@ public class FrontController extends HttpServlet {
             return result;
         }
 
-        String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, guardianDescList);
-
-        if (StringUtils.isEmpty(mobilePhone)) {
+        String clientGUID = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_GUID, guardianDescList);
+        if (StringUtils.isEmpty(clientGUID)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
             result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
-            return result;
-        }
-
-        mobilePhone = Client.checkAndConvertMobile(mobilePhone);
-        if (null == mobilePhone) {
-            result.code = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE;
-            result.message = ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE;
             return result;
         }
 
@@ -2017,7 +2020,12 @@ public class FrontController extends HttpServlet {
 
             Date fireTime = new Date();
 
-            Client guardian = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, Client.checkAndConvertMobile(mobilePhone));
+            Client guardian = DAOUtils.findClientByGuid(persistenceSession, clientGUID);
+            if (null == guardian) {
+                result.code = ResponseItem.ERROR_CLIENT_NOT_FOUND;
+                result.message = ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE;
+                return result;
+            }
 
             ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree,
                     false, clientId, ClientCreatedFromType.ARM);
