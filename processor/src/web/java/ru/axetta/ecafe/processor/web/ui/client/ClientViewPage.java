@@ -183,6 +183,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String middleGroup;
     private Long externalId;
     private String clientGUID;
+    private String clientSSOID;
     private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
@@ -215,6 +216,11 @@ public class ClientViewPage extends BasicWorkspacePage {
     public String getClientGUID() {
         return clientGUID;
     }
+
+    public String getClientSSOID() {
+        return clientSSOID;
+    }
+
 
     // Kadyrov (22.12.2011)
     private String san;
@@ -501,6 +507,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.clientGUID = client.getClientGUID();
+        this.clientSSOID = client.getSsoid();
         this.externalId = client.getExternalId();
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
@@ -583,6 +590,7 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         Criteria clientDiscountsDTiSZNCriteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         clientDiscountsDTiSZNCriteria.add(Restrictions.eq("client", client));
+        clientDiscountsDTiSZNCriteria.add(Restrictions.eq("archived", false));
         List<ClientDtisznDiscountInfo> clientDiscountsDTiSZNList = clientDiscountsDTiSZNCriteria.list();
 
         if(CollectionUtils.isEmpty(clientDiscountsList) && CollectionUtils.isEmpty(clientDiscountsDTiSZNList)){
