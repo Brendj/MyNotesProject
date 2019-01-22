@@ -15,7 +15,7 @@ public class GuardianDesc extends ClientField {
     public static final String FIELD_GENDER = "gender";
     public static final String FIELD_GUARDIAN_BIRTHDAY = "guardianBirthday";
     public static final String FIELD_MOBILE = "mobile";
-    public static final String FIELD_CLIENT_ID = "clientId";
-    public static final String FIELD_CLIENT_GUID = "clientGUID";
+    public static final String FIELD_CLIENT_ID = "childId";
+    public static final String FIELD_CLIENT_GUID = "guardianGUID";
 }
 
