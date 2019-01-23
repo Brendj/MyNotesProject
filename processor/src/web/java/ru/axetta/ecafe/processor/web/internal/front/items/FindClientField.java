@@ -16,4 +16,5 @@ public class FindClientField extends ClientField {
     public static final String FIELD_GENDER = "gender";
     public static final String FIELD_GUARDIAN_BIRTHDAY = "guardianBirthday";
     public static final String FIELD_MOBILE = "mobile";
+    public static final String FIELD_GROUP_NAMES = "groupsNames";
 }

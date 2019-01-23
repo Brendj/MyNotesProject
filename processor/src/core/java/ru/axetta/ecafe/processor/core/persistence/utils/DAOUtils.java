@@ -4041,13 +4041,21 @@ public class DAOUtils {
         return (Person) query.uniqueResult();
     }
 
-    public static Client findClientByMobileIgnoreLeavingDeletedDisplaced(Session session, String mobile) {
+    public static List<Client> findClientsByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(Session session, String mobile,
+            List<String> groupNameList) {
         Criteria mobileCriteria = session.createCriteria(Client.class);
+        mobileCriteria.createAlias("clientGroup", "cg");
         mobileCriteria.add(Restrictions.eq("mobile", mobile));
         mobileCriteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
         mobileCriteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         mobileCriteria.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue()));
-        List<Client> resultList = (List<Client>) mobileCriteria.list();
-        return resultList.isEmpty() ? null : resultList.get(0);
+        mobileCriteria.add(Restrictions.in("cg.groupName", groupNameList));
+        return (List<Client>) mobileCriteria.list();
+    }
+
+    public static Client findClientByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(Session session, String mobile,
+            List<String> groupNameList) {
+        List<Client> clientList = findClientsByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(session, mobile, groupNameList);
+        return clientList.isEmpty() ? null : clientList.get(0);
     }
 }

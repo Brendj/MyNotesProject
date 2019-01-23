@@ -20,6 +20,9 @@ public class FindClientResult {
     public static final String FIELD_GENDER = "gender";
     public static final String FIELD_GUARDIAN_BIRTHDAY = "guardianBirthday";
     public static final String FIELD_MOBILE = "mobile";
+    public static final String FIELD_ORG_ID = "orgId";
+    public static final String FIELD_CLIENT_ID = "clientId";
+    public static final String FIELD_CLIENT_GUID = "clientGUID";
 
     protected FindClientItemParamList findClientDescParams;
 

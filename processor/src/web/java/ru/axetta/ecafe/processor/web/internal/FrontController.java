@@ -1758,7 +1758,8 @@ public class FrontController extends HttpServlet {
             String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, findClientField);
 
             if (StringUtils.isEmpty(mobilePhone)) {
-                throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+                throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                        FindClientField.FIELD_MOBILE));
             }
 
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
@@ -1766,31 +1767,59 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException(ResponseItem.ERROR_INCORRECT_FORMAT_OF_MOBILE_MESSAGE);
             }
 
-            Client client = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone);
-            if (null == client) {
-                throw new FrontControllerException(ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE);
+            String groupNames = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_GROUP_NAMES, findClientField);
+            if (StringUtils.isEmpty(groupNames)) {
+                throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                        FindClientField.FIELD_GROUP_NAMES));
+            }
+            String[] groupNameArray = StringUtils.split(groupNames, ",");
+            List<String> groupNameList = new LinkedList<String>();
+            for (String groupName : groupNameArray) {
+                groupNameList.add(StringUtils.trim(groupName));
+            }
+
+            List<Client> clientList = DAOUtils
+                    .findClientsByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone, groupNameList);
+            if (clientList.isEmpty()) {
+                return null;
             }
 
             List<FindClientResult> findClientResultList = new LinkedList<FindClientResult>();
 
-            FindClientResult findClientResult = new FindClientResult();
+            for (Client client : clientList) {
+                FindClientResult findClientResult = new FindClientResult();
 
-            Person person = client.getPerson();
-            if (null != person) {
-                findClientResult.getFindClientDescParams()
-                        .getParam().add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SURNAME, person.getSurname()));
-                findClientResult.getFindClientDescParams().getParam().add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_FIRST_NAME, person.getFirstName()));
-                findClientResult.getFindClientDescParams().getParam().add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SECOND_NAME, person.getSecondName()));
+                Org org = client.getOrg();
+                if (null != org) {
+                    findClientResult.getFindClientDescParams().getParam()
+                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_ID, org.getIdOfOrg().toString()));
+                }
+
+                findClientResult.getFindClientDescParams().getParam().add(
+                        new FindClientResult.FindClientItemParam(FindClientResult.FIELD_CLIENT_ID, client.getIdOfClient().toString()));
+                findClientResult.getFindClientDescParams().getParam().add(
+                        new FindClientResult.FindClientItemParam(FindClientResult.FIELD_CLIENT_GUID, client.getClientGUID()));
+
+                Person person = client.getPerson();
+                if (null != person) {
+                    findClientResult.getFindClientDescParams().getParam()
+                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SURNAME, person.getSurname()));
+                    findClientResult.getFindClientDescParams().getParam()
+                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_FIRST_NAME, person.getFirstName()));
+                    findClientResult.getFindClientDescParams().getParam()
+                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_SECOND_NAME, person.getSecondName()));
+                }
+
+                ClientGroup clientGroup = client.getClientGroup();
+                if (null != clientGroup) {
+                    findClientResult.getFindClientDescParams().getParam()
+                            .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_GROUP, clientGroup.getGroupName()));
+                }
+                findClientResult.getFindClientDescParams().getParam()
+                        .add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_NAME, client.getOrg().getShortNameInfoService()));
+
+                findClientResultList.add(findClientResult);
             }
-
-            ClientGroup clientGroup = client.getClientGroup();
-            if (null != clientGroup) {
-                findClientResult.getFindClientDescParams().getParam().add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_GROUP, clientGroup.getGroupName()));
-            }
-            findClientResult.getFindClientDescParams()
-                    .getParam().add(new FindClientResult.FindClientItemParam(FindClientResult.FIELD_ORG_NAME, client.getOrg().getShortNameInfoService()));
-
-            findClientResultList.add(findClientResult);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -1811,39 +1840,47 @@ public class FrontController extends HttpServlet {
 
         String firstName = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_FIRST_NAME, guardianDescList);
         if (StringUtils.isEmpty(firstName)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_FIRST_NAME));
         }
         String secondName = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
         if (StringUtils.isEmpty(secondName)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_SECOND_NAME));
         }
         String surname = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
         if (StringUtils.isEmpty(surname)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_SURNAME));
         }
         String group = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GROUP, guardianDescList);
         if (StringUtils.isEmpty(group)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_GROUP));
         }
         String relationDegree = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
         if (StringUtils.isEmpty(relationDegree)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_RELATION_DEGREE));
         }
         String legalityStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
         if (StringUtils.isEmpty(legalityStr)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_LEGALITY));
         }
 
         Boolean legality = Boolean.parseBoolean(legalityStr);
 
         String gender = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
         if (StringUtils.isEmpty(gender)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_GENDER));
         }
 
         String guardianBirthDayStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
         if (StringUtils.isEmpty(guardianBirthDayStr)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         Date guardianBirthDay;
@@ -1852,13 +1889,15 @@ public class FrontController extends HttpServlet {
             guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
         } catch (ParseException e) {
             logger.error("Error in registerGuardian", e);
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
         }
 
-        String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(FindClientField.FIELD_MOBILE, guardianDescList);
+        String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_MOBILE, guardianDescList);
 
         if (StringUtils.isEmpty(mobilePhone)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_MOBILE));
         }
 
         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
@@ -1868,7 +1907,8 @@ public class FrontController extends HttpServlet {
 
         String clientIdStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_ID, guardianDescList);
         if (StringUtils.isEmpty(clientIdStr)) {
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_CLIENT_ID));
         }
 
         Long clientId;
@@ -1876,7 +1916,8 @@ public class FrontController extends HttpServlet {
             clientId = Long.parseLong(clientIdStr);
         } catch (NumberFormatException e) {
             logger.error("Error in registerGuardian", e);
-            throw new FrontControllerException(ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE);
+            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
+                    GuardianDesc.FIELD_CLIENT_ID));
         }
 
         Session persistenceSession = null;
@@ -1885,7 +1926,11 @@ public class FrontController extends HttpServlet {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = DAOUtils.findClientByMobileIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone);
+            List<String> groupNameList = new ArrayList<String>();
+            groupNameList.add(ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
+
+            Client client = DAOUtils
+                    .findClientByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(persistenceSession, mobilePhone, groupNameList);
             if (null != client) {
 
                 List<RegisterGuardianResult> registerGuardianResultList = new LinkedList<RegisterGuardianResult>();
@@ -1969,7 +2014,7 @@ public class FrontController extends HttpServlet {
         String clientIdStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_ID, guardianDescList);
         if (StringUtils.isEmpty(clientIdStr)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
-            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_CLIENT_ID);
             return result;
         }
 
@@ -1979,27 +2024,27 @@ public class FrontController extends HttpServlet {
         } catch (NumberFormatException e) {
             logger.error("Error in registerGuardian", e);
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
-            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_CLIENT_ID);
             return result;
         }
 
         String clientGUID = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_GUID, guardianDescList);
         if (StringUtils.isEmpty(clientGUID)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
-            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_CLIENT_GUID);
             return result;
         }
 
         String relationDegree = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_RELATION_DEGREE, guardianDescList);
         if (StringUtils.isEmpty(relationDegree)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
-            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_RELATION_DEGREE);
             return result;
         }
         String legalityStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_LEGALITY, guardianDescList);
         if (StringUtils.isEmpty(legalityStr)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
-            result.message = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE;
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_LEGALITY);
             return result;
         }
 
@@ -2034,7 +2079,7 @@ public class FrontController extends HttpServlet {
             persistenceSession.merge(clientGuardian);
 
             Long idOfProcessorMigrantRequest = MigrantsUtils
-                    .nextIdOfProcessorMigrantRequest(persistenceSession, orgId);
+                    .nextIdOfProcessorMigrantRequest(persistenceSession, guardian.getOrg().getIdOfOrg());
             CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
                     guardian.getOrg().getIdOfOrg());
             String requestNumber = ImportMigrantsService.formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId,
