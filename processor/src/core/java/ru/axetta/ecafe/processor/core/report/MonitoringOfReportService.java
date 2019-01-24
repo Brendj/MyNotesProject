@@ -599,7 +599,7 @@ public class MonitoringOfReportService {
             List<Object[]> list = query.list();
 
             for (Object[] obj : list) {
-                Long idOfUniqueClient = (Long) obj[1];
+                Long idOfUniqueClient = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[1]);
                 result.put(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[0]), idOfUniqueClient);
             }
             transaction.commit();
