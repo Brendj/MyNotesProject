@@ -2028,10 +2028,20 @@ public class FrontController extends HttpServlet {
             return result;
         }
 
-        String clientGUID = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_CLIENT_GUID, guardianDescList);
-        if (StringUtils.isEmpty(clientGUID)) {
+        String guardianIdString = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GUARDIAN_ID, guardianDescList);
+        if (StringUtils.isEmpty(guardianIdString)) {
             result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
-            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_CLIENT_GUID);
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_GUARDIAN_ID);
+            return result;
+        }
+
+        Long guardianId;
+        try {
+            guardianId = Long.parseLong(guardianIdString);
+        } catch (NumberFormatException e) {
+            logger.error("Error in registerGuardian", e);
+            result.code = ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED;
+            result.message = String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE, GuardianDesc.FIELD_GUARDIAN_ID);
             return result;
         }
 
@@ -2065,7 +2075,7 @@ public class FrontController extends HttpServlet {
 
             Date fireTime = new Date();
 
-            Client guardian = DAOUtils.findClientByGuid(persistenceSession, clientGUID);
+            Client guardian = (Client) persistenceSession.load(Client.class, guardianId);
             if (null == guardian) {
                 result.code = ResponseItem.ERROR_CLIENT_NOT_FOUND;
                 result.message = ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE;
