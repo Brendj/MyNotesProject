@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
+import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Query;
@@ -25,12 +26,12 @@ public class MonitoringOfReportService {
     final private static Logger logger = LoggerFactory.getLogger(MonitoringOfReportService.class);
     private final static Integer ORGS_AMOUNT_FOR_REPORT = 20;
 
-    private List<MonitoringOfItem> getMonitoringOfItems(Date startDate ,Long idOfOrg,
-            Map<Long, NumberOfPasses> numberOfPassesMap,
-            Map<Long, NumberOfPreferential> numberOfPreferentialMap,
+    private List<MonitoringOfItem> getMonitoringOfItems(Date startDate, Long idOfOrg,
+            Map<Long, NumberOfPasses> numberOfPassesMap, Map<Long, NumberOfPreferential> numberOfPreferentialMap,
             Map<Long, NumberOfStudentsAndGuardians> numberOfBuffetMap,
             Map<Long, NumberOfStudentsAndGuardians> numberOfSubfeedMap,
-            Map<Long, NumberOfStudentsAndGuardians> numberOfPaidMap) {
+            Map<Long, NumberOfStudentsAndGuardians> numberOfPaidMap,
+            Map<Long, Long> numberOfpreordersMap) {
 
         MonitoringOfItem monitoringOfItem = new MonitoringOfItem();
         monitoringOfItem.setsDate(startDate);
@@ -80,7 +81,12 @@ public class MonitoringOfReportService {
         if(numberOfPaid != null) {
             monitoringOfItem.setNumberOfPaidStudents(numberOfPaid.getStudents());
             monitoringOfItem.setNumberOfPaidGuardians(numberOfPaid.getGuardians());
+        }
 
+        //preorders
+        Long numberOfUniquePreorderClients = numberOfpreordersMap.get(idOfOrg);
+        if(numberOfUniquePreorderClients != null){
+            monitoringOfItem.setNumberOfPreorders(numberOfUniquePreorderClients);
         }
         return monitoringOfItemList;
     }
@@ -499,6 +505,7 @@ public class MonitoringOfReportService {
         Map<Long, NumberOfStudentsAndGuardians> numberOfBuffetMap = numberOfBuffet(startTime, endTime, idOfOrgList);
         Map<Long, NumberOfStudentsAndGuardians> numberOfSubfeedMap = numberOfSubFeed(startTime, endTime, idOfOrgList);
         Map<Long, NumberOfStudentsAndGuardians> numberOfPaidMap = numberOfPaid(startTime, endTime, idOfOrgList);
+        Map<Long, Long> numberOfpreordersMap = buildNumberOfPreordersMap(startTime, endTime, idOfOrgList);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -530,7 +537,8 @@ public class MonitoringOfReportService {
                 reportItem.setOtherEmployees(peopleData == null ? "" : String.valueOf(peopleData.getOther()));
 
                 List<MonitoringOfItem> monitoringOfItemList = getMonitoringOfItems(startTime,
-                        idOfOrg, numberOfPassesMap, numberOfPreferentialMap, numberOfBuffetMap, numberOfSubfeedMap, numberOfPaidMap);
+                        idOfOrg, numberOfPassesMap, numberOfPreferentialMap, numberOfBuffetMap,
+                        numberOfSubfeedMap, numberOfPaidMap, numberOfpreordersMap);
 
                 reportItem.setMonitoringOfItems(monitoringOfItemList);
                 reportItemList.add(reportItem);
@@ -558,6 +566,51 @@ public class MonitoringOfReportService {
         });
 
         return reportItemList;
+    }
+
+    private Map<Long, Long> buildNumberOfPreordersMap(Date startTime, Date endTime, List<Long> idOfOrgList) {
+        Session session = null;
+        Transaction transaction = null;
+        Map<Long, Long> result = new HashMap<Long, Long>();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            String orgsCondition = " ";
+            if (idOfOrgList.size() <= 10) {
+                orgsCondition = " and c.idoforg in (:idOfOrg)";
+            }
+            Query query = session.createSQLQuery(
+                    "SELECT pl.idoforg, count(DISTINCT pc.idofclient) AS unique_clients_count "
+                            + " FROM cf_preorder_linkod pl "
+                            + " JOIN cf_orders o ON o.idoforder = pl.idoforder AND o.idoforg = pl.idoforg "
+                            + " JOIN cf_preorder_complex pc ON pc.guid = pl.preorderguid "
+                            + " JOIN cf_clients c on c.idofclient = pc.idofclient "
+                            + " WHERE o.state = 0 AND pc.preorderdate BETWEEN :startDate AND :endDate " + orgsCondition
+                            + " AND c.idofclientgroup < :employees "
+                            + " GROUP BY pl.idoforg ");
+
+            if (idOfOrgList.size() <= 10) {
+                query.setParameterList("idOfOrg", idOfOrgList);
+            }
+
+            query.setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("startDate", startTime.getTime());
+            query.setParameter("endDate", endTime.getTime());
+            List<Object[]> list = query.list();
+
+            for (Object[] obj : list) {
+                Long idOfUniqueClient = (Long) obj[1];
+                result.put(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[0]), idOfUniqueClient);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in buildNumberOfPreorders: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
     }
 
     public static class ReportItem {
@@ -745,6 +798,7 @@ public class MonitoringOfReportService {
         private Long numberOfSubFeedGuardians;
         private Long numberOfPaidStudents;
         private Long numberOfPaidGuardians;
+        private Long numberOfPreorders;
 
         public MonitoringOfItem() {
             this.numberOfPassesStudents = 0L;
@@ -764,6 +818,7 @@ public class MonitoringOfReportService {
             this.numberOfSubFeedGuardians = 0L;
             this.numberOfPaidStudents = 0L;
             this.numberOfPaidGuardians = 0L;
+            this.numberOfPreorders = 0L;
         }
 
         public MonitoringOfItem(Date sDate, Long numberOfPassesStudents, Long numberOfUniquePassesStudents,
@@ -931,6 +986,14 @@ public class MonitoringOfReportService {
 
         public void setNumberOfUniquePassesGuardians(Long numberOfUniquePassesGuardians) {
             this.numberOfUniquePassesGuardians = numberOfUniquePassesGuardians;
+        }
+
+        public Long getNumberOfPreorders() {
+            return numberOfPreorders;
+        }
+
+        public void setNumberOfPreorders(Long numberOfPreorders) {
+            this.numberOfPreorders = numberOfPreorders;
         }
     }
 
