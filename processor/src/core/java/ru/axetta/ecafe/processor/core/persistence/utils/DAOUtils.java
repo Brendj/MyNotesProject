@@ -4058,4 +4058,14 @@ public class DAOUtils {
         List<Client> clientList = findClientsByMobileAndGroupNamesIgnoreLeavingDeletedDisplaced(session, mobile, groupNameList);
         return clientList.isEmpty() ? null : clientList.get(0);
     }
+
+    public static Boolean isFriendlyOrganizations(Session session, Org org1, Org org2) {
+        List<Long> friendlyOrgIdList = findFriendlyOrgIds(session, org1.getIdOfOrg());
+        for (Long id : friendlyOrgIdList) {
+            if (id.equals(org2.getIdOfOrg())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

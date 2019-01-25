@@ -2095,22 +2095,33 @@ public class FrontController extends HttpServlet {
             String requestNumber = ImportMigrantsService.formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId,
                     idOfProcessorMigrantRequest, fireTime);
 
-            // TODO
-            Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
-                    requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 5), Migrant.NOT_SYNCHRONIZED);
-            migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
-            //migrantNew.setSection(request.getGroupName());
-            //migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
-            persistenceSession.save(migrantNew);
+            Client child = (Client) persistenceSession.load(Client.class, clientId);
+            if (null == child) {
+                result.code = ResponseItem.ERROR_CLIENT_NOT_FOUND;
+                result.message = ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE;
+                return result;
+            }
 
-            persistenceSession.save(ImportMigrantsService.createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                    VisitReqResolutionHist.RES_CREATED, fireTime));
-            persistenceSession.flush();
-            persistenceSession.save(ImportMigrantsService.createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                    VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+            if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
+                // TODO
+                Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
+                        requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 10), Migrant.NOT_SYNCHRONIZED);
+                migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
+                //migrantNew.setSection(request.getGroupName());
+                //migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
+                persistenceSession.save(migrantNew);
 
-            result.code = ResponseItem.OK;
-            result.message = ResponseItem.OK_MESSAGE;
+                persistenceSession.save(ImportMigrantsService
+                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                                VisitReqResolutionHist.RES_CREATED, fireTime));
+                persistenceSession.flush();
+                persistenceSession.save(ImportMigrantsService
+                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                                VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+
+                result.code = ResponseItem.OK;
+                result.message = ResponseItem.OK_MESSAGE;
+            }
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
