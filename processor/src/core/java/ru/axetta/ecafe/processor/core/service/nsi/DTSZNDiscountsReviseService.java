@@ -577,7 +577,8 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
-    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList, ETPMVService service) throws Exception {
+    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList, ETPMVService service,
+            Long otherDiscountCode) throws Exception {
 
         Date fireTime = new Date();
 
@@ -597,7 +598,7 @@ public class DTSZNDiscountsReviseService {
             }
 
             List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils.getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
-            if (categoryDiscountDSZNList.isEmpty()) {
+            if (categoryDiscountDSZNList.isEmpty() || discountCode.equals(otherDiscountCode)) {
                 categoryDiscountsList.add(discountCode);
                 continue;
             }
@@ -675,6 +676,8 @@ public class DTSZNDiscountsReviseService {
 
             Integer clientCounter = 1;
 
+            Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
+
             for (Long idOfClient : clientList) {
                 if (null == transaction || !transaction.isActive()) {
                     transaction = session.beginTransaction();
@@ -683,7 +686,7 @@ public class DTSZNDiscountsReviseService {
                 Client client = (Client) session.load(Client.class, idOfClient);
                 List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
                 if (!clientInfoList.isEmpty()) {
-                    processDiscounts(session, client, clientInfoList, service);
+                    processDiscounts(session, client, clientInfoList, service, otherDiscountCode);
                 }
                 transaction.commit();
                 transaction = null;

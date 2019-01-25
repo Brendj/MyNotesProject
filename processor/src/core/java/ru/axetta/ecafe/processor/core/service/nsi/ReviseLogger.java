@@ -11,12 +11,15 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
@@ -29,12 +32,25 @@ public class ReviseLogger {
 
     private String fileName;
     private Boolean enableLogger;
+    private Date currentDate;
+    private String currentDateString;
+
+    @PostConstruct
+    private void init() {
+        currentDate = new Date();
+    }
 
     private String getFileName() {
         if (fileName == null) {
             fileName = RuntimeContext.getInstance().getConfigProperties().getProperty(filenameProperty, "");
         }
-        return fileName;
+        Date date = new Date();
+        if (!DateUtils.isSameDay(date, currentDate) || StringUtils.isEmpty(currentDateString)) {
+            currentDate = date;
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            currentDateString = format.format(currentDate);
+        }
+        return fileName + "." + currentDateString;
     }
 
     private Boolean getEnableLogger() {
