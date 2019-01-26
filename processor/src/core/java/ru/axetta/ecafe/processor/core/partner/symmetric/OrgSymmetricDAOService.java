@@ -135,4 +135,10 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
         result.add(info);
         return info;
     }
+
+    public List getQueryResult(String str_query) {
+        entityManager.setFlushMode(FlushModeType.COMMIT);
+        Query query = entityManager.createNativeQuery(str_query);
+        return query.getResultList();
+    }
 }

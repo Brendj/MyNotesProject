@@ -39,7 +39,10 @@ public class ImportRegisterFileService extends ClientMskNSIService {
 
     public final String FILENAME_PROPERTY = "ecafe.processor.nsi.registry.filename";
     public final String NODE_PROPERTY = "ecafe.processor.nsi.registry.node";
-    public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service" или отсутствие настройки
+    public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service, symmetric" или отсутствие настройки
+    public static final String MODE_FILE = "file";
+    public static final String MODE_SYMMETRIC = "symmetric";
+    public static final String LEGAL_REPRESENTATIVE = "Законный представитель";
 
     protected final String INITIAL_INSERT_STATEMENT = "insert into cf_registry_file(guidofclient, "
             + "  guidoforg, firstname, secondname, surname, birthdate, gender, benefit, parallel, "
@@ -54,7 +57,15 @@ public class ImportRegisterFileService extends ClientMskNSIService {
 
     public void run() throws Exception {
         if (isOn()) {
-            loadNSIFile();
+            String mode = RuntimeContext.getInstance().getPropertiesValue(MODE_PROPERTY, null);
+            if (mode.equals(MODE_FILE)) {
+                loadNSIFile();
+            }
+            if (mode.equals(MODE_SYMMETRIC)) {
+                RuntimeContext.getAppContext().getBean("importRegisterSymmetricService", ImportRegisterSymmetricService.class).loadClientsFromSymmetric();
+            } else {
+                logger.error("Не определен тип сверки по контингенту");
+            }
         }
     }
 
@@ -67,11 +78,6 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             return false;
         }
         return true;
-    }
-
-    public static boolean isFileMode() {
-        String mode = RuntimeContext.getInstance().getPropertiesValue(MODE_PROPERTY, null);
-        return (mode != null && mode.equals("file"));
     }
 
     public void loadNSIFile() throws Exception {
@@ -169,22 +175,14 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 str_query += "(" + one_str + "), ";
                 counter++;
                 if (counter == 1000) {
-                    str_query = str_query.substring(0, str_query.length()-2);
-                    query = session.createSQLQuery(str_query);
-                    query.executeUpdate();
-                    transaction.commit();
+                    executeQuery(str_query, session, transaction, processed);
                     counter = 0;
                     str_query = getInitialInsertStatement();
-                    getLogger().info(String.format("Lines processed: %s", processed));
                 }
                 processed++;
             }
             if (counter > 0) {
-                str_query = str_query.substring(0, str_query.length()-2);
-                query = session.createSQLQuery(str_query);
-                query.executeUpdate();
-                transaction.commit();
-                getLogger().info(String.format("Lines processed: %s", processed));
+                executeQuery(str_query, session, transaction, processed);
             }
             transaction = null;
 
@@ -197,6 +195,14 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             HibernateUtils.close(session, getLogger());
             DAOService.getInstance().setSverkaEnabled(true);
         }
+    }
+
+    protected void executeQuery(String str_query, Session session, Transaction transaction, int processed) {
+        str_query = str_query.substring(0, str_query.length()-2);
+        Query query = session.createSQLQuery(str_query);
+        query.executeUpdate();
+        transaction.commit();
+        getLogger().info(String.format("Lines processed: %s", processed));
     }
 
     protected String buildOneInsertValue(String[] arr) {
@@ -296,26 +302,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             String fioCondition = (!StringUtils.isBlank(familyName) ? " and r.surname like :surname" : "") +
                     (!StringUtils.isBlank(firstName) ? " and r.firstname like :firstname" : "") +
                     (!StringUtils.isBlank(secondName) ? " and r.secondname like :secondname" : "");
-            String str_query = "SELECT guidofclient, "
-                    + "  guidoforg, "
-                    + "  firstname,"
-                    + "  secondname, "
-                    + "  surname, "
-                    + "  birthdate, " //5
-                    + "  gender, "
-                    + "  benefit, "
-                    + "  parallel, "
-                    + "  letter,"
-                    + "  clazz, "    //10
-                    + "  currentclassorgroup,"
-                    + "  status, "
-                    + "  rep_firstname,"
-                    + "  rep_secondname, "
-                    + "  rep_surname,"   //15
-                    + "  rep_phone, "
-                    + "  rep_who,"
-                    + "  agegrouptype "  //19
-                    + "from cf_registry_file r where r.guidoforg in :guids" + fioCondition;
+            String str_query = getQueryString() + fioCondition;
             Query query = session.createSQLQuery(str_query);
             query.setParameterList("guids", orgGuids);
             if (!StringUtils.isBlank(familyName)) query.setParameter("surname", familyName);
@@ -331,22 +318,35 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 pupil.secondName = (String) row[3];
                 pupil.familyName = (String) row[4];
                 pupil.guid = (String) row[0];
-                pupil.birthDate = (String) row[5]; //(row[5] == null) ? "" : row[5].toString();
+                pupil.birthDate = (String) row[5];
+                pupil.parallel = (String) row[8];
                 pupil.groupDeprecated = (String) row[11];
                 pupil.groupNewWay = (String) row[10];
                 pupil.guidOfOrg = (String) row[1];
-                pupil.gender = (String) row[6];//row[6] == null ? "" : getGenderString((Integer)row[6]);
-                if (!StringUtils.isEmpty((String) row[15])) {
-                    ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
-                    guardianInfo.setFamilyName((String) row[15]);
-                    guardianInfo.setFirstName((String) row[13]);
-                    guardianInfo.setSecondName((String) row[14]);
-                    guardianInfo.setRelationship((String) row[17]);
-                    guardianInfo.setPhoneNumber((String) row[16]);
-                    pupil.getGuardianInfoList().add(guardianInfo);
-                }
+                pupil.gender = (String) row[6];
                 pupil.benefitDSZN = (String) row[7];
-                pupil.ageTypeGroup = (String) row[18];
+                pupil.ageTypeGroup = (String) row[13];
+                try {
+                    String[] guardians = ((String) row[14]).split("\\$");
+                    for (String guardian : guardians) {
+                        String[] arr = guardian.split("\\|");
+                        if (!StringUtils.isEmpty(arr[2])) {
+                            ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+                            guardianInfo.setFamilyName(arr[2]);
+                            guardianInfo.setFirstName(arr[0]);
+                            guardianInfo.setSecondName(arr[1]);
+                            guardianInfo.setRelationship(arr[4]);
+                            guardianInfo.setPhoneNumber(arr[3]);
+                            guardianInfo.setLegalRepresentative(arr[5].equals(LEGAL_REPRESENTATIVE));
+                            guardianInfo.setSsoid(arr[6]);
+                            guardianInfo.setGuid(arr[7]);
+                            pupil.getGuardianInfoList().add(guardianInfo);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.info("Error when parse guardian info for people guid " + pupil.guid);
+                }
+
                 pupil.guardiansCount = String.valueOf(pupil.getGuardianInfoList().size());
 
                 pupil.familyName = pupil.familyName == null ? null : pupil.familyName.trim();
@@ -371,5 +371,24 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             HibernateUtils.rollback(transaction, getLogger());
             HibernateUtils.close(session, getLogger());
         }
+    }
+
+    protected String getQueryString() {
+        return "SELECT guidofclient, "
+                + "  guidoforg, "
+                + "  firstname,"
+                + "  secondname, "
+                + "  surname, "
+                + "  birthdate, " //5
+                + "  gender, "
+                + "  benefit, "
+                + "  parallel, "
+                + "  letter,"
+                + "  clazz, "    //10
+                + "  currentclassorgroup,"
+                + "  status, "
+                + "  agegrouptype, "
+                + "  concat_ws('|', rep_firstname,  rep_secondname, rep_surname, rep_phone, rep_who, '', '' '') "  //последние 3 поля - законный представитель, ссоид, гуид
+                + "from cf_registry_file r where r.guidoforg in :guids";
     }
 }

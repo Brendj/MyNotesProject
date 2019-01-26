@@ -24,6 +24,9 @@ public class RegistryChangeGuardians {
     private String emailAddress;
     private Date createdDate;
     protected Boolean applied;
+    private Boolean legal_representative;
+    private String ssoid;
+    private String guid;
     /**
      * Ссылка на таблицу поставщики Разногласий.
      */
@@ -33,7 +36,7 @@ public class RegistryChangeGuardians {
     }
 
     public RegistryChangeGuardians(String familyName, String firstName, String secondName, String relationship, String phoneNumber,
-            String emailAddress, Date createdDate, RegistryChange registryChange, Boolean applied) {
+            String emailAddress, Date createdDate, RegistryChange registryChange, Boolean applied, Boolean legal_representative, String ssoid, String guid) {
         this.familyName = familyName;
         this.firstName = firstName;
         this.secondName = secondName;
@@ -43,7 +46,9 @@ public class RegistryChangeGuardians {
         this.createdDate = createdDate;
         this.registryChange = registryChange;
         this.applied = applied;
-
+        this.legal_representative = legal_representative;
+        this.ssoid = ssoid;
+        this.guid = guid;
     }
 
     public Long getIdOfRegistryGuardian() {
@@ -124,5 +129,29 @@ public class RegistryChangeGuardians {
 
     public void setApplied(Boolean applied) {
         this.applied = applied;
+    }
+
+    public Boolean getLegal_representative() {
+        return legal_representative;
+    }
+
+    public void setLegal_representative(Boolean legal_representative) {
+        this.legal_representative = legal_representative;
+    }
+
+    public String getSsoid() {
+        return ssoid;
+    }
+
+    public void setSsoid(String ssoid) {
+        this.ssoid = ssoid;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guis) {
+        this.guid = guis;
     }
 }

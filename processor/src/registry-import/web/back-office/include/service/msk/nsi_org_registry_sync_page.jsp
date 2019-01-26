@@ -166,6 +166,18 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
+                                <h:outputText value="Параллель" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.parallel}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
+                                <h:outputText value="Предыдущая параллель" />
+                            </f:facet>
+                            <h:outputText styleClass="output-text" value="#{e.parallelFrom}" rendered="#{e.parallelChangeExists}" />
+                        </rich:column>
+                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
+                            <f:facet name="header">
                                 <h:outputText value="Тип возрастной группы" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.ageTypeGroup}" />

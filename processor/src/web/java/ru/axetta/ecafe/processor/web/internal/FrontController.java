@@ -486,6 +486,38 @@ public class FrontController extends HttpServlet {
                 commentRegistryChangeError(idOfRegistryChangeError, comment, author);
     }
 
+    @WebMethod(operationName = "loadRegistryChangeGuardians")
+    public List<RegistryChangeGuardianItem> loadRegistryChangeGuardians(@WebParam(name = "idOfRegistryChange") long idOfRegistryChange) throws FrontControllerException {
+        List<RegistryChangeGuardianItem> items = new ArrayList<RegistryChangeGuardianItem>();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            Criteria criteria = session.createCriteria(RegistryChangeGuardians.class);
+            criteria.add(Restrictions.eq("registryChange.idOfRegistryChange", idOfRegistryChange));
+            List<RegistryChangeGuardians> list = criteria.list();
+            for (RegistryChangeGuardians change : list) {
+                RegistryChangeGuardianItem item = new RegistryChangeGuardianItem();
+                item.setFio(change.getFamilyName() + " " + change.getFirstName() + " " + change.getSecondName());
+                item.setGuardianType(change.getRelationship());
+                item.setLegalRepresent(change.getLegal_representative());
+                item.setPhone(change.getPhoneNumber());
+                items.add(item);
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.info("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
+        return items;
+    }
+
     /* Выполняет проверку наличия «не нашей customerType=1» карты с физическим идентификатором  cardNo в таблице временных карт. */
     @WebMethod(operationName = "checkVisitorByCard")
     public VisitorItem checkVisitorByCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo) throws FrontControllerException{
@@ -1987,7 +2019,7 @@ public class FrontController extends HttpServlet {
             Client guardian = (Client) persistenceSession.load(Client.class, idOfClient);
 
             ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree,
-                    false, clientId, ClientCreatedFromType.ARM);
+                    false, clientId, ClientCreatedFromType.ARM, null);
 
             clientGuardian.setIsLegalRepresent(legality);
             persistenceSession.merge(clientGuardian);
@@ -2083,7 +2115,7 @@ public class FrontController extends HttpServlet {
             }
 
             ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree,
-                    false, clientId, ClientCreatedFromType.ARM);
+                    false, clientId, ClientCreatedFromType.ARM, null);
 
             clientGuardian.setIsLegalRepresent(legality);
             persistenceSession.merge(clientGuardian);

@@ -85,7 +85,8 @@ public class ClientManager {
         CHECKBENEFITS,
         CREATED_FROM,
         MIDDLE_GROUP,
-        IAC_REG_ID
+        IAC_REG_ID,
+        PARALLEL
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -135,6 +136,7 @@ public class ClientManager {
                     FieldId.CREATED_FROM, false),
             new FieldProcessor.Def(42, false, false, "Подгруппа", null, FieldId.MIDDLE_GROUP, false),
             new FieldProcessor.Def(43, false, false, "ИАЦ regID", null, FieldId.IAC_REG_ID, true),
+            new FieldProcessor.Def(44, false, false, "Параллель", null, FieldId.PARALLEL, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -526,6 +528,10 @@ public class ClientManager {
                 client.setAgeTypeGroup(fieldConfig.getValue(FieldId.AGE_TYPE_GROUP));
             }
 
+            if (fieldConfig.getValue(FieldId.PARALLEL) != null) {
+                client.setParallel(fieldConfig.getValue(FieldId.PARALLEL));
+            }
+
             client.setUpdateTime(new Date());
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
@@ -895,6 +901,10 @@ public class ClientManager {
                 client.setAgeTypeGroup(fieldConfig.getValue(FieldId.AGE_TYPE_GROUP));
             }
 
+            if (fieldConfig.getValue(FieldId.PARALLEL) != null) {
+                client.setParallel(fieldConfig.getValue(FieldId.PARALLEL));
+            }
+
             if (fieldConfig.getValue(FieldId.SSOID) != null) {
                 client.setSsoid(fieldConfig.getValue(FieldId.SSOID));
             }
@@ -997,6 +1007,7 @@ public class ClientManager {
                                 clientGuardian.setDisabled(true);
                                 clientGuardian.setDeletedState(false);
                                 clientGuardian.setRelation(relationType);
+                                clientGuardian.setIsLegalRepresent(registryChangeGuardians.getLegal_representative());
                                 clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
                                 persistenceSession.flush();
@@ -1027,7 +1038,8 @@ public class ClientManager {
 
     public static Client createGuardianTransactionFree(Session session, String firstName, String secondName, String surname,
             String mobile, String remark, Integer gender, Org org, ClientCreatedFromType createdFrom,
-            String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries) throws Exception {
+            String createdFromDesc, Iterator<Long> iterator, String passportNumber, String passportSeries,
+            String ssoid, String guid) throws Exception {
         Person personGuardian = new Person(firstName, surname, secondName);
         personGuardian.setIdDocument("");
         session.persist(personGuardian);
@@ -1068,6 +1080,8 @@ public class ClientManager {
             }
         }
         clientGuardianToSave.setMobile(mobile);
+        if (ssoid != null) clientGuardianToSave.setSsoid(ssoid);
+        if (guid != null) clientGuardianToSave.setClientGUID(guid);
 
         if (gender != null) {
             clientGuardianToSave.setGender(gender);
@@ -1085,7 +1099,7 @@ public class ClientManager {
     }
 
     public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-            Long idOfClientChild, ClientCreatedFromType createdFrom) {
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Boolean legal_representative) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1102,6 +1116,7 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
+        clientGuardian.setIsLegalRepresent(legal_representative);
         Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         if (enableNotifications) {
             Set<ClientGuardianNotificationSetting> settings = new HashSet<ClientGuardianNotificationSetting>();
@@ -1120,11 +1135,12 @@ public class ClientManager {
         String remark = String.format(MskNSIService.COMMENT_AUTO_CREATE, dateString);
         Client guardian = createGuardianTransactionFree(persistenceSession, registryChangeGuardians.getFirstName(),
                 registryChangeGuardians.getSecondName(), registryChangeGuardians.getFamilyName(), registryChangeGuardians.getPhoneNumber(),
-                remark, null, organization, ClientCreatedFromType.REGISTRY, "", iterator, null, null);
+                remark, null, organization, ClientCreatedFromType.REGISTRY, "", iterator, null, null,
+                registryChangeGuardians.getSsoid(), registryChangeGuardians.getGuid());
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY);
+                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getLegal_representative());
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }

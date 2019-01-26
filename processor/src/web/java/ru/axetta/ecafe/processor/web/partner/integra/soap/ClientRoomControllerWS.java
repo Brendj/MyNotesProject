@@ -8035,7 +8035,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (guardian == null) {
                 if (gender != null && gender.equals(2)) gender = 0; else gender = 1;
                 guardian = ClientManager.createGuardianTransactionFree(session, firstName, secondName,
-                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries);
+                        surname, mobile, remark, gender, org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries, null, null);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                 guardian.setClientRegistryVersion(clientRegistryVersion);
@@ -8047,7 +8047,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
-                clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient(), ClientCreatedFromType.MPGU);
+                clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient(), ClientCreatedFromType.MPGU, null);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()){
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);

@@ -611,6 +611,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         protected String secondName;
         protected String surname;
         protected String groupName;
+        protected String parallel;
+        protected String parallelFrom;
         protected String firstNameFrom;
         protected String secondNameFrom;
         protected String surnameFrom;
@@ -712,6 +714,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
             ageTypeGroup = parent.getList().get(25).getFieldValueParam();
             ageTypeGroupFrom = parent.getList().get(26).getFieldValueParam();
+
+            parallel = parent.getList().get(29).getFieldValueParam();
+            parallelFrom = parent.getList().get(30).getFieldValueParam();
         }
 
         public Long getIdOfMigrateOrgFrom() {
@@ -795,6 +800,11 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             return (operation == ImportRegisterClientsService.MODIFY_OPERATION ||operation == ImportRegisterClientsService.MOVE_OPERATION ) &&
                    !groupName.equals(groupNameFrom);
         }
+
+        public boolean getParallelChangeExists() {
+            return (operation == ImportRegisterClientsService.MODIFY_OPERATION ||operation == ImportRegisterClientsService.MOVE_OPERATION ) &&
+                    !parallel.equals(parallelFrom);
+        }
         
         public String getFullname() {
             return surname + " " + firstName + " " + secondName;
@@ -866,6 +876,14 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
         public String getSurname() {
             return surname;
+        }
+
+        public String getParallel() {
+            return parallel;
+        }
+
+        public String getParallelFrom() {
+            return parallelFrom;
         }
 
         public String getGroupName() {

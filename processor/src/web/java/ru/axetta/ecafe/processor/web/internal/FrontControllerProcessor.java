@@ -201,6 +201,12 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r28 = new RegistryChangeItemParam("benefitDSZNFrom", c.getCheckBenefitsSafe() ? c.getBenefitDSZNFrom() == null ? "" : c.getBenefitDSZNFrom() : null);
                 registryChangeItemParams.add(r28);
 
+                RegistryChangeItemParam r29 = new RegistryChangeItemParam("parallel", c.getParallel());
+                registryChangeItemParams.add(r29);
+
+                RegistryChangeItemParam r30 = new RegistryChangeItemParam("parallelFrom", c.getParallelFrom());
+                registryChangeItemParams.add(r30);
+
                 registryChangeItemV2.setList(registryChangeItemParams);
 
                 itemParams.add(registryChangeItemV2);

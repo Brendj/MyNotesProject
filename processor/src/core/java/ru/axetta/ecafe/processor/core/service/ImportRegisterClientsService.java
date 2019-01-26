@@ -525,6 +525,8 @@ public class ImportRegisterClientsService {
                 //  Если группа у клиента не указана, то перемещаем его в Другие
                 updateClient = doUpdateClientGroup(fieldConfig, cl, updateClient);
             }
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.PARALLEL, pupil.getParallel(),
+                    cl == null ? null : cl.getParallel(), updateClient);
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean crossFound = false;
             if (cl != null) {
@@ -763,6 +765,7 @@ public class ImportRegisterClientsService {
         String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, clientGuid, "Количество представителей");
         List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
         String ageTypeGroup = trim(fieldConfig.getValue(ClientManager.FieldId.AGE_TYPE_GROUP), 128, clientGuid, "Тип возрастной группы");
+        String parallel = trim(fieldConfig.getValue(ClientManager.FieldId.PARALLEL), 255, clientGuid, "Параллель");
 
         //RegistryChange ch = new RegistryChange();
         RegistryChange ch = getRegistryChangeClassInstance();
@@ -771,6 +774,7 @@ public class ImportRegisterClientsService {
         ch.setSecondName(secondname);
         ch.setSurname(surname);
         ch.setGroupName(registryGroupName);
+        ch.setParallel(parallel);
         ch.setIdOfClient(currentClient == null ? null : currentClient.getIdOfClient());
         ch.setIdOfOrg(idOfOrg);
         ch.setOperation(operation);
@@ -812,7 +816,8 @@ public class ImportRegisterClientsService {
                 for (GuardianInfo guardianInfo : guardianInfoList) {
                     RegistryChangeGuardians guardians = new RegistryChangeGuardians(guardianInfo.getFamilyName(),
                             guardianInfo.getFirstName(), guardianInfo.getSecondName(), guardianInfo.getRelationship(),
-                            guardianInfo.getPhoneNumber(), guardianInfo.getEmailAddress(), new Date(), ch, false);
+                            guardianInfo.getPhoneNumber(), guardianInfo.getEmailAddress(), new Date(), ch, false,
+                            guardianInfo.getLegalRepresentative(), guardianInfo.getSsoid(), guardianInfo.getGuid());
                     registryChangeGuardiansSet.add(guardians);
                 }
                 ch.setRegistryChangeGuardiansSet(registryChangeGuardiansSet);
@@ -835,7 +840,7 @@ public class ImportRegisterClientsService {
             } else {
                 ch.setGroupNameFrom("");
             }
-
+            ch.setParallelFrom(currentClient.getParallel());
             ch.setGenderFrom(currentClient.getGender());
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
@@ -850,6 +855,7 @@ public class ImportRegisterClientsService {
             } else {
                 ch.setGroupNameFrom("");
             }
+            ch.setParallelFrom(currentClient.getParallel());
             ch.setFirstNameFrom(currentClient.getPerson().getFirstName());
             ch.setSecondNameFrom(currentClient.getPerson().getSecondName());
             ch.setSurnameFrom(currentClient.getPerson().getSurname());
@@ -940,6 +946,7 @@ public class ImportRegisterClientsService {
         ch.setSecondName(currentClient.getPerson().getSecondName());
         ch.setSurname(currentClient.getPerson().getSurname());
         ch.setGroupName(currentClient.getClientGroup() == null ? "" : currentClient.getClientGroup().getGroupName());
+        ch.setParallel(currentClient.getParallel());
         ch.setIdOfClient(currentClient.getIdOfClient());
         ch.setIdOfOrg(idOfOrg);
         ch.setOperation(operation);
@@ -1330,6 +1337,7 @@ public class ImportRegisterClientsService {
                     createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                     createConfig.setValue(ClientManager.FieldId.GROUP, groupName == null ? change.getGroupName() : groupName);
+                    createConfig.setValue(ClientManager.FieldId.PARALLEL, change.getParallel());
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
                     createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
                     if (change.getGender() != null) {
@@ -1394,6 +1402,7 @@ public class ImportRegisterClientsService {
                                     .createClientGroup(session, newOrg.getIdOfOrg(), change.getGroupName());
                         }
                         dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                        dbClient.setParallel(change.getParallel());
                         dbClient.setOrg(newOrg);
                     }
                     if(!newOrg.multiCardModeIsEnabled() && dbClient.activeMultiCardMode()){
@@ -1416,6 +1425,7 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
                     modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                    modifyConfig.setValue(ClientManager.FieldId.PARALLEL, change.getParallel());
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
@@ -1594,7 +1604,10 @@ public class ImportRegisterClientsService {
     }
 
     private ClientMskNSIService getNSIService() {
-        if (ImportRegisterFileService.isFileMode()) {
+        String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
+        if (mode.equals(ImportRegisterFileService.MODE_SYMMETRIC)) {
+            return RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class);
+        } else if (mode.equals(ImportRegisterFileService.MODE_FILE)) {
             return RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class);
         } else {
             return RuntimeContext.getAppContext().getBean("ClientMskNSIService", ClientMskNSIService.class);
@@ -1774,6 +1787,7 @@ public class ImportRegisterClientsService {
         public String gender;
         public String guardiansCount;
         public String ageTypeGroup;
+        public String parallel;
 
         public List<GuardianInfo> guardianInfoList = new ArrayList<GuardianInfo>();
 
@@ -1910,6 +1924,7 @@ public class ImportRegisterClientsService {
             this.enterDate = pi.enterDate;
             this.leaveDate = pi.leaveDate;
             this.ageTypeGroup = pi.ageTypeGroup;
+            this.parallel = pi.parallel;
         }
 
         public String getGroupDeprecated() {
@@ -1918,6 +1933,10 @@ public class ImportRegisterClientsService {
 
         public String getGroupNewWay() {
             return groupNewWay;
+        }
+
+        public String getParallel() {
+            return parallel;
         }
     }
 
@@ -1929,6 +1948,9 @@ public class ImportRegisterClientsService {
         private String relationship;
         private String phoneNumber;
         private String emailAddress;
+        private Boolean legalRepresentative;
+        private String ssoid;
+        private String guid;
 
         public GuardianInfo() {
         }
@@ -1989,6 +2011,30 @@ public class ImportRegisterClientsService {
 
         public void setEmailAddress(String emailAddress) {
             this.emailAddress = emailAddress;
+        }
+
+        public Boolean getLegalRepresentative() {
+            return legalRepresentative;
+        }
+
+        public void setLegalRepresentative(Boolean legalRepresentative) {
+            this.legalRepresentative = legalRepresentative;
+        }
+
+        public String getSsoid() {
+            return ssoid;
+        }
+
+        public void setSsoid(String ssoid) {
+            this.ssoid = ssoid;
+        }
+
+        public String getGuid() {
+            return guid;
+        }
+
+        public void setGuid(String guid) {
+            this.guid = guid;
         }
     }
 }
