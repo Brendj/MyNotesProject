@@ -71,27 +71,8 @@ public class MonitoringOfReportPage extends OnlineReportPage {
         if (validateFormData()){
             return null;
         }
-        String templateFilename = checkIsExistFile(selectedPeriod);
-        if(selectedPeriod.equals(MonitoringOfReport.FOR_ONE_DAY)){
-            startDate = CalendarUtils.startOfDay(startDate);
-            endDate = CalendarUtils.endOfDay(startDate);
-        } else if(selectedPeriod.equals(MonitoringOfReport.FOR_MONTH)){
-            startDate = CalendarUtils.getFirstDayOfMonth(startDate);
-            endDate = CalendarUtils.getLastDayOfMonth(startDate);
-        }
-        if (StringUtils.isEmpty(templateFilename)) {
-            return null;
-        }
-        MonitoringOfReport.Builder builder = new MonitoringOfReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
-        builder.setSelectedPeriod(selectedPeriod);
-        BasicReportJob report = null;
-        try {
-            report = builder.buildInternal(startDate, endDate, localCalendar);
-        }catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        }
+       
+        BasicReportJob report = buildBasicReportJob();
         if (report != null) {
             try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -116,23 +97,13 @@ public class MonitoringOfReportPage extends OnlineReportPage {
     }
 
     public void exportToXLS(ActionEvent actionEvent) {
-
-        if (validateFormData()) return;
-        String templateFilename = checkIsExistFile(selectedPeriod);
-        if (StringUtils.isEmpty(templateFilename)) return ;
-        Date generateTime = new Date();
-        MonitoringOfReport.Builder builder = new MonitoringOfReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
-        builder.setSelectedPeriod(selectedPeriod);
-        BasicReportJob report = null;
-        try {
-            report =  builder.buildInternal(startDate, endDate, localCalendar);
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        if (validateFormData()){
+            return;
         }
 
-        if(report!=null){
+        BasicReportJob report = buildBasicReportJob();
+        Date generateTime = new Date();
+        if(report != null){
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
@@ -159,7 +130,32 @@ public class MonitoringOfReportPage extends OnlineReportPage {
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
             }
         }
+    }
 
+    private BasicReportJob buildBasicReportJob(){
+        String templateFilename = checkIsExistFile(selectedPeriod);
+        if (StringUtils.isEmpty(templateFilename)) {
+            return null;
+        }
+        if(selectedPeriod.equals(MonitoringOfReport.FOR_ONE_DAY)){
+            startDate = CalendarUtils.startOfDay(startDate);
+            endDate = CalendarUtils.endOfDay(startDate);
+        } else if(selectedPeriod.equals(MonitoringOfReport.FOR_MONTH)){
+            startDate = CalendarUtils.getFirstDayOfMonth(startDate);
+            endDate = CalendarUtils.getLastDayOfMonth(startDate);
+        }
+        MonitoringOfReport.Builder builder = new MonitoringOfReport.Builder(templateFilename);
+        builder.setReportProperties(buildProperties());
+        builder.setSelectedPeriod(selectedPeriod);
+        BasicReportJob report = null;
+        try {
+            report = builder.buildInternal(startDate, endDate, localCalendar);
+        }catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+            return null;
+        }
+        return report;
     }
 
     private boolean validateFormData() {
