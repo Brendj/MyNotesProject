@@ -19,8 +19,7 @@ public enum ClientGuardianRelationType {
     /*4*/ ADOPTIVE_PARENT("Приемный родитель"),
     /*5*/ ADOPTIVE_FATHER("Усыновитель"),
     /*6*/ FOSTER_PARENT("Патронатный воспитатель"),
-    /*7*/ OTHER("Иное"),
-    /*8*/ TRUSTED_REPRESENTATIVE("Доверенный представитель");
+    /*7*/ OTHER("Иное");
 
     private final String description;
     static Map<Integer,ClientGuardianRelationType> map = new HashMap<Integer,ClientGuardianRelationType>();
@@ -40,5 +39,14 @@ public enum ClientGuardianRelationType {
 
     public static ClientGuardianRelationType fromInteger(Integer value){
         return map.get(value);
+    }
+
+    public static String getRelationshipExtended(String relation) {
+        for (ClientGuardianRelationType value : ClientGuardianRelationType.values()) {
+            if (value.toString().toUpperCase().contains(relation.toUpperCase()) || relation.toUpperCase().contains(value.toString().toUpperCase())) {
+                return value.toString();
+            }
+        }
+        return OTHER.toString();
     }
 }

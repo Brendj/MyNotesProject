@@ -40,7 +40,7 @@ public class RegistryChangeGuardians {
         this.familyName = familyName;
         this.firstName = firstName;
         this.secondName = secondName;
-        this.relationship = relationship;
+        this.relationship = ClientGuardianRelationType.getRelationshipExtended(relationship);
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
         this.createdDate = createdDate;
