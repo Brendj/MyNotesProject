@@ -62,7 +62,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 loadNSIFile();
             }
             if (mode.equals(MODE_SYMMETRIC)) {
-                RuntimeContext.getAppContext().getBean("importRegisterSymmetricService", ImportRegisterSymmetricService.class).loadClientsFromSymmetric();
+                RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class).loadClientsFromSymmetric();
             } else {
                 logger.error("Не определен тип сверки по контингенту");
             }

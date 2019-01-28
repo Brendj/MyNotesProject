@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*;
+
 @Component
 @Scope("session")
 public class OtherActionsPage extends BasicWorkspacePage {
@@ -246,7 +248,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
             return;
         }
         try {
-            RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class).loadNSIFile();
+            String mode = RuntimeContext.getInstance().getPropertiesValue(MODE_PROPERTY, null);
+            if (mode.equals(MODE_FILE)) {
+                RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class).loadNSIFile();
+            }
+            if (mode.equals(MODE_SYMMETRIC)) {
+                RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class).loadClientsFromSymmetric();
+            }
             printMessage("Файл загружен");
         } catch (Exception e) {
             getLogger().error("Error run load NSI file: ", e);
