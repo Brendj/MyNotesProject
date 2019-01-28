@@ -8,6 +8,7 @@ public class CardInfoItem{
     private Integer cardType;
     private Long cardPrintedNo;
     private Integer state;
+    private Long cardNo;
 
     public Integer getCardType() {
         return cardType;
@@ -31,5 +32,13 @@ public class CardInfoItem{
 
     public void setState(Integer state) {
         this.state = state;
+    }
+
+    public Long getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(Long cardNo) {
+        this.cardNo = cardNo;
     }
 }

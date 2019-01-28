@@ -107,14 +107,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.balanceHold = balanceHold;
     }
 
-    public Boolean getMultiCardMode() {
-        return multiCardMode;
-    }
-
-    public void setMultiCardMode(Boolean multiCardMode) {
-        this.multiCardMode = multiCardMode;
-    }
-
     public Boolean getInOrgEnabledMultiCardMode() {
         return inOrgEnabledMultiCardMode;
     }
@@ -320,7 +312,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String passportSeries;
     private String cardRequest;
     private String balanceHold;
-    private Boolean multiCardMode;
     private Boolean inOrgEnabledMultiCardMode;
     private String parallel;
 
@@ -1098,16 +1089,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
         }
 
-        if(client.getOrg() != null && client.getOrg().multiCardModeIsEnabled()){
-            client.setMultiCardMode(multiCardMode);
-            if(!multiCardMode){
-                ClientManager.blockExtraCardOfClient(client, persistenceSession);
-            }
-        } else if(client.activeMultiCardMode()){
-            client.setMultiCardMode(false);
-            ClientManager.blockExtraCardOfClient(client, persistenceSession);
-        }
-
         resetNewFlags();
 
         client.setGender(this.gender);
@@ -1246,7 +1227,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
         this.inOrgEnabledMultiCardMode = client.getOrg().multiCardModeIsEnabled();
-        this.multiCardMode = client.activeMultiCardMode();
         this.parallel = StringUtils.defaultString(client.getParallel());
         this.clientDiscountItems = ClientViewPage.buildClientDiscountItem(session, client);
     }

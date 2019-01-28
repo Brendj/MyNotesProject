@@ -71,7 +71,7 @@ public class MonitoringOfReportPage extends OnlineReportPage {
         if (validateFormData()){
             return null;
         }
-       
+
         BasicReportJob report = buildBasicReportJob();
         if (report != null) {
             try {

@@ -27,10 +27,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -4067,5 +4064,15 @@ public class DAOUtils {
             }
         }
         return false;
+    }
+
+    public static Integer countActiveCardByIdOfClient(Long idOfClient, Session persistenceSession) {
+        Query query = persistenceSession.createSQLQuery(" select cast(count(idofcard) as integer) as numbOfActiveCard"
+                + " from cf_cards "
+                + " where state = :activeState and idofclient = :idOfClient"
+        );
+        query.setParameter("idOfClient", idOfClient);
+        query.setParameter("activeState", CardState.ISSUED.getValue());
+        return (Integer) query.uniqueResult();
     }
 }

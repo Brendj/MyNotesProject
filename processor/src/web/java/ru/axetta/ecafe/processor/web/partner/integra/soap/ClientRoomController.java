@@ -581,4 +581,7 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getETPDiscounts")
     ETPDiscountsResult getETPDiscounts();
+
+    @WebMethod(operationName = "blockActiveCardByCardNoAndContractId")
+    Result blockActiveCardByCardNoAndContractId(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cardNo") Long cardNo);
 }

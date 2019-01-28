@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
@@ -45,6 +46,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQues
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -73,6 +75,7 @@ import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
+import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -8877,9 +8880,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             if(client.getOrg() != null && client.getOrg().multiCardModeIsEnabled()){
-                client.setMultiCardMode(multiCardModeFlag);
-                if(!multiCardModeFlag){
-                    ClientManager.blockExtraCardOfClient(client, persistenceSession);
+                Integer numbOfActiveCards = DAOUtils.countActiveCardByIdOfClient(client.getIdOfClient(), persistenceSession);
+                if(numbOfActiveCards != null && numbOfActiveCards > 1 && !multiCardModeFlag){
+                    throw new IllegalArgumentException("Клиент имеет 2 или более активные карты");
+                } else {
+                    client.setMultiCardMode(multiCardModeFlag);
                 }
             } else {
                 throw new IllegalArgumentException(
@@ -8897,7 +8902,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             response.description = RC_OK_DESC;
         }catch (IllegalArgumentException e) {
             logger.error(
-                    "Попытка установить режим \"Использования нескольких индификаторов\" для клиента л/с" + contractId + " , при отключеной опции для ОО клиента", e);
+                    "Нарушение условий установки режима \"Использования нескольких индификаторов\" для клиента л/с " + contractId, e);
             response.resultCode = RC_INTERNAL_ERROR;
             response.description = e.getMessage();
         }catch (ClientNotFoundException e) {
@@ -8948,10 +8953,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     item.setCardPrintedNo(card.getCardPrintedNo());
                     item.setCardType(card.getCardType());
                     item.setState(card.getState());
+                    item.setCardNo(card.getCardNo());
                 } else if(card.getCardType() > 8){
                     item.setCardPrintedNo(card.getCardPrintedNo());
                     item.setCardType(card.getCardType());
                     item.setState(card.getState());
+                    item.setCardNo(card.getCardNo());
                 } else {
                     continue;
                 }
@@ -9312,6 +9319,59 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         }finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result blockActiveCardByCardNoAndContractId(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cardNo") Long cardNo){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Result result = new Result();
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (client == null) {
+                throw new ClientNotFoundException("Не найдет клиент с л/с " + contractId);
+            }
+
+            Criteria criteria = persistenceSession.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("cardNo", cardNo));
+            criteria.add(Restrictions.eq("client", client));
+            criteria.add(Restrictions.eq("state", Card.ACTIVE_STATE));
+
+            Card card = (Card) criteria.uniqueResult();
+            if(card == null){
+                throw new CardNotFoundException("У клиента с л/с " + contractId + " нет активной карты с UID " + cardNo);
+            }
+
+            CardManager cardManager = RuntimeContext.getInstance().getCardManager();
+            cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                    CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
+                    CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId());
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (ClientNotFoundException e){
+            logger.error("Error in blockActiveCardByCardNoAndContractId", e);
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (CardNotFoundException e){
+            logger.error("Error in blockActiveCardByCardNoAndContractId", e);
+            result.resultCode = RC_CARD_NOT_FOUND;
+            result.description = RC_CARD_NOT_FOUND_DESC;
+        } catch (Exception e){
+            logger.error("Error in blockActiveCardByCardNoAndContractId", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }

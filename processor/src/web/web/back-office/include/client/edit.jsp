@@ -410,10 +410,6 @@
     <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.specialMenu}" styleClass="output-text" />
 
-    <h:outputText escape="true" value="Режим выдачи нескольких активных карт" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.multiCardMode}" styleClass="output-text"
-        disabled="#{!mainPage.clientEditPage.inOrgEnabledMultiCardMode}"/>
-
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
