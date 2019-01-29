@@ -1073,7 +1073,7 @@
         <h:outputText escape="true" value="#{app.benefit}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
-        <h:outputText escape="true" value="#{app.fio}" styleClass="output-text" />
+        <h:outputText escape="true" value="#{app.applicantFio}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.mobile}" styleClass="output-text" />

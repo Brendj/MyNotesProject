@@ -19,6 +19,7 @@ public class ApplicationForFoodReportItem {
     private Date lastUpdate;
     private Long contractId;
     private String fio;
+    private String applicantFio;
     private Long idOfOrg;
     private String orgName;
     private String benefit;
@@ -38,7 +39,8 @@ public class ApplicationForFoodReportItem {
         this.applicationForFoodStatus = applicationForFood.getStatus();
         this.lastUpdate = applicationForFood.getLastUpdate();
         this.contractId = applicationForFood.getClient().getContractId();
-        this.fio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
+        this.fio = applicationForFood.getClient().getPerson().getFullName();
+        this.applicantFio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
         this.idOfOrg = applicationForFood.getClient().getOrg().getIdOfOrg();
         this.orgName = applicationForFood.getClient().getOrg().getShortNameInfoService();
         this.benefit = applicationForFood.getDtisznCode() == null ? "Иное" : applicationForFood.getDtisznCode().toString();
@@ -184,5 +186,13 @@ public class ApplicationForFoodReportItem {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public String getApplicantFio() {
+        return applicantFio;
+    }
+
+    public void setApplicantFio(String applicantFio) {
+        this.applicantFio = applicantFio;
     }
 }
