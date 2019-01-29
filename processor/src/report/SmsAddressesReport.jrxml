@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SmsAddressesReport" pageWidth="1167" pageHeight="595" orientation="Landscape" columnWidth="1127" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="ef1b814a-1ef5-4d07-9b7f-015204ea0c57">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SmsAddressesReport" pageWidth="971" pageHeight="595" orientation="Landscape" columnWidth="931" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="ef1b814a-1ef5-4d07-9b7f-015204ea0c57">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -39,14 +39,14 @@
 	<title>
 		<band height="85" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="59aa78f2-cf2f-4ff3-af69-832ed77972d0" x="0" y="0" width="1127" height="30"/>
+				<reportElement x="0" y="0" width="930" height="30" uuid="59aa78f2-cf2f-4ff3-af69-832ed77972d0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="14" isBold="true" isItalic="false" isUnderline="false" pdfEncoding="Cp1251"/>
 				</textElement>
 				<text><![CDATA[Отчет по адресам доставки сообщений]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="e80108c9-1fad-4c8f-aa71-d28d388f7809" x="0" y="30" width="1127" height="16">
+				<reportElement x="0" y="30" width="930" height="16" uuid="e80108c9-1fad-4c8f-aa71-d28d388f7809">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -57,7 +57,7 @@
 				<textFieldExpression><![CDATA["За период: " + $V{startDate} + " - " + $V{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="9787c632-b7e9-4c7e-9418-0a1db2307979" style="Column header" mode="Transparent" x="422" y="52" width="147" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="318" y="52" width="147" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="9787c632-b7e9-4c7e-9418-0a1db2307979"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -69,10 +69,10 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Идентификатор]]></text>
+				<text><![CDATA[Идентификатор сообщения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01084430-1829-470d-8154-7dbf7bd43b9f" style="Column header" mode="Transparent" x="569" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="465" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="01084430-1829-470d-8154-7dbf7bd43b9f"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -87,7 +87,7 @@
 				<text><![CDATA[Телефонный номер]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c496587a-96b0-467f-bdc8-f00fdecde430" style="Column header" mode="Transparent" x="662" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="558" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="c496587a-96b0-467f-bdc8-f00fdecde430"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -99,10 +99,10 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Тип содержимого]]></text>
+				<text><![CDATA[Тип сообщения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f81d2daf-e7c4-4799-af34-934970b9820d" style="Column header" mode="Transparent" x="755" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="651" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="f81d2daf-e7c4-4799-af34-934970b9820d"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -117,7 +117,7 @@
 				<text><![CDATA[Статус доставки]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="88c17009-8362-49dc-bee4-dd949a5c92a8" style="Column header" mode="Transparent" x="848" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="744" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="88c17009-8362-49dc-bee4-dd949a5c92a8"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -129,10 +129,10 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Время события]]></text>
+				<text><![CDATA[Время формирования события]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="192695af-fd9d-450d-a253-75e6bd991305" style="Column header" stretchType="RelativeToBandHeight" mode="Transparent" x="941" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="837" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="72ccdf87-6fc8-41f2-be67-e853854210e7"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -144,25 +144,10 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Время отправки в шлюз]]></text>
+				<text><![CDATA[Время доставки сообщения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="72ccdf87-6fc8-41f2-be67-e853854210e7" style="Column header" mode="Transparent" x="1034" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Время доставки]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="8657f744-a0f5-4db5-af19-08ca3b8c060c" style="Column header" mode="Transparent" x="0" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="0" y="52" width="93" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="8657f744-a0f5-4db5-af19-08ca3b8c060c"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -177,7 +162,7 @@
 				<text><![CDATA[№ л/с]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f08464d6-55d3-4795-b19c-d498929e1d93" style="Column header" mode="Transparent" x="93" y="52" width="130" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="93" y="52" width="130" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="f08464d6-55d3-4795-b19c-d498929e1d93"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -189,10 +174,10 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[ФИО]]></text>
+				<text><![CDATA[ФИО представителя]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1d2ed95d-306a-4a4f-97ce-f655b3692381" style="Column header" mode="Transparent" x="223" y="52" width="104" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
+				<reportElement style="Column header" mode="Transparent" x="223" y="52" width="95" height="33" forecolor="#000000" backcolor="#FFFFFF" uuid="b6ad9555-e645-479b-ab65-48a6722c7946"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -204,29 +189,14 @@
 					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<text><![CDATA[Представители]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="b6ad9555-e645-479b-ab65-48a6722c7946" style="Column header" mode="Transparent" x="327" y="52" width="95" height="33" forecolor="#000000" backcolor="#FFFFFF"/>
-				<box>
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
-					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfEncoding="Cp1251" isPdfEmbedded="false"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<text><![CDATA[Ребенок]]></text>
+				<text><![CDATA[ФИО обучающегося]]></text>
 			</staticText>
 		</band>
 	</title>
 	<detail>
 		<band height="21" splitType="Stretch">
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="da45b447-3996-42ce-b09d-8f700884e31f" positionType="Float" stretchType="RelativeToBandHeight" x="422" y="1" width="147" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="318" y="1" width="147" height="20" uuid="da45b447-3996-42ce-b09d-8f700884e31f"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -240,7 +210,7 @@
 				<textFieldExpression><![CDATA[$F{idOfSms}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="660ec492-cf60-433c-bee0-fc26c52c35ba" positionType="Float" stretchType="RelativeToBandHeight" x="569" y="1" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="465" y="1" width="93" height="20" uuid="660ec492-cf60-433c-bee0-fc26c52c35ba"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -254,7 +224,7 @@
 				<textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="297bd98b-3e90-40b1-a75c-ea03d59c34b6" positionType="Float" stretchType="RelativeToBandHeight" x="662" y="1" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="558" y="1" width="93" height="20" uuid="297bd98b-3e90-40b1-a75c-ea03d59c34b6"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -268,7 +238,7 @@
 				<textFieldExpression><![CDATA[$F{contentsTypeAsString}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="f97be0cd-fe79-4f0b-bbed-70a2419eea56" positionType="Float" stretchType="RelativeToBandHeight" x="755" y="1" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="651" y="1" width="93" height="20" uuid="f97be0cd-fe79-4f0b-bbed-70a2419eea56"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -282,7 +252,7 @@
 				<textFieldExpression><![CDATA[$F{deliveryStatusAsString}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="9cb1425f-f274-4384-8fde-328287a03f7d" positionType="Float" stretchType="RelativeToBandHeight" x="848" y="1" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="744" y="1" width="93" height="20" uuid="9cb1425f-f274-4384-8fde-328287a03f7d"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -296,21 +266,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{eventTime})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="728f30b7-a9ba-47a9-9842-5aa8c85c6793" positionType="Float" stretchType="RelativeToBandHeight" x="941" y="1" width="93" height="20"/>
-				<box topPadding="1" leftPadding="2">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{serviceSendTime})]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="4b345a26-987b-4f58-8c3a-c2d813227447" positionType="Float" stretchType="RelativeToBandHeight" x="1034" y="1" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="837" y="1" width="93" height="20" uuid="4b345a26-987b-4f58-8c3a-c2d813227447"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -324,7 +280,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format($F{deliveryTime})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="09d9ae45-2be4-4f84-941f-3c916bb55992" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="1" width="93" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="0" y="1" width="93" height="20" uuid="09d9ae45-2be4-4f84-941f-3c916bb55992"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -338,7 +294,7 @@
 				<textFieldExpression><![CDATA[$F{contractId}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="c1b26d9e-a32d-43d8-8537-49eb875b6771" positionType="Float" stretchType="RelativeToBandHeight" x="93" y="1" width="130" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="93" y="1" width="130" height="20" uuid="c1b26d9e-a32d-43d8-8537-49eb875b6771"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -352,21 +308,7 @@
 				<textFieldExpression><![CDATA[$F{fio}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ad9c31d8-17c0-4673-9f66-b4d7788c26e9" positionType="Float" stretchType="RelativeToBandHeight" x="223" y="1" width="104" height="20"/>
-				<box topPadding="1" leftPadding="2">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement>
-					<font size="10"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{guardian}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="c85db6d6-cd36-470d-ba02-5f089169ed5a" positionType="Float" stretchType="RelativeToBandHeight" x="327" y="1" width="95" height="20"/>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="223" y="1" width="95" height="20" uuid="c85db6d6-cd36-470d-ba02-5f089169ed5a"/>
 				<box topPadding="1" leftPadding="2">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
