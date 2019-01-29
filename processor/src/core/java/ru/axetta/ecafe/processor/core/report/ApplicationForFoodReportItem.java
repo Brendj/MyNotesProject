@@ -38,7 +38,7 @@ public class ApplicationForFoodReportItem {
         this.applicationForFoodStatus = applicationForFood.getStatus();
         this.lastUpdate = applicationForFood.getLastUpdate();
         this.contractId = applicationForFood.getClient().getContractId();
-        this.fio = applicationForFood.getClient().getPerson().getFullName();
+        this.fio = applicationForFood.getApplicantSurname() + " " + applicationForFood.getApplicantName() + " " + applicationForFood.getApplicantSecondName();
         this.idOfOrg = applicationForFood.getClient().getOrg().getIdOfOrg();
         this.orgName = applicationForFood.getClient().getOrg().getShortNameInfoService();
         this.benefit = applicationForFood.getDtisznCode() == null ? "Иное" : applicationForFood.getDtisznCode().toString();
