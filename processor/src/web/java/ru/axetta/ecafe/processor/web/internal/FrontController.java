@@ -2004,6 +2004,8 @@ public class FrontController extends HttpServlet {
             fc.setValue(ClientManager.FieldId.NAME, firstName);
             if (!StringUtils.isEmpty(secondName)) {
                 fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+            } else {
+                fc.setValue(ClientManager.FieldId.SECONDNAME, "");
             }
             fc.setValue(ClientManager.FieldId.GROUP, group);
             fc.setValue(ClientManager.FieldId.GENDER, gender);
