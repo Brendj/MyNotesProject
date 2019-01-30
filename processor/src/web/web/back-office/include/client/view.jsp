@@ -373,7 +373,7 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Дана начала" />
+                    <h:outputText escape="true" value="Дата начала" />
                 </f:facet>
                 <h:outputText escape="true" value="#{clientDiscount.dateStart}" styleClass="output-text" />
             </rich:column>
