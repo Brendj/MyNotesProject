@@ -46,6 +46,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE = "Не заполнены обязательные поля";
     public static final String ERROR_ORGANIZATION_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_CLIENT_ALREADY_EXIST_MESSAGE = "Клиент уже существует";
+    public static final String ERROR_INCORRECT_FORMAT = "Некорректный формат";
     public int code;
     public String message;
 

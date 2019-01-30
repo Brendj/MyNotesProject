@@ -1876,10 +1876,6 @@ public class FrontController extends HttpServlet {
                     GuardianDesc.FIELD_FIRST_NAME));
         }
         String secondName = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_SECOND_NAME, guardianDescList);
-        if (StringUtils.isEmpty(secondName)) {
-            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                    GuardianDesc.FIELD_SECOND_NAME));
-        }
         String surname = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_SURNAME, guardianDescList);
         if (StringUtils.isEmpty(surname)) {
             throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
@@ -1910,19 +1906,17 @@ public class FrontController extends HttpServlet {
         }
 
         String guardianBirthDayStr = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_GUARDIAN_BIRTHDAY, guardianDescList);
-        if (StringUtils.isEmpty(guardianBirthDayStr)) {
-            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                    GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
-        }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        Date guardianBirthDay;
+        Date guardianBirthDay = null;
+        if (!StringUtils.isEmpty(guardianBirthDayStr)) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-        try {
-            guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
-        } catch (ParseException e) {
-            logger.error("Error in registerGuardian", e);
-            throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_REQUIRED_FIELDS_NOT_FILLED_MESSAGE,
-                    GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
+            try {
+                guardianBirthDay = dateFormat.parse(guardianBirthDayStr);
+            } catch (ParseException e) {
+                logger.error("Error in registerGuardian", e);
+                throw new FrontControllerException(String.format("%s: %s", ResponseItem.ERROR_INCORRECT_FORMAT,
+                        GuardianDesc.FIELD_GUARDIAN_BIRTHDAY));
+            }
         }
 
         String mobilePhone = FrontControllerProcessor.getFindClientFieldValueByName(GuardianDesc.FIELD_MOBILE, guardianDescList);
@@ -2008,10 +2002,14 @@ public class FrontController extends HttpServlet {
             ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
             fc.setValue(ClientManager.FieldId.SURNAME, surname);
             fc.setValue(ClientManager.FieldId.NAME, firstName);
-            fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+            if (!StringUtils.isEmpty(secondName)) {
+                fc.setValue(ClientManager.FieldId.SECONDNAME, secondName);
+            }
             fc.setValue(ClientManager.FieldId.GROUP, group);
             fc.setValue(ClientManager.FieldId.GENDER, gender);
-            fc.setValue(ClientManager.FieldId.BIRTH_DATE, guardianBirthDay);
+            if (null != guardianBirthDay) {
+                fc.setValue(ClientManager.FieldId.BIRTH_DATE, guardianBirthDay);
+            }
             fc.setValue(ClientManager.FieldId.MOBILE_PHONE, mobilePhone);
 
             Long idOfClient = ClientManager.registerClient(orgId, fc, false, true);
