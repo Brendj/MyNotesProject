@@ -218,34 +218,56 @@ public class ClientSmsList {
                         orgs.add(forg.getIdOfOrg());
                     }
                 }
-                if (orgs.size() == 0) {
-                    this.child = "";
-                    return;
-                }
                 Query query = null;
-                if (contentsType == ClientSms.TYPE_ENTER_EVENT_NOTIFY) {
-                    String squery = "select idOfClient from cf_enterevents where idOfOrg in (" + StringUtils.join(orgs, ",") +
-                            ") and IdOfEnterEvent = :eventId and IdOfClient in (" + StringUtils.join(children, ",") + ")";
-                    query = session.createSQLQuery(squery);
-                    query.setParameter("eventId", this.eventId);
+                if (this.eventId != null) {
+                    //if (orgs.size() == 0) {
+                    //    this.child = "";
+                    //    return;
+                    //}
+                    if (contentsType == ClientSms.TYPE_ENTER_EVENT_NOTIFY) {
+                        String squery =
+                                "select idOfClient from cf_enterevents where idOfOrg in (" + StringUtils.join(orgs, ",")
+                                        + ") and IdOfEnterEvent = :eventId and IdOfClient in (" + StringUtils
+                                        .join(children, ",") + ")";
+                        query = session.createSQLQuery(squery);
+                        query.setParameter("eventId", this.eventId);
 
+                    }
+                    if (contentsType == ClientSms.TYPE_PAYMENT_REGISTERED) {
+                        String squery =
+                                "select t.idOfClient from cf_clientpayments p join cf_transactions t on p.idOfTransaction = t.idOfTransaction "
+                                        + " where p.idOfClientPayment = :eventId";
+                        query = session.createSQLQuery(squery);
+                        query.setParameter("eventId", this.eventId);
+                    }
+                    if (contentsType == ClientSms.TYPE_PAYMENT_NOTIFY) {
+                        String squery =
+                                "select idOfClient from cf_orders where idOfOrg in (" + StringUtils.join(orgs, ",")
+                                        + ") and IdOfOrder = :eventId and IdOfClient in (" + StringUtils
+                                        .join(children, ",") + ")";
+                        query = session.createSQLQuery(squery);
+                        query.setParameter("eventId", this.eventId);
+                    }
                 }
-                if (contentsType == ClientSms.TYPE_PAYMENT_REGISTERED) {
-                    String squery = "select t.idOfClient from cf_clientpayments p join cf_transactions t on p.idOfTransaction = t.idOfTransaction " +
-                            " where p.idOfClientPayment = :eventId";
-                    query = session.createSQLQuery(squery);
-                    query.setParameter("eventId", this.eventId);
-                }
-                if (contentsType == ClientSms.TYPE_PAYMENT_NOTIFY) {
-                    String squery = "select idOfClient from cf_orders where idOfOrg in (" + StringUtils.join(orgs, ",") +
-                            ") and IdOfOrder = :eventId and IdOfClient in (" + StringUtils.join(children, ",") + ")";
-                    query = session.createSQLQuery(squery);
-                    query.setParameter("eventId", this.eventId);
+                else
+                {
+                    //Пытаемся извлечь информацию о клиенте из SMS
+
+                    //При возврате билета в музей или при входе в музей
+                    if (contentsType == ClientSms.TYPE_NOENTER_MUSEUM_NOTIFICATION ||
+                            contentsType == ClientSms.TYPE_ENTER_MUSEUM_NOTIFICATION) {
+                        String contactid = this.textContents;
+                        String cons = "л/с: ";
+                        contactid = contactid.substring(contactid.indexOf(cons) + cons.length());
+                        contactid = contactid.substring(0,contactid.indexOf(" ") - 2);
+                        String squery ="select idofclient from cf_clients where contractid=" + contactid;
+                        query = session.createSQLQuery(squery);
+                    }
                 }
                 if (query != null) {
                     Long clientId = ((BigInteger) query.list().get(0)).longValue();
                     if (clientId != null) {
-                        childFIO = ((Client)session.load(Client.class, clientId)).getPerson().getFullName();
+                        childFIO = ((Client) session.load(Client.class, clientId)).getPerson().getFullName();
                     }
                 }
             }
