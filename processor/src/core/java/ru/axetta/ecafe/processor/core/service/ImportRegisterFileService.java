@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -331,12 +332,14 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                     for (String guardian : guardians) {
                         String[] arr = guardian.split("\\|");
                         if (!StringUtils.isEmpty(arr[2])) {
+                            String validPhone = getValidPhone(arr[3]);
+                            if (validPhone == null) continue;
                             ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
                             guardianInfo.setFamilyName(arr[2]);
                             guardianInfo.setFirstName(arr[0]);
                             guardianInfo.setSecondName(arr[1]);
                             guardianInfo.setRelationship(arr[4]);
-                            guardianInfo.setPhoneNumber(arr[3]);
+                            guardianInfo.setPhoneNumber(validPhone);
                             guardianInfo.setLegalRepresentative(arr[5].equals(LEGAL_REPRESENTATIVE));
                             guardianInfo.setSsoid(arr[6]);
                             guardianInfo.setGuid(arr[7]);
@@ -371,6 +374,20 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             HibernateUtils.rollback(transaction, getLogger());
             HibernateUtils.close(session, getLogger());
         }
+    }
+
+    public String getValidPhone(String phones) {
+        String result = "";
+        if (phones == null) return null;
+        String[] arr = phones.split(",");
+        for (String phone : arr) {
+            String ph = Client.checkAndConvertMobile(phone);
+            if (ph == null) continue;
+            if (ph.startsWith("7495") || ph.startsWith("7499")) continue;
+            if (result.length() > 0) return null; //нашли второй моб. телефон - отбрасываем представителя
+            result = ph;
+        }
+        return result.length() > 0 ? result : null;
     }
 
     protected String getQueryString() {

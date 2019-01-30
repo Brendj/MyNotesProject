@@ -805,23 +805,21 @@ public class ImportRegisterClientsService {
         //    }
         //}
 
-        if (operation == CREATE_OPERATION) {
-            if (!StringUtils.isEmpty(guardiansCount)) {
-                ch.setGuardiansCount(Integer.valueOf(guardiansCount));
-            }
+        if (!StringUtils.isEmpty(guardiansCount)) {
+            ch.setGuardiansCount(Integer.valueOf(guardiansCount));
+        }
 
-            if (guardianInfoList != null && !guardianInfoList.isEmpty()) {
-                Set<RegistryChangeGuardians> registryChangeGuardiansSet = new HashSet<RegistryChangeGuardians>();
+        if (guardianInfoList != null && !guardianInfoList.isEmpty()) {
+            Set<RegistryChangeGuardians> registryChangeGuardiansSet = new HashSet<RegistryChangeGuardians>();
 
-                for (GuardianInfo guardianInfo : guardianInfoList) {
-                    RegistryChangeGuardians guardians = new RegistryChangeGuardians(guardianInfo.getFamilyName(),
-                            guardianInfo.getFirstName(), guardianInfo.getSecondName(), guardianInfo.getRelationship(),
-                            guardianInfo.getPhoneNumber(), guardianInfo.getEmailAddress(), new Date(), ch, false,
-                            guardianInfo.getLegalRepresentative(), guardianInfo.getSsoid(), guardianInfo.getGuid());
-                    registryChangeGuardiansSet.add(guardians);
-                }
-                ch.setRegistryChangeGuardiansSet(registryChangeGuardiansSet);
+            for (GuardianInfo guardianInfo : guardianInfoList) {
+                RegistryChangeGuardians guardians = new RegistryChangeGuardians(guardianInfo.getFamilyName(),
+                        guardianInfo.getFirstName(), guardianInfo.getSecondName(), guardianInfo.getRelationship(),
+                        guardianInfo.getPhoneNumber(), guardianInfo.getEmailAddress(), new Date(), ch, false,
+                        guardianInfo.getLegalRepresentative(), guardianInfo.getSsoid(), guardianInfo.getGuid());
+                registryChangeGuardiansSet.add(guardians);
             }
+            ch.setRegistryChangeGuardiansSet(registryChangeGuardiansSet);
         }
 
         if (clientBirthDate != null) {
