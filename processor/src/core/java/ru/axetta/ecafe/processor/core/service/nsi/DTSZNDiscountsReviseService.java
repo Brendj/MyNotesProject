@@ -672,7 +672,8 @@ public class DTSZNDiscountsReviseService {
             session.setFlushMode(FlushMode.MANUAL);
             transaction = session.beginTransaction();
 
-            List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
+            List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session,
+                    CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1)));
             ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
             Integer clientCounter = 1;

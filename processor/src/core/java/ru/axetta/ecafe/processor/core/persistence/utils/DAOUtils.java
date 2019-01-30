@@ -4008,8 +4008,9 @@ public class DAOUtils {
         return (GroupNamesToOrgs) criteria.uniqueResult();
     }
 
-    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfo(Session session) {
-        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo");
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date) {
+        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo where lastUpdate >= :date");
+        query.setParameter("date", date);
         return query.list();
     }
 
