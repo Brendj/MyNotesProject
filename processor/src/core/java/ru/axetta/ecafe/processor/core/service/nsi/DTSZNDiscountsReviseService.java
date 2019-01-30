@@ -66,7 +66,7 @@ public class DTSZNDiscountsReviseService {
     public static final Long DEFAULT_PAGE_SIZE = 300L;
 
     public static final String MAX_RECORDS_PER_TRANSACTION = "ecafe.processor.revise.dtszn.records";
-    public static final Long DEFAULT_MAX_RECORDS_PER_TRANSACTION = 1000L;
+    public static final Long DEFAULT_MAX_RECORDS_PER_TRANSACTION = 20L;
 
     public static final String DISABLE_OU_FILTER_PROPERTY = "ecafe.processor.revise.dtszn.disableOUFilter";
     public static final Boolean DEFAULT_DISABLE_OU_FILTER = true;
@@ -157,16 +157,19 @@ public class DTSZNDiscountsReviseService {
                 session = runtimeContext.createPersistenceSession();
                 session.setFlushMode(FlushMode.MANUAL);
 
+                transaction = session.beginTransaction();
+                clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+
                 Integer counter = 1;
                 for (NSIPersonBenefitResponseItem item : response.getPayLoad()) {
                     try {
-                        if (null == transaction || !transaction.isActive()) {
-                            transaction = session.beginTransaction();
-                        }
-
                         Client client = DAOUtils.findClientByGuid(session, item.getPerson().getId());
                         if (null == client) {
                             //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
+                            if (0 == counter++ % maxRecords) {
+                                session.flush();
+                                session.clear();
+                            }
                             continue;
                         }
 
@@ -174,13 +177,15 @@ public class DTSZNDiscountsReviseService {
                             logger.info(String.format(
                                     "Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped",
                                     item.getPerson().getId()));
+                            if (0 == counter++ % maxRecords) {
+                                session.flush();
+                                session.clear();
+                            }
                             continue;
                         }
 
                         ClientDtisznDiscountInfo discountInfo = DAOUtils
                                 .getDTISZNDiscountInfoByClientAndCode(session, client, item.getBenefit().getDsznCode());
-
-                        clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
                         if (null == discountInfo) {
                             discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
@@ -224,10 +229,8 @@ public class DTSZNDiscountsReviseService {
                                 if (wasModified) {
                                     discountInfo.setVersion(clientDTISZNDiscountVersion);
                                     discountInfo.setLastUpdate(new Date());
-                                    session.merge(discountInfo);
-                                } else {
-                                    session.merge(discountInfo);
                                 }
+                                session.merge(discountInfo);
                             } else {
                                 // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
                                 // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
@@ -243,8 +246,6 @@ public class DTSZNDiscountsReviseService {
                                 session.save(discountInfo);
                             }
                         }
-                        transaction.commit();
-                        transaction = null;
                         if (0 == counter++ % maxRecords) {
                             session.flush();
                             session.clear();
@@ -254,8 +255,8 @@ public class DTSZNDiscountsReviseService {
                                 item.getPerson().getEntityId()), e);
                     }
                 }
-                session.flush();
-                session.clear();
+                transaction.commit();
+                transaction = null;
 
                 pagesCount = response.getPagesCount();
             } catch (HttpException e) {
