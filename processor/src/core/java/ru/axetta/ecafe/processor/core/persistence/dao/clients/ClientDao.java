@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.ClientCount;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -50,8 +47,8 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClie
  */
 @Repository
 public class ClientDao extends WritableJpaDao {
-    public static final String UNKNOWN_PERSON_DATA = "Не заполнено";
-    public static final String UNKNOWN_PERSON_SURNAME = "Представитель: %s";
+    public static final String UNKNOWN_PERSON_DATA = "Обратитесь в школу для корректировки ФИО представителя";
+    public static final String UNKNOWN_PERSON_SURNAME = "Представитель обучающегося: %s";
     public static final String COMMENT_AUTO_CREATE = "{Создано %s}";
     private static final Logger logger = LoggerFactory.getLogger(ClientDao.class);
 
@@ -212,7 +209,9 @@ public class ClientDao extends WritableJpaDao {
                     session.flush();
                     transaction.commit();
                     transaction = null;
-                } catch (Exception ignoreRecord) { }
+                } catch (Exception ignoreRecord) {
+                    logger.error("", ignoreRecord);
+                }
                 finally {
                     HibernateUtils.rollback(transaction, logger);
                 }
@@ -262,8 +261,44 @@ public class ClientDao extends WritableJpaDao {
         ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(), version, false, null, null,
                 ClientCreatedFromType.DEFAULT, null);
 
-        //Очищаем данные клиента (ребенка)
+        //Устанавливаем правила оповещения для опекуна
         Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
+        ClientGuardian currentClientGuardian = DAOUtils.findClientGuardian(session, clientInfo.getIdOfClient(), clientId.getIdOfClient());
+
+        for(ClientNotificationSetting item : client.getNotificationSettings()){
+            ClientGuardianNotificationSetting notificationSetting = new ClientGuardianNotificationSetting(currentClientGuardian, item.getNotifyType());
+            currentClientGuardian.getNotificationSettings().add(notificationSetting);
+        }
+
+        if(RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE)){
+            boolean containsNotificationOnBalances = false;
+            boolean containsNotificationOnEnterEvent = false;
+
+            // getNotificationSettings().contains() always false
+            for(ClientGuardianNotificationSetting item : currentClientGuardian.getNotificationSettings()){
+                if(item.getNotifyType().equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())){
+                    containsNotificationOnBalances = true;
+                } else if (item.getNotifyType().equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())){
+                    containsNotificationOnEnterEvent = true;
+                }
+                if(containsNotificationOnBalances && containsNotificationOnEnterEvent){
+                    break;
+                }
+            }
+            if(!containsNotificationOnBalances) {
+                ClientGuardianNotificationSetting notificationOnBalancesSetting = new ClientGuardianNotificationSetting(
+                        currentClientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue());
+                currentClientGuardian.getNotificationSettings().add(notificationOnBalancesSetting);
+            }
+            if(!containsNotificationOnEnterEvent){
+                ClientGuardianNotificationSetting notificationOnEnterEventSetting = new ClientGuardianNotificationSetting(currentClientGuardian,
+                        ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue());
+                currentClientGuardian.getNotificationSettings().add(notificationOnEnterEventSetting);
+            }
+        }
+        session.update(currentClientGuardian);
+
+        //Очищаем данные клиента (ребенка)
         clearClientContacts(client, session);
         session.update(client);
     }
