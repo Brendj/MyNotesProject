@@ -4839,48 +4839,52 @@ public class Processor implements SyncProcessor {
         Date endDate = CalendarUtils.endOfDay(menuDate);
         Date now = new Date();
 
-        Query query = persistenceSession.createQuery("select rp from RegularPreorder rp where rp.client.org = :org "
-                + "and rp.endDate >= :date and rp.deletedState = false");
-        query.setParameter("org", organization);
-        query.setParameter("date", menuDate);
-        List<RegularPreorder> rpList = query.list();
-        for (RegularPreorder regularPreorder : rpList) {
-            if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
-                //заказ на блюдо
-                SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
-                Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
-                while (reqMenuDetails.hasNext()) {
-                    SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-                    if (equalsNullSafe(regularPreorder.getItemCode(), reqMenuDetail.getItemCode())) { //ищем по цене и коду товара
-                        reqMenuDetailMatch = reqMenuDetail;
-                        if (regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) { //проверяем на цену отдельно, т.к. в меню могут быть несколько позиций с одинаковым itemCode
-                            break;
+        int day = CalendarUtils.getDayOfWeek(menuDate);
+        if (day != Calendar.SATURDAY && day != Calendar.SUNDAY) {
+            Query query = persistenceSession.createQuery("select rp from RegularPreorder rp where rp.client.org = :org "
+                    + "and rp.endDate >= :date and rp.deletedState = false");
+            query.setParameter("org", organization);
+            query.setParameter("date", menuDate);
+            List<RegularPreorder> rpList = query.list();
+            for (RegularPreorder regularPreorder : rpList) {
+                if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
+                    //заказ на блюдо
+                    SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
+                    Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
+                    while (reqMenuDetails.hasNext()) {
+                        SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
+                        if (equalsNullSafe(regularPreorder.getItemCode(), reqMenuDetail.getItemCode())) { //ищем по цене и коду товара
+                            reqMenuDetailMatch = reqMenuDetail;
+                            if (regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) { //проверяем на цену отдельно, т.к. в меню могут быть несколько позиций с одинаковым itemCode
+                                break;
+                            }
                         }
                     }
-                }
-                if (reqMenuDetailMatch == null) {
-                    RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                            .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
-                } else if(!regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) {
-                    RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                            .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
-                }
-            } else {
-                //заказ на комплекс
-                SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = findReqComplexInfo(item, regularPreorder.getIdOfComplex());
-                if (reqComplexInfoMatch == null) {
-                    RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                            .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
-                } else {
-                    if (!reqComplexInfoMatch.getCurrentPrice().equals(regularPreorder.getPrice())) {
+                    if (reqMenuDetailMatch == null) {
+                        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                                .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
+                    } else if (!regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) {
                         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
                                 .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
+                    }
+                } else {
+                    //заказ на комплекс
+                    SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = findReqComplexInfo(item,
+                            regularPreorder.getIdOfComplex());
+                    if (reqComplexInfoMatch == null) {
+                        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                                .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
+                    } else {
+                        if (!reqComplexInfoMatch.getCurrentPrice().equals(regularPreorder.getPrice())) {
+                            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                                    .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
+                        }
                     }
                 }
             }
         }
 
-        query = persistenceSession.createQuery("select pc from PreorderComplex pc "
+        Query query = persistenceSession.createQuery("select pc from PreorderComplex pc "
                 + "where pc.client.org = :org and pc.preorderDate between :begDate and :endDate and pc.deletedState = false "
                 + "and pc.amount is not null and pc.amount > 0");  //предзаказы по ОО на день меню
         query.setParameter("org", organization);
