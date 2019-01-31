@@ -2120,13 +2120,6 @@ public class FrontController extends HttpServlet {
             clientGuardian.setIsLegalRepresent(legality);
             persistenceSession.merge(clientGuardian);
 
-            Long idOfProcessorMigrantRequest = MigrantsUtils
-                    .nextIdOfProcessorMigrantRequest(persistenceSession, guardian.getOrg().getIdOfOrg());
-            CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
-                    guardian.getOrg().getIdOfOrg());
-            String requestNumber = ImportMigrantsService.formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId,
-                    idOfProcessorMigrantRequest, fireTime);
-
             Client child = (Client) persistenceSession.load(Client.class, clientId);
             if (null == child) {
                 result.code = ResponseItem.ERROR_CLIENT_NOT_FOUND;
@@ -2135,7 +2128,13 @@ public class FrontController extends HttpServlet {
             }
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
-                // TODO
+                Long idOfProcessorMigrantRequest = MigrantsUtils
+                        .nextIdOfProcessorMigrantRequest(persistenceSession, guardian.getOrg().getIdOfOrg());
+                CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
+                        guardian.getOrg().getIdOfOrg());
+                String requestNumber = ImportMigrantsService.formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId,
+                        idOfProcessorMigrantRequest, fireTime);
+
                 Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
                         requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 10), Migrant.NOT_SYNCHRONIZED);
                 migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);

@@ -48,10 +48,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -8250,6 +8247,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session.update(cg);
 
             DAOUtils.disableCardRequest(session, guardian.getIdOfClient());
+            MigrantsUtils.disableMigrantRequestIfExists(session, child.getOrg().getIdOfOrg(), guardian.getIdOfClient());
 
             transaction.commit();
             transaction = null;

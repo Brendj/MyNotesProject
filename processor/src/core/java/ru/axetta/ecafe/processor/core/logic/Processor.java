@@ -3210,6 +3210,9 @@ public class Processor implements SyncProcessor {
                         if (item.isDeleted()) {
                             clientGuardian.delete(resultClientGuardianVersion);
                         }
+                        if (item.getDisabled() || item.isDeleted()) {
+                            MigrantsUtils.disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
+                        }
                         clientGuardian.setLastUpdate(new Date());
                         persistenceSession.save(clientGuardian);
                         resultClientGuardian.addItem(clientGuardian, 0, null);
@@ -3218,6 +3221,9 @@ public class Processor implements SyncProcessor {
                             dbClientGuardian.restore(resultClientGuardianVersion);
                         } else if (item.isDeleted()) {
                             dbClientGuardian.delete(resultClientGuardianVersion);
+                        }
+                        if (item.getDisabled() || item.isDeleted()) {
+                            MigrantsUtils.disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
                         }
                         dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
                         dbClientGuardian.setVersion(resultClientGuardianVersion);

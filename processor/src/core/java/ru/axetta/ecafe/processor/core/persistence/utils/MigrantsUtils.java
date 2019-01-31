@@ -448,4 +448,23 @@ public class MigrantsUtils {
         criteria.add(Restrictions.ge("visitEndDate", startTime));
         return criteria.list();
     }
+
+    public static Migrant findMigrant(Session session, Long orgVisitId, Long clientMigrateId) {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("orgVisit.idOfOrg", orgVisitId));
+        criteria.add(Restrictions.eq("clientMigrate.idOfClient", clientMigrateId));
+        criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
+        List<Migrant> migrantList = criteria.list();
+        if (migrantList.isEmpty()) {
+            return null;
+        }
+        return (Migrant) migrantList.get(0);
+    }
+
+    public static void disableMigrantRequestIfExists(Session session, Long orgVisitId, Long clientMigrateId) {
+        Migrant migrant = findMigrant(session, orgVisitId, clientMigrateId);
+        if (null != migrant) {
+            disableMigrant(migrant.getCompositeIdOfMigrant());
+        }
+    }
 }
