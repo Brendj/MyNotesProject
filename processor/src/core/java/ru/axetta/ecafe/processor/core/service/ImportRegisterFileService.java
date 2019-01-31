@@ -340,9 +340,11 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                             guardianInfo.setSecondName(arr[1]);
                             guardianInfo.setRelationship(arr[4]);
                             guardianInfo.setPhoneNumber(validPhone);
-                            guardianInfo.setLegalRepresentative(arr[5].equals(LEGAL_REPRESENTATIVE));
-                            guardianInfo.setSsoid(arr[6]);
-                            guardianInfo.setGuid(arr[7]);
+                            if (arr.length > 5 ) {
+                                guardianInfo.setLegalRepresentative(arr[5].equals(LEGAL_REPRESENTATIVE));
+                                guardianInfo.setSsoid(arr[6]);
+                                guardianInfo.setGuid(arr[7]);
+                            }
                             pupil.getGuardianInfoList().add(guardianInfo);
                         }
                     }
