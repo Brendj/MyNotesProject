@@ -25,4 +25,5 @@ alter table cf_registrychange_guardians
   add column guid character varying(40),
   add column legal_representative character varying(128);
 
---Новые значения для параметра ecafe.processor.nsi.registry.mode - file, service, symmetric
+--! Новые значения для параметра ecafe.processor.nsi.registry.mode - file, service, symmetric
+--! ФИНАЛИЗИРОВАН 31.01.2019, НЕ МЕНЯТЬ

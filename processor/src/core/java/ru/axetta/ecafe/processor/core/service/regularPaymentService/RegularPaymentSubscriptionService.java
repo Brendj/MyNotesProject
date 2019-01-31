@@ -39,7 +39,13 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -379,6 +385,7 @@ public class RegularPaymentSubscriptionService {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         Document doc = XMLUtils.inputStreamToXML(is, dbf);
+        logger.info("XML response from MFR: " + docToString(doc));
         Node responseNode = XMLUtils.findFirstChildElement(doc, "response");
         Node workNode = XMLUtils.findFirstChildElement(responseNode, "status");
         if (workNode != null) {
@@ -429,6 +436,22 @@ public class RegularPaymentSubscriptionService {
         } else if(pr.getExtendedStatus().equalsIgnoreCase("DECLINE")) {
             pr.setResponseCodeShortDescription(getResponseCodeShortDescription(DEFAULT_RESPONSE_CODE));
             pr.setResponseCodeFullDescription(getResponseCodeFullDescription(DEFAULT_RESPONSE_CODE));
+        }
+    }
+
+    private String docToString(Document doc) {
+        try {
+            StringWriter sw = new StringWriter();
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.INDENT, "no");
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.transform(new DOMSource(doc), new StreamResult(sw));
+            return sw.toString();
+        } catch (Exception ex) {
+            return "Error in document parsing";
         }
     }
 
