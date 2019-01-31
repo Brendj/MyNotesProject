@@ -109,8 +109,10 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
 
             String joinMigrants = outputMigrants ? " left join cf_migrants m on m.IdOfClientMigrate = c.idofclient"
                     + " and m.IdOfOrgVisit = ee.idOfOrg and ee.evtdatetime between m.VisitStartDate and m.VisitEndDate" : "";
-            String selectPartSectionName = outputMigrants ? ", m.section " : ", cast('' as text) as section "; // No Dialect mapping for JDBC type: 1111 exception
-            String partOfOrderByMigrantSection = sortedBySections && outputMigrants ? " m.section, " : "";
+            String selectPartSectionName = outputMigrants ? " ,array_to_string(array_agg(m.section ),', ') as section " : ", cast('' as text) as section "; // No Dialect mapping for JDBC type: 1111 exception
+            String partOfOrderByMigrantSection = sortedBySections && outputMigrants ? " 8 desc, 1 "
+                    : outputMigrants ? " 1, 8" : " 1 ";
+            String groupWhenSelectMigrants = outputMigrants ? " group by 1, 2, 3, 4, 5, 6, 7 " : "";
             String eventsCondition = "";
             String clientGroupCondition = "";
             String orgCondition = allFriendlyOrgs ? " and ee.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg)" : " and ee.idoforg = :idOfOrg ";
@@ -147,7 +149,8 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                             + orgCondition
                             + eventsCondition
                             + clientGroupCondition
-                            + " order by " + partOfOrderByMigrantSection + " ee.evtdatetime "
+                            + groupWhenSelectMigrants
+                            + " order by " + partOfOrderByMigrantSection
             );
             query.setParameter("startTime", startTime.getTime())
                  .setParameter("endTime", endTime.getTime())

@@ -161,9 +161,9 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                         properties.setProperty("eventFilter", selectedEventFilter.toString());
                         properties.setProperty("outputMigrants", outputMigrants.toString());
                         if(outputMigrants){
-                            properties.setProperty("sortedBySection", sortedBySections.toString());
+                            properties.setProperty("sortedBySections", sortedBySections.toString());
                         } else {
-                            properties.setProperty("sortedBySection", "false");
+                            properties.setProperty("sortedBySections", "false");
                         }
 
                         builder.setReportProperties(properties);
