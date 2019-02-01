@@ -42,6 +42,10 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final Integer FOR_ONE_DAY = 0;
     public static final Integer FOR_MONTH = 1;
+    public static final int[] PARAM_HINTS = new int[]{3};
+    public static final String[] TEMPLATE_FILE_NAMES = {
+            "MonitoringOfReportForOneDay.jasper", "MonitoringOfReportForMonth.jasper", "MonitoringOfReport.jasper"
+    };
 
     public static final String REPORT_NAME_FOR_MENU = "Мониторинг";
 
@@ -71,6 +75,8 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             parameterMap.put("reportName", REPORT_NAME);
             parameterMap.put("SUBREPORT_DIR", subReportDir);
+
+            templateFilename = subReportDir + TEMPLATE_FILE_NAMES[selectedPeriod];
 
             if(selectedPeriod.equals(FOR_ONE_DAY)) {
                 parameterMap.put("reportDate", CalendarUtils.dateShortToStringFullYear(startTime));
