@@ -31,6 +31,10 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -715,6 +719,12 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
             service116 = new SmevGISGMPService_Service();
             port116 = service116.getSmevGISGMPServiceSOAP();
             bindingProvider116 = (BindingProvider) port116;
+            Client client = ClientProxy.getClient(port116);
+            HTTPConduit conduit = (HTTPConduit) client.getConduit();
+            HTTPClientPolicy policy = conduit.getClient();
+            policy.setReceiveTimeout(15 * 60 * 1000);
+            policy.setConnectionTimeout(15 * 60 * 1000);
+
             URL endpoint = new URL(getRNIPUrl());
             setEndpointAddress(bindingProvider116, endpoint.toString());
         }
