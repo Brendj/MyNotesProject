@@ -17,6 +17,7 @@
     <jee:jndi-lookup id="reportsPU" jndi-name="java:/reportsPUFactory"/>
     <jee:jndi-lookup id="externalServicesPU" jndi-name="java:/externalServicesPUFactory"/>
     <jee:jndi-lookup id="symmetricPU" jndi-name="java:/symmetricPUFactory"/>
+    <jee:jndi-lookup id="revisePU" jndi-name="java:/revisePUFactory"/>
 
     <!--    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
           <property name="persistenceUnitName" value="processor"/>
@@ -36,6 +37,9 @@
     </bean>
     <bean id="txManagerSymmetric" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="symmetricPU"/>
+    </bean>
+    <bean id="txManagerRevise" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="revisePU"/>
     </bean>
 
 

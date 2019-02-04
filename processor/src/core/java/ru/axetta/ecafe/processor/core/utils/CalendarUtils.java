@@ -410,6 +410,13 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date addHours(Date date, int nHours) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.HOUR, nHours);
+        return calendar.getTime();
+    }
+
     public static int getDayOfMonth(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

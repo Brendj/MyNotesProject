@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -83,6 +84,9 @@ public class DTSZNDiscountsReviseService {
 
     public static final String DSZN_CODE_FILTER = "24,41,48,52,56,66";
 
+    public static final Integer DATA_SOURCE_TYPE_NSI = 1;
+    public static final Integer DATA_SOURCE_TYPE_DB = 2;
+
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
 
@@ -127,6 +131,16 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTask() throws Exception {
+        Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
+
+        switch (sourceType) {
+            case 1: runTaskRest(); break;   //DATA_SOURCE_TYPE_NSI
+            case 2: runTaskDB(); break;     //DATA_SOURCE_TYPE_DB
+            default: runTaskRest(); break;
+        }
+    }
+
+    public void runTaskRest() throws Exception {
         if (null == serviceURL) {
             throw new Exception("Unable to run DTSZNDiscountsReviseService - no service url was found");
         }
@@ -271,9 +285,10 @@ public class DTSZNDiscountsReviseService {
             logger.info(String.format("Revise 2.0: %d/%d pages was processed", currentPage, pagesCount));
         } while (currentPage++ < pagesCount);
 
-        updateArchivedFlagForDiscounts();
-
-        runTaskPart2();
+        if (pagesCount != 0L) {
+            updateArchivedFlagForDiscounts();
+            runTaskPart2();
+        }
     }
 
     private URL getServiceUrl() throws Exception {
@@ -743,6 +758,133 @@ public class DTSZNDiscountsReviseService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public void runTaskDB() throws Exception {
+        Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
+        Date deltaDate = CalendarUtils.addHours(new Date(), delta);
+        List<ReviseDAOService.DiscountItem> discountItemList =
+                RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
+
+        Date fireTime = new Date();
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+
+            transaction = session.beginTransaction();
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+
+            Integer counter = 0;
+            for (ReviseDAOService.DiscountItem item : discountItemList) {
+                if (null == transaction || !transaction.isActive()) {
+                    transaction = session.beginTransaction();
+                }
+                Client client = DAOUtils.findClientByGuid(session, item.getRegistryGUID());
+                if (null == client) {
+                    //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
+                    if (0 == counter++ % maxRecords) {
+                        transaction.commit();
+                        transaction = null;
+                    }
+                    continue;
+                }
+
+                if (!client.getOrg().getChangesDSZN()) {
+                    logger.info(String.format(
+                            "Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped",
+                            item.getRegistryGUID()));
+                    if (0 == counter++ % maxRecords) {
+                        transaction.commit();
+                        transaction = null;
+                    }
+                    continue;
+                }
+
+                ClientDtisznDiscountInfo discountInfo = DAOUtils
+                        .getDTISZNDiscountInfoByClientAndCode(session, client, item.getDsznCode().longValue());
+
+                if (null == discountInfo) {
+                    discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
+                            item.getTitle(),
+                            item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
+                            item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(),
+                            clientDTISZNDiscountVersion);
+                    session.save(discountInfo);
+                } else {
+                    if (discountInfo.getDtisznCode().equals(item.getDsznCode().longValue())) {
+                        // Проверяем поля: статус льготы, дата начала действия льготы ДТиСЗН, дата окончания действия льготы ДТиСЗН.
+                        // Перезаписываем те поля, которые отличаются в Реестре от ИС ПП (берем из Реестров).
+                        boolean wasModified = false;
+                        if (!discountInfo.getDateStart().equals(item.getSdDszn())) {
+                            discountInfo.setDateStart(item.getSdDszn());
+                            wasModified = true;
+                        }
+                        if (!discountInfo.getDateEnd().equals(item.getFdDszn())) {
+                            discountInfo.setDateEnd(item.getFdDszn());
+                            wasModified = true;
+                        }
+                        if (item.getBenefitConfirm() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)) {
+                            discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+                            discountInfo.setArchived(false);
+                            wasModified = true;
+                        }
+                        if (!item.getBenefitConfirm() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
+                            discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
+                            discountInfo.setArchived(true);
+                            wasModified = true;
+                        }
+                        if (item.getDeleted() || item.getFd().getTime() <= fireTime.getTime() || item.getFdDszn().getTime() <= fireTime.getTime()) {
+                            discountInfo.setArchived(true);
+                            wasModified = true;
+                        }
+                        if (item.getBenefitConfirm() && discountInfo.getArchived()) {
+                            discountInfo.setArchived(false);
+                            wasModified = true;
+                        }
+                        discountInfo.setLastReceivedDate(new Date());
+                        if (wasModified) {
+                            discountInfo.setVersion(clientDTISZNDiscountVersion);
+                            discountInfo.setLastUpdate(new Date());
+                        }
+                        session.merge(discountInfo);
+                    } else {
+                        // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
+                        // Создаем новую запись по тому же клиенту в таблице cf_client_dtiszn_discount_info (данные берем из Реестров)."
+                        discountInfo.setArchived(true);
+                        discountInfo.setLastUpdate(new Date());
+                        session.merge(discountInfo);
+                        discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
+                                item.getTitle(),
+                                item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
+                                item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(),
+                                clientDTISZNDiscountVersion);
+                        session.save(discountInfo);
+                    }
+                }
+                if (0 == counter++ % maxRecords) {
+                    transaction.commit();
+                    transaction = null;
+                }
+            }
+
+            if (null != transaction && transaction.isActive()) {
+                transaction.commit();
+                transaction = null;
+            }
+        } catch (Exception e) {
+            logger.error("Unable to get person benefits from DB", e);
+            return;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+
+        updateArchivedFlagForDiscounts();
+
+        runTaskPart2();
     }
 
     public void scheduleSync() throws Exception {

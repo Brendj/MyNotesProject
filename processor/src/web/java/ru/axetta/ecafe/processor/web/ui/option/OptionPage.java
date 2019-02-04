@@ -125,6 +125,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean useXadesT;
     private Boolean disableEmailEdit;
     private Date validRegistryDate;
+    private Integer reviseSourceType;
+    private Integer reviseDelta;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -949,6 +951,8 @@ public class OptionPage extends BasicWorkspacePage {
         Long timeStamp = runtimeContext.getOptionValueLong(Option.OPTION_VALID_REGISTRY_DATE);
         validRegistryDate = new Date(timeStamp == null? 0L : timeStamp);
 
+        reviseSourceType = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
+        reviseDelta = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DELTA);
     }
 
     public Object save() {
@@ -1058,6 +1062,9 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_VALID_REGISTRY_DATE, validRegistryDate.getTime());
 
+            runtimeContext.setOptionValue(Option.OPTION_REVISE_DATA_SOURCE, reviseSourceType);
+            runtimeContext.setOptionValue(Option.OPTION_REVISE_DELTA, reviseDelta);
+
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {
@@ -1121,5 +1128,21 @@ public class OptionPage extends BasicWorkspacePage {
         } else {
             this.validRegistryDate = validRegistryDate;
         }
+    }
+
+    public Integer getReviseSourceType() {
+        return reviseSourceType;
+    }
+
+    public void setReviseSourceType(Integer reviseSourceType) {
+        this.reviseSourceType = reviseSourceType;
+    }
+
+    public Integer getReviseDelta() {
+        return reviseDelta;
+    }
+
+    public void setReviseDelta(Integer reviseDelta) {
+        this.reviseDelta = reviseDelta;
     }
 }
