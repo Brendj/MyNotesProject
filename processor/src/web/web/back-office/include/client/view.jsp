@@ -170,7 +170,7 @@
     <rich:calendar value="#{mainPage.clientViewPage.birthDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                    inputClass="input-text" showWeeksBar="false" readonly="true" />
 
-    <h:outputText escape="true" value="Кружоки/Секции" styleClass="output-text" rendered="#{mainPage.clientViewPage.visitsSections}"/>
+    <h:outputText escape="true" value="Кружки/Секции" styleClass="output-text" rendered="#{mainPage.clientViewPage.visitsSections}"/>
     <rich:dataTable id="clientSectionsViewTable" value="#{mainPage.clientViewPage.clientSectionsItems}" var="clientSection"
                     columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer-center" rendered="#{mainPage.clientViewPage.visitsSections}">
@@ -178,19 +178,19 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Ид ОО посещения" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.idOfOrg}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientSection.idOfOrgVisit}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Название ОО посещения" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.shortName}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientSection.shortNameVisit}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Адрес ОО посещения" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.shortAddress}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{clientSection.shortAddressVisit}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -202,13 +202,13 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата начала занятий" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.visitStartDate}" styleClass="output-text" converter="timeConverter"/>
+            <h:outputText escape="true" value="#{clientSection.visitStartDate}" styleClass="output-text" converter="dateConverter"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата окончания занятий" />
             </f:facet>
-            <h:outputText escape="true" value="#{clientSection.visitEndDate}" styleClass="output-text" converter="timeConverter"/>
+            <h:outputText escape="true" value="#{clientSection.visitEndDate}" styleClass="output-text" converter="dateConverter"/>
         </rich:column>
     </rich:dataTable>
 

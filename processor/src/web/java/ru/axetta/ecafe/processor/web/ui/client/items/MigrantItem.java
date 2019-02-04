@@ -35,9 +35,9 @@ public class MigrantItem implements Comparable {
     private String group;
     private boolean annulled;
 
-    private String shortName;
-    private Long idOfOrg;
-    private String shortAddress;
+    private String shortNameVisit;
+    private Long idOfOrgVisit;
+    private String shortAddressVisit;
 
     public MigrantItem(Session session, Migrant migrant) {
         this.compositeIdOfMigrant = migrant.getCompositeIdOfMigrant();
@@ -68,11 +68,11 @@ public class MigrantItem implements Comparable {
         this.section = migrant.getSection();
         this.annulled = false;
 
-        if(migrant.getOrgRegistry() != null){
-            Org orgRegistry = migrant.getOrgRegistry();
-            this.shortAddress = orgRegistry.getShortAddress();
-            this.idOfOrg = orgRegistry.getIdOfOrg();
-            this.shortName = orgRegistry.getShortName();
+        if(migrant.getOrgVisit() != null){
+            Org orgVisit = migrant.getOrgVisit();
+            this.shortAddressVisit = orgVisit.getShortAddress();
+            this.idOfOrgVisit = orgVisit.getIdOfOrg();
+            this.shortNameVisit = orgVisit.getShortName();
         }
     }
 
@@ -237,27 +237,27 @@ public class MigrantItem implements Comparable {
         this.lastUpdateDateTime = lastUpdateDateTime;
     }
 
-    public String getShortName() {
-        return shortName;
+    public String getShortNameVisit() {
+        return shortNameVisit;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setShortNameVisit(String shortName) {
+        this.shortNameVisit = shortName;
     }
 
-    public Long getIdOfOrg() {
-        return idOfOrg;
+    public Long getIdOfOrgVisit() {
+        return idOfOrgVisit;
     }
 
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
+    public void setIdOfOrgVisit(Long idOfOrg) {
+        this.idOfOrgVisit = idOfOrg;
     }
 
-    public String getShortAddress() {
-        return shortAddress;
+    public String getShortAddressVisit() {
+        return shortAddressVisit;
     }
 
-    public void setShortAddress(String shortAddress) {
-        this.shortAddress = shortAddress;
+    public void setShortAddressVisit(String shortAddress) {
+        this.shortAddressVisit = shortAddress;
     }
 }
