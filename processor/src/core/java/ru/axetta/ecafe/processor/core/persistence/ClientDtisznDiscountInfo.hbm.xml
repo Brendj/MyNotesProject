@@ -27,5 +27,6 @@
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="createdDateInternal" column="CreatedDateInternal" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lastReceivedDate" column="LastReceivedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="source" column="Source" type="string"/>
     </class>
 </hibernate-mapping>

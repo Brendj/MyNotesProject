@@ -87,6 +87,9 @@ public class DTSZNDiscountsReviseService {
     public static final Integer DATA_SOURCE_TYPE_NSI = 1;
     public static final Integer DATA_SOURCE_TYPE_DB = 2;
 
+    public static final String DATA_SOURCE_TYPE_MARKER_NSI = "nsiir";
+    public static final String DATA_SOURCE_TYPE_MARKER_OU = "ou";
+
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
 
@@ -205,7 +208,7 @@ public class DTSZNDiscountsReviseService {
                             discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
                                     item.getBenefit().getBenefitForm(),
                                     item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                    item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
+                                    item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
                                     clientDTISZNDiscountVersion);
                             session.save(discountInfo);
                         } else {
@@ -244,6 +247,7 @@ public class DTSZNDiscountsReviseService {
                                     discountInfo.setVersion(clientDTISZNDiscountVersion);
                                     discountInfo.setLastUpdate(new Date());
                                 }
+                                discountInfo.setSource(DATA_SOURCE_TYPE_MARKER_NSI);
                                 session.merge(discountInfo);
                             } else {
                                 // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
@@ -255,7 +259,7 @@ public class DTSZNDiscountsReviseService {
                                 discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
                                         item.getBenefit().getBenefitForm(),
                                         item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                        item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(),
+                                        item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
                                         clientDTISZNDiscountVersion);
                                 session.save(discountInfo);
                             }
@@ -762,7 +766,7 @@ public class DTSZNDiscountsReviseService {
 
     public void runTaskDB() throws Exception {
         Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
-        Date deltaDate = CalendarUtils.addHours(new Date(), delta);
+        Date deltaDate = CalendarUtils.addHours(new Date(), -delta);
         List<ReviseDAOService.DiscountItem> discountItemList =
                 RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
 
@@ -810,7 +814,7 @@ public class DTSZNDiscountsReviseService {
                     discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
                             item.getTitle(),
                             item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                            item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(),
+                            item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU,
                             clientDTISZNDiscountVersion);
                     session.save(discountInfo);
                 } else {
@@ -849,6 +853,7 @@ public class DTSZNDiscountsReviseService {
                             discountInfo.setVersion(clientDTISZNDiscountVersion);
                             discountInfo.setLastUpdate(new Date());
                         }
+                        discountInfo.setSource(DATA_SOURCE_TYPE_MARKER_OU);
                         session.merge(discountInfo);
                     } else {
                         // "Ставим у такой записи признак Удалена при сверке (дата). Тут можно или признак, или примечание.
@@ -859,7 +864,7 @@ public class DTSZNDiscountsReviseService {
                         discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
                                 item.getTitle(),
                                 item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(),
+                                item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU,
                                 clientDTISZNDiscountVersion);
                         session.save(discountInfo);
                     }

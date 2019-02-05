@@ -120,7 +120,7 @@
             </rich:calendar>
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid" columns="2">
-            <h:outputText escape="true" value="Сверка 2.0 источник данны:" styleClass="output-text" />
+            <h:outputText escape="true" value="Сверка 2.0 источник данных:" styleClass="output-text" />
             <h:selectOneRadio value="#{optionPage.reviseSourceType}" styleClass="input-text">
                 <f:selectItem itemValue="1" itemLabel="НСИ" />
                 <f:selectItem itemValue="2" itemLabel="мастер база" />

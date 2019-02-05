@@ -15,3 +15,6 @@ CREATE TABLE cf_production_calendar
   CONSTRAINT cf_production_calendar_day_unique UNIQUE (day)
 );
 
+--поле "Источник"
+alter table cf_client_dtiszn_discount_info
+  add column source character varying(5);
