@@ -3835,7 +3835,7 @@ public class DAOUtils {
         condition += benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
         condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
         condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber like :number";
-        Query query = session.createQuery("select a from ApplicationForFood a " + condition + " order by a.serviceNumber");
+        Query query = session.createQuery("select a from ApplicationForFood a " + condition + " order by a.createdDate, a.serviceNumber");
         if (idOfOrgs.size() > 0) query.setParameterList("idOfOrgs", idOfOrgs);
         if (status != null) query.setParameter("status", status);
         if (benefit != null && benefit > 0L) query.setParameter("code", benefit);
