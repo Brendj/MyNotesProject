@@ -2500,8 +2500,12 @@ public class DAOService {
                     Calendar calendar = new GregorianCalendar(Integer.parseInt(sYear), i - 1, 1);
                     int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
                     for (int j = 1; j <= daysInMonth; j++) { //по всем дням месяца
-                        if (!days.contains(j)) continue;
                         Date date = CalendarUtils.parseDate(getStrForDate(new Integer(j).toString()) + "." + getStrForDate(new Integer(i).toString()) + "." + sYear);
+                        if (!days.contains(j)) {
+                            deleteProductionCalendarDay(date);
+                            continue;
+                        }
+
                         ProductionCalendar productionCalendar = getProductionCalendarByDate(date);
                         if (productionCalendar == null) {
                             productionCalendar = new ProductionCalendar(date);
@@ -2515,6 +2519,12 @@ public class DAOService {
             currLine = reader.readLine();
             ++lineNo;
         }
+    }
+
+    private void deleteProductionCalendarDay(Date date) {
+        Query query = entityManager.createQuery("delete from ProductionCalendar where day = :date");
+        query.setParameter("date", date);
+        query.executeUpdate();
     }
 
     private ProductionCalendar getProductionCalendarByDate(Date date) {
