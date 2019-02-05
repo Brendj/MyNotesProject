@@ -70,7 +70,36 @@
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{applicationForFoodReportPage.filter}}" />
         </h:panelGroup>
-
+        <h:outputText styleClass="output-text" escape="true" value="Статус" />
+        <h:selectOneMenu id="affStatus"
+                         value="#{applicationForFoodReportPage.status}"
+                         styleClass="input-text" style="width: 250px;">
+            <f:selectItems value="#{applicationForFoodReportPage.statuses}" />
+            <a4j:support event="onchange" />
+        </h:selectOneMenu>
+        <h:outputText styleClass="output-text" escape="true" value="Льгота" />
+        <h:selectOneMenu id="affBenefit"
+                         value="#{applicationForFoodReportPage.benefit}"
+                         styleClass="input-text" style="width: 250px;">
+            <f:selectItems value="#{applicationForFoodReportPage.benefits}" />
+            <a4j:support event="onchange" />
+        </h:selectOneMenu>
+        <h:outputText styleClass="output-text" escape="true" value="Физ. лицо" />
+        <h:panelGroup id="clientFilter">
+            <a4j:commandButton value="..." action="#{mainPage.showClientSelectListPage(applicationForFoodReportPage.getClientList())}"
+                               reRender="modalClientListSelectorPanel,selectedClientList"
+                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                <f:setPropertyActionListener value="#{applicationForFoodReportPage.getStringClientList}"
+                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                          value=" {#{applicationForFoodReportPage.stringClientList}}" />
+        </h:panelGroup>
+        <h:outputText styleClass="output-text" escape="true" value="Номер заявления" />
+        <h:inputText value="#{applicationForFoodReportPage.number}" styleClass="input-text long-field" />
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="1">

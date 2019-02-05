@@ -216,8 +216,11 @@ public class RegularPaymentSubscriptionService {
             int statusCode = httpClient.executeMethod(httpMethod);
             paymentResponse.setStatusCode(statusCode);
             if (statusCode == HttpStatus.SC_OK) {
+                logger.info("OK response from MFR");
                 if (httpMethod.getResponseHeader("Content-Type").getValue().contains("text/xml")) {
                     fillFromXMLResponse(paymentResponse, httpMethod.getResponseBodyAsStream());
+                } else {
+                    logger.info("Wrong Content-Type: " + httpMethod.getResponseHeader("Content-Type").getValue());
                 }
             } else {
                 logger.error("Http request has status {}", statusCode);

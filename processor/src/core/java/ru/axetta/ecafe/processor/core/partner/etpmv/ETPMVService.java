@@ -49,7 +49,7 @@ import java.util.*;
 public class ETPMVService {
     private static final Logger logger = LoggerFactory.getLogger(ETPMVService.class);
     private final int COORDINATE_MESSAGE = 0;
-    private final String ISPP_ID = "-063101-";
+    public static final String ISPP_ID = "-063101-";
     private final int PAUSE_IN_MILLIS = 1000;
     public final String BENEFIT_INOE = "0";
     public final String BENEFIT_REGULAR = "1";

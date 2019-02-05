@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
@@ -3826,11 +3827,26 @@ public class DAOUtils {
         return version;
     }
 
-    public static List<ApplicationForFood> getApplicationForFoodListByOrgs(Session session, List<Long> idOfOrgs) {
-        String condition = (idOfOrgs.size() == 0 ? "" : "where a.client.org.idOfOrg in :idOfOrgs");
+    public static List<ApplicationForFood> getApplicationForFoodListByOrgs(Session session, List<Long> idOfOrgs,
+            ApplicationForFoodStatus status, Long benefit, List<Long> idOfClientList, String number) {
+        String condition = "where 1=1 ";
+        condition += (idOfOrgs.size() == 0 ? "" : "and a.client.org.idOfOrg in :idOfOrgs");
+        condition += status == null ? "" : " and a.status = :status";
+        condition += benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
+        condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
+        condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber like :number";
         Query query = session.createQuery("select a from ApplicationForFood a " + condition + " order by a.serviceNumber");
         if (idOfOrgs.size() > 0) query.setParameterList("idOfOrgs", idOfOrgs);
+        if (status != null) query.setParameter("status", status);
+        if (benefit != null && benefit > 0L) query.setParameter("code", benefit);
+        if (idOfClientList.size() > 0) query.setParameterList("idOfClientList", idOfClientList);
+        if (!StringUtils.isEmpty(number)) query.setParameter("number", number.length() == 30 ? number : "%" + ETPMVService.ISPP_ID + getProperNumber(number) + "%");
         return query.list();
+    }
+
+    private static String getProperNumber(String number) {
+        while (number.length() < 7) number = "0" + number;
+        return number;
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByClient(Session session, Long idOfClient) {
@@ -3938,6 +3954,13 @@ public class DAOUtils {
             criteria.add(Restrictions.isNotNull("ETPCode"));
         }
         criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscountDSZN"));
+        return criteria.list();
+    }
+
+    public static List<CategoryDiscountDSZN> getCategoryDiscountDSZNForReportList(Session session) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("deleted", false));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("code"));
         return criteria.list();
     }
 

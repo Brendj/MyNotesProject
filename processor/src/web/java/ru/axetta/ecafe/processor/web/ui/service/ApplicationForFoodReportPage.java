@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.model.SelectItem;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,52 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private List<ApplicationForFoodReportItem> items = new ArrayList<ApplicationForFoodReportItem>();
     private ApplicationForFoodReportItem currentItem;
 
+    private List<SelectItem> statuses = readAllItems();
+    private String status;
+    private List<SelectItem> benefits = readAllBenefits();
+    private Integer benefit;
+    private String number = "";
+    private final static Integer ALL_BENEFITS = -1;
+
+    private static List<SelectItem> readAllItems() {
+        ApplicationForFoodState[] states = ApplicationForFoodState.values();
+        List<SelectItem> items = new ArrayList<SelectItem>(states.length);
+        items.add(new SelectItem("Все", "Все"));
+        for (ApplicationForFoodState state : states) {
+            if (!state.equals(ApplicationForFoodState.DENIED)) {
+                items.add(new SelectItem(state.getCode().toString(), state.getCode().toString()));
+            } else {
+                items.add(new SelectItem("1080.1", "1080.1"));
+                items.add(new SelectItem("1080.2", "1080.2"));
+                items.add(new SelectItem("1080.3", "1080.3"));
+            }
+        }
+        return items;
+    }
+
+    private List<SelectItem> readAllBenefits() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(ALL_BENEFITS, "Все"));
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            List<CategoryDiscountDSZN> list = DAOUtils.getCategoryDiscountDSZNForReportList(session);
+            for (CategoryDiscountDSZN category : list) {
+                items.add(new SelectItem(category.getCode(), category.getCode() + " - " + category.getDescription()));
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in reload applicationForFoodReport: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return items;
+    }
+
     public ApplicationForFoodReportPage() {
 
     }
@@ -45,7 +93,24 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList);
+            ApplicationForFoodStatus statusCondition = null;
+            if (!status.equals("Все")) {
+                String[] arr = status.split("\\.");
+                statusCondition = new ApplicationForFoodStatus(ApplicationForFoodState.fromCode(Integer.parseInt(arr[0])),
+                        arr.length == 1 ? null : ApplicationForFoodDeclineReason.fromInteger(Integer.parseInt(arr[1])));
+            }
+            Long benefitCondition = null;
+            if (benefit > ALL_BENEFITS) {
+                benefitCondition = benefit.longValue();
+            }
+            List<Long> idOfClientList = new ArrayList<Long>();
+            if (getClientList().size() > 0) {
+                for (ClientSelectListPage.Item clientItem : getClientList()) {
+                    idOfClientList.add(clientItem.getIdOfClient());
+                }
+            }
+            List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
+                    benefitCondition, idOfClientList, number);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
                 items.add(item);
@@ -189,4 +254,43 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         return result;
     }
 
+    public List<SelectItem> getStatuses() {
+        return statuses;
+    }
+
+    public void setStatuses(List<SelectItem> statuses) {
+        this.statuses = statuses;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<SelectItem> getBenefits() {
+        return benefits;
+    }
+
+    public void setBenefits(List<SelectItem> benefits) {
+        this.benefits = benefits;
+    }
+
+    public Integer getBenefit() {
+        return benefit;
+    }
+
+    public void setBenefit(Integer benefit) {
+        this.benefit = benefit;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
 }
