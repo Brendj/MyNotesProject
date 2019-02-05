@@ -415,18 +415,15 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void specialDatesLoadFileListener(UploadEvent event) {
         UploadItem item = event.getUploadItem();
         InputStream inputStream = null;
-        long dataSize = 0;
         try {
             if (item.isTempFile()) {
                 File file = item.getFile();
-                dataSize = file.length();
                 inputStream = new FileInputStream(file);
             } else {
                 byte[] data = item.getData();
-                dataSize = data.length;
                 inputStream = new ByteArrayInputStream(data);
             }
-            DAOService.getInstance().loadSpecialDates(inputStream, dataSize);
+            DAOService.getInstance().loadProductionCalendar(inputStream);
             printMessage("Файл загружен успешно");
         } catch (Exception e) {
             getLogger().error("Failed to load special dates from file", e);
@@ -448,9 +445,9 @@ public class OtherActionsPage extends BasicWorkspacePage {
             response.setContentType("application/csv");
             response.setHeader("Content-disposition", "attachment;filename=\"pk.csv\"");
             String sample = "\"Год/Месяц\",\"Январь\",\"Февраль\",\"Март\",\"Апрель\",\"Май\",\"Июнь\",\"Июль\",\"Август\",\"Сентябрь\",\"Октябрь\",\"Ноябрь\",\"Декабрь\"\n"
-                    + "2019,\"1,2,3,4,5,6,7,8,9,10,12,13,19,20,26,27\",\"2,3,9,10,16,17,22*,23,24,25\",\"2,3,7*,8,9,10,16,17,23,24,30,31\",\"6,7,13,14,20,21,27,28,30*\","
-                    + "\"1,4,5,8*,9,11,12,18,19,25,26\",\"1,2,8,9,11*,12,15,16,22,23,29,30\",\"6,7,13,14,20,21,27,28\",\"3,4,10,11,17,18,24,25,31\","
-                    + "\"1,7,8,14,15,21,22,28,29\",\"5,6,12,13,19,20,26,27\",\"2,3,4,9,10,16,17,23,24,30\",\"1,7,8,14,15,21,22,28,29,31*\"";
+                    + "2019,\"1,2,3,4,5,6,7,8,9,10,12,13,19,20,26,27\",\"2,3,9,10,16,17,23,24,25\",\"2,3,8,9,10,16,17,23,24,30,31\",\"6,7,13,14,20,21,27,28\","
+                    + "\"1,4,5,9,11,12,18,19,25,26\",\"1,2,8,9,12,15,16,22,23,29,30\",\"6,7,13,14,20,21,27,28\",\"3,4,10,11,17,18,24,25,31\","
+                    + "\"1,7,8,14,15,21,22,28,29\",\"5,6,12,13,19,20,26,27\",\"2,3,4,9,10,16,17,23,24,30\",\"1,7,8,14,15,21,22,28,29\"";
             servletOutputStream.write(sample.getBytes(Charset.forName("UTF-8")));
             servletOutputStream.flush();
             servletOutputStream.close();

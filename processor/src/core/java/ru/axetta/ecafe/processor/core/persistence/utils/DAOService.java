@@ -2482,71 +2482,48 @@ public class DAOService {
     }
 
     //Загружаем производственный календарь из файла
-    public void loadSpecialDates(InputStream inputStream, long dataSize) throws Exception {
+    public void loadProductionCalendar(InputStream inputStream) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         int lineNo = 0;
         String currLine = reader.readLine();
-        Long version = DAOUtils.nextVersionBySpecialDate(entityManager.unwrap(Session.class));
-        Query orgsQuery = entityManager.createQuery("select o.idOfOrg from Org o order by o.idOfOrg");
-        List<Long> orgs = orgsQuery.getResultList();
         while (null != currLine) {
             if (lineNo > 0) { //пропускаем заголовок
-                String[] arr = currLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+                String[] arr = currLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); //элементы массива - месяцы
                 String sYear = arr[0];
-                Date beginYear = CalendarUtils.parseDate("01.01." + sYear);
-                Date endYear = CalendarUtils.parseDate("31.12." + sYear);
-                Query delOldData = entityManager.createQuery("update SpecialDate sd set sd.version = :version, sd.deleted = true "
-                        + "where sd.compositeIdOfSpecialDate.date between :startDate and :endDate");
-                delOldData.setParameter("version", version);
-                delOldData.setParameter("startDate", beginYear);
-                delOldData.setParameter("endDate", endYear);
-                delOldData.executeUpdate(); //помечаем удаленными все записи за год
-                version++;
-                boolean isWorkDay, addWeekend, addWorkDay, dayFound;
                 List<Integer> days = new ArrayList<Integer>();
-                Long addMillis = System.currentTimeMillis() % 1000;
                 for (int i = 1; i <= 12; i++) { //по месяцам
-                    dayFound = false;
-                    String[] sDays = arr[i].split(",");
+                    String[] sDays = arr[i].split(",");                                 //элементы - дни в месяце
                     days.clear();
                     for (String d : sDays) {
-                        if (d.contains("*")) continue; //пропускаем дни со звездочкой - укороченные рабочие дни
-                        days.add(new Integer(d.replaceAll("\\+|\"", "")));
+                        days.add(new Integer(d.replaceAll("\"", "")));
                     }
                     Calendar calendar = new GregorianCalendar(Integer.parseInt(sYear), i - 1, 1);
                     int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-                    StringBuilder builder = new StringBuilder();
-                    builder.append("insert into cf_specialdates (idoforg, date, isweekend, deleted, version, comment, idoforgowner) values ");
                     for (int j = 1; j <= daysInMonth; j++) { //по всем дням месяца
-                        addWeekend = false;
-                        addWorkDay = false;
+                        if (!days.contains(j)) continue;
                         Date date = CalendarUtils.parseDate(getStrForDate(new Integer(j).toString()) + "." + getStrForDate(new Integer(i).toString()) + "." + sYear);
-                        isWorkDay = CalendarUtils.isWorkDateWithoutParser(false, date);
-                        date = CalendarUtils.addMilliseconds(date, addMillis.intValue());
-
-                        if (isWorkDay && days.contains(j)) {
-                            addWeekend = true;
-                        } else if (!isWorkDay && !days.contains(j)) {
-                            addWorkDay = true;
+                        ProductionCalendar productionCalendar = getProductionCalendarByDate(date);
+                        if (productionCalendar == null) {
+                            productionCalendar = new ProductionCalendar(date);
+                        } else {
+                            productionCalendar.setLastUpdate(new Date());
                         }
-                        if (addWeekend || addWorkDay) {
-                            dayFound = true; //найден аномальный день - либо выходной в будни, либо общерабочая суббота
-                            for (Long idOfOrg : orgs) {
-                                builder.append(String.format("(%s, %s, %s, %s, %s, '%s', %s), ", idOfOrg, date.getTime(), addWeekend ? 1 : 0, 0, version, "Производственный календарь", idOfOrg));
-                            }
-                        }
-                    }
-                    if (dayFound) {
-                        String insStatement = builder.toString();
-                        insStatement = insStatement.substring(0, insStatement.length() - 2);
-                        Query insQuery = entityManager.createNativeQuery(insStatement);
-                        insQuery.executeUpdate();
+                        entityManager.merge(productionCalendar);
                     }
                 }
             }
             currLine = reader.readLine();
             ++lineNo;
+        }
+    }
+
+    private ProductionCalendar getProductionCalendarByDate(Date date) {
+        Query query = entityManager.createQuery("select pc from ProductionCalendar pc where pc.day = :day");
+        query.setParameter("day", date);
+        try {
+            return (ProductionCalendar) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
     }
 
