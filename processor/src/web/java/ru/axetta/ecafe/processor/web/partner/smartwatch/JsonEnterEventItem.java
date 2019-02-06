@@ -4,20 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
-import java.util.Date;
-
-
 public class JsonEnterEventItem {
-    private Date evtDateTime;
+    private Long evtDateTime;
     private Integer direction;
     private String cardType;
     private String client;
 
-    public Date getEvtDateTime() {
+    public Long getEvtDateTime() {
         return evtDateTime;
     }
 
-    public void setEvtDateTime(Date evtDateTime) {
+    public void setEvtDateTime(Long evtDateTime) {
         this.evtDateTime = evtDateTime;
     }
 

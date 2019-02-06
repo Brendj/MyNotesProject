@@ -5,23 +5,25 @@
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.LongType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -39,9 +41,11 @@ import java.util.*;
 public class SmartWatchRestController {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
-    private Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private boolean debug;
+
     private final Integer CARD_TYPE_SMARTWATCH = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
+    private final Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
+    private final Integer DEFAULT_SAMPLE_LIMIT = 10;
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -57,7 +61,6 @@ public class SmartWatchRestController {
                 .getConfigProperties().getProperty("ecafe.processor.geoplaner.restcontroller.debug", "false");
         return Boolean.parseBoolean(reqInstance);
     }
-
 
     @POST
     @Path(value = "getTokenByMobile")
@@ -210,11 +213,13 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("No clients found by contractID: " + contractId);
             }
             if(!isRelatives(session, parent, child)){
-                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId()
+                        + ") is not relatives");
             }
 
             if(childHasAnActiveSmartWatch(session, child)){
-                throw new IllegalArgumentException("The client witch contractID: " + child.getContractId() + " has an active SmartWatch");
+                throw new IllegalArgumentException("The client witch contractID: " + child.getContractId()
+                        + " has an active SmartWatch");
             }
 
             Date issueTime = new Date();
@@ -229,12 +234,16 @@ public class SmartWatchRestController {
                         .createSmartWatchAsCard(session, child.getIdOfClient(), trackerId, Card.ACTIVE_STATE, validTime,
                                 Card.ISSUED_LIFE_STATE, null, issueTime, trackerUid, null);
             } else {
-                if((card.getClient() == null || card.getClient().equals(child) || card.getState().equals(CardState.BLOCKED.getValue()))
+                if((card.getClient() == null || card.getState().equals(CardState.BLOCKED.getValue()))
                         && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {
-                    cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(),
-                            CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId(), null, child.getOrg().getIdOfOrg());
+                    cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
+                            card.getLifeState(), CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId(), null,
+                            child.getOrg().getIdOfOrg());
                 } else {
-                    throw new Exception("Card CardNo: " + card.getCardNo() + " is registered and owned Client contractID: " + card.getClient().getContractId());
+                    throw new Exception("Card CardNo: " + card.getCardNo()
+                            + " is registered and owned Client contractID: "
+                            + card.getClient().getContractId()
+                            + " (tried to register on the client with contractID: " + child.getContractId() + " )");
                 }
                 idOfCard = card.getIdOfCard();
             }
@@ -281,7 +290,6 @@ public class SmartWatchRestController {
             HibernateUtils.close(session, logger);
         }
     }
-
 
     @POST
     @Path(value = "blockSmartWatch")
@@ -348,7 +356,8 @@ public class SmartWatchRestController {
     @Path(value="getEnterEvents")
     public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone,
             @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
-            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
+            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
+            @QueryParam(value="limit") Integer limit){
         JsonEnterEvents result = new JsonEnterEvents();
         Session session = null;
         Transaction transaction = null;
@@ -380,24 +389,15 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
             }
 
-            Date startDate;
-            Date endDate;
-
             if(startDateTime == null){
-                logger.warn("Start date is Null, set as yesterday");
-                startDate = CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1));
-            } else {
-                startDate = CalendarUtils.startOfDay(new Date(startDateTime));
+                logger.warn("Start date is Null, set as now");
+                startDateTime = new Date().getTime();
+            }
+            if(endDateTime != null && endDateTime >= startDateTime){
+                endDateTime = null;
             }
 
-            if(endDateTime == null){
-                logger.warn("End date is Null, set as now");
-                endDate = CalendarUtils.endOfDay(new Date());
-            } else {
-                endDate = CalendarUtils.endOfDay(new Date(endDateTime));
-            }
-
-            List<JsonEnterEventItem> items = buildEnterEventItem(session, child, startDate, endDate);
+            List<JsonEnterEventItem> items = buildEnterEventItem(session, child, startDateTime, endDateTime, limit);
             result.setItems(items);
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
@@ -432,7 +432,8 @@ public class SmartWatchRestController {
     @Path(value="getPurchases")
     public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone,
             @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
-            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
+            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
+            @QueryParam(value="limit") Integer limit){
         Session session = null;
         Transaction transaction = null;
         JsonPurchases result = new JsonPurchases();
@@ -466,23 +467,20 @@ public class SmartWatchRestController {
             }
 
             Date startDate;
-            Date endDate;
+            Date endDate = null;
 
             if(startDateTime == null){
-                logger.warn("Start date is Null, set as yesterday");
-                startDate = CalendarUtils.startOfDay(CalendarUtils.addDays(new Date(), -1));
+                logger.warn("Start date is Null, set as now");
+                startDate = new Date();
             } else {
-                startDate = CalendarUtils.startOfDay(new Date(startDateTime));
+                startDate = new Date(startDateTime);
             }
 
-            if(endDateTime == null){
-                logger.warn("End date is Null, set as now");
-                endDate = CalendarUtils.endOfDay(new Date());
-            } else {
-                endDate = CalendarUtils.endOfDay(new Date(endDateTime));
+            if(endDateTime != null && endDateTime < startDate.getTime()){
+                endDate = new Date(endDateTime);
             }
 
-            List<JsonOrder> items = buildPaymentsInfo(session, child, startDate, endDate);
+            List<JsonOrder> items = buildPaymentsInfo(session, child, startDate, endDate, limit);
             result.setItems(items);
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
@@ -590,14 +588,22 @@ public class SmartWatchRestController {
         return info;
     }
 
-    private List<JsonOrder> buildPaymentsInfo(Session session, Client child, Date startDate, Date endDate) throws Exception{
+    private List<JsonOrder> buildPaymentsInfo(Session session, Client child, Date startDate,
+            Date endDate, Integer limit) throws Exception{
         List<JsonOrder> items = new LinkedList<JsonOrder>();
         List<Order> ordersOfClient = null;
+        Criterion timeRestriction = endDate == null ?
+                Restrictions.le("orderDate", startDate) : Restrictions.between("orderDate", startDate, endDate);
+
+        if(limit == null || limit <= 0){
+            limit = DEFAULT_SAMPLE_LIMIT;
+        }
 
         Criteria criteria = session.createCriteria(Order.class);
-        criteria.add(Restrictions.eq("client", child));
-        criteria.add(Restrictions.between("orderDate", startDate, endDate));
-        criteria.addOrder(org.hibernate.criterion.Order.desc("orderDate"));
+        criteria.add(Restrictions.eq("client", child))
+                .add(timeRestriction)
+                .addOrder(org.hibernate.criterion.Order.desc("orderDate"))
+                .setMaxResults(limit);
 
         ordersOfClient = criteria.list();
 
@@ -637,29 +643,49 @@ public class SmartWatchRestController {
         return items;
     }
 
-    private List<JsonEnterEventItem> buildEnterEventItem(Session session, Client child, Date startDate, Date endDate) throws Exception{
+    private List<JsonEnterEventItem> buildEnterEventItem(Session session, Client child, Long startDate, Long endDate,
+            Integer limit) throws Exception{
         List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
         List<Long> cardNoOfOwner = new LinkedList<Long>();
-        List<EnterEvent> events = null;
+        List<EnterEventsItem> events = null;
+        String timeConditional = endDate == null ? " evtDateTime <= :startDate" : " evtDateTime BETWEEN :startDate AND :endDate ";
+
+        if(limit == null || limit <= 0){
+            limit = DEFAULT_SAMPLE_LIMIT;
+        }
 
         for(Card card : child.getCards()){
             cardNoOfOwner.add(card.getCardNo());
         }
 
-        Criteria criteria = session.createCriteria(EnterEvent.class);
-        Criterion cardNoRestriction = Restrictions.in("idOfCard", cardNoOfOwner);
-        Criterion clientRestriction = Restrictions.eq("client", child);
-        criteria.add(Restrictions.or(cardNoRestriction, clientRestriction));
-        criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
-        criteria.addOrder(org.hibernate.criterion.Order.desc("evtDateTime"));
+        SQLQuery query = session.createSQLQuery("SELECT passDirection, evtDateTime, idOfClient, idOfCard "
+                + " FROM cf_enterevents "
+                + " WHERE " + timeConditional
+                + " AND (idofclient = :idOfChild OR idofcard IN (:idOfCards)) "
+                + " ORDER BY 2 DESC "
+                + " LIMIT :limit");
+        query
+                .addScalar("passDirection", new IntegerType())
+                .addScalar("evtDateTime", new LongType())
+                .addScalar("idOfClient", new LongType())
+                .addScalar("idOfCard", new LongType())
+                .setParameter("startDate", startDate)
+                .setParameter("idOfChild", child.getIdOfClient())
+                .setParameter("limit", limit)
+                .setParameterList("idOfCards", cardNoOfOwner)
+                .setResultTransformer(Transformers.aliasToBean(EnterEventsItem.class));
 
-        events = criteria.list();
+        if(endDate != null){
+            query.setParameter("endDate", endDate);
+        }
+        events = query.list();
+
         if(events == null || events.isEmpty()){
             logger.warn("Not found event for client contractID: " + child.getContractId());
             return Collections.emptyList();
         }
 
-        for(EnterEvent event : events){
+        for(EnterEventsItem event : events){
             JsonEnterEventItem item = new JsonEnterEventItem();
             item.setDirection(event.getPassDirection());
             item.setEvtDateTime(event.getEvtDateTime());
@@ -669,7 +695,7 @@ public class SmartWatchRestController {
                     item.setCardType(Card.TYPE_NAMES[card.getCardType()]);
                 }
             }
-            if(event.getClient() != null){
+            if(event.getIdOfClient() != null){
                 item.setClient(child.getPerson().getFullName());
             }
             items.add(item);
