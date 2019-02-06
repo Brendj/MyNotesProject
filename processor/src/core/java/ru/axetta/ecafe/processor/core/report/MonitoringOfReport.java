@@ -101,21 +101,19 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            Date date;
-            if(templateFilename.contains(TEMPLATE_FILE_NAMES[FOR_ONE_DAY])) {
-                date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);//вызов из построения по расписанию
+            Date date; //вызов из построения по расписанию
+            if (templateFilename.contains(TEMPLATE_FILE_NAMES[FOR_MONTH])) {
+                date = CalendarUtils.getFirstDayOfMonth(new Date());
+                endTime = CalendarUtils.getLastDayOfMonth(date);
+                selectedPeriod = FOR_MONTH;
+            } else {
+                date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);
                 endTime = CalendarUtils.endOfDay(date);
                 int day = CalendarUtils.getDayOfWeek(date);
                 if (day == 1) {
                     return null; //на Вск не генерируем
                 }
                 selectedPeriod = FOR_ONE_DAY;
-            } else if(templateFilename.contains(TEMPLATE_FILE_NAMES[FOR_MONTH])) {
-                date = CalendarUtils.getFirstDayOfMonth(new Date());
-                endTime = CalendarUtils.getLastDayOfMonth(date);
-                selectedPeriod = FOR_MONTH;
-            } else {
-                return null;
             }
             return buildInternal(date, endTime, calendar);
         }
