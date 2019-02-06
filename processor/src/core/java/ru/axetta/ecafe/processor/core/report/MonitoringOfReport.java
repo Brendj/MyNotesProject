@@ -44,7 +44,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public static final Integer FOR_MONTH = 1;
     public static final int[] PARAM_HINTS = new int[]{3};
     public static final String[] TEMPLATE_FILE_NAMES = {
-            "MonitoringOfReportForOneDay.jasper", "MonitoringOfReportForMonth.jasper", "MonitoringOfReport.jasper"
+            "MonitoringOfReportForOneDay.jasper", "MonitoringOfReportForMonth.jasper", /*"MonitoringOfReport.jasper"*/
     };
 
     public static final String REPORT_NAME_FOR_MENU = "Мониторинг";
@@ -76,8 +76,6 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
             parameterMap.put("reportName", REPORT_NAME);
             parameterMap.put("SUBREPORT_DIR", subReportDir);
 
-            templateFilename = subReportDir + TEMPLATE_FILE_NAMES[selectedPeriod];
-
             if(selectedPeriod.equals(FOR_ONE_DAY)) {
                 parameterMap.put("reportDate", CalendarUtils.dateShortToStringFullYear(startTime));
             } else if(selectedPeriod.equals(FOR_MONTH)){
@@ -103,11 +101,21 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            Date date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);//вызов из построения по расписанию
-            endTime = CalendarUtils.endOfDay(date);
-            int day = CalendarUtils.getDayOfWeek(date);
-            if (day == 1 && selectedPeriod.equals(FOR_ONE_DAY)) {
-                return null; //на Вск не генерируем
+            Date date;
+            if(templateFilename.contains(TEMPLATE_FILE_NAMES[FOR_ONE_DAY])) {
+                date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);//вызов из построения по расписанию
+                endTime = CalendarUtils.endOfDay(date);
+                int day = CalendarUtils.getDayOfWeek(date);
+                if (day == 1) {
+                    return null; //на Вск не генерируем
+                }
+                selectedPeriod = FOR_ONE_DAY;
+            } else if(templateFilename.contains(TEMPLATE_FILE_NAMES[FOR_MONTH])) {
+                date = CalendarUtils.getFirstDayOfMonth(new Date());
+                endTime = CalendarUtils.getLastDayOfMonth(date);
+                selectedPeriod = FOR_MONTH;
+            } else {
+                return null;
             }
             return buildInternal(date, endTime, calendar);
         }
