@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.partner.revise;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.service.nsi.ReviseLogger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -20,16 +23,22 @@ import java.util.List;
 @Scope("singleton")
 public class ReviseDAOService {
     private static final Logger logger = LoggerFactory.getLogger(ReviseDAOService.class);
+    private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
 
     @PersistenceContext(unitName = "revisePU")
     private EntityManager entityManager;
 
     public List<DiscountItem> getDiscountsUpdatedSinceDate(Date updated) {
         List<DiscountItem> discountItemList = new LinkedList<DiscountItem>();
-        Query query = entityManager.createNativeQuery(
-                "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
-                 + " from benefits_for_ispp where updated_at >= :updatedDate and registry_guid is not null");
+        String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
+                + " from benefits_for_ispp where updated_at >= :updatedDate and registry_guid is not null";
+        Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("updatedDate", updated);
+        try {
+            reviseLogger.logRequestDB(query, sqlString);
+        } catch (Exception e) {
+            logger.warn("Unable to log revise request");
+        }
         List list = query.getResultList();
         for (Object o : list) {
             Object[] row = (Object[]) o;
@@ -52,6 +61,11 @@ public class ReviseDAOService {
             Boolean isDeleted = (Boolean) row[9];
             discountItemList.add(new DiscountItem(registryGUID, dsznCode, title, sd, sdDszn, fd, fdDszn, isBenefitConfirmed,
                     updatedAt, isDeleted));
+        }
+        try {
+            reviseLogger.logResponseDB(discountItemList);
+        } catch (Exception e) {
+            logger.warn("Unable to log revise response");
         }
         return discountItemList;
     }

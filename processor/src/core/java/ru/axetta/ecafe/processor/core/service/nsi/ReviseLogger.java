@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service.nsi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.httpclient.Header;
@@ -18,9 +19,12 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.Parameter;
+import javax.persistence.Query;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @Scope("singleton")
@@ -120,5 +124,69 @@ public class ReviseLogger {
             fw.flush();
             fw.close();
         }
+    }
+
+    public void logRequestDB(Query query, String queryString) throws Exception {
+        if (!getEnableLogger() || StringUtils.isEmpty(getFileName())) return;
+        StringBuilder sb = new StringBuilder();
+        sb.append(new Date());
+        sb.append(" Query { ");
+        sb.append(queryString);
+        sb.append(" }");
+        sb.append("\r\n");
+        sb.append("Parameters={ ");
+        int size = query.getParameters().size();
+        int counter = 0;
+        for (Parameter parameter : query.getParameters()) {
+            sb.append(parameter.getName());
+            sb.append("=");
+            sb.append(query.getParameterValue(parameter.getName()));
+            if (++counter < size) {
+                sb.append(", ");
+            }
+        }
+        sb.append(" }");
+        sb.append("\r\n");
+        writeDataToFile(sb);
+    }
+
+    public void logResponseDB(List<ReviseDAOService.DiscountItem> discountItemList) throws Exception {
+        if (!getEnableLogger() || StringUtils.isEmpty(getFileName())) return;
+        StringBuilder sb = new StringBuilder();
+        sb.append(new Date());
+        sb.append(" Response { size=");
+        sb.append(discountItemList.size());
+        sb.append("\r\n");
+        int size = discountItemList.size();
+        int counter = 0;
+        for (ReviseDAOService.DiscountItem item : discountItemList) {
+            sb.append("item={");
+            sb.append("registry_guid=\"");
+            sb.append(item.getRegistryGUID());
+            sb.append("\",dszn_code=\"");
+            sb.append(item.getDsznCode());
+            sb.append("\",title=\"");
+            sb.append(item.getTitle());
+            sb.append("\",sd=\"");
+            sb.append(item.getSd());
+            sb.append("\",sd_dszn=\"");
+            sb.append(item.getSdDszn());
+            sb.append("\",fd=\"");
+            sb.append(item.getFd());
+            sb.append("\",fd_dszn=\"");
+            sb.append(item.getFdDszn());
+            sb.append("\",is_benefit_confirm=\"");
+            sb.append(item.getBenefitConfirm());
+            sb.append("\",updated_at=\"");
+            sb.append(item.getUpdatedAt());
+            sb.append("\",is_del=\"");
+            sb.append(item.getDeleted());
+            sb.append("\"}");
+            if (++counter < size) {
+                sb.append(", ");
+            }
+        }
+        sb.append(" }\r\n");
+        writeDataToFile(sb);
     }
 }
