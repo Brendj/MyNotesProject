@@ -46,7 +46,7 @@ public class ReviseDAOService {
             String dsznCodeString = (String) row[1];
             Integer dsznCode;
             try {
-                dsznCode = Integer.parseInt(dsznCodeString);
+                dsznCode = Integer.parseInt(dsznCodeString.trim());
             } catch (NumberFormatException e) {
                 logger.error(String.format("Unable to parse dsznCode: %s", dsznCodeString));
                 continue;
