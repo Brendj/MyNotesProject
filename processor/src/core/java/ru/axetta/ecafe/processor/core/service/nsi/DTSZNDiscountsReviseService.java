@@ -887,9 +887,41 @@ public class DTSZNDiscountsReviseService {
             HibernateUtils.close(session, logger);
         }
 
-        updateArchivedFlagForDiscounts();
+        updateArchivedFlagForDiscountsDB();
 
         runTaskPart2();
+    }
+
+    public void updateArchivedFlagForDiscountsDB() throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Date fireTime = new Date();
+            Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            Query query = session.createSQLQuery(
+                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, "
+                     + " lastupdate = :lastUpdate where dateend <= :now and status = :confirmed and archived = 0");
+            query.setParameter("version", nextVersion);
+            query.setParameter("lastUpdate", fireTime.getTime());
+            query.setParameter("now", fireTime.getTime());
+            query.setParameter("confirmed", ClientDTISZNDiscountStatus.CONFIRMED.getValue());
+            int rows = query.executeUpdate();
+            if (0 != rows) {
+                logger.info(String.format("%d discounts marked as archived", rows));
+            }
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in update archived flag", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public void scheduleSync() throws Exception {

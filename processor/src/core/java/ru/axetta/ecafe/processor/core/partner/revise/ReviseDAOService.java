@@ -28,7 +28,7 @@ public class ReviseDAOService {
         List<DiscountItem> discountItemList = new LinkedList<DiscountItem>();
         Query query = entityManager.createNativeQuery(
                 "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
-                 + " from benefits_for_ispp where updated_at >= :updatedDate");
+                 + " from benefits_for_ispp where updated_at >= :updatedDate and registry_guid is not null");
         query.setParameter("updatedDate", updated);
         List list = query.getResultList();
         for (Object o : list) {
