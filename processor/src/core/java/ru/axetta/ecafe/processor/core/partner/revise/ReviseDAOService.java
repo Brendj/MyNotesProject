@@ -34,7 +34,14 @@ public class ReviseDAOService {
         for (Object o : list) {
             Object[] row = (Object[]) o;
             String registryGUID = (String) row[0];
-            Integer dsznCode = (Integer) row[1];
+            String dsznCodeString = (String) row[1];
+            Integer dsznCode;
+            try {
+                dsznCode = Integer.parseInt(dsznCodeString);
+            } catch (NumberFormatException e) {
+                logger.error(String.format("Unable to parse dsznCode: %s", dsznCodeString));
+                continue;
+            }
             String title = (String) row[2];
             Date sd = (Date) row[3];
             Date sdDszn = (Date) row[4];
