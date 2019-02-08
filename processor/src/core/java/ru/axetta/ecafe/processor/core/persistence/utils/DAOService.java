@@ -2527,7 +2527,7 @@ public class DAOService {
         query.executeUpdate();
     }
 
-    private ProductionCalendar getProductionCalendarByDate(Date date) {
+    public ProductionCalendar getProductionCalendarByDate(Date date) {
         Query query = entityManager.createQuery("select pc from ProductionCalendar pc where pc.day = :day");
         query.setParameter("day", date);
         try {

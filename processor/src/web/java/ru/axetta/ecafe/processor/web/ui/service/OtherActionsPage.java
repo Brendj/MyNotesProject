@@ -468,6 +468,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void generatePreorderRequests() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runGeneratePreorderRequests(CalendarUtils.addDays(new Date(), 1));
+            printMessage("Генерация завершена");
+        } catch (Exception e) {
+            getLogger().error("Error PreorderRequestsReport: ", e);
+            printError("Произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
     public void createRegularPreorders() throws Exception {
         try {
             RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();

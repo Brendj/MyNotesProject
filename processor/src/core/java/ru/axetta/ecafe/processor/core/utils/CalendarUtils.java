@@ -184,6 +184,14 @@ public class CalendarUtils {
         return c.getTime();
     }
 
+    public static Date startOfDayInUTC(Date date) {
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTimeZone(utcTimeZone);
+        c.setTime(date);
+        startOfDay(c);
+        return c.getTime();
+    }
+
     public static Date truncateToDayOfMonthAndAddDay(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);

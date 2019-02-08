@@ -16,6 +16,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPositionTemp;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestTemp;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
@@ -65,6 +67,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
     private IPreorderDAOOperations preorderDAOOperations;
     public final Integer PREORDER_REQUEST_TYPE = 3;
+    private static final Integer MAX_FORBIDDEN_DAYS = 3;
 
     private Calendar localCalendar;
     private Date startDate;
@@ -81,6 +84,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         updateStatusFile(new Date(), Status.RUNNING);
         runTask();
         updateStatusFile(new Date(), Status.FINISHED);
+    }
+
+    public void run2() throws Exception {
+        if (!RuntimeContext.getInstance().actionIsOnByNode("ecafe.processor.report.PreorderRequestsReport2.node"))
+            return;
+
+        runGeneratePreorderRequests(new Date());
     }
 
     @Override
@@ -118,6 +128,180 @@ public class PreorderRequestsReportService extends RecoverableService {
         Long version = DAOUtils.nextVersionByPreorderComplex(session);
         if (item.getIdOfPreorderComplex() != null) {
             PreorderComplex.delete(session, item.getIdOfPreorderComplex(), version, PreorderState.CHANGED_CALENDAR);
+        }
+    }
+
+    public void runGeneratePreorderRequests(Date date) {
+        try {
+            Date fireTime = new Date();
+            Date currentDate = CalendarUtils.startOfDayInUTC(date); // CalendarUtils.addHours(CalendarUtils.startOfDay(date), 3);
+            if (DAOService.getInstance().getProductionCalendarByDate(currentDate) != null) return; //в выходной день заявки не формируем
+            logger.info("Start generating preorder requests");
+            List<Date> weekends = GoodRequestsChangeAsyncNotificationService.getInstance().getProductionCalendarDates(date);
+            Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItemsLocal = GoodRequestsChangeAsyncNotificationService.getInstance().findOrgItems2(true); //орги с включенным флагом предзаказа
+
+            Integer maxDays = getMaxDateToCreateRequests(currentDate, weekends, MAX_FORBIDDEN_DAYS);
+            Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
+            List<PreorderItem> preorderItemList = loadPreorders2(dateTo); //предзаказы от завтрашнего дня до дня, на который максимум можем сгенерить заявки
+            List<OrgGoodRequest> doneOrgGoodRequests = GoodRequestsChangeAsyncNotificationService.getInstance().getDoneOrgGoodRequests(dateTo);
+
+            Map<Long, Map<Date, Long>> clientBalances = getClientBalancesOnDates(preorderItemList); //балансы клиентов на даты с учетом предзаказов
+
+            Integer sizeOrgs = orgItemsLocal.size();
+            int counterOrgs = 0;
+            Session session = null;
+            Transaction transaction = null;
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                session.setFlushMode(FlushMode.COMMIT);
+
+                for (Map.Entry<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> entry : orgItemsLocal.entrySet()) {
+                    counterOrgs++;
+                    long idOfOrg = entry.getKey();
+                    logger.info(String.format("Generating preorder requests. orgID=%s (№%s from %s)", idOfOrg, counterOrgs, sizeOrgs));
+
+                    GoodRequestsChangeAsyncNotificationService.OrgItem orgItem = entry.getValue();
+
+                    Long number = DAOUtils.getNextGoodRequestNumberForOrgPerDay(session, idOfOrg, new Date());
+                    Staff staff = DAOUtils.getAdminStaffFromOrg(session, idOfOrg);
+
+                    List<Date> orgDates = getOrgDates(currentDate, idOfOrg, weekends); //вычислены даты, на которые нужно генерировать заявки для текущей ОО
+                    List<String> guids = new ArrayList<String>();
+                    for (Date dateWork : orgDates) {
+                        if (getOrgGoodRequestByDate(idOfOrg, dateWork, doneOrgGoodRequests) != null) {
+                            logger.info(String.format("Requests for orgID=%s on date=%s already exist", idOfOrg, CalendarUtils.dateToString(dateWork)));
+                            continue;
+                        }
+                        try {
+                            transaction = session.beginTransaction();
+                            List<PreorderItem> preordersByOrg = getPreorderItemsByOrg(idOfOrg, preorderItemList, dateWork); //предзаказы по ОО на дату
+                            for (PreorderItem item : preordersByOrg) {
+                                try {
+                                    if (null == item.getIdOfGood()) {
+                                        logger.error(String.format(
+                                                "PreorderRequestsReportService: preorder without good item was found (preorderComplex = orgID = %s, createdDate = %s)",
+                                                item.getIdOfOrg(), item.getCreatedDate().toString()));
+                                        continue;
+                                    }
+                                    long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
+                                    if (balanceOnDate < 0L) {
+                                        //deletePreorderForNotEnoughMoney(session, item);
+                                        logger.info("Delete preorder " + item.toString());
+                                    } else {
+                                        String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
+                                        if (null != guid) {
+                                            number++;
+                                            guids.add(guid);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    logger.error("Error in create request for item = " + item.toString());
+                                }
+                            }
+
+
+                            //notifyOrg(bla-bla);
+                            OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
+                            session.save(orgGoodRequest);
+                        } catch (Exception e) {
+                            transaction.rollback();
+                            logger.error(String.format("Error in generate request for orgID = %s: ", idOfOrg), e);
+                        } finally {
+                            if (transaction.isActive()) transaction.commit();
+                            transaction = null;
+                        }
+                    }
+
+                }
+
+            } catch (Exception e) {
+                logger.error("Error in generate preorder requests: ", e);
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error in generating preorder requests: ", e);
+        }
+        logger.info("End generating preorder requests");
+    }
+
+    /**
+    * Максимальная дата, на которую нужно построить заявки при количестве дней запрета редактирования предзаказа = 3
+    * (3 - максимально возможное количество дней по системе)
+    * */
+    public Integer getMaxDateToCreateRequests(Date date, List<Date> weekends, Integer maxForbiddenDays) {
+        Date d = date;
+        int countDays = 0;
+        int i = 0;
+        while (i < maxForbiddenDays) {
+            d = CalendarUtils.addDays(d, 1);
+            countDays++;
+            if (!weekends.contains(d)) {
+                i++;
+            }
+        }
+        return countDays;
+    }
+
+    /**
+    * Предзаказы по ОО idOfOrg на дату
+    * */
+    private List<PreorderItem> getPreorderItemsByOrg(long idOfOrg, List<PreorderItem> items, Date date) {
+        List<PreorderItem> result = new ArrayList<PreorderItem>();
+        for (PreorderItem item : items) {
+            if (item.getIdOfOrg().equals(idOfOrg) && item.getPreorderDate().equals(date)) result.add(item);
+        }
+        return result;
+    }
+
+    /**
+    * Возвращаем даты, на которые нужно генерировать заявки для ОО idOfOrg с учетом ее forbiddenDays
+    * */
+    private List<Date> getOrgDates(Date date, long idOfOrg, List<Date> weekends) {
+        Integer forbiddenDaysCount = DAOUtils.getPreorderFeedingForbiddenDays(idOfOrg);
+        if (forbiddenDaysCount == null) forbiddenDaysCount = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
+        Integer addDays = getMaxDateToCreateRequests(date, weekends, forbiddenDaysCount);
+        List<Date> dates = new ArrayList<Date>();
+        Date dateToAdd = CalendarUtils.addDays(date, addDays);
+        dates.add(dateToAdd);
+        Date prevDate = CalendarUtils.addDays(dateToAdd, -1);
+        while (weekends.contains(prevDate)) {
+            dates.add(prevDate);
+            prevDate = CalendarUtils.addDays(prevDate, -1);
+        }
+        return dates;
+    }
+
+    private OrgGoodRequest getOrgGoodRequestByDate(long idOfOrg, Date date, List<OrgGoodRequest> list) {
+        for (OrgGoodRequest orgGoodRequest : list) {
+            if (orgGoodRequest.getIdOfOrg().equals(idOfOrg) && orgGoodRequest.getDay().equals(date)) {
+                return orgGoodRequest;
+            }
+        }
+        return null;
+    }
+
+    private Map<Long, Map<Date, Long>> getClientBalancesOnDates(List<PreorderItem> preorderItemList) {
+        Map<Long, Map<Date, Long>> result = new HashMap<Long, Map<Date, Long>>();
+        for (PreorderItem item : preorderItemList) {
+            Map<Date, Long> map = result.get(item.getIdOfClient());
+            if (map == null) {
+                map = new HashMap<Date, Long>();
+                map.put(item.getPreorderDate(), item.getClientBalance());
+            }
+            map.put(item.getPreorderDate(), map.get(item.getPreorderDate()) - item.getAmount() * item.getComplexPrice() + item.getUsedSum());
+            result.put(item.getIdOfClient(), map);
+        }
+        return result;
+    }
+
+    private long getBalanceOnDate(long idOfClient, Date date, Map<Long, Map<Date, Long>> clientBalances) {
+        try {
+            return clientBalances.get(idOfClient).get(date);
+        } catch (Exception e) {
+            return 0L;
         }
     }
 
@@ -527,12 +711,13 @@ public class PreorderRequestsReportService extends RecoverableService {
                 Boolean isDeleted = (Boolean) o[14];
                 Boolean isComplex = !complexAmount.equals(0);
                 Long idOfClientGroup = (null != o[15]) ? ((BigInteger) o[15]).longValue() : null;
+                Long usedSum = (null != o[16]) ? ((BigInteger) o[16]).longValue() : 0L;
 
                 preorderItemList
                         .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                                 createdDate, idOfGoodsRequest, preorderDate,
                                 complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance,
-                                idOfClient, isDeleted, isComplex, idOfClientGroup));
+                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum));
             }
             transaction.commit();
             transaction = null;
@@ -542,6 +727,79 @@ public class PreorderRequestsReportService extends RecoverableService {
         }
         return preorderItemList;
     }
+
+    private List<PreorderItem> loadPreorders2(Date dateTo) {
+        Session session = null;
+        Transaction transaction = null;
+        List<PreorderItem> preorderItemList = new ArrayList<PreorderItem>();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            String sqlQuery = "SELECT ci.idoforg, "                                                                        //0
+                            + "pc.createddate, "                                                                           //1
+                            + "pc.idofpreordercomplex, "                                                                   //2
+                            + "pmd.idofpreordermenudetail, "                                                               //3
+                            + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "           //4
+                            + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"                 //5
+                            + "   pc.preorderdate, "                                                                       //6
+                            + "pc.complexprice, "                                                                          //7
+                            + "pc.amount AS complexamount, "                                                               //8
+                            + "pmd.menudetailprice, "                                                                      //9
+                            + "pmd.amount AS menudetailamount, "                                                           //10
+                            + "c.balance, "                                                                                //11
+                            + "c.idofclient, "                                                                             //12
+                            + "c.idofclientgroup, "                                                                        //13
+                            + "pc.usedsum "                                                                                //14
+                            + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                            + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
+                            + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 and pmd.idOfGoodsRequestPosition is null "
+                            + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
+                            + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
+                            + "WHERE pc.preorderdate > :date " + (dateTo != null ? " and pc.preorderdate < :dateTo " : "")
+                            + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 and pc.idOfGoodsRequestPosition is null order by pc.preorderdate";
+
+            Query query = session.createSQLQuery(sqlQuery);
+            query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
+            if (dateTo != null) query.setParameter("dateTo", dateTo.getTime());
+            List data = query.list();
+            for (Object entry : data) {
+                Object o[] = (Object[]) entry;
+                Long idOfOrg = (null != o[0]) ? ((BigInteger) o[0]).longValue() : null;
+                Date createdDate = (null != o[1]) ? new Date(((BigInteger) o[1]).longValue()) : null;
+                Long idOfPreorderComplex = (null != o[2]) ? ((BigInteger) o[2]).longValue() : null;
+                Long idOfPreorderMenuDetail = (null != o[3]) ? ((BigInteger) o[3]).longValue() : null;
+                Long idOfGood = (null != o[4]) ? ((BigInteger) o[4]).longValue() : null;
+                Integer amount = (Integer) o[5];
+                Long idOfGoodsRequest = null; //(null != o[6]) ? ((BigInteger) o[6]).longValue() : null;
+                Date preorderDate = (null != o[6]) ? new Date(((BigInteger) o[6]).longValue()) : null;
+
+                Long complexPrice = (null != o[7]) ? ((BigInteger) o[7]).longValue() : 0L;
+                Integer complexAmount = (null != o[8]) ? (Integer) o[8] : 0;
+                Long menuDetailPrice = (null != o[9]) ? ((BigInteger) o[9]).longValue() : 0L;
+                Integer menuDetailAmount = (null != o[10]) ? (Integer) o[10] : 0;
+                Long clientBalance = (null != o[11]) ? ((BigInteger) o[11]).longValue() : 0L;
+                Long idOfClient = (null != o[12]) ? ((BigInteger) o[12]).longValue() : null;
+                Boolean isDeleted = false; //(Boolean) o[14];
+                Boolean isComplex = !complexAmount.equals(0);
+                Long idOfClientGroup = (null != o[13]) ? ((BigInteger) o[13]).longValue() : null;
+                Long usedSum = (null != o[14]) ? ((BigInteger) o[14]).longValue() : 0L;
+
+                preorderItemList
+                        .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
+                                createdDate, idOfGoodsRequest, preorderDate,
+                                complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance,
+                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum));
+            }
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return preorderItemList;
+    }
+
 
     private String createRequestFromPreorder(Session session, PreorderItem preorderItem, Date fireTime) {
         //  Формируем номер по маске {idOfOrg}-{yyMMdd}-ЗВК-{countToDay}
@@ -600,6 +858,64 @@ public class PreorderRequestsReportService extends RecoverableService {
             detail.setIdOfGoodsRequestPosition(pos.getGlobalId());
             session.update(detail);
         }
+
+        return pos.getGuid();
+    }
+
+
+
+    private String createRequestFromPreorder2(Session session, PreorderItem preorderItem, Date fireTime, Long num, Staff staff) {
+        //  Формируем номер по маске {idOfOrg}-{yyMMdd}-ЗВК-{countToDay}
+        Date now = new Date(System.currentTimeMillis());
+        String number = "" + preorderItem.getIdOfOrg() + "-" + new SimpleDateFormat("yyMMdd").format(now) + "-ЗВК-" + num;
+
+        Good good = DAOService.getInstance().getGood(preorderItem.getIdOfGood());
+
+        if (null == good || null == staff)
+            return null;
+
+        //  Создание GoodRequest
+        GoodRequestTemp goodRequest = new GoodRequestTemp();
+        goodRequest.setOrgOwner(preorderItem.getIdOfOrg());
+        goodRequest.setDateOfGoodsRequest(preorderItem.getCreatedDate());
+        goodRequest.setDoneDate(preorderItem.getPreorderDate());
+        goodRequest.setNumber(number);
+        goodRequest.setState(DocumentState.FOLLOW);
+        goodRequest.setDeletedState(false);
+        goodRequest.setCreatedDate(fireTime);
+        goodRequest.setComment(PREORDER_COMMENT);
+        goodRequest.setRequestType(PREORDER_REQUEST_TYPE);
+        goodRequest.setStaff(staff);
+        goodRequest.setGuidOfStaff(staff.getGuid());
+//        goodRequest = save(session, goodRequest, GoodRequestTemp.class.getSimpleName());
+        session.save(goodRequest);
+
+        //  Создание GoodRequestPosition
+        GoodRequestPositionTemp pos = new GoodRequestPositionTemp();
+        pos.setGoodRequest(goodRequest);
+        pos.setGood(good);
+        pos.setDeletedState(false);
+        pos.setOrgOwner(preorderItem.getIdOfOrg());
+        pos.setUnitsScale(good.getUnitsScale());
+        pos.setNetWeight(good.getNetWeight());
+        pos.setCreatedDate(fireTime);
+        pos.setTotalCount(preorderItem.getAmount() * 1000L);
+        pos.setDailySampleCount(0L);
+        pos.setTempClientsCount(0L);
+        pos.setNotified(false);
+//        pos = save(session, pos, GoodRequestPositionTemp.class.getSimpleName());
+        session.save(pos);
+
+        /*if (preorderItem.getComplex()) {
+            PreorderComplex complex = (PreorderComplex) session.get(PreorderComplex.class, preorderItem.getIdOfPreorderComplex());
+            complex.setIdOfGoodsRequestPosition(pos.getGlobalId());
+            session.update(complex);
+        } else {
+            PreorderMenuDetail detail = (PreorderMenuDetail) session.get(PreorderMenuDetail.class,
+                    preorderItem.getIdOfPreorderMenuDetail());
+            detail.setIdOfGoodsRequestPosition(pos.getGlobalId());
+            session.update(detail);
+        }*/
 
         return pos.getGuid();
     }
@@ -1039,10 +1355,11 @@ public class PreorderRequestsReportService extends RecoverableService {
         private Boolean isDeleted;
         private Boolean isComplex;
         private Long idOfClientGroup;
+        private Long usedSum;
 
         public PreorderItem(Long idOfPreorderComplex, Long idOfPreorderMenuDetail, Long idOfOrg, Long idOfGood, Integer amount,
                 Date createdDate, Long idOfGoodsRequestPosition, Date preorderDate, Long complexPrice, Long clientBalance,
-                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup) {
+                Long idOfClient, Boolean isDeleted, Boolean isComplex, Long idOfClientGroup, Long usedSum) {
             this.idOfPreorderComplex = idOfPreorderComplex;
             this.idOfPreorderMenuDetail = idOfPreorderMenuDetail;
             this.idOfOrg = idOfOrg;
@@ -1057,6 +1374,7 @@ public class PreorderRequestsReportService extends RecoverableService {
             this.isDeleted = isDeleted;
             this.isComplex = isComplex;
             this.idOfClientGroup = idOfClientGroup;
+            this.usedSum = usedSum;
         }
 
         public PreorderItem() {
@@ -1174,6 +1492,20 @@ public class PreorderRequestsReportService extends RecoverableService {
         public void setIdOfClientGroup(Long idOfClientGroup) {
             this.idOfClientGroup = idOfClientGroup;
         }
+
+        public Long getUsedSum() {
+            return usedSum;
+        }
+
+        public void setUsedSum(Long usedSum) {
+            this.usedSum = usedSum;
+        }
+
+        @Override
+        public String toString() {
+            return "{PreorderItem: idOfPreorderComplex = " + idOfPreorderComplex + ", idOfPreorderMenuDetail = " + idOfPreorderMenuDetail
+                    + ", idOfOrg = " + idOfOrg + ", preorderDate = " + CalendarUtils.dateToString(preorderDate) + ", idOfClient = " + idOfClient + "}";
+        }
     }
 
     @PostConstruct
@@ -1220,6 +1552,18 @@ public class PreorderRequestsReportService extends RecoverableService {
         public PreorderItemForDelete(Long idOfClient, Date preorderDate) {
             this.idOfClient = idOfClient;
             this.preorderDate = preorderDate;
+        }
+    }
+
+    public static class ClientBalances {
+        public Long idOfClient;
+        public Date date;
+        public Long balance;
+
+        public ClientBalances(Long idOfClient, Date date, Long balance) {
+            this.idOfClient = idOfClient;
+            this.date = date;
+            this.balance = balance;
         }
     }
 }

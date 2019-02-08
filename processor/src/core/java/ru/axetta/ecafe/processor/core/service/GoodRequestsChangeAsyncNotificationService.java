@@ -479,6 +479,50 @@ public class GoodRequestsChangeAsyncNotificationService {
         return items;
     }
 
+    @Transactional(readOnly = true)
+    public Map<Long, OrgItem> findOrgItems2(boolean onlyWithPreorders) {
+        Map<Long, OrgItem> items = new HashMap<Long, OrgItem>();
+        String str_query = "select o.idOfOrg, o.shortName, o.officialName, o.defaultSupplier.id, o.address, sm.idOfOrg from Org o join o.sourceMenuOrgs sm";
+        if (onlyWithPreorders) str_query += " where o.preordersEnabled = true";
+        str_query += " order by o.idOfOrg";
+        Query query = entityManager.createQuery(str_query);
+        List res = query.getResultList();
+        for (Object obj : res) {
+            Object[] row = (Object[]) obj;
+            Long idOfOrg = Long.valueOf(row[0].toString());
+            Long idOfSourceMenu = null;
+            try {
+                idOfSourceMenu = Long.valueOf(row[5].toString());
+            } catch (Exception e) {
+                LOGGER.error(String.format("Organization (idOfOrg=%d) has not source menu organization", idOfOrg));
+            }
+            if (!items.containsKey(idOfOrg)) {
+                Long idOfContragent = Long.valueOf(row[3].toString());
+                if (contragentItems.containsKey(idOfContragent)) {
+                    ContragentItem contragentItem = contragentItems.get(idOfContragent);
+                    items.put(idOfOrg, new OrgItem(idOfOrg, row[1].toString(), row[2].toString(), contragentItem,
+                            row[4].toString(), idOfSourceMenu));
+                }
+            }
+        }
+        return items;
+    }
+
+
+    public List<Date> getProductionCalendarDates(Date date) {
+        return entityManager.createQuery("select pc.day from ProductionCalendar pc where pc.day between :date1 and :date2")
+                .setParameter("date1", date)
+                .setParameter("date2", CalendarUtils.addDays(date, 30))
+                .getResultList();
+    }
+
+    public List<OrgGoodRequest> getDoneOrgGoodRequests(Date date) {
+        return entityManager.createQuery("select ogr from OrgGoodRequest ogr where ogr.day between :startDate and :endDate order by ogr.day")
+        .setParameter("startDate", CalendarUtils.endOfDay(new Date()))
+        .setParameter("endDate", date)
+        .getResultList();
+    }
+
     protected static class OrgItem {
 
         private long idOfOrg;
