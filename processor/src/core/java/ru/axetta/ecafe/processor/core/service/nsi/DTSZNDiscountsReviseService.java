@@ -210,6 +210,9 @@ public class DTSZNDiscountsReviseService {
                                     item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                                     item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
                                     clientDTISZNDiscountVersion);
+                            discountInfo.setArchived(item.getDeleted() ||
+                                    item.getDateEndAsDate().getTime() <= fireTime.getTime() ||
+                                    !item.getBenefitConfirmed());
                             session.save(discountInfo);
                         } else {
                             if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
@@ -224,12 +227,12 @@ public class DTSZNDiscountsReviseService {
                                     discountInfo.setDateEnd(item.getDsznDateEndAsDate());
                                     wasModified = true;
                                 }
-                                if (item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)) {
+                                if (item.getBenefitConfirmed() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED) || discountInfo.getArchived())) {
                                     discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
                                     discountInfo.setArchived(false);
                                     wasModified = true;
                                 }
-                                if (!item.getBenefitConfirmed() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
+                                if (!item.getBenefitConfirmed() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !discountInfo.getArchived())) {
                                     discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
                                     discountInfo.setArchived(true);
                                     wasModified = true;
@@ -261,6 +264,9 @@ public class DTSZNDiscountsReviseService {
                                         item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                                         item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
                                         clientDTISZNDiscountVersion);
+                                discountInfo.setArchived(item.getDeleted() ||
+                                        item.getDateEndAsDate().getTime() <= fireTime.getTime() ||
+                                        !item.getBenefitConfirmed());
                                 session.save(discountInfo);
                             }
                         }
@@ -816,6 +822,10 @@ public class DTSZNDiscountsReviseService {
                             item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                             item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU,
                             clientDTISZNDiscountVersion);
+                    discountInfo.setArchived(item.getDeleted() ||
+                            item.getFd().getTime() <= fireTime.getTime() ||
+                            item.getFdDszn().getTime() <= fireTime.getTime() ||
+                            !item.getBenefitConfirm());
                     session.save(discountInfo);
                 } else {
                     if (discountInfo.getDtisznCode().equals(item.getDsznCode().longValue())) {
@@ -830,12 +840,12 @@ public class DTSZNDiscountsReviseService {
                             discountInfo.setDateEnd(item.getFdDszn());
                             wasModified = true;
                         }
-                        if (item.getBenefitConfirm() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)) {
+                        if (item.getBenefitConfirm() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED) || discountInfo.getArchived())) {
                             discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
                             discountInfo.setArchived(false);
                             wasModified = true;
                         }
-                        if (!item.getBenefitConfirm() && discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)) {
+                        if (!item.getBenefitConfirm() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !discountInfo.getArchived())) {
                             discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
                             discountInfo.setArchived(true);
                             wasModified = true;
@@ -861,11 +871,16 @@ public class DTSZNDiscountsReviseService {
                         discountInfo.setArchived(true);
                         discountInfo.setLastUpdate(new Date());
                         session.merge(discountInfo);
+
                         discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
                                 item.getTitle(),
                                 item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
                                 item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU,
                                 clientDTISZNDiscountVersion);
+                        discountInfo.setArchived(item.getDeleted() ||
+                                item.getFd().getTime() <= fireTime.getTime() ||
+                                item.getFdDszn().getTime() <= fireTime.getTime() ||
+                                !item.getBenefitConfirm());
                         session.save(discountInfo);
                     }
                 }
