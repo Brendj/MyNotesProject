@@ -23,10 +23,10 @@
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
     <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
-    <h:inputText value="#{mainPage.cardCreatePage.cardNo}" converter="cardNoConverter" maxlength="16"
+    <h:inputText value="#{mainPage.cardCreatePage.cardNo}" converter="cardNoConverter" maxlength="18"
                  styleClass="input-text" />
     <h:outputText escape="true" value="Номер, нанесенный на карту" styleClass="output-text" />
-    <h:inputText value="#{mainPage.cardCreatePage.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="16"
+    <h:inputText value="#{mainPage.cardCreatePage.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="18"
                  styleClass="input-text" />
     <h:outputText escape="true" value="Тип карты" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.cardCreatePage.cardType}" styleClass="input-text">
