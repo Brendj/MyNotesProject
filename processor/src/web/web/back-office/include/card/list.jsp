@@ -26,11 +26,11 @@
             </h:panelGroup>
 
             <h:outputText escape="true" value="Номер карты" styleClass="output-text" />
-            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardNo}" converter="cardNoConverter" maxlength="16"
+            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardNo}" converter="cardNoConverter" maxlength="18"
                          style="width: 240px;" styleClass="input-text" />
 
             <h:outputText escape="true" value="Номер, нанесённый на карту" styleClass="output-text" />
-            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="16"
+            <h:inputText value="#{mainPage.cardListPage.cardFilter.cardPrintedNo}" converter="cardPrintedNoConverter" maxlength="18"
                          style="width: 240px;" styleClass="input-text"/>
 
             <h:outputText escape="true" value="Cтатус" styleClass="output-text" />
