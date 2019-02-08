@@ -4036,8 +4036,14 @@ public class DAOUtils {
     }
 
     public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date) {
-        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo where lastUpdate >= :date");
+        List<Long> clientGroupList = new LinkedList<Long>();
+        clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
+        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
+                + "where lastUpdate >= :date and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
         query.setParameter("date", date);
+        query.setParameterList("clientGroups", clientGroupList);
         return query.list();
     }
 
