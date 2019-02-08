@@ -51,7 +51,7 @@ CREATE TABLE cf_goods_requests_temp
   dateofgoodsrequest bigint,
   state integer NOT NULL DEFAULT 0,
   donedate bigint,
-  comment character varying(512) DEFAULT NULL::character varying,
+  comment character varying(512),
   sendall integer DEFAULT 0,
   globalversiononcreate bigint,
   requesttype integer NOT NULL DEFAULT 0,
@@ -90,3 +90,5 @@ CREATE TABLE cf_goods_requests_positions_temp
 WITH (
 OIDS=FALSE
 );
+
+--! ФИНАЛИЗИРОВАН 08.02.2019, НЕ МЕНЯТЬ
